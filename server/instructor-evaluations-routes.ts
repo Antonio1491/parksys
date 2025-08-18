@@ -137,21 +137,24 @@ export function registerInstructorEvaluationRoutes(app: any, apiRouter: Router) 
       // Validar datos de entrada
       const validatedData = insertInstructorEvaluationSchema.parse(req.body);
 
-      // Insertar nueva evaluación (pending por defecto)
+      // Insertar nueva evaluación - solo columnas requeridas y opcionales con valores
       const result = await db.execute(`
         INSERT INTO instructor_evaluations (
-          instructor_id, evaluator_name, evaluator_email, evaluator_city, 
-          evaluator_ip, overall_rating, knowledge_rating, patience_rating,
-          clarity_rating, punctuality_rating, would_recommend, comments,
-          attended_activity, status
+          instructor_id, 
+          knowledge, communication, methodology, overall_performance,
+          evaluator_name, evaluator_email, evaluator_city, evaluator_ip,
+          patience_rating, clarity_rating, punctuality_rating, 
+          would_recommend, comments, attended_activity, status
         ) VALUES (
           ${instructorId}, 
+          ${validatedData.knowledgeRating},
+          ${validatedData.clarityRating},
+          ${validatedData.punctualityRating},
+          ${validatedData.overallRating},
           '${validatedData.evaluatorName}',
           ${validatedData.evaluatorEmail ? `'${validatedData.evaluatorEmail}'` : 'NULL'},
           ${validatedData.evaluatorCity ? `'${validatedData.evaluatorCity}'` : 'NULL'},
           '${clientIp}',
-          ${validatedData.overallRating},
-          ${validatedData.knowledgeRating},
           ${validatedData.patienceRating},
           ${validatedData.clarityRating},
           ${validatedData.punctualityRating},

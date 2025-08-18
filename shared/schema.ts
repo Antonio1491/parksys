@@ -1230,6 +1230,7 @@ export const insertInstructorEvaluationSchema = createInsertSchema(instructorEva
   attendedActivity: z.string().max(255).optional(),
 }).omit({
   id: true,
+  instructorId: true,
   createdAt: true,
   updatedAt: true,
   status: true,
