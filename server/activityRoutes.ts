@@ -295,6 +295,7 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
     console.log("🔄 MAPEO DE VALORES:");
     console.log("Frontend envía categoryId:", categoryId, "→ Backend usa category_id:", category_id);
     console.log("Frontend envía allowsPublicRegistration:", allowsPublicRegistration, "→ Backend usa registrationEnabled:", registrationEnabled);
+    console.log("Frontend envía status:", status, "→ Backend usa status:", status || 'programada');
     
     console.log("🎯 ACTUALIZACIÓN EXITOSA - Los campos se están guardando correctamente:");
     
@@ -366,7 +367,7 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
                 status = ${status || 'programada'}
             WHERE id = ${activityId}
             RETURNING id, title, description, park_id as "parkId", start_date as "startDate", 
-                     end_date as "endDate", category_id as "categoryId", location, created_at as "createdAt"`
+                     end_date as "endDate", category_id as "categoryId", location, status, created_at as "createdAt"`
       );
 
       if (updateResult.rows && updateResult.rows.length > 0) {
