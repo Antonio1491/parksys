@@ -180,16 +180,31 @@ router.get('/api/evaluations/instructors', async (req, res) => {
     const evaluations = await db
       .select({
         id: instructorEvaluations.id,
+        instructorId: instructorEvaluations.instructorId,
         instructorName: sql`${instructors.firstName} || ' ' || ${instructors.lastName}`,
         evaluatorName: instructorEvaluations.evaluatorName,
+        evaluatorEmail: instructorEvaluations.evaluatorEmail,
+        evaluatorCity: instructorEvaluations.evaluatorCity,
         overallRating: instructorEvaluations.overallRating,
+        knowledgeRating: instructorEvaluations.knowledgeRating,
+        patienceRating: instructorEvaluations.patienceRating,
+        clarityRating: instructorEvaluations.clarityRating,
+        punctualityRating: instructorEvaluations.punctualityRating,
+        wouldRecommend: instructorEvaluations.wouldRecommend,
+        comments: instructorEvaluations.comments,
+        attendedActivity: instructorEvaluations.attendedActivity,
         status: instructorEvaluations.status,
+        moderationNotes: instructorEvaluations.moderationNotes,
+        moderatedBy: instructorEvaluations.moderatedBy,
+        moderatedAt: instructorEvaluations.moderatedAt,
+        evaluationDate: instructorEvaluations.createdAt,
         createdAt: instructorEvaluations.createdAt
       })
       .from(instructorEvaluations)
       .leftJoin(instructors, eq(instructorEvaluations.instructorId, instructors.id))
       .orderBy(desc(instructorEvaluations.createdAt));
 
+    console.log(`📊 Enviando ${evaluations.length} evaluaciones de instructores con datos completos`);
     res.json(evaluations);
   } catch (error) {
     console.error('Error al obtener evaluaciones de instructores:', error);
