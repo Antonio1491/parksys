@@ -527,6 +527,9 @@ export const documents = pgTable("documents", {
   updatedAt: timestamp("updated_at").notNull().defaultNow()
 });
 
+// Enum para estados de actividades
+export const activityStatusEnum = pgEnum('activity_status', ['activa', 'programada', 'cancelada', 'finalizada', 'en_pausa']);
+
 // Categorías de actividades
 export const activityCategories = pgTable("activity_categories", {
   id: serial("id").primaryKey(),
@@ -579,6 +582,8 @@ export const activities = pgTable("activities", {
   registrationInstructions: text("registration_instructions"),
   ageRestrictions: text("age_restrictions"),
   healthRequirements: text("health_requirements"),
+  // Estado de la actividad
+  status: activityStatusEnum("status").default("programada"),
 });
 
 // Tabla de imágenes de actividades

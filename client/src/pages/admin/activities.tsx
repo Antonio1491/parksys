@@ -513,6 +513,24 @@ const AdminActivities = () => {
     }
   };
 
+  // Función para obtener el color y emoji del estado
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case 'activa':
+        return { emoji: '🟢', label: 'Activa', color: 'bg-green-100 text-green-800' };
+      case 'programada':
+        return { emoji: '🟡', label: 'Programada', color: 'bg-yellow-100 text-yellow-800' };
+      case 'cancelada':
+        return { emoji: '🔴', label: 'Cancelada', color: 'bg-red-100 text-red-800' };
+      case 'finalizada':
+        return { emoji: '⚫', label: 'Finalizada', color: 'bg-gray-100 text-gray-800' };
+      case 'en_pausa':
+        return { emoji: '🟠', label: 'En Pausa', color: 'bg-orange-100 text-orange-800' };
+      default:
+        return { emoji: '🟡', label: 'Programada', color: 'bg-yellow-100 text-yellow-800' };
+    }
+  };
+
   // Crear mapeo de categorías por ID y por string
   const categoriesMap = useMemo(() => {
     if (!Array.isArray(categoriesData)) return {};
@@ -811,6 +829,7 @@ const AdminActivities = () => {
                     <TableRow>
                       <TableHead className="w-[50px]">ID</TableHead>
                       <TableHead>Título</TableHead>
+                      <TableHead>Estado</TableHead>
                       <TableHead>Categoría</TableHead>
                       <TableHead>Parque</TableHead>
                       <TableHead>Fecha</TableHead>
@@ -830,6 +849,17 @@ const AdminActivities = () => {
                               </p>
                             )}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const statusInfo = getStatusDisplay(activity.status || 'programada');
+                            return (
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.color}`}>
+                                <span className="mr-1">{statusInfo.emoji}</span>
+                                {statusInfo.label}
+                              </span>
+                            );
+                          })()}
                         </TableCell>
                         <TableCell>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColors(getCategoryName(activity))}`}>
@@ -920,6 +950,15 @@ const AdminActivities = () => {
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColors(getCategoryName(activity))}`}>
                               {getCategoryName(activity)}
                             </span>
+                            {(() => {
+                              const statusInfo = getStatusDisplay(activity.status || 'programada');
+                              return (
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.color}`}>
+                                  <span className="mr-1">{statusInfo.emoji}</span>
+                                  {statusInfo.label}
+                                </span>
+                              );
+                            })()}
                           </div>
                         </div>
                         
