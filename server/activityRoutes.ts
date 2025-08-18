@@ -337,7 +337,9 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
         registrationEnabled,
         maxRegistrations,
         registrationDeadline,
-        requiresApproval
+        requiresApproval,
+        status,
+        statusFinal: status || 'programada'
       });
       
       const updateResult = await db.execute(
@@ -371,7 +373,11 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
       );
 
       if (updateResult.rows && updateResult.rows.length > 0) {
-        res.json(updateResult.rows[0]);
+        const updatedActivity = updateResult.rows[0];
+        console.log("🎯 ACTIVIDAD ACTUALIZADA EXITOSAMENTE:");
+        console.log("Status guardado:", updatedActivity.status);
+        console.log("Actividad completa:", updatedActivity);
+        res.json(updatedActivity);
       } else {
         throw new Error("No se pudo actualizar la actividad");
       }
