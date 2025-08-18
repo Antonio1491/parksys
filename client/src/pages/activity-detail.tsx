@@ -751,7 +751,20 @@ function ActivityDetailPage() {
                     <p className="text-sm text-gray-600">
                       {activity?.isRecurring ? (
                         activity?.recurringDays && activity.recurringDays.length > 0 
-                          ? `Recurrente: ${activity.recurringDays.join(', ')}`
+                          ? `Se repite: ${activity.recurringDays.map(day => {
+                              const dayTranslations = {
+                                'lunes': 'Lunes',
+                                'martes': 'Martes', 
+                                'miércoles': 'Miércoles',
+                                'miercoles': 'Miércoles',
+                                'jueves': 'Jueves',
+                                'viernes': 'Viernes',
+                                'sábado': 'Sábado',
+                                'sabado': 'Sábado',
+                                'domingo': 'Domingo'
+                              };
+                              return dayTranslations[day.toLowerCase()] || day;
+                            }).join(', ')}`
                           : 'Actividad recurrente'
                       ) : (
                         'Actividad única'
