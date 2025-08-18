@@ -102,19 +102,31 @@ const ActivityRegistrationsPage = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [registrationToDelete, setRegistrationToDelete] = useState<number | null>(null);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  
+  // Estados para filtros de fecha
+  const [yearFilter, setYearFilter] = useState<string>('all');
+  const [monthFilter, setMonthFilter] = useState<string>('all');
+  const [startDateFilter, setStartDateFilter] = useState<string>('');
+  const [endDateFilter, setEndDateFilter] = useState<string>('');
+  const [dateFilterType, setDateFilterType] = useState<'preset' | 'range'>('preset');
+  
   const ITEMS_PER_PAGE = 10;
   const itemsPerPage = 10;
 
   // Obtener inscripciones
   const { data: registrationsData, isLoading } = useQuery({
-    queryKey: ['/api/activity-registrations', currentPage, searchTerm, statusFilter, activityFilter],
+    queryKey: ['/api/activity-registrations', currentPage, searchTerm, statusFilter, activityFilter, yearFilter, monthFilter, startDateFilter, endDateFilter],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: itemsPerPage.toString(),
         ...(searchTerm && { search: searchTerm }),
         ...(statusFilter !== 'all' && { status: statusFilter }),
-        ...(activityFilter !== 'all' && { activity: activityFilter })
+        ...(activityFilter !== 'all' && { activity: activityFilter }),
+        ...(yearFilter !== 'all' && { year: yearFilter }),
+        ...(monthFilter !== 'all' && { month: monthFilter }),
+        ...(startDateFilter && { startDate: startDateFilter }),
+        ...(endDateFilter && { endDate: endDateFilter })
       });
       
       const response = await fetch(`/api/activity-registrations?${params}`);
@@ -261,6 +273,11 @@ const ActivityRegistrationsPage = () => {
   };
 
   // Los filtros se manejan desde el backend, no necesitamos filtrar aquí
+  
+  // Función para resetear página cuando cambian los filtros
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [yearFilter, monthFilter, startDateFilter, endDateFilter, statusFilter, activityFilter, searchTerm]);
   const displayedRegistrations = registrations;
 
   const handleStatusChange = (id: number, status: 'approved' | 'rejected', reason?: string) => {
@@ -278,9 +295,11 @@ const ActivityRegistrationsPage = () => {
         reg.status,
         format(new Date(reg.registrationDate), 'dd/MM/yyyy', { locale: es })
       ])
-    ].map(row => row.join(',')).join('\n');
+    ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Add UTF-8 BOM for proper Excel encoding
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `inscripciones_actividades_${format(new Date(), 'dd-MM-yyyy')}.csv`;
@@ -472,6 +491,109 @@ const ActivityRegistrationsPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Filtros de fecha */}
+              <div className="flex flex-col md:flex-row gap-4 w-full border-t pt-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">Filtros por fecha:</span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={dateFilterType === 'preset' ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDateFilterType('preset')}
+                  >
+                    Por Año/Mes
+                  </Button>
+                  <Button
+                    variant={dateFilterType === 'range' ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDateFilterType('range')}
+                  >
+                    Rango Personalizado
+                  </Button>
+                </div>
+
+                {dateFilterType === 'preset' ? (
+                  <div className="flex gap-2">
+                    <Select value={yearFilter} onValueChange={setYearFilter}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Año" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="2025">2025</SelectItem>
+                        <SelectItem value="2024">2024</SelectItem>
+                        <SelectItem value="2023">2023</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select 
+                      value={monthFilter} 
+                      onValueChange={setMonthFilter}
+                      disabled={yearFilter === 'all'}
+                    >
+                      <SelectTrigger className="w-36">
+                        <SelectValue placeholder="Mes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="1">Enero</SelectItem>
+                        <SelectItem value="2">Febrero</SelectItem>
+                        <SelectItem value="3">Marzo</SelectItem>
+                        <SelectItem value="4">Abril</SelectItem>
+                        <SelectItem value="5">Mayo</SelectItem>
+                        <SelectItem value="6">Junio</SelectItem>
+                        <SelectItem value="7">Julio</SelectItem>
+                        <SelectItem value="8">Agosto</SelectItem>
+                        <SelectItem value="9">Septiembre</SelectItem>
+                        <SelectItem value="10">Octubre</SelectItem>
+                        <SelectItem value="11">Noviembre</SelectItem>
+                        <SelectItem value="12">Diciembre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <div className="flex gap-2 items-center">
+                    <div className="flex flex-col">
+                      <label className="text-xs text-gray-500 mb-1">Desde</label>
+                      <Input
+                        type="date"
+                        value={startDateFilter}
+                        onChange={(e) => setStartDateFilter(e.target.value)}
+                        className="w-40"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <label className="text-xs text-gray-500 mb-1">Hasta</label>
+                      <Input
+                        type="date"
+                        value={endDateFilter}
+                        onChange={(e) => setEndDateFilter(e.target.value)}
+                        className="w-40"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setYearFilter('all');
+                    setMonthFilter('all');
+                    setStartDateFilter('');
+                    setEndDateFilter('');
+                    setCurrentPage(1); // Reset page when clearing filters
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Limpiar Filtros
+                </Button>
               </div>
 
               <div className="flex gap-2">

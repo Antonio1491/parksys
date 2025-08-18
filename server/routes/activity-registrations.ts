@@ -219,7 +219,11 @@ router.get('/', async (req, res) => {
       limit = '10', 
       search = '', 
       status = '', 
-      activity = '' 
+      activity = '',
+      year = '',
+      month = '',
+      startDate = '',
+      endDate = ''
     } = req.query;
     
     const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
@@ -250,6 +254,32 @@ router.get('/', async (req, res) => {
     if (activity) {
       whereConditions.push(`ar.activity_id = $${paramIndex}`);
       queryParams.push(parseInt(activity as string));
+      paramIndex++;
+    }
+
+    // Filtros de fechas
+    if (year) {
+      whereConditions.push(`EXTRACT(YEAR FROM ar.registration_date) = $${paramIndex}`);
+      queryParams.push(parseInt(year as string));
+      paramIndex++;
+    }
+
+    if (month && year) {
+      whereConditions.push(`EXTRACT(MONTH FROM ar.registration_date) = $${paramIndex}`);
+      queryParams.push(parseInt(month as string));
+      paramIndex++;
+    }
+
+    // Filtro de rango de fechas personalizado
+    if (startDate) {
+      whereConditions.push(`ar.registration_date >= $${paramIndex}`);
+      queryParams.push(startDate);
+      paramIndex++;
+    }
+
+    if (endDate) {
+      whereConditions.push(`ar.registration_date <= $${paramIndex}`);
+      queryParams.push(endDate);
       paramIndex++;
     }
 
