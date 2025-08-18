@@ -687,6 +687,940 @@ R: Verifique sus permisos de usuario. Es posible que solo tenga acceso de lectur
         `
       }
     ]
+  },
+  'actividades-manual': {
+    title: 'Manual Completo - Módulo de Actividades',
+    icon: <Activity className="h-5 w-5" />,
+    sections: [
+      {
+        id: 'intro',
+        title: 'Introducción al Módulo de Actividades',
+        level: 1,
+        content: `
+El **Módulo de Actividades** es una herramienta integral diseñada para la gestión completa de actividades recreativas, culturales, deportivas y educativas en los parques urbanos de Guadalajara. Este módulo permite la planificación, organización, seguimiento y análisis de todas las actividades que se realizan en el sistema de parques.
+
+### ¿Para qué sirve?
+- **Planificar** y organizar actividades en todos los parques
+- **Gestionar** instructores, participantes y recursos
+- **Monitorear** la participación ciudadana y satisfacción
+- **Analizar** tendencias de participación y preferencias
+- **Administrar** categorías, horarios y capacidades
+- **Controlar** inscripciones y pagos (cuando aplique)
+
+### Componentes del Módulo
+El módulo está organizado en varias secciones principales:
+
+1. **Gestión de Actividades**: Creación, edición y administración
+2. **Categorías**: Organización por tipos de actividades
+3. **Instructores**: Gestión del personal capacitado
+4. **Inscripciones**: Control de participantes y cupos
+5. **Horarios**: Programación y calendarios
+6. **Reportes**: Análisis y métricas de participación
+
+### Acceso al Módulo
+1. Inicie sesión en ParkSys con sus credenciales administrativas
+2. En el sidebar administrativo, localice la sección **"Actividades"**
+3. Expanda el menú para acceder a las diferentes funcionalidades
+4. Use los filtros y herramientas según sus permisos asignados
+        `
+      },
+      {
+        id: 'listado',
+        title: 'Listado y Gestión de Actividades',
+        level: 1,
+        content: `
+### Descripción General
+La sección de **Listado de Actividades** proporciona una vista completa de todas las actividades programadas, activas y finalizadas en el sistema. Es el hub central para administrar el catálogo completo de ofertas recreativas.
+
+### Características Principales
+
+#### Vista Unificada
+- **Catálogo Completo**: Todas las actividades del sistema en una sola vista
+- **Información Detallada**: Estado, instructor, parque, horarios y participación
+- **Filtros Avanzados**: Por categoría, estado, instructor, parque y fechas
+- **Búsqueda Inteligente**: Por nombre, descripción o palabras clave
+
+#### Estados de Actividades
+Las actividades pueden tener los siguientes estados:
+- **🟢 Activa**: Disponible para inscripciones
+- **🟡 Programada**: Definida pero aún no iniciada
+- **🔴 Cancelada**: Suspendida temporalmente
+- **⚫ Finalizada**: Completada y archivada
+- **🟠 En Pausa**: Temporalmente suspendida
+
+### Funcionalidades de Gestión
+
+#### Creación de Nuevas Actividades
+**Información Básica Requerida:**
+- **Nombre**: Título descriptivo de la actividad
+- **Descripción**: Detalles completos del contenido
+- **Categoría**: Clasificación por tipo (deportiva, cultural, etc.)
+- **Instructor**: Personal asignado responsable
+- **Parque**: Ubicación donde se realizará
+- **Capacidad**: Número máximo de participantes
+
+**Configuración Avanzada:**
+- **Horarios**: Días y horas específicas
+- **Duración**: Tiempo por sesión
+- **Nivel**: Principiante, intermedio, avanzado
+- **Edad**: Rangos de edad permitidos
+- **Costo**: Gratuita o con tarifa específica
+- **Requisitos**: Materiales o condiciones necesarias
+
+#### Gestión de Imágenes
+- **Imagen Principal**: Foto representativa de la actividad
+- **Galería**: Hasta 5 imágenes adicionales
+- **Formatos Soportados**: JPG, PNG, WebP (máximo 5MB)
+- **Optimización Automática**: Redimensionado para web
+
+### Acciones Disponibles
+
+#### Por Actividad Individual
+1. **👁️ Ver Detalles**: Información completa y estadísticas
+2. **✏️ Editar**: Modificar cualquier aspecto de la actividad
+3. **📸 Gestionar Imágenes**: Subir, cambiar o eliminar fotos
+4. **👥 Ver Inscripciones**: Lista de participantes actuales
+5. **📊 Estadísticas**: Métricas de participación y satisfacción
+6. **🗑️ Eliminar**: Cancelar permanentemente (solo administradores)
+
+#### Acciones Masivas
+- **Exportar**: Generar reportes en Excel/CSV
+- **Cambiar Estado**: Modificar múltiples actividades
+- **Asignar Instructor**: Reasignar responsables
+- **Duplicar**: Crear copias para nuevos períodos
+        `
+      },
+      {
+        id: 'categorias',
+        title: 'Gestión de Categorías',
+        level: 1,
+        content: `
+### Descripción del Sistema
+Las **Categorías de Actividades** permiten organizar y clasificar toda la oferta recreativa de manera coherente y fácil de navegar tanto para administradores como para ciudadanos.
+
+### Categorías Predeterminadas del Sistema
+
+#### 🏃 Deportivas
+- **Descripción**: Actividades físicas y deportes diversos
+- **Ejemplos**: Fútbol, básquetbol, atletismo, natación
+- **Color**: Verde (#10B981)
+- **Características**: Enfoque en ejercicio y competencia
+
+#### 🎨 Culturales  
+- **Descripción**: Arte, música, teatro y expresión creativa
+- **Ejemplos**: Pintura, danza, música, teatro
+- **Color**: Púrpura (#8B5CF6)
+- **Características**: Desarrollo artístico y cultural
+
+#### 🌱 Ambientales
+- **Descripción**: Educación ecológica y sostenibilidad
+- **Ejemplos**: Jardinería, reciclaje, observación de aves
+- **Color**: Verde Oscuro (#059669)
+- **Características**: Conciencia ambiental
+
+#### 👨‍👩‍👧‍👦 Familiares
+- **Descripción**: Actividades para toda la familia
+- **Ejemplos**: Picnics, juegos familiares, cuentacuentos
+- **Color**: Azul (#3B82F6)
+- **Características**: Participación intergeneracional
+
+#### 📚 Educativas
+- **Descripción**: Talleres de aprendizaje y desarrollo
+- **Ejemplos**: Computación, idiomas, lectura
+- **Color**: Naranja (#F97316)
+- **Características**: Adquisición de conocimientos
+
+#### 🧘 Bienestar
+- **Descripción**: Salud física y mental
+- **Ejemplos**: Yoga, meditación, tai chi
+- **Color**: Rosa (#EC4899)
+- **Características**: Relajación y equilibrio
+
+### Administración de Categorías
+
+#### Crear Nueva Categoría
+**Proceso paso a paso:**
+1. Acceda a **Actividades > Categorías**
+2. Haga clic en **"Nueva Categoría"**
+3. Complete la información requerida:
+   - **Nombre**: Identificación clara
+   - **Descripción**: Explicación del propósito
+   - **Color**: Código hexadecimal para identificación visual
+   - **Icono**: Símbolo representativo
+   - **Estado**: Activa o inactiva
+
+#### Modificar Categorías Existentes
+- **Edición**: Cambiar nombre, descripción o color
+- **Activar/Desactivar**: Controlar disponibilidad
+- **Reorganizar**: Cambiar orden de aparición
+- **Estadísticas**: Ver cantidad de actividades por categoría
+
+### Impacto en el Sistema
+
+#### Para Administradores
+- **Organización**: Mejor estructura del catálogo
+- **Reportes**: Análisis por tipo de actividad
+- **Filtros**: Búsquedas más eficientes
+- **Planificación**: Equilibrio en la oferta
+
+#### Para Ciudadanos
+- **Navegación**: Encontrar actividades de interés fácilmente
+- **Identificación**: Reconocimiento visual rápido
+- **Búsqueda**: Filtros intuitivos en el portal público
+- **Experiencia**: Interface más organizada y clara
+        `
+      },
+      {
+        id: 'instructores',
+        title: 'Gestión de Instructores',
+        level: 1,
+        content: `
+### Descripción del Sistema
+La **Gestión de Instructores** es fundamental para asegurar la calidad y profesionalismo de todas las actividades. Este módulo maneja desde el registro hasta la evaluación continua del personal.
+
+### Proceso de Registro
+
+#### Invitación por Email
+El sistema utiliza un proceso de invitación controlado:
+
+1. **Generación de Invitación**: Administrador crea invitación con datos básicos
+2. **Envío Automático**: Email con enlace único y token de seguridad
+3. **Registro Completo**: Instructor completa su perfil detallado
+4. **Validación**: Revisión administrativa antes de activación
+
+#### Información del Perfil
+**Datos Personales:**
+- Nombre completo y datos de contacto
+- Fotografía de perfil profesional
+- Currículum vitae (PDF/DOC)
+- Experiencia y certificaciones
+
+**Información Profesional:**
+- Especialidades y áreas de expertise
+- Años de experiencia
+- Tarifas por hora (si aplica)
+- Disponibilidad de días y horarios
+- Parque preferido de trabajo
+
+### Estados del Instructor
+
+#### 🟢 Activo
+- Disponible para asignación a actividades
+- Perfil visible en listados internos
+- Puede recibir evaluaciones
+- Acceso completo al sistema
+
+#### 🟡 Pendiente
+- Registro iniciado pero incompleto
+- En proceso de validación administrativa
+- Sin acceso a funcionalidades
+- Requiere completar documentación
+
+#### 🔴 Inactivo
+- Temporalmente fuera del sistema
+- No disponible para nuevas actividades
+- Mantiene historial y evaluaciones
+- Puede reactivarse cuando sea necesario
+
+### Funcionalidades de Gestión
+
+#### Perfil Detallado del Instructor
+**Vista Completa Incluye:**
+- **Información Personal**: Datos básicos y contacto
+- **Experiencia**: Historial y especialidades
+- **Actividades Actuales**: Programación activa
+- **Evaluaciones Recibidas**: Calificaciones y comentarios
+- **Currículum**: Descarga/visualización de CV
+- **Estadísticas**: Métricas de desempeño
+
+#### Asignación a Actividades
+**Proceso de Asignación:**
+1. Desde la creación/edición de actividad
+2. Selección de instructor disponible
+3. Verificación de compatibilidad (horarios, especialidad)
+4. Confirmación automática o manual
+5. Notificación al instructor
+
+#### Sistema de Evaluaciones
+**Evaluación Pública**: Los participantes pueden evaluar instructores
+**Evaluación Administrativa**: Revisiones internas periódicas
+**Criterios de Evaluación:**
+- Conocimiento técnico
+- Habilidades de comunicación
+- Metodología de enseñanza
+- Puntualidad y profesionalismo
+- Desempeño general
+
+### Métricas y Reportes
+
+#### Indicadores por Instructor
+- **Calificación Promedio**: Basada en evaluaciones recibidas
+- **Actividades Impartidas**: Histórico completo
+- **Participantes Atendidos**: Total de personas impactadas
+- **Índice de Satisfacción**: Porcentaje de evaluaciones positivas
+
+#### Reportes Disponibles
+- **Listado Completo**: Todos los instructores con filtros
+- **Evaluaciones Detalladas**: Análisis de desempeño
+- **Actividad por Período**: Productividad temporal
+- **Certificaciones**: Validez de documentos
+        `
+      },
+      {
+        id: 'inscripciones',
+        title: 'Sistema de Inscripciones',
+        level: 1,
+        content: `
+### Descripción General
+El **Sistema de Inscripciones** gestiona la participación ciudadana en actividades, controlando cupos, listas de espera, confirmaciones y seguimiento de asistencia.
+
+### Tipos de Inscripción
+
+#### 🆓 Inscripción Gratuita
+- **Proceso Simple**: Solo datos básicos requeridos
+- **Confirmación Inmediata**: Sin procesos de pago
+- **Control de Cupo**: Límite por capacidad de actividad
+- **Lista de Espera**: Automática cuando se llena
+
+#### 💳 Inscripción con Pago
+- **Datos Completos**: Información personal y de pago
+- **Reserva Temporal**: 15 minutos para completar pago
+- **Confirmación**: Solo después del pago exitoso
+- **Facturación**: Comprobante automático
+
+### Proceso de Inscripción
+
+#### Para el Ciudadano
+1. **Selección**: Elegir actividad de interés
+2. **Verificación**: Confirmar horarios y requisitos
+3. **Registro**: Completar formulario de inscripción
+4. **Pago** (si aplica): Procesar tarifa correspondiente
+5. **Confirmación**: Recibir comprobante por email
+
+#### Estados de Inscripción
+- **✅ Confirmada**: Lugar asegurado en la actividad
+- **⏳ Pendiente**: En proceso de validación/pago
+- **📋 En Lista de Espera**: Sin cupo disponible actualmente
+- **❌ Cancelada**: Anulada por el participante
+- **⚠️ No Presentado**: No asistió a las sesiones
+
+### Gestión Administrativa
+
+#### Panel de Control
+**Vista por Actividad:**
+- Lista completa de inscritos
+- Estado de cada inscripción
+- Datos de contacto de participantes
+- Historial de asistencias
+- Pagos realizados (si aplica)
+
+**Acciones Disponibles:**
+- **✏️ Editar Inscripción**: Modificar datos del participante
+- **📧 Enviar Comunicación**: Email directo al inscrito
+- **📊 Marcar Asistencia**: Control de presencia en sesiones
+- **💰 Gestionar Pago**: Ver estado y procesar reembolsos
+- **🗑️ Cancelar Inscripción**: Liberar cupo
+
+#### Lista de Espera
+**Funcionamiento Automático:**
+- Se activa cuando se alcanza capacidad máxima
+- Los nuevos interesados se agregan automáticamente
+- Notificación inmediata cuando se libera cupo
+- Tiempo límite de 48 horas para confirmar
+
+### Comunicaciones Automáticas
+
+#### Emails de Confirmación
+**Contenido Incluye:**
+- Detalles completos de la actividad
+- Ubicación exacta y cómo llegar
+- Horarios y fechas de sesiones
+- Información del instructor
+- Requisitos y materiales necesarios
+- Contacto para dudas o cancelaciones
+
+#### Recordatorios
+- **24 horas antes**: Primera sesión
+- **2 horas antes**: Cada sesión regular
+- **Cambios**: Notificación inmediata de modificaciones
+- **Cancelaciones**: Aviso con opciones alternatives
+
+### Reportes y Estadísticas
+
+#### Métricas por Actividad
+- **Ocupación**: Porcentaje de cupo utilizado
+- **Lista de Espera**: Demanda no cubierta
+- **Asistencia Real**: Participantes que efectivamente asisten
+- **Satisfacción**: Evaluaciones post-actividad
+
+#### Análisis de Participación
+- **Demografía**: Edad, género, ubicación de participantes
+- **Preferencias**: Categorías más demandadas
+- **Comportamiento**: Patrones de inscripción y asistencia
+- **Retención**: Participantes que repiten actividades
+        `
+      },
+      {
+        id: 'horarios',
+        title: 'Gestión de Horarios y Calendarios',
+        level: 1,
+        content: `
+### Sistema de Programación
+La **Gestión de Horarios** permite crear calendarios flexibles y detallados para todas las actividades, considerando disponibilidad de espacios, instructores y recursos.
+
+### Configuración de Horarios
+
+#### Tipos de Programación
+**🔄 Recurrente Regular:**
+- Mismos días y horas cada semana
+- Ejemplo: Lunes, Miércoles, Viernes 6:00 PM
+- Duración fija por sesión
+- Fechas de inicio y fin definidas
+
+**📅 Calendario Personalizado:**
+- Fechas específicas no regulares
+- Horarios variables por sesión
+- Actividades de temporada o especiales
+- Eventos únicos o esporádicos
+
+**⚡ Intensivos:**
+- Actividades concentradas en pocos días
+- Ejemplo: Taller de fin de semana
+- Mayor duración por sesión
+- Formato tipo campamento o curso
+
+### Herramientas de Programación
+
+#### Vista de Calendario
+**Características:**
+- **Vista Mensual**: Panorámica general de actividades
+- **Vista Semanal**: Detalle de horarios por día
+- **Vista Diaria**: Programación específica por fecha
+- **Filtros**: Por parque, instructor, categoría o actividad
+
+#### Gestión de Conflictos
+**Detección Automática:**
+- Solapamiento de horarios del mismo instructor
+- Uso simultáneo del mismo espacio
+- Exceso de actividades en horario pico
+- Conflictos con mantenimiento de instalaciones
+
+**Resolución Asistida:**
+- Sugerencias de horarios alternativos
+- Notificaciones a instructores afectados
+- Reprogramación automática cuando sea posible
+- Alertas para administradores
+
+### Administración de Espacios
+
+#### Asignación de Ubicaciones
+**Por Actividad:**
+- Espacios techados vs. al aire libre
+- Capacidad del área vs. participantes esperados
+- Requisitos especiales (agua, electricidad, etc.)
+- Proximidad a servicios (baños, estacionamiento)
+
+**Control de Disponibilidad:**
+- Calendario de mantenimiento
+- Eventos especiales que afecten disponibilidad
+- Condiciones climáticas (para espacios exteriores)
+- Reservas de terceros o eventos municipales
+
+### Flexibilidad Operativa
+
+#### Cambios y Reprogramaciones
+**Proceso Controlado:**
+1. **Identificar Necesidad**: Cambio solicitado o imprevisto
+2. **Evaluar Impact**: Participantes, instructor, espacio afectados
+3. **Proponer Alternativas**: Nuevos horarios disponibles
+4. **Comunicar Cambios**: Notificación a todos los involucrados
+5. **Confirmar Aceptación**: Validar que el cambio es viable
+
+#### Cancelaciones Excepcionales
+**Causas Comunes:**
+- Condiciones climáticas adversas
+- Enfermedad del instructor
+- Problemas en las instalaciones
+- Emergencias o eventos imprevisto
+
+**Protocolo de Cancelación:**
+- Notificación inmediata a participantes
+- Opciones de reprogramación
+- Política de reembolsos (si aplica)
+- Registro del motivo para estadísticas
+
+### Optimización de Recursos
+
+#### Análisis de Utilización
+**Métricas Clave:**
+- **Ocupación por Horario**: Identificar picos y valles
+- **Utilización de Espacios**: Eficiencia de instalaciones
+- **Carga de Instructores**: Distribución equitativa
+- **Preferencias Ciudadanas**: Horarios más demandados
+
+#### Recomendaciones Automáticas
+**El sistema sugiere:**
+- Horarios alternativos para nuevas actividades
+- Redistribución para mejor aprovechamiento
+- Identificación de espacios subutilizados
+- Oportunidades para ampliar oferta en horarios populares
+        `
+      },
+      {
+        id: 'reportes',
+        title: 'Reportes y Análisis',
+        level: 1,
+        content: `
+### Dashboard Ejecutivo
+El **Sistema de Reportes** proporciona insights valiosos sobre el desempeño del programa de actividades, participación ciudadana y utilización de recursos.
+
+### Métricas Principales
+
+#### 📊 Indicadores Clave (KPIs)
+**Participación:**
+- **Total de Actividades**: Cantidad de programas ofrecidos
+- **Participantes Únicos**: Ciudadanos diferentes que participan
+- **Sesiones Realizadas**: Encuentros efectivamente realizados
+- **Tasa de Ocupación**: Porcentaje de cupos utilizados
+
+**Satisfacción:**
+- **Calificación Promedio**: Evaluaciones de participantes (1-5 estrellas)
+- **Actividades Mejor Calificadas**: Top 10 por satisfacción
+- **Índice de Retención**: Participantes que repiten actividades
+- **Recomendaciones**: Porcentaje de participantes que recomendarían
+
+#### 📈 Análisis de Tendencias
+**Participación por Período:**
+- Evolución mensual de inscripciones
+- Estacionalidad en diferentes tipos de actividades
+- Comparativas año con año
+- Proyecciones basadas en tendencias históricas
+
+**Demografía de Participantes:**
+- Distribución por rangos de edad
+- Participación por género
+- Procedencia geográfica (colonias, municipios)
+- Preferencias por categoría de actividad
+
+### Reportes Especializados
+
+#### 🎯 Por Categoría de Actividad
+**Análisis Comparativo:**
+- **Deportivas**: Participación, horarios preferidos, espacios más utilizados
+- **Culturales**: Talleres más populares, necesidad de materiales, creatividad mostrada
+- **Educativas**: Efectividad del aprendizaje, continuidad en cursos
+- **Familiares**: Composición de grupos, satisfacción intergeneracional
+- **Ambientales**: Impacto en conciencia ecológica, proyectos realizados
+
+#### 🏞️ Por Parque
+**Desempeño por Ubicación:**
+- Número total de actividades por parque
+- Participación promedio por ubicación
+- Categorías más exitosas en cada espacio
+- Utilización de instalaciones específicas
+- Análisis de accesibilidad y transporte
+
+#### 👨‍🏫 Por Instructor
+**Evaluación de Desempeño:**
+- Actividades impartidas por período
+- Calificaciones promedio recibidas
+- Número total de participantes impactados
+- Especialidades más demandadas
+- Desarrollo profesional y capacitación
+
+### Herramientas de Análisis
+
+#### Filtros Avanzados
+**Segmentación Temporal:**
+- Filtro por fechas específicas
+- Comparación entre períodos
+- Análisis estacional
+- Tendencias a largo plazo
+
+**Segmentación Geográfica:**
+- Por parque individual
+- Por zona de la ciudad
+- Por accesibilidad (transporte público)
+- Por demografía del área
+
+#### Exportación de Datos
+**Formatos Disponibles:**
+- **Excel**: Análisis detallado y pivot tables
+- **PDF**: Reportes ejecutivos presentables
+- **CSV**: Integración con otros sistemas
+- **JSON**: Integración con APIs externas
+
+### Análisis Predictivo
+
+#### Proyecciones de Demanda
+**Factores Considerados:**
+- Tendencias históricas de participación
+- Estacionalidad por tipo de actividad
+- Crecimiento demográfico del área
+- Nuevas instalaciones o mejoras planificadas
+
+#### Recomendaciones Estratégicas
+**El sistema sugiere:**
+- Nuevas categorías de actividades basadas en gaps identificados
+- Horarios alternativos para maximizar participación
+- Parques con potencial para ampliar oferta
+- Instructores especializados necesarios para cubrir demanda
+
+### Impacto Social
+
+#### Indicadores de Beneficio Comunitario
+**Medición Cuantitativa:**
+- **Cobertura Poblacional**: Porcentaje de ciudadanos que participan
+- **Inclusión**: Diversidad demográfica en participantes
+- **Accesibilidad**: Facilidad de acceso para diferentes grupos
+- **Continuidad**: Participantes que mantienen actividad regular
+
+**Medición Cualitativa:**
+- Testimonios y casos de éxito documentados
+- Mejoras en salud y bienestar reportadas
+- Desarrollo de habilidades y talentos
+- Fortalecimiento de vínculos comunitarios
+
+### Benchmarking
+
+#### Comparación con Estándares
+**Referentes Nacionales:**
+- Sistemas similares en otras ciudades mexicanas
+- Mejores prácticas documentadas
+- Indicadores de ciudades modelo
+
+**Referentes Internacionales:**
+- Programas exitosos en Latinoamérica
+- Estándares ONU para espacios públicos
+- Innovations en gestión de parques urbanos
+        `
+      },
+      {
+        id: 'mejores-practicas',
+        title: 'Mejores Prácticas y Recomendaciones',
+        level: 1,
+        content: `
+### Planificación Estratégica
+
+#### Desarrollo de Programación
+**Principios Fundamentales:**
+1. **Diversidad**: Ofrecer actividades para todos los gustos y edades
+2. **Inclusión**: Considerar necesidades especiales y diferentes capacidades
+3. **Calidad**: Priorizar instructores capacitados y materiales adecuados
+4. **Sostenibilidad**: Actividades que puedan mantenerse a largo plazo
+
+**Proceso de Planificación:**
+- **Diagnóstico**: Análisis de necesidades comunitarias
+- **Oferta Balanceada**: Mix equilibrado entre categorías
+- **Recursos Disponibles**: Evaluación realista de capacidades
+- **Evaluación Continua**: Ajustes basados en resultados
+
+#### Gestión de Recursos Humanos
+**Selección de Instructores:**
+1. **Criterios Técnicos**: Certificaciones y experiencia relevante
+2. **Habilidades Pedagógicas**: Capacidad de transmitir conocimiento
+3. **Valores**: Alineación con misión del programa
+4. **Flexibilidad**: Adaptación a diferentes grupos y situaciones
+
+**Desarrollo Continuo:**
+- Capacitación regular en nuevas metodologías
+- Intercambio de experiencias entre instructores
+- Evaluación 360° (participantes, pares, supervisores)
+- Plan de carrera y reconocimientos
+
+### Comunicación Efectiva
+
+#### Promoción de Actividades
+**Canales Múltiples:**
+- **Redes Sociales**: Instagram, Facebook, TikTok para audiencias jóvenes
+- **WhatsApp**: Grupos por colonias y tipos de actividades
+- **Carteles**: En parques, centros comunitarios y espacios públicos
+- **Radio Local**: Programas matutinos y de tarde
+
+**Mensajes Clave:**
+- Beneficios específicos de cada actividad
+- Facilidad de inscripción y participación
+- Testimonios de participantes satisfechos
+- Información clara sobre horarios y ubicaciones
+
+#### Gestión de Expectativas
+**Comunicación Clara:**
+- Descripción precisa del nivel requerido
+- Materiales que debe aportar el participante
+- Política de faltas y cancelaciones
+- Certificaciones o reconocimientos a obtener
+
+### Gestión Operativa
+
+#### Control de Calidad
+**Estándares Mínimos:**
+- Puntualidad y asistencia del instructor
+- Materiales y equipos en buen estado
+- Espacios limpios y seguros
+- Seguimiento de protocolos de seguridad
+
+**Monitoreo Continuo:**
+- Visitas aleatorias a actividades en curso
+- Encuestas regulares de satisfacción
+- Buzón de sugerencias y quejas
+- Reuniones periódicas con instructores
+
+#### Gestión de Crisis
+**Situaciones Comunes y Respuestas:**
+- **Clima Adverso**: Protocolos para actividades exteriores
+- **Ausencia de Instructor**: Instructores de respaldo capacitados
+- **Accidentes Menores**: Primeros auxilios y seguimiento
+- **Baja Participación**: Estrategias de revitalización
+
+### Innovación y Mejora Continua
+
+#### Incorporación de Tecnología
+**Herramientas Digitales:**
+- Apps móviles para inscripciones y seguimiento
+- Plataformas de video para actividades híbridas
+- Gamificación para aumentar engagement
+- Analytics para optimizar programación
+
+#### Adaptación a Nuevas Tendencias
+**Monitoreo de Tendencias:**
+- Seguimiento de redes sociales y tendencias fitness
+- Feedback continuo de participantes jóvenes
+- Investigación de programas exitosos en otras ciudades
+- Experimentación controlada con nuevos formatos
+
+### Sostenibilidad del Programa
+
+#### Financiera
+**Estrategias de Financiamiento:**
+- Diversificación de fuentes (gubernamental, privada, internacional)
+- Actividades autofinanciables para subsidiar programas gratuitos
+- Alianzas con empresas para patrocinio
+- Aplicación a fondos nacionales e internacionales
+
+#### Ambiental
+**Prácticas Eco-Amigables:**
+- Preferencia por materiales reutilizables
+- Actividades que promuevan conciencia ambiental
+- Uso eficiente de recursos (agua, electricidad)
+- Conexión con la naturaleza en espacios verdes
+
+#### Social
+**Construcción de Comunidad:**
+- Eventos especiales que integren diferentes actividades
+- Reconocimiento público a participantes destacados
+- Oportunidades de liderazgo para participantes avanzados
+- Vínculos con organizaciones comunitarias locales
+        `
+      },
+      {
+        id: 'faq',
+        title: 'Preguntas Frecuentes',
+        level: 1,
+        content: `
+### Gestión General
+
+**P: ¿Cómo accedo al módulo de Actividades?**
+R: Inicie sesión en ParkSys, vaya al sidebar administrativo, expanda "Actividades" y seleccione el submenu requerido según sus permisos asignados.
+
+**P: ¿Puedo gestionar actividades de múltiples parques simultáneamente?**
+R: Sí, el sistema permite filtrar por múltiples parques o ver todas las actividades del sistema en una vista unificada.
+
+**P: ¿Con qué frecuencia se actualizan los datos en el dashboard?**
+R: Los datos se actualizan en tiempo real. Las métricas reflejan información hasta el último registro ingresado.
+
+### Creación y Gestión de Actividades
+
+**P: ¿Qué información es obligatoria para crear una nueva actividad?**
+R: Nombre, descripción, categoría, instructor asignado, parque donde se realizará, horarios y capacidad máxima son campos obligatorios.
+
+**P: ¿Puedo duplicar una actividad existente?**
+R: Sí, use la función "Duplicar" para crear una copia y luego modifique las fechas, horarios o detalles específicos según sea necesario.
+
+**P: ¿Cómo cambio el instructor de una actividad?**
+R: Desde la edición de la actividad, seleccione un nuevo instructor del dropdown. El sistema verificará disponibilidad de horarios automáticamente.
+
+**P: ¿Puedo subir múltiples imágenes por actividad?**
+R: Sí, cada actividad puede tener una imagen principal y hasta 5 imágenes adicionales en la galería.
+
+### Gestión de Instructores
+
+**P: ¿Cómo invito a un nuevo instructor?**
+R: En la sección Instructores, use "Nuevo Instructor", ingrese los datos básicos y el sistema enviará automáticamente un email de invitación con enlace de registro.
+
+**P: ¿Qué hago si un instructor no recibe el email de invitación?**
+R: Verifique que el email sea correcto, revise carpeta de spam, y puede reenviar la invitación desde el panel administrativo.
+
+**P: ¿Cómo evalúan los ciudadanos a los instructores?**
+R: Los participantes reciben automáticamente un enlace de evaluación al finalizar la actividad, donde pueden calificar diferentes aspectos del desempeño.
+
+### Inscripciones y Participantes
+
+**P: ¿Cómo manejo las listas de espera?**
+R: El sistema maneja automáticamente las listas de espera. Cuando se libera un cupo, notifica automáticamente al siguiente en lista con 48 horas para confirmar.
+
+**P: ¿Puedo modificar datos de un participante inscrito?**
+R: Sí, desde el panel de inscripciones de cada actividad puede editar la información de contacto y otros datos relevantes.
+
+**P: ¿Cómo proceso reembolsos para actividades canceladas?**
+R: En el panel de gestión de pagos, seleccione las inscripciones afectadas y use la función "Procesar Reembolso" con la justificación correspondiente.
+
+### Categorías y Organización
+
+**P: ¿Puedo crear nuevas categorías de actividades?**
+R: Sí, en la sección Categorías puede crear nuevos tipos con nombre, descripción, color identificativo e ícono representativo.
+
+**P: ¿Cómo reorganizo las categorías existentes?**
+R: Use la función "Reorganizar" para cambiar el orden de aparición tanto en el panel administrativo como en el portal público.
+
+**P: ¿Puedo tener subcategorías?**
+R: Actualmente el sistema maneja un nivel de categorización. Para mayor especificidad, use tags o palabras clave en la descripción.
+
+### Horarios y Programación
+
+**P: ¿Cómo evito conflictos de horarios entre actividades?**
+R: El sistema detecta automáticamente conflictos cuando se programa una actividad. Recibirá alertas si hay solapamiento de instructores o espacios.
+
+**P: ¿Puedo programar actividades irregulares (no semanales)?**
+R: Sí, use el modo "Calendario Personalizado" para actividades con fechas específicas no regulares.
+
+**P: ¿Qué hago si necesito cancelar una sesión por mal clima?**
+R: Use la función "Cancelar Sesión" especificando el motivo. El sistema notificará automáticamente a todos los participantes y sugerirá fechas de reposición.
+
+### Reportes y Análisis
+
+**P: ¿Cómo genero un reporte de participación mensual?**
+R: En la sección Reportes, seleccione el rango de fechas, filtre por parques o categorías según necesite, y exporte en el formato deseado (Excel/PDF).
+
+**P: ¿Puedo ver qué actividades tienen mayor demanda?**
+R: Sí, el dashboard muestra métricas de ocupación y hay reportes específicos de "Actividades Más Demandadas" con análisis de listas de espera.
+
+**P: ¿Cómo mido la satisfacción de los participantes?**
+R: El sistema recopila automáticamente evaluaciones post-actividad y las presenta en métricas consolidadas por instructor, actividad y período.
+
+### Problemas Técnicos
+
+**P: ¿Por qué no puedo editar cierta actividad?**
+R: Verifique sus permisos de usuario. Es posible que solo tenga permisos de lectura o acceso limitado a ciertos parques o categorías.
+
+**P: Las notificaciones por email no se están enviando, ¿qué reviso?**
+R: Verifique la configuración del servidor de email en configuraciones del sistema y contacte al administrador técnico si persiste el problema.
+
+**P: ¿Cómo restauro una actividad eliminada accidentalmente?**
+R: Solo usuarios con permisos de Super Administrador pueden recuperar registros eliminados. Contacte inmediatamente al soporte técnico con los detalles específicos.
+        `
+      },
+      {
+        id: 'soporte',
+        title: 'Soporte Técnico y Contacto',
+        level: 1,
+        content: `
+### Canales de Comunicación
+
+#### Soporte Inmediato
+- **Chat en Vivo**: Disponible en horario de oficina (8:00 AM - 6:00 PM)
+- **Teléfono**: +52 (33) 1234-5678 ext. 200
+- **WhatsApp Business**: +52 (33) 9876-5432
+
+#### Soporte por Email
+- **Técnico**: soporte.actividades@guadalajara.gob.mx
+- **Administrativo**: admin.actividades@guadalajara.gob.mx
+- **Instructores**: instructores.parksys@guadalajara.gob.mx
+- **Urgencias**: urgencias.parksys@guadalajara.gob.mx
+
+### Procedimiento de Reporte de Problemas
+
+#### Información Requerida para Tickets
+1. **Usuario**: Nombre completo y rol en el sistema
+2. **Módulo Afectado**: Actividades específicas o sección general
+3. **Fecha/Hora**: Cuándo ocurrió el problema
+4. **Acción Realizada**: Qué estaba intentando hacer específicamente
+5. **Error Observado**: Mensaje exacto o comportamiento anormal
+6. **Navegador/Dispositivo**: Especificaciones técnicas
+7. **Screenshots**: Capturas que muestren el problema claramente
+
+#### Categorías de Prioridad
+
+**🔴 Crítica (Respuesta en 1 hora):**
+- Sistema de actividades completamente inaccesible
+- Pérdida confirmada de inscripciones o datos de participantes
+- Problemas de seguridad en información de instructores
+- Fallas en sistema de pagos que afecten ingresos
+
+**🟠 Alta (Respuesta en 4 horas):**
+- Funcionalidades principales no disponibles
+- Errores en generación de reportes importantes
+- Problemas con notificaciones automáticas
+- Conflictos en programación de horarios
+
+**🟡 Media (Respuesta en 24 horas):**
+- Funcionalidades específicas con problemas menores
+- Errores de interfaz que no impiden operación
+- Solicitudes de mejoras en flujos existentes
+- Problemas de rendimiento no críticos
+
+**🟢 Baja (Respuesta en 72 horas):**
+- Consultas sobre uso correcto del sistema
+- Solicitudes de capacitación adicional
+- Sugerencias de nuevas funcionalidades
+- Reportes de errores cosméticos menores
+
+### Recursos de Capacitación
+
+#### Documentación Disponible
+- **Manual Completo**: Este documento actualizado mensualmente
+- **Videos Tutoriales**: Biblioteca en el portal interno
+- **Casos de Uso**: Ejemplos prácticos paso a paso
+- **FAQ Extendida**: Preguntas más frecuentes con respuestas detalladas
+
+#### Capacitación Presencial
+- **Sesiones Grupales**: Mensuales para nuevos usuarios
+- **Capacitación Especializada**: Para administradores avanzados
+- **Talleres Temáticos**: Según necesidades específicas identificadas
+- **Soporte en Sitio**: Disponible para implementaciones complejas
+
+### Acuerdos de Nivel de Servicio (SLA)
+
+#### Disponibilidad del Sistema
+- **Objetivo**: 99.5% de uptime mensual para módulo de Actividades
+- **Horario Crítico**: 6:00 AM - 10:00 PM todos los días
+- **Mantenimiento Programado**: Domingos 2:00 AM - 4:00 AM con aviso previo
+- **Tiempo de Respuesta**: < 2 segundos para operaciones básicas
+
+#### Soporte de Usuarios
+- **Horario de Atención**: Lunes a viernes 8:00 AM - 6:00 PM
+- **Emergencias**: 24/7 solo para problemas críticos
+- **Resolución**: 90% de tickets resueltos dentro del SLA establecido
+- **Satisfacción**: Meta de 95% de satisfacción en encuestas de servicio
+
+### Contactos Especializados
+
+#### Equipo de Actividades
+- **Coordinador General**: coord.actividades@guadalajara.gob.mx
+- **Responsable Técnico**: tech.actividades@guadalajara.gob.mx
+- **Gestión de Instructores**: instructores.coord@guadalajara.gob.mx
+
+#### Escalación de Problemas
+**Nivel 1**: Soporte técnico general
+**Nivel 2**: Especialistas en módulo de actividades
+**Nivel 3**: Arquitectos de sistema y desarrollo
+**Nivel 4**: Dirección técnica y toma de decisiones críticas
+
+### Mejora Continua
+
+#### Feedback del Usuario
+- **Encuestas Trimestrales**: Evaluación de satisfacción y necesidades
+- **Grupos Focales**: Sesiones con usuarios avanzados
+- **Buzón de Sugerencias**: Canal permanente para ideas de mejora
+- **Beta Testing**: Participación en pruebas de nuevas funcionalidades
+
+#### Actualizaciones del Sistema
+- **Versiones Menores**: Cada 2 semanas con correcciones y mejoras menores
+- **Versiones Mayores**: Cada 3-4 meses con nuevas funcionalidades
+- **Hotfixes**: Dentro de 24 horas para problemas críticos
+- **Comunicación**: Notificación previa de todos los cambios importantes
+        `
+      }
+    ]
   }
 };
 

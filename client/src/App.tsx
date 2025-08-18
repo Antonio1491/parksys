@@ -1234,6 +1234,12 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/help/ParquesManual')))}
           </Suspense>
         </Route>
+        
+        <Route path="/help/actividades-manual">
+          <Suspense fallback={<div className="p-8 text-center">Cargando manual de actividades...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/help/ActividadesManual')))}
+          </Suspense>
+        </Route>
 
 
         
