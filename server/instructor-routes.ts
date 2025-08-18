@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { eq, and, desc } from 'drizzle-orm';
 import { db } from './db';
-import { instructors, parks, activities } from '../shared/schema';
+import { instructors, parks, activities, users } from '../shared/schema';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
