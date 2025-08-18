@@ -805,7 +805,9 @@ function ActivityDetailPage() {
                     <div>
                       <p className="font-medium">Público</p>
                       <p className="text-sm text-gray-600">
-                        {activity.targetMarket.join(', ')}
+                        {activity.targetMarket.map(target => 
+                          target.charAt(0).toUpperCase() + target.slice(1)
+                        ).join(', ')}
                       </p>
                     </div>
                   </div>
