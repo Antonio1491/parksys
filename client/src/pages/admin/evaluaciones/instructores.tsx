@@ -674,37 +674,39 @@ const EvaluacionesInstructores = () => {
                 <CardContent className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center">
-                      {renderStars(evaluation.overallRating)}
+                      {renderStars(evaluation.overallRating || 0)}
                     </div>
-                    <span className="text-sm font-medium">{evaluation.overallRating}/5</span>
+                    <span className="text-sm font-medium">
+                      {evaluation.overallRating ? `${evaluation.overallRating}/5` : 'Sin calificar'}
+                    </span>
                   </div>
                   
                   {/* Calificaciones por criterio */}
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Conocimiento:</span>
-                      <span className="font-medium">{evaluation.knowledgeRating}/5</span>
+                      <span className="font-medium">{evaluation.knowledgeRating || 'N/A'}/5</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Paciencia:</span>
-                      <span className="font-medium">{evaluation.patienceRating}/5</span>
+                      <span className="font-medium">{evaluation.patienceRating || 'N/A'}/5</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Claridad:</span>
-                      <span className="font-medium">{evaluation.clarityRating}/5</span>
+                      <span className="font-medium">{evaluation.clarityRating || 'N/A'}/5</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Puntualidad:</span>
-                      <span className="font-medium">{evaluation.punctualityRating}/5</span>
+                      <span className="font-medium">{evaluation.punctualityRating || 'N/A'}/5</span>
                     </div>
                   </div>
 
-                  {evaluation.attendedActivity && (
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Actividad: </span>
-                      <span className="font-medium">{translateActivity(evaluation.attendedActivity)}</span>
-                    </div>
-                  )}
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Actividad: </span>
+                    <span className="font-medium">
+                      {evaluation.attendedActivity ? evaluation.attendedActivity : 'No especificada'}
+                    </span>
+                  </div>
 
                   {evaluation.comments && (
                     <div className="text-sm">
@@ -761,13 +763,17 @@ const EvaluacionesInstructores = () => {
                         <td className="p-4">
                           <div className="flex items-center space-x-2">
                             <div className="flex">
-                              {renderStars(evaluation.overallRating)}
+                              {renderStars(evaluation.overallRating || 0)}
                             </div>
-                            <span className="text-sm font-medium">{evaluation.overallRating}/5</span>
+                            <span className="text-sm font-medium">
+                              {evaluation.overallRating ? `${evaluation.overallRating}/5` : 'Sin calificar'}
+                            </span>
                           </div>
                         </td>
                         <td className="p-4">
-                          <span className="text-sm">{translateActivity(evaluation.attendedActivity || '')}</span>
+                          <span className="text-sm">
+                            {evaluation.attendedActivity ? evaluation.attendedActivity : 'No especificada'}
+                          </span>
                         </td>
                         <td className="p-4">
                           <Badge className={getStatusColor(evaluation.status)}>
