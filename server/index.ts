@@ -423,6 +423,74 @@ if (isProduction) {
   app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
 }
 
+// RUTAS ESPECÍFICAS PARA VERCEL - Endpoints individuales para archivos estáticos
+// Estas rutas son necesarias porque vercel.json las redirige al servidor Node.js
+
+// Servir imágenes desde /images
+app.get('/images/:filename(*)', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(process.cwd(), 'public', 'images', filename);
+  
+  if (fs.existsSync(imagePath)) {
+    res.sendFile(imagePath);
+  } else {
+    console.log(`⚠️ Imagen no encontrada: ${imagePath}`);
+    res.status(404).json({ error: 'Image not found' });
+  }
+});
+
+// Servir uploads desde /uploads
+app.get('/uploads/:filename(*)', (req, res) => {
+  const filename = req.params.filename;
+  const uploadPath = path.join(uploadsBasePath, filename);
+  
+  if (fs.existsSync(uploadPath)) {
+    res.sendFile(uploadPath);
+  } else {
+    console.log(`⚠️ Upload no encontrado: ${uploadPath}`);
+    res.status(404).json({ error: 'Upload not found' });
+  }
+});
+
+// Servir fuentes desde /fonts
+app.get('/fonts/:filename(*)', (req, res) => {
+  const filename = req.params.filename;
+  const fontPath = path.join(process.cwd(), 'public', 'fonts', filename);
+  
+  if (fs.existsSync(fontPath)) {
+    const ext = path.extname(filename).toLowerCase();
+    const mimeTypes = {
+      '.woff': 'font/woff',
+      '.woff2': 'font/woff2',
+      '.ttf': 'font/truetype',
+      '.otf': 'font/opentype'
+    };
+    
+    if (mimeTypes[ext]) {
+      res.setHeader('Content-Type', mimeTypes[ext]);
+    }
+    
+    res.sendFile(fontPath);
+  } else {
+    console.log(`⚠️ Fuente no encontrada: ${fontPath}`);
+    res.status(404).json({ error: 'Font not found' });
+  }
+});
+
+// Servir archivos de localización desde /locales
+app.get('/locales/:lang/:namespace.json', (req, res) => {
+  const { lang, namespace } = req.params;
+  const localePath = path.join(process.cwd(), 'public', 'locales', lang, `${namespace}.json`);
+  
+  if (fs.existsSync(localePath)) {
+    res.setHeader('Content-Type', 'application/json');
+    res.sendFile(localePath);
+  } else {
+    console.log(`⚠️ Archivo de localización no encontrado: ${localePath}`);
+    res.status(404).json({ error: 'Locale file not found' });
+  }
+});
+
 // Configuraciones específicas con fallback para development
 if (!isProduction) {
   // Solo en desarrollo, servir desde la carpeta uploads original
