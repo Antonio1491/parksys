@@ -81,12 +81,44 @@ export default function InstructorsListPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Estados para diálogos de confirmación
+  const [deleteInstructorId, setDeleteInstructorId] = useState<number | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   // Obtener datos de instructores
   const { data: instructors = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['/api/instructors'],
     retry: 1,
-    suspense: false,
     enabled: true, // Hacemos la consulta automáticamente
+  });
+
+  // Mutación para eliminar un instructor individual
+  const deleteInstructorMutation = useMutation({
+    mutationFn: async (instructorId: number) => {
+      return await apiRequest(`/api/instructors/${instructorId}`, {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: (data, instructorId) => {
+      toast({
+        title: "Instructor eliminado",
+        description: "El instructor ha sido eliminado correctamente",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/instructors'] });
+      setDeleteDialogOpen(false);
+      setDeleteInstructorId(null);
+    },
+    onError: (error) => {
+      console.error("Error al eliminar instructor:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el instructor. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
+      setDeleteDialogOpen(false);
+      setDeleteInstructorId(null);
+    },
   });
 
   // Mutación para eliminar todos los instructores
@@ -165,6 +197,19 @@ export default function InstructorsListPage() {
     deleteAllInstructorsMutation.mutate();
   };
 
+  // Manejar click en botón de eliminar instructor individual
+  const handleDeleteClick = (instructorId: number) => {
+    setDeleteInstructorId(instructorId);
+    setDeleteDialogOpen(true);
+  };
+
+  // Manejar confirmación de eliminar instructor individual
+  const handleConfirmDelete = () => {
+    if (deleteInstructorId !== null) {
+      deleteInstructorMutation.mutate(deleteInstructorId);
+    }
+  };
+
   // Resetear página al cambiar filtros
   useEffect(() => {
     setCurrentPage(1);
@@ -172,18 +217,18 @@ export default function InstructorsListPage() {
 
   // Lista de especialidades únicas para el filtro
   const specialties = React.useMemo(() => {
-    if (!instructors) return [];
+    if (!Array.isArray(instructors) || instructors.length === 0) return [];
     
     const allSpecialties = new Set<string>();
     instructors.forEach((instructor: Instructor) => {
       if (instructor.specialties && Array.isArray(instructor.specialties)) {
-        instructor.specialties.forEach(specialty => {
+        instructor.specialties.forEach((specialty: string) => {
           allSpecialties.add(specialty.trim());
         });
       } else if (instructor.specialties && typeof instructor.specialties === 'string') {
         // Fallback para datos legacy que puedan estar como string
         const specialtiesList = instructor.specialties.split(',');
-        specialtiesList.forEach(specialty => {
+        specialtiesList.forEach((specialty: string) => {
           allSpecialties.add(specialty.trim());
         });
       }
@@ -205,7 +250,9 @@ export default function InstructorsListPage() {
   };
 
   // Renderizar badge de estado
-  const renderStatusBadge = (status: string) => {
+  const renderStatusBadge = (status?: string) => {
+    if (!status) return <Badge>Sin estado</Badge>;
+    
     switch (status) {
       case 'active':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Activo</Badge>;
@@ -258,6 +305,34 @@ export default function InstructorsListPage() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deleteAllInstructorsMutation.isPending ? 'Procesando...' : 'Confirmar eliminación'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Diálogo de confirmación para eliminar un instructor individual */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar instructor?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará permanentemente al instructor seleccionado del sistema.
+              Esta operación no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setDeleteDialogOpen(false);
+              setDeleteInstructorId(null);
+            }}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              disabled={deleteInstructorMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteInstructorMutation.isPending ? 'Eliminando...' : 'Eliminar instructor'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -500,6 +575,15 @@ export default function InstructorsListPage() {
                             title="Editar instructor"
                           >
                             <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteClick(instructor.id)}
+                            title="Eliminar instructor"
+                            className="hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
