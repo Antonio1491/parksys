@@ -488,13 +488,6 @@ const ActivityRegistrationsPage = () => {
                 </Select>
               </div>
 
-              {/* Filtros de fecha */}
-              <div className="flex flex-col md:flex-row gap-4 w-full border-t pt-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">Filtrar por rango de fechas:</span>
-                </div>
-                
                 <div className="flex gap-2 items-center">
                   <div className="flex flex-col">
                     <label className="text-xs text-gray-500 mb-1">Desde</label>
@@ -529,7 +522,6 @@ const ActivityRegistrationsPage = () => {
                   <X className="h-4 w-4" />
                   Limpiar Fechas
                 </Button>
-              </div>
 
               <div className="flex gap-2">
                 {/* Toggle de vista */}
