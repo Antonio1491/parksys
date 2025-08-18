@@ -133,7 +133,7 @@ activityRouter.post("/activities", async (req: Request, res: Response) => {
     console.log("Datos recibidos para crear actividad:", req.body);
     
     // Extraer los datos
-    const { startDate, endDate, parkId, title, description, category, location } = req.body;
+    const { startDate, endDate, parkId, title, description, category, location, status } = req.body;
     
     // Convertir las fechas explícitamente a objetos Date
     let parsedStartDate: Date;
@@ -167,12 +167,12 @@ activityRouter.post("/activities", async (req: Request, res: Response) => {
     // Crear la actividad directamente usando SQL para evitar problemas con el esquema
     try {
       const insertResult = await db.execute(
-        sql`INSERT INTO activities (title, description, park_id, start_date, end_date, category, location)
+        sql`INSERT INTO activities (title, description, park_id, start_date, end_date, category, location, status)
             VALUES (${title}, ${description || null}, ${Number(parkId)}, 
                     ${parsedStartDate}, ${parsedEndDate || null}, ${category || null}, 
-                    ${location || null})
+                    ${location || null}, ${status || 'programada'})
             RETURNING id, title, description, park_id as "parkId", start_date as "startDate", 
-                     end_date as "endDate", category, location, created_at as "createdAt"`
+                     end_date as "endDate", category, location, status, created_at as "createdAt"`
       );
       
       if (insertResult.rows && insertResult.rows.length > 0) {
@@ -205,7 +205,7 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
                a.is_free as "isFree", a.materials, a.requirements, 
                a.is_recurring as "isRecurring", a.recurring_days as "recurringDays",
                a.target_market as "targetMarket", a.special_needs as "specialNeeds",
-               a.instructor_id as "instructorId", 
+               a.instructor_id as "instructorId", a.status,
                a.registration_enabled as "registrationEnabled",
                a.max_registrations as "maxRegistrations", 
                a.registration_deadline as "registrationDeadline",
@@ -284,7 +284,8 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
       startTime, endTime, capacity, duration, price, isPriceRandom, isFree,
       materials, requirements, isRecurring, recurringDays, targetMarket, specialNeeds,
       instructorId, instructorName, instructorContact,
-      allowsPublicRegistration, maxRegistrations, registrationDeadline, requiresApproval
+      allowsPublicRegistration, maxRegistrations, registrationDeadline, requiresApproval,
+      status
     } = req.body;
     
     // Mapear los valores correctos
@@ -361,7 +362,8 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
                 registration_deadline = ${registrationDeadline ? new Date(registrationDeadline) : null},
                 requires_approval = ${Boolean(requiresApproval)},
                 target_market = ${targetMarket ? JSON.stringify(targetMarket) : null},
-                special_needs = ${specialNeeds ? JSON.stringify(specialNeeds) : null}
+                special_needs = ${specialNeeds ? JSON.stringify(specialNeeds) : null},
+                status = ${status || 'programada'}
             WHERE id = ${activityId}
             RETURNING id, title, description, park_id as "parkId", start_date as "startDate", 
                      end_date as "endDate", category_id as "categoryId", location, created_at as "createdAt"`

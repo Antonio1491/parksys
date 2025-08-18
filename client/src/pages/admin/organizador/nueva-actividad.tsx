@@ -39,6 +39,15 @@ import LocationSelector from '@/components/LocationSelector';
 
 // Las categorías se cargan dinámicamente desde la API
 
+// Estados de actividad
+const ESTADOS_ACTIVIDAD = [
+  { id: 'activa', label: '🟢 Activa' },
+  { id: 'programada', label: '🟡 Programada' },
+  { id: 'cancelada', label: '🔴 Cancelada' },
+  { id: 'finalizada', label: '⚫ Finalizada' },
+  { id: 'en_pausa', label: '🟠 En Pausa' }
+];
+
 // Esquema de validación para nueva actividad
 const nuevaActividadSchema = z.object({
   nombre: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -60,6 +69,7 @@ const nuevaActividadSchema = z.object({
   diasRecurrentes: z.array(z.string()).optional(),
   requisitos: z.string().optional(),
   instructorId: z.number().optional(),
+  status: z.string().default('programada'),
 });
 
 type NuevaActividadFormValues = z.infer<typeof nuevaActividadSchema>;
@@ -235,6 +245,7 @@ const NuevaActividadPage = () => {
       ubicacion: '',
       ubicaciones: [],
       diasRecurrentes: [],
+      status: 'programada',
     }
   });
 
@@ -451,6 +462,31 @@ const NuevaActividadPage = () => {
                           {parques.map((parque) => (
                             <SelectItem key={parque.id} value={parque.id.toString()}>
                               {parque.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Estado de la Actividad</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona el estado" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {ESTADOS_ACTIVIDAD.map((estado) => (
+                            <SelectItem key={estado.id} value={estado.id}>
+                              {estado.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
