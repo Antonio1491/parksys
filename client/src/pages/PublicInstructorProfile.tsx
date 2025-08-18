@@ -11,7 +11,9 @@ import {
   User,
   Users,
   Mail,
-  Phone
+  Phone,
+  GraduationCap,
+  Briefcase
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,6 +33,8 @@ interface Instructor {
   bio?: string;
   experienceYears: number;
   specialties: string;
+  certifications?: string[];
+  qualifications?: string;
   profileImageUrl?: string;
   status: string;
   createdAt: string;
@@ -261,6 +265,48 @@ function PublicInstructorProfile() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-700 leading-relaxed">{instructor.bio}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Certificaciones */}
+            {instructor.certifications && instructor.certifications.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <GraduationCap className="h-5 w-5 text-blue-600" />
+                    Certificaciones
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {instructor.certifications.map((certification, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <GraduationCap className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-gray-700">{certification}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Experiencia Profesional */}
+            {instructor.qualifications && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-green-600" />
+                    Experiencia Profesional
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                    <div className="flex items-start gap-3">
+                      <Briefcase className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700 leading-relaxed">{instructor.qualifications}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
