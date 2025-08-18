@@ -63,12 +63,12 @@ const helpItems: HelpItem[] = [
     icon: <TreeDeciduous className="h-4 w-4" />
   },
   {
-    id: 'actividades-guide',
-    title: 'Gestión de Actividades y Eventos',
-    description: 'Crear, programar y gestionar actividades en parques',
+    id: 'actividades-manual',
+    title: 'Manual Completo - Gestión de Actividades',
+    description: 'Guía completa para gestionar actividades, categorías, instructores, inscripciones y horarios',
     module: 'Actividades',
-    type: 'guide',
-    url: '/help/actividades-guide',
+    type: 'manual',
+    url: '/help/actividades-manual',
     icon: <Activity className="h-4 w-4" />
   },
   {
