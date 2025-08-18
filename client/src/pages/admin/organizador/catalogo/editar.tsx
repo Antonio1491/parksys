@@ -386,6 +386,9 @@ const EditarActividadPage = () => {
         requiresApproval: values.requiresApproval,
         ageRestrictions: values.ageRestrictions,
         healthRequirements: values.healthRequirements,
+        
+        // Estado de la actividad
+        status: values.status,
       };
 
       const response = await fetch(`/api/activities/${activityId}`, {
