@@ -154,7 +154,7 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
         qualifications,
         availability,
         hourlyRate,
-
+        experience,
         preferredParkId
       } = req.body;
 
@@ -197,7 +197,8 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
       console.log('🔍 Debugging arrays:', {
         specialties: { original: specialtiesStr, parsed: specialties },
         availability: { original: availability, parsed: availabilityArray },
-        certifications: { original: qualifications, parsed: certificationsArray }
+        certifications: { original: qualifications, parsed: certificationsArray },
+        experience: { value: experience, length: experience?.length }
       });
 
       // Validaciones básicas
@@ -278,6 +279,7 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
           experienceYears: parseInt(experienceYears) || 1,
           bio: bio || '',
           qualifications: qualifications || '',
+          education: experience || '',
           availableDays: availabilityArray,
           hourlyRate: parseFloat(hourlyRate) || 0,
           preferredParkId: preferredParkId ? parseInt(preferredParkId) : null,
@@ -290,6 +292,22 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
           updatedAt: new Date(),
         })
         .returning();
+
+      console.log('🔍 DEBUG - Datos que se insertaron:', {
+        fullName: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
+        email,
+        phone: phone || '',
+        specialties: processedSpecialties,
+        certifications: certificationsArray,
+        experienceYears: parseInt(experienceYears) || 1,
+        bio: bio || '',
+        qualifications: qualifications || '',
+        education: experience || '',
+        availableDays: availabilityArray,
+        hourlyRate: parseFloat(hourlyRate) || 0
+      });
 
       console.log('✅ Instructor creado exitosamente:', {
         instructorId: instructorResult[0].id,
@@ -343,7 +361,7 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
         qualifications,
         availability,
         hourlyRate,
-
+        experience,
         preferredParkId
       } = req.body;
 
@@ -405,6 +423,7 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
         experienceYears: parseInt(experienceYears) || 1,
         bio: bio || '',
         qualifications: qualifications || '',
+        education: experience || '',
         availableDays: availabilityArray,
         hourlyRate: parseFloat(hourlyRate) || 0,
         preferredParkId: preferredParkId ? parseInt(preferredParkId) : null,

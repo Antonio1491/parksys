@@ -1042,6 +1042,7 @@ export const instructors = pgTable("instructors", {
   status: text("status").default("pending"), // pending, active, rejected, inactive
   bio: text("bio"),
   qualifications: text("qualifications"),
+  education: text("education"),
   profileImageUrl: text("profile_image_url"),
   curriculumUrl: text("curriculum_url"),
   hourlyRate: real("hourly_rate").default(0),
