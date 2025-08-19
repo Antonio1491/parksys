@@ -417,6 +417,7 @@ const EditarActividadPage = () => {
       
       queryClient.invalidateQueries({ queryKey: ['/api/activities'] });
       queryClient.invalidateQueries({ queryKey: [`/api/activities/${activityId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/actividades-fotos'] });
       
       setLocation(`/admin/activities`);
     },
