@@ -10,6 +10,41 @@ import { eq, like, desc, asc, count } from 'drizzle-orm';
 
 const router = Router();
 
+// ENDPOINT PRINCIPAL: Obtener todas las especies de fauna (para búsqueda global)
+router.get('/', async (req, res) => {
+  try {
+    console.log('🔍 Main fauna endpoint for search:', req.query);
+    
+    const species = await db
+      .select({
+        id: faunaSpecies.id,
+        common_name: faunaSpecies.commonName,
+        scientific_name: faunaSpecies.scientificName,
+        habitat: faunaSpecies.habitat,
+        image_url: faunaSpecies.imageUrl,
+        category: faunaSpecies.category
+      })
+      .from(faunaSpecies)
+      .orderBy(asc(faunaSpecies.commonName))
+      .limit(100); // Límite razonable para búsqueda
+
+    console.log(`✅ Found ${species.length} fauna species for search`);
+    
+    res.json({
+      success: true,
+      data: species
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching fauna for search:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Error al obtener las especies de fauna',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // Configuración de multer para subida de imágenes
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

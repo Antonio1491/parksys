@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, MapPin, Calendar, Users, TreePine, GraduationCap, Building } from 'lucide-react';
+import { Search, X, MapPin, Calendar, Users, TreePine, GraduationCap, Building, Squirrel, Sparkles, Home } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 
@@ -7,7 +7,7 @@ interface SearchResult {
   id: string;
   title: string;
   description: string;
-  type: 'park' | 'activity' | 'instructor' | 'volunteer' | 'species' | 'concession';
+  type: 'park' | 'activity' | 'instructor' | 'volunteer' | 'species' | 'concession' | 'fauna' | 'event' | 'reservation';
   url: string;
   image?: string;
 }
@@ -58,6 +58,21 @@ const GlobalSearch: React.FC = () => {
     enabled: searchTerm.length >= 2,
   });
 
+  const { data: faunaData } = useQuery({
+    queryKey: ['/api/fauna'],
+    enabled: searchTerm.length >= 2,
+  });
+
+  const { data: eventsData } = useQuery({
+    queryKey: ['/api/events'],
+    enabled: searchTerm.length >= 2,
+  });
+
+  const { data: reservableSpacesData } = useQuery({
+    queryKey: ['/api/reservable-spaces'],
+    enabled: searchTerm.length >= 2,
+  });
+
   // Procesar resultados de búsqueda
   useEffect(() => {
     if (searchTerm.length < 2) {
@@ -70,7 +85,7 @@ const GlobalSearch: React.FC = () => {
 
     // Buscar en parques
     const parks = parksData?.data || parksData || [];
-    if (Array.isArray(parks)) {
+    if (Array.isArray(parks) && parks.length > 0) {
       parks
         .filter((park: any) => 
           park.name?.toLowerCase().includes(searchLower) ||
@@ -92,7 +107,7 @@ const GlobalSearch: React.FC = () => {
 
     // Buscar en actividades
     const activities = activitiesData?.data || activitiesData || [];
-    if (Array.isArray(activities)) {
+    if (Array.isArray(activities) && activities.length > 0) {
       activities
         .filter((activity: any) => 
           activity.title?.toLowerCase().includes(searchLower) ||
@@ -113,7 +128,7 @@ const GlobalSearch: React.FC = () => {
 
     // Buscar en instructores
     const instructors = instructorsData?.data || instructorsData || [];
-    if (Array.isArray(instructors)) {
+    if (Array.isArray(instructors) && instructors.length > 0) {
       instructors
         .filter((instructor: any) => {
           const name = instructor.name || instructor.fullName || instructor.full_name || '';
@@ -144,7 +159,7 @@ const GlobalSearch: React.FC = () => {
 
     // Buscar en especies arbóreas
     const species = speciesData?.data || speciesData || [];
-    if (Array.isArray(species)) {
+    if (Array.isArray(species) && species.length > 0) {
       species
         .filter((specie: any) => 
           specie.common_name?.toLowerCase().includes(searchLower) ||
@@ -165,7 +180,7 @@ const GlobalSearch: React.FC = () => {
 
     // Buscar en concesiones
     const concessions = concessionsData?.data || concessionsData || [];
-    if (Array.isArray(concessions)) {
+    if (Array.isArray(concessions) && concessions.length > 0) {
       concessions
         .filter((concession: any) => 
           concession.name?.toLowerCase().includes(searchLower) ||
@@ -184,8 +199,74 @@ const GlobalSearch: React.FC = () => {
         });
     }
 
-    setResults(searchResults.slice(0, 10)); // Máximo 10 resultados
-  }, [searchTerm, parksData, activitiesData, instructorsData, speciesData, concessionsData]);
+    // Buscar en fauna
+    const fauna = faunaData?.data || faunaData || [];
+    if (Array.isArray(fauna) && fauna.length > 0) {
+      fauna
+        .filter((animal: any) => 
+          animal.common_name?.toLowerCase().includes(searchLower) ||
+          animal.scientific_name?.toLowerCase().includes(searchLower) ||
+          animal.habitat?.toLowerCase().includes(searchLower)
+        )
+        .slice(0, 2)
+        .forEach((animal: any) => {
+          searchResults.push({
+            id: `fauna-${animal.id}`,
+            title: animal.common_name || animal.scientific_name,
+            description: `Fauna - ${animal.scientific_name} (${animal.habitat || 'Hábitat variado'})`,
+            type: 'fauna',
+            url: `/fauna/${animal.id}`,
+            image: animal.image_url
+          });
+        });
+    }
+
+    // Buscar en eventos
+    const events = eventsData?.data || eventsData || [];
+    if (Array.isArray(events) && events.length > 0) {
+      events
+        .filter((event: any) => 
+          event.title?.toLowerCase().includes(searchLower) ||
+          event.description?.toLowerCase().includes(searchLower) ||
+          event.category?.toLowerCase().includes(searchLower)
+        )
+        .slice(0, 2)
+        .forEach((event: any) => {
+          searchResults.push({
+            id: `event-${event.id}`,
+            title: event.title,
+            description: `Evento - ${event.description?.substring(0, 100) || 'Sin descripción'}...`,
+            type: 'event',
+            url: `/events/${event.id}`,
+            image: event.imageUrl
+          });
+        });
+    }
+
+    // Buscar en espacios reservables
+    const reservableSpaces = reservableSpacesData?.data || reservableSpacesData || [];
+    if (Array.isArray(reservableSpaces) && reservableSpaces.length > 0) {
+      reservableSpaces
+        .filter((space: any) => 
+          space.name?.toLowerCase().includes(searchLower) ||
+          space.description?.toLowerCase().includes(searchLower) ||
+          space.location?.toLowerCase().includes(searchLower)
+        )
+        .slice(0, 2)
+        .forEach((space: any) => {
+          searchResults.push({
+            id: `reservation-${space.id}`,
+            title: space.name,
+            description: `Espacio reservable - ${space.description?.substring(0, 100) || space.location || 'Disponible para reservas'}...`,
+            type: 'reservation',
+            url: `/reservations/space/${space.id}`,
+            image: space.imageUrl
+          });
+        });
+    }
+
+    setResults(searchResults.slice(0, 12)); // Aumentado a 12 resultados
+  }, [searchTerm, parksData, activitiesData, instructorsData, speciesData, concessionsData, faunaData, eventsData, reservableSpacesData]);
 
   const handleResultClick = (url: string) => {
     navigate(url);
@@ -202,6 +283,9 @@ const GlobalSearch: React.FC = () => {
       case 'volunteer': return <Users {...iconProps} />;
       case 'species': return <TreePine {...iconProps} />;
       case 'concession': return <Building {...iconProps} />;
+      case 'fauna': return <Squirrel {...iconProps} />;
+      case 'event': return <Sparkles {...iconProps} />;
+      case 'reservation': return <Home {...iconProps} />;
       default: return <Search {...iconProps} />;
     }
   };
@@ -214,6 +298,9 @@ const GlobalSearch: React.FC = () => {
       case 'volunteer': return 'Voluntario';
       case 'species': return 'Especie';
       case 'concession': return 'Concesión';
+      case 'fauna': return 'Fauna';
+      case 'event': return 'Evento';
+      case 'reservation': return 'Reservación';
       default: return 'Resultado';
     }
   };
@@ -226,6 +313,9 @@ const GlobalSearch: React.FC = () => {
       case 'volunteer': return 'text-orange-600 bg-orange-50';
       case 'species': return 'text-emerald-600 bg-emerald-50';
       case 'concession': return 'text-gray-600 bg-gray-50';
+      case 'fauna': return 'text-amber-600 bg-amber-50';
+      case 'event': return 'text-pink-600 bg-pink-50';
+      case 'reservation': return 'text-teal-600 bg-teal-50';
       default: return 'text-gray-600 bg-gray-50';
     }
   };
@@ -259,7 +349,7 @@ const GlobalSearch: React.FC = () => {
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Buscar parques, actividades, instructores..."
+                  placeholder="Buscar parques, actividades, fauna, eventos, reservaciones..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="flex-1 outline-none text-sm placeholder-gray-400"

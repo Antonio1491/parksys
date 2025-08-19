@@ -422,6 +422,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   console.log('🌳 Todas las rutas de árboles registradas');
   
+  // Registramos las rutas de fauna
+  const faunaRouter = await import('./faunaRoutes');
+  apiRouter.use('/fauna', faunaRouter.default);
+  console.log('🐾 Rutas de fauna registradas');
+  
+  // Añadimos endpoint específico para tree-species (búsqueda global)
+  apiRouter.get('/tree-species', async (req: Request, res: Response) => {
+    try {
+      console.log('🌲 Tree species endpoint for search:', req.query);
+      
+      const result = await pool.query(`
+        SELECT 
+          id,
+          common_name,
+          scientific_name,
+          family,
+          characteristics,
+          image_url
+        FROM tree_species
+        ORDER BY common_name ASC
+        LIMIT 100
+      `);
+      
+      console.log(`✅ Found ${result.rows.length} tree species for search`);
+      
+      res.json({
+        success: true,
+        data: result.rows
+      });
+      
+    } catch (error) {
+      console.error('❌ Error fetching tree species for search:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Error al obtener especies de árboles',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
   // Registramos las rutas del módulo de eventos
   registerEventRoutes(app, apiRouter, isAuthenticated);
   
