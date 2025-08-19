@@ -322,6 +322,12 @@ const Header: React.FC = () => {
                           Eventos
                         </Link>
                         <Link
+                          href="/admin/dashboard-reservas"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                        >
+                        Reservas
+                        </Link>
+                        <Link
                               href="/admin/evaluaciones"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                         >

@@ -623,13 +623,6 @@ const AdminSidebarComplete: React.FC = () => {
               onToggle={toggleSubmenu}
             >
               <NavItem 
-                href="/admin/dashboard-reservas" 
-                icon={<BarChart3 className="h-4 w-4" />}
-                active={location.startsWith('/admin/dashboard-reservas')}
-              >
-                Dashboard Reservas
-              </NavItem>
-              <NavItem 
                 href="/admin/space-reservations" 
                 icon={<Calendar className="h-4 w-4" />}
                 active={location.startsWith('/admin/space-reservations')}
