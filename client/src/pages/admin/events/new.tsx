@@ -133,6 +133,7 @@ const NewEventPage: React.FC = () => {
       registrationType: "open",
       parkIds: [],
       organizerName: "",
+      organizerOrganization: "",
       organizerEmail: "",
       organizerPhone: "",
       geolocation: null,
