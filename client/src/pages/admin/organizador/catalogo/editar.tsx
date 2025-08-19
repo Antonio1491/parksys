@@ -327,6 +327,11 @@ const EditarActividadPage = () => {
   const updateMutation = useMutation({
     mutationFn: async (values: FormValues) => {
       console.log('Enviando datos de edición:', values);
+      console.log('🔍 STATUS ESPECÍFICO enviado:', {
+        status: values.status,
+        statusType: typeof values.status,
+        statusLength: values.status?.length
+      });
 
       // Buscamos el instructor seleccionado para obtener sus datos
       let instructorData = {};
