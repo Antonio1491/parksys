@@ -63,6 +63,7 @@ interface ActivityData {
   recurringDays?: string[];
   duration?: number;
   isFree?: boolean;
+  status?: 'activa' | 'programada' | 'cancelada' | 'finalizada' | 'en_pausa';
 }
 
 const categoryColors = {
@@ -74,6 +75,22 @@ const categoryColors = {
   'Naturaleza y Ciencia': 'bg-teal-100 text-teal-800 border-teal-200',
   'Fitness y Ejercicio': 'bg-indigo-100 text-indigo-800 border-indigo-200',
   'Actividades Familiares': 'bg-pink-100 text-pink-800 border-pink-200'
+};
+
+const statusColors = {
+  'activa': 'bg-green-500 text-white border-green-600',
+  'programada': 'bg-blue-500 text-white border-blue-600',
+  'cancelada': 'bg-red-500 text-white border-red-600',
+  'finalizada': 'bg-gray-500 text-white border-gray-600',
+  'en_pausa': 'bg-yellow-500 text-white border-yellow-600'
+};
+
+const statusLabels = {
+  'activa': 'Activa',
+  'programada': 'Programada',
+  'cancelada': 'Cancelada',
+  'finalizada': 'Finalizada',
+  'en_pausa': 'En Pausa'
 };
 
 // Componente para tarjeta horizontal de actividad
@@ -91,6 +108,8 @@ function HorizontalActivityCard({
   };
 
   const categoryColor = categoryColors[activity.category as keyof typeof categoryColors] || 'bg-gray-100 text-gray-800 border-gray-200';
+  const statusColor = statusColors[activity.status as keyof typeof statusColors] || 'bg-gray-500 text-white border-gray-600';
+  const statusLabel = statusLabels[activity.status as keyof typeof statusLabels] || 'Sin estado';
   
   // Calcular el conteo de actividades del parque
   const parkActivitiesCount = allActivities.filter(a => a.parkId === activity.parkId).length;
@@ -122,6 +141,13 @@ function HorizontalActivityCard({
           {activity.category && (
             <Badge className={`${categoryColor} border text-xs absolute top-2 left-2 shadow-md z-10`}>
               {activity.category}
+            </Badge>
+          )}
+
+          {/* Badge de estado - esquina superior derecha */}
+          {activity.status && (
+            <Badge className={`${statusColor} border text-xs absolute top-2 right-2 shadow-md z-10 font-semibold`}>
+              {statusLabel}
             </Badge>
           )}
           
@@ -173,6 +199,8 @@ function HorizontalActivityCard({
 // Tarjeta simplificada para carrusel
 function CarouselActivityCard({ activity, isCenter = false }: { activity: ActivityData; isCenter?: boolean }) {
   const categoryColor = categoryColors[activity.category as keyof typeof categoryColors] || 'bg-gray-100 text-gray-800 border-gray-200';
+  const statusColor = statusColors[activity.status as keyof typeof statusColors] || 'bg-gray-500 text-white border-gray-600';
+  const statusLabel = statusLabels[activity.status as keyof typeof statusLabels] || 'Sin estado';
   const parksResponse = useQuery({ queryKey: ['/api/parks'] });
   const parksData = parksResponse.data || [];
   
@@ -214,6 +242,15 @@ function CarouselActivityCard({ activity, isCenter = false }: { activity: Activi
             {activity.category}
           </Badge>
         </div>
+
+        {/* Badge de estado */}
+        {activity.status && (
+          <div className="absolute top-3 right-3">
+            <Badge className={`${statusColor} border shadow-sm text-xs font-semibold`}>
+              {statusLabel}
+            </Badge>
+          </div>
+        )}
         
         {/* Contenido superpuesto con fondo semitransparente */}
         <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm p-4 space-y-2">
@@ -246,6 +283,8 @@ function CarouselActivityCard({ activity, isCenter = false }: { activity: Activi
 
 function ActivityCard({ activity, viewMode }: { activity: ActivityData; viewMode: 'grid' | 'list' }) {
   const categoryColor = categoryColors[activity.category as keyof typeof categoryColors] || 'bg-gray-100 text-gray-800 border-gray-200';
+  const statusColor = statusColors[activity.status as keyof typeof statusColors] || 'bg-gray-500 text-white border-gray-600';
+  const statusLabel = statusLabels[activity.status as keyof typeof statusLabels] || 'Sin estado';
   
   const startDate = new Date(activity.startDate);
   const endDate = new Date(activity.endDate);
@@ -262,6 +301,11 @@ function ActivityCard({ activity, viewMode }: { activity: ActivityData; viewMode
                 <Badge className={`${categoryColor} border`}>
                   {activity.category}
                 </Badge>
+                {activity.status && (
+                  <Badge className={`${statusColor} border font-semibold`}>
+                    {statusLabel}
+                  </Badge>
+                )}
               </div>
               
               <p className="text-gray-600 mb-4 line-clamp-2">{activity.description}</p>
@@ -385,8 +429,19 @@ function ActivityCard({ activity, viewMode }: { activity: ActivityData; viewMode
             {activity.category}
           </Badge>
         </div>
-        {activity.price === 0 && (
+        
+        {/* Badge de estado - prioridad en esquina superior derecha */}
+        {activity.status && (
           <div className="absolute top-4 right-4">
+            <Badge className={`${statusColor} border shadow-sm font-semibold`}>
+              {statusLabel}
+            </Badge>
+          </div>
+        )}
+        
+        {/* Badge de gratis - se muestra debajo del estado si ambos existen */}
+        {activity.price === 0 && (
+          <div className={`absolute ${activity.status ? 'top-12' : 'top-4'} right-4`}>
             <Badge className="bg-green-500 text-white border-0 shadow-sm">
               <Heart className="h-3 w-3 mr-1" />
               Gratis

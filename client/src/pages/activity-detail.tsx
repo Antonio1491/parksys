@@ -17,6 +17,23 @@ const stripeOptions = {
 import { ActivityPaymentForm } from '@/components/ActivityPaymentForm';
 import { apiRequest } from '@/lib/queryClient';
 
+// Configuraciones de colores para estados
+const statusColors = {
+  'activa': 'bg-green-500 text-white border-green-600',
+  'programada': 'bg-blue-500 text-white border-blue-600',
+  'cancelada': 'bg-red-500 text-white border-red-600',
+  'finalizada': 'bg-gray-500 text-white border-gray-600',
+  'en_pausa': 'bg-yellow-500 text-white border-yellow-600'
+};
+
+const statusLabels = {
+  'activa': 'Activa',
+  'programada': 'Programada',
+  'cancelada': 'Cancelada',
+  'finalizada': 'Finalizada',
+  'en_pausa': 'En Pausa'
+};
+
 interface ActivityData {
   id: number;
   title: string;
@@ -53,6 +70,7 @@ interface ActivityData {
   requiresApproval?: boolean;
   ageRestrictions?: string;
   healthRequirements?: string;
+  status?: 'activa' | 'programada' | 'cancelada' | 'finalizada' | 'en_pausa';
 }
 
 interface InstructorDetails {
@@ -460,6 +478,11 @@ function ActivityDetailPage() {
                       <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                         <Tag className="h-3 w-3 mr-1" />
                         {activity.categoryName}
+                      </Badge>
+                    )}
+                    {activity?.status && (
+                      <Badge className={`${statusColors[activity.status as keyof typeof statusColors]} font-semibold`}>
+                        {statusLabels[activity.status as keyof typeof statusLabels]}
                       </Badge>
                     )}
                   </div>
