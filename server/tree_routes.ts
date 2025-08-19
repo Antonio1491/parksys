@@ -53,8 +53,8 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
           WHERE t.id = ${treeId}
         `);
         
-        if (treeWithPark.length > 0) {
-          const parkId = treeWithPark[0].park_id;
+        if (treeWithPark.rows.length > 0) {
+          const parkId = (treeWithPark.rows[0] as any).park_id;
           const parkEvaluations = await db.execute(sql`
             SELECT 
               id,
@@ -69,7 +69,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
             ORDER BY evaluation_date DESC
             LIMIT 20
           `);
-          evaluationData.push(...parkEvaluations);
+          evaluationData.push(...parkEvaluations.rows);
         }
       } catch (error) {
         console.log('No se encontraron evaluaciones de parque para este árbol');
@@ -93,7 +93,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         `);
         
         // Transformar datos de mantenimiento a formato de evaluación
-        const transformedMaintenanceData = maintenanceEvaluations.map((item: any) => ({
+        const transformedMaintenanceData = maintenanceEvaluations.rows.map((item: any) => ({
           ...item,
           healthStatus: item.status,
           evaluatorName: `Empleado ID: ${item.performed_by}`,
@@ -728,7 +728,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         headers.join(','),
         ...mexicanSpeciesSample.map(species => 
           headers.map(header => {
-            const value = species[header] || '';
+            const value = (species as any)[header] || '';
             const escapedValue = String(value).replace(/"/g, '""');
             return escapedValue.includes(',') || escapedValue.includes('\n') ? `"${escapedValue}"` : escapedValue;
           }).join(',')
@@ -849,8 +849,8 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
             const origin = row.origin || 'Desconocido';
             
             insertData = {
-              common_name: familyToCommonName[family] || `Árbol de ${family}`,
-              scientific_name: familyToScientificName[family] || `${family} sp.`,
+              common_name: (familyToCommonName as any)[family] || `Árbol de ${family}`,
+              scientific_name: (familyToScientificName as any)[family] || `${family} sp.`,
               family: family,
               origin: origin,
               growth_rate: 'Medio',
@@ -1253,7 +1253,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         WHERE species_id = ${id}
       `);
       
-      if (treeCount.rows[0]?.count > 0) {
+      if ((treeCount.rows[0] as any)?.count > 0) {
         return res.status(400).json({ 
           message: "No se puede eliminar la especie porque tiene árboles asociados" 
         });
@@ -1340,7 +1340,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
       const formattedTrees = result.rows.map(tree => ({
         id: tree.id,
         // Crear un código generado a partir del ID
-        code: `ARB-${tree.id.toString().padStart(5, '0')}`,
+        code: `ARB-${(tree.id as any).toString().padStart(5, '0')}`,
         speciesId: tree.species_id,
         parkId: tree.park_id,
         latitude: tree.latitude,
@@ -1841,7 +1841,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         ORDER BY t.id DESC
       `;
 
-      const result = await db.execute(sql.raw(query, queryParams));
+      const result = await db.execute(sql.raw(query));
 
       // Crear contenido CSV
       const headers = [
