@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-const logoPath = "/images/login-logo.png";
+import logoPath from "@assets/Parksys smart Management 2_1755620540116.png";
 
 const loginSchema = z.object({
   username: z.string().min(1, { message: 'El nombre de usuario es requerido' }),

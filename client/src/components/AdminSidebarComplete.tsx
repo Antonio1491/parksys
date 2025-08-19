@@ -117,6 +117,8 @@ interface ModuleNavProps {
   defaultOpen?: boolean;
 }
 
+const sidebarItemLayout = "w-full flex items-center text-sm font-normal text-white hover:bg-teal-600 transition-colors rounded-lg h-9 px-2";
+
 const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleColor }) => {
   const iconWithClass = React.cloneElement(icon as React.ReactElement, {
     className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-white')
@@ -127,8 +129,8 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start text-sm font-normal h-9 text-white hover:bg-teal-600 hover:text-white",
-          active && "bg-teal-500 text-white font-medium"
+          "w-full flex items-center justify-start text-sm font-normal h-9 px-2 text-white hover:bg-teal-600",
+          active && "bg-teal-500 font-medium"
         )}
       >
         {iconWithClass}
@@ -261,14 +263,17 @@ const CollapsibleSubmenu: React.FC<{
     <div className="mb-3">
       <button
         onClick={() => onToggle(id)}
-        className="w-full flex items-center justify-between p-2 text-sm font-medium text-white hover:bg-teal-600 rounded-lg transition-colors"
+        className="w-full flex items-center justify-start text-sm font-medium text-white hover:bg-teal-600 rounded-lg transition-colors h-9 px-2"
       >
         <div className="flex items-center">
-          <span className="text-white">{React.cloneElement(icon as React.ReactElement, { className: 'h-4 w-4 text-white' })}</span>
+          {iconWithClass}
           <span className="ml-2">{title}</span>
         </div>
-        <ChevronRight 
-          className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''} text-white`}
+        <ChevronRight
+          className={cn(
+            "ml-auto h-4 w-4 transition-transform text-white",
+            isExpanded && "rotate-90"
+          )}
         />
       </button>
       {isExpanded && (
