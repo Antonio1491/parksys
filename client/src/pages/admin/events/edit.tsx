@@ -28,6 +28,8 @@ const editEventSchema = z.object({
   category: z.string().min(1, 'Debe seleccionar una categoría'),
   capacity: z.string().optional(),
   location: z.string().optional(),
+  organizer_name: z.string().optional(),
+  organizer_organization: z.string().optional(),
   contact_email: z.string().email('Email inválido').optional().or(z.literal('')),
   contact_phone: z.string().optional(),
   registration_required: z.boolean().default(false),
@@ -84,6 +86,8 @@ export default function EditEventPage() {
       category: '',
       capacity: '',
       location: '',
+      organizer_name: '',
+      organizer_organization: '',
       contact_email: '',
       contact_phone: '',
       registration_required: false,
@@ -94,29 +98,31 @@ export default function EditEventPage() {
 
   // Actualizar el formulario cuando se cargue el evento
   useEffect(() => {
-    if (event) {
-      console.log('🔄 Cargando datos del evento:', event);
+    if (event?.data) {
+      console.log('🔄 Cargando datos del evento:', event.data);
       
       // Establecer la imagen del evento
-      if (event.featuredImageUrl) {
-        setEventImage(event.featuredImageUrl);
+      if (event.data.featuredImageUrl) {
+        setEventImage(event.data.featuredImageUrl);
       }
 
       // Actualizar valores del formulario
       form.reset({
-        title: event.title || '',
-        description: event.description || '',
-        start_date: formatDateForInput(event.startDate),
-        end_date: formatDateForInput(event.endDate),
-        start_time: extractTime(event.startDate),
-        end_time: extractTime(event.endDate),
-        park_id: event.parkIds && event.parkIds.length > 0 ? String(event.parkIds[0]) : '',
-        category: event.eventType || '',
-        capacity: event.capacity ? String(event.capacity) : '',
-        location: event.location || '',
-        contact_email: event.organizerEmail || '',
-        contact_phone: event.organizerPhone || '',
-        registration_required: event.registrationType === 'registration',
+        title: event.data.title || '',
+        description: event.data.description || '',
+        start_date: formatDateForInput(event.data.startDate),
+        end_date: formatDateForInput(event.data.endDate),
+        start_time: extractTime(event.data.startDate),
+        end_time: extractTime(event.data.endDate),
+        park_id: event.data.parkIds && event.data.parkIds.length > 0 ? String(event.data.parkIds[0]) : '',
+        category: event.data.eventType || '',
+        capacity: event.data.capacity ? String(event.data.capacity) : '',
+        location: event.data.location || '',
+        organizer_name: event.data.organizerName || '',
+        organizer_organization: event.data.organizerOrganization || '',
+        contact_email: event.data.organizerEmail || '',
+        contact_phone: event.data.organizerPhone || '',
+        registration_required: event.data.registrationType === 'registration',
         price: '',
         notes: ''
       });
@@ -126,10 +132,10 @@ export default function EditEventPage() {
   // Obtener parques para el selector
   const { data: parks } = useQuery({
     queryKey: ['/api/parks'],
-    select: (data: any[]) => data.map((park: any) => ({
+    select: (data: any) => data?.data?.map((park: any) => ({
       id: park.id,
       name: park.name
-    }))
+    })) || []
   });
 
   // Obtener categorías de eventos
@@ -150,6 +156,8 @@ export default function EditEventPage() {
         endTime: data.end_time || null,
         capacity: data.capacity ? parseInt(data.capacity) : null,
         location: data.location || null,
+        organizerName: data.organizer_name || null,
+        organizerOrganization: data.organizer_organization || null,
         organizerEmail: data.contact_email || null,
         organizerPhone: data.contact_phone || null,
         registrationType: data.registration_required ? 'registration' : 'free',
@@ -202,7 +210,7 @@ export default function EditEventPage() {
     );
   }
 
-  if (!event) {
+  if (!event?.data) {
     return (
       <AdminLayout>
         <div className="text-center py-12">
@@ -311,7 +319,7 @@ export default function EditEventPage() {
                           <SelectValue placeholder="Seleccionar categoría" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories?.map((category: any) => (
+                          {categories?.data?.map((category: any) => (
                             <SelectItem key={category.id} value={category.name}>
                               {category.name}
                             </SelectItem>
@@ -476,6 +484,26 @@ export default function EditEventPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="organizer_name">Nombre del Organizador</Label>
+                    <Input
+                      id="organizer_name"
+                      {...form.register('organizer_name')}
+                      placeholder="Nombre del organizador"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="organizer_organization">Empresa / Organización</Label>
+                    <Input
+                      id="organizer_organization"
+                      {...form.register('organizer_organization')}
+                      placeholder="Nombre de la empresa u organización"
+                      className="mt-1"
+                    />
+                  </div>
+
                   <div>
                     <Label htmlFor="contact_email">Email de Contacto</Label>
                     <Input

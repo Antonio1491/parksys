@@ -63,6 +63,7 @@ const eventFormSchema = z.object({
   registrationType: z.string().default("open"),
   parkIds: z.array(z.coerce.number()).optional().default([]),
   organizerName: z.string().optional().nullable(),
+  organizerOrganization: z.string().optional().nullable(),
   organizerEmail: z.string().email().optional().nullable(),
   organizerPhone: z.string().optional().nullable(),
   geolocation: z.any().optional().nullable(),
@@ -441,20 +442,20 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {parks.map((park: any) => (
+                          {parks?.data?.map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
-                          ))}
+                          )) || []}
                         </SelectContent>
                       </Select>
                       <FormDescription>
                         Parques seleccionados:{" "}
                         {field.value?.length
-                          ? parks
-                              .filter((park: any) => field.value?.includes(park.id))
-                              .map((park: any) => park.name)
-                              .join(", ")
+                          ? parks?.data
+                              ?.filter((park: any) => field.value?.includes(park.id))
+                              ?.map((park: any) => park.name)
+                              ?.join(", ")
                           : "Ninguno"}
                       </FormDescription>
                       <FormMessage />
@@ -562,8 +563,25 @@ const NewEventPage: React.FC = () => {
                     <FormItem>
                       <FormLabel>Nombre del organizador</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nombre" {...field} value={field.value || ""} />
+                        <Input placeholder="Nombre del organizador" {...field} value={field.value || ""} />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="organizerOrganization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Empresa / Organización</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nombre de la empresa u organización" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormDescription>
+                        Opcional: entidad que organiza el evento
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
