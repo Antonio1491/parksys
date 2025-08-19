@@ -462,6 +462,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Añadimos endpoint para concesiones (búsqueda global)
+  apiRouter.get('/concessions', async (req: Request, res: Response) => {
+    try {
+      console.log('🏢 Concessions endpoint for search:', req.query);
+      
+      const result = await pool.query(`
+        SELECT 
+          id,
+          vendor_name,
+          location,
+          status,
+          start_date,
+          end_date,
+          park_id,
+          notes
+        FROM concessions
+        WHERE status = 'activa'
+        ORDER BY vendor_name ASC
+        LIMIT 100
+      `);
+      
+      console.log(`✅ Found ${result.rows.length} concessions for search`);
+      
+      res.json({
+        success: true,
+        data: result.rows
+      });
+      
+    } catch (error) {
+      console.error('❌ Error fetching concessions for search:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Error al obtener concesiones',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
   // Registramos las rutas del módulo de eventos
   registerEventRoutes(app, apiRouter, isAuthenticated);
   

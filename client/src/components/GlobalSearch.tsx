@@ -84,7 +84,7 @@ const GlobalSearch: React.FC = () => {
     const searchLower = searchTerm.toLowerCase();
 
     // Buscar en parques
-    const parks = parksData?.data || parksData || [];
+    const parks = (parksData as any)?.data || parksData || [];
     if (Array.isArray(parks) && parks.length > 0) {
       parks
         .filter((park: any) => 
@@ -106,7 +106,7 @@ const GlobalSearch: React.FC = () => {
     }
 
     // Buscar en actividades
-    const activities = activitiesData?.data || activitiesData || [];
+    const activities = (activitiesData as any)?.data || activitiesData || [];
     if (Array.isArray(activities) && activities.length > 0) {
       activities
         .filter((activity: any) => 
@@ -127,7 +127,7 @@ const GlobalSearch: React.FC = () => {
     }
 
     // Buscar en instructores
-    const instructors = instructorsData?.data || instructorsData || [];
+    const instructors = (instructorsData as any)?.data || instructorsData || [];
     if (Array.isArray(instructors) && instructors.length > 0) {
       instructors
         .filter((instructor: any) => {
@@ -158,7 +158,7 @@ const GlobalSearch: React.FC = () => {
     }
 
     // Buscar en especies arbóreas
-    const species = speciesData?.data || speciesData || [];
+    const species = (speciesData as any)?.data || speciesData || [];
     if (Array.isArray(species) && species.length > 0) {
       species
         .filter((specie: any) => 
@@ -179,19 +179,20 @@ const GlobalSearch: React.FC = () => {
     }
 
     // Buscar en concesiones
-    const concessions = concessionsData?.data || concessionsData || [];
+    const concessions = (concessionsData as any)?.data || concessionsData || [];
     if (Array.isArray(concessions) && concessions.length > 0) {
       concessions
         .filter((concession: any) => 
-          concession.name?.toLowerCase().includes(searchLower) ||
-          concession.description?.toLowerCase().includes(searchLower)
+          concession.vendor_name?.toLowerCase().includes(searchLower) ||
+          concession.location?.toLowerCase().includes(searchLower) ||
+          concession.notes?.toLowerCase().includes(searchLower)
         )
         .slice(0, 2)
         .forEach((concession: any) => {
           searchResults.push({
             id: `concession-${concession.id}`,
-            title: concession.name,
-            description: `Concesión - ${concession.description?.substring(0, 100) || 'Sin descripción'}...`,
+            title: concession.vendor_name || `Concesión ${concession.id}`,
+            description: `Concesión - ${concession.location || concession.notes?.substring(0, 100) || 'Sin descripción'}...`,
             type: 'concession',
             url: `/concessions/${concession.id}`,
             image: concession.imageUrl
@@ -200,7 +201,7 @@ const GlobalSearch: React.FC = () => {
     }
 
     // Buscar en fauna
-    const fauna = faunaData?.data || faunaData || [];
+    const fauna = (faunaData as any)?.data || faunaData || [];
     if (Array.isArray(fauna) && fauna.length > 0) {
       fauna
         .filter((animal: any) => 
@@ -222,7 +223,7 @@ const GlobalSearch: React.FC = () => {
     }
 
     // Buscar en eventos
-    const events = eventsData?.data || eventsData || [];
+    const events = (eventsData as any)?.data || eventsData || [];
     if (Array.isArray(events) && events.length > 0) {
       events
         .filter((event: any) => 
@@ -244,7 +245,7 @@ const GlobalSearch: React.FC = () => {
     }
 
     // Buscar en espacios reservables
-    const reservableSpaces = reservableSpacesData?.data || reservableSpacesData || [];
+    const reservableSpaces = (reservableSpacesData as any) || [];
     if (Array.isArray(reservableSpaces) && reservableSpaces.length > 0) {
       reservableSpaces
         .filter((space: any) => 
