@@ -47,6 +47,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Tag, Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 // Schema de validación para editar categorías
 const categorySchema = z.object({
@@ -54,6 +55,7 @@ const categorySchema = z.object({
   description: z.string().optional(),
   color: z.string().default("#00a587"),
   icon: z.string().default("tag"),
+  isActive: z.boolean().default(true),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -87,6 +89,7 @@ const ActivityCategoriesPage: React.FC = () => {
       description: "",
       color: "#00a587",
       icon: "tag",
+      isActive: true,
     },
   });
 
@@ -95,7 +98,7 @@ const ActivityCategoriesPage: React.FC = () => {
     mutationFn: async (data: { id: number; updates: CategoryFormData }) => {
       return apiRequest(`/api/activity-categories/${data.id}`, {
         method: 'PUT',
-        body: JSON.stringify(data.updates),
+        data: data.updates,
       });
     },
     onSuccess: () => {
@@ -148,6 +151,7 @@ const ActivityCategoriesPage: React.FC = () => {
       description: category.description || "",
       color: category.color || "#00a587",
       icon: category.icon || "tag",
+      isActive: category.isActive !== false,
     });
     setIsEditDialogOpen(true);
   };
@@ -264,7 +268,7 @@ const ActivityCategoriesPage: React.FC = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900">Categorías Activas</h3>
                 <p className="text-3xl font-bold mt-2">
-                  {categoryData.filter(cat => cat.count > 0).length}
+                  {categoryData.filter(cat => cat.isActive).length}
                 </p>
               </div>
               <div className="bg-green-100 p-3 rounded-full">
@@ -345,10 +349,10 @@ const ActivityCategoriesPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Badge 
-                        variant={category.count > 0 ? "default" : "secondary"}
-                        className={category.count > 0 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}
+                        variant={category.isActive ? "default" : "secondary"}
+                        className={category.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}
                       >
-                        {category.count > 0 ? 'Activa' : 'Inactiva'}
+                        {category.isActive ? 'Activa' : 'Inactiva'}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -480,6 +484,29 @@ const ActivityCategoriesPage: React.FC = () => {
                         <Input type="color" {...field} />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Estado de la categoría
+                        </FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          {field.value ? "Categoría activa y disponible" : "Categoría inactiva (no se muestra en formularios)"}
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
