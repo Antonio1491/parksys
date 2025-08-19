@@ -834,6 +834,11 @@ function Router() {
         </Route>
 
         {/* RUTAS RESERVAS DE ESPACIOS */}
+        <Route path="/admin/dashboard-reservas">
+          <Suspense fallback={<div className="p-8 text-center">Cargando dashboard de reservas...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/dashboard-reservas')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/space-reservations">
           <Suspense fallback={<div className="p-8 text-center">Cargando reservas de espacios...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/space-reservations/index')))}

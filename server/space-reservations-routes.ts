@@ -416,7 +416,11 @@ export function registerSpaceReservationRoutes(app: any, apiRouter: any, isAuthe
 
       const result = await pool.query(query);
 
-      const stats = {
+      const stats: {
+        total: number;
+        byStatus: { [key: string]: number };
+        bySpaceType: { [key: string]: number };
+      } = {
         total: 0,
         byStatus: {},
         bySpaceType: {}
@@ -440,6 +444,108 @@ export function registerSpaceReservationRoutes(app: any, apiRouter: any, isAuthe
     } catch (error) {
       console.error('Error fetching reservations stats:', error);
       res.status(500).json({ error: 'Error al obtener estadísticas' });
+    }
+  });
+
+  // Estadísticas para dashboard de reservas
+  apiRouter.get('/space-reservations/dashboard-stats', async (req: Request, res: Response) => {
+    try {
+      const { period = 'month' } = req.query;
+      const { pool } = await import("./db");
+
+      // Calcular el rango de fechas según el periodo
+      let dateFilter = '';
+      const now = new Date();
+      
+      switch (period) {
+        case 'week':
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          dateFilter = `AND sr.created_at >= '${weekAgo.toISOString()}'`;
+          break;
+        case 'quarter':
+          const quarterAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+          dateFilter = `AND sr.created_at >= '${quarterAgo.toISOString()}'`;
+          break;
+        case 'year':
+          const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          dateFilter = `AND sr.created_at >= '${yearAgo.toISOString()}'`;
+          break;
+        default: // month
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          dateFilter = `AND sr.created_at >= '${monthAgo.toISOString()}'`;
+      }
+
+      // Estadísticas principales
+      const statsQuery = `
+        SELECT 
+          COUNT(*) as total_reservations,
+          COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed,
+          COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+          COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled,
+          COALESCE(SUM(CAST(total_cost AS DECIMAL)), 0) as total_revenue,
+          COALESCE(AVG(CAST(total_cost AS DECIMAL)), 0) as avg_booking_value
+        FROM space_reservations sr
+        WHERE 1=1 ${dateFilter}
+      `;
+
+      const statsResult = await pool.query(statsQuery);
+      const stats = statsResult.rows[0];
+
+      // Espacios más populares
+      const popularSpacesQuery = `
+        SELECT 
+          rs.name as space_name,
+          p.name as park_name,
+          COUNT(*) as booking_count
+        FROM space_reservations sr
+        JOIN reservable_spaces rs ON sr.space_id = rs.id
+        JOIN parks p ON rs.park_id = p.id
+        WHERE sr.status != 'cancelled' ${dateFilter}
+        GROUP BY rs.id, rs.name, p.name
+        ORDER BY booking_count DESC
+        LIMIT 5
+      `;
+
+      const popularSpacesResult = await pool.query(popularSpacesQuery);
+
+      res.json({
+        total_reservations: parseInt(stats.total_reservations) || 0,
+        confirmed: parseInt(stats.confirmed) || 0,
+        pending: parseInt(stats.pending) || 0,
+        cancelled: parseInt(stats.cancelled) || 0,
+        total_revenue: stats.total_revenue || '0',
+        avg_booking_value: stats.avg_booking_value || '0',
+        popular_spaces: popularSpacesResult.rows
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      res.status(500).json({ error: 'Error al obtener estadísticas del dashboard' });
+    }
+  });
+
+  // Reservas recientes
+  apiRouter.get('/space-reservations/recent', async (req: Request, res: Response) => {
+    try {
+      const { limit = 10 } = req.query;
+      const { pool } = await import("./db");
+
+      const query = `
+        SELECT 
+          sr.*,
+          rs.name as space_name,
+          p.name as park_name
+        FROM space_reservations sr
+        JOIN reservable_spaces rs ON sr.space_id = rs.id
+        JOIN parks p ON rs.park_id = p.id
+        ORDER BY sr.created_at DESC
+        LIMIT $1
+      `;
+
+      const result = await pool.query(query, [limit]);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Error fetching recent reservations:', error);
+      res.status(500).json({ error: 'Error al obtener reservas recientes' });
     }
   });
 
