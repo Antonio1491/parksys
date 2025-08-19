@@ -26,6 +26,103 @@ import { getTreeMaintenanceStats } from './tree_maintenance_stats';
  * @param isAuthenticated Middleware de autenticación
  */
 export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
+  // Rutas de evaluaciones por árbol
+  apiRouter.get("/trees/:id/evaluations", async (req: Request, res: Response) => {
+    try {
+      const treeId = Number(req.params.id);
+      
+      if (isNaN(treeId)) {
+        return res.status(400).json({ error: "ID de árbol inválido" });
+      }
+      
+      // Verificar que el árbol existe
+      const treeExists = await db.select({ id: trees.id }).from(trees).where(eq(trees.id, treeId));
+      
+      if (treeExists.length === 0) {
+        return res.status(404).json({ error: "Árbol no encontrado" });
+      }
+
+      // Buscar evaluaciones del árbol usando diferentes posibles fuentes de datos
+      let evaluationData: any[] = [];
+      
+      try {
+        // Intentar desde la tabla park_evaluations si el árbol está vinculado a un parque
+        const treeWithPark = await db.execute(sql`
+          SELECT p.id as park_id FROM trees t 
+          JOIN parks p ON t.park_id = p.id 
+          WHERE t.id = ${treeId}
+        `);
+        
+        if (treeWithPark.length > 0) {
+          const parkId = treeWithPark[0].park_id;
+          const parkEvaluations = await db.execute(sql`
+            SELECT 
+              id,
+              evaluation_date,
+              overall_score,
+              notes,
+              evaluated_by as evaluator_name,
+              created_at
+            FROM park_evaluations 
+            WHERE park_id = ${parkId}
+            AND notes LIKE '%árbol%' OR notes LIKE '%árbol ${treeId}%'
+            ORDER BY evaluation_date DESC
+            LIMIT 20
+          `);
+          evaluationData.push(...parkEvaluations);
+        }
+      } catch (error) {
+        console.log('No se encontraron evaluaciones de parque para este árbol');
+      }
+
+      // También intentar buscar en registros de mantenimiento que puedan tener información de evaluación
+      try {
+        const maintenanceEvaluations = await db.execute(sql`
+          SELECT 
+            id,
+            maintenance_date as evaluation_date,
+            maintenance_type as status,
+            notes,
+            performed_by,
+            created_at
+          FROM tree_maintenances 
+          WHERE tree_id = ${treeId}
+          AND (maintenance_type LIKE '%evalua%' OR maintenance_type LIKE '%inspec%')
+          ORDER BY maintenance_date DESC
+          LIMIT 10
+        `);
+        
+        // Transformar datos de mantenimiento a formato de evaluación
+        const transformedMaintenanceData = maintenanceEvaluations.map((item: any) => ({
+          ...item,
+          healthStatus: item.status,
+          evaluatorName: `Empleado ID: ${item.performed_by}`,
+          observations: item.notes
+        }));
+        
+        evaluationData.push(...transformedMaintenanceData);
+      } catch (error) {
+        console.log('No se encontraron mantenimientos tipo evaluación para este árbol');
+      }
+
+      res.json({
+        success: true,
+        data: evaluationData,
+        total: evaluationData.length,
+        message: evaluationData.length > 0 
+          ? `Se encontraron ${evaluationData.length} registros de evaluaciones` 
+          : 'No se encontraron evaluaciones para este árbol'
+      });
+      
+    } catch (error) {
+      console.error("❌ Error al obtener evaluaciones del árbol:", error);
+      res.status(500).json({ 
+        error: "Error interno del servidor al obtener las evaluaciones",
+        details: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
   // Rutas de mantenimiento por árbol
   apiRouter.get("/trees/:id/maintenances", async (req: Request, res: Response) => {
     try {
