@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
-import UserProfileImage from '@/components/UserProfileImage';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
 import { SidebarSearch } from './SidebarSearch';
 const parksysLogo = "/parksys-smart-logo.png";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { 
   Home, 
@@ -98,7 +95,7 @@ import {
   History,
   Download,
   Upload,
-  Bird
+  Bird,
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -405,14 +402,6 @@ const AdminSidebarComplete: React.FC = () => {
       setOpenAccordions(activeModules);
     }
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
-  };
 
   return (
     <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40" style={{ top: '80px', height: 'calc(100vh - 80px)', backgroundColor: '#003D49' }}>

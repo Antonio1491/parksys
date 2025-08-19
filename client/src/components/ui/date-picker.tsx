@@ -12,15 +12,15 @@ import {
 } from "@/components/ui/popover";
 
 interface DatePickerProps {
-  date?: Date;
-  onDateChange: (date: Date | undefined) => void;
+  date?: Date | null;
+  setDate: (date: Date | undefined) => void;
   placeholder?: string;
   className?: string;
 }
 
 export function DatePicker({ 
   date, 
-  onDateChange, 
+  setDate, 
   placeholder = "Seleccionar fecha",
   className 
 }: DatePickerProps) {
@@ -46,7 +46,7 @@ export function DatePicker({
           mode="single"
           selected={date}
           onSelect={(selectedDate) => {
-            onDateChange(selectedDate);
+            setDate(selectedDate);
             setIsOpen(false);
           }}
           initialFocus

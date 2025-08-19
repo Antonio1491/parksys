@@ -146,13 +146,12 @@ function NewTreePage() {
 
       await apiRequest('/api/trees', {
         method: 'POST',
-        body: JSON.stringify(formattedData),
+        data: formattedData,
       });
 
       toast({
         title: 'Árbol registrado',
         description: 'El árbol ha sido agregado correctamente al inventario.',
-        variant: 'success',
       });
 
       // Invalidar la caché para forzar una recarga de los datos
@@ -182,7 +181,6 @@ function NewTreePage() {
           toast({
             title: 'Ubicación obtenida',
             description: 'Las coordenadas de tu ubicación actual han sido capturadas.',
-            variant: 'success',
           });
         },
         (error) => {
