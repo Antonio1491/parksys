@@ -151,7 +151,7 @@ function TreeDetailPage() {
         data: {
           maintenance_type: data.maintenanceType,
           maintenance_date: data.maintenanceDate,
-          performed_by: data.performedBy || null,
+          performed_by: data.performedBy ? parseInt(data.performedBy) : null,
           notes: data.notes,
         },
       });
@@ -460,12 +460,11 @@ function TreeDetailPage() {
           </div>
         ) : (
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid grid-cols-5">
+            <TabsList className="grid grid-cols-4">
               <TabsTrigger value="general">Información General</TabsTrigger>
               <TabsTrigger value="physical">Estado Físico</TabsTrigger>
               <TabsTrigger value="location">Ubicación</TabsTrigger>
               <TabsTrigger value="maintenance">Mantenimiento</TabsTrigger>
-              <TabsTrigger value="environmental">Servicios Ambientales</TabsTrigger>
             </TabsList>
 
             {/* Tab: Información General */}
@@ -1048,15 +1047,15 @@ function TreeDetailPage() {
               
               <div className="space-y-2">
                 <label htmlFor="performedBy" className="text-sm font-medium">
-                  Realizado por
+                  Realizado por (ID empleado)
                 </label>
                 <input 
-                  type="text"
+                  type="number"
                   id="performedBy"
                   className="w-full p-2 border rounded-md"
                   value={newMaintenance.performedBy}
                   onChange={(e) => setNewMaintenance({...newMaintenance, performedBy: e.target.value})}
-                  placeholder="Nombre del responsable"
+                  placeholder="ID del empleado responsable"
                 />
               </div>
               
