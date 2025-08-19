@@ -93,11 +93,7 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
         primaryImage: row.primaryImage || null
       }));
 
-      res.json({
-        status: 'success',
-        data: mappedData,
-        count: mappedData.length
-      });
+      res.json(mappedData);
     } catch (error) {
       console.error('Error al obtener concesiones activas:', error);
       res.status(500).json({
