@@ -3696,6 +3696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           a.target_market as "targetMarket",
           a.special_needs as "specialNeeds",
           a.is_free as "isFree",
+          a.status,
           p.name as "parkName",
           c.name as "categoryName",
           i.full_name as "instructorName",
@@ -3779,7 +3780,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           recurringDays: recurringDays,
           targetMarket: targetMarket,
           specialNeeds: specialNeeds,
-          isFree: row.isFree
+          isFree: row.isFree,
+          status: row.status
         };
       });
       
