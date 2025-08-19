@@ -127,12 +127,12 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
       <Button
         variant="ghost"
         className={cn(
-          "w-full flex items-center justify-start text-sm font-normal h-9 px-2 text-white hover:bg-teal-600",
+          "w-full flex items-center justify-start text-sm font-medium h-9 px-2 text-white hover:bg-teal-600",
           active && "bg-teal-500 font-medium"
         )}
       >
         {iconWithClass}
-        <span className="ml-2">{children}</span>
+        <span className="ml-0">{children}</span>
       </Button>
     </Link>
   );
@@ -258,7 +258,7 @@ const CollapsibleSubmenu: React.FC<{
   onToggle: (id: string) => void;
 }> = ({ id, title, icon, children, isExpanded, onToggle }) => {
   return (
-    <div className="mb-3">
+    <div className="mb-0">
       <button
         onClick={() => onToggle(id)}
         className="w-full flex items-center justify-between p-2 text-sm font-medium text-white hover:bg-teal-600 rounded-lg transition-colors"
@@ -437,21 +437,13 @@ const AdminSidebarComplete: React.FC = () => {
             defaultOpen={location.startsWith('/admin/visitors') || location.startsWith('/admin/parks') || location.startsWith('/admin/trees') || location.startsWith('/admin/organizador') || location.startsWith('/admin/activities') || location.startsWith('/admin/events') || location.startsWith('/admin/space-reservations')}
           >
             {/* PARQUES */}
-            <CollapsibleSubmenu
-              id="parques"
-              title="Parques"
+            <NavItem
+              href="/admin/parks"
               icon={<Map className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('parques')}
-              onToggle={toggleSubmenu}
-            >
-              <NavItem 
-                href="/admin/parks" 
-                icon={<Map className="h-4 w-4" />}
-                active={location === '/admin/parks'}
+              active={location.startsWith('/admin/parks')}
               >
-                {t('navigation.management')}
-              </NavItem>
-            </CollapsibleSubmenu>
+              {t('navigation.parks')}
+            </NavItem>
 
             {/* ACTIVIDADES */}
             <CollapsibleSubmenu
@@ -471,7 +463,7 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/activities" 
                 icon={<Activity className="h-4 w-4" />}
-                active={location === '/admin/activities'}
+                active={location.startsWith('/admin/activities')}
               >
                 {t('navigation.listing')}
               </NavItem>
@@ -499,7 +491,7 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/instructors" 
                 icon={<GraduationCap className="h-4 w-4" />}
-                active={location === '/admin/instructors'}
+                active={location.startsWith('/admin/instructors')}
               >
                 {t('navigation.instructors')}
               </NavItem>
@@ -509,7 +501,7 @@ const AdminSidebarComplete: React.FC = () => {
             <NavItem
               href="/admin/amenities"
               icon={<Package className="h-4 w-4" />}
-              active={location === '/admin/amenities'}
+              active={location.startsWith('/admin/amenities')}
             >
               Amenidades
             </NavItem>
@@ -546,21 +538,13 @@ const AdminSidebarComplete: React.FC = () => {
             </CollapsibleSubmenu>
 
             {/* FAUNA */}
-            <CollapsibleSubmenu
-              id="fauna"
-              title="Fauna"
+            <NavItem
+              href="/admin/fauna/species"
               icon={<Heart className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('fauna')}
-              onToggle={toggleSubmenu}
+              active={location.startsWith('/admin/fauna/species')}
             >
-              <NavItem 
-                href="/admin/fauna/species" 
-                icon={<Heart className="h-4 w-4" />}
-                active={location.startsWith('/admin/fauna/species')}
-              >
-                Especies
-              </NavItem>
-            </CollapsibleSubmenu>
+              Fauna
+            </NavItem>
 
             {/* VISITANTES */}
             <CollapsibleSubmenu
@@ -573,7 +557,7 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/visitors/count" 
                 icon={<Users className="h-4 w-4" />}
-                active={location === '/admin/visitors/count'}
+                active={location.startsWith('/admin/visitors/count')}
               >
                 Conteo
               </NavItem>
@@ -582,7 +566,7 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/visitors/feedback" 
                 icon={<MessageSquare className="h-4 w-4" />}
-                active={location === '/admin/visitors/feedback'}
+                active={location.startsWith('/admin/visitors/feedback')}
               >
                 Retroalimentación
               </NavItem>
@@ -651,7 +635,7 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/space-reservations" 
                 icon={<Calendar className="h-4 w-4" />}
-                active={location === '/admin/space-reservations'}
+                active={location.startsWith('/admin/space-reservations')}
               >
                 Reservas Activas
               </NavItem>
@@ -777,7 +761,7 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/assets/map" 
                 icon={<Map className="h-4 w-4" />}
-                active={location === '/admin/assets/map'}
+                active={location.startsWith('/admin/assets/map')}
               >
                 {t('navigation.map')}
               </NavItem>
@@ -815,14 +799,14 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/incidents" 
                 icon={<ClipboardList className="h-4 w-4" />}
-                active={location === '/admin/incidents'}
+                active={location.startsWith('/admin/incidents')}
               >
                 {t('navigation.listing')}
               </NavItem>
               <NavItem 
                 href="/admin/incidents/categories" 
                 icon={<Tag className="h-4 w-4" />}
-                active={location === '/admin/incidents/categories'}
+                active={location.startsWith('/admin/incidents/categories')}
               >
                 {t('navigation.categories')}
               </NavItem>
@@ -839,14 +823,14 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/volunteers" 
                 icon={<Users className="h-4 w-4" />}
-                active={location === '/admin/volunteers'}
+                active={location.startsWith('/admin/volunteers')}
               >
                 {t('navigation.listing')}
               </NavItem>
               <NavItem 
                 href="/admin/volunteers/register" 
                 icon={<Plus className="h-4 w-4" />}
-                active={location === '/admin/volunteers/register'}
+                active={location.startsWith('/admin/volunteers/register')}
               >
                 Registro
               </NavItem>
@@ -854,7 +838,7 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/volunteers/recognition" 
                 icon={<Award className="h-4 w-4" />}
-                active={location === '/admin/volunteers/recognition'}
+                active={location.startsWith('/admin/volunteers/recognition')}
               >
                 Reconocimientos
               </NavItem>
@@ -884,28 +868,28 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/finance/budget-planning" 
                 icon={<Target className="h-4 w-4" />}
-                active={location === '/admin/finance/budget-planning'}
+                active={location.startsWith('/admin/finance/budget-planning')}
               >
                 Presupuestos
               </NavItem>
               <NavItem 
                 href="/admin/finance/cash-flow-matrix" 
                 icon={<LayoutGrid className="h-4 w-4" />}
-                active={location === '/admin/finance/cash-flow-matrix'}
+                active={location.startsWith('/admin/finance/cash-flow-matrix')}
               >
                 {t('navigation.cashFlow')}
               </NavItem>
               <NavItem 
                 href="/admin/finance/calculator" 
                 icon={<Calculator className="h-4 w-4" />}
-                active={location === '/admin/finance/calculator'}
+                active={location.startsWith('/admin/finance/calculator')}
               >
                 Calculadora
               </NavItem>
               <NavItem 
                 href="/admin/payments" 
                 icon={<CreditCard className="h-4 w-4" />}
-                active={location === '/admin/payments'}
+                active={location.startsWith('/admin/payments')}
               >
                 Registro de Pagos
               </NavItem>
@@ -922,42 +906,42 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/accounting/categories" 
                 icon={<FolderTree className="h-4 w-4" />}
-                active={location === '/admin/accounting/categories'}
+                active={location.startsWith('/admin/accounting/categories')}
               >
                 Categorías
               </NavItem>
               <NavItem 
                 href="/admin/accounting/transactions" 
                 icon={<Receipt className="h-4 w-4" />}
-                active={location === '/admin/accounting/transactions'}
+                active={location.startsWith('/admin/accounting/transactions')}
               >
                 Transacciones
               </NavItem>
               <NavItem 
                 href="/admin/accounting/journal-entries" 
                 icon={<ClipboardList className="h-4 w-4" />}
-                active={location === '/admin/accounting/journal-entries'}
+                active={location.startsWith('/admin/accounting/journal-entries')}
               >
                 Asientos Contables
               </NavItem>
               <NavItem 
                 href="/admin/accounting/trial-balance" 
                 icon={<Scale className="h-4 w-4" />}
-                active={location === '/admin/accounting/trial-balance'}
+                active={location.startsWith('/admin/accounting/trial-balance')}
               >
                 Balanza
               </NavItem>
               <NavItem 
                 href="/admin/accounting/financial-statements" 
                 icon={<FileText className="h-4 w-4" />}
-                active={location === '/admin/accounting/financial-statements'}
+                active={location.startsWith('/admin/accounting/financial-statements')}
               >
                 Estados Financieros
               </NavItem>
               <NavItem 
                 href="/admin/accounting/integration" 
                 icon={<ArrowRightLeft className="h-4 w-4" />}
-                active={location === '/admin/accounting/integration'}
+                active={location.startsWith('/admin/accounting/integration')}
               >
                 Integración
               </NavItem>
@@ -1110,35 +1094,35 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/communications/templates" 
                 icon={<FileText className="h-4 w-4" />}
-                active={location === '/admin/communications/templates'}
+                active={location.startsWith('/admin/communications/templates')}
               >
                 Plantillas
               </NavItem>
               <NavItem 
                 href="/admin/communications/queue" 
                 icon={<ListChecks className="h-4 w-4" />}
-                active={location === '/admin/communications/queue'}
+                active={location.startsWith('/admin/communications/queue')}
               >
                 Cola de Emails
               </NavItem>
               <NavItem 
                 href="/admin/communications/campaigns" 
                 icon={<Megaphone className="h-4 w-4" />}
-                active={location === '/admin/communications/campaigns'}
+                active={location.startsWith('/admin/communications/campaigns')}
               >
                 Campañas
               </NavItem>
               <NavItem 
                 href="/admin/communications/bulk" 
                 icon={<Mail className="h-4 w-4" />}
-                active={location === '/admin/communications/bulk'}
+                active={location.startsWith('/admin/communications/bulk')}
               >
                 Envío Masivo
               </NavItem>
               <NavItem 
                 href="/admin/communications/analytics" 
                 icon={<TrendingUp className="h-4 w-4" />}
-                active={location === '/admin/communications/analytics'}
+                active={location.startsWith('/admin/communications/analytics')}
               >
                 Análisis
               </NavItem>
@@ -1159,21 +1143,21 @@ const AdminSidebarComplete: React.FC = () => {
             <NavItem 
               href="/admin/hr/employees" 
               icon={<Users className="h-5 w-5" />}
-              active={location === '/admin/hr/employees'}
+              active={location.startsWith('/admin/hr/employees')}
             >
               Empleados
             </NavItem>
             <NavItem 
               href="/admin/hr/payroll" 
               icon={<DollarSign className="h-5 w-5" />}
-              active={location === '/admin/hr/payroll'}
+              active={location.startsWith('/admin/hr/payroll')}
             >
               Nómina
             </NavItem>
             <NavItem 
               href="/admin/hr/vacations" 
               icon={<Calendar className="h-5 w-5" />}
-              active={location === '/admin/hr/vacations'}
+              active={location.startsWith('/admin/hr/vacations')}
             >
               Vacaciones
             </NavItem>
@@ -1203,14 +1187,14 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/configuracion-seguridad/access/roles" 
                 icon={<UserCog className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/access/roles'}
+                active={location.startsWith('/admin/configuracion-seguridad/access/roles')}
               >
                 Gestión de Roles
               </NavItem>
               <NavItem 
                 href="/admin/configuracion-seguridad/access/permissions" 
                 icon={<Grid className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/access/permissions'}
+                active={location.startsWith('/admin/configuracion-seguridad/access/permissions')}
               >
                 Matriz de Permisos
               </NavItem>
@@ -1218,45 +1202,29 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/configuracion-seguridad/access/users" 
                 icon={<Users className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/access/users'}
+                active={location.startsWith('/admin/configuracion-seguridad/access/users')}
               >
                 Gestión de Usuarios
               </NavItem>
             </CollapsibleSubmenu>
 
             {/* POLÍTICAS */}
-            <CollapsibleSubmenu
-              id="politicas"
-              title="Políticas"
+            <NavItem
+              href="/admin/configuracion-seguridad/policies"
               icon={<FileText className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('politicas')}
-              onToggle={toggleSubmenu}
+              active={location.startsWith('/admin/configuracion-seguridad/policies')}
             >
-              <NavItem 
-                href="/admin/configuracion-seguridad/policies" 
-                icon={<FileText className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/policies'}
-              >
-                Panel de Políticas
-              </NavItem>
-            </CollapsibleSubmenu>
+              Políticas
+            </NavItem>
 
             {/* NOTIFICACIONES */}
-            <CollapsibleSubmenu
-              id="notificaciones"
-              title="Notificaciones"
+            <NavItem
+              href="/admin/configuracion-seguridad/notifications"
               icon={<Bell className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('notificaciones')}
-              onToggle={toggleSubmenu}
+              active={location.startsWith('/admin/configuracion-seguridad/notifications')}
             >
-              <NavItem 
-                href="/admin/configuracion-seguridad/notifications" 
-                icon={<Bell className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/notifications'}
-              >
-                Panel de Notificaciones
-              </NavItem>
-            </CollapsibleSubmenu>
+              Notificaciones
+            </NavItem>
 
             {/* AUDITORÍA */}
             <CollapsibleSubmenu
@@ -1269,14 +1237,14 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/configuracion-seguridad/audit" 
                 icon={<ClipboardList className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/audit'}
+                active={location.startsWith('/admin/configuracion-seguridad/audit')}
               >
                 Panel de Auditoría
               </NavItem>
               <NavItem 
                 href="/admin/configuracion-seguridad/audit/role-audits" 
                 icon={<UserCheck className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/audit/role-audits'}
+                active={location.startsWith('/admin/configuracion-seguridad/audit/role-audits')}
               >
                 Auditoría de Roles
               </NavItem>
@@ -1293,28 +1261,28 @@ const AdminSidebarComplete: React.FC = () => {
               <NavItem 
                 href="/admin/configuracion-seguridad/maintenance" 
                 icon={<Settings className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/maintenance'}
+                active={location.startsWith('/admin/configuracion-seguridad/maintenance')}
               >
                 Panel de Mantenimiento
               </NavItem>
               <NavItem 
                 href="/admin/configuracion-seguridad/maintenance/backup" 
                 icon={<Download className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/maintenance/backup'}
+                active={location.startsWith('/admin/configuracion-seguridad/maintenance/backup')}
               >
                 Respaldos
               </NavItem>
               <NavItem 
                 href="/admin/configuracion-seguridad/maintenance/performance" 
                 icon={<TrendingUp className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/maintenance/performance'}
+                active={location.startsWith('/admin/configuracion-seguridad/maintenance/performance')}
               >
                 Rendimiento
               </NavItem>
               <NavItem 
                 href="/admin/configuracion-seguridad/maintenance/updates" 
                 icon={<Upload className="h-4 w-4" />}
-                active={location === '/admin/configuracion-seguridad/maintenance/updates'}
+                active={location.startsWith('/admin/configuracion-seguridad/maintenance/updates')}
               >
                 Actualizaciones
               </NavItem>
