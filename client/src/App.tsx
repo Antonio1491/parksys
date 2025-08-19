@@ -39,6 +39,7 @@ import AdminParticipationEdit from "@/pages/admin/volunteers/participations/edit
 import DashboardPage from "@/pages/admin/volunteers/dashboard-page";
 import EventCategoriesPage from "@/pages/admin/events/categories";
 import NewEventPage from "@/pages/admin/events/new-event";
+import NewEventSimplePage from "@/pages/admin/events/new-simple";
 import EventsIndex from "@/pages/admin/events/index";
 import EditEventPage from "@/pages/admin/events/edit";
 import Header from "@/components/Header";
@@ -570,7 +571,8 @@ function Router() {
         {/* Rutas para eventos generales */}
         <Route path="/admin/events" component={EventsIndex} />
         
-        <Route path="/admin/events/new" component={NewEventPage} />
+        <Route path="/admin/events/new" component={NewEventSimplePage} />
+        <Route path="/admin/events/new-original" component={NewEventPage} />
         
         <Route path="/admin/events/edit/:id" component={EditEventPage} />
 
