@@ -180,6 +180,9 @@ const NewEventPage: React.FC = () => {
 
   // Manejar envío del formulario
   const onSubmit = (data: EventFormValues) => {
+    console.log("DATOS DEL FORMULARIO COMPLETOS:", data);
+    console.log("Nombre del organizador:", data.organizerName);
+    console.log("Organización:", data.organizerOrganization);
     createEventMutation.mutate(data);
   };
 
@@ -199,6 +202,7 @@ const NewEventPage: React.FC = () => {
   // Debug: Log de datos para verificar
   console.log("Parks data:", parks);
   console.log("Event categories:", eventCategories);
+  console.log("Form values actuales:", form.getValues());
 
   return (
     <AdminLayout>
@@ -574,40 +578,59 @@ const NewEventPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-card p-6 rounded-lg border">
-              <h3 className="text-lg font-medium mb-4">
-                Información del organizador
+            <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+              <h3 className="text-lg font-medium mb-4 text-blue-800">
+                🏢 Información del organizador
               </h3>
+              <p className="text-sm text-blue-600 mb-4">
+                Estos campos deben aparecer: Nombre del organizador y Empresa/Organización
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="organizerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre del organizador</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre del organizador" {...field} value={field.value || ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    console.log("Renderizando campo organizerName:", field);
+                    return (
+                      <FormItem>
+                        <FormLabel className="text-blue-800 font-semibold">Nombre del organizador *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Escribe el nombre del organizador" 
+                            {...field} 
+                            value={field.value || ""} 
+                            className="bg-white border-2 border-blue-300"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <FormField
                   control={form.control}
                   name="organizerOrganization"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Empresa / Organización</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre de la empresa u organización" {...field} value={field.value || ""} />
-                      </FormControl>
-                      <FormDescription>
-                        Opcional: entidad que organiza el evento
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    console.log("Renderizando campo organizerOrganization:", field);
+                    return (
+                      <FormItem>
+                        <FormLabel className="text-blue-800 font-semibold">Empresa / Organización</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Nombre de la empresa u organización" 
+                            {...field} 
+                            value={field.value || ""} 
+                            className="bg-white border-2 border-blue-300"
+                          />
+                        </FormControl>
+                        <FormDescription className="text-blue-600">
+                          Opcional: entidad que organiza el evento
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
             </div>
