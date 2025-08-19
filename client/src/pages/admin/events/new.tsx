@@ -113,8 +113,13 @@ const NewEventPage: React.FC = () => {
   const [, navigate] = useLocation();
 
   // Consultar parques para el select
-  const { data: parks = [] } = useQuery({
+  const { data: parks, isLoading: parksLoading, error: parksError } = useQuery({
     queryKey: ["/api/parks"],
+  });
+
+  // Consultar categorías de eventos
+  const { data: eventCategories, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["/api/event-categories"],
   });
 
   // Formulario con validación zod
@@ -181,6 +186,23 @@ const NewEventPage: React.FC = () => {
   const onSubmit = (data: EventFormValues) => {
     createEventMutation.mutate(data);
   };
+
+  // Estados de carga
+  if (parksLoading || categoriesLoading) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <Card className="p-4">
+            <div>Cargando formulario...</div>
+          </Card>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  // Debug: Log de datos para verificar
+  console.log("Parks data:", parks);
+  console.log("Event categories:", eventCategories);
 
   return (
     <AdminLayout>
@@ -447,13 +469,17 @@ const NewEventPage: React.FC = () => {
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
+                          )) || parks?.map((park: any) => (
+                            <SelectItem key={park.id} value={park.id.toString()}>
+                              {park.name}
+                            </SelectItem>
                           )) || []}
                         </SelectContent>
                       </Select>
                       <FormDescription>
                         Parques seleccionados:{" "}
                         {field.value?.length
-                          ? parks?.data
+                          ? (parks?.data || parks)
                               ?.filter((park: any) => field.value?.includes(park.id))
                               ?.map((park: any) => park.name)
                               ?.join(", ")
