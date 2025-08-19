@@ -506,21 +506,13 @@ const AdminSidebarComplete: React.FC = () => {
             </CollapsibleSubmenu>
 
             {/* AMENIDADES */}
-            <CollapsibleSubmenu
-              id="amenidades"
-              title="Amenidades"
+            <NavItem
+              href="/admin/amenities"
               icon={<Package className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('amenidades')}
-              onToggle={toggleSubmenu}
+              active={location === '/admin/amenities'}
             >
-              <NavItem 
-                href="/admin/amenities" 
-                icon={<Package className="h-4 w-4" />}
-                active={location === '/admin/amenities'}
-              >
-                {t('navigation.management')}
-              </NavItem>
-            </CollapsibleSubmenu>
+              Amenidades
+            </NavItem>
 
             {/* ARBOLADO */}
             <CollapsibleSubmenu

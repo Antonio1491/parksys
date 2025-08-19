@@ -71,6 +71,16 @@ const Events: React.FC = () => {
 
 
 
+  // Mapeo de colores desde la base de datos de categorías
+  const eventTypeColors = {
+    'Benéficos': '#06B6D4',
+    'Culturales': '#8B5CF6',
+    'Deportivos': '#10B981',
+    'Empresariales': '#3B82F6',
+    'Gubernamentales': '#EF4444',
+    'Sociales': '#EC4899'
+  };
+
   const eventTypeLabels = {
     cultural: 'Cultural',
     sports: 'Deportes',
@@ -273,7 +283,13 @@ const Events: React.FC = () => {
                       
                       {/* Badge de categoría arriba a la izquierda */}
                       <div className="absolute top-4 left-4 z-10">
-                        <Badge variant="outline" className="bg-white/90 text-xs border-white/50">
+                        <Badge 
+                          variant="outline" 
+                          className="text-xs border-none text-white font-medium"
+                          style={{ 
+                            backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'
+                          }}
+                        >
                           {eventTypeLabels[event.eventType as keyof typeof eventTypeLabels] || event.eventType}
                         </Badge>
                       </div>
@@ -323,7 +339,13 @@ const Events: React.FC = () => {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {event.title}
                           </h3>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge 
+                            variant="outline" 
+                            className="text-xs border-none text-white font-medium"
+                            style={{ 
+                              backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'
+                            }}
+                          >
                             {eventTypeLabels[event.eventType as keyof typeof eventTypeLabels] || event.eventType}
                           </Badge>
                         </div>
