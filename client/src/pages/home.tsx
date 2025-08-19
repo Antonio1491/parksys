@@ -423,9 +423,8 @@ const Home: React.FC = () => {
                 ];
                 const colors = eventColors[index % eventColors.length];
                 
-                // Enlaces específicos para cada tarjeta de evento
-                const eventLinks = ['/event/5', '/event/4', '/event/2'];
-                const eventLink = eventLinks[index] || `/events/${event.id}`;
+                // Enlace dinámico usando el ID real del evento
+                const eventLink = `/events/${event.id}`;
                 
                 return (
                   <Link key={event.id} href={eventLink}>
