@@ -63,6 +63,11 @@ function TreeDetailPage() {
     performedBy: '',
     notes: ''
   });
+
+  // Estado para búsqueda de empleados
+  const [employeeSearch, setEmployeeSearch] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
+  const [showEmployeeList, setShowEmployeeList] = useState(false);
   
   // Verificar que se obtiene el ID correctamente
   console.log("ID del árbol:", treeId);
@@ -87,6 +92,25 @@ function TreeDetailPage() {
   });
 
   const tree = treeResponse?.data;
+
+  // Consultar empleados para el selector
+  const { data: employees = [] } = useQuery({
+    queryKey: ['/api/employees'],
+    queryFn: async () => {
+      const response = await fetch('/api/employees');
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.employees || [];
+    },
+  });
+
+  // Filtrar empleados basado en la búsqueda
+  const filteredEmployees = employees.filter((emp: any) => 
+    emp.firstName?.toLowerCase().includes(employeeSearch.toLowerCase()) ||
+    emp.lastName?.toLowerCase().includes(employeeSearch.toLowerCase()) ||
+    emp.email?.toLowerCase().includes(employeeSearch.toLowerCase()) ||
+    emp.position?.toLowerCase().includes(employeeSearch.toLowerCase())
+  ).slice(0, 10); // Limitar a 10 resultados
   
   // Consultar mantenimientos del árbol
   const {
@@ -165,6 +189,9 @@ function TreeDetailPage() {
         performedBy: '',
         notes: ''
       });
+      setEmployeeSearch('');
+      setSelectedEmployee(null);
+      setShowEmployeeList(false);
       
       // Mostrar mensaje de éxito
       toast({
@@ -1047,16 +1074,55 @@ function TreeDetailPage() {
               
               <div className="space-y-2">
                 <label htmlFor="performedBy" className="text-sm font-medium">
-                  Realizado por (ID empleado)
+                  Realizado por
                 </label>
-                <input 
-                  type="number"
-                  id="performedBy"
-                  className="w-full p-2 border rounded-md"
-                  value={newMaintenance.performedBy}
-                  onChange={(e) => setNewMaintenance({...newMaintenance, performedBy: e.target.value})}
-                  placeholder="ID del empleado responsable"
-                />
+                <div className="relative">
+                  <input 
+                    type="text"
+                    id="employeeSearch"
+                    className="w-full p-2 border rounded-md"
+                    value={employeeSearch}
+                    onChange={(e) => {
+                      setEmployeeSearch(e.target.value);
+                      setShowEmployeeList(e.target.value.length > 0);
+                    }}
+                    onFocus={() => setShowEmployeeList(employeeSearch.length > 0)}
+                    placeholder="Buscar empleado por nombre, email o puesto..."
+                  />
+                  
+                  {showEmployeeList && filteredEmployees.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      {filteredEmployees.map((employee: any) => (
+                        <div
+                          key={employee.id}
+                          className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+                          onClick={() => {
+                            setSelectedEmployee(employee);
+                            setEmployeeSearch(`${employee.firstName} ${employee.lastName}`);
+                            setNewMaintenance({...newMaintenance, performedBy: employee.id.toString()});
+                            setShowEmployeeList(false);
+                          }}
+                        >
+                          <div className="font-medium">
+                            {employee.firstName} {employee.lastName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {employee.position} • {employee.email}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {selectedEmployee && (
+                    <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                      <div className="text-sm text-green-800">
+                        <strong>Empleado seleccionado:</strong><br />
+                        {selectedEmployee.firstName} {selectedEmployee.lastName} (ID: {selectedEmployee.id})
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="space-y-2">
