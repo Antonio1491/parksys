@@ -800,41 +800,41 @@ Las **Categorías de Actividades** permiten organizar y clasificar toda la ofert
 
 ### Categorías Predeterminadas del Sistema
 
-#### 🏃 Deportivas
-- **Descripción**: Actividades físicas y deportes diversos
-- **Ejemplos**: Fútbol, básquetbol, atletismo, natación
-- **Color**: Verde (#10B981)
-- **Características**: Enfoque en ejercicio y competencia
+#### 🏃 Deportivo
+- **Descripción**: Actividades deportivas y de acondicionamiento físico
+- **Ejemplos**: Fútbol, básquetbol, atletismo, natación, gimnasia
+- **Color**: Rojo (#e74c3c)
+- **Características**: Actividad física intensa y competitiva
 
-#### 🎨 Culturales  
-- **Descripción**: Arte, música, teatro y expresión creativa
-- **Ejemplos**: Pintura, danza, música, teatro
-- **Color**: Púrpura (#8B5CF6)
-- **Características**: Desarrollo artístico y cultural
+#### 💚 Recreación y Bienestar  
+- **Descripción**: Actividades recreativas para el bienestar físico y mental
+- **Ejemplos**: Yoga, tai chi, caminatas, meditación, relajación
+- **Color**: Verde (#2ecc71)
+- **Características**: Salud física y mental, relajación
 
-#### 🌱 Ambientales
-- **Descripción**: Educación ecológica y sostenibilidad
-- **Ejemplos**: Jardinería, reciclaje, observación de aves
-- **Color**: Verde Oscuro (#059669)
-- **Características**: Conciencia ambiental
+#### 🎨 Arte y Cultura
+- **Descripción**: Eventos culturales, artísticos y creativos
+- **Ejemplos**: Pintura, danza, música, teatro, exposiciones
+- **Color**: Púrpura (#9b59b6)
+- **Características**: Desarrollo artístico y expresión creativa
 
-#### 👨‍👩‍👧‍👦 Familiares
-- **Descripción**: Actividades para toda la familia
-- **Ejemplos**: Picnics, juegos familiares, cuentacuentos
-- **Color**: Azul (#3B82F6)
-- **Características**: Participación intergeneracional
+#### 🌱 Naturaleza y Ciencia
+- **Descripción**: Actividades de conservación, medio ambiente y educación científica
+- **Ejemplos**: Jardinería, observación de aves, talleres ecológicos, experimentos
+- **Color**: Verde Oscuro (#27ae60)
+- **Características**: Conciencia ambiental y conocimiento científico
 
-#### 📚 Educativas
-- **Descripción**: Talleres de aprendizaje y desarrollo
-- **Ejemplos**: Computación, idiomas, lectura
-- **Color**: Naranja (#F97316)
-- **Características**: Adquisición de conocimientos
+#### 👥 Comunidad
+- **Descripción**: Eventos de participación y cohesión comunitaria
+- **Ejemplos**: Reuniones vecinales, festivales comunitarios, actividades solidarias
+- **Color**: Azul (#3498db)
+- **Características**: Participación ciudadana y fortalecimiento social
 
-#### 🧘 Bienestar
-- **Descripción**: Salud física y mental
-- **Ejemplos**: Yoga, meditación, tai chi
-- **Color**: Rosa (#EC4899)
-- **Características**: Relajación y equilibrio
+#### 📅 Eventos de Temporada
+- **Descripción**: Celebraciones y eventos especiales según temporadas
+- **Ejemplos**: Día del niño, festivales navideños, celebraciones patrias
+- **Color**: Naranja (#f39c12)
+- **Características**: Celebraciones especiales y eventos únicos
 
 ### Administración de Categorías
 
