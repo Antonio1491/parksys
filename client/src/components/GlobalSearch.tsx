@@ -73,6 +73,11 @@ const GlobalSearch: React.FC = () => {
     enabled: searchTerm.length >= 2,
   });
 
+  const { data: activeConcessions } = useQuery({
+    queryKey: ['/api/active-concessions'],
+    enabled: searchTerm.length >= 2,
+  });
+
   // Procesar resultados de búsqueda
   useEffect(() => {
     if (searchTerm.length < 2) {
@@ -178,7 +183,7 @@ const GlobalSearch: React.FC = () => {
         });
     }
 
-    // Buscar en concesiones
+    // Buscar en concesiones (tabla concessions)
     const concessions = (concessionsData as any)?.data || concessionsData || [];
     if (Array.isArray(concessions) && concessions.length > 0) {
       concessions
@@ -195,6 +200,29 @@ const GlobalSearch: React.FC = () => {
             description: `Concesión - ${concession.location || concession.notes?.substring(0, 100) || 'Sin descripción'}...`,
             type: 'concession',
             url: `/concessions/${concession.id}`,
+            image: concession.imageUrl
+          });
+        });
+    }
+
+    // Buscar en concesiones activas (tabla active_concessions)
+    const activeConcessionsData = (activeConcessions as any)?.data || activeConcessions || [];
+    if (Array.isArray(activeConcessionsData) && activeConcessionsData.length > 0) {
+      activeConcessionsData
+        .filter((concession: any) => 
+          concession.name?.toLowerCase().includes(searchLower) ||
+          concession.description?.toLowerCase().includes(searchLower) ||
+          concession.specific_location?.toLowerCase().includes(searchLower) ||
+          concession.notes?.toLowerCase().includes(searchLower)
+        )
+        .slice(0, 2)
+        .forEach((concession: any) => {
+          searchResults.push({
+            id: `active-concession-${concession.id}`,
+            title: concession.name || `Concesión Activa ${concession.id}`,
+            description: `Concesión Activa - ${concession.specific_location || concession.description?.substring(0, 100) || 'Sin descripción'}...`,
+            type: 'concession',
+            url: `/concession/${concession.id}`,
             image: concession.imageUrl
           });
         });
