@@ -251,6 +251,12 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
         activity.recurringDays = [];
       }
       
+      console.log("🎯 STATUS EN RESPUESTA GET:", activity.status);
+      console.log("🎯 ACTIVITY COMPLETA CON STATUS:", {
+        id: activity.id,
+        title: activity.title,
+        status: activity.status
+      });
       res.json(activity);
     } else {
       res.status(404).json({ message: "Actividad no encontrada" });
