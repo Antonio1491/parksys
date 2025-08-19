@@ -65,6 +65,7 @@ const ActivityCategoriesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -90,6 +91,44 @@ const ActivityCategoriesPage: React.FC = () => {
       color: "#00a587",
       icon: "tag",
       isActive: true,
+    },
+  });
+
+  // Formulario para crear categorías
+  const createForm = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      color: "#00a587",
+      icon: "tag",
+      isActive: true,
+    },
+  });
+
+  // Mutación para crear categoría
+  const createCategoryMutation = useMutation({
+    mutationFn: async (data: CategoryFormData) => {
+      return apiRequest('/api/activity-categories', {
+        method: 'POST',
+        data: data,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/activity-categories'] });
+      setIsCreateDialogOpen(false);
+      createForm.reset();
+      toast({
+        title: "Categoría creada",
+        description: "La nueva categoría se creó correctamente.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo crear la categoría.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -154,6 +193,23 @@ const ActivityCategoriesPage: React.FC = () => {
       isActive: category.isActive !== false,
     });
     setIsEditDialogOpen(true);
+  };
+
+  // Función para crear nueva categoría
+  const handleCreateCategory = () => {
+    setIsCreateDialogOpen(true);
+    createForm.reset({
+      name: "",
+      description: "",
+      color: "#00a587",
+      icon: "tag",
+      isActive: true,
+    });
+  };
+
+  // Función para enviar el formulario de creación
+  const handleSubmitCreate = (data: CategoryFormData) => {
+    createCategoryMutation.mutate(data);
   };
 
   // Función para enviar el formulario de edición
@@ -240,7 +296,7 @@ const ActivityCategoriesPage: React.FC = () => {
             <div className="flex gap-2">
               <Button 
                 className="flex items-center gap-2"
-                onClick={() => setLocation('/admin/organizador/categorias')}
+                onClick={handleCreateCategory}
               >
                 <Plus size={16} />
                 Nueva Categoría
@@ -525,6 +581,103 @@ const ActivityCategoriesPage: React.FC = () => {
                     disabled={updateCategoryMutation.isPending}
                   >
                     {updateCategoryMutation.isPending ? "Guardando..." : "Guardar cambios"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Diálogo de creación */}
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Nueva Categoría</DialogTitle>
+            </DialogHeader>
+            <Form {...createForm}>
+              <form onSubmit={createForm.handleSubmit(handleSubmitCreate)} className="space-y-4">
+                <FormField
+                  control={createForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre de la categoría</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ej: Arte y Cultura" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={createForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descripción</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Descripción opcional de la categoría..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={createForm.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color</FormLabel>
+                      <FormControl>
+                        <Input type="color" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={createForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Estado de la categoría
+                        </FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          {field.value ? "Categoría activa y disponible" : "Categoría inactiva (no se muestra en formularios)"}
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsCreateDialogOpen(false)}
+                    disabled={createCategoryMutation.isPending}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={createCategoryMutation.isPending}
+                  >
+                    {createCategoryMutation.isPending ? "Creando..." : "Crear categoría"}
                   </Button>
                 </div>
               </form>
