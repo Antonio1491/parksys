@@ -141,7 +141,7 @@ const Events: React.FC = () => {
                 </h2>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
-                Eventos y Actividades
+                Eventos
               </h1>
               <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto drop-shadow-md">
                 Descubre los eventos más emocionantes en los parques urbanos de Guadalajara. 
