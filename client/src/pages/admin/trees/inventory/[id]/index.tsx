@@ -872,14 +872,27 @@ function TreeDetailPage() {
                           <label htmlFor="performedBy" className="text-sm font-medium">
                             Realizado por
                           </label>
-                          <input 
-                            type="text"
+                          <select 
                             id="performedBy"
                             className="w-full p-2 border rounded-md"
                             value={newMaintenance.performedBy}
                             onChange={(e) => setNewMaintenance({...newMaintenance, performedBy: e.target.value})}
-                            placeholder="Nombre de la persona o equipo"
-                          />
+                          >
+                            <option value="">Seleccionar empleado</option>
+                            <option value="1">Juan Pérez - Jardinero</option>
+                            <option value="2">María González - Supervisora</option>
+                            <option value="3">Carlos López - Técnico Forestal</option>
+                            <option value="4">Ana Martínez - Coordinadora</option>
+                            <option value="manual">Otro (escribir manualmente)</option>
+                          </select>
+                          {newMaintenance.performedBy === 'manual' && (
+                            <input 
+                              type="text"
+                              className="w-full p-2 border rounded-md text-sm mt-2"
+                              placeholder="Escribir nombre del responsable"
+                              onChange={(e) => setNewMaintenance({...newMaintenance, performedBy: e.target.value})}
+                            />
+                          )}
                         </div>
                         
                         <div className="space-y-2">
@@ -946,7 +959,7 @@ function TreeDetailPage() {
                                 {maintenance.maintenanceType}
                               </TableCell>
                               <TableCell>{formatDate(maintenance.maintenanceDate)}</TableCell>
-                              <TableCell>{maintenance.performedBy || '-'}</TableCell>
+                              <TableCell>{maintenance.performedByName || maintenance.performedBy || '-'}</TableCell>
                               <TableCell className="max-w-xs truncate">
                                 {maintenance.notes || 'Sin observaciones'}
                               </TableCell>
