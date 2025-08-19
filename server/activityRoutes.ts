@@ -22,6 +22,7 @@ activityRouter.get("/activities", async (_req: Request, res: Response) => {
                a.category, a.category_id as "categoryId", a.location, 
                a.capacity, a.price, a.is_free as "isFree", 
                a.instructor_id as "instructorId", a.created_at as "createdAt",
+               a.status,
                p.name as "parkName",
                c.name as "categoryName",
                i.full_name as "instructorName"
@@ -48,6 +49,7 @@ activityRouter.get("/activities", async (_req: Request, res: Response) => {
       isFree: row.isFree,
       instructorId: row.instructorId,
       createdAt: row.createdAt,
+      status: row.status,
       parkName: row.parkName,
       categoryName: row.categoryName,
       instructorName: row.instructorName
@@ -106,6 +108,7 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
                a.category, a.category_id as "categoryId", a.location, 
                a.capacity, a.price, a.is_free as "isFree", 
                a.instructor_id as "instructorId", a.created_at as "createdAt",
+               a.status,
                p.name as "parkName",
                c.name as "categoryName",
                i.full_name as "instructorName"
