@@ -110,13 +110,12 @@ function TreeDetailPage() {
     try {
       await apiRequest(`/api/trees/${treeId}`, {
         method: 'DELETE',
-        body: JSON.stringify({ removalReason: reason }),
+        data: { removalReason: reason },
       });
 
       toast({
         title: 'Árbol eliminado',
         description: 'El árbol ha sido marcado como removido correctamente.',
-        variant: 'success',
       });
 
       // Invalidar caché
@@ -149,7 +148,12 @@ function TreeDetailPage() {
     mutationFn: async (data: typeof newMaintenance) => {
       return apiRequest(`/api/trees/${treeId}/maintenances`, {
         method: 'POST',
-        body: JSON.stringify(data),
+        data: {
+          maintenance_type: data.maintenanceType,
+          maintenance_date: data.maintenanceDate,
+          performed_by: data.performedBy || null,
+          notes: data.notes,
+        },
       });
     },
     onSuccess: () => {
@@ -166,12 +170,12 @@ function TreeDetailPage() {
       toast({
         title: 'Mantenimiento registrado',
         description: 'El mantenimiento ha sido registrado correctamente.',
-        variant: 'success',
       });
       
       // Actualizar los datos
       refetchMaintenances();
       queryClient.invalidateQueries({ queryKey: [`/api/trees/${treeId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/trees'] });
     },
     onError: (error) => {
       console.error('Error al registrar mantenimiento:', error);
@@ -973,22 +977,21 @@ function TreeDetailPage() {
                     <CardTitle>Mapa</CardTitle>
                   </CardHeader>
                   <CardContent className="min-h-[400px]">
-                    <div className="h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
-                      <div className="text-center p-6">
-                        <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-700">Vista previa del mapa no disponible</h3>
-                        <p className="text-gray-500 mt-2 max-w-md mx-auto">
-                          Utiliza el botón "Ver en Google Maps" para visualizar la ubicación exacta del árbol.
-                        </p>
-                        <Button
-                          variant="outline"
-                          className="mt-4"
-                          onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${tree.latitude},${tree.longitude}`, '_blank')}
-                        >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Abrir en Google Maps
-                        </Button>
-                      </div>
+                    <div className="h-[400px] bg-gray-100 rounded-lg overflow-hidden">
+                      <iframe
+                        src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOVTAuHiigloWU&center=${tree.latitude},${tree.longitude}&zoom=18&maptype=satellite`}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Ubicación del árbol"
+                        onError={() => {
+                          // Fallback si no se puede cargar el mapa
+                          console.log('Error cargando mapa, mostrando alternativa');
+                        }}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -996,6 +999,98 @@ function TreeDetailPage() {
             </TabsContent>
           </Tabs>
         )}
+
+        {/* Modal para registrar mantenimiento */}
+        <Dialog open={isMaintenanceModalOpen} onOpenChange={setIsMaintenanceModalOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Registrar Nuevo Mantenimiento</DialogTitle>
+              <DialogDescription>
+                Ingresa los detalles del mantenimiento realizado al árbol.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmitMaintenance} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="maintenanceType" className="text-sm font-medium">
+                  Tipo de Mantenimiento *
+                </label>
+                <select 
+                  id="maintenanceType"
+                  className="w-full p-2 border rounded-md"
+                  value={newMaintenance.maintenanceType}
+                  onChange={(e) => setNewMaintenance({...newMaintenance, maintenanceType: e.target.value})}
+                  required
+                >
+                  <option value="">Seleccionar tipo</option>
+                  <option value="Poda">Poda</option>
+                  <option value="Plantación">Plantación</option>
+                  <option value="Riego">Riego</option>
+                  <option value="Tratamiento Fitosanitario">Tratamiento Fitosanitario</option>
+                  <option value="Reparación">Reparación</option>
+                  <option value="Inspección">Inspección</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="maintenanceDate" className="text-sm font-medium">
+                  Fecha de Mantenimiento *
+                </label>
+                <input 
+                  type="date"
+                  id="maintenanceDate"
+                  className="w-full p-2 border rounded-md"
+                  value={newMaintenance.maintenanceDate}
+                  onChange={(e) => setNewMaintenance({...newMaintenance, maintenanceDate: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="performedBy" className="text-sm font-medium">
+                  Realizado por
+                </label>
+                <input 
+                  type="text"
+                  id="performedBy"
+                  className="w-full p-2 border rounded-md"
+                  value={newMaintenance.performedBy}
+                  onChange={(e) => setNewMaintenance({...newMaintenance, performedBy: e.target.value})}
+                  placeholder="Nombre del responsable"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="notes" className="text-sm font-medium">
+                  Notas
+                </label>
+                <textarea 
+                  id="notes"
+                  className="w-full p-2 border rounded-md"
+                  value={newMaintenance.notes}
+                  onChange={(e) => setNewMaintenance({...newMaintenance, notes: e.target.value})}
+                  placeholder="Detalles adicionales del mantenimiento..."
+                  rows={3}
+                />
+              </div>
+              
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">
+                    Cancelar
+                  </Button>
+                </DialogClose>
+                <Button 
+                  type="submit" 
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={createMaintenanceMutation.isPending}
+                >
+                  {createMaintenanceMutation.isPending ? 'Registrando...' : 'Registrar Mantenimiento'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
