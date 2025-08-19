@@ -78,6 +78,11 @@ const GlobalSearch: React.FC = () => {
     enabled: searchTerm.length >= 2,
   });
 
+  const { data: volunteersData } = useQuery({
+    queryKey: ['/api/volunteers'],
+    enabled: searchTerm.length >= 2,
+  });
+
   // Procesar resultados de búsqueda
   useEffect(() => {
     if (searchTerm.length < 2) {
@@ -281,6 +286,39 @@ const GlobalSearch: React.FC = () => {
         });
     }
 
+    // Buscar en voluntarios
+    const volunteers = (volunteersData as any)?.data || volunteersData || [];
+    if (Array.isArray(volunteers) && volunteers.length > 0) {
+      volunteers
+        .filter((volunteer: any) => {
+          const fullName = volunteer.full_name || volunteer.fullName || '';
+          const skills = volunteer.skills || '';
+          const email = volunteer.email || '';
+          const interestAreas = Array.isArray(volunteer.interest_areas) 
+            ? volunteer.interest_areas.join(' ').toLowerCase()
+            : (volunteer.interest_areas || '').toString().toLowerCase();
+          
+          return fullName.toLowerCase().includes(searchLower) ||
+                 skills.toLowerCase().includes(searchLower) ||
+                 email.toLowerCase().includes(searchLower) ||
+                 interestAreas.includes(searchLower);
+        })
+        .slice(0, 2)
+        .forEach((volunteer: any) => {
+          const displayName = volunteer.full_name || volunteer.fullName || `Voluntario ${volunteer.id}`;
+          const displaySkills = volunteer.skills || 'Habilidades variadas';
+          
+          searchResults.push({
+            id: `volunteer-${volunteer.id}`,
+            title: displayName,
+            description: `Voluntario - ${displaySkills}`,
+            type: 'volunteer',
+            url: `/volunteers/${volunteer.id}`,
+            image: volunteer.profile_image_url || volunteer.profileImageUrl
+          });
+        });
+    }
+
     // Buscar en espacios reservables
     const reservableSpaces = (reservableSpacesData as any) || [];
     if (Array.isArray(reservableSpaces) && reservableSpaces.length > 0) {
@@ -304,7 +342,7 @@ const GlobalSearch: React.FC = () => {
     }
 
     setResults(searchResults.slice(0, 12)); // Aumentado a 12 resultados
-  }, [searchTerm, parksData, activitiesData, instructorsData, speciesData, concessionsData, faunaData, eventsData, reservableSpacesData]);
+  }, [searchTerm, parksData, activitiesData, instructorsData, speciesData, concessionsData, faunaData, eventsData, reservableSpacesData, activeConcessions, volunteersData]);
 
   const handleResultClick = (url: string) => {
     navigate(url);
