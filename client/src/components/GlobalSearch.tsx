@@ -168,16 +168,18 @@ const GlobalSearch: React.FC = () => {
       species
         .filter((specie: any) => {
           // Solo incluir especies que tengan al menos un nombre válido
-          const hasValidName = specie.common_name?.trim() || specie.scientific_name?.trim();
+          // El endpoint devuelve commonName y scientificName (camelCase)
+          const hasValidName = specie.commonName?.trim() || specie.scientificName?.trim();
           if (!hasValidName) return false;
           
-          return specie.common_name?.toLowerCase().includes(searchLower) ||
-                 specie.scientific_name?.toLowerCase().includes(searchLower);
+          return specie.commonName?.toLowerCase().includes(searchLower) ||
+                 specie.scientificName?.toLowerCase().includes(searchLower) ||
+                 specie.family?.toLowerCase().includes(searchLower);
         })
         .slice(0, 2)
         .forEach((specie: any) => {
-          const title = specie.common_name?.trim() || specie.scientific_name?.trim() || `Especie ${specie.id}`;
-          const scientificName = specie.scientific_name?.trim() || 'Sin nombre científico';
+          const title = specie.commonName?.trim() || specie.scientificName?.trim() || `Especie ${specie.id}`;
+          const scientificName = specie.scientificName?.trim() || 'Sin nombre científico';
           
           searchResults.push({
             id: `species-${specie.id}`,
@@ -185,7 +187,7 @@ const GlobalSearch: React.FC = () => {
             description: `Especie arbórea - ${scientificName}`,
             type: 'species',
             url: `/tree-species/${specie.id}`,
-            image: specie.image_url
+            image: specie.imageUrl || specie.photoUrl
           });
         });
     }
