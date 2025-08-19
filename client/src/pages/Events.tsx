@@ -325,7 +325,7 @@ const Events: React.FC = () => {
                         
                         <div className="text-xs text-gray-500">
                           <span className="font-medium">Organiza: </span>
-                          <span className="text-gray-700">{event.organizerName}</span>
+                          <span className="text-gray-700">{event.organizerName || 'Administración del Parque'}</span>
                         </div>
                       </div>
                     </div>
@@ -367,7 +367,7 @@ const Events: React.FC = () => {
                         
                         <div className="text-xs text-gray-500">
                           <span className="font-medium">Organiza: </span>
-                          <span className="text-gray-700">{event.organizerName}</span>
+                          <span className="text-gray-700">{event.organizerName || 'Administración del Parque'}</span>
                         </div>
                       </div>
                       
