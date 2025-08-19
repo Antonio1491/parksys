@@ -811,6 +811,7 @@ app.get("/api/activities/:id", async (req: Request, res: Response) => {
         a.age_restrictions,
         a.health_requirements,
         a.category_id,
+        a.status,
         a.created_at,
         ac.name as category_name,
         ac.id as category_id,
@@ -947,9 +948,12 @@ app.get("/api/activities/:id", async (req: Request, res: Response) => {
       registrationInstructions: activity.registration_instructions || "",
       requiresApproval: activity.requires_approval || false,
       ageRestrictions: activity.age_restrictions || "",
-      healthRequirements: activity.health_requirements || ""
+      healthRequirements: activity.health_requirements || "",
+      status: activity.status || "programada"
     };
 
+    console.log("🎯 STATUS EN ACTIVIDAD:", activity.status);
+    console.log("🎯 STATUS EN FORMATTED ACTIVITY:", formattedActivity.status);
     console.log("🎯 Actividad encontrada:", formattedActivity);
     res.json(formattedActivity);
 
