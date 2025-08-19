@@ -424,7 +424,7 @@ const Home: React.FC = () => {
                 const colors = eventColors[index % eventColors.length];
                 
                 // Enlace dinámico usando el ID real del evento
-                const eventLink = `/events/${event.id}`;
+                const eventLink = `/event/${event.id}`;
                 
                 return (
                   <Link key={event.id} href={eventLink}>
