@@ -496,7 +496,10 @@ export const parkVideos = pgTable("park_videos", {
 export const amenities = pgTable("amenities", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  icon: text("icon"),
+  icon: text("icon").notNull(),
+  category: text("category").notNull(),
+  iconType: text("icon_type").notNull().default("system"),
+  customIconUrl: text("custom_icon_url"),
   createdAt: timestamp("created_at").notNull().defaultNow()
 });
 

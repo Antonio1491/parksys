@@ -689,6 +689,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registramos las rutas de evaluaciones de instructores
   registerInstructorEvaluationRoutes(app, apiRouter);
   
+  // Registramos las rutas de importación de amenidades
+  try {
+    const { registerAmenitiesImportRoutes } = await import("./amenities-import-routes");
+    registerAmenitiesImportRoutes(app, apiRouter, isAuthenticated);
+    console.log("Rutas de importación de amenidades registradas correctamente");
+  } catch (error) {
+    console.error("Error al registrar rutas de importación de amenidades:", error);
+  }
+  
   // Registramos las rutas del módulo de concesiones
   registerConcessionRoutes(app, apiRouter, isAuthenticated);
   registerConcessionContractsRoutes(app, apiRouter, isAuthenticated);
