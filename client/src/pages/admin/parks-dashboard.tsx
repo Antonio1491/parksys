@@ -359,51 +359,8 @@ const ParksDashboard = () => {
         {/* Sección continua con el resto del dashboard */}
         <div className="space-y-6">
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Parques por municipio */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-white rounded-t-lg">
-                <CardTitle className="text-lg font-bold text-gray-800">
-                  Parques por Municipio
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {data.parksByMunicipality?.map((item, index) => {
-                    const maxCount = Math.max(...(data.parksByMunicipality?.map(p => p.count) || [1]));
-                    const percentage = (item.count / maxCount) * 100;
-                    const colors = ['#D2EAEA', '#036668', '#003D49'];
-                    const backgroundColor = colors[index % colors.length];
-                    
-                    return (
-                      <div key={index} className="flex items-center space-x-3">
-                        <div className="w-32 text-sm font-medium text-right text-gray-700 truncate">
-                          {item.municipalityName}
-                        </div>
-                        <div className="flex-1 flex items-center space-x-2">
-                          <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
-                            <div 
-                              className="h-6 rounded-full flex items-center justify-end pr-3 transition-all duration-700 shadow-sm"
-                              style={{ 
-                                width: `${Math.max(percentage, 5)}%`,
-                                backgroundColor: backgroundColor
-                              }}
-                            >
-                              <span className={`text-xs font-bold ${backgroundColor === '#D2EAEA' ? 'text-gray-800' : 'text-white'}`}>
-                                {item.count}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Parques por tipo */}
-            <Card className="border-0 shadow-lg">
+          {/* Parques por tipo */}
+          <Card className="border-0 shadow-lg max-w-2xl mx-auto">
               <CardHeader className="bg-white rounded-t-lg">
                 <CardTitle className="text-lg font-bold text-gray-800">
                   Distribución por Tipo
@@ -443,7 +400,6 @@ const ParksDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
 
           {/* Mapa de parques */}
           <Card className="border-0 shadow-xl">
