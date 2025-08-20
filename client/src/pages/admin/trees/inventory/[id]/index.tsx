@@ -10,8 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Sprout, TreeDeciduous, ThermometerSun, Tag, AlertCircle, AlertOctagon, 
   AlertTriangle, CircleAlert, CircleCheck, Info, ArrowLeft, Edit, ExternalLink, 
-  MapPin, Leaf, Calendar, Ruler, HelpCircle, Trash2, Plus, Scissors, 
-  Shovel, Wrench, RotateCcw } from 'lucide-react';
+  MapPin, Leaf, Calendar, Ruler, HelpCircle, Trash2, Scissors, 
+  Shovel, Wrench } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Card,
@@ -38,16 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 function TreeDetailPage() {
@@ -56,18 +47,7 @@ function TreeDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const treeId = params?.id;
-  const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
-  const [newMaintenance, setNewMaintenance] = useState({
-    maintenanceType: '',
-    maintenanceDate: '',
-    performedBy: '',
-    notes: ''
-  });
 
-  // Estado para búsqueda de empleados
-  const [employeeSearch, setEmployeeSearch] = useState('');
-  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
-  const [showEmployeeList, setShowEmployeeList] = useState(false);
   
   // Verificar que se obtiene el ID correctamente
   console.log("ID del árbol:", treeId);
@@ -93,24 +73,9 @@ function TreeDetailPage() {
 
   const tree = treeResponse?.data;
 
-  // Consultar empleados para el selector
-  const { data: employees = [] } = useQuery({
-    queryKey: ['/api/employees'],
-    queryFn: async () => {
-      const response = await fetch('/api/employees');
-      if (!response.ok) return [];
-      const data = await response.json();
-      return data.employees || [];
-    },
-  });
 
-  // Filtrar empleados basado en la búsqueda
-  const filteredEmployees = employees.filter((emp: any) => 
-    emp.firstName?.toLowerCase().includes(employeeSearch.toLowerCase()) ||
-    emp.lastName?.toLowerCase().includes(employeeSearch.toLowerCase()) ||
-    emp.email?.toLowerCase().includes(employeeSearch.toLowerCase()) ||
-    emp.position?.toLowerCase().includes(employeeSearch.toLowerCase())
-  ).slice(0, 10); // Limitar a 10 resultados
+
+
   
   // Consultar mantenimientos del árbol
   const {
@@ -129,22 +94,7 @@ function TreeDetailPage() {
     enabled: !!treeId,
   });
 
-  // Consultar evaluaciones/inspecciones del árbol
-  const {
-    data: evaluations,
-    isLoading: isLoadingEvaluations,
-    refetch: refetchEvaluations
-  } = useQuery({
-    queryKey: [`/api/trees/${treeId}/evaluations`],
-    queryFn: async () => {
-      const response = await fetch(`/api/trees/${treeId}/evaluations`);
-      if (!response.ok) {
-        throw new Error('Error al cargar las evaluaciones del árbol');
-      }
-      return response.json();
-    },
-    enabled: !!treeId,
-  });
+
 
   // Manejar la eliminación (marcado como removido) de un árbol
   const handleRemoveTree = async (reason: string) => {
@@ -184,67 +134,7 @@ function TreeDetailPage() {
     }
   };
   
-  // Agregar un nuevo mantenimiento
-  const createMaintenanceMutation = useMutation({
-    mutationFn: async (data: typeof newMaintenance) => {
-      return apiRequest(`/api/trees/${treeId}/maintenances`, {
-        method: 'POST',
-        data: {
-          maintenance_type: data.maintenanceType,
-          maintenance_date: data.maintenanceDate,
-          performed_by: data.performedBy ? parseInt(data.performedBy) : null,
-          notes: data.notes,
-        },
-      });
-    },
-    onSuccess: () => {
-      // Cerrar el modal y limpiar el formulario
-      setIsMaintenanceModalOpen(false);
-      setNewMaintenance({
-        maintenanceType: '',
-        maintenanceDate: '',
-        performedBy: '',
-        notes: ''
-      });
-      setEmployeeSearch('');
-      setSelectedEmployee(null);
-      setShowEmployeeList(false);
-      
-      // Mostrar mensaje de éxito
-      toast({
-        title: 'Mantenimiento registrado',
-        description: 'El mantenimiento ha sido registrado correctamente.',
-      });
-      
-      // Actualizar los datos
-      refetchMaintenances();
-      queryClient.invalidateQueries({ queryKey: [`/api/trees/${treeId}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/trees'] });
-    },
-    onError: (error) => {
-      console.error('Error al registrar mantenimiento:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudo registrar el mantenimiento. Por favor, intenta nuevamente.',
-        variant: 'destructive',
-      });
-    },
-  });
-  
-  // Manejar el envío del formulario
-  const handleSubmitMaintenance = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMaintenance.maintenanceType || !newMaintenance.maintenanceDate) {
-      toast({
-        title: 'Campos requeridos',
-        description: 'Por favor completa el tipo de mantenimiento y la fecha.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    createMaintenanceMutation.mutate(newMaintenance);
-  };
+
   
   // Obtener el icono para el tipo de mantenimiento
   const getMaintenanceIcon = (type: string) => {
@@ -746,114 +636,8 @@ function TreeDetailPage() {
             {/* Tab: Ubicación */}
             <TabsContent value="maintenance">
               <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-semibold text-gray-900">Registro de Mantenimiento</h2>
-                  <Dialog open={isMaintenanceModalOpen} onOpenChange={setIsMaintenanceModalOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Registrar Mantenimiento
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]">
-                      <DialogHeader>
-                        <DialogTitle>Registrar Nuevo Mantenimiento</DialogTitle>
-                        <DialogDescription>
-                          Ingresa los detalles del mantenimiento realizado al árbol.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <form onSubmit={handleSubmitMaintenance} className="space-y-4">
-                        <div className="space-y-2">
-                          <label htmlFor="maintenanceType" className="text-sm font-medium">
-                            Tipo de Mantenimiento *
-                          </label>
-                          <select 
-                            id="maintenanceType"
-                            className="w-full p-2 border rounded-md"
-                            value={newMaintenance.maintenanceType}
-                            onChange={(e) => setNewMaintenance({...newMaintenance, maintenanceType: e.target.value})}
-                            required
-                          >
-                            <option value="">Seleccionar tipo</option>
-                            <option value="Poda">Poda</option>
-                            <option value="Plantación">Plantación</option>
-                            <option value="Riego">Riego</option>
-                            <option value="Tratamiento Fitosanitario">Tratamiento Fitosanitario</option>
-                            <option value="Reparación">Reparación</option>
-                            <option value="Inspección">Inspección</option>
-                            <option value="Otro">Otro</option>
-                          </select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label htmlFor="maintenanceDate" className="text-sm font-medium">
-                            Fecha de Mantenimiento *
-                          </label>
-                          <input 
-                            type="date"
-                            id="maintenanceDate"
-                            className="w-full p-2 border rounded-md"
-                            value={newMaintenance.maintenanceDate}
-                            onChange={(e) => setNewMaintenance({...newMaintenance, maintenanceDate: e.target.value})}
-                            required
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label htmlFor="performedBy" className="text-sm font-medium">
-                            Realizado por
-                          </label>
-                          <select 
-                            id="performedBy"
-                            className="w-full p-2 border rounded-md"
-                            value={newMaintenance.performedBy}
-                            onChange={(e) => setNewMaintenance({...newMaintenance, performedBy: e.target.value})}
-                          >
-                            <option value="">Seleccionar empleado</option>
-                            <option value="1">Juan Pérez - Jardinero</option>
-                            <option value="2">María González - Supervisora</option>
-                            <option value="3">Carlos López - Técnico Forestal</option>
-                            <option value="4">Ana Martínez - Coordinadora</option>
-                            <option value="manual">Otro (escribir manualmente)</option>
-                          </select>
-                          {newMaintenance.performedBy === 'manual' && (
-                            <input 
-                              type="text"
-                              className="w-full p-2 border rounded-md text-sm mt-2"
-                              placeholder="Escribir nombre del responsable"
-                              onChange={(e) => setNewMaintenance({...newMaintenance, performedBy: e.target.value})}
-                            />
-                          )}
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label htmlFor="notes" className="text-sm font-medium">
-                            Notas y observaciones
-                          </label>
-                          <textarea 
-                            id="notes"
-                            className="w-full p-2 border rounded-md h-24"
-                            value={newMaintenance.notes}
-                            onChange={(e) => setNewMaintenance({...newMaintenance, notes: e.target.value})}
-                            placeholder="Detalles adicionales sobre el mantenimiento realizado"
-                          />
-                        </div>
-                        
-                        <DialogFooter>
-                          <Button type="button" variant="outline" onClick={() => setIsMaintenanceModalOpen(false)}>
-                            Cancelar
-                          </Button>
-                          <Button 
-                            type="submit" 
-                            disabled={createMaintenanceMutation.isPending}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            {createMaintenanceMutation.isPending ? 'Guardando...' : 'Guardar Mantenimiento'}
-                          </Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Historial de Mantenimiento</h2>
                 </div>
                 
                 <Card>
@@ -907,13 +691,12 @@ function TreeDetailPage() {
                         <p className="text-gray-500 mb-4">
                           No se han registrado actividades de mantenimiento para este árbol todavía.
                         </p>
-                        <Button
-                          onClick={() => setIsMaintenanceModalOpen(true)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Registrar el primer mantenimiento
-                        </Button>
+                        <p className="text-sm text-gray-500">
+                          Para registrar mantenimientos, utiliza la sección de 
+                          <a href="/admin/trees/maintenance" className="text-green-600 hover:text-green-700 font-medium ml-1">
+                            Mantenimiento de Árboles
+                          </a>
+                        </p>
                       </div>
                     )}
                   </CardContent>
