@@ -59,6 +59,7 @@ const parkSchema = z.object({
   administrator: z.string().nullable().optional(),
   contactPhone: z.string().nullable().optional(),
   contactEmail: z.string().nullable().optional(),
+  certificaciones: z.string().nullable().optional(),
 });
 
 type ParkFormValues = z.infer<typeof parkSchema>;
@@ -115,6 +116,7 @@ const AdminParkEdit: React.FC = () => {
       administrator: '',
       contactPhone: '',
       contactEmail: '',
+      certificaciones: '',
     },
   });
   
@@ -143,6 +145,7 @@ const AdminParkEdit: React.FC = () => {
         administrator: park.administrator || '',
         contactPhone: park.contactPhone || '',
         contactEmail: park.contactEmail || '',
+        certificaciones: park.certificaciones || '',
       };
       
       form.reset(formValues);
@@ -166,7 +169,8 @@ const AdminParkEdit: React.FC = () => {
       administrator: values.administrator || undefined,
       contactPhone: values.contactPhone || undefined,
       contactEmail: values.contactEmail || undefined,
-      openingHours: values.openingHours || undefined
+      openingHours: values.openingHours || undefined,
+      certificaciones: values.certificaciones || undefined
     };
     
     console.log('Valores limpiados para enviar:', cleanedValues);
@@ -521,6 +525,27 @@ const AdminParkEdit: React.FC = () => {
                     )}
                   />
                   
+                  {/* Certificaciones */}
+                  <FormField
+                    control={form.control}
+                    name="certificaciones"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Certificaciones</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Green Flag Award, ISO 14001, Certificación Ambiental (separadas por comas)" 
+                            className="min-h-[80px]" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-sm text-muted-foreground">
+                          Ingresa las certificaciones del parque separadas por comas. Ejemplo: Green Flag Award 2024, ISO 14001, Bandera Verde
+                        </p>
+                      </FormItem>
+                    )}
+                  />
 
                 </CardContent>
                 <CardFooter className="flex justify-end">

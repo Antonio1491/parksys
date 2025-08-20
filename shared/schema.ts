@@ -1349,6 +1349,7 @@ export const parks = pgTable("parks", {
   contactEmail: text("contact_email"),
   contactPhone: text("contact_phone"),
   videoUrl: text("video_url"),
+  certificaciones: text("certificaciones"), // Campo para certificaciones múltiples separadas por comas
   isDeleted: boolean("is_deleted").default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
