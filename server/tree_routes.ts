@@ -184,7 +184,8 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
     }
   });
   
-  // Crear nuevo registro de mantenimiento para un árbol
+  // TEMPORALMENTE DESHABILITADO - Crear nuevo registro de mantenimiento para un árbol (ENDPOINT DUPLICADO)
+  /*
   apiRouter.post("/trees/:id/maintenances", async (req: Request, res: Response) => {
     try {
       const treeId = Number(req.params.id);
@@ -200,28 +201,19 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         return res.status(404).json({ error: "Árbol no encontrado" });
       }
       
-      // Obtener y convertir datos de entrada
-      const { maintenance_type, maintenance_date, notes, description, performed_by, next_maintenance_date } = req.body;
+      // Obtener y convertir datos de entrada (acepta camelCase del frontend)
+      const { maintenanceType, maintenanceDate, notes, description, performedBy, nextMaintenanceDate } = req.body;
       
       // Validar que los campos obligatorios estén presentes
-      if (!maintenance_type || !maintenance_date) {
+      if (!maintenanceType || !maintenanceDate) {
         return res.status(400).json({ 
           error: "Datos de mantenimiento inválidos", 
-          details: "Los campos maintenance_type y maintenance_date son obligatorios" 
+          details: "Los campos maintenanceType y maintenanceDate son obligatorios" 
         });
       }
       
-      // Convertir performed_by a número si existe
-      let performedById = null;
-      if (performed_by) {
-        performedById = Number(performed_by);
-        if (isNaN(performedById)) {
-          return res.status(400).json({ 
-            error: "Datos de mantenimiento inválidos", 
-            details: "El campo performed_by debe ser un número" 
-          });
-        }
-      }
+      // El performedBy puede ser un texto (nombre) o un ID numérico
+      let performedByValue = performedBy || null;
       
       // Insertar usando SQL directo para evitar problemas de esquema
       const result = await db.execute(sql`
@@ -237,12 +229,12 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         ) 
         VALUES (
           ${treeId}, 
-          ${maintenance_type}, 
-          ${maintenance_date}, 
+          ${maintenanceType}, 
+          ${maintenanceDate}, 
           ${description || null},
-          ${performedById}, 
+          ${performedByValue}, 
           ${notes || null}, 
-          ${next_maintenance_date || null},
+          ${nextMaintenanceDate || null},
           NOW()
         )
         RETURNING *
@@ -277,6 +269,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
       res.status(500).json({ error: "Error al crear registro de mantenimiento" });
     }
   });
+  */
   // Endpoint para cargar árboles de muestra en el inventario
   apiRouter.post("/trees/seed", isAuthenticated, async (_req: Request, res: Response) => {
     try {

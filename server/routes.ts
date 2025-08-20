@@ -416,7 +416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registramos las rutas del módulo de arbolado
   registerTreeRoutes(app, apiRouter, isAuthenticated);
-  registerTreeMaintenanceRoutes(app, apiRouter, isAuthenticated);
+  // registerTreeMaintenanceRoutes(app, apiRouter, isAuthenticated); // Temporalmente deshabilitado para evitar duplicación
   registerTreeInventoryRoutes(app, apiRouter, isAuthenticated);
   registerTreeInventoryGeneratorRoutes(app, apiRouter, isAuthenticated);
   
