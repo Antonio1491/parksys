@@ -148,7 +148,7 @@ export default function AmenitiesImport() {
         </div>
       </Card>
 
-      <div className="grid gap-6 max-w-4xl">
+      <div className="grid gap-6">
         {/* Instrucciones */}
         <Card>
           <CardHeader>
