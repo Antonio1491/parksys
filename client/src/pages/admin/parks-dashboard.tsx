@@ -149,7 +149,7 @@ const ParksDashboard = () => {
         <div className="mb-8">
           <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-3xl font-bold font-poppins">
                 <span style={{ color: '#00444f' }}>MÉTRICAS</span>{' '}
                 <span style={{ color: '#504378' }}>Parques</span>
               </h1>
