@@ -145,18 +145,20 @@ const ParksDashboard = () => {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        {/* Main Header con Card */}
-        <Card className="p-4" style={{backgroundColor: '#003D49'}}>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{backgroundColor: '#513C73'}}>
-              <Activity className="w-5 h-5 text-white" />
-            </div>
+        {/* Main Header sin Card */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-              <p className="text-gray-200 mt-2">Resumen General del Sistema</p>
+              <h1 className="text-3xl font-bold">
+                <span style={{ color: '#00444f' }}>MÉTRICAS</span>{' '}
+                <span style={{ color: '#504378' }}>Parques</span>
+              </h1>
+              <p className="mt-2" style={{ color: '#00444f' }}>
+                Estadísticas generales del sistema de parques
+              </p>
             </div>
           </div>
-        </Card>
+        </div>
         
         {/* Sección 1: Información General */}
         <div className="space-y-4">
