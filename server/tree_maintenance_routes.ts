@@ -23,6 +23,64 @@ import { sql } from 'drizzle-orm';
  * @param isAuthenticated Middleware de autenticación
  */
 export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
+  console.log('🌳 Registrando rutas de mantenimiento de árboles - ENDPOINTS POST PRIMERO');
+
+  // ENDPOINT POST - CREAR MANTENIMIENTO (DEBE IR PRIMERO PARA EVITAR CONFLICTOS DE RUTAS)
+  apiRouter.post("/trees/maintenances", async (req: Request, res: Response) => {
+    try {
+      console.log('🌳 POST /trees/maintenances - Creando mantenimiento:', req.body);
+      
+      const treeId = parseInt(req.body.treeId);
+      
+      if (!treeId || isNaN(treeId)) {
+        return res.status(400).json({ error: "ID de árbol inválido" });
+      }
+      
+      // Verificar que el árbol existe
+      const treeExists = await db.select({ id: trees.id }).from(trees).where(eq(trees.id, treeId));
+      
+      if (treeExists.length === 0) {
+        return res.status(404).json({ error: "Árbol no encontrado" });
+      }
+      
+      // Validación básica de campos requeridos
+      if (!req.body.maintenanceType) {
+        return res.status(400).json({ error: "El tipo de mantenimiento es requerido" });
+      }
+      
+      if (!req.body.maintenanceDate) {
+        return res.status(400).json({ error: "La fecha de mantenimiento es requerida" });
+      }
+      
+      // Insertar el nuevo mantenimiento
+      const [newMaintenance] = await db.insert(treeMaintenances).values({
+        tree_id: treeId,
+        maintenance_type: req.body.maintenanceType,
+        maintenance_date: req.body.maintenanceDate,
+        performed_by: req.body.performedBy,
+        description: req.body.notes || req.body.description,
+        notes: req.body.notes,
+        next_maintenance_date: req.body.nextMaintenanceDate || null
+      }).returning();
+      
+      console.log('✅ Mantenimiento creado exitosamente:', newMaintenance);
+      
+      return res.status(201).json({
+        success: true,
+        message: "Mantenimiento registrado correctamente",
+        data: newMaintenance
+      });
+      
+    } catch (error) {
+      console.error('❌ Error creating maintenance:', error);
+      
+      return res.status(500).json({ 
+        error: "Error al crear mantenimiento",
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Obtener todos los mantenimientos de árboles con paginación
   apiRouter.get("/trees/maintenances", async (req: Request, res: Response) => {
     try {
@@ -225,7 +283,7 @@ export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAut
     }
   });
 
-  // Endpoint para crear un nuevo mantenimiento
+  // Endpoint para crear un nuevo mantenimiento (por ID de árbol específico)
   apiRouter.post("/trees/:id/maintenances", async (req: Request, res: Response) => {
     try {
       const treeId = parseInt(req.params.id);

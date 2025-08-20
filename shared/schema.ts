@@ -1423,7 +1423,7 @@ export const treeMaintenances = pgTable("tree_maintenances", {
   maintenance_type: varchar("maintenance_type").notNull(),
   maintenance_date: date("maintenance_date").notNull(),
   description: text("description"),
-  performed_by: integer("performed_by"),
+  performed_by: varchar("performed_by", { length: 255 }), // Cambiado de integer a varchar para nombres
   notes: text("notes"),
   next_maintenance_date: date("next_maintenance_date"),
   created_at: timestamp("created_at").notNull().defaultNow()

@@ -414,6 +414,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerActivityPaymentRoutes(app);
   console.log('💳 Rutas de pagos de actividades registradas');
   
+  // ENDPOINT POST CRÍTICO - DEBE IR PRIMERO PARA EVITAR INTERCEPTACIÓN
+  apiRouter.post("/trees/maintenances", async (req: Request, res: Response) => {
+    try {
+      console.log('🌳 POST /trees/maintenances - Creando mantenimiento (desde routes.ts):', req.body);
+      
+      const treeId = parseInt(req.body.treeId);
+      
+      if (!treeId || isNaN(treeId)) {
+        return res.status(400).json({ error: "ID de árbol inválido" });
+      }
+      
+      // Verificar que el árbol existe
+      const treeExists = await db.select({ id: schema.trees.id }).from(schema.trees).where(eq(schema.trees.id, treeId));
+      
+      if (treeExists.length === 0) {
+        return res.status(404).json({ error: "Árbol no encontrado" });
+      }
+      
+      // Validación básica de campos requeridos
+      if (!req.body.maintenanceType) {
+        return res.status(400).json({ error: "El tipo de mantenimiento es requerido" });
+      }
+      
+      if (!req.body.maintenanceDate) {
+        return res.status(400).json({ error: "La fecha de mantenimiento es requerida" });
+      }
+      
+      console.log('📋 Datos para inserción:', {
+        tree_id: treeId,
+        maintenance_type: req.body.maintenanceType,
+        maintenance_date: req.body.maintenanceDate,
+        performed_by: req.body.performedBy,
+        description: req.body.notes || req.body.description,
+        notes: req.body.notes,
+        next_maintenance_date: req.body.nextMaintenanceDate || null
+      });
+      
+      // Insertar el nuevo mantenimiento
+      const [newMaintenance] = await db.insert(schema.treeMaintenances).values({
+        tree_id: treeId,
+        maintenance_type: req.body.maintenanceType,
+        maintenance_date: req.body.maintenanceDate,
+        performed_by: req.body.performedBy,
+        description: req.body.notes || req.body.description,
+        notes: req.body.notes,
+        next_maintenance_date: req.body.nextMaintenanceDate || null
+      }).returning();
+      
+      console.log('✅ Mantenimiento creado exitosamente (desde routes.ts):', newMaintenance);
+      
+      return res.status(201).json({
+        success: true,
+        message: "Mantenimiento registrado correctamente",
+        data: newMaintenance
+      });
+      
+    } catch (error) {
+      console.error('❌ Error creating maintenance (desde routes.ts):', error);
+      
+      return res.status(500).json({ 
+        error: "Error al crear mantenimiento",
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Registramos las rutas del módulo de arbolado (orden específico para evitar conflictos)
   registerTreeMaintenanceRoutes(app, apiRouter, isAuthenticated); // Rutas específicas primero
   registerTreeRoutes(app, apiRouter, isAuthenticated);
