@@ -87,28 +87,6 @@ interface CalendarItem {
   status?: string;
 }
 
-// Tipo unificado para el calendario
-interface CalendarItem {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  startDate: string;
-  endDate?: string;
-  startTime?: string;
-  endTime?: string;
-  location?: string;
-  capacity?: number;
-  price?: number;
-  parkName: string;
-  type: 'activity' | 'event';
-  isFree?: boolean;
-  instructorName?: string;
-  organizerName?: string;
-  targetAudience?: string;
-  status?: string;
-}
-
 const CalendarPage: React.FC = () => {
   // Estado para el mes actual y filtros
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -187,6 +165,10 @@ const CalendarPage: React.FC = () => {
   
   // Categorías dinámicas según el filtro de tipo
   const getAvailableCategories = () => {
+    console.log('Activities:', activities.length, 'activityCategories:', activityCategories);
+    console.log('Events:', events.length, 'eventCategories:', eventCategories);
+    console.log('TypeFilter:', typeFilter);
+    
     if (typeFilter === 'activities') return activityCategories;
     if (typeFilter === 'events') return eventCategories;
     return Array.from(new Set([...activityCategories, ...eventCategories]));
