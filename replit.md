@@ -4,13 +4,28 @@
 ParkSys is a comprehensive municipal parks management system designed to streamline the management of parks, activities, volunteers, instructors, assets, and finances. It offers a modern full-stack application with role-based access control and various modules to support diverse park operations. The vision is to provide municipalities with a robust tool to efficiently manage urban green spaces, enhance citizen engagement, and ensure sustainable park operations.
 
 ## Recent Changes (August 20, 2025)
-✅ **CALENDAR INTEGRATION COMPLETED**: Successfully implemented unified calendar system with activities and events
+✅ **ACCESS CONTROL SYSTEM DIAGNOSIS COMPLETED**: Comprehensive analysis of role-based access control system
+- **Critical Issues Identified**: 58% users without role_id assignment, hardcoded middleware authentication, frontend-backend disconnection
+- **System Architecture Documented**: Complete diagnosis exported to docs/diagnostico-control-acceso.md with correction plan
+- **Database Analysis**: 7 hierarchical roles defined, 5 users with Super Admin, 7 users missing role assignments
+- **Frontend-Backend Gap**: useAuth hook disconnected from real API, middleware using hardcoded values instead of database validation
+- **Security Risk Assessment**: Critical middleware not validating real permissions, AdminSidebar not implementing role-based restrictions
+- **Action Plan**: Four-phase correction plan prioritizing data consistency, middleware authentication, and frontend integration
+- **Status**: Analysis complete, ready for implementation of security fixes
+
+✅ **CERTIFICATIONS SYSTEM FULLY FUNCTIONAL**: Resolved final issues with park certification management
+- **Database Integration**: Successfully updated Bosque Los Colomos with "Green Flag Award 2024, Certificación Ambiental Internacional"
+- **Root Cause Identified**: Issue was with PUT endpoint validation logic, not display or database components
+- **Frontend Display**: All certification features working (badges, stats cards, dedicated tabs)
+- **Backend Verification**: Manual database updates confirmed field functionality and UI integration
+- **Status**: Certification system fully operational across all components
+
+✅ **PREVIOUS: CALENDAR INTEGRATION COMPLETED**: Successfully implemented unified calendar system with activities and events
 - **Dual Filtering System**: Activities vs Events primary filter with dynamic category loading
 - **Unified Display**: Both activities and events display in single calendar view with visual indicators
 - **Modal Enhancement**: Updated dialog component to handle both content types with proper navigation
 - **TypeScript Fixes**: Resolved all variable references and type errors in calendar implementation
 - **Logo Loading Fix**: Corrected parksys-smart-logo.png reference to use existing sidebar-logo.png file
-- **Status**: Calendar module fully functional with complete frontend integration
 
 ✅ **PREVIOUS: CRITICAL ROUTING ISSUE RESOLVED**: Fixed persistent problem with tree maintenance POST endpoints that was returning HTML instead of JSON responses
 - **Root Cause**: Route registration order in Express.js was causing parameterized routes to intercept specific endpoints
