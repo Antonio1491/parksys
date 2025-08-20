@@ -160,11 +160,8 @@ const ParksDashboard = () => {
           </div>
         </div>
         
-        {/* Sección 1: Información General */}
+        {/* Sección 1: Métricas Principales */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Información General
-          </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card className="border-0 shadow-lg text-white" style={{backgroundColor: '#003D49'}}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
