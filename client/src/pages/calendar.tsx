@@ -19,6 +19,7 @@ interface Activity {
   title: string;
   description: string;
   category: string;
+  categoryId?: number;
   startDate: string;
   endDate?: string;
   location?: string;
@@ -100,13 +101,18 @@ const CalendarPage: React.FC = () => {
   const [parkFilter, setParkFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState('all');
   
-  // Consultar actividades y eventos desde las APIs
+  // Consultar actividades, eventos y categorías desde las APIs
   const { data: activities = [], isLoading: loadingActivities } = useQuery<Activity[]>({
     queryKey: ['/api/activities'],
   });
   
   const { data: events = [], isLoading: loadingEvents } = useQuery<Event[]>({
     queryKey: ['/api/events'],
+  });
+
+  // Obtener las categorías reales desde la API
+  const { data: activityCategoriesData = [] } = useQuery({
+    queryKey: ['/api/activity-categories'],
   });
   
   // Procesar datos de eventos para el formato unificado
@@ -133,30 +139,37 @@ const CalendarPage: React.FC = () => {
     }));
   
   // Procesar datos de actividades para el formato unificado
-  const processedActivities: CalendarItem[] = activities.map(activity => ({
-    id: activity.id,
-    title: activity.title,
-    description: activity.description,
-    category: activity.category,
-    startDate: activity.startDate,
-    endDate: activity.endDate,
-    startTime: activity.startTime,
-    endTime: activity.endTime,
-    location: activity.location,
-    capacity: activity.capacity,
-    price: activity.price,
-    parkName: activity.parkName,
-    type: 'activity' as const,
-    isFree: activity.isFree,
-    instructorName: activity.instructorName,
-    targetAudience: activity.targetMarket?.join(', ') || ''
-  }));
+  const processedActivities: CalendarItem[] = activities.map(activity => {
+    // Mapear categoryId a nombre de categoría
+    const categoryName = activity.categoryId 
+      ? activityCategoriesData.find((cat: any) => cat.id === activity.categoryId)?.name || 'Sin categoría'
+      : activity.category || 'Sin categoría';
+    
+    return {
+      id: activity.id,
+      title: activity.title,
+      description: activity.description,
+      category: categoryName,
+      startDate: activity.startDate,
+      endDate: activity.endDate,
+      startTime: activity.startTime,
+      endTime: activity.endTime,
+      location: activity.location,
+      capacity: activity.capacity,
+      price: activity.price,
+      parkName: activity.parkName,
+      type: 'activity' as const,
+      isFree: activity.isFree,
+      instructorName: activity.instructorName,
+      targetAudience: activity.targetMarket?.join(', ') || ''
+    };
+  });
   
   // Combinar actividades y eventos
   const allItems = [...processedActivities, ...processedEvents];
   
-  // Extraer categorías y parques únicos para los filtros
-  const activityCategories = Array.from(new Set(activities.map(a => a.category || 'Sin categoría')));
+  // Usar las categorías reales de la API de actividades
+  const activityCategories = activityCategoriesData.map((cat: any) => cat.name);
   const eventCategories = Array.from(new Set(events.map(e => e.eventType || 'Sin categoría')));
   const allParks = Array.from(new Set([
     ...activities.map(a => a.parkName || 'Sin parque'),
@@ -165,10 +178,6 @@ const CalendarPage: React.FC = () => {
   
   // Categorías dinámicas según el filtro de tipo
   const getAvailableCategories = () => {
-    console.log('Activities:', activities.length, 'activityCategories:', activityCategories);
-    console.log('Events:', events.length, 'eventCategories:', eventCategories);
-    console.log('TypeFilter:', typeFilter);
-    
     if (typeFilter === 'activities') return activityCategories;
     if (typeFilter === 'events') return eventCategories;
     return Array.from(new Set([...activityCategories, ...eventCategories]));
@@ -246,6 +255,14 @@ const CalendarPage: React.FC = () => {
     setDialogOpen(true);
   };
 
+  // Función para resetear filtros
+  const resetFilters = () => {
+    setTypeFilter('all');
+    setCategoryFilter('all');
+    setParkFilter('all');
+    setPriceFilter('all');
+  };
+
   // Configurar fechas del calendario
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -256,14 +273,6 @@ const CalendarPage: React.FC = () => {
   endDate.setDate(endDate.getDate() + (6 - getDay(monthEnd)));
   
   const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
-
-  // Función para resetear filtros
-  const resetFilters = () => {
-    setTypeFilter('all');
-    setCategoryFilter('all');
-    setParkFilter('all');
-    setPriceFilter('all');
-  };
 
   // Calcular estadísticas para el hero
   const totalActivities = activities.length;
