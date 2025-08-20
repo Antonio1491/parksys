@@ -74,15 +74,19 @@ const ParksDashboard = () => {
     return (
       <AdminLayout>
         <div className="space-y-6">
-          <Card className="p-4 bg-gray-50 mb-8">
-            <div className="flex items-center gap-2">
-              <Activity className="w-8 h-8 text-gray-900" />
+          <div className="mb-8">
+            <div className="flex items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-gray-600 mt-2">Resumen General del Sistema</p>
+                <h1 className="text-3xl font-bold font-poppins">
+                  <span style={{ color: '#00444f' }}>MÉTRICAS</span>{' '}
+                  <span style={{ color: '#504378' }}>Parques</span>
+                </h1>
+                <p className="mt-2" style={{ color: '#00444f' }}>
+                  Estadísticas generales del sistema de parques
+                </p>
               </div>
             </div>
-          </Card>
+          </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[...Array(8)].map((_, i) => (
               <Card key={i}>
@@ -105,15 +109,19 @@ const ParksDashboard = () => {
   if (error) {
     return (
       <AdminLayout>
-        <Card className="p-4 bg-gray-50 mb-8">
-          <div className="flex items-center gap-2">
-            <Activity className="w-8 h-8 text-gray-900" />
+        <div className="mb-8">
+          <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600 mt-2">Resumen General del Sistema</p>
+              <h1 className="text-3xl font-bold font-poppins">
+                <span style={{ color: '#00444f' }}>MÉTRICAS</span>{' '}
+                <span style={{ color: '#504378' }}>Parques</span>
+              </h1>
+              <p className="mt-2" style={{ color: '#00444f' }}>
+                Estadísticas generales del sistema de parques
+              </p>
             </div>
           </div>
-        </Card>
+        </div>
         <div className="text-center py-8">
           <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
           <p className="text-gray-600">Error al cargar los datos del dashboard</p>
@@ -125,15 +133,19 @@ const ParksDashboard = () => {
   if (!data) {
     return (
       <AdminLayout>
-        <Card className="p-4 bg-gray-50 mb-8">
-          <div className="flex items-center gap-2">
-            <Activity className="w-8 h-8 text-gray-900" />
+        <div className="mb-8">
+          <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600 mt-2">Resumen General del Sistema</p>
+              <h1 className="text-3xl font-bold font-poppins">
+                <span style={{ color: '#00444f' }}>MÉTRICAS</span>{' '}
+                <span style={{ color: '#504378' }}>Parques</span>
+              </h1>
+              <p className="mt-2" style={{ color: '#00444f' }}>
+                Estadísticas generales del sistema de parques
+              </p>
             </div>
           </div>
-        </Card>
+        </div>
         <div className="text-center py-8">
           <p className="text-gray-600">No hay datos disponibles</p>
         </div>

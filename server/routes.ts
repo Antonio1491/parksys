@@ -1275,11 +1275,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calificación promedio (simulado - valor fijo por ahora)
       const averageRating = 4.2;
       
-      // Parques con Green Flag Award
+      // Parques con Green Flag Award (simulado basado en estado de conservación excelente)
       const greenFlagResult = await pool.query(`
         SELECT COUNT(*) as count
         FROM parks
-        WHERE green_flag_award = true OR LOWER(awards) LIKE '%green flag%'
+        WHERE conservation_status = 'Excelente' OR conservation_status = 'Excellent'
       `);
       const greenFlagParks = parseInt(greenFlagResult.rows[0].count);
       const greenFlagPercentage = totalParks > 0 ? ((greenFlagParks / totalParks) * 100) : 0;
