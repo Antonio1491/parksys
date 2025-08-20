@@ -55,13 +55,25 @@ export default function ConcessionsList() {
     queryKey: ['/api/parks'],
   });
 
-  const concessions = (concessionsResponse as any)?.data || [];
+  // El endpoint /api/active-concessions devuelve directamente un array, no un objeto con data
+  const concessions = Array.isArray(concessionsResponse) ? concessionsResponse : [];
   const parks = Array.isArray(parksResponse) ? parksResponse : (parksResponse as any)?.data || [];
 
+  // Debug logging
+  console.log('🏪 CONCESSIONS DEBUG:', {
+    concessionsLength: concessions.length,
+    concessionsResponse: concessionsResponse,
+    firstConcession: concessions[0],
+    parksLength: parks.length
+  });
 
 
-  // Filtrar concesiones
+
+  // Filtrar concesiones activas solamente
   const filteredConcessions = concessions.filter((concession: Concession) => {
+    // Solo mostrar concesiones con status "activa"
+    if (concession.status !== 'activa') return false;
+    
     const matchesSearch = (concession.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (concession.concessionTypeName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (concession.specific_location || "").toLowerCase().includes(searchTerm.toLowerCase());
