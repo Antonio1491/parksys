@@ -252,6 +252,107 @@ const ParkReservationsTab = ({ parkId }: { parkId: number }) => {
   );
 };
 
+const ParkCertificationsTab = ({ park }: { park: any }) => {
+  if (!park.certificaciones || park.certificaciones.trim().length === 0) {
+    return (
+      <div className="text-center p-8 text-gray-500">
+        <Shield className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+        <p>No hay certificaciones registradas para este parque</p>
+      </div>
+    );
+  }
+
+  const certifications = park.certificaciones
+    .split(',')
+    .filter(cert => cert.trim().length > 0)
+    .map(cert => cert.trim());
+
+  const isGreenFlag = (certification: string) => {
+    const cert = certification.toLowerCase();
+    return cert.includes('green flag') || cert.includes('bandera verde');
+  };
+
+  const getCertificationIcon = (certification: string) => {
+    if (isGreenFlag(certification)) {
+      return '🏅'; // Medal for Green Flag
+    }
+    return '🏆'; // Trophy for other certifications
+  };
+
+  const getCertificationColor = (certification: string) => {
+    if (isGreenFlag(certification)) {
+      return 'bg-green-50 border-green-200';
+    }
+    return 'bg-blue-50 border-blue-200';
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        {certifications.map((certification, index) => (
+          <Card key={index} className={`${getCertificationColor(certification)} transition-all hover:shadow-md`}>
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">
+                  {getCertificationIcon(certification)}
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    {certification}
+                  </h4>
+                  {isGreenFlag(certification) && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="secondary" className="bg-green-600 text-white">
+                        Certificación Internacional
+                      </Badge>
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-600">
+                    {isGreenFlag(certification) 
+                      ? 'Reconocimiento internacional por excelencia en la gestión de espacios verdes urbanos'
+                      : 'Certificación que reconoce la calidad y gestión del parque'
+                    }
+                  </p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <Clock className="h-3 w-3" />
+                      <span>Vigente</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <Shield className="h-3 w-3" />
+                      <span>Verificada</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h4 className="font-medium text-gray-900 mb-2">Resumen de Certificaciones</h4>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+          <div>
+            <span className="font-medium">Total certificaciones:</span>
+            <span className="ml-2 text-blue-600">{certifications.length}</span>
+          </div>
+          <div>
+            <span className="font-medium">Internacionales:</span>
+            <span className="ml-2 text-green-600">
+              {certifications.filter(cert => isGreenFlag(cert)).length}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium">Estado:</span>
+            <span className="ml-2 text-green-600">Todas vigentes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ParkEventsTab = ({ parkId }: { parkId: number }) => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showEventDialog, setShowEventDialog] = useState(false);
@@ -821,6 +922,20 @@ export default function AdminParkView() {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
+                <Shield className="h-8 w-8 text-green-600" />
+                <div>
+                  <p className="text-2xl font-bold">
+                    {park.certificaciones ? park.certificaciones.split(',').filter(cert => cert.trim().length > 0).length : 0}
+                  </p>
+                  <p className="text-sm text-gray-600">Certificaciones</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
                 <Store className="h-8 w-8 text-orange-600" />
                 <div>
                   <p className="text-2xl font-bold">{park.stats?.activeConcessions || 0}</p>
@@ -870,12 +985,13 @@ export default function AdminParkView() {
 
       {/* Detailed Tabs */}
       <Tabs defaultValue="activities" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="activities">Actividades</TabsTrigger>
           <TabsTrigger value="concessions">Concesiones</TabsTrigger>
           <TabsTrigger value="reservations">Reservas</TabsTrigger>
           <TabsTrigger value="events">Eventos</TabsTrigger>
           <TabsTrigger value="incidents">Incidencias</TabsTrigger>
+          <TabsTrigger value="certifications">Certificaciones</TabsTrigger>
         </TabsList>
 
 
@@ -958,6 +1074,17 @@ export default function AdminParkView() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="certifications" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Certificaciones ({park.certificaciones ? park.certificaciones.split(',').filter(cert => cert.trim().length > 0).length : 0})</CardTitle>
+              <CardDescription>Certificaciones y reconocimientos obtenidos por este parque</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ParkCertificationsTab park={park} />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
       </Tabs>
 

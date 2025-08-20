@@ -32,10 +32,22 @@ const generateParkSlug = (parkName: string, parkId: number) => {
 };
 
 function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksListProps) {
-  // Función para verificar si el parque debe mostrar el Green Flag Award
-  const shouldShowGreenFlag = (parkId: number) => {
-    // Bosque Los Colomos (ID: 5), Parque Metropolitano (ID: 2), Parque Alcalde (ID: 4), Bosque Urbano Tlaquepaque (ID: 18)
-    return parkId === 5 || parkId === 2 || parkId === 4 || parkId === 18;
+  // Función para verificar si el parque tiene certificaciones
+  const hasCertifications = (park: ExtendedPark) => {
+    return park.certificaciones && park.certificaciones.trim().length > 0;
+  };
+
+  // Función para verificar si el parque tiene Green Flag Award
+  const hasGreenFlag = (park: ExtendedPark) => {
+    if (!park.certificaciones) return false;
+    const certs = park.certificaciones.toLowerCase();
+    return certs.includes('green flag') || certs.includes('bandera verde');
+  };
+
+  // Función para obtener el número de certificaciones
+  const getCertificationsCount = (park: ExtendedPark) => {
+    if (!park.certificaciones) return 0;
+    return park.certificaciones.split(',').filter(cert => cert.trim().length > 0).length;
   };
 
   // Amenidades simplificadas - sin consulta automática
@@ -118,14 +130,23 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
             
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             
-            {shouldShowGreenFlag(park.id) && (
-              <div className="absolute top-3 right-3 z-10">
-                <img 
-                  src={greenFlagLogo} 
-                  alt="Green Flag Award" 
-                  className={`object-contain bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-green-500/30 ${size === 'wide' ? 'h-20 w-28' : 'h-16 w-24'}`}
-                  title="Green Flag Award"
-                />
+            {/* Badge de certificaciones */}
+            {hasCertifications(park) && (
+              <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
+                {hasGreenFlag(park) && (
+                  <img 
+                    src={greenFlagLogo} 
+                    alt="Green Flag Award" 
+                    className={`object-contain bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-green-500/30 ${size === 'wide' ? 'h-20 w-28' : 'h-16 w-24'}`}
+                    title="Green Flag Award"
+                  />
+                )}
+                <Badge 
+                  variant="secondary" 
+                  className="bg-blue-600/90 text-white text-xs backdrop-blur-sm border-blue-500/30"
+                >
+                  {getCertificationsCount(park)} Certificación{getCertificationsCount(park) !== 1 ? 'es' : ''}
+                </Badge>
               </div>
             )}
             
