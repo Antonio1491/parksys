@@ -136,7 +136,7 @@ export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAut
       console.error('Error fetching tree maintenances:', error);
       return res.status(500).json({ 
         error: "Error interno del servidor",
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
@@ -196,8 +196,8 @@ export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAut
           `"${row.maintenance_type || ''}"`,
           row.maintenance_date || '',
           `"${row.performed_by || ''}"`,
-          `"${(row.description || '').replace(/"/g, '""')}"`,
-          `"${(row.notes || '').replace(/"/g, '""')}"`,
+          `"${String(row.description || '').replace(/"/g, '""')}"`,
+          `"${String(row.notes || '').replace(/"/g, '""')}"`,
           row.next_maintenance_date || '',
           row.created_at || ''
         ];
@@ -212,7 +212,66 @@ export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAut
       console.error('Error exporting maintenances to CSV:', error);
       return res.status(500).json({ 
         error: "Error al exportar mantenimientos",
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Endpoint para crear un nuevo mantenimiento
+  apiRouter.post("/trees/:id/maintenances", async (req: Request, res: Response) => {
+    try {
+      const treeId = parseInt(req.params.id);
+      
+      if (!treeId || isNaN(treeId)) {
+        return res.status(400).json({ error: "ID de árbol inválido" });
+      }
+      
+      // Verificar que el árbol existe
+      const treeExists = await db.select({ id: trees.id }).from(trees).where(eq(trees.id, treeId));
+      
+      if (treeExists.length === 0) {
+        return res.status(404).json({ error: "Árbol no encontrado" });
+      }
+      
+      // Validación básica de campos requeridos
+      if (!req.body.maintenanceType) {
+        return res.status(400).json({ error: "El tipo de mantenimiento es requerido" });
+      }
+      
+      if (!req.body.maintenanceDate) {
+        return res.status(400).json({ error: "La fecha de mantenimiento es requerida" });
+      }
+      
+      // Insertar el nuevo mantenimiento con solo los campos que existen en el esquema
+      const [newMaintenance] = await db.insert(treeMaintenances).values({
+        tree_id: treeId,
+        maintenance_type: req.body.maintenanceType,
+        maintenance_date: req.body.maintenanceDate,
+        performed_by: req.body.performedBy,
+        description: req.body.notes || req.body.description,
+        notes: req.body.notes,
+        next_maintenance_date: req.body.nextMaintenanceDate || null
+      }).returning();
+      
+      return res.status(201).json({
+        success: true,
+        message: "Mantenimiento registrado correctamente",
+        data: newMaintenance
+      });
+      
+    } catch (error) {
+      console.error('Error creating maintenance:', error);
+      
+      if (error instanceof ZodError) {
+        return res.status(400).json({ 
+          error: "Datos inválidos",
+          details: fromZodError(error).toString()
+        });
+      }
+      
+      return res.status(500).json({ 
+        error: "Error al crear mantenimiento",
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
@@ -231,7 +290,7 @@ export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAut
       console.error('Error importing maintenances from CSV:', error);
       return res.status(500).json({ 
         error: "Error al importar mantenimientos",
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
@@ -259,7 +318,7 @@ export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAut
       console.error('Error deleting maintenance:', error);
       return res.status(500).json({ 
         error: "Error al eliminar mantenimiento",
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
