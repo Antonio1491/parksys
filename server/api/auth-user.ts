@@ -1,34 +1,30 @@
 import { Request, Response } from "express";
 import { db } from "../db";
 import { sql } from "drizzle-orm";
-import bcrypt from "bcryptjs";
 
-export async function handleLogin(req: Request, res: Response) {
+export async function getCurrentUser(req: Request, res: Response) {
   try {
-    const { username, password } = req.body;
-    
-    // Buscar el usuario con datos completos del rol
+    // En desarrollo, obtener el usuario del middleware
+    if (!req.user) {
+      return res.status(401).json({ message: "No autenticado" });
+    }
+
+    // Obtener datos completos del usuario desde la base de datos
     const result = await db.execute(sql`
-      SELECT u.id, u.username, u.email, u.full_name, u.role, u.municipality_id, u.password,
+      SELECT u.id, u.username, u.email, u.full_name, u.role, u.municipality_id,
              u.role_id, r.name as role_name, r.level as role_level, r.permissions as role_permissions
       FROM users u
       LEFT JOIN roles r ON u.role_id = r.id
-      WHERE u.username = ${username} OR u.email = ${username}
+      WHERE u.id = ${req.user.id}
     `);
-    
+
     if (result.rows.length === 0) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    
+
     const userData = result.rows[0];
-    
-    // Verificar la contraseña usando bcrypt
-    const passwordMatch = await bcrypt.compare(password, userData.password as string);
-    if (!passwordMatch) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
-    }
-    
-    // Si el usuario pertenece a un municipio, incluimos su información
+
+    // Obtener información del municipio si existe
     let municipalityData = null;
     if (userData.municipality_id) {
       const municipalityResult = await db.execute(sql`
@@ -47,8 +43,7 @@ export async function handleLogin(req: Request, res: Response) {
         };
       }
     }
-    
-    // Convertimos a formato camelCase para mantener consistencia en el frontend
+
     const user = {
       id: userData.id,
       username: userData.username,
@@ -59,18 +54,13 @@ export async function handleLogin(req: Request, res: Response) {
       roleId: userData.role_id,
       roleName: userData.role_name,
       roleLevel: userData.role_level,
-      rolePermissions: userData.role_permissions
+      rolePermissions: userData.role_permissions,
+      municipality: municipalityData
     };
-    
-    res.json({
-      user: {
-        ...user,
-        municipality: municipalityData
-      },
-      token: 'dummy-token-' + Date.now()
-    });
+
+    res.json(user);
   } catch (error) {
-    console.error("Error en login:", error);
-    res.status(500).json({ message: "Error durante el inicio de sesión" });
+    console.error("Error obteniendo usuario actual:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 }
