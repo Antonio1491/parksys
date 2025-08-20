@@ -36,6 +36,14 @@ export function registerTreeMaintenanceRoutes(app: any, apiRouter: Router, isAut
       const type = req.query.type as string || 'all';
       const park = req.query.park as string || 'all';
       const treeId = req.query.treeId ? parseInt(req.query.treeId as string) : null;
+      
+      // Validar treeId si está presente
+      if (req.query.treeId && (isNaN(treeId!) || treeId! <= 0)) {
+        return res.status(400).json({ 
+          error: "ID de árbol inválido",
+          message: "El parámetro treeId debe ser un número válido" 
+        });
+      }
 
       // Construir condiciones WHERE
       let whereConditions = [];

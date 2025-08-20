@@ -220,7 +220,18 @@ export function registerTreeInventoryRoutes(app: any, apiRouter: Router, isAuthe
   // GET: Obtener un árbol específico por ID
   apiRouter.get('/trees/:id', async (req: Request, res: Response) => {
     try {
-      const treeId = Number(req.params.id);
+      const id = req.params.id;
+      
+      // Verificar que el ID sea un número válido y no sea una ruta específica
+      if (id === 'maintenances' || isNaN(Number(id)) || id === 'NaN' || id.includes('maintenance')) {
+        console.log(`❌ Rechazando petición interceptada: /trees/${id} (debería ir a endpoint específico)`);
+        return res.status(404).json({ 
+          error: "Ruta no encontrada",
+          message: `La ruta /trees/${id} no es válida para este endpoint` 
+        });
+      }
+      
+      const treeId = Number(id);
       
       // Consulta directa con pool para evitar problemas de Drizzle
       const result = await pool.query('SELECT * FROM trees WHERE id = $1 LIMIT 1', [treeId]);
