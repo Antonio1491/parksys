@@ -33,6 +33,7 @@ const parkEditSchema = z.object({
   foundationYear: z.number().optional(),
   administrator: z.string().optional(),
   conservationStatus: z.string().optional(),
+  certificaciones: z.string().optional(),
   regulationUrl: z.string().optional(),
   videoUrl: z.string().optional(),
   schedule: z.object({
@@ -75,6 +76,7 @@ export default function ParkEditSimple() {
       foundationYear: undefined,
       administrator: "",
       conservationStatus: "",
+      certificaciones: "",
       regulationUrl: "",
       videoUrl: "",
       schedule: {
@@ -128,6 +130,7 @@ export default function ParkEditSimple() {
         foundationYear: park.foundationYear || undefined,
         administrator: park.administrator || "",
         conservationStatus: park.conservationStatus || "",
+        certificaciones: park.certificaciones || "",
         regulationUrl: park.regulationUrl || "",
         videoUrl: park.videoUrl || "",
         schedule: parseSchedule(park.openingHours),
@@ -541,8 +544,26 @@ export default function ParkEditSimple() {
                         />
                       </div>
 
-
-
+                      <FormField
+                        control={form.control}
+                        name="certificaciones"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Certificaciones</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Green Flag Award, ISO 14001, Certificación Ambiental (separadas por comas)" 
+                                className="min-h-[80px]" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                            <p className="text-sm text-muted-foreground">
+                              Ingresa las certificaciones del parque separadas por comas. Ejemplo: Green Flag Award 2024, ISO 14001, Bandera Verde
+                            </p>
+                          </FormItem>
+                        )}
+                      />
 
                     </CardContent>
                   </Card>
