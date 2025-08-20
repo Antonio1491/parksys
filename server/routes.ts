@@ -2027,7 +2027,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const {
           name, description, address, postalCode, latitude, longitude,
           area, greenArea, parkType, openingHours, contactPhone, contactEmail,
-          administrator, conservationStatus, regulationUrl, foundationYear, videoUrl,
+          administrator, conservationStatus, certificaciones, regulationUrl, foundationYear, videoUrl,
           municipalityId
         } = req.body;
         
@@ -2047,6 +2047,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (contactEmail !== undefined) fieldsToUpdate.contact_email = contactEmail;
         if (administrator !== undefined) fieldsToUpdate.administrator = administrator;
         if (conservationStatus !== undefined) fieldsToUpdate.conservation_status = conservationStatus;
+        if (certificaciones !== undefined) fieldsToUpdate.certificaciones = certificaciones;
         if (regulationUrl !== undefined) fieldsToUpdate.regulation_url = regulationUrl;
         if (foundationYear !== undefined) fieldsToUpdate.foundation_year = foundationYear;
         if (videoUrl !== undefined) fieldsToUpdate.video_url = videoUrl;
