@@ -414,20 +414,33 @@ export default function TreeMaintenancePage() {
   // Mutación para agregar nuevo mantenimiento
   const addMaintenanceMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(`/api/trees/${selectedTreeId}/maintenances`, {
+      console.log('🌳 Enviando datos de mantenimiento:', data);
+      console.log('🎯 selectedTreeId:', selectedTreeId);
+      
+      const payload = {
+        ...data,
+        treeId: selectedTreeId
+      };
+      
+      console.log('📦 Payload completo:', payload);
+      
+      const response = await fetch('/api/trees/maintenances', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Error al registrar mantenimiento');
+        const errorData = await response.text();
+        console.error('❌ Error en respuesta del servidor:', errorData);
+        throw new Error(`Error ${response.status}: ${errorData}`);
       }
       
-      return response.json();
+      const result = await response.json();
+      console.log('✅ Mantenimiento creado exitosamente:', result);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trees/maintenances'] });

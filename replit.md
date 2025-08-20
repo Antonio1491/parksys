@@ -3,6 +3,16 @@
 ## Overview
 ParkSys is a comprehensive municipal parks management system designed to streamline the management of parks, activities, volunteers, instructors, assets, and finances. It offers a modern full-stack application with role-based access control and various modules to support diverse park operations. The vision is to provide municipalities with a robust tool to efficiently manage urban green spaces, enhance citizen engagement, and ensure sustainable park operations.
 
+## Recent Changes (August 20, 2025)
+✅ **CRITICAL ROUTING ISSUE RESOLVED**: Fixed persistent problem with tree maintenance POST endpoints that was returning HTML instead of JSON responses
+- **Root Cause**: Route registration order in Express.js was causing parameterized routes to intercept specific endpoints
+- **Solution**: Moved POST `/api/trees/maintenances` endpoint to main routes.ts file before parameterized routes
+- **Database Schema Fix**: Changed `performed_by` field from integer to varchar to accept string values like "Juan Pérez"
+- **Foreign Key Resolution**: Removed conflicting foreign key constraint `tree_maintenances_performed_by_fkey`
+- **Testing Results**: Successfully created maintenance records (IDs 38, 39, 40) with proper JSON responses
+- **Frontend Integration**: Updated mutation function to use correct endpoint `/api/trees/maintenances`
+- **Status**: Tree maintenance module now fully functional with complete frontend-backend integration
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
