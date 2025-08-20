@@ -445,61 +445,6 @@ const ParksDashboard = () => {
             </Card>
           </div>
 
-          {/* Estado de conservación */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-white rounded-t-lg">
-              <CardTitle className="text-lg font-bold text-gray-800">
-                Estado de Conservación
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                {data.conservationStatus?.map((item, index) => {
-                  const maxCount = Math.max(...(data.conservationStatus?.map(p => p.count) || [1]));
-                  const percentage = (item.count / maxCount) * 100;
-                  const colors = ['#036668', '#003D49', '#61B1A0'];
-                  const backgroundColor = colors[index % colors.length];
-                  
-                  // Función para traducir estados de conservación
-                  const translateStatus = (status: string) => {
-                    switch (status.toLowerCase()) {
-                      case 'good': return 'Excelente';
-                      case 'excellent': return 'Excelente';
-                      case 'fair': return 'Bueno';
-                      case 'regular': return 'Regular';
-                      case 'poor': return 'Malo';
-                      case 'bad': return 'Malo';
-                      default: return status;
-                    }
-                  };
-                  
-                  return (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div className="w-20 text-sm font-medium text-right text-gray-700 truncate">
-                        {translateStatus(item.status)}
-                      </div>
-                      <div className="flex-1 flex items-center space-x-2">
-                        <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
-                          <div 
-                            className="h-6 rounded-full flex items-center justify-end pr-3 transition-all duration-700 shadow-sm"
-                            style={{ 
-                              width: `${Math.max(percentage, 5)}%`,
-                              backgroundColor: backgroundColor
-                            }}
-                          >
-                            <span className="text-white text-xs font-bold">
-                              {item.count}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Mapa de parques */}
           <Card className="border-0 shadow-xl">
             <CardHeader className="bg-white rounded-t-lg">
