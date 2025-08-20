@@ -739,76 +739,7 @@ function TreeDetailPage() {
                     </>
                   )}
 
-                  <Separator />
-
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Historial de Evaluaciones</h3>
-                    {isLoadingEvaluations ? (
-                      <div className="text-center py-4">
-                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
-                        <p className="text-gray-500 mt-2">Cargando evaluaciones...</p>
-                      </div>
-                    ) : (
-                      <Table>
-                        <TableCaption>
-                          {evaluations?.data?.length > 0 
-                            ? `${evaluations.data.length} registros de evaluaciones` 
-                            : "No hay registros de evaluaciones anteriores"}
-                        </TableCaption>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Fecha</TableHead>
-                            <TableHead>Estado</TableHead>
-                            <TableHead>Evaluador</TableHead>
-                            <TableHead>Notas</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {evaluations?.data && evaluations.data.length > 0 ? (
-                            evaluations.data.map((evaluation: any, index: number) => (
-                              <TableRow key={evaluation.id || index}>
-                                <TableCell>
-                                  {formatDate(evaluation.evaluationDate || evaluation.inspection_date || evaluation.date)}
-                                </TableCell>
-                                <TableCell>
-                                  <Badge 
-                                    variant={
-                                      evaluation.healthStatus === 'Excelente' || evaluation.status === 'Excelente' ? 'default' :
-                                      evaluation.healthStatus === 'Bueno' || evaluation.status === 'Bueno' ? 'secondary' :
-                                      evaluation.healthStatus === 'Regular' || evaluation.status === 'Regular' ? 'outline' : 'destructive'
-                                    }
-                                  >
-                                    {evaluation.healthStatus || evaluation.status || evaluation.overall_condition || 'Sin especificar'}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell>
-                                  {evaluation.evaluatorName || evaluation.inspector || evaluation.performed_by_name || 'No especificado'}
-                                </TableCell>
-                                <TableCell className="max-w-xs">
-                                  <div className="truncate" title={evaluation.notes || evaluation.observations || evaluation.comments || ''}>
-                                    {evaluation.notes || evaluation.observations || evaluation.comments || 'Sin notas'}
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          ) : (
-                            <TableRow>
-                              <TableCell className="text-muted-foreground text-center" colSpan={4}>
-                                No hay datos disponibles
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </div>
                 </CardContent>
-                <CardFooter className="flex justify-end">
-                  <Button variant="outline">
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    Registrar Nueva Evaluación
-                  </Button>
-                </CardFooter>
               </Card>
             </TabsContent>
 
