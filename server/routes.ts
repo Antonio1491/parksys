@@ -2007,22 +2007,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ENDPOINT DE PRUEBA PARA CERTIFICACIONES
+  apiRouter.put("/test/parks/:id/certificaciones", async (req: Request, res: Response) => {
+    console.log("🚀 ENDPOINT DE PRUEBA CERTIFICACIONES EJECUTÁNDOSE");
+    console.log("Park ID:", req.params.id);
+    console.log("Body:", req.body);
+    
+    try {
+      const result = await pool.query(
+        'UPDATE parks SET certificaciones = $1, updated_at = NOW() WHERE id = $2 RETURNING certificaciones',
+        [req.body.certificaciones, Number(req.params.id)]
+      );
+      
+      if (result.rows.length > 0) {
+        console.log("✅ CERTIFICACIONES ACTUALIZADAS:", result.rows[0].certificaciones);
+        return res.json({ success: true, certificaciones: result.rows[0].certificaciones });
+      } else {
+        return res.status(404).json({ error: "Park not found" });
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+  });
+
   // RUTA ESPECIAL PARA DESARROLLO - Sin verificación de permisos y con actualización directa a BD
   apiRouter.put("/dev/parks/:id", async (req: Request, res: Response) => {
     try {
-      console.log("DESARROLLO - Actualizando parque directamente en base de datos");
-      console.log("Datos recibidos del cliente:", req.body);
+      console.log("=== DESARROLLO - Actualizando parque directamente ===");
+      console.log("Park ID:", req.params.id);
+      console.log("Datos recibidos:", req.body);
+      
+      // SIMPLE TEST: Solo actualizar certificaciones directamente
+      console.log("🔍 VERIFICANDO CERTIFICACIONES:", req.body.certificaciones, typeof req.body.certificaciones);
+      if (req.body.certificaciones !== undefined) {
+        console.log("✅ ENTRANDO AL BLOQUE DE ACTUALIZACIÓN DIRECTA");
+        try {
+          const result = await pool.query(
+            'UPDATE parks SET certificaciones = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+            [req.body.certificaciones, Number(req.params.id)]
+          );
+          
+          if (result.rows.length > 0) {
+            console.log("✅ CERTIFICACIONES ACTUALIZADAS EXITOSAMENTE:", result.rows[0].certificaciones);
+            return res.json({ success: true, park: result.rows[0] });
+          }
+        } catch (err) {
+          console.error("Error actualizando certificaciones:", err);
+          return res.status(500).json({ error: "Error updating certificaciones" });
+        }
+      }
       
       const parkId = Number(req.params.id);
+      console.log("Park ID convertido:", parkId);
       
       // Verificamos que existe el parque
       const existingPark = await storage.getPark(parkId);
+      console.log("Parque existente encontrado:", !!existingPark);
       if (!existingPark) {
         return res.status(404).json({ message: "Parque no encontrado" });
       }
       
+      console.log("✅ PARQUE ENCONTRADO - CONTINUANDO CON ACTUALIZACIÓN");
+      
       // Actualizamos directamente en la base de datos usando SQL para evitar problemas
       try {
+        console.log("Iniciando proceso de actualización...");
         // Primero extraemos solo los campos válidos que vamos a actualizar
         const {
           name, description, address, postalCode, latitude, longitude,
@@ -2030,6 +2080,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           administrator, conservationStatus, certificaciones, regulationUrl, foundationYear, videoUrl,
           municipalityId
         } = req.body;
+        console.log("Campos extraídos del body. certificaciones:", certificaciones);
         
         // Creamos un objeto con solo las propiedades que no son null o undefined
         const fieldsToUpdate: any = {};
@@ -2053,8 +2104,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (videoUrl !== undefined) fieldsToUpdate.video_url = videoUrl;
         if (municipalityId !== undefined) fieldsToUpdate.municipality_id = municipalityId;
         
+        // DEBUG: Log de campos extraídos
+        console.log("=== DEBUG CERTIFICACIONES ===");
+        console.log("certificaciones valor:", certificaciones);
+        console.log("certificaciones type:", typeof certificaciones);
+        console.log("certificaciones !== undefined:", certificaciones !== undefined);
+        console.log("fieldsToUpdate antes de updated_at:", fieldsToUpdate);
+        
         // Agregamos la fecha de actualización
         fieldsToUpdate.updated_at = new Date();
+        
+        console.log("ANTES DE VERIFICAR LONGITUD - fieldsToUpdate:", fieldsToUpdate);
+        console.log("ANTES DE VERIFICAR LONGITUD - Object.keys(fieldsToUpdate).length:", Object.keys(fieldsToUpdate).length);
         
         // Construimos el SQL para la actualización usando SQL directo
         if (Object.keys(fieldsToUpdate).length > 0) {
@@ -2086,7 +2147,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } else {
           // Si no hay campos para actualizar, devolvemos el parque existente
           console.log("No hay campos para actualizar");
-          res.json(existingPark);
+          console.log("fieldsToUpdate final:", fieldsToUpdate);
+          return res.status(400).json({ message: "No hay campos para actualizar" });
         }
       } catch (dbError) {
         console.error("Error en actualización directa:", dbError);
