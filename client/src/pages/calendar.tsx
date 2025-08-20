@@ -41,59 +41,211 @@ interface Activity {
   specialNeeds?: string[];
 }
 
+// Tipo para los eventos
+interface Event {
+  id: number;
+  title: string;
+  description: string;
+  eventType: string;
+  startDate: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  capacity?: number;
+  registrationType?: string;
+  targetAudience?: string;
+  status: string;
+  organizerName?: string;
+  organizerEmail?: string;
+  organizerPhone?: string;
+  featuredImageUrl?: string;
+  isRecurring?: boolean;
+  parks?: Array<{ id: number; name: string; }>;
+  parkNames?: string;
+}
+
+// Tipo unificado para el calendario
+interface CalendarItem {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  startDate: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  capacity?: number;
+  price?: number;
+  parkName: string;
+  type: 'activity' | 'event';
+  isFree?: boolean;
+  instructorName?: string;
+  organizerName?: string;
+  targetAudience?: string;
+  status?: string;
+}
+
+// Tipo unificado para el calendario
+interface CalendarItem {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  startDate: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  capacity?: number;
+  price?: number;
+  parkName: string;
+  type: 'activity' | 'event';
+  isFree?: boolean;
+  instructorName?: string;
+  organizerName?: string;
+  targetAudience?: string;
+  status?: string;
+}
+
 const CalendarPage: React.FC = () => {
   // Estado para el mes actual y filtros
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [selectedItem, setSelectedItem] = useState<CalendarItem | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  // Filtros
+  // Filtros principales
+  const [typeFilter, setTypeFilter] = useState('all'); // all, activities, events
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [parkFilter, setParkFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState('all');
   
-  // Consultar actividades desde la API
-  const { data: activities = [], isLoading } = useQuery<Activity[]>({
+  // Consultar actividades y eventos desde las APIs
+  const { data: activities = [], isLoading: loadingActivities } = useQuery<Activity[]>({
     queryKey: ['/api/activities'],
   });
   
-  // Extraer categorías y parques únicos para los filtros
-  const categories = Array.from(new Set(activities.map(a => a.category || 'Sin categoría')));
-  const parks = Array.from(new Set(activities.map(a => a.parkName || 'Sin parque')));
+  const { data: events = [], isLoading: loadingEvents } = useQuery<Event[]>({
+    queryKey: ['/api/events'],
+  });
   
-  // Colores por categoría
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      'Deportes': 'bg-blue-500',
-      'Cultura': 'bg-purple-500',
-      'Ecología': 'bg-green-500',
-      'Recreación': 'bg-orange-500',
-      'Educación': 'bg-indigo-500',
-      'Bienestar': 'bg-pink-500',
-      'Arte': 'bg-red-500',
-      'Música': 'bg-yellow-500',
-      'Tecnología': 'bg-gray-500',
-      'default': 'bg-teal-500'
+  // Procesar datos de eventos para el formato unificado
+  const processedEvents: CalendarItem[] = events
+    .filter(event => event.status === 'published')
+    .map(event => ({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      category: event.eventType,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      location: event.location,
+      capacity: event.capacity,
+      price: undefined,
+      parkName: event.parks?.[0]?.name || 'Sin parque',
+      type: 'event' as const,
+      isFree: event.registrationType === 'free',
+      organizerName: event.organizerName,
+      targetAudience: event.targetAudience,
+      status: event.status
+    }));
+  
+  // Procesar datos de actividades para el formato unificado
+  const processedActivities: CalendarItem[] = activities.map(activity => ({
+    id: activity.id,
+    title: activity.title,
+    description: activity.description,
+    category: activity.category,
+    startDate: activity.startDate,
+    endDate: activity.endDate,
+    startTime: activity.startTime,
+    endTime: activity.endTime,
+    location: activity.location,
+    capacity: activity.capacity,
+    price: activity.price,
+    parkName: activity.parkName,
+    type: 'activity' as const,
+    isFree: activity.isFree,
+    instructorName: activity.instructorName,
+    targetAudience: activity.targetMarket?.join(', ') || ''
+  }));
+  
+  // Combinar actividades y eventos
+  const allItems = [...processedActivities, ...processedEvents];
+  
+  // Extraer categorías y parques únicos para los filtros
+  const activityCategories = Array.from(new Set(activities.map(a => a.category || 'Sin categoría')));
+  const eventCategories = Array.from(new Set(events.map(e => e.eventType || 'Sin categoría')));
+  const allParks = Array.from(new Set([
+    ...activities.map(a => a.parkName || 'Sin parque'),
+    ...events.flatMap(e => e.parks?.map(p => p.name) || ['Sin parque'])
+  ]));
+  
+  // Categorías dinámicas según el filtro de tipo
+  const getAvailableCategories = () => {
+    if (typeFilter === 'activities') return activityCategories;
+    if (typeFilter === 'events') return eventCategories;
+    return Array.from(new Set([...activityCategories, ...eventCategories]));
+  };
+  
+  // Colores por categoría (actividades y eventos)
+  const getCategoryColor = (category: string, type: 'activity' | 'event') => {
+    const activityColors: Record<string, string> = {
+      'Deportivo': 'bg-blue-500',
+      'Arte y Cultura': 'bg-purple-500',
+      'Naturaleza y Ciencia': 'bg-green-500',
+      'Recreación y Bienestar': 'bg-orange-500',
+      'Comunidad': 'bg-indigo-500',
+      'Eventos de Temporada': 'bg-pink-500'
     };
-    return colors[category] || colors.default;
+    
+    const eventColors: Record<string, string> = {
+      'Deportivos': 'bg-cyan-500',
+      'Culturales': 'bg-violet-500',
+      'Ambientales': 'bg-emerald-500',
+      'Sociales': 'bg-amber-500',
+      'Educativos': 'bg-blue-600',
+      'Benéficos': 'bg-rose-500',
+      'Celebraciones': 'bg-yellow-500',
+      'default': 'bg-gray-500'
+    };
+    
+    if (type === 'activity') {
+      return activityColors[category] || 'bg-teal-500';
+    } else {
+      return eventColors[category] || eventColors.default;
+    }
   };
 
-  // Filtrar actividades
-  const filteredActivities = activities.filter(activity => {
-    if (categoryFilter !== 'all' && activity.category !== categoryFilter) return false;
-    if (parkFilter !== 'all' && activity.parkName !== parkFilter) return false;
-    if (priceFilter === 'free' && !activity.isFree) return false;
-    if (priceFilter === 'paid' && activity.isFree) return false;
+  // Filtrar elementos del calendario
+  const filteredItems = allItems.filter(item => {
+    // Filtrar por tipo (actividades, eventos o todos)
+    if (typeFilter === 'activities' && item.type !== 'activity') return false;
+    if (typeFilter === 'events' && item.type !== 'event') return false;
+    
+    // Filtrar por categoría
+    if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
+    
+    // Filtrar por parque
+    if (parkFilter !== 'all' && item.parkName !== parkFilter) return false;
+    
+    // Filtrar por precio (solo aplica a actividades)
+    if (priceFilter === 'free' && !item.isFree) return false;
+    if (priceFilter === 'paid' && item.isFree) return false;
+    
     return true;
   });
 
-  // Obtener actividades por fecha
-  const getActivitiesForDate = (date: Date) => {
-    return filteredActivities.filter(activity => {
-      if (!activity.startDate || !isValid(parseISO(activity.startDate))) return false;
-      const activityDate = parseISO(activity.startDate);
-      return isSameDay(date, activityDate);
+  // Obtener elementos del calendario por fecha
+  const getItemsForDate = (date: Date) => {
+    return filteredItems.filter(item => {
+      if (!item.startDate || !isValid(parseISO(item.startDate))) return false;
+      const itemDate = parseISO(item.startDate);
+      return isSameDay(date, itemDate);
     });
   };
 
@@ -106,9 +258,9 @@ const CalendarPage: React.FC = () => {
     setCurrentMonth(prev => addMonths(prev, 1));
   };
 
-  // Función para manejar la selección de una actividad
-  const handleActivityClick = (activity: Activity) => {
-    setSelectedActivity(activity);
+  // Función para manejar la selección de un elemento
+  const handleItemClick = (item: CalendarItem) => {
+    setSelectedItem(item);
     setDialogOpen(true);
   };
 
@@ -125,6 +277,7 @@ const CalendarPage: React.FC = () => {
 
   // Función para resetear filtros
   const resetFilters = () => {
+    setTypeFilter('all');
     setCategoryFilter('all');
     setParkFilter('all');
     setPriceFilter('all');
@@ -139,7 +292,7 @@ const CalendarPage: React.FC = () => {
     return activityDate >= startOfMonth(currentMonth) && activityDate <= endOfMonth(currentMonth);
   }).length;
 
-  if (isLoading) {
+  if (loadingActivities || loadingEvents) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -192,7 +345,7 @@ const CalendarPage: React.FC = () => {
               <Separator orientation="vertical" className="h-6 bg-blue-300" />
               <div className="flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                <span>{categories.length} categorías</span>
+                <span>{getAvailableCategories().length} categorías</span>
               </div>
             </div>
           </div>
@@ -202,14 +355,30 @@ const CalendarPage: React.FC = () => {
         <section className="py-6" style={{backgroundColor: '#19633c'}}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="rounded-2xl shadow-sm p-6" style={{backgroundColor: '#19633c'}}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Filtro de tipo */}
+                <Select value={typeFilter} onValueChange={(value) => {
+                  setTypeFilter(value);
+                  setCategoryFilter('all'); // Reset category when changing type
+                }}>
+                  <SelectTrigger className="border-gray-200 focus:border-primary focus:ring-primary">
+                    <SelectValue placeholder="Tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Actividades y Eventos</SelectItem>
+                    <SelectItem value="activities">Solo Actividades</SelectItem>
+                    <SelectItem value="events">Solo Eventos</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Filtro de categoría - dinámico según el tipo */}
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger className="border-gray-200 focus:border-primary focus:ring-primary">
                     <SelectValue placeholder="Categoría" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas las categorías</SelectItem>
-                    {categories.map((category) => (
+                    {getAvailableCategories().map((category) => (
                       <SelectItem key={category} value={category}>{category}</SelectItem>
                     ))}
                   </SelectContent>
@@ -221,7 +390,7 @@ const CalendarPage: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos los parques</SelectItem>
-                    {parks.map((park) => (
+                    {allParks.map((park) => (
                       <SelectItem key={park} value={park}>{park}</SelectItem>
                     ))}
                   </SelectContent>
@@ -241,7 +410,7 @@ const CalendarPage: React.FC = () => {
 
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm text-white">
-                  Mostrando {filteredActivities.length} de {totalActivities} actividades
+                  Mostrando {filteredItems.length} de {allItems.length} elementos
                 </div>
                 <Button
                   variant="outline"
@@ -301,7 +470,7 @@ const CalendarPage: React.FC = () => {
             {/* Días del calendario */}
             <div className="grid grid-cols-7 gap-2">
               {dateRange.map((date, index) => {
-                const dayActivities = getActivitiesForDate(date);
+                const dayItems = getItemsForDate(date);
                 const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
                 const isToday = isSameDay(date, new Date());
 
@@ -319,22 +488,27 @@ const CalendarPage: React.FC = () => {
                     </div>
                     
                     <div className="space-y-1">
-                      {dayActivities.slice(0, 3).map((activity, actIndex) => (
+                      {dayItems.slice(0, 3).map((item, itemIndex) => (
                         <div
-                          key={actIndex}
-                          onClick={() => handleActivityClick(activity)}
-                          className={`text-xs p-1 rounded cursor-pointer hover:opacity-80 transition-opacity ${getCategoryColor(activity.category)} text-white`}
+                          key={itemIndex}
+                          onClick={() => handleItemClick(item)}
+                          className={`text-xs p-1 rounded cursor-pointer hover:opacity-80 transition-opacity ${getCategoryColor(item.category, item.type)} text-white relative`}
                         >
-                          <div className="font-medium truncate">{activity.title}</div>
-                          {activity.startTime && (
-                            <div className="text-xs opacity-90">{activity.startTime}</div>
+                          <div className="flex items-center justify-between">
+                            <div className="font-medium truncate">{item.title}</div>
+                            {item.type === 'event' && (
+                              <span className="text-[10px] opacity-75 ml-1">E</span>
+                            )}
+                          </div>
+                          {item.startTime && (
+                            <div className="text-xs opacity-90">{item.startTime}</div>
                           )}
                         </div>
                       ))}
                       
-                      {dayActivities.length > 3 && (
+                      {dayItems.length > 3 && (
                         <div className="text-xs text-gray-500 font-medium">
-                          +{dayActivities.length - 3} más...
+                          +{dayItems.length - 3} más...
                         </div>
                       )}
                     </div>
@@ -392,27 +566,33 @@ const CalendarPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Dialog de detalles de actividad */}
+        {/* Dialog de detalles de elemento */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-2xl">
-            {selectedActivity && (
+            {selectedItem && (
               <>
                 <DialogHeader>
                   <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-lg ${getCategoryColor(selectedActivity.category)} flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-12 h-12 rounded-lg ${getCategoryColor(selectedItem.category, selectedItem.type)} flex items-center justify-center flex-shrink-0`}>
                       <Activity className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
                       <DialogTitle className="text-xl font-bold text-gray-900 leading-tight">
-                        {selectedActivity.title}
+                        {selectedItem.title}
                       </DialogTitle>
                       <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="secondary" className={`${getCategoryColor(selectedActivity.category)} text-white`}>
-                          {selectedActivity.category}
+                        <Badge variant="secondary" className={`${getCategoryColor(selectedItem.category, selectedItem.type)} text-white`}>
+                          {selectedItem.category}
                         </Badge>
-                        {selectedActivity.isFree && (
+                        <Badge 
+                          variant="outline" 
+                          className={selectedItem.type === 'activity' ? 'text-blue-600 border-blue-600' : 'text-purple-600 border-purple-600'}
+                        >
+                          {selectedItem.type === 'activity' ? 'Actividad' : 'Evento'}
+                        </Badge>
+                        {selectedItem.isFree && (
                           <Badge variant="outline" className="text-green-600 border-green-600">
-                            Gratuita
+                            Gratuito
                           </Badge>
                         )}
                       </div>
@@ -421,93 +601,82 @@ const CalendarPage: React.FC = () => {
                 </DialogHeader>
                 
                 <div className="space-y-4">
-                  <p className="text-gray-700 leading-relaxed">{selectedActivity.description}</p>
+                  <p className="text-gray-700 leading-relaxed">{selectedItem.description}</p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center gap-2 text-gray-600">
                       <MapPin className="w-4 h-4 text-primary" />
-                      <span className="font-medium">{selectedActivity.parkName}</span>
+                      <span className="font-medium">{selectedItem.parkName}</span>
                     </div>
                     
-                    {selectedActivity.startDate && (
+                    {selectedItem.startDate && (
                       <div className="flex items-center gap-2 text-gray-600">
                         <CalendarIcon className="w-4 h-4 text-primary" />
                         <span className="font-medium">
-                          {format(parseISO(selectedActivity.startDate), 'PPP', { locale: es })}
+                          {format(parseISO(selectedItem.startDate), 'PPP', { locale: es })}
                         </span>
                       </div>
                     )}
                     
-                    {selectedActivity.startTime && (
+                    {selectedItem.startTime && (
                       <div className="flex items-center gap-2 text-gray-600">
                         <Clock className="w-4 h-4 text-primary" />
                         <span className="font-medium">
-                          {selectedActivity.startTime}
-                          {selectedActivity.endTime && ` - ${selectedActivity.endTime}`}
+                          {selectedItem.startTime}
+                          {selectedItem.endTime && ` - ${selectedItem.endTime}`}
                         </span>
                       </div>
                     )}
                     
-                    {selectedActivity.capacity && (
+                    {selectedItem.capacity && (
                       <div className="flex items-center gap-2 text-gray-600">
                         <Users className="w-4 h-4 text-primary" />
-                        <span className="font-medium">{selectedActivity.capacity} personas max.</span>
+                        <span className="font-medium">{selectedItem.capacity} personas max.</span>
                       </div>
                     )}
                     
-                    {selectedActivity.instructorName && (
+                    {/* Mostrar instructor para actividades */}
+                    {selectedItem.type === 'activity' && selectedItem.instructorName && (
                       <div className="flex items-center gap-2 text-gray-600">
                         <User className="w-4 h-4 text-primary" />
-                        <span className="font-medium">{selectedActivity.instructorName}</span>
+                        <span className="font-medium">Instructor: {selectedItem.instructorName}</span>
                       </div>
                     )}
                     
-                    {!selectedActivity.isFree && selectedActivity.price && (
+                    {/* Mostrar organizador para eventos */}
+                    {selectedItem.type === 'event' && selectedItem.organizerName && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <User className="w-4 h-4 text-primary" />
+                        <span className="font-medium">Organizador: {selectedItem.organizerName}</span>
+                      </div>
+                    )}
+                    
+                    {/* Mostrar precio solo para actividades de pago */}
+                    {selectedItem.type === 'activity' && !selectedItem.isFree && selectedItem.price && (
                       <div className="flex items-center gap-2 text-gray-600">
                         <Tag className="w-4 h-4 text-primary" />
-                        <span className="font-medium">${selectedActivity.price}</span>
+                        <span className="font-medium">${selectedItem.price}</span>
                       </div>
                     )}
                   </div>
 
-                  {(selectedActivity.materials || selectedActivity.requirements || selectedActivity.targetMarket?.length || selectedActivity.specialNeeds?.length) && (
+                  {/* Mostrar información adicional solo para actividades */}
+                  {selectedItem.type === 'activity' && selectedItem.targetAudience && (
                     <div className="space-y-3 pt-4 border-t">
-                      {selectedActivity.materials && (
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-1">Materiales</h4>
-                          <p className="text-sm text-gray-600">{selectedActivity.materials}</p>
-                        </div>
-                      )}
-
-                      {selectedActivity.requirements && (
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-1">Requisitos</h4>
-                          <p className="text-sm text-gray-600">{selectedActivity.requirements}</p>
-                        </div>
-                      )}
-
-                      {selectedActivity.targetMarket && selectedActivity.targetMarket.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-1">Público Objetivo</h4>
-                          <p className="text-sm text-gray-600">
-                            {selectedActivity.targetMarket.join(', ')}
-                          </p>
-                        </div>
-                      )}
-
-                      {selectedActivity.specialNeeds && selectedActivity.specialNeeds.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-1">Requerimientos Especiales</h4>
-                          <div className="space-y-1">
-                            {selectedActivity.specialNeeds.map((need, index) => (
-                              <p key={index} className="text-sm text-gray-600 flex items-center gap-2">
-                                <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                {need}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1">Público Objetivo</h4>
+                        <p className="text-sm text-gray-600">{selectedItem.targetAudience}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Mostrar información adicional para eventos */}
+                  {selectedItem.type === 'event' && selectedItem.targetAudience && (
+                    <div className="space-y-3 pt-4 border-t">
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1">Audiencia Objetivo</h4>
+                        <p className="text-sm text-gray-600 capitalize">{selectedItem.targetAudience}</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -516,7 +685,8 @@ const CalendarPage: React.FC = () => {
                   <Button 
                     className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                     onClick={() => {
-                      window.open(`/activity/${selectedActivity.id}`, '_blank');
+                      const route = selectedItem.type === 'activity' ? 'activity' : 'events';
+                      window.open(`/${route}/${selectedItem.id}`, '_blank');
                     }}
                   >
                     Más Información
