@@ -751,8 +751,7 @@ const AdminSidebarComplete: React.FC = () => {
               </NavItem>
             </CollapsibleSubmenu>
           </ModuleNav>
-
-
+          )}
 
           {/* 3. O & M - OPERACIONES Y MANTENIMIENTO CON SUBMENÚS COLAPSABLES */}
           <ModuleNav 
