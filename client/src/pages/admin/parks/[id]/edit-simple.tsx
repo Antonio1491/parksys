@@ -54,7 +54,16 @@ type ParkEditFormValues = z.infer<typeof parkEditSchema>;
 export default function ParkEditSimple() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const availableCertifications = ["Green Flag Award"];
+  const availableCertifications = [
+    "Green Flag Award",
+    "Green Flag Award 2024", 
+    "Certificación ISO 14001",
+    "Certificación Ambiental Internacional",
+    "Parque Sustentable",
+    "Certificación de Biodiversidad",
+    "Reconocimiento Municipal",
+    "Premio de Conservación"
+  ];
 
   const { data: park, isLoading } = useQuery({
     queryKey: [`/api/parks/${id}`],
@@ -216,14 +225,17 @@ export default function ParkEditSimple() {
   });
 
   const onSubmit = (values: ParkEditFormValues) => {
-    console.log('=== FORM SUBMIT ===');
-    console.log('Form values:', values);
-    console.log('Form errors:', form.formState.errors);
+    console.log('=== FORM SUBMIT INICIADO ===');
+    console.log('Form values recibidos:', values);
+    console.log('Form state errors:', form.formState.errors);
+    console.log('Form state isValid:', form.formState.isValid);
+    console.log('Form state isSubmitting:', form.formState.isSubmitting);
+    console.log('updateParkMutation.isPending:', updateParkMutation.isPending);
     
-    // Verificar errores específicos en lugar de usar isValid
+    // Verificar errores específicos
     const hasErrors = Object.keys(form.formState.errors).length > 0;
     if (hasErrors) {
-      console.error('Formulario con errores:', form.formState.errors);
+      console.error('❌ Formulario con errores:', form.formState.errors);
       toast({
         title: "Error de validación",
         description: "Por favor revisa los campos del formulario",
@@ -232,6 +244,7 @@ export default function ParkEditSimple() {
       return;
     }
     
+    console.log('✅ Formulario válido, ejecutando mutación...');
     updateParkMutation.mutate(values);
   };
 
@@ -559,6 +572,63 @@ export default function ParkEditSimple() {
                               <FormLabel>Administrador</FormLabel>
                               <FormControl>
                                 <Input placeholder="Nombre del administrador" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="conservationStatus"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Estado de Conservación</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione estado" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Excelente">Excelente</SelectItem>
+                                  <SelectItem value="Bueno">Bueno</SelectItem>
+                                  <SelectItem value="Regular">Regular</SelectItem>
+                                  <SelectItem value="Malo">Malo</SelectItem>
+                                  <SelectItem value="Crítico">Crítico</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="regulationUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>URL de Regulación</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://ejemplo.com/regulacion" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="videoUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>URL de Video</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://youtube.com/watch?v=..." {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
