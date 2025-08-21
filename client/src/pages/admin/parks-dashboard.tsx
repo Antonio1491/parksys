@@ -192,9 +192,28 @@ const ParksDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-white">{data.totalParks}</div>
-              <p className="text-xs text-white">
+              <p className="text-xs text-white mb-3">
                 {data.activeParks} activos
               </p>
+              
+              {/* Barra de certificación Green Flag Award */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Award className="h-3 w-3 text-green-400" />
+                    <span className="text-xs text-gray-200">Green Flag Award</span>
+                  </div>
+                  <span className="text-xs font-semibold text-green-400">
+                    {data.greenFlagParks || 0}/{data.totalParks} ({data.greenFlagPercentage?.toFixed(0) || 0}%)
+                  </span>
+                </div>
+                <div className="w-full bg-gray-600 rounded-full h-2">
+                  <div 
+                    className="bg-green-500 h-2 rounded-full transition-all duration-700" 
+                    style={{ width: `${data.greenFlagPercentage || 0}%` }}
+                  ></div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
