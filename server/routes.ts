@@ -73,6 +73,7 @@ import {
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { getParkByIdDirectly } from "./direct-park-queries";
 import { registerRoleRoutes } from "./roleRoutes";
 import feedbackRouter from "./feedback-routes";
 import { registerEventCategoriesRoutes } from "./event-categories-routes";
@@ -1812,6 +1813,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: park.description || "Sin descripción disponible",
         municipalityId: park.municipalityId,
         municipality: municipality ? { name: municipality.name } : { name: "Municipio no encontrado" },
+        certificaciones: park.certificaciones,
         amenities: amenities.map((amenity: any) => ({
           id: amenity.id,
           name: amenity.name,

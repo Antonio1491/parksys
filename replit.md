@@ -3,22 +3,21 @@
 ## Overview
 ParkSys is a comprehensive municipal parks management system designed to streamline the management of parks, activities, volunteers, instructors, assets, and finances. It offers a modern full-stack application with role-based access control and various modules to support diverse park operations. The vision is to provide municipalities with a robust tool to efficiently manage urban green spaces, enhance citizen engagement, and ensure sustainable park operations.
 
-## Recent Changes (August 20, 2025)
-✅ **CALENDAR INTEGRATION COMPLETED**: Successfully implemented unified calendar system with activities and events
+## Recent Changes (August 21, 2025)
+✅ **CERTIFICATION API ENDPOINTS FULLY CORRECTED**: Fixed critical inconsistency in park certification data between endpoints
+- **Root Cause**: storage.getPark() method was using Drizzle ORM select which wasn't properly including certificaciones field  
+- **Solution**: Updated storage.getPark() to use direct SQL query that explicitly includes certificaciones field
+- **Endpoint Fix**: Added certificaciones field to /api/parks/:id/details response object
+- **Verification**: Both /api/parks/5 and /api/parks/5/details now consistently return: "Green Flag Award 2024, Certificación Ambiental Internacional"
+- **Impact**: Park certifications now display correctly in both list views (ExtendedParksList) and individual park tabs (ParkCertificationsTab)
+- **Status**: Complete API consistency achieved for park certification data across all endpoints
+
+✅ **PREVIOUS: CALENDAR INTEGRATION COMPLETED**: Successfully implemented unified calendar system with activities and events
 - **Dual Filtering System**: Activities vs Events primary filter with dynamic category loading
-- **Unified Display**: Both activities and events display in single calendar view with visual indicators
+- **Unified Display**: Both activities and events display in single calendar view with visual indicators  
 - **Modal Enhancement**: Updated dialog component to handle both content types with proper navigation
 - **TypeScript Fixes**: Resolved all variable references and type errors in calendar implementation
 - **Logo Loading Fix**: Corrected parksys-smart-logo.png reference to use existing sidebar-logo.png file
-- **Status**: Calendar module fully functional with complete frontend integration
-
-✅ **PREVIOUS: CRITICAL ROUTING ISSUE RESOLVED**: Fixed persistent problem with tree maintenance POST endpoints that was returning HTML instead of JSON responses
-- **Root Cause**: Route registration order in Express.js was causing parameterized routes to intercept specific endpoints
-- **Solution**: Moved POST `/api/trees/maintenances` endpoint to main routes.ts file before parameterized routes
-- **Database Schema Fix**: Changed `performed_by` field from integer to varchar to accept string values like "Juan Pérez"
-- **Foreign Key Resolution**: Removed conflicting foreign key constraint `tree_maintenances_performed_by_fkey`
-- **Testing Results**: Successfully created maintenance records (IDs 38, 39, 40) with proper JSON responses
-- **Frontend Integration**: Updated mutation function to use correct endpoint `/api/trees/maintenances`
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

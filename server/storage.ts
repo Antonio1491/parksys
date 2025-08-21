@@ -793,8 +793,21 @@ export class DatabaseStorage implements IStorage {
   
   async getPark(id: number): Promise<any> {
     try {
-      const result = await db.select().from(parks).where(eq(parks.id, id));
-      return result[0] || null;
+      const result = await pool.query(`
+        SELECT 
+          id, name, municipality_id as "municipalityId",
+          park_type as "parkType", description, address,
+          postal_code as "postalCode", latitude, longitude,
+          area, green_area as "greenArea", foundation_year as "foundationYear",
+          administrator, conservation_status as "conservationStatus",
+          regulation_url as "regulationUrl", opening_hours as "openingHours",
+          contact_email as "contactEmail", contact_phone as "contactPhone",
+          video_url as "videoUrl", certificaciones,
+          is_deleted as "isDeleted", created_at as "createdAt", updated_at as "updatedAt"
+        FROM parks
+        WHERE id = $1
+      `, [id]);
+      return result.rows[0] || null;
     } catch (error) {
       console.error("Error al obtener parque:", error);
       return null;
