@@ -143,20 +143,25 @@ export default function ParkEditSimple() {
         administrator: park.administrator || "",
         conservationStatus: park.conservationStatus || "",
         certificaciones: (() => {
-          console.log("🔍 Procesando certificaciones del parque:", park.certificaciones, typeof park.certificaciones);
+          console.log("🔍 PARK ID:", park.id, "- Procesando certificaciones:", park.certificaciones, typeof park.certificaciones);
           // Manejar el caso de null o undefined
           if (!park.certificaciones || park.certificaciones === null || park.certificaciones === undefined) {
+            console.log("✅ PARK ID:", park.id, "- Certificaciones nulas, devolviendo array vacío");
             return [];
           }
           // Si es un array, devolverlo directamente
           if (Array.isArray(park.certificaciones)) {
+            console.log("✅ PARK ID:", park.id, "- Certificaciones como array:", park.certificaciones);
             return park.certificaciones;
           }
           // Si es string y no está vacío, dividirlo
           if (typeof park.certificaciones === 'string' && park.certificaciones.trim()) {
-            return park.certificaciones.split(", ").filter(c => c.trim());
+            const result = park.certificaciones.split(", ").filter(c => c.trim());
+            console.log("✅ PARK ID:", park.id, "- Certificaciones como string dividido:", result);
+            return result;
           }
           // Caso por defecto
+          console.log("✅ PARK ID:", park.id, "- Certificaciones fallback a array vacío");
           return [];
         })(),
         regulationUrl: park.regulationUrl || "",
@@ -738,8 +743,18 @@ export default function ParkEditSimple() {
                   type="submit" 
                   disabled={updateParkMutation.isPending}
                   className="min-w-32 bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => {
-                    console.log("🔘 BOTÓN GUARDAR PRESIONADO - Event handler ejecutado");
+                  onClick={(e) => {
+                    console.log("🔘 BOTÓN GUARDAR PRESIONADO - Park ID:", id);
+                    console.log("🔘 Form state valid:", form.formState.isValid);
+                    console.log("🔘 Form errors:", form.formState.errors);
+                    console.log("🔘 Form values before submit:", form.getValues());
+                    
+                    // Si hay errores, prevenirlo
+                    if (!form.formState.isValid) {
+                      console.error("❌ FORM INVALID - Previniendo submit");
+                      e.preventDefault();
+                      return;
+                    }
                   }}
                 >
                   {updateParkMutation.isPending ? (
