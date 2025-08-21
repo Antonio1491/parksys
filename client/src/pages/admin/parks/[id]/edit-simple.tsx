@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Trash2 } from "lucide-react";
+import { X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Save, Info, MapPin, Building } from "lucide-react";
 import { MapSelector } from "@/components/ui/map-selector";
@@ -54,17 +54,7 @@ type ParkEditFormValues = z.infer<typeof parkEditSchema>;
 export default function ParkEditSimple() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const [customCertification, setCustomCertification] = React.useState("");
-  const [availableCertifications, setAvailableCertifications] = React.useState([
-    "Green Flag Award",
-    "ISO 14001",
-    "Certificación Ambiental Internacional",
-    "Bandera Verde",
-    "Certificación de Sostenibilidad",
-    "Parque Carbono Neutral",
-    "Certificación de Biodiversidad",
-    "Smart Park Certification"
-  ]);
+  const availableCertifications = ["Green Flag Award"];
 
   const { data: park, isLoading } = useQuery({
     queryKey: [`/api/parks/${id}`],
@@ -589,48 +579,12 @@ export default function ParkEditSimple() {
                           const removeCertification = (cert: string) => {
                             field.onChange(field.value?.filter((c: string) => c !== cert) || []);
                           };
-                          
-                          const addCustomCertification = () => {
-                            const trimmed = customCertification.trim();
-                            if (trimmed && !availableCertifications.includes(trimmed)) {
-                              setAvailableCertifications([...availableCertifications, trimmed]);
-                              setCustomCertification("");
-                              toast({
-                                title: "Certificación agregada",
-                                description: `"${trimmed}" ha sido agregada a las opciones disponibles.`,
-                              });
-                            } else if (availableCertifications.includes(trimmed)) {
-                              toast({
-                                title: "Certificación duplicada",
-                                description: "Esta certificación ya existe en la lista.",
-                                variant: "destructive",
-                              });
-                            }
-                          };
-                          
-                          const removeCertificationOption = (cert: string) => {
-                            // No permitir eliminar si está siendo usada
-                            if (field.value?.includes(cert)) {
-                              toast({
-                                title: "No se puede eliminar",
-                                description: "Esta certificación está asignada al parque. Retírala del parque antes de eliminarla de las opciones.",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
-                            
-                            setAvailableCertifications(availableCertifications.filter(c => c !== cert));
-                            toast({
-                              title: "Certificación eliminada",
-                              description: `"${cert}" ha sido eliminada de las opciones disponibles.`,
-                            });
-                          };
 
                           return (
                             <FormItem>
                               <FormLabel>Certificaciones</FormLabel>
                               <div className="space-y-4">
-                                {/* Selector de certificaciones existentes */}
+                                {/* Selector de certificaciones */}
                                 <div className="space-y-2">
                                   <Select onValueChange={addCertification}>
                                     <FormControl>
@@ -650,58 +604,6 @@ export default function ParkEditSimple() {
                                       ))}
                                     </SelectContent>
                                   </Select>
-                                </div>
-
-                                {/* Agregar nueva certificación */}
-                                <div className="border rounded-lg p-3 bg-gray-50">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <Plus className="h-4 w-4 text-green-600" />
-                                    <span className="text-sm font-medium">Agregar nueva certificación</span>
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <Input
-                                      placeholder="Nombre de la nueva certificación"
-                                      value={customCertification}
-                                      onChange={(e) => setCustomCertification(e.target.value)}
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                          e.preventDefault();
-                                          addCustomCertification();
-                                        }
-                                      }}
-                                    />
-                                    <Button
-                                      type="button"
-                                      size="sm"
-                                      onClick={addCustomCertification}
-                                      disabled={!customCertification.trim()}
-                                    >
-                                      <Plus className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-
-                                {/* Gestión de certificaciones disponibles */}
-                                <div className="border rounded-lg p-3">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-sm font-medium">Gestionar opciones disponibles</span>
-                                  </div>
-                                  <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
-                                    {availableCertifications.map((cert) => (
-                                      <div key={cert} className="flex items-center justify-between p-2 bg-white rounded border">
-                                        <span className="text-sm">{cert}</span>
-                                        <Button
-                                          type="button"
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() => removeCertificationOption(cert)}
-                                          className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
-                                        >
-                                          <Trash2 className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ))}
-                                  </div>
                                 </div>
                                 
                                 {/* Certificaciones seleccionadas */}
@@ -728,7 +630,7 @@ export default function ParkEditSimple() {
                               </div>
                               <FormMessage />
                               <p className="text-sm text-muted-foreground">
-                                Selecciona y gestiona las certificaciones del parque. Puedes agregar nuevas opciones y eliminar las que no necesites.
+                                Selecciona las certificaciones del parque.
                               </p>
                             </FormItem>
                           );
