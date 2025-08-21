@@ -144,12 +144,19 @@ export default function ParkEditSimple() {
         conservationStatus: park.conservationStatus || "",
         certificaciones: (() => {
           console.log("🔍 Procesando certificaciones del parque:", park.certificaciones, typeof park.certificaciones);
+          // Manejar el caso de null o undefined
+          if (!park.certificaciones || park.certificaciones === null || park.certificaciones === undefined) {
+            return [];
+          }
+          // Si es un array, devolverlo directamente
           if (Array.isArray(park.certificaciones)) {
             return park.certificaciones;
           }
+          // Si es string y no está vacío, dividirlo
           if (typeof park.certificaciones === 'string' && park.certificaciones.trim()) {
             return park.certificaciones.split(", ").filter(c => c.trim());
           }
+          // Caso por defecto
           return [];
         })(),
         regulationUrl: park.regulationUrl || "",
@@ -173,7 +180,9 @@ export default function ParkEditSimple() {
         // Convertir foundationYear a number si existe
         foundationYear: parkData.foundationYear || null,
         // Convertir certificaciones array a string para backend
-        certificaciones: parkData.certificaciones?.join(', ') || '',
+        certificaciones: Array.isArray(parkData.certificaciones) 
+          ? parkData.certificaciones.join(', ') 
+          : (parkData.certificaciones || ''),
       };
       
       console.log('Datos procesados a enviar:', dataToSend);
@@ -232,11 +241,13 @@ export default function ParkEditSimple() {
 
   const onSubmit = (values: ParkEditFormValues) => {
     console.log('=== FORM SUBMIT INICIADO ===');
+    console.log('Park ID:', id);
     console.log('Form values recibidos:', values);
     console.log('Form state errors:', form.formState.errors);
     console.log('Form state isValid:', form.formState.isValid);
     console.log('Form state isSubmitting:', form.formState.isSubmitting);
     console.log('updateParkMutation.isPending:', updateParkMutation.isPending);
+    console.log('Certificaciones procesadas:', values.certificaciones);
     
     // Verificar errores específicos
     const hasErrors = Object.keys(form.formState.errors).length > 0;
