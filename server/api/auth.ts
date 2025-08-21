@@ -7,13 +7,11 @@ export async function handleLogin(req: Request, res: Response) {
   try {
     const { username, password } = req.body;
     
-    // Buscar el usuario con datos completos del rol
+    // Primero buscar el usuario por nombre de usuario o email
     const result = await db.execute(sql`
-      SELECT u.id, u.username, u.email, u.full_name, u.role, u.municipality_id, u.password,
-             u.role_id, r.name as role_name, r.level as role_level, r.permissions as role_permissions
-      FROM users u
-      LEFT JOIN roles r ON u.role_id = r.id
-      WHERE u.username = ${username} OR u.email = ${username}
+      SELECT id, username, email, full_name, role, municipality_id, password 
+      FROM users 
+      WHERE username = ${username} OR email = ${username}
     `);
     
     if (result.rows.length === 0) {
@@ -23,7 +21,7 @@ export async function handleLogin(req: Request, res: Response) {
     const userData = result.rows[0];
     
     // Verificar la contraseña usando bcrypt
-    const passwordMatch = await bcrypt.compare(password, userData.password as string);
+    const passwordMatch = await bcrypt.compare(password, userData.password);
     if (!passwordMatch) {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
@@ -55,11 +53,7 @@ export async function handleLogin(req: Request, res: Response) {
       email: userData.email,
       fullName: userData.full_name,
       role: userData.role,
-      municipalityId: userData.municipality_id,
-      roleId: userData.role_id,
-      roleName: userData.role_name,
-      roleLevel: userData.role_level,
-      rolePermissions: userData.role_permissions
+      municipalityId: userData.municipality_id
     };
     
     res.json({

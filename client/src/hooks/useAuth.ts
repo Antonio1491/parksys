@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-// Definición de la estructura de usuario con datos completos de rol
+// Definición de la estructura de usuario
 interface User {
   id: number;
   username: string;
   email: string;
   role: string;
   fullName?: string;
-  roleId?: number;
-  roleName?: string;
-  roleLevel?: number;
-  rolePermissions?: any;
 }
 
 export function useAuth() {
@@ -33,7 +29,7 @@ export function useAuth() {
   // Obtener el usuario desde la API si está autenticado
   const { data: apiUser, isLoading } = useQuery({
     queryKey: ['/api/auth/user'],
-    enabled: true, // Habilitamos la consulta para obtener datos actualizados
+    enabled: false, // Desactivamos la consulta automática ya que usamos localStorage
   });
   
   // Determinar el usuario final (priorizar localStorage)

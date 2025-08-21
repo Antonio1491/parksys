@@ -282,41 +282,6 @@ const AdminSidebarComplete: React.FC = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation('common');
   
-  // Función para verificar permisos basado en el nivel de rol
-  const hasPermission = (requiredLevel: number) => {
-    if (!user?.roleLevel) return false;
-    // Niveles más bajos tienen más permisos (1 = Super Admin, 7 = Consultor)
-    return user.roleLevel <= requiredLevel;
-  };
-  
-  // Función para verificar permisos específicos
-  const hasModulePermission = (module: string) => {
-    if (!user?.rolePermissions) return false;
-    
-    // Super Admin tiene acceso total
-    if (user.rolePermissions.all === true) return true;
-    
-    // Verificar permisos específicos del módulo
-    const permissions = user.rolePermissions;
-    if (permissions[module]) return true;
-    
-    // Verificar permisos por categoría
-    if (module.includes('park') || module.includes('tree') || module.includes('fauna')) {
-      return permissions.operations || permissions.management;
-    }
-    if (module.includes('finance') || module.includes('accounting')) {
-      return permissions.finance;
-    }
-    if (module.includes('hr') || module.includes('employee')) {
-      return permissions.hr;
-    }
-    if (module.includes('marketing') || module.includes('advertising')) {
-      return permissions.marketing;
-    }
-    
-    return false;
-  };
-  
   // Estados para controlar los submenús colapsables dentro de "Gestión"
   const [expandedSubmenus, setExpandedSubmenus] = useState<string[]>([]);
   
@@ -455,7 +420,6 @@ const AdminSidebarComplete: React.FC = () => {
           </div>
 
           {/* 1. GESTIÓN - MENÚ PRINCIPAL CON SUBMENÚS COLAPSABLES */}
-          {hasPermission(4) && ( // Gestión requiere nivel 4 o superior
           <ModuleNav 
             title="Gestión" 
             icon={<FolderOpen className="h-5 w-5" />}
@@ -463,7 +427,6 @@ const AdminSidebarComplete: React.FC = () => {
             defaultOpen={location.startsWith('/admin/visitors') || location.startsWith('/admin/parks') || location.startsWith('/admin/trees') || location.startsWith('/admin/organizador') || location.startsWith('/admin/activities') || location.startsWith('/admin/events') || location.startsWith('/admin/space-reservations') || location.startsWith('/admin/dashboard-reservas')}
           >
             {/* PARQUES */}
-            {hasModulePermission('parks') && (
             <NavItem
               href="/admin/parks"
               icon={<Map className="h-4 w-4" />}
@@ -471,10 +434,8 @@ const AdminSidebarComplete: React.FC = () => {
               >
               {t('navigation.parks')}
             </NavItem>
-            )}
 
             {/* ACTIVIDADES */}
-            {hasModulePermission('activities') && (
             <CollapsibleSubmenu
               id="actividades"
               title="Actividades"
@@ -525,7 +486,6 @@ const AdminSidebarComplete: React.FC = () => {
                 {t('navigation.instructors')}
               </NavItem>
             </CollapsibleSubmenu>
-            )}
 
             {/* AMENIDADES */}
             <NavItem
@@ -751,7 +711,8 @@ const AdminSidebarComplete: React.FC = () => {
               </NavItem>
             </CollapsibleSubmenu>
           </ModuleNav>
-          )}
+
+
 
           {/* 3. O & M - OPERACIONES Y MANTENIMIENTO CON SUBMENÚS COLAPSABLES */}
           <ModuleNav 

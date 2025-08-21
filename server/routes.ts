@@ -5402,17 +5402,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Obtener usuario actual con datos completos de rol
-  apiRouter.get("/auth/user", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const { getCurrentUser } = await import('./api/auth-user');
-      await getCurrentUser(req, res);
-    } catch (error) {
-      console.error("Error getting current user:", error);
-      res.status(500).json({ message: "Error interno del servidor" });
-    }
-  });
-
   // Add the parks list endpoint to the main API router for frontend compatibility
   apiRouter.get("/public/parks/list", async (_req: Request, res: Response) => {
     try {
