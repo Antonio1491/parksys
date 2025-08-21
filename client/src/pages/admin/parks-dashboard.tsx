@@ -596,7 +596,7 @@ const ParksDashboard = () => {
                 Incidencias por Parque
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Total de incidencias registradas y este mes por parque
+                Barra gris: Total histórico | Barra verde: % del total del sistema
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
@@ -613,9 +613,11 @@ const ParksDashboard = () => {
                         return '#22C55E'; // Verde muy bajo
                       };
                       
+                      const totalSystemIncidents = data.incidentsByPark.reduce((sum, p) => sum + p.totalIncidents, 0);
+                      const systemPercentage = (park.totalIncidents / totalSystemIncidents) * 100;
                       const maxIncidents = Math.max(...data.incidentsByPark.map(p => p.totalIncidents));
                       const totalIncidentsPercentage = (park.totalIncidents / maxIncidents) * 80; // Escala máxima 80%
-                      const monthIncidentsWidth = park.incidentsThisMonth > 0 ? (park.incidentsThisMonth / park.totalIncidents) * totalIncidentsPercentage : 0;
+                      const systemPercentageWidth = (systemPercentage / 100) * totalIncidentsPercentage;
                       
                       return (
                         <div key={park.parkId} className="flex items-center space-x-2">
@@ -639,26 +641,26 @@ const ParksDashboard = () => {
                                 </div>
                               </div>
                               
-                              {/* Barra coloreada superpuesta (incidencias este mes) */}
+                              {/* Barra verde superpuesta (porcentaje del sistema total) */}
                               <div 
                                 className="absolute top-0 left-0 rounded-full h-5 flex items-center justify-end pr-1 transition-all duration-700 shadow-sm"
                                 style={{ 
-                                  width: `${Math.max(monthIncidentsWidth, 2)}%`,
-                                  backgroundColor: getIncidentColor(park.totalIncidents)
+                                  width: `${Math.max(systemPercentageWidth, 2)}%`,
+                                  backgroundColor: '#22C55E'
                                 }}
                               >
                                 <span className="text-white text-xs font-bold">
-                                  {park.incidentsThisMonth}
+                                  {systemPercentage.toFixed(1)}%
                                 </span>
                               </div>
                             </div>
                           </div>
                           <div className="w-24 text-right">
-                            <div className="text-xs text-gray-600">
-                              Este mes: {park.incidentsThisMonth}
+                            <div className="text-xs text-green-600 font-semibold">
+                              {systemPercentage.toFixed(1)}% del sistema
                             </div>
                             <div className="text-xs text-gray-600">
-                              Abiertas: {park.openIncidents}
+                              Este mes: {park.incidentsThisMonth}
                             </div>
                             <div className="text-xs font-semibold" style={{ color: getIncidentColor(park.totalIncidents) }}>
                               {park.totalIncidents} total
