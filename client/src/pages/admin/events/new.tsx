@@ -62,10 +62,10 @@ const eventFormSchema = z.object({
     .nullable(),
   registrationType: z.string().default("open"),
   parkIds: z.array(z.coerce.number()).optional().default([]),
-  organizerName: z.string().optional().nullable(),
-  organizerOrganization: z.string().optional().nullable(),
-  contactEmail: z.string().email().optional().nullable(),
-  contactPhone: z.string().optional().nullable(),
+  organizer_name: z.string().optional().nullable(),
+  organizer_organization: z.string().optional().nullable(),
+  contact_email: z.string().email().optional().nullable(),
+  contact_phone: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   geolocation: z.any().optional().nullable(),
 });
@@ -138,8 +138,10 @@ const NewEventPage: React.FC = () => {
       capacity: null,
       registrationType: "open",
       parkIds: [],
-      organizerName: "",
-      organizerOrganization: "",
+      organizer_name: "",
+      organizer_organization: "",
+      contact_email: "",
+      contact_phone: "",
       geolocation: null,
     },
   });
@@ -184,8 +186,8 @@ const NewEventPage: React.FC = () => {
   // Manejar envío del formulario
   const onSubmit = (data: EventFormValues) => {
     console.log("DATOS DEL FORMULARIO COMPLETOS:", data);
-    console.log("Nombre del organizador:", data.organizerName);
-    console.log("Organización:", data.organizerOrganization);
+    console.log("Nombre del organizador:", data.organizer_name);
+    console.log("Organización:", data.organizer_organization);
     createEventMutation.mutate(data);
   };
 
@@ -356,7 +358,7 @@ const NewEventPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="organizerName"
+                  name="organizer_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-green-800 font-semibold">Nombre del Contacto</FormLabel>
@@ -376,7 +378,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="organizerOrganization"
+                  name="organizer_organization"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-green-800 font-semibold">Empresa / Organización</FormLabel>
@@ -396,7 +398,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="contactEmail"
+                  name="contact_email"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-green-800 font-semibold">Email</FormLabel>
@@ -416,7 +418,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="contactPhone"
+                  name="contact_phone"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-green-800 font-semibold">Teléfono</FormLabel>
