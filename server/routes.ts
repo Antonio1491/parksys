@@ -1285,22 +1285,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const greenFlagParks = parseInt(greenFlagResult.rows[0].count);
       const greenFlagPercentage = totalParks > 0 ? ((greenFlagParks / totalParks) * 100) : 0;
       
-      // Evaluaciones promedio por parque
+      // Evaluaciones promedio por parque - MOSTRAR TODOS LOS PARQUES
       const parkEvaluationsResult = await pool.query(`
         SELECT 
           p.id as park_id,
           p.name as park_name,
-          ROUND(AVG(pe.overall_rating), 2) as average_rating,
+          COALESCE(ROUND(AVG(pe.overall_rating), 2), 0) as average_rating,
           COUNT(pe.id) as evaluation_count
         FROM parks p
-        LEFT JOIN park_evaluations pe ON p.id = pe.park_id
-        WHERE pe.overall_rating IS NOT NULL
+        LEFT JOIN park_evaluations pe ON p.id = pe.park_id AND pe.overall_rating IS NOT NULL
         GROUP BY p.id, p.name
-        HAVING COUNT(pe.id) > 0
-        ORDER BY average_rating DESC
+        ORDER BY average_rating DESC, p.name ASC
       `);
       
-      // Porcentajes de área verde por parque
+      // Porcentajes de área verde por parque - MOSTRAR TODOS LOS PARQUES
       const greenAreaPercentagesResult = await pool.query(`
         SELECT 
           p.id as park_id,
@@ -1308,23 +1306,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           CASE 
             WHEN p.area IS NOT NULL AND p.area::text ~ '^[0-9.]+$' AND p.area::numeric > 0 
             THEN p.area::numeric 
-            ELSE NULL 
+            ELSE 10000 
           END as total_area,
           CASE 
             WHEN p.green_area IS NOT NULL AND p.green_area::text ~ '^[0-9.]+$' 
             THEN p.green_area::numeric 
-            ELSE NULL 
+            ELSE 0 
           END as green_area,
           CASE 
             WHEN p.area IS NOT NULL AND p.area::text ~ '^[0-9.]+$' AND p.area::numeric > 0 
                  AND p.green_area IS NOT NULL AND p.green_area::text ~ '^[0-9.]+$'
             THEN ROUND((p.green_area::numeric / p.area::numeric) * 100, 2)
-            ELSE NULL 
+            ELSE 0 
           END as green_percentage
         FROM parks p
-        WHERE p.area IS NOT NULL AND p.area::text ~ '^[0-9.]+$' AND p.area::numeric > 0
-              AND p.green_area IS NOT NULL AND p.green_area::text ~ '^[0-9.]+$'
-        ORDER BY green_percentage DESC NULLS LAST
+        ORDER BY green_percentage DESC, p.name ASC
       `);
       
       const dashboardData = {
