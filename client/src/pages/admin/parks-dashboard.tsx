@@ -520,30 +520,47 @@ const ParksDashboard = () => {
                         return '#EF4444'; // Rojo muy bajo
                       };
                       
+                      const maxArea = Math.max(...data.greenAreaPercentages.map(p => p.totalArea));
+                      const totalAreaPercentage = (park.totalArea / maxArea) * 100; // Proporción del área total respecto al máximo
+                      const greenAreaWidth = (park.greenPercentage / 100) * totalAreaPercentage; // Ancho de la barra verde basado en el porcentaje
+                      
                       return (
                         <div key={park.parkId} className="flex items-center space-x-3">
                           <div className="w-32 text-sm font-medium text-right text-gray-700 truncate">
                             {park.parkName}
                           </div>
                           <div className="flex-1 flex items-center space-x-2">
-                            <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
+                            <div className="flex-1 relative h-6">
+                              {/* Barra gris proporcional al área total */}
                               <div 
-                                className="h-6 rounded-full flex items-center justify-between px-3 transition-all duration-700 shadow-sm"
+                                className="bg-gray-400 rounded-full h-6 relative transition-all duration-700 shadow-sm"
                                 style={{ 
-                                  width: `${Math.max(park.greenPercentage, 3)}%`,
+                                  width: `${Math.max(totalAreaPercentage, 5)}%`
+                                }}
+                              >
+                                {/* Área total en la barra gris */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">
+                                    {park.totalArea.toLocaleString('es-MX')} m²
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              {/* Barra verde superpuesta (área verde) */}
+                              <div 
+                                className="absolute top-0 left-0 rounded-full h-6 flex items-center justify-end pr-2 transition-all duration-700 shadow-sm"
+                                style={{ 
+                                  width: `${Math.max(greenAreaWidth, 2)}%`,
                                   backgroundColor: getPercentageColor(park.greenPercentage)
                                 }}
                               >
                                 <span className="text-white text-xs font-bold">
                                   {park.greenPercentage.toFixed(1)}%
                                 </span>
-                                <span className="text-white text-xs">
-                                  {park.totalArea.toLocaleString('es-MX')} m²
-                                </span>
                               </div>
                             </div>
                           </div>
-                          <div className="w-20 text-right">
+                          <div className="w-24 text-right">
                             <div className="text-xs text-gray-600">
                               Verde: {park.greenArea.toLocaleString('es-MX')} m²
                             </div>
