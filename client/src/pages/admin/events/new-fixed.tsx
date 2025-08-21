@@ -1,10 +1,10 @@
 import React from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,7 +18,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import AdminLayout from "@/components/AdminLayout";
-import PageHeader from "@/components/PageHeader";
 import {
   Select,
   SelectContent,
@@ -35,7 +34,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, Clock, Users, MapPin } from "lucide-react";
+import { CalendarIcon, Clock, Users, MapPin, Plus } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Esquema para validar el formulario
@@ -62,58 +62,28 @@ const eventFormSchema = z.object({
     .nullable(),
   registrationType: z.string().default("open"),
   parkIds: z.array(z.coerce.number()).optional().default([]),
-  organizerName: z.string().optional().nullable(),
-  organizerEmail: z.string().email().optional().nullable(),
-  organizerPhone: z.string().optional().nullable(),
+  organizer_name: z.string().optional().nullable(),
+  organizer_organization: z.string().optional().nullable(),
+  contact_email: z.string().email().optional().nullable(),
+  contact_phone: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
   geolocation: z.any().optional().nullable(),
 });
 
 // Tipos
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
-// Arreglo de tipos de eventos
-const eventTypes = [
-  { value: "cultural", label: "Cultural" },
-  { value: "sports", label: "Deportivo" },
-  { value: "environmental", label: "Ambiental" },
-  { value: "social", label: "Social" },
-  { value: "educational", label: "Educativo" },
-  { value: "recreational", label: "Recreativo" },
-  { value: "other", label: "Otro" },
-];
-
-// Arreglo de públicos objetivo
-const targetAudiences = [
-  { value: "all", label: "Todo público" },
-  { value: "children", label: "Niños" },
-  { value: "youth", label: "Jóvenes" },
-  { value: "adults", label: "Adultos" },
-  { value: "seniors", label: "Adultos mayores" },
-  { value: "families", label: "Familias" },
-];
-
-// Arreglo de estados de eventos
-const eventStatuses = [
-  { value: "draft", label: "Borrador" },
-  { value: "published", label: "Publicado" },
-  { value: "cancelled", label: "Cancelado" },
-  { value: "postponed", label: "Pospuesto" },
-  { value: "completed", label: "Completado" },
-];
-
-// Arreglo de tipos de registro
-const registrationTypes = [
-  { value: "open", label: "Abierto" },
-  { value: "invitation", label: "Por invitación" },
-  { value: "closed", label: "Cerrado" },
-];
-
-const NewEventPage: React.FC = () => {
+const NewEventPageFixed: React.FC = () => {
   const [, navigate] = useLocation();
 
-  // Consultar parques para el select
-  const { data: parks = [] } = useQuery({
+  // Consultar parques
+  const { data: parks, isLoading: parksLoading } = useQuery({
     queryKey: ["/api/parks"],
+  });
+
+  // Consultar categorías de eventos
+  const { data: eventCategories, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["/api/event-categories"],
   });
 
   // Formulario con validación zod
@@ -131,9 +101,11 @@ const NewEventPage: React.FC = () => {
       capacity: null,
       registrationType: "open",
       parkIds: [],
-      organizerName: "",
-      organizerEmail: "",
-      organizerPhone: "",
+      organizer_name: "",
+      organizer_organization: "",
+      contact_email: "",
+      contact_phone: "",
+      notes: "",
       geolocation: null,
     },
   });
@@ -177,24 +149,39 @@ const NewEventPage: React.FC = () => {
 
   // Manejar envío del formulario
   const onSubmit = (data: EventFormValues) => {
+    console.log("DATOS DEL FORMULARIO:", data);
     createEventMutation.mutate(data);
   };
 
+  if (parksLoading || categoriesLoading) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <Card className="p-4">
+            <div>Cargando formulario...</div>
+          </Card>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
-      <div className="container mx-auto py-6">
-        <PageHeader
-          title="Crear Nuevo Evento"
-          description="Completa el formulario para crear un nuevo evento en el sistema"
-          actions={
-            <Button variant="outline" onClick={() => navigate("/admin/events")}>
-              Volver a eventos
-            </Button>
-          }
-        />
+      <div className="space-y-6">
+        {/* Header */}
+        <Card className="p-4 bg-gray-50">
+          <div className="flex items-center gap-2">
+            <Plus className="w-8 h-8 text-gray-900" />
+            <h1 className="text-3xl font-bold text-gray-900">Nuevo Evento</h1>
+          </div>
+          <p className="text-gray-600 mt-2">
+            Crear un nuevo evento
+          </p>
+        </Card>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Información básica */}
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4">Información básica</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -228,11 +215,9 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {eventStatuses.map((status) => (
-                            <SelectItem key={status.value} value={status.value}>
-                              {status.label}
-                            </SelectItem>
-                          ))}
+                          <SelectItem value="draft">Borrador</SelectItem>
+                          <SelectItem value="published">Publicado</SelectItem>
+                          <SelectItem value="cancelled">Cancelado</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -258,259 +243,50 @@ const NewEventPage: React.FC = () => {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="eventType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de evento</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona un tipo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {eventTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="targetAudience"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Público objetivo</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value || "all"}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona el público" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {targetAudiences.map((audience) => (
-                            <SelectItem key={audience.value} value={audience.value}>
-                              {audience.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
             </div>
 
-            <div className="bg-card p-6 rounded-lg border">
-              <h3 className="text-lg font-medium mb-4">Fecha y hora</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Fecha de inicio</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={`w-full pl-3 text-left font-normal ${
-                                !field.value ? "text-muted-foreground" : ""
-                              }`}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP", { locale: es })
-                              ) : (
-                                <span>Seleccionar fecha</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date < new Date(new Date().setHours(0, 0, 0, 0))
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Fecha de fin (opcional)</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={`w-full pl-3 text-left font-normal ${
-                                !field.value ? "text-muted-foreground" : ""
-                              }`}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP", { locale: es })
-                              ) : (
-                                <span>Seleccionar fecha</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value || undefined}
-                            onSelect={field.onChange}
-                            disabled={(date) => {
-                              const startDate = form.getValues("startDate");
-                              return startDate && date < startDate;
-                            }}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormDescription>
-                        Opcional: si es un evento de varios días
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="bg-card p-6 rounded-lg border">
-              <h3 className="text-lg font-medium mb-4">
-                <MapPin className="w-5 h-5 inline-block mr-2" />
-                Ubicación
+            {/* Información de Contacto */}
+            <div className="bg-green-50 p-6 rounded-lg border-2 border-green-200">
+              <h3 className="text-lg font-medium mb-4 text-green-800">
+                📞 Información de Contacto
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="parkIds"
+                  name="organizer_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Parques asociados</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          const currentValues = field.value || [];
-                          const valueNumber = Number(value);
-                          
-                          if (currentValues.includes(valueNumber)) {
-                            field.onChange(
-                              currentValues.filter((val) => val !== valueNumber)
-                            );
-                          } else {
-                            field.onChange([...currentValues, valueNumber]);
-                          }
-                        }}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar parques" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {parks.map((park: any) => (
-                            <SelectItem key={park.id} value={park.id.toString()}>
-                              {park.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Parques seleccionados:{" "}
-                        {field.value?.length
-                          ? parks
-                              .filter((park: any) => field.value?.includes(park.id))
-                              .map((park: any) => park.name)
-                              .join(", ")
-                          : "Ninguno"}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ubicación específica (opcional)</FormLabel>
+                      <FormLabel className="text-green-800 font-semibold">Nombre del Contacto</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Ej: Área de picnic, Entrada principal..."
+                          type="text"
+                          placeholder="Nombre completo del responsable"
                           {...field}
                           value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
-                      <FormDescription>
-                        Especifica el punto exacto dentro del parque
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
 
-            <div className="bg-card p-6 rounded-lg border">
-              <h3 className="text-lg font-medium mb-4">
-                <Users className="w-5 h-5 inline-block mr-2" />
-                Participantes
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="capacity"
+                  name="organizer_organization"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Capacidad máxima (opcional)</FormLabel>
+                      <FormLabel className="text-green-800 font-semibold">Empresa / Organización</FormLabel>
                       <FormControl>
                         <Input
-                          type="number"
-                          placeholder="Número de participantes"
+                          type="text"
+                          placeholder="Nombre de la empresa u organización"
                           {...field}
-                          value={field.value === null ? "" : field.value}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(value === "" ? null : parseInt(value, 10));
-                          }}
+                          value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
-                      <FormDescription>
-                        Deja en blanco si no hay límite
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -518,68 +294,17 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="registrationType"
+                  name="contact_email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tipo de registro</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona tipo de registro" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {registrationTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Define cómo se registrarán los participantes
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="bg-card p-6 rounded-lg border">
-              <h3 className="text-lg font-medium mb-4">
-                Información de contacto
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="organizerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre del organizador</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nombre" {...field} value={field.value || ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="organizerEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email de contacto</FormLabel>
+                      <FormLabel className="text-green-800 font-semibold">Email de Contacto</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="email@ejemplo.com"
+                          placeholder="evento@ejemplo.com"
                           {...field}
                           value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -589,20 +314,40 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="organizerPhone"
+                  name="contact_phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Teléfono de contacto</FormLabel>
+                      <FormLabel className="text-green-800 font-semibold">Teléfono de Contacto</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="(555) 555-5555"
+                          type="tel"
+                          placeholder="(33) 1234-5678"
+                          {...field}
+                          value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="mt-6">
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-green-800 font-semibold">Notas Adicionales</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Información adicional sobre el evento..."
+                          className="min-h-[100px] bg-white border-2 border-green-300"
                           {...field}
                           value={field.value || ""}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Opcional: para contacto directo
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -633,4 +378,4 @@ const NewEventPage: React.FC = () => {
   );
 };
 
-export default NewEventPage;
+export default NewEventPageFixed;
