@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Users, Calendar, Package, AlertTriangle, TreePine, Activity, Camera, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Users, Calendar, Package, AlertTriangle, TreePine, Activity, Camera, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -25,6 +25,7 @@ interface Park {
   parkType: string;
   municipalityId: number;
   municipality?: { name: string };
+  certificaciones?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -91,6 +92,11 @@ const AdminParksContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const itemsPerPage = 9;
+
+  // Helper function to check if park is certified
+  const isParkCertified = (park: Park) => {
+    return park.certificaciones && park.certificaciones.trim() !== '';
+  };
 
 
 
@@ -300,6 +306,15 @@ const AdminParksContent = () => {
                   <div className="flex items-center space-x-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900">{park.name}</h3>
+                      {isParkCertified(park) && (
+                        <Badge 
+                          variant="secondary" 
+                          className="mt-1 bg-green-100 text-green-800 border-green-200"
+                        >
+                          <Award className="h-3 w-3 mr-1" />
+                          Certificado
+                        </Badge>
+                      )}
                     </div>
                     <div className="flex items-center space-x-6 text-sm text-gray-600">
                       <div className="flex items-center">
@@ -372,8 +387,17 @@ const AdminParksContent = () => {
           <Card key={park.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start">
-                <div>
+                <div className="flex-1">
                   <CardTitle className="text-lg">{park.name}</CardTitle>
+                  {isParkCertified(park) && (
+                    <Badge 
+                      variant="secondary" 
+                      className="mt-2 bg-green-100 text-green-800 border-green-200"
+                    >
+                      <Award className="h-3 w-3 mr-1" />
+                      Certificado
+                    </Badge>
+                  )}
                 </div>
                 <Badge 
                   variant="outline" 
