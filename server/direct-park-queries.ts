@@ -14,7 +14,7 @@ export async function getParksDirectly(filters?: any) {
         p.administrator, p.conservation_status as "conservationStatus",
         p.regulation_url as "regulationUrl", p.opening_hours as "openingHours", 
         p.contact_email as "contactEmail", p.contact_phone as "contactPhone",
-        p.video_url as "videoUrl"
+        p.video_url as "videoUrl", p.certificaciones
       FROM parks p
       WHERE 1=1
     `;
@@ -258,7 +258,7 @@ export async function getParkByIdDirectly(parkId: number) {
           administrator, conservation_status as "conservationStatus",
           regulation_url as "regulationUrl", opening_hours as "openingHours", 
           contact_email as "contactEmail", contact_phone as "contactPhone",
-          video_url as "videoUrl"
+          video_url as "videoUrl", certificaciones
         FROM parks
         WHERE id = $1
       `, [parkId]);
