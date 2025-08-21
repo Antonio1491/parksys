@@ -143,9 +143,16 @@ export default function ParkEditSimple() {
         foundationYear: park.foundationYear || undefined,
         administrator: park.administrator || "",
         conservationStatus: park.conservationStatus || "",
-        certificaciones: park.certificaciones ? 
-          (Array.isArray(park.certificaciones) ? park.certificaciones : park.certificaciones.split(', ')) : 
-          [],
+        certificaciones: (() => {
+          console.log("🔍 Procesando certificaciones del parque:", park.certificaciones, typeof park.certificaciones);
+          if (Array.isArray(park.certificaciones)) {
+            return park.certificaciones;
+          }
+          if (typeof park.certificaciones === 'string' && park.certificaciones.trim()) {
+            return park.certificaciones.split(", ").filter(c => c.trim());
+          }
+          return [];
+        })(),
         regulationUrl: park.regulationUrl || "",
         videoUrl: park.videoUrl || "",
         schedule: parseSchedule(park.openingHours),
@@ -192,9 +199,17 @@ export default function ParkEditSimple() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("✅ PARQUE ACTUALIZADO - Invalidando cache y recargando datos...");
       queryClient.invalidateQueries({ queryKey: ["/api/parks"] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/parks/${id}/details`] });
+      
+      // Forzar recarga de los datos del parque
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: [`/api/parks/${id}`] });
+      }, 100);
+      
       toast({
         title: "Parque actualizado",
         description: "La información del parque ha sido actualizada correctamente.",
