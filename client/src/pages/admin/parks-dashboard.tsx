@@ -418,48 +418,6 @@ const ParksDashboard = () => {
         {/* Sección continua con el resto del dashboard */}
         <div className="space-y-6">
 
-          {/* Parques por tipo */}
-          <Card className="border-0 shadow-lg max-w-2xl mx-auto">
-              <CardHeader className="bg-white rounded-t-lg">
-                <CardTitle className="text-lg font-bold text-gray-800">
-                  Distribución por Tipo
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {data.parksByType?.map((item, index) => {
-                    const maxCount = Math.max(...(data.parksByType?.map(p => p.count) || [1]));
-                    const percentage = (item.count / maxCount) * 100;
-                    const colors = ['#B3C077', '#1E5AA6', '#198DCE', '#90D3EC'];
-                    const backgroundColor = colors[index % colors.length];
-                    
-                    return (
-                      <div key={index} className="flex items-center space-x-3">
-                        <div className="w-24 text-sm font-medium text-right text-gray-700 truncate">
-                          {item.type}
-                        </div>
-                        <div className="flex-1 flex items-center space-x-2">
-                          <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
-                            <div 
-                              className="h-6 rounded-full flex items-center justify-end pr-3 transition-all duration-700 shadow-sm"
-                              style={{ 
-                                width: `${Math.max(percentage, 5)}%`,
-                                backgroundColor: backgroundColor
-                              }}
-                            >
-                              <span className="text-white text-xs font-bold">
-                                {item.count}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
           {/* NUEVO: Gráfico de Evaluación Promedio por Parque */}
           <Card className="border-0 shadow-lg max-w-4xl mx-auto">
             <CardHeader className="bg-white rounded-t-lg">
