@@ -4,7 +4,16 @@
 ParkSys is a comprehensive municipal parks management system designed to streamline the management of parks, activities, volunteers, instructors, assets, and finances. It offers a modern full-stack application with role-based access control and various modules to support diverse park operations. The vision is to provide municipalities with a robust tool to efficiently manage urban green spaces, enhance citizen engagement, and ensure sustainable park operations.
 
 ## Recent Changes (August 21, 2025)
-✅ **CERTIFICATION API ENDPOINTS FULLY CORRECTED**: Fixed critical inconsistency in park certification data between endpoints
+✅ **PARK CREATION WITH CERTIFICATIONS FULLY FIXED**: Completed critical fix for certification handling in park creation workflow
+- **Critical Bug Fixed**: storage.createPark() method was missing certificaciones field in database insertion
+- **Root Cause**: Method was inserting all park fields except certificaciones, causing newly created parks to lose certification data
+- **Solution**: Added `certificaciones: parkData.certificaciones || null,` to the INSERT VALUES in storage.createPark()
+- **Verification**: Successfully created test park (ID: 29) "Parque Test Final Certificaciones" with "Green Flag Award 2024" certification
+- **Endpoint Testing**: Both /api/parks and /api/parks/:id/details now correctly handle certifications for new and existing parks
+- **Impact**: New parks can now be created with certifications, and certification data persists correctly across all endpoints
+- **Status**: Complete certification system functionality achieved for both creation and retrieval workflows
+
+✅ **PREVIOUS: CERTIFICATION API ENDPOINTS FULLY CORRECTED**: Fixed critical inconsistency in park certification data between endpoints
 - **Root Cause**: storage.getPark() method was using Drizzle ORM select which wasn't properly including certificaciones field  
 - **Solution**: Updated storage.getPark() to use direct SQL query that explicitly includes certificaciones field
 - **Endpoint Fix**: Added certificaciones field to /api/parks/:id/details response object

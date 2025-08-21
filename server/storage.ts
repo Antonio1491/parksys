@@ -1350,6 +1350,7 @@ export class DatabaseStorage implements IStorage {
         openingHours: parkData.openingHours || '{}',
         contactEmail: parkData.contactEmail || '',
         contactPhone: parkData.contactPhone || '',
+        certificaciones: parkData.certificaciones || null,
         createdAt: new Date(),
         updatedAt: new Date(),
         isDeleted: false,
