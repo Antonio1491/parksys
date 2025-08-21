@@ -10,6 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Save, Info, MapPin, Building } from "lucide-react";
 import { MapSelector } from "@/components/ui/map-selector";
@@ -33,7 +35,7 @@ const parkEditSchema = z.object({
   foundationYear: z.number().optional(),
   administrator: z.string().optional(),
   conservationStatus: z.string().optional(),
-  certificaciones: z.string().optional(),
+  certificaciones: z.array(z.string()).optional(),
   regulationUrl: z.string().optional(),
   videoUrl: z.string().optional(),
   schedule: z.object({
@@ -76,7 +78,7 @@ export default function ParkEditSimple() {
       foundationYear: undefined,
       administrator: "",
       conservationStatus: "",
-      certificaciones: "",
+      certificaciones: [],
       regulationUrl: "",
       videoUrl: "",
       schedule: {
@@ -130,7 +132,9 @@ export default function ParkEditSimple() {
         foundationYear: park.foundationYear || undefined,
         administrator: park.administrator || "",
         conservationStatus: park.conservationStatus || "",
-        certificaciones: park.certificaciones || "",
+        certificaciones: park.certificaciones ? 
+          (Array.isArray(park.certificaciones) ? park.certificaciones : park.certificaciones.split(', ')) : 
+          [],
         regulationUrl: park.regulationUrl || "",
         videoUrl: park.videoUrl || "",
         schedule: parseSchedule(park.openingHours),
@@ -151,6 +155,8 @@ export default function ParkEditSimple() {
         openingHours: schedule ? JSON.stringify(schedule) : "{}",
         // Convertir foundationYear a number si existe
         foundationYear: parkData.foundationYear || null,
+        // Convertir certificaciones array a string para backend
+        certificaciones: parkData.certificaciones?.join(', ') || '',
       };
       
       console.log('Datos procesados a enviar:', dataToSend);
@@ -547,22 +553,76 @@ export default function ParkEditSimple() {
                       <FormField
                         control={form.control}
                         name="certificaciones"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Certificaciones</FormLabel>
-                            <FormControl>
-                              <Textarea 
-                                placeholder="Green Flag Award, ISO 14001, Certificación Ambiental (separadas por comas)" 
-                                className="min-h-[80px]" 
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                            <p className="text-sm text-muted-foreground">
-                              Ingresa las certificaciones del parque separadas por comas. Ejemplo: Green Flag Award 2024, ISO 14001, Bandera Verde
-                            </p>
-                          </FormItem>
-                        )}
+                        render={({ field }) => {
+                          const availableCertifications = [
+                            "Green Flag Award",
+                            "ISO 14001",
+                            "Certificación Ambiental Internacional",
+                            "Bandera Verde",
+                            "Certificación de Sostenibilidad",
+                            "Parque Carbono Neutral",
+                            "Certificación de Biodiversidad",
+                            "Smart Park Certification"
+                          ];
+                          
+                          const addCertification = (cert: string) => {
+                            if (!field.value?.includes(cert)) {
+                              field.onChange([...(field.value || []), cert]);
+                            }
+                          };
+                          
+                          const removeCertification = (cert: string) => {
+                            field.onChange(field.value?.filter((c: string) => c !== cert) || []);
+                          };
+
+                          return (
+                            <FormItem>
+                              <FormLabel>Certificaciones</FormLabel>
+                              <div className="space-y-3">
+                                <Select onValueChange={addCertification}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Seleccionar certificación" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {availableCertifications.map((cert) => (
+                                      <SelectItem 
+                                        key={cert} 
+                                        value={cert}
+                                        disabled={field.value?.includes(cert)}
+                                      >
+                                        {cert}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                
+                                {field.value && field.value.length > 0 && (
+                                  <div className="flex flex-wrap gap-2">
+                                    {field.value.map((cert: string, index: number) => (
+                                      <Badge 
+                                        key={index} 
+                                        variant="secondary" 
+                                        className="flex items-center gap-1"
+                                      >
+                                        {cert}
+                                        <X 
+                                          className="h-3 w-3 cursor-pointer hover:text-red-500" 
+                                          onClick={() => removeCertification(cert)}
+                                        />
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              <FormMessage />
+                              <p className="text-sm text-muted-foreground">
+                                Selecciona las certificaciones del parque. Puedes agregar múltiples certificaciones.
+                              </p>
+                            </FormItem>
+                          );
+                        }}
                       />
 
                     </CardContent>

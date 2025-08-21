@@ -2038,128 +2038,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Park ID:", req.params.id);
       console.log("Datos recibidos:", req.body);
       
-      // SIMPLE TEST: Solo actualizar certificaciones directamente
-      console.log("🔍 VERIFICANDO CERTIFICACIONES:", req.body.certificaciones, typeof req.body.certificaciones);
-      if (req.body.certificaciones !== undefined) {
-        console.log("✅ ENTRANDO AL BLOQUE DE ACTUALIZACIÓN DIRECTA");
-        try {
-          const result = await pool.query(
-            'UPDATE parks SET certificaciones = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
-            [req.body.certificaciones, Number(req.params.id)]
-          );
-          
-          if (result.rows.length > 0) {
-            console.log("✅ CERTIFICACIONES ACTUALIZADAS EXITOSAMENTE:", result.rows[0].certificaciones);
-            return res.json({ success: true, park: result.rows[0] });
-          }
-        } catch (err) {
-          console.error("Error actualizando certificaciones:", err);
-          return res.status(500).json({ error: "Error updating certificaciones" });
-        }
-      }
-      
       const parkId = Number(req.params.id);
-      console.log("Park ID convertido:", parkId);
+      const parkData = req.body;
       
-      // Verificamos que existe el parque
-      const existingPark = await storage.getPark(parkId);
-      console.log("Parque existente encontrado:", !!existingPark);
-      if (!existingPark) {
-        return res.status(404).json({ message: "Parque no encontrado" });
+      // Actualizar usando el storage directamente
+      const updatedPark = await storage.updatePark(parkId, parkData);
+      
+      if (!updatedPark) {
+        return res.status(404).json({ message: "Park not found" });
       }
       
-      console.log("✅ PARQUE ENCONTRADO - CONTINUANDO CON ACTUALIZACIÓN");
-      
-      // Actualizamos directamente en la base de datos usando SQL para evitar problemas
-      try {
-        console.log("Iniciando proceso de actualización...");
-        // Primero extraemos solo los campos válidos que vamos a actualizar
-        const {
-          name, description, address, postalCode, latitude, longitude,
-          area, greenArea, parkType, openingHours, contactPhone, contactEmail,
-          administrator, conservationStatus, certificaciones, regulationUrl, foundationYear, videoUrl,
-          municipalityId
-        } = req.body;
-        console.log("Campos extraídos del body. certificaciones:", certificaciones);
-        
-        // Creamos un objeto con solo las propiedades que no son null o undefined
-        const fieldsToUpdate: any = {};
-        if (name !== undefined) fieldsToUpdate.name = name;
-        if (description !== undefined) fieldsToUpdate.description = description;
-        if (address !== undefined) fieldsToUpdate.address = address;
-        if (postalCode !== undefined) fieldsToUpdate.postal_code = postalCode;
-        if (latitude !== undefined) fieldsToUpdate.latitude = latitude;
-        if (longitude !== undefined) fieldsToUpdate.longitude = longitude;
-        if (area !== undefined) fieldsToUpdate.area = area;
-        if (greenArea !== undefined) fieldsToUpdate.green_area = greenArea;
-        if (parkType !== undefined) fieldsToUpdate.park_type = parkType;
-        if (openingHours !== undefined) fieldsToUpdate.opening_hours = openingHours;
-        if (contactPhone !== undefined) fieldsToUpdate.contact_phone = contactPhone;
-        if (contactEmail !== undefined) fieldsToUpdate.contact_email = contactEmail;
-        if (administrator !== undefined) fieldsToUpdate.administrator = administrator;
-        if (conservationStatus !== undefined) fieldsToUpdate.conservation_status = conservationStatus;
-        if (certificaciones !== undefined) fieldsToUpdate.certificaciones = certificaciones;
-        if (regulationUrl !== undefined) fieldsToUpdate.regulation_url = regulationUrl;
-        if (foundationYear !== undefined) fieldsToUpdate.foundation_year = foundationYear;
-        if (videoUrl !== undefined) fieldsToUpdate.video_url = videoUrl;
-        if (municipalityId !== undefined) fieldsToUpdate.municipality_id = municipalityId;
-        
-        // DEBUG: Log de campos extraídos
-        console.log("=== DEBUG CERTIFICACIONES ===");
-        console.log("certificaciones valor:", certificaciones);
-        console.log("certificaciones type:", typeof certificaciones);
-        console.log("certificaciones !== undefined:", certificaciones !== undefined);
-        console.log("fieldsToUpdate antes de updated_at:", fieldsToUpdate);
-        
-        // Agregamos la fecha de actualización
-        fieldsToUpdate.updated_at = new Date();
-        
-        console.log("ANTES DE VERIFICAR LONGITUD - fieldsToUpdate:", fieldsToUpdate);
-        console.log("ANTES DE VERIFICAR LONGITUD - Object.keys(fieldsToUpdate).length:", Object.keys(fieldsToUpdate).length);
-        
-        // Construimos el SQL para la actualización usando SQL directo
-        if (Object.keys(fieldsToUpdate).length > 0) {
-          // Construir query SQL dinámicamente
-          const setClause = Object.keys(fieldsToUpdate)
-            .map((field, index) => `${field} = $${index + 2}`)
-            .join(', ');
-          
-          const values = Object.values(fieldsToUpdate);
-          
-          const sqlQuery = `
-            UPDATE parks 
-            SET ${setClause}
-            WHERE id = $1
-            RETURNING *
-          `;
-          
-          console.log("SQL Query:", sqlQuery);
-          console.log("Values:", [parkId, ...values]);
-          
-          const result = await pool.query(sqlQuery, [parkId, ...values]);
-          
-          if (result.rows.length > 0) {
-            console.log("Parque actualizado con éxito (SQL directo):", result.rows[0]);
-            res.json(result.rows[0]);
-          } else {
-            throw new Error("No se pudo actualizar el parque");
-          }
-        } else {
-          // Si no hay campos para actualizar, devolvemos el parque existente
-          console.log("No hay campos para actualizar");
-          console.log("fieldsToUpdate final:", fieldsToUpdate);
-          return res.status(400).json({ message: "No hay campos para actualizar" });
-        }
-      } catch (dbError) {
-        console.error("Error en actualización directa:", dbError);
-        throw new Error(`Error al actualizar en base de datos: ${dbError.message}`);
-      }
+      console.log("✅ PARQUE ACTUALIZADO EXITOSAMENTE");
+      return res.json(updatedPark);
     } catch (error) {
-      console.error("Error detallado al actualizar parque:", error);
-      res.status(500).json({ 
-        message: "Error updating park",
-        details: error instanceof Error ? error.message : "Unknown error" 
-      });
+      console.error("Error updating park:", error);
+      res.status(500).json({ message: "Error updating park" });
     }
   });
 
