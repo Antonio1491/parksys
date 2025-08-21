@@ -1482,6 +1482,8 @@ export const events = pgTable("events", {
   capacity: integer("capacity"),
   price: decimal("price", { precision: 10, scale: 2 }).default("0.00"),
   location: varchar("location", { length: 255 }), // Ubicación específica dentro del parque
+  organizer_name: varchar("organizer_name", { length: 255 }),
+  organizer_organization: varchar("organizer_organization", { length: 255 }),
   contact_email: varchar("contact_email", { length: 255 }),
   contact_phone: varchar("contact_phone", { length: 20 }),
   notes: text("notes"),

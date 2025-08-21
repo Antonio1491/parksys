@@ -64,6 +64,9 @@ const eventFormSchema = z.object({
   parkIds: z.array(z.coerce.number()).optional().default([]),
   organizerName: z.string().optional().nullable(),
   organizerOrganization: z.string().optional().nullable(),
+  contactEmail: z.string().email().optional().nullable(),
+  contactPhone: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
   geolocation: z.any().optional().nullable(),
 });
 
@@ -631,6 +634,72 @@ const NewEventPage: React.FC = () => {
                       </FormItem>
                     );
                   }}
+                />
+              </div>
+            </div>
+
+            <div className="bg-card p-6 rounded-lg border">
+              <h3 className="text-lg font-medium mb-4">
+                📞 Información de Contacto
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="contactEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="correo@ejemplo.com"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="contactPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Teléfono</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          placeholder="(555) 123-4567"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="mt-6">
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notas Adicionales</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Información adicional sobre el evento o instrucciones especiales..."
+                          className="min-h-[100px]"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
             </div>
