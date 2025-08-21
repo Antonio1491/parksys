@@ -21,11 +21,11 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       const { sql } = await import('drizzle-orm');
       
       const result = await db.execute(sql`
-        SELECT u.id, u.username, u.role, u.is_active, u.role_id,
+        SELECT u.id, u.username, u.is_active, u.role_id,
                r.name as role_name, r.level as role_level, r.permissions as role_permissions
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.id = 4 AND u.is_active = true
+        WHERE u.id = 1 AND u.is_active = true
       `);
       
       if (result.rows.length > 0) {
@@ -33,7 +33,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
         req.user = {
           id: userData.id,
           username: userData.username,
-          role: userData.role,
+          role: userData.role_name || 'admin', // Usar role_name como role
           isActive: userData.is_active,
           roleId: userData.role_id,
           roleName: userData.role_name,

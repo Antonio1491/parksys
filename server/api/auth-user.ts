@@ -11,7 +11,7 @@ export async function getCurrentUser(req: Request, res: Response) {
 
     // Obtener datos completos del usuario desde la base de datos
     const result = await db.execute(sql`
-      SELECT u.id, u.username, u.email, u.full_name, u.role, u.municipality_id,
+      SELECT u.id, u.username, u.email, u.full_name, u.municipality_id,
              u.role_id, r.name as role_name, r.level as role_level, r.permissions as role_permissions
       FROM users u
       LEFT JOIN roles r ON u.role_id = r.id
@@ -49,7 +49,7 @@ export async function getCurrentUser(req: Request, res: Response) {
       username: userData.username,
       email: userData.email,
       fullName: userData.full_name,
-      role: userData.role,
+      role: userData.role_name || 'admin', // Usar role_name como role
       municipalityId: userData.municipality_id,
       roleId: userData.role_id,
       roleName: userData.role_name,
