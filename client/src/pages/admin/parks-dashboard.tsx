@@ -368,56 +368,7 @@ const ParksDashboard = () => {
 
           </div>
 
-          {/* Fila adicional para Green Flag Award */}
-          <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1 mt-6">
-            <Card
-              className="border-0 shadow-lg text-white"
-              style={{ backgroundColor: "#2E8B57" }}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-base font-medium text-gray-100">
-                  Green Flag Award
-                </CardTitle>
-                <div
-                  className="rounded-full p-2"
-                  style={{ backgroundColor: "#228B22" }}
-                >
-                  <Award className="h-5 w-5 text-white" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-3xl font-bold text-white">
-                      {data.greenFlagParks || 0}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-gray-100">
-                        {(data.greenFlagPercentage || 0).toFixed(1)}%
-                      </div>
-                      <p className="text-xs text-gray-200">del total</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-gray-200">
-                      <span>Parques certificados</span>
-                      <span>
-                        {data.greenFlagParks || 0} de {data.totalParks}
-                      </span>
-                    </div>
-                    <div className="w-full bg-green-900 rounded-full h-2">
-                      <div
-                        className="bg-yellow-400 h-2 rounded-full transition-all duration-700"
-                        style={{
-                          width: `${Math.max(data.greenFlagPercentage || 0, 2)}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+
         </div>
 
         {/* Separador visual */}
