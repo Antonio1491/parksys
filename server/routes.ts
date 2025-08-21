@@ -1285,6 +1285,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const greenFlagParks = parseInt(greenFlagResult.rows[0].count);
       const greenFlagPercentage = totalParks > 0 ? ((greenFlagParks / totalParks) * 100) : 0;
       
+      // Evaluaciones promedio por parque
+      const parkEvaluationsResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          ROUND(AVG(pe.overall_rating), 2) as average_rating,
+          COUNT(pe.id) as evaluation_count
+        FROM parks p
+        LEFT JOIN park_evaluations pe ON p.id = pe.park_id
+        WHERE pe.overall_rating IS NOT NULL
+        GROUP BY p.id, p.name
+        HAVING COUNT(pe.id) > 0
+        ORDER BY average_rating DESC
+      `);
+      
       const dashboardData = {
         totalParks,
         totalSurface,
@@ -1330,6 +1345,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           type: row.type || 'Sin tipo',
           area: parseFloat(row.area) || 0,
           status: row.status || 'Sin estado'
+        })),
+        parkEvaluations: parkEvaluationsResult.rows.map(row => ({
+          parkId: parseInt(row.park_id),
+          parkName: row.park_name,
+          averageRating: parseFloat(row.average_rating),
+          evaluationCount: parseInt(row.evaluation_count)
         }))
       };
       

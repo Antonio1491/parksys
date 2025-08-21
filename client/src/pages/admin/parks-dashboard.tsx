@@ -63,6 +63,12 @@ interface ParksDashboardData {
     status: string;
     count: number;
   }>;
+  parkEvaluations: Array<{
+    parkId: number;
+    parkName: string;
+    averageRating: number;
+    evaluationCount: number;
+  }>;
 }
 
 const ParksDashboard = () => {
@@ -453,6 +459,83 @@ const ParksDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+          {/* NUEVO: Gráfico de Evaluación Promedio por Parque */}
+          <Card className="border-0 shadow-lg max-w-4xl mx-auto">
+            <CardHeader className="bg-white rounded-t-lg">
+              <CardTitle className="text-lg font-bold text-gray-800">
+                Evaluación Promedio por Parque
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Nivel de satisfacción promedio de visitantes por parque basado en evaluaciones
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                {data.parkEvaluations?.length > 0 ? (
+                  data.parkEvaluations
+                    .sort((a, b) => b.averageRating - a.averageRating)
+                    .slice(0, 10) // Mostrar top 10
+                    .map((park, index) => {
+                      const percentage = (park.averageRating / 5) * 100;
+                      const getRatingColor = (rating: number) => {
+                        if (rating >= 4.5) return '#22C55E'; // Verde excelente
+                        if (rating >= 4.0) return '#84CC16'; // Verde bueno
+                        if (rating >= 3.5) return '#EAB308'; // Amarillo regular
+                        if (rating >= 3.0) return '#F97316'; // Naranja bajo
+                        return '#EF4444'; // Rojo muy bajo
+                      };
+                      
+                      return (
+                        <div key={park.parkId} className="flex items-center space-x-3">
+                          <div className="w-32 text-sm font-medium text-right text-gray-700 truncate">
+                            {park.parkName}
+                          </div>
+                          <div className="flex-1 flex items-center space-x-2">
+                            <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
+                              <div 
+                                className="h-6 rounded-full flex items-center justify-between px-3 transition-all duration-700 shadow-sm"
+                                style={{ 
+                                  width: `${Math.max(percentage, 10)}%`,
+                                  backgroundColor: getRatingColor(park.averageRating)
+                                }}
+                              >
+                                <span className="text-white text-xs font-bold">
+                                  {park.averageRating.toFixed(1)} ⭐
+                                </span>
+                                <span className="text-white text-xs">
+                                  ({park.evaluationCount} eval.)
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="w-16 text-right">
+                            <span className="text-sm font-semibold" style={{ color: getRatingColor(park.averageRating) }}>
+                              {park.averageRating.toFixed(1)}/5
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="flex flex-col items-center space-y-2">
+                      <CheckCircle className="h-12 w-12 text-gray-300" />
+                      <p className="text-lg font-medium">No hay evaluaciones disponibles</p>
+                      <p className="text-sm">Los datos de evaluación aparecerán aquí una vez que los visitantes evalúen los parques</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {data.parkEvaluations?.length > 10 && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-500">
+                    Mostrando los 10 parques mejor evaluados de {data.parkEvaluations.length} total
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Mapa de parques */}
           <Card className="border-0 shadow-xl">
