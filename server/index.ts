@@ -1279,6 +1279,9 @@ app.put("/api/dev/parks/:id", async (req: Request, res: Response) => {
     console.log("=== DESARROLLO - Actualizando parque directamente ===");
     console.log("Park ID:", req.params.id);
     console.log("Datos recibidos:", req.body);
+    console.log("Campo certificaciones recibido:", req.body.certificaciones);
+    console.log("Campo area recibido:", req.body.area);
+    console.log("Campo administrator recibido:", req.body.administrator);
     
     const parkId = Number(req.params.id);
     const parkData = req.body;
@@ -1333,6 +1336,38 @@ app.put("/api/dev/parks/:id", async (req: Request, res: Response) => {
     if (parkData.openingHours !== undefined) {
       updateFields.push(`opening_hours = $${paramIndex++}`);
       values.push(parkData.openingHours);
+    }
+    if (parkData.certificaciones !== undefined) {
+      updateFields.push(`certificaciones = $${paramIndex++}`);
+      values.push(parkData.certificaciones);
+    }
+    if (parkData.area !== undefined) {
+      updateFields.push(`area = $${paramIndex++}`);
+      values.push(parkData.area);
+    }
+    if (parkData.greenArea !== undefined) {
+      updateFields.push(`green_area = $${paramIndex++}`);
+      values.push(parkData.greenArea);
+    }
+    if (parkData.foundationYear !== undefined) {
+      updateFields.push(`foundation_year = $${paramIndex++}`);
+      values.push(parkData.foundationYear);
+    }
+    if (parkData.administrator !== undefined) {
+      updateFields.push(`administrator = $${paramIndex++}`);
+      values.push(parkData.administrator);
+    }
+    if (parkData.conservationStatus !== undefined) {
+      updateFields.push(`conservation_status = $${paramIndex++}`);
+      values.push(parkData.conservationStatus);
+    }
+    if (parkData.regulationUrl !== undefined) {
+      updateFields.push(`regulation_url = $${paramIndex++}`);
+      values.push(parkData.regulationUrl);
+    }
+    if (parkData.videoUrl !== undefined) {
+      updateFields.push(`video_url = $${paramIndex++}`);
+      values.push(parkData.videoUrl);
     }
     
     // Agregar ID del parque al final
