@@ -495,8 +495,8 @@ const ParksDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Gráfico de Porcentaje de Área Verde */}
-          <Card className="border-0 shadow-lg max-w-4xl mx-auto">
+          {/* Gráfico de Porcentaje de Área Verde - Barras Verticales */}
+          <Card className="border-0 shadow-lg max-w-5xl mx-auto">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
                 Porcentaje de Área Verde
@@ -506,56 +506,81 @@ const ParksDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-4">
+              <div className="h-96 w-full">
                 {data.greenAreaPercentages?.length > 0 ? (
-                  data.greenAreaPercentages
-                    .sort((a, b) => b.greenPercentage - a.greenPercentage)
-                    .slice(0, 15) // Mostrar top 15
-                    .map((park, index) => {
-                      const getPercentageColor = (percentage: number) => {
-                        if (percentage >= 80) return '#22C55E'; // Verde excelente
-                        if (percentage >= 60) return '#84CC16'; // Verde bueno
-                        if (percentage >= 40) return '#EAB308'; // Amarillo regular
-                        if (percentage >= 20) return '#F97316'; // Naranja bajo
-                        return '#EF4444'; // Rojo muy bajo
-                      };
+                  <div className="h-full flex flex-col">
+                    {/* Área del gráfico */}
+                    <div className="flex-1 flex items-end justify-center space-x-2 px-4 pb-4 border-l-2 border-b-2 border-gray-300 relative">
+                      {/* Eje Y - Etiquetas de área */}
+                      <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-600 pr-2">
+                        <span>Max</span>
+                        <span>75%</span>
+                        <span>50%</span>
+                        <span>25%</span>
+                        <span>0 m²</span>
+                      </div>
                       
-                      return (
-                        <div key={park.parkId} className="flex items-center space-x-3">
-                          <div className="w-32 text-sm font-medium text-right text-gray-700 truncate">
-                            {park.parkName}
-                          </div>
-                          <div className="flex-1 flex items-center space-x-2">
-                            <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
-                              <div 
-                                className="h-6 rounded-full flex items-center justify-between px-3 transition-all duration-700 shadow-sm"
-                                style={{ 
-                                  width: `${Math.max(park.greenPercentage, 3)}%`,
-                                  backgroundColor: getPercentageColor(park.greenPercentage)
-                                }}
-                              >
-                                <span className="text-white text-xs font-bold">
-                                  {park.greenPercentage.toFixed(1)}%
-                                </span>
-                                <span className="text-white text-xs">
-                                  {park.totalArea.toLocaleString('es-MX')} m²
+                      {/* Barras de los parques */}
+                      {data.greenAreaPercentages
+                        .sort((a, b) => b.greenPercentage - a.greenPercentage)
+                        .slice(0, 12) // Mostrar top 12 para que quepan bien
+                        .map((park, index) => {
+                          const maxArea = Math.max(...data.greenAreaPercentages.map(p => p.totalArea));
+                          const totalBarHeight = (park.totalArea / maxArea) * 100; // Porcentaje de altura máxima
+                          const greenBarHeight = (park.greenArea / maxArea) * 100; // Altura de la barra verde
+                          
+                          return (
+                            <div key={park.parkId} className="flex flex-col items-center space-y-1" style={{ minWidth: '60px' }}>
+                              {/* Barra del parque */}
+                              <div className="relative h-64 w-8 flex flex-col justify-end">
+                                {/* Barra gris (área total) */}
+                                <div 
+                                  className="w-full bg-gray-400 relative transition-all duration-700"
+                                  style={{ height: `${totalBarHeight}%` }}
+                                >
+                                  {/* Barra verde (área verde) superpuesta */}
+                                  <div 
+                                    className="w-full bg-green-500 absolute bottom-0 left-0 transition-all duration-700"
+                                    style={{ height: `${(greenBarHeight / totalBarHeight) * 100}%` }}
+                                  >
+                                    {/* Porcentaje en la punta de la barra verde */}
+                                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-green-700 whitespace-nowrap">
+                                      {park.greenPercentage.toFixed(1)}%
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Nombre del parque (rotado) */}
+                              <div className="text-xs text-gray-700 transform -rotate-45 origin-top-left w-20 h-8 flex items-start">
+                                <span className="truncate block" style={{ maxWidth: '80px' }}>
+                                  {park.parkName}
                                 </span>
                               </div>
                             </div>
-                          </div>
-                          <div className="w-20 text-right">
-                            <div className="text-xs text-gray-600">
-                              Verde: {park.greenArea.toLocaleString('es-MX')} m²
-                            </div>
-                            <div className="text-sm font-semibold" style={{ color: getPercentageColor(park.greenPercentage) }}>
-                              {park.greenPercentage.toFixed(1)}%
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })
+                          );
+                        })}
+                    </div>
+                    
+                    {/* Leyenda */}
+                    <div className="mt-6 flex justify-center space-x-6 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 bg-gray-400"></div>
+                        <span>Área Total</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 bg-green-500"></div>
+                        <span>Área Verde</span>
+                      </div>
+                    </div>
+                    
+                    {/* Información adicional */}
+                    <div className="mt-4 text-center text-sm text-gray-600">
+                      <p>Eje vertical: Área en metros cuadrados (m²) • Eje horizontal: Parques ordenados por mayor % de área verde</p>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 h-full flex flex-col justify-center">
                     <div className="flex flex-col items-center space-y-2">
                       <CheckCircle className="h-12 w-12 text-gray-300" />
                       <p className="text-lg font-medium">No hay datos de área verde disponibles</p>
@@ -564,10 +589,10 @@ const ParksDashboard = () => {
                   </div>
                 )}
               </div>
-              {data.greenAreaPercentages?.length > 15 && (
+              {data.greenAreaPercentages?.length > 12 && (
                 <div className="mt-4 text-center">
                   <p className="text-sm text-gray-500">
-                    Mostrando los 15 parques con mayor porcentaje de área verde de {data.greenAreaPercentages.length} total
+                    Mostrando los 12 parques con mayor porcentaje de área verde de {data.greenAreaPercentages.length} total
                   </p>
                 </div>
               )}
