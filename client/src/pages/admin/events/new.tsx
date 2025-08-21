@@ -351,9 +351,49 @@ const NewEventPage: React.FC = () => {
                 📞 Información de Contacto
               </h3>
               <p className="text-sm text-green-600 mb-4">
-                CAMPOS AGREGADOS: Email, Teléfono, Notas Adicionales
+                CAMPOS INCLUIDOS: Nombre del Contacto, Empresa/Organización, Email, Teléfono, Notas Adicionales
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="organizerName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-green-800 font-semibold">Nombre del Contacto</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Nombre completo del responsable"
+                          {...field}
+                          value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="organizerOrganization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-green-800 font-semibold">Empresa / Organización</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Nombre de la empresa u organización"
+                          {...field}
+                          value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="contactEmail"
