@@ -210,9 +210,15 @@ export default function ParkEditSimple() {
       }, 100);
       
       toast({
-        title: "Parque actualizado",
-        description: "La información del parque ha sido actualizada correctamente.",
+        title: "✅ Parque actualizado exitosamente",
+        description: "Todos los cambios han sido guardados correctamente. La página se actualizará automáticamente.",
+        variant: "default",
       });
+      
+      // Opcional: después de 2 segundos, redirigir a la vista del parque
+      setTimeout(() => {
+        window.location.href = `/admin/parks/${id}/view`;
+      }, 2000);
     },
     onError: (error: any) => {
       console.error('Error al actualizar:', error);
@@ -720,7 +726,10 @@ export default function ParkEditSimple() {
                 <Button 
                   type="submit" 
                   disabled={updateParkMutation.isPending}
-                  className="min-w-32"
+                  className="min-w-32 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => {
+                    console.log("🔘 BOTÓN GUARDAR PRESIONADO - Event handler ejecutado");
+                  }}
                 >
                   {updateParkMutation.isPending ? (
                     <>
