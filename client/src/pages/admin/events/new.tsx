@@ -678,6 +678,44 @@ const NewEventPage: React.FC = () => {
                 />
                 <FormField
                   control={form.control}
+                  name="organizer_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre del Contacto</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Nombre completo del responsable"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="organizer_organization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Empresa / Organización</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Nombre de la empresa u organización"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="contact_email"
                   render={({ field }) => (
                     <FormItem>
