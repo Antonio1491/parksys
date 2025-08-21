@@ -345,6 +345,129 @@ const NewEventPage: React.FC = () => {
               </div>
             </div>
 
+            {/* NUEVOS CAMPOS DE CONTACTO - COLOCADOS AQUÍ PARA MAYOR VISIBILIDAD */}
+            <div className="bg-green-50 p-6 rounded-lg border-2 border-green-200">
+              <h3 className="text-lg font-medium mb-4 text-green-800">
+                📞 Información de Contacto
+              </h3>
+              <p className="text-sm text-green-600 mb-4">
+                CAMPOS AGREGADOS: Email, Teléfono, Notas Adicionales
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="contactEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-green-800 font-semibold">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="correo@ejemplo.com"
+                          {...field}
+                          value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="contactPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-green-800 font-semibold">Teléfono</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          placeholder="(555) 123-4567"
+                          {...field}
+                          value={field.value || ""}
+                          className="bg-white border-2 border-green-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="mt-6">
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-green-800 font-semibold">Notas Adicionales</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Información adicional sobre el evento o instrucciones especiales..."
+                          className="min-h-[100px] bg-white border-2 border-green-300"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+              <h3 className="text-lg font-medium mb-4 text-blue-800">
+                🏢 Información del organizador
+              </h3>
+              <p className="text-sm text-blue-600 mb-4">
+                CAMPOS AGREGADOS: Nombre del organizador y Empresa/Organización
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="organizerName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-blue-800 font-semibold">Nombre del organizador *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Escribe el nombre del organizador" 
+                          {...field} 
+                          value={field.value || ""} 
+                          className="bg-white border-2 border-blue-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="organizerOrganization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-blue-800 font-semibold">Empresa / Organización</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Nombre de la empresa u organización" 
+                          {...field} 
+                          value={field.value || ""} 
+                          className="bg-white border-2 border-blue-300"
+                        />
+                      </FormControl>
+                      <FormDescription className="text-blue-600">
+                        Opcional: entidad que organiza el evento
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4">Fecha y hora</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
