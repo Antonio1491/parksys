@@ -468,24 +468,20 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {parks?.data?.map((park: any) => (
+                          {(parks?.data || parks || []).map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
-                          )) || parks?.map((park: any) => (
-                            <SelectItem key={park.id} value={park.id.toString()}>
-                              {park.name}
-                            </SelectItem>
-                          )) || []}
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormDescription>
                         Parques seleccionados:{" "}
                         {field.value?.length
-                          ? (parks?.data || parks)
-                              ?.filter((park: any) => field.value?.includes(park.id))
-                              ?.map((park: any) => park.name)
-                              ?.join(", ")
+                          ? (parks?.data || parks || [])
+                              .filter((park: any) => field.value?.includes(park.id))
+                              .map((park: any) => park.name)
+                              .join(", ")
                           : "Ninguno"}
                       </FormDescription>
                       <FormMessage />
