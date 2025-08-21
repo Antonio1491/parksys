@@ -37,6 +37,7 @@ import { es } from "date-fns/locale";
 import { CalendarIcon, Clock, Users, MapPin, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import EventImageUploader from "@/components/EventImageUploader";
 
 // Esquema para validar el formulario
 const eventFormSchema = z.object({
@@ -68,6 +69,7 @@ const eventFormSchema = z.object({
   contact_phone: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   geolocation: z.any().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
 });
 
 // Tipos
@@ -144,6 +146,7 @@ const NewEventPageFixed: React.FC = () => {
       contact_phone: "",
       notes: "",
       geolocation: null,
+      imageUrl: null,
     },
   });
 
@@ -518,9 +521,21 @@ const NewEventPageFixed: React.FC = () => {
               </div>
             </div>
 
-            {/* Información de Contacto - DESTACADA */}
-            <div className="bg-green-50 p-6 rounded-lg border-2 border-green-200">
-              <h3 className="text-lg font-medium mb-4 text-green-800">
+            {/* Imagen del evento */}
+            <div className="bg-card p-6 rounded-lg border">
+              <h3 className="text-lg font-medium mb-4">
+                📷 Imagen del evento
+              </h3>
+              <EventImageUploader
+                onImageUpload={(imageUrl) => form.setValue('imageUrl', imageUrl)}
+                currentImage={form.watch('imageUrl') || undefined}
+                onRemoveImage={() => form.setValue('imageUrl', null)}
+              />
+            </div>
+
+            {/* Información de Contacto */}
+            <div className="bg-card p-6 rounded-lg border">
+              <h3 className="text-lg font-medium mb-4">
                 📞 Información de Contacto
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -529,14 +544,13 @@ const NewEventPageFixed: React.FC = () => {
                   name="organizer_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Nombre del Contacto</FormLabel>
+                      <FormLabel>Nombre del Contacto</FormLabel>
                       <FormControl>
                         <Input
                           type="text"
                           placeholder="Nombre completo del responsable"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -549,14 +563,13 @@ const NewEventPageFixed: React.FC = () => {
                   name="organizer_organization"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Empresa / Organización</FormLabel>
+                      <FormLabel>Empresa / Organización</FormLabel>
                       <FormControl>
                         <Input
                           type="text"
                           placeholder="Nombre de la empresa u organización"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -569,14 +582,13 @@ const NewEventPageFixed: React.FC = () => {
                   name="contact_email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Email de Contacto</FormLabel>
+                      <FormLabel>Email de Contacto</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
                           placeholder="evento@ejemplo.com"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -589,14 +601,13 @@ const NewEventPageFixed: React.FC = () => {
                   name="contact_phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Teléfono de Contacto</FormLabel>
+                      <FormLabel>Teléfono de Contacto</FormLabel>
                       <FormControl>
                         <Input
                           type="tel"
                           placeholder="(33) 1234-5678"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -611,11 +622,11 @@ const NewEventPageFixed: React.FC = () => {
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Notas Adicionales</FormLabel>
+                      <FormLabel>Notas Adicionales</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Información adicional sobre el evento..."
-                          className="min-h-[100px] bg-white border-2 border-green-300"
+                          className="min-h-[100px]"
                           {...field}
                           value={field.value || ""}
                         />
