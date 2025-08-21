@@ -38,15 +38,7 @@ const parkEditSchema = z.object({
   certificaciones: z.array(z.string()).optional(),
   regulationUrl: z.string().optional(),
   videoUrl: z.string().optional(),
-  schedule: z.object({
-    monday: z.object({ enabled: z.boolean(), openTime: z.string(), closeTime: z.string() }),
-    tuesday: z.object({ enabled: z.boolean(), openTime: z.string(), closeTime: z.string() }),
-    wednesday: z.object({ enabled: z.boolean(), openTime: z.string(), closeTime: z.string() }),
-    thursday: z.object({ enabled: z.boolean(), openTime: z.string(), closeTime: z.string() }),
-    friday: z.object({ enabled: z.boolean(), openTime: z.string(), closeTime: z.string() }),
-    saturday: z.object({ enabled: z.boolean(), openTime: z.string(), closeTime: z.string() }),
-    sunday: z.object({ enabled: z.boolean(), openTime: z.string(), closeTime: z.string() }),
-  }).optional(),
+  schedule: z.any().optional(),
 });
 
 type ParkEditFormValues = z.infer<typeof parkEditSchema>;
@@ -55,14 +47,7 @@ export default function ParkEditSimple() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const availableCertifications = [
-    "Green Flag Award",
-    "Green Flag Award 2024", 
-    "Certificación ISO 14001",
-    "Certificación Ambiental Internacional",
-    "Parque Sustentable",
-    "Certificación de Biodiversidad",
-    "Reconocimiento Municipal",
-    "Premio de Conservación"
+    "Green Flag Award"
   ];
 
   const { data: park, isLoading } = useQuery({
@@ -166,7 +151,7 @@ export default function ParkEditSimple() {
         })(),
         regulationUrl: park.regulationUrl || "",
         videoUrl: park.videoUrl || "",
-        schedule: parseSchedule(park.openingHours),
+        schedule: parseSchedule(park.openingHours) || {},
       });
     }
   }, [park, form]);
@@ -743,18 +728,25 @@ export default function ParkEditSimple() {
                   type="submit" 
                   disabled={updateParkMutation.isPending}
                   className="min-w-32 bg-green-600 hover:bg-green-700 text-white"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     console.log("🔘 BOTÓN GUARDAR PRESIONADO - Park ID:", id);
                     console.log("🔘 Form state valid:", form.formState.isValid);
                     console.log("🔘 Form errors:", form.formState.errors);
                     console.log("🔘 Form values before submit:", form.getValues());
                     
+                    // Forzar validación manual del formulario
+                    const isValid = await form.trigger();
+                    console.log("🔍 Manual validation result:", isValid);
+                    console.log("🔍 Form errors after trigger:", form.formState.errors);
+                    
                     // Si hay errores, prevenirlo
-                    if (!form.formState.isValid) {
+                    if (!isValid) {
                       console.error("❌ FORM INVALID - Previniendo submit");
                       e.preventDefault();
                       return;
                     }
+                    
+                    console.log("✅ FORM VALID - Permitiendo submit");
                   }}
                 >
                   {updateParkMutation.isPending ? (
