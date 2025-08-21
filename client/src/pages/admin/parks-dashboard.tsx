@@ -228,9 +228,35 @@ const ParksDashboard = () => {
               <div className="text-3xl font-bold text-white">
                 {data.totalSurface ? `${(data.totalSurface / 10000).toFixed(1)} ha` : 'N/A'}
               </div>
-              <p className="text-xs text-white">
+              <p className="text-xs text-white mb-3">
                 Superficie total de parques
               </p>
+              
+              {/* Barra de porcentaje de área verde */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Trees className="h-3 w-3 text-green-400" />
+                    <span className="text-xs text-gray-200">Área Verde</span>
+                  </div>
+                  <span className="text-xs font-semibold text-green-400">
+                    {data.totalGreenArea ? `${(data.totalGreenArea / 10000).toFixed(1)} ha` : '0 ha'} 
+                    ({data.totalSurface && data.totalGreenArea 
+                      ? ((data.totalGreenArea / data.totalSurface) * 100).toFixed(0) 
+                      : 0}%)
+                  </span>
+                </div>
+                <div className="w-full bg-gray-600 rounded-full h-2">
+                  <div 
+                    className="bg-green-500 h-2 rounded-full transition-all duration-700" 
+                    style={{ 
+                      width: `${data.totalSurface && data.totalGreenArea 
+                        ? ((data.totalGreenArea / data.totalSurface) * 100) 
+                        : 0}%` 
+                    }}
+                  ></div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
