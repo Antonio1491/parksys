@@ -589,6 +589,104 @@ const ParksDashboard = () => {
             </CardContent>
           </Card>
 
+          {/* NUEVO: Gráfico de Incidencias por Parque */}
+          <Card className="border-0 shadow-lg max-w-4xl mx-auto">
+            <CardHeader className="bg-white rounded-t-lg">
+              <CardTitle className="text-lg font-bold text-gray-800">
+                Incidencias por Parque
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Total de incidencias registradas y este mes por parque
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-3">
+                {data.incidentsByPark?.length > 0 ? (
+                  data.incidentsByPark
+                    .sort((a, b) => b.totalIncidents - a.totalIncidents)
+                    .map((park, index) => {
+                      const getIncidentColor = (incidents: number) => {
+                        if (incidents >= 20) return '#EF4444'; // Rojo crítico
+                        if (incidents >= 15) return '#F97316'; // Naranja alto
+                        if (incidents >= 10) return '#EAB308'; // Amarillo medio
+                        if (incidents >= 5) return '#84CC16'; // Verde bajo
+                        return '#22C55E'; // Verde muy bajo
+                      };
+                      
+                      const maxIncidents = Math.max(...data.incidentsByPark.map(p => p.totalIncidents));
+                      const totalIncidentsPercentage = (park.totalIncidents / maxIncidents) * 80; // Escala máxima 80%
+                      const monthIncidentsWidth = park.incidentsThisMonth > 0 ? (park.incidentsThisMonth / park.totalIncidents) * totalIncidentsPercentage : 0;
+                      
+                      return (
+                        <div key={park.parkId} className="flex items-center space-x-2">
+                          <div className="w-28 text-xs font-medium text-right text-gray-700 truncate">
+                            {park.parkName}
+                          </div>
+                          <div className="flex-1 flex items-center">
+                            <div className="flex-1 relative h-5">
+                              {/* Barra gris para incidencias totales */}
+                              <div 
+                                className="bg-gray-400 rounded-full h-5 relative transition-all duration-700 shadow-sm"
+                                style={{ 
+                                  width: `${Math.max(totalIncidentsPercentage, 8)}%`
+                                }}
+                              >
+                                {/* Total de incidencias */}
+                                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                                  <span className="text-white text-xs font-bold truncate px-1">
+                                    {park.totalIncidents} total
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              {/* Barra coloreada superpuesta (incidencias este mes) */}
+                              <div 
+                                className="absolute top-0 left-0 rounded-full h-5 flex items-center justify-end pr-1 transition-all duration-700 shadow-sm"
+                                style={{ 
+                                  width: `${Math.max(monthIncidentsWidth, 2)}%`,
+                                  backgroundColor: getIncidentColor(park.totalIncidents)
+                                }}
+                              >
+                                <span className="text-white text-xs font-bold">
+                                  {park.incidentsThisMonth}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="w-24 text-right">
+                            <div className="text-xs text-gray-600">
+                              Este mes: {park.incidentsThisMonth}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              Abiertas: {park.openIncidents}
+                            </div>
+                            <div className="text-xs font-semibold" style={{ color: getIncidentColor(park.totalIncidents) }}>
+                              {park.totalIncidents} total
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                ) : (
+                  <div className="text-center py-6 text-gray-500">
+                    <div className="flex flex-col items-center space-y-2">
+                      <CheckCircle className="h-10 w-10 text-gray-300" />
+                      <p className="text-sm font-medium">No hay incidencias registradas</p>
+                      <p className="text-xs">Los datos aparecerán cuando se registren incidencias en los parques</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {data.incidentsByPark?.length > 0 && (
+                <div className="mt-3 text-center">
+                  <p className="text-xs text-gray-500">
+                    Mostrando los {data.incidentsByPark.length} parques con incidencias registradas
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Mapa de parques */}
           <Card className="border-0 shadow-xl">
             <CardHeader className="bg-white rounded-t-lg">

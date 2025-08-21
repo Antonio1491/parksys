@@ -1323,6 +1323,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ORDER BY green_percentage DESC, p.name ASC
       `);
       
+      // Incidencias por parque - Solo parques con incidencias
+      const incidentsByParkResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          COUNT(i.id) as total_incidents,
+          COUNT(CASE WHEN i.created_at >= CURRENT_DATE - INTERVAL '30 days' THEN 1 END) as incidents_this_month,
+          COUNT(CASE WHEN i.status = 'open' OR i.status = 'pending' THEN 1 END) as open_incidents,
+          COUNT(CASE WHEN i.status = 'resolved' OR i.status = 'closed' THEN 1 END) as resolved_incidents
+        FROM parks p
+        INNER JOIN incidents i ON p.id = i.park_id
+        GROUP BY p.id, p.name
+        HAVING COUNT(i.id) > 0
+        ORDER BY total_incidents DESC, p.name ASC
+      `);
+      
       const dashboardData = {
         totalParks,
         totalSurface,
@@ -1381,6 +1397,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           totalArea: parseFloat(row.total_area) || 0,
           greenArea: parseFloat(row.green_area) || 0,
           greenPercentage: parseFloat(row.green_percentage) || 0
+        })),
+        incidentsByPark: incidentsByParkResult.rows.map(row => ({
+          parkId: parseInt(row.park_id),
+          parkName: row.park_name,
+          totalIncidents: parseInt(row.total_incidents),
+          incidentsThisMonth: parseInt(row.incidents_this_month),
+          openIncidents: parseInt(row.open_incidents),
+          resolvedIncidents: parseInt(row.resolved_incidents)
         }))
       };
       
