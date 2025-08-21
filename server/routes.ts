@@ -1300,6 +1300,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ORDER BY average_rating DESC
       `);
       
+      // Porcentajes de área verde por parque
+      const greenAreaPercentagesResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          CASE 
+            WHEN p.area IS NOT NULL AND p.area::text ~ '^[0-9.]+$' AND p.area::numeric > 0 
+            THEN p.area::numeric 
+            ELSE NULL 
+          END as total_area,
+          CASE 
+            WHEN p.green_area IS NOT NULL AND p.green_area::text ~ '^[0-9.]+$' 
+            THEN p.green_area::numeric 
+            ELSE NULL 
+          END as green_area,
+          CASE 
+            WHEN p.area IS NOT NULL AND p.area::text ~ '^[0-9.]+$' AND p.area::numeric > 0 
+                 AND p.green_area IS NOT NULL AND p.green_area::text ~ '^[0-9.]+$'
+            THEN ROUND((p.green_area::numeric / p.area::numeric) * 100, 2)
+            ELSE NULL 
+          END as green_percentage
+        FROM parks p
+        WHERE p.area IS NOT NULL AND p.area::text ~ '^[0-9.]+$' AND p.area::numeric > 0
+              AND p.green_area IS NOT NULL AND p.green_area::text ~ '^[0-9.]+$'
+        ORDER BY green_percentage DESC NULLS LAST
+      `);
+      
       const dashboardData = {
         totalParks,
         totalSurface,
@@ -1351,6 +1378,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           parkName: row.park_name,
           averageRating: parseFloat(row.average_rating),
           evaluationCount: parseInt(row.evaluation_count)
+        })),
+        greenAreaPercentages: greenAreaPercentagesResult.rows.map(row => ({
+          parkId: parseInt(row.park_id),
+          parkName: row.park_name,
+          totalArea: parseFloat(row.total_area) || 0,
+          greenArea: parseFloat(row.green_area) || 0,
+          greenPercentage: parseFloat(row.green_percentage) || 0
         }))
       };
       
