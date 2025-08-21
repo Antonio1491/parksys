@@ -507,28 +507,7 @@ const ParksDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card
-              className="border-0 shadow-lg text-white"
-              style={{ backgroundColor: "#003D49" }}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-medium text-gray-100">
-                  Activos
-                </CardTitle>
-                <div
-                  className="rounded-full p-2"
-                  style={{ backgroundColor: "#B275B0" }}
-                >
-                  <Package className="h-5 w-5 text-white" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-white">
-                  {data.totalAssets}
-                </div>
-                <p className="text-xs text-white">Activos registrados</p>
-              </CardContent>
-            </Card>
+
           </div>
 
           {/* Fila adicional para Green Flag Award */}
