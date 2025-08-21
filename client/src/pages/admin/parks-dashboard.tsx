@@ -433,7 +433,6 @@ const ParksDashboard = () => {
                 {data.parkEvaluations?.length > 0 ? (
                   data.parkEvaluations
                     .sort((a, b) => b.averageRating - a.averageRating)
-                    .slice(0, 10) // Mostrar top 10
                     .map((park, index) => {
                       const percentage = (park.averageRating / 5) * 100;
                       const getRatingColor = (rating: number) => {
@@ -485,10 +484,10 @@ const ParksDashboard = () => {
                   </div>
                 )}
               </div>
-              {data.parkEvaluations?.length > 10 && (
+              {data.parkEvaluations?.length > 0 && (
                 <div className="mt-4 text-center">
                   <p className="text-sm text-gray-500">
-                    Mostrando los 10 parques mejor evaluados de {data.parkEvaluations.length} total
+                    Mostrando todos los {data.parkEvaluations.length} parques registrados en el sistema
                   </p>
                 </div>
               )}
@@ -510,7 +509,6 @@ const ParksDashboard = () => {
                 {data.greenAreaPercentages?.length > 0 ? (
                   data.greenAreaPercentages
                     .sort((a, b) => b.greenPercentage - a.greenPercentage)
-                    .slice(0, 10) // Mostrar top 10 para mejor ajuste
                     .map((park, index) => {
                       const getPercentageColor = (percentage: number) => {
                         if (percentage >= 80) return '#22C55E'; // Verde excelente
@@ -581,10 +579,10 @@ const ParksDashboard = () => {
                   </div>
                 )}
               </div>
-              {data.greenAreaPercentages?.length > 10 && (
+              {data.greenAreaPercentages?.length > 0 && (
                 <div className="mt-3 text-center">
                   <p className="text-xs text-gray-500">
-                    Mostrando los 10 parques con mayor % de área verde de {data.greenAreaPercentages.length} total
+                    Mostrando todos los {data.greenAreaPercentages.length} parques registrados en el sistema
                   </p>
                 </div>
               )}
