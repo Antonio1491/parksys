@@ -110,7 +110,7 @@ const registrationTypes = [
   { value: "closed", label: "Cerrado" },
 ];
 
-const NewEventPageFixed: React.FC = () => {
+const NewEventPage: React.FC = () => {
   const [, navigate] = useLocation();
 
   // Consultar parques para el select
@@ -142,7 +142,6 @@ const NewEventPageFixed: React.FC = () => {
       organizer_organization: "",
       contact_email: "",
       contact_phone: "",
-      notes: "",
       geolocation: null,
     },
   });
@@ -186,10 +185,13 @@ const NewEventPageFixed: React.FC = () => {
 
   // Manejar envío del formulario
   const onSubmit = (data: EventFormValues) => {
-    console.log("DATOS DEL FORMULARIO:", data);
+    console.log("DATOS DEL FORMULARIO COMPLETOS:", data);
+    console.log("Nombre del organizador:", data.organizer_name);
+    console.log("Organización:", data.organizer_organization);
     createEventMutation.mutate(data);
   };
 
+  // Estados de carga
   if (parksLoading || categoriesLoading) {
     return (
       <AdminLayout>
@@ -202,10 +204,15 @@ const NewEventPageFixed: React.FC = () => {
     );
   }
 
+  // Debug: Log de datos para verificar
+  console.log("Parks data:", parks);
+  console.log("Event categories:", eventCategories);
+  console.log("Form values actuales:", form.getValues());
+
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
+        {/* Header con patrón Card estandarizado */}
         <Card className="p-4 bg-gray-50">
           <div className="flex items-center gap-2">
             <Plus className="w-8 h-8 text-gray-900" />
@@ -218,7 +225,6 @@ const NewEventPageFixed: React.FC = () => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Información básica */}
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4">Información básica</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -252,9 +258,11 @@ const NewEventPageFixed: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="draft">Borrador</SelectItem>
-                          <SelectItem value="published">Publicado</SelectItem>
-                          <SelectItem value="cancelled">Cancelado</SelectItem>
+                          {eventStatuses.map((status) => (
+                            <SelectItem key={status.value} value={status.value}>
+                              {status.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -280,10 +288,118 @@ const NewEventPageFixed: React.FC = () => {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="eventType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de evento</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona un tipo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {eventTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="targetAudience"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Público objetivo</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value || "all"}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona el público" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {targetAudiences.map((audience) => (
+                            <SelectItem key={audience.value} value={audience.value}>
+                              {audience.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
 
-            {/* Fecha y hora */}
+
+
+            <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+              <h3 className="text-lg font-medium mb-4 text-blue-800">
+                🏢 Información del organizador
+              </h3>
+              <p className="text-sm text-blue-600 mb-4">
+                CAMPOS AGREGADOS: Nombre del organizador y Empresa/Organización
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="organizerName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-blue-800 font-semibold">Nombre del organizador *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Escribe el nombre del organizador" 
+                          {...field} 
+                          value={field.value || ""} 
+                          className="bg-white border-2 border-blue-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="organizerOrganization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-blue-800 font-semibold">Empresa / Organización</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Nombre de la empresa u organización" 
+                          {...field} 
+                          value={field.value || ""} 
+                          className="bg-white border-2 border-blue-300"
+                        />
+                      </FormControl>
+                      <FormDescription className="text-blue-600">
+                        Opcional: entidad que organiza el evento
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4">Fecha y hora</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -375,7 +491,6 @@ const NewEventPageFixed: React.FC = () => {
               </div>
             </div>
 
-            {/* Ubicación */}
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4">
                 <MapPin className="w-5 h-5 inline-block mr-2" />
@@ -452,7 +567,6 @@ const NewEventPageFixed: React.FC = () => {
               </div>
             </div>
 
-            {/* Participantes */}
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4">
                 <Users className="w-5 h-5 inline-block mr-2" />
@@ -518,10 +632,11 @@ const NewEventPageFixed: React.FC = () => {
               </div>
             </div>
 
-            {/* Información de Contacto - DESTACADA */}
-            <div className="bg-green-50 p-6 rounded-lg border-2 border-green-200">
-              <h3 className="text-lg font-medium mb-4 text-green-800">
-                📞 Información de Contacto
+
+
+            <div className="bg-card p-6 rounded-lg border">
+              <h3 className="text-lg font-medium mb-4 text-blue-600">
+                📞 Información de Contacto ACTUALIZADA
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
@@ -529,14 +644,13 @@ const NewEventPageFixed: React.FC = () => {
                   name="organizer_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Nombre del Contacto</FormLabel>
+                      <FormLabel>Nombre del Contacto</FormLabel>
                       <FormControl>
                         <Input
                           type="text"
                           placeholder="Nombre completo del responsable"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -549,14 +663,50 @@ const NewEventPageFixed: React.FC = () => {
                   name="organizer_organization"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Empresa / Organización</FormLabel>
+                      <FormLabel>Empresa / Organización</FormLabel>
                       <FormControl>
                         <Input
                           type="text"
                           placeholder="Nombre de la empresa u organización"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="organizer_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre del Contacto</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Nombre completo del responsable"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="organizer_organization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Empresa / Organización</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Nombre de la empresa u organización"
+                          {...field}
+                          value={field.value || ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -569,14 +719,13 @@ const NewEventPageFixed: React.FC = () => {
                   name="contact_email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Email de Contacto</FormLabel>
+                      <FormLabel>Email de Contacto</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
                           placeholder="evento@ejemplo.com"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -589,14 +738,13 @@ const NewEventPageFixed: React.FC = () => {
                   name="contact_phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Teléfono de Contacto</FormLabel>
+                      <FormLabel>Teléfono de Contacto</FormLabel>
                       <FormControl>
                         <Input
                           type="tel"
                           placeholder="(33) 1234-5678"
                           {...field}
                           value={field.value || ""}
-                          className="bg-white border-2 border-green-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -611,11 +759,11 @@ const NewEventPageFixed: React.FC = () => {
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-green-800 font-semibold">Notas Adicionales</FormLabel>
+                      <FormLabel>Notas Adicionales</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Información adicional sobre el evento..."
-                          className="min-h-[100px] bg-white border-2 border-green-300"
+                          placeholder="Información adicional sobre el evento o instrucciones especiales..."
+                          className="min-h-[100px]"
                           {...field}
                           value={field.value || ""}
                         />
@@ -650,4 +798,4 @@ const NewEventPageFixed: React.FC = () => {
   );
 };
 
-export default NewEventPageFixed;
+export default NewEventPage;
