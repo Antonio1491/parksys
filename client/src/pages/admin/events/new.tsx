@@ -635,8 +635,8 @@ const NewEventPage: React.FC = () => {
 
 
             <div className="bg-card p-6 rounded-lg border">
-              <h3 className="text-lg font-medium mb-4">
-                📞 Información de Contacto
+              <h3 className="text-lg font-medium mb-4 text-blue-600">
+                📞 Información de Contacto ACTUALIZADA
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
