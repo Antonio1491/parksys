@@ -24,10 +24,11 @@ import { Spinner } from '@/components/Spinner';
 
 // Esquema de validación para el formulario
 const evaluationFormSchema = z.object({
-  communication: z.number().min(1).max(5),
-  knowledge: z.number().min(1).max(5),
-  methodology: z.number().min(1).max(5),
-  overallPerformance: z.number().min(1).max(5),
+  overallRating: z.number().min(1).max(5),
+  knowledgeRating: z.number().min(1).max(5),
+  patienceRating: z.number().min(1).max(5),
+  clarityRating: z.number().min(1).max(5),
+  punctualityRating: z.number().min(1).max(5),
   comments: z.string().optional(),
 });
 
@@ -67,10 +68,11 @@ export default function InstructorEvaluationForm({
   const form = useForm<EvaluationFormValues>({
     resolver: zodResolver(evaluationFormSchema),
     defaultValues: {
-      communication: 0,
-      knowledge: 0,
-      methodology: 0,
-      overallPerformance: 0,
+      overallRating: 0,
+      knowledgeRating: 0,
+      patienceRating: 0,
+      clarityRating: 0,
+      punctualityRating: 0,
       comments: '',
     },
   });
@@ -233,19 +235,19 @@ export default function InstructorEvaluationForm({
               <div className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="communication"
+                  name="overallRating"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Habilidades de comunicación</FormLabel>
+                      <FormLabel>Calificación general</FormLabel>
                       <FormControl>
                         <RatingStars 
                           value={field.value} 
-                          onChange={(rating) => handleRatingChange('communication', rating)} 
-                          name="communication"
+                          onChange={(rating) => handleRatingChange('overallRating', rating)} 
+                          name="overallRating"
                         />
                       </FormControl>
                       <FormDescription>
-                        Evalúa la claridad, efectividad y accesibilidad en la comunicación del instructor.
+                        Evalúa la impresión general y efectividad del instructor.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -254,15 +256,15 @@ export default function InstructorEvaluationForm({
                 
                 <FormField
                   control={form.control}
-                  name="knowledge"
+                  name="knowledgeRating"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Conocimiento del tema</FormLabel>
                       <FormControl>
                         <RatingStars 
                           value={field.value} 
-                          onChange={(rating) => handleRatingChange('knowledge', rating)} 
-                          name="knowledge"
+                          onChange={(rating) => handleRatingChange('knowledgeRating', rating)} 
+                          name="knowledgeRating"
                         />
                       </FormControl>
                       <FormDescription>
@@ -275,19 +277,19 @@ export default function InstructorEvaluationForm({
                 
                 <FormField
                   control={form.control}
-                  name="methodology"
+                  name="patienceRating"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Metodología de enseñanza</FormLabel>
+                      <FormLabel>Paciencia</FormLabel>
                       <FormControl>
                         <RatingStars 
                           value={field.value} 
-                          onChange={(rating) => handleRatingChange('methodology', rating)} 
-                          name="methodology"
+                          onChange={(rating) => handleRatingChange('patienceRating', rating)} 
+                          name="patienceRating"
                         />
                       </FormControl>
                       <FormDescription>
-                        Evalúa las técnicas y enfoques utilizados para facilitar el aprendizaje.
+                        Evalúa la paciencia y comprensión del instructor hacia los participantes.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -296,19 +298,40 @@ export default function InstructorEvaluationForm({
                 
                 <FormField
                   control={form.control}
-                  name="overallPerformance"
+                  name="clarityRating"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Desempeño general</FormLabel>
+                      <FormLabel>Claridad al explicar</FormLabel>
                       <FormControl>
                         <RatingStars 
                           value={field.value} 
-                          onChange={(rating) => handleRatingChange('overallPerformance', rating)} 
-                          name="overallPerformance"
+                          onChange={(rating) => handleRatingChange('clarityRating', rating)} 
+                          name="clarityRating"
                         />
                       </FormControl>
                       <FormDescription>
-                        Evalúa la impresión general y efectividad del instructor.
+                        Evalúa la claridad y efectividad en las explicaciones del instructor.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="punctualityRating"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Puntualidad</FormLabel>
+                      <FormControl>
+                        <RatingStars 
+                          value={field.value} 
+                          onChange={(rating) => handleRatingChange('punctualityRating', rating)} 
+                          name="punctualityRating"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Evalúa la puntualidad y el cumplimiento de horarios del instructor.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
