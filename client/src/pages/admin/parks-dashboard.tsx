@@ -217,11 +217,11 @@ const ParksDashboard = () => {
         {/* Main Header con contenedor coloreado */}
         <div className="mb-4">
           <div 
-            className="rounded-2xl p-6 flex items-center gap-4"
+            className="rounded-3xl p-4 flex items-center gap-3"
             style={{ backgroundColor: "#14b8a6" }}
           >
-            <Map className="h-8 w-8 text-white" />
-            <h1 className="text-3xl font-semibold text-white font-poppins">
+            <Map className="h-6 w-6 text-white" />
+            <h1 className="text-2xl font-semibold text-white font-poppins">
               Parques
             </h1>
           </div>
