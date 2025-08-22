@@ -212,18 +212,16 @@ const ParksDashboard = () => {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        {/* Main Header sin Card */}
+        {/* Main Header con contenedor coloreado */}
         <div className="mb-8">
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold font-poppins">
-                <span style={{ color: "#00444f" }}>MÉTRICAS</span>{" "}
-                <span style={{ color: "#504378" }}>Parques</span>
-              </h1>
-              <p className="mt-2" style={{ color: "#00444f" }}>
-                Estadísticas generales del sistema de parques
-              </p>
-            </div>
+          <div 
+            className="rounded-lg p-6 flex items-center gap-4"
+            style={{ backgroundColor: "#14b8a6" }}
+          >
+            <MapPin className="h-8 w-8 text-white" />
+            <h1 className="text-3xl font-semibold text-white font-poppins">
+              Parques
+            </h1>
           </div>
         </div>
 
