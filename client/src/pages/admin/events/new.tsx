@@ -36,6 +36,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon, Clock, Users, MapPin, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Esquema para validar el formulario
@@ -68,6 +69,14 @@ const eventFormSchema = z.object({
   contact_phone: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   geolocation: z.any().optional().nullable(),
+  // Campos de precio y pago
+  isFree: z.boolean().default(true),
+  price: z.coerce
+    .number()
+    .min(0, { message: "El precio no puede ser negativo" })
+    .optional()
+    .nullable(),
+  requiresApproval: z.boolean().default(false),
 });
 
 // Tipos
@@ -143,6 +152,10 @@ const NewEventPage: React.FC = () => {
       contact_email: "",
       contact_phone: "",
       geolocation: null,
+      // Campos de precio y pago
+      isFree: true,
+      price: null,
+      requiresApproval: false,
     },
   });
 
@@ -629,10 +642,86 @@ const NewEventPage: React.FC = () => {
                     </FormItem>
                   )}
                 />
+                
+                {/* Campos de precio y pago */}
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="isFree"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Evento gratuito</FormLabel>
+                          <FormDescription>
+                            ¿Este evento es completamente gratuito para los participantes?
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {!form.watch("isFree") && (
+                  <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Precio por participante</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              className="pl-8"
+                              {...field}
+                              value={field.value === null ? "" : field.value}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                field.onChange(value === "" ? null : parseFloat(value));
+                              }}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Precio en pesos mexicanos por cada participante
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <FormField
+                  control={form.control}
+                  name="requiresApproval"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Requiere aprobación</FormLabel>
+                        <FormDescription>
+                          Las inscripciones necesitan ser aprobadas manualmente antes de confirmar
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
-
-
 
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4 text-blue-600">

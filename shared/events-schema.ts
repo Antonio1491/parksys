@@ -37,6 +37,10 @@ export const events = pgTable("events", {
   organizerEmail: varchar("organizer_email", { length: 100 }),
   organizerPhone: varchar("organizer_phone", { length: 20 }),
   geolocation: json("geolocation"), // Coordenadas de ubicación {lat, lng}
+  // Campos de precio y pago
+  isFree: boolean("is_free").default(true).notNull(),
+  price: integer("price"), // Precio en centavos para evitar problemas de float
+  requiresApproval: boolean("requires_approval").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   createdById: integer("created_by_id"), // ID del usuario que creó el evento
