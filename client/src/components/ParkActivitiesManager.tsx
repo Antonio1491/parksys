@@ -62,7 +62,7 @@ export default function ParkActivitiesManager({ parkId }: ParkActivitiesManagerP
   };
 
   const goToActivitiesModule = () => {
-    setLocation('/admin/activities');
+    setLocation('/admin/activities/management');
   };
 
   if (isLoading) {

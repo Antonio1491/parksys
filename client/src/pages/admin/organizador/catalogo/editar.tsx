@@ -419,7 +419,7 @@ const EditarActividadPage = () => {
       queryClient.invalidateQueries({ queryKey: [`/api/activities/${activityId}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/actividades-fotos'] });
       
-      setLocation(`/admin/activities`);
+      setLocation(`/admin/activities/management`);
     },
     onError: (error) => {
       console.error('Error al actualizar actividad:', error);

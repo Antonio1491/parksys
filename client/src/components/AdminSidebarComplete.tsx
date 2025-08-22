@@ -451,9 +451,9 @@ const AdminSidebarComplete: React.FC = () => {
                 Categorías
               </NavItem>
               <NavItem 
-                href="/admin/activities" 
+                href="/admin/activities/management" 
                 icon={<Activity className="h-4 w-4" />}
-                active={location.startsWith('/admin/activities')}
+                active={location.startsWith('/admin/activities/management')}
               >
                 {t('navigation.listing')}
               </NavItem>

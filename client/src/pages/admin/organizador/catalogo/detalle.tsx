@@ -126,7 +126,7 @@ const DetalleActividadPage = () => {
             </p>
             <Button 
               className="mt-6" 
-              onClick={() => setLocation('/admin/activities')}
+              onClick={() => setLocation('/admin/activities/management')}
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
               Volver al listado
@@ -145,7 +145,7 @@ const DetalleActividadPage = () => {
         <div className="mb-6">
           <Button 
             variant="outline" 
-            onClick={() => setLocation('/admin/activities')}
+            onClick={() => setLocation('/admin/activities/management')}
             className="mb-4"
           >
             <ChevronLeft className="h-4 w-4 mr-2" />

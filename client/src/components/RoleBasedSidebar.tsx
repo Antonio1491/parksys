@@ -236,9 +236,9 @@ const AdminSidebarContent: React.FC<{ location: string; defaultAccordion: string
       value="activities"
     >
       <NavItem 
-        href="/admin/activities" 
+        href="/admin/activities/management" 
         icon={<Activity className="h-5 w-5" />}
-        active={location === '/admin/activities'}
+        active={location === '/admin/activities/management'}
       >
         Listado
       </NavItem>
@@ -384,9 +384,9 @@ const ManagerSidebar: React.FC<{ location: string; defaultAccordion: string[] }>
       value="activities"
     >
       <NavItem 
-        href="/admin/activities" 
+        href="/admin/activities/management" 
         icon={<Activity className="h-5 w-5" />}
-        active={location === '/admin/activities'}
+        active={location === '/admin/activities/management'}
       >
         Listado
       </NavItem>
@@ -430,9 +430,9 @@ const InstructorSidebar: React.FC<{ location: string; defaultAccordion: string[]
       value="activities"
     >
       <NavItem 
-        href="/admin/activities" 
+        href="/admin/activities/management" 
         icon={<Activity className="h-5 w-5" />}
-        active={location === '/admin/activities'}
+        active={location === '/admin/activities/management'}
       >
         Listado
       </NavItem>
@@ -485,9 +485,9 @@ const SupervisorSidebar: React.FC<{ location: string; defaultAccordion: string[]
     </ModuleNav>
 
     <NavItem 
-      href="/admin/activities" 
+      href="/admin/activities/management" 
       icon={<Calendar className="h-5 w-5" />}
-      active={location === '/admin/activities'}
+      active={location === '/admin/activities/management'}
     >
       Actividades
     </NavItem>
@@ -502,7 +502,7 @@ const RoleBasedSidebar: React.FC = () => {
   // Determinar qué sección debe estar abierta basado en la URL actual
   const getInitialOpenSections = () => {
     if (location.startsWith('/admin/assets')) return ['assets'];
-    if (location.startsWith('/admin/activities')) return ['activities'];
+    if (location.startsWith('/admin/activities/management')) return ['activities'];
     if (location.startsWith('/admin/instructors')) return ['activities'];
     if (location.startsWith('/admin/parks') || 
         location.startsWith('/admin/amenities') || 
