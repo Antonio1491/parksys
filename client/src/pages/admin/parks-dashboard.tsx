@@ -135,9 +135,6 @@ const ParksDashboard = () => {
                   <span style={{ color: "#00444f" }}>MÉTRICAS</span>{" "}
                   <span style={{ color: "#504378" }}>Parques</span>
                 </h1>
-                <p className="mt-2" style={{ color: "#00444f" }}>
-                  Estadísticas generales del sistema de parques
-                </p>
               </div>
             </div>
           </div>
