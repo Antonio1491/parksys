@@ -345,10 +345,10 @@ const ParksDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Columna 3: Dividida en 2 mitades - Reportes e Incidencias */}
-            <div className="flex flex-col gap-3">
+            {/* Columna 3: Dividida en 2 mitades verticales - Reportes e Incidencias */}
+            <div className="flex flex-row gap-3">
               
-              {/* Columna 3a (mitad superior): Reportes Públicos */}
+              {/* Columna 3a (mitad izquierda): Reportes Públicos */}
               <Card
                 className="border-0 shadow-lg text-white flex-1"
                 style={{ backgroundColor: "#003D49" }}
@@ -374,7 +374,7 @@ const ParksDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Columna 3b (mitad inferior): Incidencias */}
+              {/* Columna 3b (mitad derecha): Incidencias */}
               <Card
                 className="border-0 shadow-lg text-white flex-1"
                 style={{ backgroundColor: "#003D49" }}
