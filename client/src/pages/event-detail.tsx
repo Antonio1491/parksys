@@ -19,6 +19,7 @@ import {
   Heart
 } from "lucide-react";
 import { Link } from "wouter";
+import { EventRegistrationForm } from '@/components/EventRegistrationForm';
 
 interface Event {
   id: number;
@@ -38,9 +39,15 @@ interface Event {
   capacity?: number;
   registrationType: string;
   organizerName: string;
+  organizerOrganization?: string;
   organizerEmail: string;
   organizerPhone?: string;
   geolocation?: any;
+  price?: number;
+  isFree?: boolean;
+  requiresApproval?: boolean;
+  registrationDeadline?: string;
+  registrations?: any[];
   parks?: Array<{
     id: number;
     name: string;
@@ -215,6 +222,8 @@ const EventDetail = () => {
                 </CardContent>
               </Card>
 
+              {/* Formulario de Inscripción */}
+              <EventRegistrationForm event={event} />
 
             </div>
 
@@ -284,17 +293,6 @@ const EventDetail = () => {
                     </h3>
                     
                     <div className="space-y-4">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <MapPin className="h-4 w-4 text-red-600" />
-                          <span className="font-medium text-gray-900">Ubicación GPS</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Latitud: {event.geolocation.lat}<br />
-                          Longitud: {event.geolocation.lng}
-                        </p>
-                      </div>
-
                       <div className="grid grid-cols-1 gap-3">
                         <a
                           href={`https://www.google.com/maps?q=${event.geolocation.lat},${event.geolocation.lng}`}

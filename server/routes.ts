@@ -61,6 +61,8 @@ import { eventImageRouter } from "./events-image-routes";
 import { registerActivityRoutes } from "./activitiesRoutes";
 import advertisingRoutes from "./advertising-routes";
 import activityRegistrationsRouter from "./routes/activity-registrations";
+import eventRegistrationsRouter from "./routes/event-registrations";
+import eventPaymentsRouter from "./routes/event-payments";
 import paymentsRouter from "./routes/payments";
 import { registerActivityPaymentRoutes } from "./routes/activityPaymentsSimple";
 import { registerSpacePaymentRoutes } from "./routes/space-payments";
@@ -410,6 +412,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registramos las rutas de inscripciones de actividades (DESPUÉS del endpoint específico)
   apiRouter.use('/activity-registrations', activityRegistrationsRouter);
   console.log('📝 Rutas de inscripciones de actividades registradas');
+  
+  // Registramos las rutas de inscripciones y pagos de eventos
+  apiRouter.use('/events', eventRegistrationsRouter);
+  apiRouter.use('/events', eventPaymentsRouter);
+  console.log('📝 Rutas de inscripciones y pagos de eventos registradas');
   
   // Registramos las rutas de pagos de actividades con Stripe
   registerActivityPaymentRoutes(app);
