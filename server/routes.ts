@@ -417,6 +417,299 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.use('/events', eventRegistrationsRouter);
   apiRouter.use('/events', eventPaymentsRouter);
   console.log('📝 Rutas de inscripciones y pagos de eventos registradas');
+
+  // ===== RUTAS ADMINISTRATIVAS DE INSCRIPCIONES DE EVENTOS =====
+  
+  // GET /api/event-registrations - Lista todas las inscripciones con filtros (para admin)
+  apiRouter.get('/event-registrations', async (req, res) => {
+    try {
+      const { 
+        page = '1', 
+        limit = '10', 
+        search = '', 
+        status = 'all', 
+        event = 'all',
+        startDate = '',
+        endDate = ''
+      } = req.query;
+
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      
+      let whereConditions = [];
+      let params: any[] = [];
+      let paramIndex = 1;
+
+      if (search) {
+        whereConditions.push(`(er.full_name ILIKE $${paramIndex} OR er.email ILIKE $${paramIndex})`);
+        params.push(`%${search}%`);
+        paramIndex++;
+      }
+
+      if (status !== 'all') {
+        whereConditions.push(`er.status = $${paramIndex}`);
+        params.push(status);
+        paramIndex++;
+      }
+
+      if (event !== 'all') {
+        whereConditions.push(`er.event_id = $${paramIndex}`);
+        params.push(parseInt(event as string));
+        paramIndex++;
+      }
+
+      if (startDate) {
+        whereConditions.push(`e.start_date >= $${paramIndex}`);
+        params.push(startDate);
+        paramIndex++;
+      }
+
+      if (endDate) {
+        whereConditions.push(`e.start_date <= $${paramIndex}`);
+        params.push(endDate);
+        paramIndex++;
+      }
+
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+      const query = `
+        SELECT 
+          er.*,
+          e.title as event_title,
+          e.start_date as event_start_date,
+          e.end_date as event_end_date,
+          e.start_time as event_start_time,
+          e.end_time as event_end_time,
+          e.location as event_location,
+          e.capacity as event_capacity,
+          e.price as event_price,
+          e.is_free as event_is_free,
+          (SELECT COUNT(*) FROM event_registrations er2 WHERE er2.event_id = e.id) as event_current_registrations,
+          (SELECT json_agg(json_build_object('name', p.name)) 
+           FROM event_parks ep 
+           JOIN parks p ON ep.park_id = p.id 
+           WHERE ep.event_id = e.id) as event_parks
+        FROM event_registrations er
+        JOIN events e ON er.event_id = e.id
+        ${whereClause}
+        ORDER BY er.registration_date DESC
+        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+      `;
+
+      params.push(parseInt(limit as string), offset);
+
+      // Usamos la instancia sql directa de Neon
+      const { neon } = require('@neondatabase/serverless');
+      const neonSql = neon(process.env.DATABASE_URL!);
+      
+      const registrations = await neonSql.unsafe(query, params);
+
+      // Contar total de registros
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM event_registrations er
+        JOIN events e ON er.event_id = e.id
+        ${whereClause}
+      `;
+
+      const countParams = params.slice(0, -2); // Remover limit y offset
+      const countResult = await neonSql.unsafe(countQuery, countParams);
+      const total = parseInt(countResult[0].total);
+
+      res.json({
+        success: true,
+        registrations: registrations.map(reg => ({
+          id: reg.id,
+          eventId: reg.event_id,
+          fullName: reg.full_name,
+          email: reg.email,
+          phone: reg.phone,
+          registrationDate: reg.registration_date,
+          status: reg.status,
+          notes: reg.notes,
+          attendeeCount: reg.attendee_count || 1,
+          paymentStatus: reg.payment_status,
+          paymentAmount: reg.payment_amount,
+          stripePaymentIntentId: reg.stripe_payment_intent_id,
+          createdAt: reg.created_at,
+          updatedAt: reg.updated_at,
+          event: {
+            id: reg.event_id,
+            title: reg.event_title,
+            startDate: reg.event_start_date,
+            endDate: reg.event_end_date,
+            startTime: reg.event_start_time,
+            endTime: reg.event_end_time,
+            location: reg.event_location,
+            capacity: reg.event_capacity,
+            currentRegistrations: reg.event_current_registrations,
+            price: reg.event_price,
+            isFree: reg.event_is_free,
+            parks: reg.event_parks || []
+          }
+        })),
+        total,
+        page: parseInt(page as string),
+        totalPages: Math.ceil(total / parseInt(limit as string))
+      });
+
+    } catch (error) {
+      console.error('Error obteniendo inscripciones:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor'
+      });
+    }
+  });
+
+  // GET /api/events-summary - Resumen de todos los eventos con estadísticas (para admin)
+  apiRouter.get('/events-summary', async (req, res) => {
+    try {
+      const query = `
+        SELECT 
+          e.*,
+          COUNT(er.id) as total_registrations,
+          COUNT(CASE WHEN er.status = 'registered' THEN 1 END) as registered_count,
+          COUNT(CASE WHEN er.status = 'confirmed' THEN 1 END) as confirmed_count,
+          COUNT(CASE WHEN er.status = 'cancelled' THEN 1 END) as cancelled_count,
+          COUNT(CASE WHEN er.status = 'attended' THEN 1 END) as attended_count,
+          COALESCE(SUM(CASE WHEN er.payment_status = 'paid' THEN er.payment_amount ELSE 0 END), 0) as total_revenue,
+          COALESCE(SUM(CASE WHEN er.payment_status = 'pending' THEN er.payment_amount ELSE 0 END), 0) as potential_revenue,
+          (SELECT json_agg(json_build_object('name', p.name)) 
+           FROM event_parks ep 
+           JOIN parks p ON ep.park_id = p.id 
+           WHERE ep.event_id = e.id) as parks
+        FROM events e
+        LEFT JOIN event_registrations er ON e.id = er.event_id
+        GROUP BY e.id
+        ORDER BY e.start_date DESC
+      `;
+
+      const { neon } = require('@neondatabase/serverless');
+      const neonSql = neon(process.env.DATABASE_URL!);
+      
+      const events = await neonSql.unsafe(query);
+
+      res.json({
+        success: true,
+        events: events.map(event => ({
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          eventType: event.event_type,
+          location: event.location,
+          startDate: event.start_date,
+          endDate: event.end_date,
+          startTime: event.start_time,
+          capacity: event.capacity,
+          price: event.price,
+          isFree: event.is_free,
+          registrationType: event.registration_type,
+          registrationStats: {
+            totalRegistrations: parseInt(event.total_registrations) || 0,
+            registered: parseInt(event.registered_count) || 0,
+            confirmed: parseInt(event.confirmed_count) || 0,
+            cancelled: parseInt(event.cancelled_count) || 0,
+            attended: parseInt(event.attended_count) || 0,
+            availableSlots: event.capacity ? 
+              event.capacity - (parseInt(event.confirmed_count) || 0) : 
+              null
+          },
+          revenue: {
+            totalRevenue: parseFloat(event.total_revenue) || 0,
+            potentialRevenue: parseFloat(event.potential_revenue) || 0
+          },
+          parks: event.parks || []
+        })),
+        total: events.length
+      });
+
+    } catch (error) {
+      console.error('Error obteniendo resumen de eventos:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor'
+      });
+    }
+  });
+
+  // PUT /api/event-registrations/:id/status - Actualizar estado de inscripción (admin)
+  apiRouter.put('/event-registrations/:id/status', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!['registered', 'confirmed', 'cancelled', 'attended'].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Estado inválido'
+        });
+      }
+
+      const { neon } = require('@neondatabase/serverless');
+      const neonSql = neon(process.env.DATABASE_URL!);
+      
+      const result = await neonSql`
+        UPDATE event_registrations 
+        SET status = ${status}, updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `;
+
+      if (result.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Inscripción no encontrada'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: result[0]
+      });
+
+    } catch (error) {
+      console.error('Error actualizando estado de inscripción:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor'
+      });
+    }
+  });
+
+  // DELETE /api/event-registrations/:id - Eliminar inscripción (admin)
+  apiRouter.delete('/event-registrations/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const { neon } = require('@neondatabase/serverless');
+      const neonSql = neon(process.env.DATABASE_URL!);
+      
+      const result = await neonSql`
+        DELETE FROM event_registrations 
+        WHERE id = ${id}
+        RETURNING *
+      `;
+
+      if (result.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Inscripción no encontrada'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Inscripción eliminada exitosamente'
+      });
+
+    } catch (error) {
+      console.error('Error eliminando inscripción:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor'
+      });
+    }
+  });
   
   // Registramos las rutas de pagos de actividades con Stripe
   registerActivityPaymentRoutes(app);

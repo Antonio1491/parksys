@@ -41,6 +41,7 @@ import EventCategoriesPage from "@/pages/admin/events/categories";
 import NewEventPageFixed from "@/pages/admin/events/new-fixed";
 import EventsIndex from "@/pages/admin/events/index";
 import EditEventPage from "@/pages/admin/events/edit";
+import EventRegistrationsPage from "@/pages/admin/events/registrations";
 import Header from "@/components/Header";
 import ParkEvaluationForm from "@/pages/ParkEvaluationForm";
 import EvaluacionesParques from "@/pages/admin/evaluaciones/parques";
@@ -580,6 +581,8 @@ function Router() {
         <Route path="/admin/events/edit/:id" component={EditEventPage} />
 
         <Route path="/admin/events/categories" component={EventCategoriesPage} />
+
+        <Route path="/admin/events/registrations" component={EventRegistrationsPage} />
 
         <Route path="/admin/events/list">
           <Suspense fallback={<div className="p-8 text-center">Cargando listado de eventos...</div>}>

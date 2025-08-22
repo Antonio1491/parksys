@@ -592,6 +592,13 @@ const AdminSidebarComplete: React.FC = () => {
                 Listado
               </NavItem>
               <NavItem 
+                href="/admin/events/registrations" 
+                icon={<UserCheck className="h-4 w-4" />}
+                active={location.startsWith('/admin/events/registrations')}
+              >
+                Inscripciones
+              </NavItem>
+              <NavItem 
                 href="/admin/eventos-ambu" 
                 icon={<FileText className="h-4 w-4" />}
                 active={location.startsWith('/admin/eventos-ambu')}
