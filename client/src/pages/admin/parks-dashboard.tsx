@@ -233,7 +233,7 @@ const ParksDashboard = () => {
             
             {/* Columna 1: Total de Parques + Green Flag Award */}
             <Card
-              className="border-0 shadow-lg text-white"
+              className="border-0 shadow-lg text-white rounded-3xl"
               style={{ backgroundColor: "#003D49" }}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -281,7 +281,7 @@ const ParksDashboard = () => {
 
             {/* Columna 2: Superficie Total + Área Verde */}
             <Card
-              className="border-0 shadow-lg text-white"
+              className="border-0 shadow-lg text-white rounded-3xl"
               style={{ backgroundColor: "#003D49" }}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -347,7 +347,7 @@ const ParksDashboard = () => {
               
               {/* Columna 3a (mitad izquierda): Reportes Públicos */}
               <Card
-                className="border-0 shadow-lg text-white flex-1"
+                className="border-0 shadow-lg text-white flex-1 rounded-3xl"
                 style={{ backgroundColor: "#003D49" }}
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
@@ -373,7 +373,7 @@ const ParksDashboard = () => {
 
               {/* Columna 3b (mitad derecha): Incidencias */}
               <Card
-                className="border-0 shadow-lg text-white flex-1"
+                className="border-0 shadow-lg text-white flex-1 rounded-3xl"
                 style={{ backgroundColor: "#003D49" }}
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
@@ -401,7 +401,7 @@ const ParksDashboard = () => {
 
             {/* Columna 4: Calificación + Parque mejor evaluado */}
             <Card
-              className="border-0 shadow-lg text-white"
+              className="border-0 shadow-lg text-white rounded-3xl"
               style={{ backgroundColor: "#003D49" }}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -454,7 +454,7 @@ const ParksDashboard = () => {
         {/* Sección continua con el resto del dashboard */}
         <div className="space-y-6">
           {/* NUEVO: Gráfico de Evaluación Promedio por Parque */}
-          <Card className="border-0 shadow-lg max-w-4xl mx-auto">
+          <Card className="border-0 shadow-lg max-w-4xl mx-auto rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
                 Evaluación Promedio por Parque
@@ -547,7 +547,7 @@ const ParksDashboard = () => {
           </Card>
 
           {/* Gráfico de Porcentaje de Área Verde */}
-          <Card className="border-0 shadow-lg max-w-4xl mx-auto">
+          <Card className="border-0 shadow-lg max-w-4xl mx-auto rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
                 Porcentaje de Área Verde
@@ -671,7 +671,7 @@ const ParksDashboard = () => {
           </Card>
 
           {/* NUEVO: Gráfico de Incidencias por Parque */}
-          <Card className="border-0 shadow-lg max-w-4xl mx-auto">
+          <Card className="border-0 shadow-lg max-w-4xl mx-auto rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
                 Incidencias por Parque
@@ -794,7 +794,7 @@ const ParksDashboard = () => {
           </Card>
 
           {/* Mapa de parques */}
-          <Card className="border-0 shadow-xl">
+          <Card className="border-0 shadow-xl rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-xl font-bold text-gray-800">
                 Ubicación de Parques
