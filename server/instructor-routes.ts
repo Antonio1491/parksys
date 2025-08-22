@@ -63,6 +63,79 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
   
   // === RUTAS PÚBLICAS PARA INSTRUCTORES ===
   if (publicApiRouter) {
+    // Ruta pública para crear evaluación de instructor
+    publicApiRouter.post("/instructors/:id/evaluations", async (req: Request, res: Response) => {
+      try {
+        const instructorId = parseInt(req.params.id);
+        
+        if (isNaN(instructorId)) {
+          return res.status(400).json({ message: "ID de instructor no válido" });
+        }
+        
+        // Verificar que el instructor existe
+        const instructor = await db
+          .select({ id: instructors.id })
+          .from(instructors)
+          .where(eq(instructors.id, instructorId))
+          .limit(1);
+          
+        if (instructor.length === 0) {
+          return res.status(404).json({ message: "Instructor no encontrado" });
+        }
+        
+        // Obtener IP del evaluador para prevención de spam
+        const evaluatorIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] as string;
+        
+        // Preparar datos de evaluación con campos requeridos
+        const evaluationData = {
+          instructorId,
+          evaluatorName: req.body.evaluatorName,
+          evaluatorEmail: req.body.evaluatorEmail || null,
+          evaluatorCity: req.body.evaluatorCity || null,
+          evaluatorIp: evaluatorIp?.split(',')[0] || null, // Tomar la primera IP si hay múltiples
+          overallRating: req.body.overallRating,
+          knowledgeRating: req.body.knowledgeRating,
+          patienceRating: req.body.patienceRating,
+          clarityRating: req.body.clarityRating,
+          punctualityRating: req.body.punctualityRating,
+          wouldRecommend: req.body.wouldRecommend || false,
+          comments: req.body.comments || null,
+          attendedActivity: req.body.attendedActivity || null,
+          status: "pending", // Todas las evaluaciones públicas requieren moderación
+          evaluationDate: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        
+        // Validar los datos
+        const validationResult = insertInstructorEvaluationSchema.safeParse(evaluationData);
+        
+        if (!validationResult.success) {
+          return res.status(400).json({ 
+            message: "Datos de evaluación no válidos", 
+            errors: validationResult.error.format() 
+          });
+        }
+        
+        const [newEvaluation] = await db
+          .insert(instructorEvaluations)
+          .values({
+            ...validationResult.data,
+            instructorId // Asegurar que instructorId esté incluido
+          })
+          .returning();
+        
+        res.status(201).json({
+          message: "Evaluación enviada exitosamente. Será revisada antes de publicarse.",
+          evaluation: newEvaluation
+        });
+        
+      } catch (error) {
+        console.error(`Error al crear evaluación pública para instructor ${req.params.id}:`, error);
+        res.status(500).json({ message: "Error al enviar evaluación" });
+      }
+    });
+
     // Ruta pública para obtener todos los instructores activos
     publicApiRouter.get("/instructors", async (_req: Request, res: Response) => {
       try {
@@ -647,10 +720,12 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         return res.status(400).json({ message: "ID de instructor no válido" });
       }
       
-      const validationResult = insertInstructorEvaluationSchema.safeParse({
+      const evaluationData = {
         ...req.body,
         instructorId
-      });
+      };
+      
+      const validationResult = insertInstructorEvaluationSchema.safeParse(evaluationData);
       
       if (!validationResult.success) {
         return res.status(400).json({ 
@@ -661,7 +736,10 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
       
       const [newEvaluation] = await db
         .insert(instructorEvaluations)
-        .values(validationResult.data)
+        .values({
+          ...validationResult.data,
+          instructorId // Asegurar que instructorId esté incluido
+        })
         .returning();
       
       res.status(201).json(newEvaluation);
