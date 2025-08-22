@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   MapPin,
   Trees,
+  TreePine,
   Calendar,
   Users,
   TrendingUp,
@@ -218,7 +219,7 @@ const ParksDashboard = () => {
             className="rounded-lg p-6 flex items-center gap-4"
             style={{ backgroundColor: "#14b8a6" }}
           >
-            <MapPin className="h-8 w-8 text-white" />
+            <TreePine className="h-8 w-8 text-white" />
             <h1 className="text-3xl font-semibold text-white font-poppins">
               Parques
             </h1>
