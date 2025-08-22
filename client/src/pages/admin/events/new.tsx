@@ -221,6 +221,7 @@ const NewEventPage: React.FC = () => {
   console.log("Parks data:", parks);
   console.log("Event categories:", eventCategories);
   console.log("Form values actuales:", form.getValues());
+  console.log("🎯 PRECIO CAMPOS - isFree:", form.watch("isFree"), "price:", form.watch("price"), "requiresApproval:", form.watch("requiresApproval"));
 
   return (
     <AdminLayout>
@@ -583,7 +584,7 @@ const NewEventPage: React.FC = () => {
             <div className="bg-card p-6 rounded-lg border">
               <h3 className="text-lg font-medium mb-4">
                 <Users className="w-5 h-5 inline-block mr-2" />
-                Participantes
+                Participantes y Precio
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
