@@ -39,6 +39,28 @@ const editEventSchema = z.object({
 
 type EditEventForm = z.infer<typeof editEventSchema>;
 
+interface EventData {
+  id: number;
+  title: string;
+  description: string;
+  eventType: string;
+  targetAudience: string;
+  status: string;
+  featuredImageUrl?: string;
+  startDate: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  capacity?: number;
+  registrationType: string;
+  organizerName?: string;
+  organizerOrganization?: string;
+  organizerEmail?: string;
+  organizerPhone?: string;
+  parks: Array<{ id: number; name: string; address: string }>;
+}
+
 export default function EditEventPage() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
@@ -47,7 +69,7 @@ export default function EditEventPage() {
   const [eventImage, setEventImage] = useState<string>('');
 
   // Consultar el evento para editar
-  const { data: event, isLoading } = useQuery({
+  const { data: event, isLoading } = useQuery<EventData>({
     queryKey: [`/api/events/${id}`],
     enabled: !!id,
   });
@@ -131,15 +153,11 @@ export default function EditEventPage() {
 
   // Obtener parques para el selector
   const { data: parks } = useQuery({
-    queryKey: ['/api/parks'],
-    select: (data: any) => data?.data?.map((park: any) => ({
-      id: park.id,
-      name: park.name
-    })) || []
+    queryKey: ['/api/parks']
   });
 
   // Obtener categorías de eventos
-  const { data: categories } = useQuery({
+  const { data: eventCategories } = useQuery({
     queryKey: ['/api/event-categories']
   });
 
@@ -297,7 +315,7 @@ export default function EditEventPage() {
                           <SelectValue placeholder="Seleccionar parque" />
                         </SelectTrigger>
                         <SelectContent>
-                          {parks?.map((park) => (
+                          {parks?.map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
@@ -319,9 +337,15 @@ export default function EditEventPage() {
                           <SelectValue placeholder="Seleccionar categoría" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories?.data?.map((category: any) => (
+                          {eventCategories?.map((category: any) => (
                             <SelectItem key={category.id} value={category.name}>
-                              {category.name}
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded-full" 
+                                  style={{ backgroundColor: category.color }}
+                                />
+                                {category.name}
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
