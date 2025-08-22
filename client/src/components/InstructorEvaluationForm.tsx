@@ -133,8 +133,8 @@ export default function InstructorEvaluationForm({
   };
 
   const isLoading = isLoadingInstructor || isLoadingAssignment;
-  const instructorName = instructor?.full_name || instructor?.fullName || 'Instructor';
-  const activityName = assignment?.activityTitle || assignment?.title || 'Actividad';
+  const instructorName = (instructor as any)?.full_name || (instructor as any)?.fullName || 'Instructor';
+  const activityName = (assignment as any)?.activityTitle || (assignment as any)?.title || 'Actividad';
 
   // Renderizar estrellas para calificación
   const RatingStars = ({ value, onChange, name }: { value: number, onChange: (value: number) => void, name: string }) => {
@@ -190,13 +190,13 @@ export default function InstructorEvaluationForm({
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <div className="flex items-center gap-4 mb-3">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={instructor?.profileImageUrl || instructor?.profile_image_url} alt={instructorName} />
+                    <AvatarImage src={(instructor as any)?.profileImageUrl || (instructor as any)?.profile_image_url} alt={instructorName} />
                     <AvatarFallback>{instructorName.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <h3 className="font-medium text-lg">{instructorName}</h3>
                     <p className="text-sm text-gray-500">
-                      {instructor?.specialties || instructor?.especialidades || 'Instructor'}
+                      {(instructor as any)?.specialties || (instructor as any)?.especialidades || 'Instructor'}
                     </p>
                   </div>
                 </div>
@@ -205,15 +205,15 @@ export default function InstructorEvaluationForm({
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-2 text-gray-500" />
                     <span>
-                      {assignment?.startDate ? 
-                        format(new Date(assignment.startDate), 'PPP', { locale: es }) : 
+                      {(assignment as any)?.startDate ? 
+                        format(new Date((assignment as any).startDate), 'PPP', { locale: es }) : 
                         'Fecha no disponible'}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Clock className="h-4 w-4 mr-2 text-gray-500" />
                     <span>
-                      {assignment?.startTime ? assignment.startTime : 'Hora no disponible'}
+                      {(assignment as any)?.startTime ? (assignment as any).startTime : 'Hora no disponible'}
                     </span>
                   </div>
                   <div className="flex items-center">
@@ -225,7 +225,7 @@ export default function InstructorEvaluationForm({
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-2 text-gray-500" />
                     <span>
-                      {assignment?.parkName || 'Ubicación no disponible'}
+                      {(assignment as any)?.parkName || 'Ubicación no disponible'}
                     </span>
                   </div>
                 </div>
