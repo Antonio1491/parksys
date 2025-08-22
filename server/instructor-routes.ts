@@ -243,7 +243,18 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
     { name: 'curriculum', maxCount: 1 }
   ]), async (req: Request, res: Response) => {
     try {
-      const data = JSON.parse(req.body.data || '{}');
+      // Parsear datos del formulario
+      let data: any = {};
+      
+      if (req.body.data) {
+        // Si viene como FormData con campo 'data'
+        data = JSON.parse(req.body.data);
+      } else {
+        // Si viene como JSON directo
+        data = req.body;
+      }
+      
+      console.log('🔍 DEBUG: Datos recibidos en creación:', data);
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       
       // Agregar URLs de archivos subidos
@@ -255,9 +266,14 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         data.curriculumUrl = `/uploads/instructors/${files.curriculum[0].filename}`;
       }
 
-      // Construir fullName si no está presente
-      if (!data.fullName && (data.firstName || data.lastName)) {
+      // Construir fullName - es REQUERIDO por el schema
+      if (!data.fullName) {
         data.fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+        if (!data.fullName) {
+          return res.status(400).json({ 
+            message: 'firstName y lastName son requeridos para generar fullName' 
+          });
+        }
       }
 
       // Mapear campos del formulario a campos de base de datos
@@ -268,7 +284,6 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
 
       // Procesar availability como availableDays array
       if (data.availability && typeof data.availability === 'string') {
-        // Convertir availability string a availableDays array
         const availabilityMap: { [key: string]: string[] } = {
           'full-time': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
           'part-time': ['Lunes', 'Miércoles', 'Viernes'],
@@ -289,6 +304,13 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
           // Si no es JSON válido, mantener como está
         }
       }
+      
+      console.log('🔍 DEBUG: Datos procesados para validación:', { 
+        fullName: data.fullName, 
+        email: data.email, 
+        firstName: data.firstName,
+        lastName: data.lastName 
+      });
 
       const validationResult = insertInstructorSchema.safeParse(data);
       
@@ -327,7 +349,18 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         return res.status(400).json({ message: 'ID de instructor no válido' });
       }
 
-      const data = JSON.parse(req.body.data || '{}');
+      // Parsear datos del formulario
+      let data: any = {};
+      
+      if (req.body.data) {
+        // Si viene como FormData con campo 'data'
+        data = JSON.parse(req.body.data);
+      } else {
+        // Si viene como JSON directo
+        data = req.body;
+      }
+      
+      console.log('🔍 DEBUG: Datos recibidos en actualización:', data);
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       
       // Agregar URLs de archivos subidos si existen
@@ -339,8 +372,8 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         data.curriculumUrl = `/uploads/instructors/${files.curriculum[0].filename}`;
       }
 
-      // Construir fullName si no está presente
-      if (!data.fullName && (data.firstName || data.lastName)) {
+      // Construir fullName si está presente firstName/lastName
+      if ((data.firstName || data.lastName) && !data.fullName) {
         data.fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
       }
 
@@ -372,6 +405,13 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
           // Si no es JSON válido, mantener como está
         }
       }
+      
+      console.log('🔍 DEBUG: Datos procesados para actualización:', { 
+        fullName: data.fullName, 
+        email: data.email, 
+        firstName: data.firstName,
+        lastName: data.lastName 
+      });
 
       const validationResult = insertInstructorSchema.partial().safeParse(data);
       

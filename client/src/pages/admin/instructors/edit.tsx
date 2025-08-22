@@ -161,21 +161,23 @@ export default function EditInstructorPage() {
       // Preparar FormData para envío con archivos
       const formDataToSend = new FormData();
       
-      // Agregar campos básicos
-      formDataToSend.append('firstName', data.firstName);
-      formDataToSend.append('lastName', data.lastName);
-      formDataToSend.append('email', data.email);
-      formDataToSend.append('phone', data.phone || '');
-      formDataToSend.append('specialties', JSON.stringify(data.specialties));
-      formDataToSend.append('experienceYears', data.experienceYears.toString());
-      formDataToSend.append('bio', data.experience || data.bio || ''); // Mapear experience a bio
-      formDataToSend.append('qualifications', data.qualifications || '');
-      formDataToSend.append('availability', data.availability || '');
-      formDataToSend.append('hourlyRate', (data.hourlyRate || 0).toString());
+      // Crear objeto con datos del instructor
+      const instructorData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone || '',
+        specialties: data.specialties,
+        experienceYears: data.experienceYears,
+        experience: data.experience || '', // El servidor lo mapeará a bio
+        qualifications: data.qualifications || '',
+        availability: data.availability || '',
+        hourlyRate: data.hourlyRate || 0,
+        preferredParkId: data.preferredParkId || undefined
+      };
       
-      if (data.preferredParkId) {
-        formDataToSend.append('preferredParkId', data.preferredParkId.toString());
-      }
+      // Agregar datos como JSON en campo 'data'
+      formDataToSend.append('data', JSON.stringify(instructorData));
       
       // Agregar archivos si existen
       if (data.profileImageFile) {
