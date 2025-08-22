@@ -49,6 +49,9 @@ const eventFormSchema = z.object({
   eventType: z.string({
     required_error: "Selecciona un tipo de evento",
   }),
+  categoryId: z.coerce.number({
+    required_error: "Selecciona una categoría para el evento",
+  }).min(1, "Debe seleccionar una categoría"),
   targetAudience: z.string().default("all"),
   status: z.string().default("draft"),
   startDate: z.date({
@@ -132,6 +135,7 @@ const NewEventPageFixed: React.FC = () => {
       title: "",
       description: "",
       eventType: "",
+      categoryId: 1,
       targetAudience: "all",
       status: "draft",
       startDate: new Date(),
@@ -234,6 +238,40 @@ const NewEventPageFixed: React.FC = () => {
                       <FormControl>
                         <Input placeholder="Título del evento" {...field} />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoría del evento</FormLabel>
+                      <Select
+                        onValueChange={(value) => field.onChange(parseInt(value))}
+                        defaultValue={field.value?.toString()}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona una categoría" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {eventCategories?.map((category: any) => (
+                            <SelectItem key={category.id} value={category.id.toString()}>
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded-full" 
+                                  style={{ backgroundColor: category.color }}
+                                />
+                                {category.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
