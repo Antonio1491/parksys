@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Map,
   MapPin,
   Trees,
   TreePine,
@@ -219,7 +220,7 @@ const ParksDashboard = () => {
             className="rounded-lg p-6 flex items-center gap-4"
             style={{ backgroundColor: "#14b8a6" }}
           >
-            <TreePine className="h-8 w-8 text-white" />
+            <Map className="h-8 w-8 text-white" />
             <h1 className="text-3xl font-semibold text-white font-poppins">
               Parques
             </h1>
