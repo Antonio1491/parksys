@@ -1,11 +1,21 @@
 import { Request, Response, Router } from 'express';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { db } from './db';
-import { instructors, parks, activities, users } from '../shared/schema';
+import { 
+  instructors, 
+  parks, 
+  activities, 
+  instructorAssignments, 
+  instructorEvaluations, 
+  instructorRecognitions,
+  insertInstructorSchema,
+  insertInstructorAssignmentSchema,
+  insertInstructorEvaluationSchema,
+  insertInstructorRecognitionSchema
+} from '../shared/schema';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import bcryptjs from 'bcryptjs';
 
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
@@ -49,7 +59,94 @@ const upload = multer({
 /**
  * Registra las rutas para gestión de instructores
  */
-export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
+export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiRouter: any, isAuthenticated: any) {
+  
+  // === RUTAS PÚBLICAS PARA INSTRUCTORES ===
+  if (publicApiRouter) {
+    // Ruta pública para obtener todos los instructores activos
+    publicApiRouter.get("/instructors", async (_req: Request, res: Response) => {
+      try {
+        // Usamos DISTINCT ON para eliminar duplicados basados en nombre y correo
+        const result = await db.execute(
+          sql`WITH unique_instructors AS (
+                SELECT DISTINCT ON (LOWER(full_name), LOWER(email)) 
+                  id, 
+                  full_name, 
+                  email, 
+                  phone, 
+                  specialties, 
+                  experience_years, 
+                  status, 
+                  profile_image_url, 
+                  created_at
+                FROM instructors 
+                WHERE status = 'active'
+                ORDER BY LOWER(full_name), LOWER(email), created_at DESC
+              )
+              SELECT * FROM unique_instructors
+              ORDER BY id DESC`
+        );
+        
+        // Filtro adicional en memoria para seguridad
+        const uniqueInstructors = new Map();
+        
+        if (result.rows && result.rows.length > 0) {
+          result.rows.forEach((instructor: any) => {
+            const key = `${instructor.full_name.toLowerCase()}|${instructor.email.toLowerCase()}`;
+            if (!uniqueInstructors.has(key)) {
+              uniqueInstructors.set(key, instructor);
+            }
+          });
+        }
+        
+        const instructorsArray = Array.from(uniqueInstructors.values());
+        res.json(instructorsArray);
+      } catch (error) {
+        console.error("Error al obtener instructores públicos:", error);
+        res.status(500).json({ message: "Error al obtener instructores" });
+      }
+    });
+  }
+  
+  // === RUTAS ADMINISTRATIVAS PARA INSTRUCTORES ===
+  
+  // Ruta para eliminar (inactivar) todos los instructores (solo administradores)
+  apiRouter.delete("/instructors/batch/all", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Verificar que el usuario sea administrador
+      if (req.headers['x-user-role'] !== 'admin') {
+        return res.status(403).json({ message: "No autorizado. Solo administradores pueden realizar esta acción" });
+      }
+      
+      // Obtenemos una lista de IDs de instructores activos para mostrar el conteo
+      const activeInstructors = await db.execute(
+        sql`SELECT id FROM instructors WHERE status = 'active'`
+      );
+      
+      const activeCount = activeInstructors.rows?.length || 0;
+      
+      if (activeCount === 0) {
+        return res.json({ 
+          message: "No hay instructores activos para eliminar",
+          count: 0
+        });
+      }
+      
+      // Realizamos un soft delete cambiando el estado a "inactive"
+      await db.execute(
+        sql`UPDATE instructors SET status = 'inactive', updated_at = CURRENT_TIMESTAMP WHERE status = 'active'`
+      );
+      
+      res.json({ 
+        message: `${activeCount} instructores han sido inactivados correctamente`,
+        count: activeCount
+      });
+    } catch (error) {
+      console.error("Error al eliminar todos los instructores:", error);
+      res.status(500).json({ message: "Error al eliminar los instructores" });
+    }
+  });
+
   // Obtener todos los instructores
   apiRouter.get('/instructors', async (req: Request, res: Response) => {
     try {
@@ -94,7 +191,7 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
                 .where(eq(parks.id, instructor.preferredParkId))
                 .limit(1);
               
-              updatedInstructor.preferredParkName = parkResult[0]?.name || null;
+              (updatedInstructor as any).preferredParkName = parkResult[0]?.name || null;
             } catch (error) {
               console.error('Error fetching park name:', error);
             }
@@ -125,221 +222,66 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
         return res.status(404).json({ message: 'Instructor no encontrado' });
       }
 
-      res.json(result[0]);
+      const instructor = result[0];
+
+      // Construir fullName si es null
+      const updatedInstructor = {
+        ...instructor,
+        fullName: instructor.fullName || `${instructor.firstName || ''} ${instructor.lastName || ''}`.trim()
+      };
+
+      res.json(updatedInstructor);
     } catch (error) {
       console.error('Error fetching instructor:', error);
       res.status(500).json({ message: 'Error al obtener instructor' });
     }
   });
 
-  // Crear nuevo instructor (con creación automática de usuario) - maneja FormData
+  // Crear nuevo instructor
   apiRouter.post('/instructors', upload.fields([
     { name: 'profileImage', maxCount: 1 },
     { name: 'curriculum', maxCount: 1 }
   ]), async (req: Request, res: Response) => {
     try {
-      console.log('📥 Datos recibidos en POST /instructors:', {
-        body: req.body,
-        files: req.files
-      });
-
-      const {
-        firstName,
-        lastName,
-        email,
-        phone,
-        specialties: specialtiesStr,
-        experienceYears,
-        bio,
-        qualifications,
-        availability,
-        hourlyRate,
-        experience,
-        preferredParkId
-      } = req.body;
-
-      // Parsear specialties de string a array
-      let specialties = [];
-      try {
-        specialties = specialtiesStr ? JSON.parse(specialtiesStr) : [];
-      } catch (e) {
-        specialties = [specialtiesStr]; // Si no es JSON válido, usar como string único
-      }
-
-      // Parsear availability - convertir string único a array
-      let availabilityArray = [];
-      if (availability) {
-        if (availability.startsWith('[')) {
-          try {
-            availabilityArray = JSON.parse(availability);
-          } catch (e) {
-            availabilityArray = [availability];
-          }
-        } else {
-          availabilityArray = [availability];
-        }
-      }
-
-      // Parsear qualifications como certifications array
-      let certificationsArray = [];
-      if (qualifications) {
-        if (qualifications.startsWith('[')) {
-          try {
-            certificationsArray = JSON.parse(qualifications);
-          } catch (e) {
-            certificationsArray = [qualifications];
-          }
-        } else {
-          certificationsArray = [qualifications];
-        }
-      }
-
-      console.log('🔍 Debugging arrays:', {
-        specialties: { original: specialtiesStr, parsed: specialties },
-        availability: { original: availability, parsed: availabilityArray },
-        certifications: { original: qualifications, parsed: certificationsArray },
-        experience: { value: experience, length: experience?.length }
-      });
-
-      // Validaciones básicas
-      if (!firstName || !lastName || !email) {
-        console.log('❌ Validación fallida - campos requeridos:', { firstName, lastName, email });
-        return res.status(400).json({ 
-          message: 'Los campos nombre, apellido y email son requeridos' 
-        });
-      }
-
-      // Verificar que el email no esté en uso
-      const existingUser = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
-
-      if (existingUser.length > 0) {
-        return res.status(400).json({ 
-          message: 'Ya existe un usuario con este email' 
-        });
-      }
-
-      // Procesar archivos subidos
+      const data = JSON.parse(req.body.data || '{}');
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      let profileImageUrl = '';
-      let curriculumUrl = '';
-
-      if (files?.profileImage?.[0]) {
-        profileImageUrl = `/uploads/instructors/${files.profileImage[0].filename}`;
-      }
-
-      if (files?.curriculum?.[0]) {
-        curriculumUrl = `/uploads/instructors/${files.curriculum[0].filename}`;
-      }
-
-      // Usar las specialties ya procesadas anteriormente
-      const processedSpecialties = specialties;
-
-      // 1. Primero crear el usuario automáticamente
-      const hashedPassword = await bcryptjs.hash('instructor123', 10); // Contraseña temporal
-      const timestamp = Date.now().toString().slice(-6); // Últimos 6 dígitos del timestamp
       
-      const userResult = await db
-        .insert(users)
-        .values({
-          username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${timestamp}`,
-          email,
-          fullName: `${firstName} ${lastName}`,
-          password: hashedPassword,
-          role: 'instructor',
-          profileImageUrl,
-          phone,
-          bio,
-          municipalityId: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .returning();
-
-      if (userResult.length === 0) {
-        throw new Error('Error al crear usuario para instructor');
+      // Agregar URLs de archivos subidos
+      if (files?.profileImage?.[0]) {
+        data.profileImageUrl = `/uploads/instructors/${files.profileImage[0].filename}`;
+      }
+      
+      if (files?.curriculum?.[0]) {
+        data.curriculumUrl = `/uploads/instructors/${files.curriculum[0].filename}`;
       }
 
-      const createdUser = userResult[0];
+      // Construir fullName si no está presente
+      if (!data.fullName && (data.firstName || data.lastName)) {
+        data.fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+      }
 
-      // 2. Crear el registro del instructor vinculado al usuario
-      const instructorResult = await db
+      const validationResult = insertInstructorSchema.safeParse(data);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Datos de instructor no válidos', 
+          errors: validationResult.error.format() 
+        });
+      }
+
+      const [newInstructor] = await db
         .insert(instructors)
         .values({
-          fullName: `${firstName} ${lastName}`,
-          firstName,
-          lastName,
-          email,
-          phone: phone || '',
-          specialties: processedSpecialties,
-          certifications: certificationsArray,
-          experienceYears: parseInt(experienceYears) || 1,
-          bio: bio || '',
-          qualifications: qualifications || '',
-          education: experience || '',
-          availableDays: availabilityArray,
-          hourlyRate: parseFloat(hourlyRate) || 0,
-          preferredParkId: preferredParkId ? parseInt(preferredParkId) : null,
-          profileImageUrl,
-          curriculumUrl,
-          userId: createdUser.id,
-          rating: 0,
-          activitiesCount: 0,
+          ...validationResult.data,
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt: new Date()
         })
         .returning();
 
-      console.log('🔍 DEBUG - Datos que se insertaron:', {
-        fullName: `${firstName} ${lastName}`,
-        firstName,
-        lastName,
-        email,
-        phone: phone || '',
-        specialties: processedSpecialties,
-        certifications: certificationsArray,
-        experienceYears: parseInt(experienceYears) || 1,
-        bio: bio || '',
-        qualifications: qualifications || '',
-        education: experience || '',
-        availableDays: availabilityArray,
-        hourlyRate: parseFloat(hourlyRate) || 0
-      });
-
-      console.log('✅ Instructor creado exitosamente:', {
-        instructorId: instructorResult[0].id,
-        userId: createdUser.id,
-        email,
-        name: `${firstName} ${lastName}`
-      });
-
-      res.status(201).json({
-        message: 'Instructor creado exitosamente',
-        instructor: instructorResult[0],
-        user: {
-          id: createdUser.id,
-          username: createdUser.username,
-          email: createdUser.email,
-          role: createdUser.role
-        }
-      });
-
+      res.status(201).json(newInstructor);
     } catch (error) {
-      console.error('❌ Error creating instructor:', error);
-      
-      // Si el error está relacionado con la creación del usuario
-      if (error instanceof Error && error.message.includes('duplicate key')) {
-        return res.status(400).json({ 
-          message: 'Ya existe un usuario con este email o nombre de usuario' 
-        });
-      }
-      
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : 'Error al crear instructor' 
-      });
+      console.error('Error creating instructor:', error);
+      res.status(500).json({ message: 'Error al crear instructor' });
     }
   });
 
@@ -350,132 +292,67 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
   ]), async (req: Request, res: Response) => {
     try {
       const instructorId = parseInt(req.params.id);
-      const {
-        firstName,
-        lastName,
-        email,
-        phone,
-        specialties,
-        experienceYears,
-        bio,
-        qualifications,
-        availability,
-        hourlyRate,
-        experience,
-        preferredParkId
-      } = req.body;
-
-      // Obtener instructor actual
-      const currentInstructor = await db
-        .select()
-        .from(instructors)
-        .where(eq(instructors.id, instructorId))
-        .limit(1);
-
-      if (currentInstructor.length === 0) {
-        return res.status(404).json({ message: 'Instructor no encontrado' });
+      
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: 'ID de instructor no válido' });
       }
 
-      // Procesar archivos subidos
+      const data = JSON.parse(req.body.data || '{}');
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      let profileImageUrl = currentInstructor[0].profileImageUrl;
-      let curriculumUrl = currentInstructor[0].curriculumUrl;
-
+      
+      // Agregar URLs de archivos subidos si existen
       if (files?.profileImage?.[0]) {
-        profileImageUrl = `/uploads/instructors/${files.profileImage[0].filename}`;
+        data.profileImageUrl = `/uploads/instructors/${files.profileImage[0].filename}`;
       }
-
+      
       if (files?.curriculum?.[0]) {
-        curriculumUrl = `/uploads/instructors/${files.curriculum[0].filename}`;
+        data.curriculumUrl = `/uploads/instructors/${files.curriculum[0].filename}`;
       }
 
-      // Procesar especialidades
-      let processedSpecialties: string[] = [];
-      try {
-        processedSpecialties = typeof specialties === 'string' 
-          ? JSON.parse(specialties) 
-          : specialties || [];
-      } catch (error) {
-        processedSpecialties = currentInstructor[0].specialties || [];
+      // Construir fullName si no está presente
+      if (!data.fullName && (data.firstName || data.lastName)) {
+        data.fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
       }
 
-      // Parsear availability - convertir string único a array
-      let availabilityArray = [];
-      if (availability) {
-        if (availability.startsWith('[')) {
-          try {
-            availabilityArray = JSON.parse(availability);
-          } catch (e) {
-            availabilityArray = [availability];
-          }
-        } else {
-          availabilityArray = [availability];
-        }
+      const validationResult = insertInstructorSchema.partial().safeParse(data);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Datos de instructor no válidos', 
+          errors: validationResult.error.format() 
+        });
       }
 
-      // Actualizar instructor
-      const updateData = {
-        firstName,
-        lastName,
-        email,
-        phone: phone || '',
-        specialties: processedSpecialties,
-        experienceYears: parseInt(experienceYears) || 1,
-        bio: bio || '',
-        qualifications: qualifications || '',
-        education: experience || '',
-        availableDays: availabilityArray,
-        hourlyRate: parseFloat(hourlyRate) || 0,
-        preferredParkId: preferredParkId ? parseInt(preferredParkId) : null,
-        profileImageUrl,
-        curriculumUrl,
-        updatedAt: new Date(),
-      };
-
-      const result = await db
+      const [updatedInstructor] = await db
         .update(instructors)
-        .set(updateData)
+        .set({
+          ...validationResult.data,
+          updatedAt: new Date()
+        })
         .where(eq(instructors.id, instructorId))
         .returning();
 
-      // También actualizar el usuario asociado si existe
-      if (currentInstructor[0].userId) {
-        await db
-          .update(users)
-          .set({
-            firstName,
-            lastName,
-            fullName: `${firstName} ${lastName}`,
-            email,
-            phone,
-            bio,
-            specialties: processedSpecialties,
-    
-            profileImageUrl,
-            updatedAt: new Date(),
-          })
-          .where(eq(users.id, currentInstructor[0].userId));
+      if (!updatedInstructor) {
+        return res.status(404).json({ message: 'Instructor no encontrado' });
       }
 
-      res.json({
-        message: 'Instructor actualizado exitosamente',
-        instructor: result[0]
-      });
-
+      res.json(updatedInstructor);
     } catch (error) {
       console.error('Error updating instructor:', error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : 'Error al actualizar instructor' 
-      });
+      res.status(500).json({ message: 'Error al actualizar instructor' });
     }
   });
 
   // Eliminar instructor
-  apiRouter.delete('/instructors/:id', isAuthenticated, async (req: Request, res: Response) => {
+  apiRouter.delete('/instructors/:id', async (req: Request, res: Response) => {
     try {
       const instructorId = parseInt(req.params.id);
+      
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: 'ID de instructor no válido' });
+      }
 
-      // Obtener instructor para verificar si existe y obtener userId
+      // Obtener instructor para verificar si existe
       const instructorToDelete = await db
         .select()
         .from(instructors)
@@ -508,16 +385,8 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
         .delete(instructors)
         .where(eq(instructors.id, instructorId));
 
-      // Eliminar usuario asociado si existe
-      if (instructor.userId) {
-        await db
-          .delete(users)
-          .where(eq(users.id, instructor.userId));
-      }
-
       console.log('✅ Instructor eliminado exitosamente:', {
         instructorId,
-        userId: instructor.userId,
         email: instructor.email
       });
 
@@ -531,93 +400,241 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, isAuthenti
     }
   });
 
-  // Endpoint público para obtener instructores (para landing pages)
-  apiRouter.get('/public-api/instructors/public', async (req: Request, res: Response) => {
-    try {
-      const result = await db
-        .select({
-          id: instructors.id,
-          firstName: instructors.firstName,
-          lastName: instructors.lastName,
-          specialties: instructors.specialties,
-          experienceYears: instructors.experienceYears,
-          bio: instructors.bio,
-          profileImageUrl: instructors.profileImageUrl,
-          rating: instructors.rating,
-          preferredParkId: instructors.preferredParkId,
-        })
-        .from(instructors)
-        .orderBy(desc(instructors.rating));
-
-      res.json(result);
-    } catch (error) {
-      console.error('Error fetching public instructors:', error);
-      res.status(500).json({ message: 'Error al obtener instructores públicos' });
-    }
-  });
-
-  // Endpoint para obtener instructores de un parque específico
-  apiRouter.get('/parks/:parkId/instructors', async (req: Request, res: Response) => {
-    try {
-      const parkId = parseInt(req.params.parkId);
-      
-      const result = await db
-        .select({
-          id: instructors.id,
-          firstName: instructors.firstName,
-          lastName: instructors.lastName,
-          specialties: instructors.specialties,
-          experienceYears: instructors.experienceYears,
-          bio: instructors.bio,
-          profileImageUrl: instructors.profileImageUrl,
-          rating: instructors.rating,
-        })
-        .from(instructors)
-        .where(eq(instructors.preferredParkId, parkId))
-        .orderBy(desc(instructors.rating));
-
-      res.json(result);
-    } catch (error) {
-      console.error('Error fetching park instructors:', error);
-      res.status(500).json({ message: 'Error al obtener instructores del parque' });
-    }
-  });
-
-  // Obtener actividades asignadas a un instructor
-  apiRouter.get('/instructors/:id/assignments', async (req: Request, res: Response) => {
+  // === RUTAS PARA ASIGNACIONES DE INSTRUCTORES ===
+  
+  // Obtener todas las asignaciones de un instructor
+  apiRouter.get("/instructors/:id/assignments", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const instructorId = parseInt(req.params.id);
-
+      
       if (isNaN(instructorId)) {
-        return res.status(400).json({ message: 'ID de instructor inválido' });
+        return res.status(400).json({ message: "ID de instructor no válido" });
       }
-
-      // Obtener actividades asignadas al instructor con información del parque
-      const result = await db.execute(`
-        SELECT 
-          a.id, 
-          a.title, 
-          a.description, 
-          a.start_date as "startDate", 
-          a.end_date as "endDate", 
-          a.location, 
-          a.park_id as "parkId", 
-          p.name as "parkName", 
-          a.category, 
-          a.category_id as "categoryId", 
-          a.created_at as "createdAt"
-        FROM activities a 
-        LEFT JOIN parks p ON a.park_id = p.id 
-        WHERE a.instructor_id = ${instructorId}
-        ORDER BY a.start_date DESC
-      `);
-
-      res.json(result.rows);
+      
+      const assignments = await db
+        .select()
+        .from(instructorAssignments)
+        .where(eq(instructorAssignments.instructorId, instructorId))
+        .orderBy(desc(instructorAssignments.assignmentDate));
+      
+      // Obtener nombres de los parques donde están asignados
+      const parkIds = Array.from(new Set(assignments.map(a => a.parkId)));
+      let parkNames: { id: number, name: string }[] = [];
+      
+      if (parkIds.length > 0) {
+        for (const parkId of parkIds) {
+          const [park] = await db
+            .select({
+              id: parks.id,
+              name: parks.name
+            })
+            .from(parks)
+            .where(eq(parks.id, parkId));
+          
+          if (park) {
+            parkNames.push(park);
+          }
+        }
+      }
+      
+      // Obtener información de las actividades asignadas
+      const activityIds = assignments.map(a => a.activityId).filter(Boolean) as number[];
+      let activityDetails: { id: number, title: string, category: string | null }[] = [];
+      
+      if (activityIds.length > 0) {
+        for (const activityId of activityIds) {
+          const [activity] = await db
+            .select({
+              id: activities.id,
+              title: activities.title,
+              category: activities.category
+            })
+            .from(activities)
+            .where(eq(activities.id, activityId));
+          
+          if (activity) {
+            activityDetails.push(activity);
+          }
+        }
+      }
+      
+      // Procesar asignaciones con información adicional
+      const processedAssignments = assignments.map(assignment => {
+        const park = parkNames.find(p => p.id === assignment.parkId);
+        const activity = activityDetails.find(a => a.id === assignment.activityId);
+        
+        return {
+          ...assignment,
+          parkName: park ? park.name : 'Parque desconocido',
+          activityName: activity ? activity.title : 'Actividad no encontrada',
+          activityCategory: activity ? activity.category : null
+        };
+      });
+      
+      res.json(processedAssignments);
     } catch (error) {
-      console.error('Error fetching instructor activities:', error);
-      res.status(500).json({ message: 'Error al obtener actividades del instructor' });
+      console.error(`Error al obtener asignaciones del instructor ${req.params.id}:`, error);
+      res.status(500).json({ message: "Error al obtener asignaciones" });
+    }
+  });
+  
+  // Crear nueva asignación de instructor
+  apiRouter.post("/instructors/:id/assignments", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const instructorId = parseInt(req.params.id);
+      
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: "ID de instructor no válido" });
+      }
+      
+      const validationResult = insertInstructorAssignmentSchema.safeParse({
+        ...req.body,
+        instructorId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Datos de asignación no válidos", 
+          errors: validationResult.error.format() 
+        });
+      }
+      
+      const [newAssignment] = await db
+        .insert(instructorAssignments)
+        .values({
+          ...validationResult.data,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      
+      res.status(201).json(newAssignment);
+    } catch (error) {
+      console.error(`Error al crear asignación para instructor ${req.params.id}:`, error);
+      res.status(500).json({ message: "Error al crear asignación" });
+    }
+  });
+  
+  // === RUTAS PARA EVALUACIONES DE INSTRUCTORES ===
+  
+  // Obtener todas las evaluaciones de un instructor
+  apiRouter.get("/instructors/:id/evaluations", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const instructorId = parseInt(req.params.id);
+      
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: "ID de instructor no válido" });
+      }
+      
+      const evaluations = await db
+        .select()
+        .from(instructorEvaluations)
+        .where(eq(instructorEvaluations.instructorId, instructorId))
+        .orderBy(desc(instructorEvaluations.evaluationDate));
+      
+      res.json(evaluations);
+    } catch (error) {
+      console.error(`Error al obtener evaluaciones del instructor ${req.params.id}:`, error);
+      res.status(500).json({ message: "Error al obtener evaluaciones" });
+    }
+  });
+  
+  // Crear nueva evaluación de instructor
+  apiRouter.post("/instructors/:id/evaluations", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const instructorId = parseInt(req.params.id);
+      
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: "ID de instructor no válido" });
+      }
+      
+      const validationResult = insertInstructorEvaluationSchema.safeParse({
+        ...req.body,
+        instructorId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Datos de evaluación no válidos", 
+          errors: validationResult.error.format() 
+        });
+      }
+      
+      const [newEvaluation] = await db
+        .insert(instructorEvaluations)
+        .values({
+          ...validationResult.data,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      
+      res.status(201).json(newEvaluation);
+    } catch (error) {
+      console.error(`Error al crear evaluación para instructor ${req.params.id}:`, error);
+      res.status(500).json({ message: "Error al crear evaluación" });
+    }
+  });
+  
+  // === RUTAS PARA RECONOCIMIENTOS DE INSTRUCTORES ===
+  
+  // Obtener todos los reconocimientos de un instructor
+  apiRouter.get("/instructors/:id/recognitions", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const instructorId = parseInt(req.params.id);
+      
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: "ID de instructor no válido" });
+      }
+      
+      const recognitions = await db
+        .select()
+        .from(instructorRecognitions)
+        .where(eq(instructorRecognitions.instructorId, instructorId))
+        .orderBy(desc(instructorRecognitions.createdAt));
+      
+      res.json(recognitions);
+    } catch (error) {
+      console.error(`Error al obtener reconocimientos del instructor ${req.params.id}:`, error);
+      res.status(500).json({ message: "Error al obtener reconocimientos" });
+    }
+  });
+  
+  // Crear nuevo reconocimiento de instructor
+  apiRouter.post("/instructors/:id/recognitions", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const instructorId = parseInt(req.params.id);
+      
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: "ID de instructor no válido" });
+      }
+      
+      const validationResult = insertInstructorRecognitionSchema.safeParse({
+        ...req.body,
+        instructorId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Datos de reconocimiento no válidos", 
+          errors: validationResult.error.format() 
+        });
+      }
+      
+      const [newRecognition] = await db
+        .insert(instructorRecognitions)
+        .values({
+          ...validationResult.data,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      
+      res.status(201).json(newRecognition);
+    } catch (error) {
+      console.error(`Error al crear reconocimiento para instructor ${req.params.id}:`, error);
+      res.status(500).json({ message: "Error al crear reconocimiento" });
     }
   });
 
-  console.log('✅ Rutas de instructores registradas correctamente');
 }

@@ -273,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerVolunteerRoutes(app, apiRouter, null, isAuthenticated);
   
   // Registramos las rutas del módulo de instructores
-  registerInstructorRoutes(app, apiRouter, isAuthenticated);
+  registerInstructorRoutes(app, apiRouter, null, isAuthenticated);
   
   // Registramos las rutas del módulo de activos
   registerAssetRoutes(app, apiRouter, isAuthenticated); // RESTAURADO - rutas POST de mantenimientos están comentadas en asset_routes.ts
