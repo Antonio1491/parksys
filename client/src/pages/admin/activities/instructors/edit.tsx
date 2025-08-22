@@ -584,12 +584,12 @@ export default function EditInstructorPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="preferredParkId" className="text-sm font-medium">Parque Preferido (Opcional)</label>
-                    <Select value={formData.preferredParkId?.toString()} onValueChange={(value) => handleChange('preferredParkId', parseInt(value))}>
+                    <Select value={formData.preferredParkId?.toString() || "no-preference"} onValueChange={(value) => handleChange('preferredParkId', value === "no-preference" ? undefined : parseInt(value))}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecciona un parque" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Sin preferencia</SelectItem>
+                        <SelectItem value="no-preference">Sin preferencia</SelectItem>
                         {parks.map((park: any) => (
                           <SelectItem key={park.id} value={park.id.toString()}>
                             {park.name}
