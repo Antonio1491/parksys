@@ -221,9 +221,14 @@ const ParksDashboard = () => {
             style={{ backgroundColor: "#14b8a6" }}
           >
             <Map className="h-6 w-6 text-white" />
-            <h1 className="text-2xl font-semibold text-white font-poppins">
-              Parques
-            </h1>
+            <div>
+              <h1 className="text-2xl font-semibold text-white font-poppins">
+                Parques
+              </h1>
+              <p className="text-2xl font-normal text-white font-poppins">
+                Métricas / Módulo de Gestión
+              </p>
+            </div>
           </div>
         </div>
 
