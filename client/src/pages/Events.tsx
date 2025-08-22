@@ -282,48 +282,69 @@ const Events: React.FC = () => {
                       )}
                       
                       {/* Badge de categoría arriba a la izquierda */}
-                      <div className="absolute top-4 left-4 z-10">
+                      <div className="absolute top-3 left-3 z-10">
                         <Badge 
-                          variant="outline" 
-                          className="text-xs border-none text-white font-medium"
+                          className="text-xs border shadow-sm font-medium"
                           style={{ 
-                            backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'
+                            backgroundColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}20`,
+                            color: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
+                            borderColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}40`
                           }}
                         >
-                          {eventTypeLabels[event.eventType as keyof typeof eventTypeLabels] || event.eventType}
+                          <div 
+                            className="w-2 h-2 rounded-full mr-1.5" 
+                            style={{ backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6' }}
+                          />
+                          {event.eventType}
+                        </Badge>
+                      </div>
+
+                      {/* Badge de estado arriba a la derecha */}
+                      <div className="absolute top-3 right-3 z-10">
+                        <Badge 
+                          className="text-xs border shadow-sm font-semibold"
+                          style={{ 
+                            backgroundColor: event.status === 'published' ? '#10B981' : '#6B7280',
+                            color: 'white',
+                            borderColor: event.status === 'published' ? '#059669' : '#4B5563'
+                          }}
+                        >
+                          {event.status === 'published' ? 'Activo' : 'Borrador'}
                         </Badge>
                       </div>
                       
-                      {/* Información del evento abajo a la izquierda */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                        <div className="space-y-1 text-white">
-                          <h3 className="font-semibold text-lg leading-tight mb-1">
-                            {event.title}
-                          </h3>
-                          <div className="flex items-center text-sm">
-                            <Calendar className="h-3 w-3 mr-2 flex-shrink-0" />
-                            <span className="text-xs">
-                              {formatDate(event.startDate)} {event.startTime && `a las ${formatTime(event.startTime)}`}
-                            </span>
-                          </div>
-                          <div className="flex items-center text-sm">
-                            <MapPin className="h-3 w-3 mr-2 flex-shrink-0" />
-                            <span className="text-xs">
-                              {event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}
-                            </span>
-                          </div>
-                        </div>
+                      {/* Título del evento superpuesto en la parte inferior */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-3">
+                        <h3 className="font-semibold text-xl text-white drop-shadow-lg line-clamp-2">
+                          {event.title}
+                        </h3>
                       </div>
                     </div>
                     
-                    {/* Área de contenido 1/3 de la altura (abajo) */}
-                    <div className="h-1/3 p-4 bg-white flex flex-col justify-between">
-                      <div className="flex-1 space-y-3">
-                        <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
-                          {event.description}
-                        </p>
-                        
-                        <div className="text-xs text-gray-500">
+                    {/* Área de contenido inferior */}
+                    <div className="flex-1 p-4 bg-gray-50 flex flex-col justify-center">
+                      <div className="space-y-2">
+                        <div className="flex items-center text-gray-700">
+                          <Calendar className="h-4 w-4 mr-2 text-green-600" />
+                          <span className="text-sm">
+                            {formatDate(event.startDate)}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-gray-700">
+                          <MapPin className="h-4 w-4 mr-2 text-green-600" />
+                          <span className="text-sm font-medium">
+                            {event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}
+                          </span>
+                        </div>
+                        {event.capacity && (
+                          <div className="flex items-center text-gray-700">
+                            <Users className="h-4 w-4 mr-2 text-green-600" />
+                            <span className="text-sm">
+                              {event.registeredCount || 0} / {event.capacity} participantes
+                            </span>
+                          </div>
+                        )}
+                        <div className="text-xs text-gray-500 mt-2">
                           <span className="font-medium">Organiza: </span>
                           <span className="text-gray-700">{event.organizerName || 'Administración del Parque'}</span>
                         </div>
@@ -340,13 +361,18 @@ const Events: React.FC = () => {
                             {event.title}
                           </h3>
                           <Badge 
-                            variant="outline" 
-                            className="text-xs border-none text-white font-medium"
+                            className="text-xs border shadow-sm font-medium"
                             style={{ 
-                              backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'
+                              backgroundColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}20`,
+                              color: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
+                              borderColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}40`
                             }}
                           >
-                            {eventTypeLabels[event.eventType as keyof typeof eventTypeLabels] || event.eventType}
+                            <div 
+                              className="w-2 h-2 rounded-full mr-1" 
+                              style={{ backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6' }}
+                            />
+                            {event.eventType}
                           </Badge>
                         </div>
                         

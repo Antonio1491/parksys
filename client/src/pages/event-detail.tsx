@@ -118,14 +118,24 @@ const EventDetail = () => {
     );
   }
 
+  // Colores dinámicos para categorías como en actividades
+  const eventTypeColors = {
+    'Benéficos': '#06B6D4',
+    'Culturales': '#8B5CF6', 
+    'Deportivos': '#10B981',
+    'Empresariales': '#3B82F6',
+    'Gubernamentales': '#EF4444',
+    'Sociales': '#EC4899'
+  };
+
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Breadcrumb y navegación */}
-        <div className="bg-white border-b">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+        {/* Header */}
+        <div className="bg-white border-b sticky top-0 z-10">
           <div className="max-w-6xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <Button variant="ghost" asChild>
+              <Button variant="ghost" asChild className="hover:bg-green-50">
                 <Link href="/events">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Volver a eventos
@@ -148,41 +158,58 @@ const EventDetail = () => {
 
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Contenido principal */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Imagen principal y título */}
-              <Card>
-                <div className="aspect-video w-full overflow-hidden rounded-t-lg">
+            {/* Imagen principal */}
+            <div className="lg:col-span-2">
+              <Card className="overflow-hidden">
+                <div className="aspect-video bg-gradient-to-br from-green-100 to-blue-100 relative">
                   {event.featuredImageUrl ? (
-                    <img 
-                      src={event.featuredImageUrl} 
+                    <img
+                      src={event.featuredImageUrl}
                       alt={event.title}
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                      <Calendar className="h-20 w-20 text-white" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Calendar className="h-16 w-16 text-green-600/30" />
                     </div>
                   )}
-                </div>
-                
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        {event.title}
-                      </h1>
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h1 className="text-3xl font-bold text-white mb-2">{event.title}</h1>
+                    <div className="flex items-center gap-4 text-white/90">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline">
-                          {eventTypeLabels[event.eventType as keyof typeof eventTypeLabels] || event.eventType}
-                        </Badge>
-                        <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
-                          {event.status === 'published' ? 'Publicado' : 'Borrador'}
-                        </Badge>
+                        <MapPin className="h-4 w-4" />
+                        <span>{event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}</span>
                       </div>
+                      <Badge 
+                        className="text-xs border shadow-sm font-medium"
+                        style={{ 
+                          backgroundColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}40`,
+                          color: 'white',
+                          borderColor: 'white'
+                        }}
+                      >
+                        {event.eventType}
+                      </Badge>
+                      <Badge 
+                        className="text-xs border shadow-sm font-semibold"
+                        style={{ 
+                          backgroundColor: event.status === 'published' ? '#10B981' : '#6B7280',
+                          color: 'white',
+                          borderColor: 'white'
+                        }}
+                      >
+                        {event.status === 'published' ? 'Activo' : 'Borrador'}
+                      </Badge>
                     </div>
                   </div>
-                  
+                </div>
+              </Card>
+
+              {/* Descripción */}
+              <Card className="mt-4">
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4">Descripción</h2>
                   <p className="text-gray-700 text-lg leading-relaxed">
                     {event.description}
                   </p>
@@ -285,20 +312,105 @@ const EventDetail = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Información rápida */}
-              <Card>
+              {/* Detalles del evento - Card principal */}
+              <Card className="bg-gradient-to-br from-green-50 to-blue-50 border-green-200">
                 <CardContent className="p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Información rápida</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-green-600" />
+                    Detalles del Evento
+                  </h3>
                   
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Tipo:</span>
-                      <span className="font-medium">
-                        {eventTypeLabels[event.eventType as keyof typeof eventTypeLabels] || event.eventType}
-                      </span>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                      <Calendar className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm">Fecha</p>
+                        <p className="text-gray-600 text-sm">
+                          {formatDate(event.startDate)}
+                          {event.endDate !== event.startDate && ` - ${formatDate(event.endDate)}`}
+                        </p>
+                      </div>
                     </div>
                     
-                    <div className="flex justify-between">
+                    {event.startTime && (
+                      <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                        <Clock className="h-5 w-5 text-green-600 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">Horario</p>
+                          <p className="text-gray-600 text-sm">
+                            {formatTime(event.startTime)}
+                            {event.endTime && ` - ${formatTime(event.endTime)}`}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                      <MapPin className="h-5 w-5 text-red-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm">Ubicación</p>
+                        <p className="text-gray-600 text-sm">{event.location}</p>
+                      </div>
+                    </div>
+                    
+                    {event.capacity && (
+                      <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                        <Users className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">Capacidad</p>
+                          <p className="text-gray-600 text-sm">{event.capacity} personas</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Información del organizador */}
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <User className="h-5 w-5 text-gray-600" />
+                    Organizador
+                  </h3>
+                  
+                  <div className="space-y-3">
+                    <div className="text-center">
+                      <p className="font-semibold text-gray-900 text-lg">{event.organizerName}</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <Mail className="h-4 w-4 text-gray-600" />
+                      <a 
+                        href={`mailto:${event.organizerEmail}`}
+                        className="text-blue-600 hover:text-blue-800 transition-colors text-sm"
+                      >
+                        {event.organizerEmail}
+                      </a>
+                    </div>
+                    
+                    {event.organizerPhone && (
+                      <div className="flex items-center justify-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <Phone className="h-4 w-4 text-gray-600" />
+                        <a 
+                          href={`tel:${event.organizerPhone}`}
+                          className="text-blue-600 hover:text-blue-800 transition-colors text-sm"
+                        >
+                          {event.organizerPhone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Información adicional */}
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Información Adicional</h3>
+                  
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                       <span className="text-gray-600">Audiencia:</span>
                       <span className="font-medium">
                         {event.targetAudience === 'all' ? 'Público general' : 
@@ -309,7 +421,7 @@ const EventDetail = () => {
                       </span>
                     </div>
                     
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                       <span className="text-gray-600">Registro:</span>
                       <span className="font-medium">
                         {event.registrationType === 'registration' ? 'Requerido' : 
@@ -319,7 +431,7 @@ const EventDetail = () => {
                     </div>
                     
                     {event.isRecurring && (
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                         <span className="text-gray-600">Recurrente:</span>
                         <span className="font-medium">Sí</span>
                       </div>
@@ -330,22 +442,18 @@ const EventDetail = () => {
 
               {/* Acción principal */}
               {event.registrationType === 'registration' && event.status === 'published' && (
-                <Card>
+                <Card className="bg-gradient-to-r from-green-500 to-green-600">
                   <CardContent className="p-6 text-center">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">¿Te interesa?</h3>
-                    <p className="text-gray-600 mb-4 text-sm">
+                    <h3 className="text-lg font-bold text-white mb-2">¿Te interesa?</h3>
+                    <p className="text-green-100 mb-4 text-sm">
                       Regístrate para participar en este evento.
                     </p>
-                    <Button className="w-full" size="lg">
+                    <Button className="w-full bg-white text-green-600 hover:bg-green-50" size="lg">
                       Registrarse
                     </Button>
                   </CardContent>
                 </Card>
               )}
-
-              {/* Contacto */}
-              <Card>
-                <CardContent className="p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Contacto</h3>
                   
                   <div className="space-y-3">
