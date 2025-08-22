@@ -644,13 +644,14 @@ const NewEventPage: React.FC = () => {
                   )}
                 />
                 
-                {/* Campos de precio y pago */}
-                <div className="md:col-span-2">
+                {/* NUEVO: Campos de precio y pago agregados */}
+                <div className="md:col-span-2 bg-yellow-50 p-4 rounded-lg">
+                  <h4 className="text-sm font-semibold text-yellow-800 mb-3">💰 Configuración de Precio</h4>
                   <FormField
                     control={form.control}
                     name="isFree"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-white">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">Evento gratuito</FormLabel>
                           <FormDescription>
@@ -669,58 +670,62 @@ const NewEventPage: React.FC = () => {
                 </div>
 
                 {!form.watch("isFree") && (
+                  <div className="md:col-span-2 bg-green-50 p-4 rounded-lg">
+                    <FormField
+                      control={form.control}
+                      name="price"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-green-800 font-semibold">💵 Precio por participante</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <span className="absolute left-3 top-2.5 text-gray-500 font-semibold">$</span>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                placeholder="0.00"
+                                className="pl-8 border-green-300 focus:border-green-500"
+                                {...field}
+                                value={field.value === null ? "" : field.value}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  field.onChange(value === "" ? null : parseFloat(value));
+                                }}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormDescription className="text-green-700">
+                            Precio en pesos mexicanos por cada participante
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                <div className="md:col-span-2 bg-blue-50 p-4 rounded-lg">
                   <FormField
                     control={form.control}
-                    name="price"
+                    name="requiresApproval"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Precio por participante</FormLabel>
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-white">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base text-blue-800">🔒 Requiere aprobación manual</FormLabel>
+                          <FormDescription className="text-blue-600">
+                            Las inscripciones necesitan ser aprobadas manualmente antes de confirmar
+                          </FormDescription>
+                        </div>
                         <FormControl>
-                          <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              className="pl-8"
-                              {...field}
-                              value={field.value === null ? "" : field.value}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                field.onChange(value === "" ? null : parseFloat(value));
-                              }}
-                            />
-                          </div>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
-                        <FormDescription>
-                          Precio en pesos mexicanos por cada participante
-                        </FormDescription>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
-                )}
-
-                <FormField
-                  control={form.control}
-                  name="requiresApproval"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Requiere aprobación</FormLabel>
-                        <FormDescription>
-                          Las inscripciones necesitan ser aprobadas manualmente antes de confirmar
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                </div>
               </div>
             </div>
 
