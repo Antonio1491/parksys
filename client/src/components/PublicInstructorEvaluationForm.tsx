@@ -204,7 +204,11 @@ export default function PublicInstructorEvaluationForm({
                   <FormItem>
                     <FormLabel>Nombre completo *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Tu nombre completo" {...field} />
+                      <Input 
+                        placeholder="Tu nombre completo" 
+                        autoComplete="off"
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -222,6 +226,7 @@ export default function PublicInstructorEvaluationForm({
                         <Input 
                           type="email" 
                           placeholder="tu@email.com" 
+                          autoComplete="off"
                           {...field} 
                         />
                       </FormControl>
@@ -237,7 +242,11 @@ export default function PublicInstructorEvaluationForm({
                     <FormItem>
                       <FormLabel>Ciudad (opcional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Guadalajara" {...field} />
+                        <Input 
+                          placeholder="Guadalajara" 
+                          autoComplete="off"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
