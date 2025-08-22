@@ -284,17 +284,12 @@ const Events: React.FC = () => {
                       {/* Badge de categoría arriba a la izquierda */}
                       <div className="absolute top-3 left-3 z-10">
                         <Badge 
-                          className="text-xs border shadow-sm font-medium"
+                          className="text-xs border shadow-sm font-medium text-white"
                           style={{ 
-                            backgroundColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}20`,
-                            color: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
-                            borderColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}40`
+                            backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
+                            borderColor: 'rgba(255,255,255,0.3)'
                           }}
                         >
-                          <div 
-                            className="w-2 h-2 rounded-full mr-1.5" 
-                            style={{ backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6' }}
-                          />
                           {event.eventType}
                         </Badge>
                       </div>
@@ -325,20 +320,20 @@ const Events: React.FC = () => {
                     <div className="flex-1 p-4 bg-gray-50 flex flex-col justify-center">
                       <div className="space-y-2">
                         <div className="flex items-center text-gray-700">
-                          <Calendar className="h-4 w-4 mr-2 text-green-600" />
+                          <Calendar className="h-4 w-4 mr-2 text-blue-600" />
                           <span className="text-sm">
                             {formatDate(event.startDate)}
                           </span>
                         </div>
                         <div className="flex items-center text-gray-700">
-                          <MapPin className="h-4 w-4 mr-2 text-green-600" />
+                          <MapPin className="h-4 w-4 mr-2 text-red-600" />
                           <span className="text-sm font-medium">
                             {event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}
                           </span>
                         </div>
                         {event.capacity && (
                           <div className="flex items-center text-gray-700">
-                            <Users className="h-4 w-4 mr-2 text-green-600" />
+                            <Users className="h-4 w-4 mr-2 text-purple-600" />
                             <span className="text-sm">
                               {event.registeredCount || 0} / {event.capacity} participantes
                             </span>
@@ -361,17 +356,12 @@ const Events: React.FC = () => {
                             {event.title}
                           </h3>
                           <Badge 
-                            className="text-xs border shadow-sm font-medium"
+                            className="text-xs border shadow-sm font-medium text-white"
                             style={{ 
-                              backgroundColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}20`,
-                              color: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
-                              borderColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}40`
+                              backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
+                              borderColor: 'rgba(255,255,255,0.3)'
                             }}
                           >
-                            <div 
-                              className="w-2 h-2 rounded-full mr-1" 
-                              style={{ backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6' }}
-                            />
                             {event.eventType}
                           </Badge>
                         </div>

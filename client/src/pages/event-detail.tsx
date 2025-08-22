@@ -182,11 +182,10 @@ const EventDetail = () => {
                         <span>{event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}</span>
                       </div>
                       <Badge 
-                        className="text-xs border shadow-sm font-medium"
+                        className="text-xs border shadow-sm font-medium text-white"
                         style={{ 
-                          backgroundColor: `${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6'}40`,
-                          color: 'white',
-                          borderColor: 'white'
+                          backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
+                          borderColor: 'rgba(255,255,255,0.3)'
                         }}
                       >
                         {event.eventType}
@@ -454,27 +453,6 @@ const EventDetail = () => {
                   </CardContent>
                 </Card>
               )}
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Contacto</h3>
-                  
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start" asChild>
-                      <a href={`mailto:${event.organizerEmail}`}>
-                        <Mail className="h-4 w-4 mr-2" />
-                        Enviar email
-                      </a>
-                    </Button>
-                    
-                    {event.organizerPhone && (
-                      <Button variant="outline" className="w-full justify-start" asChild>
-                        <a href={`tel:${event.organizerPhone}`}>
-                          <Phone className="h-4 w-4 mr-2" />
-                          Llamar
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>
