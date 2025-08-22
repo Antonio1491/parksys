@@ -98,31 +98,31 @@ export default function EditEventPage() {
 
   // Actualizar el formulario cuando se cargue el evento
   useEffect(() => {
-    if (event?.data) {
-      console.log('🔄 Cargando datos del evento:', event.data);
+    if (event) {
+      console.log('🔄 Cargando datos del evento:', event);
       
       // Establecer la imagen del evento
-      if (event.data.featuredImageUrl) {
-        setEventImage(event.data.featuredImageUrl);
+      if (event.featuredImageUrl) {
+        setEventImage(event.featuredImageUrl);
       }
 
       // Actualizar valores del formulario
       form.reset({
-        title: event.data.title || '',
-        description: event.data.description || '',
-        start_date: formatDateForInput(event.data.startDate),
-        end_date: formatDateForInput(event.data.endDate),
-        start_time: extractTime(event.data.startDate),
-        end_time: extractTime(event.data.endDate),
-        park_id: event.data.parkIds && event.data.parkIds.length > 0 ? String(event.data.parkIds[0]) : '',
-        category: event.data.eventType || '',
-        capacity: event.data.capacity ? String(event.data.capacity) : '',
-        location: event.data.location || '',
-        organizer_name: event.data.organizerName || '',
-        organizer_organization: event.data.organizerOrganization || '',
-        contact_email: event.data.organizerEmail || '',
-        contact_phone: event.data.organizerPhone || '',
-        registration_required: event.data.registrationType === 'registration',
+        title: event.title || '',
+        description: event.description || '',
+        start_date: formatDateForInput(event.startDate),
+        end_date: formatDateForInput(event.endDate),
+        start_time: extractTime(event.startDate),
+        end_time: extractTime(event.endDate),
+        park_id: event.parks && event.parks.length > 0 ? String(event.parks[0].id) : '',
+        category: event.eventType || '',
+        capacity: event.capacity ? String(event.capacity) : '',
+        location: event.location || '',
+        organizer_name: event.organizerName || '',
+        organizer_organization: event.organizerOrganization || '',
+        contact_email: event.organizerEmail || '',
+        contact_phone: event.organizerPhone || '',
+        registration_required: event.registrationType === 'registration',
         price: '',
         notes: ''
       });
@@ -210,7 +210,7 @@ export default function EditEventPage() {
     );
   }
 
-  if (!event?.data) {
+  if (!event && !isLoading) {
     return (
       <AdminLayout>
         <div className="text-center py-12">
