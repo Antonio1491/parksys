@@ -122,11 +122,14 @@ const EventRegistrationsPage = () => {
         ...(endDateFilter && { endDate: endDateFilter })
       });
       
+      console.log('🌐 [QUERY] GET /api/event-registrations?' + params.toString());
       const response = await fetch(`/api/event-registrations?${params}`);
       if (!response.ok) {
         throw new Error('Error al cargar inscripciones');
       }
-      return response.json();
+      const data = await response.json();
+      console.log('📊 Datos de inscripciones recibidos:', data);
+      return data;
     }
   });
 
@@ -283,6 +286,9 @@ const EventRegistrationsPage = () => {
   const registrations = registrationsData?.registrations || [];
   const totalRegistrations = registrationsData?.total || 0;
   const totalPages = Math.ceil(totalRegistrations / itemsPerPage);
+  
+  // Debug logging
+  console.log('🔍 Registrations data:', { registrations, totalRegistrations, totalPages, isLoading });
 
   const summary = summaryData?.events || [];
   const totalSummary = summaryData?.total || 0;
