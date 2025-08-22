@@ -72,6 +72,8 @@ const eventFormSchema = z.object({
   contact_phone: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   geolocation: z.any().optional().nullable(),
+  latitude: z.coerce.number().optional().nullable(),
+  longitude: z.coerce.number().optional().nullable(),
   imageUrl: z.string().optional().nullable(),
 });
 
@@ -150,6 +152,8 @@ const NewEventPageFixed: React.FC = () => {
       contact_phone: "",
       notes: "",
       geolocation: null,
+      latitude: null,
+      longitude: null,
       imageUrl: null,
     },
   });
@@ -193,8 +197,16 @@ const NewEventPageFixed: React.FC = () => {
 
   // Manejar envío del formulario
   const onSubmit = (data: EventFormValues) => {
-    console.log("DATOS DEL FORMULARIO:", data);
-    createEventMutation.mutate(data);
+    // Crear el objeto de geolocation si se proporcionaron coordenadas
+    const eventData = {
+      ...data,
+      geolocation: data.latitude && data.longitude 
+        ? { lat: data.latitude, lng: data.longitude }
+        : null
+    };
+    
+    console.log("DATOS DEL FORMULARIO:", eventData);
+    createEventMutation.mutate(eventData);
   };
 
   if (parksLoading || categoriesLoading) {
@@ -490,6 +502,69 @@ const NewEventPageFixed: React.FC = () => {
                     </FormItem>
                   )}
                 />
+              </div>
+
+              {/* Coordenadas GPS */}
+              <div className="mt-6">
+                <h4 className="text-sm font-medium mb-3 text-gray-700">Coordenadas GPS (opcional)</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="latitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Latitud</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Ej: 20.6597"
+                            {...field}
+                            value={field.value === null ? "" : field.value}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === "" ? null : parseFloat(value));
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Coordenada de latitud GPS
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="longitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Longitud</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Ej: -103.3496"
+                            {...field}
+                            value={field.value === null ? "" : field.value}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === "" ? null : parseFloat(value));
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Coordenada de longitud GPS
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Las coordenadas GPS permitirán a los usuarios encontrar la ubicación exacta del evento
+                </p>
               </div>
             </div>
 

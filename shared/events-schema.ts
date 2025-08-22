@@ -33,6 +33,7 @@ export const events = pgTable("events", {
   capacity: integer("capacity"), // Capacidad máxima de asistentes
   registrationType: varchar("registration_type", { length: 20 }).default("free"), // libre o con registro
   organizerName: varchar("organizer_name", { length: 100 }),
+  organizerOrganization: varchar("organizer_organization", { length: 200 }),
   organizerEmail: varchar("organizer_email", { length: 100 }),
   organizerPhone: varchar("organizer_phone", { length: 20 }),
   geolocation: json("geolocation"), // Coordenadas de ubicación {lat, lng}

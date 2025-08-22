@@ -274,17 +274,67 @@ const EventDetail = () => {
                 </CardContent>
               </Card>
 
+              {/* Ubicación con mapa */}
+              {event.geolocation && (
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-red-600" />
+                      Cómo llegar
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="h-4 w-4 text-red-600" />
+                          <span className="font-medium text-gray-900">Ubicación GPS</span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Latitud: {event.geolocation.lat}<br />
+                          Longitud: {event.geolocation.lng}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-3">
+                        <a
+                          href={`https://www.google.com/maps?q=${event.geolocation.lat},${event.geolocation.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          Abrir en Google Maps
+                        </a>
+                        
+                        <a
+                          href={`https://waze.com/ul?ll=${event.geolocation.lat},${event.geolocation.lng}&navigate=yes`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 p-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          Abrir en Waze
+                        </a>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Información del organizador */}
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <User className="h-5 w-5 text-gray-600" />
-                    Organizador
+                    Información de Contacto
                   </h3>
                   
                   <div className="space-y-3">
                     <div className="text-center">
                       <p className="font-semibold text-gray-900 text-lg">{event.organizerName}</p>
+                      {event.organizerOrganization && (
+                        <p className="text-sm text-gray-600 mt-1">{event.organizerOrganization}</p>
+                      )}
                     </div>
                     
                     <div className="flex items-center justify-center gap-3 p-3 bg-gray-50 rounded-lg">
