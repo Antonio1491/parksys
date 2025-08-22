@@ -138,7 +138,7 @@ const NewEventPageFixed: React.FC = () => {
       endDate: null,
       location: "",
       capacity: null,
-      registrationType: "open",
+      registrationType: "free",
       parkIds: [],
       organizer_name: "",
       organizer_organization: "",
