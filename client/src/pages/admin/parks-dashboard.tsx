@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Package,
   Award,
+  MessageSquare,
 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import {
@@ -53,8 +54,17 @@ interface ParksDashboardData {
   totalAmenities: number;
   totalInstructors: number;
   totalIncidents: number;
+  resolvedIncidents: number;
+  totalReports: number;
+  resolvedReports: number;
   totalAssets: number;
   averageRating: number;
+  bestEvaluatedPark: {
+    parkId: number;
+    parkName: string;
+    averageRating: number;
+    evaluationCount: number;
+  } | null;
   greenFlagParks: number;
   greenFlagPercentage: number;
   parksByMunicipality: Array<{
@@ -91,6 +101,21 @@ interface ParksDashboardData {
     parkName: string;
     averageRating: number;
     evaluationCount: number;
+  }>;
+  greenAreaPercentages?: Array<{
+    parkId: number;
+    parkName: string;
+    totalArea: number;
+    greenArea: number;
+    greenPercentage: number;
+  }>;
+  incidentsByPark?: Array<{
+    parkId: number;
+    parkName: string;
+    totalIncidents: number;
+    incidentsThisMonth: number;
+    openIncidents: number;
+    resolvedIncidents: number;
   }>;
 }
 
@@ -205,9 +230,11 @@ const ParksDashboard = () => {
           </div>
         </div>
 
-        {/* Sección 1: Métricas Principales */}
+        {/* Sección 1: Métricas Principales - Grid de 4 columnas con columna 3 dividida */}
         <div className="space-y-4">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 lg:grid-cols-4">
+            
+            {/* Columna 1: Total de Parques + Green Flag Award */}
             <Card
               className="border-0 shadow-lg text-white"
               style={{ backgroundColor: "#003D49" }}
@@ -255,6 +282,7 @@ const ParksDashboard = () => {
               </CardContent>
             </Card>
 
+            {/* Columna 2: Superficie Total + Área Verde */}
             <Card
               className="border-0 shadow-lg text-white"
               style={{ backgroundColor: "#003D49" }}
@@ -317,13 +345,71 @@ const ParksDashboard = () => {
               </CardContent>
             </Card>
 
+            {/* Columna 3: Dividida en 2 mitades - Reportes e Incidencias */}
+            <div className="flex flex-col gap-3">
+              
+              {/* Columna 3a (mitad superior): Reportes Públicos */}
+              <Card
+                className="border-0 shadow-lg text-white flex-1"
+                style={{ backgroundColor: "#003D49" }}
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                  <CardTitle className="text-sm font-medium text-gray-100">
+                    Reportes Públicos
+                  </CardTitle>
+                  <div
+                    className="rounded-full p-1.5"
+                    style={{ backgroundColor: "#1E5AA6" }}
+                  >
+                    <MessageSquare className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent className="py-2">
+                  <div className="text-2xl font-bold text-white">
+                    {data.totalReports || 0}
+                  </div>
+                  <p className="text-xs text-white">
+                    {data.resolvedReports || 0} resueltos
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Columna 3b (mitad inferior): Incidencias */}
+              <Card
+                className="border-0 shadow-lg text-white flex-1"
+                style={{ backgroundColor: "#003D49" }}
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                  <CardTitle className="text-sm font-medium text-gray-100">
+                    Incidencias
+                  </CardTitle>
+                  <div
+                    className="rounded-full p-1.5"
+                    style={{ backgroundColor: "#B275B0" }}
+                  >
+                    <AlertTriangle className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent className="py-2">
+                  <div className="text-2xl font-bold text-white">
+                    {data.totalIncidents || 0}
+                  </div>
+                  <p className="text-xs text-white">
+                    {data.resolvedIncidents || 0} atendidas
+                  </p>
+                </CardContent>
+              </Card>
+              
+            </div>
+
+            {/* Columna 4: Calificación + Parque mejor evaluado */}
             <Card
               className="border-0 shadow-lg text-white"
               style={{ backgroundColor: "#003D49" }}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-base font-medium text-gray-100">
-                  Calificación
+                  Calificación Promedio
                 </CardTitle>
                 <div
                   className="rounded-full p-2"
@@ -336,39 +422,33 @@ const ParksDashboard = () => {
                 <div className="text-3xl font-bold text-white">
                   {data.averageRating ? data.averageRating.toFixed(1) : "N/A"}
                 </div>
-                <p className="text-xs text-white">Promedio de evaluaciones</p>
-              </CardContent>
-            </Card>
-
-            <Card
-              className="border-0 shadow-lg text-white"
-              style={{ backgroundColor: "#003D49" }}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-medium text-gray-100">
-                  Incidencias
-                </CardTitle>
-                <div
-                  className="rounded-full p-2"
-                  style={{ backgroundColor: "#B275B0" }}
-                >
-                  <AlertCircle className="h-5 w-5 text-white" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-white">
-                  {data.totalIncidents}
-                </div>
-                <p className="text-xs text-white">
-                  Incidencias (últimos 30 días)
+                <p className="text-xs text-white mb-3">
+                  Promedio de evaluaciones
                 </p>
+                
+                {/* Parque mejor evaluado */}
+                {data.bestEvaluatedPark && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <Award className="h-3 w-3 text-yellow-400" />
+                        <span className="text-xs text-gray-200">
+                          Mejor Evaluado
+                        </span>
+                      </div>
+                      <span className="text-xs font-semibold text-yellow-400">
+                        {data.bestEvaluatedPark.averageRating.toFixed(1)} ⭐
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-200 truncate">
+                      {data.bestEvaluatedPark.parkName}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
-
 
           </div>
-
-
         </div>
 
         {/* Separador visual */}

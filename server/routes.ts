@@ -1498,9 +1498,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const instructorsResult = await pool.query('SELECT COUNT(*) as count FROM instructors');
       const totalInstructors = parseInt(instructorsResult.rows[0].count);
       
-      // Total de incidencias
-      const incidentsResult = await pool.query('SELECT COUNT(*) as count FROM incidents WHERE created_at >= CURRENT_DATE - INTERVAL \'30 days\'');
-      const totalIncidents = parseInt(incidentsResult.rows[0].count);
+      // Total de incidencias y incidencias atendidas
+      const incidentsResult = await pool.query(`
+        SELECT 
+          COUNT(*) as total_count,
+          COUNT(CASE WHEN status = 'resolved' OR status = 'closed' OR resolved_at IS NOT NULL THEN 1 END) as resolved_count
+        FROM incidents 
+        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+      `);
+      const totalIncidents = parseInt(incidentsResult.rows[0].total_count);
+      const resolvedIncidents = parseInt(incidentsResult.rows[0].resolved_count);
       
       // Total de activos
       const assetsResult = await pool.query('SELECT COUNT(*) as count FROM assets');
@@ -1572,8 +1579,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       const totalVisitors = parseInt(visitorsResult.rows[0].total_visitors) || 0;
       
-      // Calificación promedio (simulado - valor fijo por ahora)
-      const averageRating = 4.2;
+      // Calificación promedio y parque mejor evaluado
+      const ratingResult = await pool.query(`
+        SELECT 
+          COALESCE(ROUND(AVG(pe.overall_rating), 2), 0) as average_rating
+        FROM park_evaluations pe
+        WHERE pe.overall_rating IS NOT NULL
+      `);
+      const averageRating = parseFloat(ratingResult.rows[0]?.average_rating) || 0;
+      
+      // Parque mejor evaluado
+      const bestParkResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          ROUND(AVG(pe.overall_rating), 2) as average_rating,
+          COUNT(pe.id) as evaluation_count
+        FROM parks p
+        INNER JOIN park_evaluations pe ON p.id = pe.park_id
+        WHERE pe.overall_rating IS NOT NULL
+        GROUP BY p.id, p.name
+        HAVING COUNT(pe.id) >= 3
+        ORDER BY average_rating DESC, evaluation_count DESC
+        LIMIT 1
+      `);
+      const bestEvaluatedPark = bestParkResult.rows[0] ? {
+        parkId: parseInt(bestParkResult.rows[0].park_id),
+        parkName: bestParkResult.rows[0].park_name,
+        averageRating: parseFloat(bestParkResult.rows[0].average_rating),
+        evaluationCount: parseInt(bestParkResult.rows[0].evaluation_count)
+      } : null;
       
       // Parques con Green Flag Award (basado en certificaciones)
       const greenFlagResult = await pool.query(`
@@ -1583,6 +1618,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       const greenFlagParks = parseInt(greenFlagResult.rows[0].count);
       const greenFlagPercentage = totalParks > 0 ? ((greenFlagParks / totalParks) * 100) : 0;
+      
+      // Total de reportes públicos y reportes resueltos (desde park_feedback)
+      const reportsResult = await pool.query(`
+        SELECT 
+          COUNT(*) as total_reports,
+          COUNT(CASE WHEN status = 'resolved' OR status = 'closed' OR resolved_at IS NOT NULL THEN 1 END) as resolved_reports
+        FROM park_feedback 
+        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+      `);
+      const totalReports = parseInt(reportsResult.rows[0]?.total_reports) || 0;
+      const resolvedReports = parseInt(reportsResult.rows[0]?.resolved_reports) || 0;
       
       // Evaluaciones promedio por parque - MOSTRAR TODOS LOS PARQUES
       const parkEvaluationsResult = await pool.query(`
@@ -1651,6 +1697,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalAmenities,
         totalInstructors,
         totalIncidents,
+        resolvedIncidents,
+        totalReports,
+        resolvedReports,
+        bestEvaluatedPark,
         totalAssets,
         averageRating,
         greenFlagParks,
