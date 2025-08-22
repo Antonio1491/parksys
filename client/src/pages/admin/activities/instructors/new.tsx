@@ -82,11 +82,10 @@ export default function NewInstructorPage() {
       formDataToSend.append('phone', data.phone || '');
       formDataToSend.append('specialties', JSON.stringify(data.specialties));
       formDataToSend.append('experienceYears', data.experienceYears.toString());
-      formDataToSend.append('bio', data.bio || '');
+      formDataToSend.append('bio', data.experience || data.bio || ''); // Mapear experience a bio
       formDataToSend.append('qualifications', data.qualifications || '');
       formDataToSend.append('availability', data.availability || '');
       formDataToSend.append('hourlyRate', (data.hourlyRate || 0).toString());
-      formDataToSend.append('experience', data.experience || '');
       
       if (data.preferredParkId) {
         formDataToSend.append('preferredParkId', data.preferredParkId.toString());
@@ -206,7 +205,7 @@ export default function NewInstructorPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Nuevo Instructor</h1>
           <p className="text-gray-600">
-            Registra un nuevo instructor para las actividades de los parques. Se creará automáticamente su usuario del sistema.
+            Registra un nuevo instructor para las actividades de los parques.
           </p>
         </div>
 
@@ -299,9 +298,6 @@ export default function NewInstructorPage() {
                       onChange={(e) => handleChange('email', e.target.value)}
                       required
                     />
-                    <p className="text-xs text-gray-500">
-                      Se usará para crear automáticamente su usuario del sistema
-                    </p>
                   </div>
 
                   <div className="space-y-2">

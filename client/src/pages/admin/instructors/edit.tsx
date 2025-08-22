@@ -168,11 +168,10 @@ export default function EditInstructorPage() {
       formDataToSend.append('phone', data.phone || '');
       formDataToSend.append('specialties', JSON.stringify(data.specialties));
       formDataToSend.append('experienceYears', data.experienceYears.toString());
-      formDataToSend.append('bio', data.bio || '');
+      formDataToSend.append('bio', data.experience || data.bio || ''); // Mapear experience a bio
       formDataToSend.append('qualifications', data.qualifications || '');
       formDataToSend.append('availability', data.availability || '');
       formDataToSend.append('hourlyRate', (data.hourlyRate || 0).toString());
-      formDataToSend.append('experience', data.experience || '');
       
       if (data.preferredParkId) {
         formDataToSend.append('preferredParkId', data.preferredParkId.toString());

@@ -260,6 +260,36 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         data.fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
       }
 
+      // Mapear campos del formulario a campos de base de datos
+      if (data.experience) {
+        data.bio = data.experience;
+        delete data.experience;
+      }
+
+      // Procesar availability como availableDays array
+      if (data.availability && typeof data.availability === 'string') {
+        // Convertir availability string a availableDays array
+        const availabilityMap: { [key: string]: string[] } = {
+          'full-time': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+          'part-time': ['Lunes', 'Miércoles', 'Viernes'],
+          'weekends': ['Sábado', 'Domingo'],
+          'evenings': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+          'mornings': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+          'flexible': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+        };
+        data.availableDays = availabilityMap[data.availability] || ['Flexible'];
+        delete data.availability;
+      }
+
+      // Procesar especialidades si vienen como string JSON
+      if (data.specialties && typeof data.specialties === 'string') {
+        try {
+          data.specialties = JSON.parse(data.specialties);
+        } catch (e) {
+          // Si no es JSON válido, mantener como está
+        }
+      }
+
       const validationResult = insertInstructorSchema.safeParse(data);
       
       if (!validationResult.success) {
@@ -312,6 +342,35 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
       // Construir fullName si no está presente
       if (!data.fullName && (data.firstName || data.lastName)) {
         data.fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+      }
+
+      // Mapear campos del formulario a campos de base de datos
+      if (data.experience) {
+        data.bio = data.experience;
+        delete data.experience;
+      }
+
+      // Procesar availability como availableDays array
+      if (data.availability && typeof data.availability === 'string') {
+        const availabilityMap: { [key: string]: string[] } = {
+          'full-time': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+          'part-time': ['Lunes', 'Miércoles', 'Viernes'],
+          'weekends': ['Sábado', 'Domingo'],
+          'evenings': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+          'mornings': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+          'flexible': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+        };
+        data.availableDays = availabilityMap[data.availability] || ['Flexible'];
+        delete data.availability;
+      }
+
+      // Procesar especialidades si vienen como string JSON
+      if (data.specialties && typeof data.specialties === 'string') {
+        try {
+          data.specialties = JSON.parse(data.specialties);
+        } catch (e) {
+          // Si no es JSON válido, mantener como está
+        }
       }
 
       const validationResult = insertInstructorSchema.partial().safeParse(data);
@@ -562,11 +621,7 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
       
       const [newEvaluation] = await db
         .insert(instructorEvaluations)
-        .values({
-          ...validationResult.data,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        })
+        .values(validationResult.data)
         .returning();
       
       res.status(201).json(newEvaluation);
