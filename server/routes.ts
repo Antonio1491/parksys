@@ -1502,7 +1502,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const incidentsResult = await pool.query(`
         SELECT 
           COUNT(*) as total_count,
-          COUNT(CASE WHEN status = 'resolved' OR status = 'closed' OR resolved_at IS NOT NULL THEN 1 END) as resolved_count
+          COUNT(CASE WHEN status = 'resolved' OR status = 'closed' THEN 1 END) as resolved_count
         FROM incidents 
         WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
       `);
@@ -1623,10 +1623,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reportsResult = await pool.query(`
         SELECT 
           COUNT(*) as total_reports,
-          COUNT(CASE WHEN status = 'resolved' OR status = 'closed' OR resolved_at IS NOT NULL THEN 1 END) as resolved_reports
+          COUNT(CASE WHEN status = 'resolved' OR status = 'closed' THEN 1 END) as resolved_reports
         FROM park_feedback 
         WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
-      `);
+      `).catch(() => ({ rows: [{ total_reports: 0, resolved_reports: 0 }] }));
       const totalReports = parseInt(reportsResult.rows[0]?.total_reports) || 0;
       const resolvedReports = parseInt(reportsResult.rows[0]?.resolved_reports) || 0;
       
