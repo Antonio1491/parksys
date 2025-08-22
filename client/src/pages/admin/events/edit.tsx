@@ -32,6 +32,8 @@ const editEventSchema = z.object({
   organizer_organization: z.string().optional(),
   contact_email: z.string().email('Email inválido').optional().or(z.literal('')),
   contact_phone: z.string().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
   registration_required: z.boolean().default(false),
   price: z.string().optional(),
   notes: z.string().optional()
@@ -58,6 +60,7 @@ interface EventData {
   organizerOrganization?: string;
   organizerEmail?: string;
   organizerPhone?: string;
+  geolocation?: { lat: number; lng: number };
   parks: Array<{ id: number; name: string; address: string }>;
 }
 
@@ -112,6 +115,8 @@ export default function EditEventPage() {
       organizer_organization: '',
       contact_email: '',
       contact_phone: '',
+      latitude: '',
+      longitude: '',
       registration_required: false,
       price: '',
       notes: ''
@@ -144,6 +149,8 @@ export default function EditEventPage() {
         organizer_organization: event.organizerOrganization || '',
         contact_email: event.organizerEmail || '',
         contact_phone: event.organizerPhone || '',
+        latitude: event.geolocation?.lat ? String(event.geolocation.lat) : '',
+        longitude: event.geolocation?.lng ? String(event.geolocation.lng) : '',
         registration_required: event.registrationType === 'registration',
         price: '',
         notes: ''
@@ -178,6 +185,9 @@ export default function EditEventPage() {
         organizerOrganization: data.organizer_organization || null,
         organizerEmail: data.contact_email || null,
         organizerPhone: data.contact_phone || null,
+        geolocation: data.latitude && data.longitude 
+          ? { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) }
+          : null,
         registrationType: data.registration_required ? 'registration' : 'free',
         status: 'published',
         targetAudience: 'general',
@@ -459,6 +469,38 @@ export default function EditEventPage() {
                       placeholder="Ej: Cancha de fútbol, Área de juegos"
                       className="mt-1"
                     />
+                  </div>
+
+                  {/* Coordenadas GPS */}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-3 block">Coordenadas GPS (opcional)</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="latitude">Latitud</Label>
+                        <Input
+                          id="latitude"
+                          type="number"
+                          step="any"
+                          {...form.register('latitude')}
+                          placeholder="Ej: 20.6597"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="longitude">Longitud</Label>
+                        <Input
+                          id="longitude"
+                          type="number"
+                          step="any"
+                          {...form.register('longitude')}
+                          placeholder="Ej: -103.3496"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Las coordenadas GPS permitirán a los usuarios encontrar la ubicación exacta del evento
+                    </p>
                   </div>
 
                   <div>
