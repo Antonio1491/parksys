@@ -11,6 +11,7 @@ import { handleProfileImageUpload } from "./api/profileImageUpload";
 import { saveProfileImage, getProfileImage } from "./profileImageCache";
 import { db, pool } from "./db";
 import { sql, eq } from "drizzle-orm";
+import { neon } from "@neondatabase/serverless";
 import { deleteAllVolunteers, deleteVolunteer } from "./delete-all-volunteers";
 import * as schema from "@shared/schema";
 const { parkAmenities, amenities, insertParkSchema } = schema;
@@ -94,6 +95,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Configure multer for file uploads
   const upload = multer({ storage: multer.memoryStorage() });
+  
+  // Crear instancia de Neon SQL para las rutas administrativas
+  const neonSql = neon(process.env.DATABASE_URL!);
   
   // Configure multer specifically for document uploads
   const documentUpload = multer({
@@ -497,11 +501,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       params.push(parseInt(limit as string), offset);
 
-      // Usamos la instancia sql directa de Neon
-      const { neon } = require('@neondatabase/serverless');
-      const neonSql = neon(process.env.DATABASE_URL!);
+      // Usamos la instancia sql directa de Neon (ya definida arriba)
       
-      const registrations = await neonSql.unsafe(query, params);
+      const registrations = await neonSql(query, params);
 
       // Contar total de registros
       const countQuery = `
@@ -512,7 +514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `;
 
       const countParams = params.slice(0, -2); // Remover limit y offset
-      const countResult = await neonSql.unsafe(countQuery, countParams);
+      const countResult = await neonSql(countQuery, countParams);
       const total = parseInt(countResult[0].total);
 
       res.json({
@@ -584,10 +586,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ORDER BY e.start_date DESC
       `;
 
-      const { neon } = require('@neondatabase/serverless');
-      const neonSql = neon(process.env.DATABASE_URL!);
+      // Usamos la instancia sql directa de Neon (ya definida arriba)
       
-      const events = await neonSql.unsafe(query);
+      const events = await neonSql(query);
 
       res.json({
         success: true,
@@ -645,8 +646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { neon } = require('@neondatabase/serverless');
-      const neonSql = neon(process.env.DATABASE_URL!);
+      // Usamos la instancia sql directa de Neon (ya definida arriba)
       
       const result = await neonSql`
         UPDATE event_registrations 
@@ -681,8 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
 
-      const { neon } = require('@neondatabase/serverless');
-      const neonSql = neon(process.env.DATABASE_URL!);
+      // Usamos la instancia sql directa de Neon (ya definida arriba)
       
       const result = await neonSql`
         DELETE FROM event_registrations 
