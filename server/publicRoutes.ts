@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { db } from './db';
-import { activities, instructors, parks } from '@shared/schema';
+import { activities, instructors, parks, instructorEvaluations } from '@shared/schema';
 import { eq, sql } from 'drizzle-orm';
 
 /**
@@ -78,26 +78,43 @@ export function registerPublicRoutes(publicRouter: any) {
         return res.status(404).json({ message: "Instructor no encontrado" });
       }
       
-      // Validar los datos de entrada - versión simplificada para evaluación pública
-      const { assignmentId, communication, knowledge, methodology, overallPerformance, comments } = req.body;
+      // Validar los datos de entrada - versión actualizada para evaluación pública
+      const { 
+        evaluatorName, 
+        evaluatorEmail, 
+        evaluatorCity, 
+        overallRating, 
+        knowledgeRating, 
+        patienceRating, 
+        clarityRating, 
+        punctualityRating, 
+        wouldRecommend,
+        comments, 
+        attendedActivity 
+      } = req.body;
       
-      if (!assignmentId || !communication || !knowledge || !methodology || !overallPerformance) {
+      if (!overallRating || !knowledgeRating || !patienceRating || !clarityRating || !punctualityRating || !evaluatorName) {
         return res.status(400).json({ message: "Faltan campos obligatorios para la evaluación" });
       }
       
-      // Insertar la evaluación
+      // Insertar la evaluación con los campos correctos
       const [newEvaluation] = await db
         .insert(instructorEvaluations)
         .values({
           instructorId,
-          assignmentId,
-          evaluatorId: 0, // Para evaluaciones públicas, usamos 0 como ID genérico
-          communication,
-          knowledge,
-          methodology,
-          overallPerformance,
-          comments,
-          // No incluimos campos que podrían no existir en la tabla
+          evaluatorName,
+          evaluatorEmail: evaluatorEmail || null,
+          evaluatorCity: evaluatorCity || null,
+          overallRating,
+          knowledgeRating,
+          patienceRating,
+          clarityRating,
+          punctualityRating,
+          wouldRecommend: wouldRecommend || false,
+          comments: comments || null,
+          attendedActivity: attendedActivity || null,
+          status: 'pending', // Evaluaciones públicas requieren moderación
+          evaluatorIp: req.ip || null, // Para prevenir spam
         })
         .returning();
       
