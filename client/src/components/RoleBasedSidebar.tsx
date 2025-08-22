@@ -243,9 +243,9 @@ const AdminSidebarContent: React.FC<{ location: string; defaultAccordion: string
         Listado
       </NavItem>
       <NavItem 
-        href="/admin/instructors" 
+        href="/admin/activities/instructors" 
         icon={<GraduationCap className="h-5 w-5" />}
-        active={location === '/admin/instructors'}
+        active={location === '/admin/activities/instructors'}
       >
         Instructores
       </NavItem>
@@ -391,9 +391,9 @@ const ManagerSidebar: React.FC<{ location: string; defaultAccordion: string[] }>
         Listado
       </NavItem>
       <NavItem 
-        href="/admin/instructors" 
+        href="/admin/activities/instructors" 
         icon={<GraduationCap className="h-5 w-5" />}
-        active={location === '/admin/instructors'}
+        active={location === '/admin/activities/instructors'}
       >
         Instructores
       </NavItem>
@@ -503,7 +503,7 @@ const RoleBasedSidebar: React.FC = () => {
   const getInitialOpenSections = () => {
     if (location.startsWith('/admin/assets')) return ['assets'];
     if (location.startsWith('/admin/activities/management')) return ['activities'];
-    if (location.startsWith('/admin/instructors')) return ['activities'];
+    if (location.startsWith('/admin/activities/instructors')) return ['activities'];
     if (location.startsWith('/admin/parks') || 
         location.startsWith('/admin/amenities') || 
         location.startsWith('/admin/incidents')) return ['operations'];

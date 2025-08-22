@@ -67,7 +67,7 @@ const SYSTEM_MODULES = {
     children: {
       list: { name: 'Listado', icon: Activity, path: '/admin/activities' },
       calendar: { name: 'Calendario', icon: Calendar, path: '/admin/activities/calendar' },
-      instructors: { name: 'Instructores', icon: GraduationCap, path: '/admin/instructors' }
+      instructors: { name: 'Instructores', icon: GraduationCap, path: '/admin/activities/instructors' }
     }
   },
   users: {

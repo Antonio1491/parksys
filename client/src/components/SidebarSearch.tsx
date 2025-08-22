@@ -122,7 +122,7 @@ export function SidebarSearch() {
     { id: 'security-settings', title: 'Configuración de Seguridad', description: 'Configuración de seguridad', href: '/admin/security/settings', module: 'Seguridad', icon: <Settings className="h-4 w-4" /> },
 
     // Instructores
-    { id: 'instructors', title: 'Gestión de Instructores', description: 'Administración de instructores', href: '/admin/instructors', module: 'Instructores', icon: <Users className="h-4 w-4" /> },
+    { id: 'instructors', title: 'Gestión de Instructores', description: 'Administración de instructores', href: '/admin/activities/instructors', module: 'Instructores', icon: <Users className="h-4 w-4" /> },
   ], []);
 
   // Filtrar resultados basado en la consulta

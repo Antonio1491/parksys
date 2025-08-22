@@ -111,7 +111,7 @@ export default function ActivityInstructorSection({
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setLocation('/admin/instructors/cards')}
+                    onClick={() => setLocation('/admin/activities/instructors/cards')}
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Ver instructores disponibles

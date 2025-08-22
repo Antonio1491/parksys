@@ -242,15 +242,15 @@ export default function InstructorCard({ instructor, showActions = true, compact
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => setLocation(`/admin/instructors/${instructor.id}/assignments`)}>
+                  <DropdownMenuItem onClick={() => setLocation(`/admin/activities/instructors/${instructor.id}/assignments`)}>
                     <Calendar className="h-4 w-4 mr-2" />
                     Asignaciones
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLocation(`/admin/instructors/${instructor.id}/evaluations`)}>
+                  <DropdownMenuItem onClick={() => setLocation(`/admin/activities/instructors/${instructor.id}/evaluations`)}>
                     <MessageSquare className="h-4 w-4 mr-2" />
                     Evaluaciones
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLocation(`/admin/instructors/${instructor.id}/recognitions`)}>
+                  <DropdownMenuItem onClick={() => setLocation(`/admin/activities/instructors/${instructor.id}/recognitions`)}>
                     <Award className="h-4 w-4 mr-2" />
                     Reconocimientos
                   </DropdownMenuItem>

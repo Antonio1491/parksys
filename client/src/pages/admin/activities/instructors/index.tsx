@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'wouter';
+import { useLocation } from 'wouter';
 import { AdminLayout } from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,11 +8,20 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useToast } from '@/hooks/use-toast';
 import { 
   Search, 
   Plus, 
   Edit2, 
+  Edit,
   Trash2, 
   Eye, 
   Star, 
@@ -24,11 +33,32 @@ import {
   MapPin,
   Filter,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  RefreshCw,
+  AlertCircle,
+  Download,
+  FileEdit,
+  ChevronDown,
+  ArrowUpDown,
+  Users,
+  UserCheck,
+  Briefcase,
+  GraduationCap
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { apiRequest } from '@/lib/queryClient';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface Instructor {
   id: number;
@@ -53,6 +83,7 @@ interface Instructor {
 }
 
 export default function InstructorsManagementPage() {
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -61,34 +92,38 @@ export default function InstructorsManagementPage() {
   const [instructorToDelete, setInstructorToDelete] = useState<Instructor | null>(null);
   
   // Estados para filtros
-  const [specialtyFilter, setSpecialtyFilter] = useState('');
-  const [ratingFilter, setRatingFilter] = useState('');
-  const [experienceFilter, setExperienceFilter] = useState('');
+  const [specialtyFilter, setSpecialtyFilter] = useState('all');
+  const [ratingFilter, setRatingFilter] = useState('all');
+  const [experienceFilter, setExperienceFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  
+  // Estados para eliminación masiva
+  const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
+  const [deleteInstructorId, setDeleteInstructorId] = useState<number | null>(null);
 
   // Obtener lista de instructores
-  const { data: instructors = [], isLoading } = useQuery({
+  const { data: instructors = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['/api/instructors'],
+    retry: 1,
+    enabled: true,
   });
 
-  // Mutación para eliminar instructor
+  // Mutación para eliminar instructor individual
   const deleteInstructorMutation = useMutation({
     mutationFn: async (instructorId: number) => {
-      const response = await fetch(`/api/instructors/${instructorId}`, {
-        method: 'DELETE',
+      return await apiRequest(`/api/instructors/${instructorId}`, {
+        method: 'DELETE'
       });
-      if (!response.ok) {
-        throw new Error('Error al eliminar instructor');
-      }
-      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, instructorId) => {
       toast({
-        title: 'Instructor eliminado',
-        description: 'El instructor ha sido eliminado exitosamente.',
+        title: "Instructor eliminado",
+        description: "El instructor ha sido eliminado correctamente",
+        variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/instructors'] });
       queryClient.invalidateQueries({ queryKey: ['/public-api/instructors/public'] });
@@ -96,11 +131,41 @@ export default function InstructorsManagementPage() {
       setInstructorToDelete(null);
     },
     onError: (error) => {
+      console.error("Error al eliminar instructor:", error);
       toast({
-        title: 'Error al eliminar instructor',
-        description: error.message,
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudo eliminar el instructor. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
       });
+      setShowDeleteDialog(false);
+      setInstructorToDelete(null);
+    },
+  });
+  
+  // Mutación para eliminar todos los instructores
+  const deleteAllInstructorsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/instructors/batch/all', {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Instructores inactivados",
+        description: `${data.count} instructores han sido inactivados correctamente`,
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/instructors'] });
+      setDeleteAllDialogOpen(false);
+    },
+    onError: (error) => {
+      console.error("Error al eliminar todos los instructores:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron eliminar los instructores. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
+      setDeleteAllDialogOpen(false);
     },
   });
 
@@ -114,43 +179,53 @@ export default function InstructorsManagementPage() {
   ).sort();
 
   // Aplicar todos los filtros
-  let filteredInstructors = (instructors as Instructor[]).filter((instructor: Instructor) => {
-    // Filtro de búsqueda
-    const matchesSearch = searchQuery === '' || 
-      `${instructor.firstName} ${instructor.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      instructor.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (Array.isArray(instructor.specialties) ? instructor.specialties : []).some(specialty => 
-        specialty.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  const filteredInstructors = React.useMemo(() => {
+    if (!Array.isArray(instructors)) return [];
+    
+    return instructors.filter((instructor: Instructor) => {
+      // Filtro de búsqueda
+      const matchesSearch = searchQuery === '' || 
+        `${instructor.firstName} ${instructor.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        instructor.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (Array.isArray(instructor.specialties) ? instructor.specialties : []).some(specialty => 
+          specialty.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
-    // Filtro por especialidad
-    const matchesSpecialty = specialtyFilter === 'all' || specialtyFilter === '' || 
-      (Array.isArray(instructor.specialties) ? instructor.specialties : []).includes(specialtyFilter);
+      // Filtro por estado
+      const matchesStatus = statusFilter === 'all' || !instructor.status || instructor.status === statusFilter;
 
-    // Filtro por calificación
-    const matchesRating = ratingFilter === 'all' || ratingFilter === '' || 
-      (instructor.rating && instructor.rating >= parseFloat(ratingFilter));
+      // Filtro por especialidad
+      const matchesSpecialty = specialtyFilter === 'all' || specialtyFilter === '' || 
+        (Array.isArray(instructor.specialties) ? instructor.specialties : []).includes(specialtyFilter);
 
-    // Filtro por experiencia
-    const matchesExperience = experienceFilter === 'all' || experienceFilter === '' || 
-      (experienceFilter === '0-2' && instructor.experienceYears <= 2) ||
-      (experienceFilter === '3-5' && instructor.experienceYears >= 3 && instructor.experienceYears <= 5) ||
-      (experienceFilter === '6-10' && instructor.experienceYears >= 6 && instructor.experienceYears <= 10) ||
-      (experienceFilter === '10+' && instructor.experienceYears > 10);
+      // Filtro por calificación
+      const matchesRating = ratingFilter === 'all' || ratingFilter === '' || 
+        (instructor.rating && instructor.rating >= parseFloat(ratingFilter));
 
-    return matchesSearch && matchesSpecialty && matchesRating && matchesExperience;
-  });
+      // Filtro por experiencia
+      const matchesExperience = experienceFilter === 'all' || experienceFilter === '' || 
+        (experienceFilter === '0-2' && instructor.experienceYears <= 2) ||
+        (experienceFilter === '3-5' && instructor.experienceYears >= 3 && instructor.experienceYears <= 5) ||
+        (experienceFilter === '6-10' && instructor.experienceYears >= 6 && instructor.experienceYears <= 10) ||
+        (experienceFilter === '10+' && instructor.experienceYears > 10);
 
-  // Calcular paginación
+      return matchesSearch && matchesStatus && matchesSpecialty && matchesRating && matchesExperience;
+    });
+  }, [instructors, searchQuery, statusFilter, specialtyFilter, ratingFilter, experienceFilter]);
+
+  // Calcular instructores paginados
+  const paginatedInstructors = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredInstructors.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredInstructors, currentPage, itemsPerPage]);
+
+  // Total de páginas
   const totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedInstructors = filteredInstructors.slice(startIndex, endIndex);
 
   // Reset página cuando cambien los filtros
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, specialtyFilter, ratingFilter, experienceFilter]);
+  }, [searchQuery, statusFilter, specialtyFilter, ratingFilter, experienceFilter]);
 
   const handleDeleteInstructor = (instructor: Instructor) => {
     setInstructorToDelete(instructor);
@@ -162,17 +237,103 @@ export default function InstructorsManagementPage() {
       deleteInstructorMutation.mutate(instructorToDelete.id);
     }
   };
+  
+  // Manejar click en botón de eliminar todos
+  const handleDeleteAllClick = () => {
+    setDeleteAllDialogOpen(true);
+  };
+
+  // Manejar confirmación de eliminar todos
+  const handleConfirmDeleteAll = () => {
+    deleteAllInstructorsMutation.mutate();
+  };
+
+  // Manejar click en botón de eliminar instructor individual
+  const handleDeleteClick = (instructorId: number) => {
+    setDeleteInstructorId(instructorId);
+    setShowDeleteDialog(true);
+  };
+
+  // Manejar confirmación de eliminar instructor individual
+  const handleConfirmDelete = () => {
+    if (deleteInstructorId !== null) {
+      deleteInstructorMutation.mutate(deleteInstructorId);
+    }
+  };
+  
+  // Formatear fecha
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Fecha desconocida';
+    
+    try {
+      const date = new Date(dateString);
+      return format(date, 'dd MMM yyyy', { locale: es });
+    } catch (error) {
+      return 'Fecha inválida';
+    }
+  };
+
+  // Renderizar badge de estado
+  const renderStatusBadge = (status?: string) => {
+    if (!status) return <Badge>Sin estado</Badge>;
+    
+    switch (status) {
+      case 'active':
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Activo</Badge>;
+      case 'inactive':
+        return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-200">Inactivo</Badge>;
+      case 'pending':
+        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Pendiente</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
+  
+  // Cambiar de página
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const formatSpecialties = (specialties: string[] | null | undefined) => {
-    if (!specialties || !Array.isArray(specialties)) {
-      return <Badge variant="outline" className="text-gray-500">Sin especialidades</Badge>;
+    if (!specialties || !Array.isArray(specialties) || specialties.length === 0) {
+      return <span className="text-gray-400 italic">No especificado</span>;
     }
-    return specialties.slice(0, 3).map((specialty, index) => (
-      <Badge key={index} variant="secondary" className="bg-[#00a587]/10 text-[#00a587] mr-1 mb-1">
-        {specialty}
-      </Badge>
-    ));
+    
+    if (specialties.length <= 2) {
+      return specialties.map((specialty, index) => (
+        <Badge key={index} variant="outline" className="mr-1 mb-1">{specialty}</Badge>
+      ));
+    } else {
+      return (
+        <>
+          <Badge variant="outline" className="mr-1 mb-1">{specialties[0]}</Badge>
+          <Badge variant="outline" className="mr-1 mb-1">+{specialties.length - 1} más</Badge>
+        </>
+      );
+    }
   };
+  
+  // Lista de especialidades únicas para el filtro
+  const specialties = React.useMemo(() => {
+    if (!Array.isArray(instructors) || instructors.length === 0) return [];
+    
+    const allSpecialties = new Set<string>();
+    instructors.forEach((instructor: Instructor) => {
+      if (instructor.specialties && Array.isArray(instructor.specialties)) {
+        instructor.specialties.forEach((specialty: string) => {
+          allSpecialties.add(specialty.trim());
+        });
+      } else if (instructor.specialties && typeof instructor.specialties === 'string') {
+        // Fallback para datos legacy que puedan estar como string
+        const specialtiesList = instructor.specialties.split(',');
+        specialtiesList.forEach((specialty: string) => {
+          allSpecialties.add(specialty.trim());
+        });
+      }
+    });
+    
+    return Array.from(allSpecialties);
+  }, [instructors]);
 
   const renderStars = (rating: number) => {
     return (
@@ -192,6 +353,28 @@ export default function InstructorsManagementPage() {
 
   return (
     <AdminLayout title="Gestión de Instructores">
+      {/* Diálogo de confirmación para eliminar todos los instructores */}
+      <AlertDialog open={deleteAllDialogOpen} onOpenChange={setDeleteAllDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción desactivará a todos los instructores en el sistema y no se puede deshacer.
+              Los instructores marcados como inactivos ya no aparecerán en las listas públicas ni podrán ser asignados a actividades.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDeleteAll}
+              disabled={deleteAllInstructorsMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteAllInstructorsMutation.isPending ? 'Procesando...' : 'Confirmar eliminación'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="space-y-6">
         {/* Header con estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -254,8 +437,56 @@ export default function InstructorsManagementPage() {
           </Card>
         </div>
 
-        {/* Barra de búsqueda y acciones */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        {/* Header con título y acciones */}
+        <Card className="p-4 bg-gray-50 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-8 h-8 text-gray-900" />
+                <h1 className="text-3xl font-bold text-gray-900">Instructores</h1>
+              </div>
+              <p className="text-gray-600 mt-2">Gestiona la lista de instructores registrados en la plataforma</p>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={() => setLocation('/admin/activities/instructors/new')} className="bg-[#00a587] hover:bg-[#067f5f]">
+                <Plus className="mr-2 h-4 w-4" />
+                Nuevo Instructor
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <Download className="mr-2 h-4 w-4" />
+                    Exportar
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Formato</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <FileEdit className="mr-2 h-4 w-4" />
+                    Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <FileEdit className="mr-2 h-4 w-4" />
+                    CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <FileEdit className="mr-2 h-4 w-4" />
+                    PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button variant="outline" onClick={handleDeleteAllClick}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Eliminar Todos
+              </Button>
+            </div>
+          </div>
+        </Card>
+        
+        {/* Barra de búsqueda */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
@@ -265,174 +496,155 @@ export default function InstructorsManagementPage() {
               className="pl-10"
             />
           </div>
-          <Link href="/admin/activities/instructors/new">
-            <Button className="bg-[#00a587] hover:bg-[#067f5f]">
-              <Plus className="mr-2 h-4 w-4" />
-              Nuevo Instructor
-            </Button>
-          </Link>
         </div>
 
         {/* Filtros */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filtros
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Filtro por especialidad */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Especialidad</label>
-                <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas las especialidades" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas las especialidades</SelectItem>
-                    {uniqueSpecialties.map((specialty) => (
-                      <SelectItem key={specialty} value={specialty}>
-                        {specialty}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Filtro por calificación */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Calificación mínima</label>
-                <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas las calificaciones" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas las calificaciones</SelectItem>
-                    <SelectItem value="4.5">4.5+ estrellas</SelectItem>
-                    <SelectItem value="4.0">4.0+ estrellas</SelectItem>
-                    <SelectItem value="3.5">3.5+ estrellas</SelectItem>
-                    <SelectItem value="3.0">3.0+ estrellas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Filtro por experiencia */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Años de experiencia</label>
-                <Select value={experienceFilter} onValueChange={setExperienceFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Toda la experiencia" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Toda la experiencia</SelectItem>
-                    <SelectItem value="0-2">0-2 años</SelectItem>
-                    <SelectItem value="3-5">3-5 años</SelectItem>
-                    <SelectItem value="6-10">6-10 años</SelectItem>
-                    <SelectItem value="10+">Más de 10 años</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Botón limpiar filtros */}
-              <div className="flex items-end">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSpecialtyFilter('all');
-                    setRatingFilter('all');
-                    setExperienceFilter('all');
-                    setSearchQuery('');
-                    setCurrentPage(1);
-                  }}
-                  className="w-full"
-                >
-                  Limpiar filtros
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mb-6 flex flex-col md:flex-row gap-4 items-end">
+          <div className="w-full md:w-1/5">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filtrar por estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="active">Activos</SelectItem>
+                <SelectItem value="inactive">Inactivos</SelectItem>
+                <SelectItem value="pending">Pendientes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="w-full md:w-1/5">
+            <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filtrar por especialidad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las especialidades</SelectItem>
+                {specialties.map((specialty, index) => (
+                  <SelectItem key={index} value={specialty}>{specialty}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="w-full md:w-1/5">
+            <Select value={ratingFilter} onValueChange={setRatingFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Calificación mínima" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las calificaciones</SelectItem>
+                <SelectItem value="4.5">4.5+ estrellas</SelectItem>
+                <SelectItem value="4.0">4.0+ estrellas</SelectItem>
+                <SelectItem value="3.5">3.5+ estrellas</SelectItem>
+                <SelectItem value="3.0">3.0+ estrellas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="w-full md:w-1/5">
+            <Select value={experienceFilter} onValueChange={setExperienceFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Experiencia" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toda la experiencia</SelectItem>
+                <SelectItem value="0-2">0-2 años</SelectItem>
+                <SelectItem value="3-5">3-5 años</SelectItem>
+                <SelectItem value="6-10">6-10 años</SelectItem>
+                <SelectItem value="10+">Más de 10 años</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Button variant="outline" className="w-full md:w-auto" onClick={() => {
+            setSearchQuery('');
+            setStatusFilter('all');
+            setSpecialtyFilter('all');
+            setRatingFilter('all');
+            setExperienceFilter('all');
+          }}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Limpiar filtros
+          </Button>
+        </div>
 
         {/* Tabla de instructores */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Instructores</CardTitle>
-            <CardDescription>
-              Gestiona los instructores que imparten actividades en los parques
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00a587]"></div>
+        <div className="bg-white rounded-md shadow">
+          {isLoading ? (
+            <div className="text-center py-8">
+              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+              <p className="mt-2 text-gray-500">Cargando instructores...</p>
+            </div>
+          ) : isError ? (
+            <div className="text-center py-8">
+              <AlertCircle className="h-8 w-8 mx-auto text-red-500" />
+              <p className="mt-2 text-red-500">Error al cargar los instructores</p>
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => refetch()}>
+                Reintentar
+              </Button>
+            </div>
+          ) : paginatedInstructors?.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-gray-500">
+                {instructors ? "No se encontraron instructores que coincidan con los criterios de búsqueda." : "Haz clic en 'Cargar instructores' para ver los datos."}
               </div>
-            ) : paginatedInstructors.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                {searchQuery || (specialtyFilter !== 'all' && specialtyFilter !== '') || (ratingFilter !== 'all' && ratingFilter !== '') || (experienceFilter !== 'all' && experienceFilter !== '') 
-                  ? 'No se encontraron instructores que coincidan con los filtros aplicados' 
-                  : 'No hay instructores registrados'}
-              </div>
-            ) : (
+            </div>
+          ) : (
+            <div className="border rounded-md overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Instructor</TableHead>
+                    <TableHead>Nombre</TableHead>
                     <TableHead>Contacto</TableHead>
+                    <TableHead>
+                      <div className="flex items-center">
+                        Estado
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </div>
+                    </TableHead>
                     <TableHead>Especialidades</TableHead>
                     <TableHead>Experiencia</TableHead>
                     <TableHead>Calificación</TableHead>
-                    <TableHead>Parque Preferido</TableHead>
-                    <TableHead>Acciones</TableHead>
+                    <TableHead>Inicio</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredInstructors.map((instructor: Instructor) => (
+                  {paginatedInstructors.map((instructor: Instructor) => (
                     <TableRow key={instructor.id}>
-                      <TableCell className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarImage src={instructor.profileImageUrl} />
-                          <AvatarFallback>
-                            {instructor.firstName?.[0] || 'I'}{instructor.lastName?.[0] || 'N'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">
-                            {instructor.firstName || 'Sin nombre'} {instructor.lastName || ''}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {instructor.activitiesCount || 0} actividades
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center text-sm">
-                            <Mail className="mr-1 h-3 w-3" />
-                            {instructor.email}
-                          </div>
-                          {instructor.phone && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Phone className="mr-1 h-3 w-3" />
-                              {instructor.phone}
+                      <TableCell className="font-medium">
+                        <div className="flex items-center space-x-3">
+                          <Avatar>
+                            <AvatarImage src={instructor.profileImageUrl} />
+                            <AvatarFallback>
+                              {instructor.firstName?.[0] || 'I'}{instructor.lastName?.[0] || 'N'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            {instructor.firstName} {instructor.lastName}
+                            <div className="text-sm text-gray-500">
+                              {instructor.activitiesCount || 0} actividades
                             </div>
-                          )}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap">
-                          {formatSpecialties(instructor.specialties)}
-                          {instructor.specialties.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{instructor.specialties.length - 3}
-                            </Badge>
-                          )}
-                        </div>
+                        <div>{instructor.email}</div>
+                        {instructor.phone && (
+                          <div className="text-muted-foreground text-xs">{instructor.phone}</div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {renderStatusBadge(instructor.status)}
+                      </TableCell>
+                      <TableCell>
+                        {formatSpecialties(instructor.specialties)}
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{instructor.experienceYears} años</div>
+                          <div className="font-medium">{instructor.experienceYears} {instructor.experienceYears === 1 ? 'año' : 'años'}</div>
                           {instructor.hourlyRate && (
                             <div className="text-sm text-gray-600">
                               ${instructor.hourlyRate}/hr
@@ -445,35 +657,31 @@ export default function InstructorsManagementPage() {
                           <span className="text-gray-400 text-sm">Sin calificar</span>
                         )}
                       </TableCell>
-                      <TableCell>
-                        {instructor.preferredParkName ? (
-                          <div className="flex items-center text-sm">
-                            <MapPin className="mr-1 h-3 w-3" />
-                            {instructor.preferredParkName}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">No especificado</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
+                      <TableCell>{formatDate(instructor.createdAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
                           <Button
                             variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedInstructor(instructor)}
+                            size="icon"
+                            onClick={() => setLocation(`/admin/activities/instructors/detail/${instructor.id}`)}
+                            title="Ver detalles"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Link href={`/admin/activities/instructors/${instructor.id}/edit`}>
-                            <Button variant="ghost" size="sm">
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                          </Link>
                           <Button
                             variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteInstructor(instructor)}
-                            className="text-red-600 hover:text-red-700"
+                            size="icon"
+                            onClick={() => setLocation(`/admin/activities/instructors/edit/${instructor.id}`)}
+                            title="Editar instructor"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteClick(instructor.id)}
+                            title="Eliminar instructor"
+                            className="hover:bg-red-50 hover:text-red-600"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -483,79 +691,60 @@ export default function InstructorsManagementPage() {
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          )}
+        </div>
 
         {/* Paginación */}
-        {filteredInstructors.length > itemsPerPage && (
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Página {currentPage} de {totalPages} - Mostrando {startIndex + 1}-{Math.min(endIndex, filteredInstructors.length)} de {filteredInstructors.length} instructores
-                </div>
+        {totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredInstructors.length)} de {filteredInstructors.length} instructores
+            </div>
+            
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                    className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
                 
-                <div className="flex items-center space-x-2">
-                  {/* Botón Anterior */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="flex items-center space-x-1"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    <span>Anterior</span>
-                  </Button>
-
-                  {/* Números de página */}
-                  <div className="flex space-x-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, index) => {
-                      let pageNumber;
-                      if (totalPages <= 5) {
-                        pageNumber = index + 1;
-                      } else if (currentPage <= 3) {
-                        pageNumber = index + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNumber = totalPages - 4 + index;
-                      } else {
-                        pageNumber = currentPage - 2 + index;
-                      }
-
-                      return (
-                        <Button
-                          key={pageNumber}
-                          variant={currentPage === pageNumber ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setCurrentPage(pageNumber)}
-                          className={`w-8 h-8 p-0 ${
-                            currentPage === pageNumber 
-                              ? 'bg-[#00a587] hover:bg-[#067f5f] text-white' 
-                              : 'hover:bg-gray-100'
-                          }`}
-                        >
-                          {pageNumber}
-                        </Button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Botón Siguiente */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="flex items-center space-x-1"
-                  >
-                    <span>Siguiente</span>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(pageNum)}
+                        isActive={currentPage === pageNum}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                    className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         )}
       </div>
 

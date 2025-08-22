@@ -47,7 +47,7 @@ import ParkEvaluationForm from "@/pages/ParkEvaluationForm";
 import EvaluacionesParques from "@/pages/admin/evaluaciones/parques";
 
 function Router() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const isVentasRoute = location === '/ventas' || location === '/landing' || location === '/sales';
   const isAdminRoute = location.startsWith('/admin');
   
@@ -349,6 +349,16 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/activities/instructors/new')))}
           </Suspense>
         </Route>
+        <Route path="/admin/activities/instructors/detail/:id">
+          <Suspense fallback={<div className="p-8 text-center">Cargando detalles del instructor...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/activities/instructors/detail')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/activities/instructors/edit/:id">
+          <Suspense fallback={<div className="p-8 text-center">Cargando edición del instructor...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/activities/instructors/edit')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/activities/:id/images">
           <Suspense fallback={<div className="p-8 text-center">Cargando gestión de imágenes...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/activities/activity-images')))}
@@ -474,42 +484,30 @@ function Router() {
         {/* La ruta de registro y edición de voluntarios ha sido eliminada del módulo de Voluntarios
              ya que ahora se gestiona desde el módulo de Usuarios */}
         
-        {/* Rutas para el módulo de instructores */}
+        {/* Legacy redirects - Rutas de instructores redirigen a la nueva ubicación */}
         <Route path="/admin/instructors/applications">
-          <Suspense fallback={<div className="p-8 text-center">Cargando aplicaciones de instructores...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/instructors/applications')))}
-          </Suspense>
+          {() => { setLocation('/admin/activities/instructors/applications'); return null; }}
         </Route>
-        <Route path="/admin/instructors/invitations" component={AdminInstructorInvitations} />
+        <Route path="/admin/instructors/invitations">
+          {() => { setLocation('/admin/activities/instructors/invitations'); return null; }}
+        </Route>
         <Route path="/admin/instructors/evaluations">
-          <Suspense fallback={<div className="p-8 text-center">Cargando evaluaciones de instructores...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/instructors/evaluations/index')))}
-          </Suspense>
+          {() => { setLocation('/admin/activities/instructors/evaluations'); return null; }}
         </Route>
         <Route path="/admin/instructors/cards">
-          <Suspense fallback={<div className="p-8 text-center">Cargando tarjetas de instructores...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/instructors/cards')))}
-          </Suspense>
+          {() => { setLocation('/admin/activities/instructors/cards'); return null; }}
         </Route>
         <Route path="/admin/instructors/detail/:id">
-          <Suspense fallback={<div className="p-8 text-center">Cargando perfil de instructor...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/instructors/detail')))}
-          </Suspense>
+          {({ id }: { id: string }) => { setLocation(`/admin/activities/instructors/detail/${id}`); return null; }}
         </Route>
         <Route path="/admin/instructors/edit/:id">
-          <Suspense fallback={<div className="p-8 text-center">Cargando formulario de edición...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/instructors/edit')))}
-          </Suspense>
+          {({ id }: { id: string }) => { setLocation(`/admin/activities/instructors/edit/${id}`); return null; }}
         </Route>
         <Route path="/admin/instructors/:id">
-          <Suspense fallback={<div className="p-8 text-center">Cargando perfil de instructor...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/instructors/detail')))}
-          </Suspense>
+          {({ id }: { id: string }) => { setLocation(`/admin/activities/instructors/detail/${id}`); return null; }}
         </Route>
         <Route path="/admin/instructors">
-          <Suspense fallback={<div className="p-8 text-center">Cargando lista de instructores...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/instructors/index')))}
-          </Suspense>
+          {() => { setLocation('/admin/activities/instructors'); return null; }}
         </Route>
         
         {/* Demostración Integración HR-Finanzas */}

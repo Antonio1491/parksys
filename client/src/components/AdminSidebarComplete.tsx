@@ -303,7 +303,7 @@ const AdminSidebarComplete: React.FC = () => {
     if (location.startsWith('/admin/parks')) return 'parques';
     if (location.startsWith('/admin/trees')) return 'arbolado';
     if (location.startsWith('/admin/fauna')) return 'fauna';
-    if (location.startsWith('/admin/organizador') || location.startsWith('/admin/activities') || location.startsWith('/admin/instructors')) return 'actividades';
+    if (location.startsWith('/admin/organizador') || location.startsWith('/admin/activities') || location.startsWith('/admin/activities/instructors')) return 'actividades';
     if (location.startsWith('/admin/events') || location.startsWith('/admin/eventos-ambu')) return 'eventos';
     if (location.startsWith('/admin/space-reservations') || location.startsWith('/admin/dashboard-reservas')) return 'reservas';
     if (location.startsWith('/admin/amenities')) return 'amenidades';
@@ -360,7 +360,7 @@ const AdminSidebarComplete: React.FC = () => {
         location.startsWith('/admin/fauna') || 
         location.startsWith('/admin/organizador') || 
         location.startsWith('/admin/activities') || 
-        location.startsWith('/admin/instructors') || 
+        location.startsWith('/admin/activities/instructors') || 
         location.startsWith('/admin/events') || 
         location.startsWith('/admin/eventos-ambu') || 
         location.startsWith('/admin/space-reservations') ||
@@ -479,9 +479,9 @@ const AdminSidebarComplete: React.FC = () => {
                 Inscripciones
               </NavItem>
               <NavItem 
-                href="/admin/instructors" 
+                href="/admin/activities/instructors" 
                 icon={<GraduationCap className="h-4 w-4" />}
-                active={location.startsWith('/admin/instructors')}
+                active={location.startsWith('/admin/activities/instructors')}
               >
                 {t('navigation.instructors')}
               </NavItem>
