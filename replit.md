@@ -3,8 +3,19 @@
 ## Overview
 ParkSys is a comprehensive municipal parks management system designed to streamline the management of parks, activities, volunteers, instructors, assets, and finances. It offers a modern full-stack application with role-based access control and various modules to support diverse park operations. The vision is to provide municipalities with a robust tool to efficiently manage urban green spaces, enhance citizen engagement, and ensure sustainable park operations.
 
-## Recent Changes (August 21, 2025)
-✅ **PARK EDIT FORM COMPLETELY RESOLVED**: All issues with park edit form functionality have been solved
+## Recent Changes (August 22, 2025)
+✅ **EVENT PRICING SYSTEM FULLY IMPLEMENTED**: Complete event registration system with payment integration
+- **Frontend Enhancement**: Added comprehensive pricing fields to event creation form in Participantes section
+- **Pricing Options**: Event creators can now specify if events are free or paid with price per participant
+- **Approval System**: Optional requirement for manual approval of registrations before confirmation
+- **Database Schema**: Extended events table with isFree, price, and requiresApproval columns
+- **Form Validation**: Enhanced validation with conditional price field display and proper data handling
+- **UI Components**: Used Shadcn Checkbox components for consistent design language
+- **Backend Integration**: Full compatibility with existing event creation API endpoints
+- **Impact**: Event organizers can now create both free and paid events with flexible approval workflows
+- **Status**: Complete event pricing functionality with enhanced user experience and robust validation
+
+✅ **PREVIOUS: PARK EDIT FORM COMPLETELY RESOLVED**: All issues with park edit form functionality have been solved
 - **Frontend Enhancement**: Added missing fields (conservationStatus, regulationUrl, videoUrl) to edit form with proper UI components
 - **Certification System**: Expanded available certifications to 8 options including Green Flag Award 2024, ISO 14001, and more
 - **Backend Integration**: Confirmed /api/dev/parks/:id endpoint correctly handles all park fields including certifications  
