@@ -515,8 +515,8 @@ const ParksDashboard = () => {
 
         {/* Sección continua con el resto del dashboard */}
         <div className="space-y-6">
-          {/* NUEVO: Gráfico de Evaluación Promedio por Parque */}
-          <Card className="border-0 shadow-lg max-w-4xl mx-auto rounded-3xl">
+          {/* NUEVO: Gráfico de Evaluación Promedio por Parque - Columnas Verticales */}
+          <Card className="border-0 shadow-lg max-w-6xl mx-auto rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
                 Evaluación Promedio por Parque
@@ -527,62 +527,58 @@ const ParksDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-4">
+              <div className="w-full">
                 {data.parkEvaluations?.length > 0 ? (
-                  data.parkEvaluations
-                    .sort((a, b) => b.averageRating - a.averageRating)
-                    .map((park, index) => {
-                      const percentage = (park.averageRating / 5) * 100;
-                      const getRatingColor = (rating: number) => {
-                        if (rating >= 4.5) return "#22C55E"; // Verde excelente
-                        if (rating >= 4.0) return "#84CC16"; // Verde bueno
-                        if (rating >= 3.5) return "#EAB308"; // Amarillo regular
-                        if (rating >= 3.0) return "#F97316"; // Naranja bajo
-                        return "#EF4444"; // Rojo muy bajo
-                      };
+                  <div className="flex justify-center items-end gap-4 min-h-[400px] px-4 overflow-x-auto">
+                    {data.parkEvaluations
+                      .sort((a, b) => b.averageRating - a.averageRating)
+                      .slice(0, 13) // Mostrar solo 13 columnas
+                      .map((park, index) => {
+                        const heightPercentage = (park.averageRating / 5) * 100;
+                        const getRatingColor = (rating: number) => {
+                          if (rating >= 4.0) return "#22C55E"; // Verde para calificaciones positivas
+                          if (rating >= 2.5) return "#F59E0B"; // Amarillo/naranja para medias
+                          return "#EF4444"; // Rojo para bajas
+                        };
 
-                      return (
-                        <div
-                          key={park.parkId}
-                          className="space-y-2"
-                        >
-                          {/* Nombre del parque arriba */}
-                          <div className="flex items-center justify-between">
-                            <div className="text-sm font-medium text-gray-700">
-                              {park.parkName}
+                        return (
+                          <div key={park.parkId} className="flex flex-col items-center relative">
+                            {/* Valor del promedio arriba con número de evaluaciones */}
+                            <div className="mb-2 text-center">
+                              <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
+                                ⭐ {park.averageRating.toFixed(1)}/5
+                              </div>
+                              <div className="text-xs font-poppins font-thin text-gray-500">
+                                ({park.evaluationCount} eval)
+                              </div>
                             </div>
-                            <span
-                              className="text-sm font-semibold"
-                              style={{
-                                color: getRatingColor(park.averageRating),
-                              }}
-                            >
-                              {park.averageRating.toFixed(1)}/5
-                            </span>
-                          </div>
-                          
-                          {/* Barra de progreso debajo */}
-                          <div className="bg-gray-200 rounded-full h-6 relative">
-                            <div
-                              className="h-6 rounded-full flex items-center justify-between px-3 transition-all duration-700 shadow-sm"
-                              style={{
-                                width: `${Math.max(percentage, 10)}%`,
-                                backgroundColor: getRatingColor(
-                                  park.averageRating,
-                                ),
-                              }}
-                            >
-                              <span className="text-white text-xs font-bold">
-                                {park.averageRating.toFixed(1)} ⭐
-                              </span>
-                              <span className="text-white text-xs">
-                                ({park.evaluationCount} eval.)
-                              </span>
+
+                            {/* Columna vertical */}
+                            <div className="relative h-80 w-12 flex flex-col justify-end">
+                              {/* Fondo de la columna */}
+                              <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-lg border border-gray-300"></div>
+                              
+                              {/* Relleno de la columna según promedio */}
+                              <div
+                                className="absolute bottom-0 w-full rounded-t-lg transition-all duration-700 border border-opacity-20"
+                                style={{
+                                  height: `${Math.max(heightPercentage, 5)}%`,
+                                  backgroundColor: getRatingColor(park.averageRating),
+                                  borderColor: getRatingColor(park.averageRating),
+                                }}
+                              ></div>
+                            </div>
+
+                            {/* Nombre del parque a la izquierda de la columna (alineado a la base) */}
+                            <div className="absolute bottom-0 -left-2 transform -rotate-45 origin-bottom-left w-32">
+                              <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                                {park.parkName}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })
+                        );
+                      })}
+                  </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <div className="flex flex-col items-center space-y-2">
@@ -599,9 +595,9 @@ const ParksDashboard = () => {
                 )}
               </div>
               {data.parkEvaluations?.length > 0 && (
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-gray-500">
-                    Mostrando todos los {data.parkEvaluations.length} parques
+                <div className="mt-8 text-center">
+                  <p className="text-sm text-gray-500 font-poppins font-thin">
+                    Mostrando {Math.min(data.parkEvaluations.length, 13)} de {data.parkEvaluations.length} parques
                     registrados en el sistema
                   </p>
                 </div>
