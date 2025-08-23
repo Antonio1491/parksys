@@ -106,10 +106,18 @@ const AdminDashboard: React.FC = () => {
       title={t('dashboard.title', 'Dashboard Ejecutivo')} 
       subtitle={t('dashboard.subtitle', 'Panel de control integral del sistema ParkSys')}
     >
-      {/* Encabezado del Panel de Control */}
-      <div className="border-b pb-4 mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Panel de Control</h1>
-        <p className="text-gray-600 mt-2">Resumen ejecutivo del sistema de gestión de parques</p>
+      {/* Header con fondo coloreado */}
+      <div 
+        className="py-8 px-4 -mx-4 -mt-6 mb-8"
+        style={{ backgroundColor: "#14b8a6" }}
+      >
+        <div className="flex items-center gap-3">
+          <TrendingUp className="h-8 w-8 text-white" />
+          <div>
+            <h1 className="text-3xl font-bold text-white font-poppins">Panel de Control</h1>
+            <p className="text-base font-normal text-white font-poppins">Resumen ejecutivo del sistema de gestión de parques</p>
+          </div>
+        </div>
       </div>
 
       {/* Fila 1: Métricas principales */}
