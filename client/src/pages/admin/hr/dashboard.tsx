@@ -73,7 +73,7 @@ export default function HRDashboard() {
       <div className="space-y-8">
         {/* Header con fondo coloreado */}
         <div 
-          className="p-4"
+          className="p-4 -mx-4"
           style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center gap-2">

@@ -137,7 +137,7 @@ const FinanceDashboard = () => {
       <div className="space-y-6">
         {/* Header con fondo coloreado */}
         <div 
-          className="p-4 flex items-center justify-between"
+          className="p-4 -mx-4 flex items-center justify-between"
           style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center gap-3">

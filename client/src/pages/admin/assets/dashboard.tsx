@@ -134,7 +134,7 @@ const AssetsDashboard: React.FC = () => {
     <AdminLayout>
       {/* Header con fondo coloreado */}
       <div 
-        className="p-4 mb-6"
+        className="p-4 -mx-4 mb-6"
         style={{ backgroundColor: "#14b8a6" }}
       >
         <div className="flex items-center gap-2">
