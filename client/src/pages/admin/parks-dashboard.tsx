@@ -216,7 +216,7 @@ const ParksDashboard = () => {
       <div className="space-y-6">
         {/* Main Header con fondo coloreado */}
         <div 
-          className="mb-4 py-6 px-4 -mx-4 -mt-6 flex items-center justify-between"
+          className="mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
           style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center gap-3">

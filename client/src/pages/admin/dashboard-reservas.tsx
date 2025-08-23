@@ -110,7 +110,7 @@ export default function DashboardReservas() {
       <div className="space-y-6">
         {/* Header con fondo coloreado */}
         <div 
-          className="py-6 px-4 -mx-4 -mt-6 flex justify-between items-start"
+          className="py-8 px-4 -mx-4 -mt-6 flex justify-between items-start"
           style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center gap-3">

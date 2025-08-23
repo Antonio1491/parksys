@@ -10,7 +10,7 @@ const AdvertisingDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header con fondo coloreado */}
         <div 
-          className="py-6 px-4 -mx-4 -mt-6 mb-8"
+          className="py-8 px-4 -mx-4 -mt-6 mb-8"
           style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center gap-2">
