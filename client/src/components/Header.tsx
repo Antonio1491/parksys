@@ -261,9 +261,9 @@ const Header: React.FC = () => {
               {isAdmin && (
                 <>
                   {/* Contenedor de Métricas y Botones */}
-                  <div className="flex items-center bg-white rounded-lg px-4 py-2 border border-gray-300 shadow-sm">
+                  <div className="flex items-center rounded-2xl px-4 py-2 shadow-sm" style={{ backgroundColor: "#003d49" }}>
                     {/* Leyenda Métricas */}
-                    <div className="text-lg font-semibold text-gray-700 mr-4">
+                    <div className="text-lg font-semibold text-white mr-4">
                       Métricas
                     </div>
                     
@@ -271,7 +271,7 @@ const Header: React.FC = () => {
                   {/* Menú Dashboard */}
                   <Link href="/admin" className="flex flex-col items-center hover:opacity-80">
                     <div className="w-9 h-5 flex items-center justify-center rounded-full transition-colors">
-                      <Gauge className="h-5 w-5 text-gray-700" />
+                      <Gauge className="h-5 w-5 text-white" />
                     </div>
                   </Link>
 
@@ -279,8 +279,8 @@ const Header: React.FC = () => {
                   <div className="relative group">
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <FolderOpen className="h-5 w-5 text-gray-700" />
-                        <ChevronDown className="h-3 w-3 text-gray-500" />
+                        <FolderOpen className="h-5 w-5 text-white" />
+                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
@@ -343,8 +343,8 @@ const Header: React.FC = () => {
                   <div className="relative group">
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <Wrench className="h-5 w-5 text-gray-700" />
-                        <ChevronDown className="h-3 w-3 text-gray-500" />
+                        <Wrench className="h-5 w-5 text-white" />
+                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
@@ -377,8 +377,8 @@ const Header: React.FC = () => {
                   <div className="relative group">
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <DollarSign className="h-5 w-5 text-gray-700" />
-                        <ChevronDown className="h-3 w-3 text-gray-500" />
+                        <DollarSign className="h-5 w-5 text-white" />
+                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
@@ -411,8 +411,8 @@ const Header: React.FC = () => {
                   <div className="relative group">
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-9 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <Megaphone className="h-5 w-5 text-gray-700" />
-                        <ChevronDown className="h-3 w-3 text-gray-700" />
+                        <Megaphone className="h-5 w-5 text-white" />
+                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
@@ -444,7 +444,7 @@ const Header: React.FC = () => {
                   {/* Menú RH */}
                   <Link href="/admin/hr/dashboard" className="flex flex-col items-center hover:opacity-80">
                     <div className="w-9 h-5 flex items-center justify-center rounded-full transition-colors">
-                      <Users className="h-5 w-5 text-gray-700" />
+                      <Users className="h-5 w-5 text-white" />
                     </div>
                   </Link>
                   </nav>
