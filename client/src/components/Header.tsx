@@ -101,8 +101,8 @@ const Header: React.FC = () => {
         )}
         
         <div className={`${isAdmin ? 'ml-64' : ''} max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full`}>
-          <div className="flex items-center h-20">
-            <div className="flex items-center">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center min-w-0">
               {/* Logo y navegación - Solo mostrar para páginas públicas */}
               {!isAdmin && (
                 <>
@@ -257,11 +257,11 @@ const Header: React.FC = () => {
                 </>
               )}
 
-              {/* Menús administrativos - Solo mostrar en páginas administrativas */}
-              {isAdmin && (
-                <>
-                  {/* Contenedor de Métricas y Botones */}
-                  <div className="flex items-center rounded-3xl px-4 py-1 shadow-sm" style={{ backgroundColor: "#003d49" }}>
+            </div>
+
+            {/* Menús administrativos centralizados - Solo mostrar en páginas administrativas */}
+            {isAdmin && (
+              <div className="flex items-center rounded-3xl px-4 py-1 shadow-sm absolute left-1/2 transform -translate-x-1/2" style={{ backgroundColor: "#003d49" }}>
                     {/* Leyenda Métricas */}
                     <div className="text-lg font-semibold text-white mr-4">
                       Métricas
@@ -447,14 +447,12 @@ const Header: React.FC = () => {
                       <Users className="h-5 w-5 text-white" />
                     </div>
                   </Link>
-                  </nav>
-                  </div>
-                </>
-              )}
-            </div>
+                </nav>
+              </div>
+            )}
 
             {/* Right side - Help, language, user */}
-            <div className="flex-1 flex items-center justify-end gap-4">
+            <div className="flex items-center gap-4">
               {/* Global search - Solo para páginas públicas */}
               {!isAdmin && (
                 <div className="hidden lg:block max-w-md">
