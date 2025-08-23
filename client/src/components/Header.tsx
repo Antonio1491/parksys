@@ -86,12 +86,12 @@ const Header: React.FC = () => {
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 shadow-sm border-b border-gray-200"
-      style={{ backgroundColor: isAdmin ? "#D2EAEA" : "white" }}
+      style={{ backgroundColor: isAdmin ? "#f4f5f7" : "white" }}
     >
       <div className="flex items-center h-20">
         {/* Logo administrativo - Posicionado absolutamente al extremo izquierdo */}
         {isAdmin && (
-          <div className="absolute left-0 top-0 bottom-0 w-64 flex items-center justify-center z-10" style={{ backgroundColor: '#D2EAEA' }}>
+          <div className="absolute left-0 top-0 bottom-0 w-64 flex items-center justify-center z-10" style={{ backgroundColor: '#f4f5f7' }}>
             <img
               src={agencyLogo}
               alt="Agencia de Bosques Urbanos"
@@ -467,7 +467,7 @@ const Header: React.FC = () => {
                       variant="outline"
                       size="sm"
                       className="w-9 h-9 p-0 rounded-lg border"
-                      style={{ backgroundColor: "#D2EAEA", borderColor: "#003D49" }}
+                      style={{ backgroundColor: "#f4f5f7", borderColor: "#003D49" }}
                       title="Centro de ayuda"
                     >
                       <HelpCircle className="h-6 w-8 text-gray-700" />
@@ -480,7 +480,7 @@ const Header: React.FC = () => {
                       variant="outline"
                       size="sm"
                       className="w-9 h-9 p-0 rounded-lg border"
-                      style={{ backgroundColor: "#D2EAEA", borderColor: "#003D49" }}
+                      style={{ backgroundColor: "#f4f5f7", borderColor: "#003D49" }}
                       title="Ver página pública"
                     >
                       <Home className="h-6 w-8 text-gray-700" />
