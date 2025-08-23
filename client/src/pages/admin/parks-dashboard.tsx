@@ -544,32 +544,13 @@ const ParksDashboard = () => {
                       return (
                         <div
                           key={park.parkId}
-                          className="flex items-center space-x-3"
+                          className="space-y-2"
                         >
-                          <div className="w-32 text-sm font-medium text-right text-gray-700 truncate">
-                            {park.parkName}
-                          </div>
-                          <div className="flex-1 flex items-center space-x-2">
-                            <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
-                              <div
-                                className="h-6 rounded-full flex items-center justify-between px-3 transition-all duration-700 shadow-sm"
-                                style={{
-                                  width: `${Math.max(percentage, 10)}%`,
-                                  backgroundColor: getRatingColor(
-                                    park.averageRating,
-                                  ),
-                                }}
-                              >
-                                <span className="text-white text-xs font-bold">
-                                  {park.averageRating.toFixed(1)} ⭐
-                                </span>
-                                <span className="text-white text-xs">
-                                  ({park.evaluationCount} eval.)
-                                </span>
-                              </div>
+                          {/* Nombre del parque arriba */}
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm font-medium text-gray-700">
+                              {park.parkName}
                             </div>
-                          </div>
-                          <div className="w-16 text-right">
                             <span
                               className="text-sm font-semibold"
                               style={{
@@ -578,6 +559,26 @@ const ParksDashboard = () => {
                             >
                               {park.averageRating.toFixed(1)}/5
                             </span>
+                          </div>
+                          
+                          {/* Barra de progreso debajo */}
+                          <div className="bg-gray-200 rounded-full h-6 relative">
+                            <div
+                              className="h-6 rounded-full flex items-center justify-between px-3 transition-all duration-700 shadow-sm"
+                              style={{
+                                width: `${Math.max(percentage, 10)}%`,
+                                backgroundColor: getRatingColor(
+                                  park.averageRating,
+                                ),
+                              }}
+                            >
+                              <span className="text-white text-xs font-bold">
+                                {park.averageRating.toFixed(1)} ⭐
+                              </span>
+                              <span className="text-white text-xs">
+                                ({park.evaluationCount} eval.)
+                              </span>
+                            </div>
                           </div>
                         </div>
                       );
