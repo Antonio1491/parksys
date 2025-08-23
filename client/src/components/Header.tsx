@@ -86,27 +86,29 @@ const Header: React.FC = () => {
   // Estados activos para menús administrativos
   const isDashboardActive = location === "/admin";
   const isGestionActive = 
-    location === "/admin/parks-dashboard" || 
-    location === "/admin/organizador" ||
-    location === "/admin/amenities-dashboard" ||
-    location === "/admin/trees/dashboard" ||
-    location === "/admin/visitors/dashboard" ||
-    location === "/admin/events" ||
-    location === "/admin/dashboard-reservas" ||
-    location === "/admin/evaluaciones";
+    location.startsWith("/admin/parks") || 
+    location.startsWith("/admin/organizador") ||
+    location.startsWith("/admin/amenities") ||
+    location.startsWith("/admin/trees") ||
+    location.startsWith("/admin/visitors") ||
+    location.startsWith("/admin/events") ||
+    location.startsWith("/admin/dashboard-reservas") ||
+    location.startsWith("/admin/evaluaciones");
   const isOMActive = 
-    location === "/admin/assets/dashboard" || 
-    location === "/admin/incidents/dashboard" || 
-    location === "/admin/volunteers/dashboard";
+    location.startsWith("/admin/assets") || 
+    location.startsWith("/admin/incidents") || 
+    location.startsWith("/admin/volunteers") ||
+    location.startsWith("/admin/incidentes") ||
+    location.startsWith("/admin/dashboard-incidencias");
   const isFinanzasActive = 
-    location === "/admin/finance/reports" || 
-    location === "/admin/accounting/dashboard" || 
-    location === "/admin/concessions/reports";
+    location.startsWith("/admin/finance") || 
+    location.startsWith("/admin/accounting") || 
+    location.startsWith("/admin/concessions");
   const isMarketingActive = 
-    location === "/admin/marketing" || 
-    location === "/admin/advertising" || 
-    location === "/admin/communications";
-  const isRHActive = location === "/admin/hr/dashboard";
+    location.startsWith("/admin/marketing") || 
+    location.startsWith("/admin/advertising") || 
+    location.startsWith("/admin/communications");
+  const isRHActive = location.startsWith("/admin/hr");
 
   return (
     <header
