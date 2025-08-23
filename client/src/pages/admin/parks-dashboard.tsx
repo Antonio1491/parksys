@@ -544,51 +544,54 @@ const ParksDashboard = () => {
                       return (
                         <div
                           key={park.parkId}
-                          className="flex flex-col items-center space-y-2 min-w-20"
+                          className="flex items-end space-x-3 min-w-32"
                         >
-                          {/* Puntuación arriba */}
-                          <div className="text-center">
-                            <span
-                              className="text-xs font-semibold"
-                              style={{
-                                color: getRatingColor(park.averageRating),
-                              }}
-                            >
-                              {park.averageRating.toFixed(1)}/5
-                            </span>
-                          </div>
-                          
-                          {/* Barra vertical */}
-                          <div className="bg-gray-200 rounded-full w-8 h-48 relative flex items-end">
+                          {/* Nombre del parque al lado izquierdo */}
+                          <div className="w-24 flex items-end justify-end">
                             <div
-                              className="w-8 rounded-full flex flex-col items-center justify-center transition-all duration-700 shadow-sm relative"
-                              style={{
-                                height: `${Math.max(percentage, 8)}%`,
-                                backgroundColor: getRatingColor(
-                                  park.averageRating,
-                                ),
-                              }}
-                            >
-                              <span className="text-white text-xs font-bold transform -rotate-90 whitespace-nowrap">
-                                {park.averageRating.toFixed(1)} ⭐
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Evaluaciones */}
-                          <div className="text-center">
-                            <span className="text-xs text-gray-500">
-                              ({park.evaluationCount})
-                            </span>
-                          </div>
-                          
-                          {/* Nombre del parque rotado */}
-                          <div className="h-24 flex items-end justify-center">
-                            <div
-                              className="text-sm font-medium text-gray-700 transform -rotate-90 origin-bottom whitespace-nowrap"
+                              className="text-sm font-medium text-gray-700 transform -rotate-90 whitespace-nowrap"
                               style={{ transformOrigin: 'center center' }}
                             >
                               {park.parkName}
+                            </div>
+                          </div>
+                          
+                          {/* Columna con barra y datos */}
+                          <div className="flex flex-col items-center space-y-2">
+                            {/* Puntuación arriba */}
+                            <div className="text-center">
+                              <span
+                                className="text-xs font-semibold"
+                                style={{
+                                  color: getRatingColor(park.averageRating),
+                                }}
+                              >
+                                {park.averageRating.toFixed(1)}/5
+                              </span>
+                            </div>
+                            
+                            {/* Barra vertical */}
+                            <div className="bg-gray-200 rounded-full w-8 h-48 relative flex items-end">
+                              <div
+                                className="w-8 rounded-full flex flex-col items-center justify-center transition-all duration-700 shadow-sm relative"
+                                style={{
+                                  height: `${Math.max(percentage, 8)}%`,
+                                  backgroundColor: getRatingColor(
+                                    park.averageRating,
+                                  ),
+                                }}
+                              >
+                                <span className="text-white text-xs font-bold transform -rotate-90 whitespace-nowrap">
+                                  {park.averageRating.toFixed(1)} ⭐
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Evaluaciones */}
+                            <div className="text-center">
+                              <span className="text-xs text-gray-500">
+                                ({park.evaluationCount})
+                              </span>
                             </div>
                           </div>
                         </div>
