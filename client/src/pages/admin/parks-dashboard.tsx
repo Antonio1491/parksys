@@ -221,11 +221,11 @@ const ParksDashboard = () => {
         >
           <div className="flex items-center gap-3">
             <Map className="h-6 w-6 text-white" />
-            <h1 className="text-2xl font-semibold text-white font-poppins">
+            <h1 className="text-3xl font-bold text-white font-poppins">
               Parques
             </h1>
           </div>
-          <p className="text-2xl font-normal text-white font-poppins">
+          <p className="text-base font-normal text-white font-poppins">
             Métricas / Módulo de Gestión
           </p>
         </div>
