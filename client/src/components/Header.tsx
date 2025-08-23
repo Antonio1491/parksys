@@ -299,9 +299,9 @@ const Header: React.FC = () => {
                   <Link href="/admin" className="flex flex-col items-center hover:opacity-80">
                     <div 
                       className="w-9 h-5 flex items-center justify-center rounded-full transition-colors"
-                      style={{ backgroundColor: isDashboardActive ? "#00444f" : "transparent" }}
+                      style={{ backgroundColor: isDashboardActive ? "#f4f5f7" : "transparent" }}
                     >
-                      <Gauge className={`h-5 w-5 ${isDashboardActive ? "text-white" : "text-white"}`} />
+                      <Gauge className={`h-5 w-5 ${isDashboardActive ? "text-[#00444f]" : "text-white"}`} />
                     </div>
                   </Link>
 
@@ -310,9 +310,9 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button 
                         className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isGestionActive ? "#00444f" : "transparent" }}
+                        style={{ backgroundColor: isGestionActive ? "#f4f5f7" : "transparent" }}
                       >
-                        <FolderOpen className={`h-5 w-5 ${isGestionActive ? "text-white" : "text-white"}`} />
+                        <FolderOpen className={`h-5 w-5 ${isGestionActive ? "text-[#00444f]" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -376,9 +376,9 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button 
                         className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isOMActive ? "#00444f" : "transparent" }}
+                        style={{ backgroundColor: isOMActive ? "#f4f5f7" : "transparent" }}
                       >
-                        <Wrench className={`h-5 w-5 ${isOMActive ? "text-white" : "text-white"}`} />
+                        <Wrench className={`h-5 w-5 ${isOMActive ? "text-[#00444f]" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -412,9 +412,9 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button 
                         className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isFinanzasActive ? "#00444f" : "transparent" }}
+                        style={{ backgroundColor: isFinanzasActive ? "#f4f5f7" : "transparent" }}
                       >
-                        <DollarSign className={`h-5 w-5 ${isFinanzasActive ? "text-white" : "text-white"}`} />
+                        <DollarSign className={`h-5 w-5 ${isFinanzasActive ? "text-[#00444f]" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -448,9 +448,9 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button 
                         className="w-9 h-9 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isMarketingActive ? "#00444f" : "transparent" }}
+                        style={{ backgroundColor: isMarketingActive ? "#f4f5f7" : "transparent" }}
                       >
-                        <Megaphone className={`h-5 w-5 ${isMarketingActive ? "text-white" : "text-white"}`} />
+                        <Megaphone className={`h-5 w-5 ${isMarketingActive ? "text-[#00444f]" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -483,9 +483,9 @@ const Header: React.FC = () => {
                   <Link href="/admin/hr/dashboard" className="flex flex-col items-center hover:opacity-80">
                     <div 
                       className="w-9 h-5 flex items-center justify-center rounded-full transition-colors"
-                      style={{ backgroundColor: isRHActive ? "#00444f" : "transparent" }}
+                      style={{ backgroundColor: isRHActive ? "#f4f5f7" : "transparent" }}
                     >
-                      <Users className={`h-5 w-5 ${isRHActive ? "text-white" : "text-white"}`} />
+                      <Users className={`h-5 w-5 ${isRHActive ? "text-[#00444f]" : "text-white"}`} />
                     </div>
                   </Link>
                 </nav>
