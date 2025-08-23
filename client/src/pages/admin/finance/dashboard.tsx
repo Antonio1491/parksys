@@ -135,17 +135,18 @@ const FinanceDashboard = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header with controls */}
-        <div className="flex items-center justify-between">
+        {/* Header con fondo coloreado */}
+        <div 
+          className="p-4 flex items-center justify-between"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <DollarSign className="h-6 w-6 text-green-600" />
-            </div>
+            <DollarSign className="h-8 w-8 text-white" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-white font-poppins">
                 Dashboard Financiero
               </h1>
-              <p className="text-gray-600">
+              <p className="text-white">
                 Gestión integral de finanzas del parque
               </p>
             </div>
@@ -153,7 +154,7 @@ const FinanceDashboard = () => {
           
           <div className="flex items-center gap-4">
             <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-32 bg-white text-gray-900">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

@@ -122,22 +122,23 @@ export default function AmenitiesDashboard() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header con título */}
-        <Card className="p-4 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <Activity className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-gray-900">Dashboard de Amenidades</h1>
-              </div>
-              <p className="text-gray-600 mt-2">Análisis y estadísticas de amenidades en parques</p>
+        {/* Header con fondo coloreado */}
+        <div 
+          className="p-4 flex items-center justify-between"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
+          <div>
+            <div className="flex items-center gap-2">
+              <Activity className="w-8 h-8 text-white" />
+              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Amenidades</h1>
             </div>
-            <Button onClick={handleRefresh} variant="outline">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Actualizar
-            </Button>
+            <p className="text-white mt-2">Análisis y estadísticas de amenidades en parques</p>
           </div>
-        </Card>
+          <Button onClick={handleRefresh} variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Actualizar
+          </Button>
+        </div>
 
         {/* KPIs principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

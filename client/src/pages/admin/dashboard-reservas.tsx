@@ -108,44 +108,43 @@ export default function DashboardReservas() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <div className="flex justify-between items-start">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <BarChart3 className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Dashboard de Reservas
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  Análisis y métricas de reservas de espacios en parques
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Select value={timeFilter} onValueChange={setTimeFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">Esta semana</SelectItem>
-                  <SelectItem value="month">Este mes</SelectItem>
-                  <SelectItem value="quarter">Este trimestre</SelectItem>
-                  <SelectItem value="year">Este año</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button 
-                onClick={handleNewReservation}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <CalendarClock className="h-4 w-4 mr-2" />
-                Nueva Reserva
-              </Button>
+        {/* Header con fondo coloreado */}
+        <div 
+          className="p-4 flex justify-between items-start"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
+          <div className="flex items-center gap-3">
+            <BarChart3 className="w-8 h-8 text-white" />
+            <div>
+              <h1 className="text-3xl font-bold text-white font-poppins">
+                Dashboard de Reservas
+              </h1>
+              <p className="text-white mt-1">
+                Análisis y métricas de reservas de espacios en parques
+              </p>
             </div>
           </div>
-        </Card>
+          <div className="flex items-center gap-3">
+            <Select value={timeFilter} onValueChange={setTimeFilter}>
+              <SelectTrigger className="w-40 bg-white text-gray-900">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="week">Esta semana</SelectItem>
+                <SelectItem value="month">Este mes</SelectItem>
+                <SelectItem value="quarter">Este trimestre</SelectItem>
+                <SelectItem value="year">Este año</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button 
+              onClick={handleNewReservation}
+              className="bg-white text-gray-900 hover:bg-gray-100"
+            >
+              <CalendarClock className="h-4 w-4 mr-2" />
+              Nueva Reserva
+            </Button>
+          </div>
+        </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

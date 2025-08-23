@@ -177,41 +177,43 @@ export default function VisitorsDashboard() {
       description="Vista integral de datos de visitantes, evaluaciones y retroalimentación"
     >
       <div className="space-y-6">
-        {/* Header con controles */}
-        <Card className="bg-gray-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="w-8 h-8 text-gray-900" />
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard de Visitantes</h1>
+        {/* Header con fondo coloreado */}
+        <div 
+          className="p-6"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart3 className="w-8 h-8 text-white" />
+            <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Visitantes</h1>
+          </div>
+          
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-white" />
+              <Select value={selectedPark} onValueChange={setSelectedPark}>
+                <SelectTrigger className="w-48 bg-white text-gray-900">
+                  <SelectValue placeholder="Seleccionar parque" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los parques</SelectItem>
+                  {parks.map((park: any) => (
+                    <SelectItem key={park.id} value={park.id.toString()}>
+                      {park.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div className="flex flex-wrap gap-4 items-center">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-600" />
-                <Select value={selectedPark} onValueChange={setSelectedPark}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Seleccionar parque" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los parques</SelectItem>
-                    {parks.map((park: any) => (
-                      <SelectItem key={park.id} value={park.id.toString()}>
-                        {park.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-600" />
-                <Select value={dateRange} onValueChange={setDateRange}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="7">Últimos 7 días</SelectItem>
-                    <SelectItem value="30">Últimos 30 días</SelectItem>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-white" />
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger className="w-40 bg-white text-gray-900">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">Últimos 7 días</SelectItem>
+                  <SelectItem value="30">Últimos 30 días</SelectItem>
                     <SelectItem value="90">Últimos 3 meses</SelectItem>
                     <SelectItem value="365">Último año</SelectItem>
                   </SelectContent>

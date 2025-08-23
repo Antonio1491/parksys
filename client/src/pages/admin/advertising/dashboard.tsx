@@ -8,14 +8,17 @@ const AdvertisingDashboard = () => {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
-        {/* Header con título */}
-        <Card className="p-4 bg-gray-50 mb-8">
+        {/* Header con fondo coloreado */}
+        <div 
+          className="p-4 mb-8"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
           <div className="flex items-center gap-2">
-            <Monitor className="w-8 h-8 text-gray-900" />
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard de Publicidad Digital</h1>
+            <Monitor className="w-8 h-8 text-white" />
+            <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Publicidad Digital</h1>
           </div>
-          <p className="text-gray-600 mt-2">Gestión completa de espacios publicitarios y campañas digitales</p>
-        </Card>
+          <p className="text-white mt-2">Gestión completa de espacios publicitarios y campañas digitales</p>
+        </div>
 
         {/* Estadísticas principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

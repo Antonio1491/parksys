@@ -132,14 +132,17 @@ const AssetsDashboard: React.FC = () => {
 
   return (
     <AdminLayout>
-      {/* Header con título */}
-      <Card className="p-4 bg-gray-50 mb-6">
+      {/* Header con fondo coloreado */}
+      <div 
+        className="p-4 mb-6"
+        style={{ backgroundColor: "#14b8a6" }}
+      >
         <div className="flex items-center gap-2">
-          <Tag className="w-8 h-8 text-gray-900" />
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard de Activos</h1>
+          <Tag className="w-8 h-8 text-white" />
+          <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Activos</h1>
         </div>
-        <p className="text-gray-600 mt-2">Panel de control y estadísticas de activos del parque</p>
-      </Card>
+        <p className="text-white mt-2">Panel de control y estadísticas de activos del parque</p>
+      </div>
 
       <div className="flex justify-between items-center mb-6">
         <div>

@@ -214,22 +214,20 @@ const ParksDashboard = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Main Header con contenedor coloreado */}
-        <div className="mb-4">
-          <div 
-            className="rounded-3xl p-4 flex items-center justify-between"
-            style={{ backgroundColor: "#14b8a6" }}
-          >
-            <div className="flex items-center gap-3">
-              <Map className="h-6 w-6 text-white" />
-              <h1 className="text-2xl font-semibold text-white font-poppins">
-                Parques
-              </h1>
-            </div>
-            <p className="text-2xl font-normal text-white font-poppins">
-              Métricas / Módulo de Gestión
-            </p>
+        {/* Main Header con fondo coloreado */}
+        <div 
+          className="mb-4 p-4 flex items-center justify-between"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
+          <div className="flex items-center gap-3">
+            <Map className="h-6 w-6 text-white" />
+            <h1 className="text-2xl font-semibold text-white font-poppins">
+              Parques
+            </h1>
           </div>
+          <p className="text-2xl font-normal text-white font-poppins">
+            Métricas / Módulo de Gestión
+          </p>
         </div>
 
         {/* Sección 1: Métricas Principales - Grid de 4 columnas con columna 3 dividida */}
