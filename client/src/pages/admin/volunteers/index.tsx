@@ -247,42 +247,24 @@ export default function VolunteersPage() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6">
-        {/* Header con fondo coloreado */}
-        <div 
-          className="py-8 px-4 -mx-4 -mt-6 mb-6 flex items-center justify-between"
-          style={{ backgroundColor: "#14b8a6" }}
-        >
-          <div className="flex items-center gap-3">
-            <Users className="w-8 h-8 text-white" />
+        {/* Header con título */}
+        <Card className="p-4 bg-gray-50 mb-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Voluntarios</h1>
-              <p className="text-base font-normal text-white font-poppins">Administra los voluntarios registrados en el sistema</p>
+              <div className="flex items-center gap-2">
+                <Users className="w-8 h-8 text-gray-900" />
+                <h1 className="text-3xl font-bold text-gray-900">Gestión de Voluntarios</h1>
+              </div>
+              <p className="text-gray-600 mt-2">Administra los voluntarios registrados en el sistema</p>
+            </div>
+            <div>
+              <Button onClick={handleNewVolunteer}>
+                <Plus className="h-4 w-4 mr-2" />
+                Nuevo Voluntario
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button onClick={exportToCSV} variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
-              <Download className="h-4 w-4 mr-2" />
-              Exportar CSV
-            </Button>
-            
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileImport}
-              accept=".csv"
-              style={{ display: 'none' }}
-            />
-            <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
-              <Upload className="h-4 w-4 mr-2" />
-              Importar CSV
-            </Button>
-
-            <Button onClick={() => navigate("/admin/volunteers/register")} className="bg-white text-gray-900 hover:bg-gray-100">
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Voluntario
-            </Button>
-          </div>
-        </div>
+        </Card>
 
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

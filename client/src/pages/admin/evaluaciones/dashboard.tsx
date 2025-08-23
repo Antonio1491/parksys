@@ -183,19 +183,14 @@ export default function EvaluacionesDashboard() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6">
-        {/* Header con fondo coloreado */}
-        <div 
-          className="py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
-          style={{ backgroundColor: "#14b8a6" }}
-        >
-          <div className="flex items-center gap-3">
-            <BarChart3 className="w-8 h-8 text-white" />
-            <div>
-              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Evaluaciones</h1>
-              <p className="text-base font-normal text-white font-poppins">Gestión centralizada del sistema de evaluaciones</p>
-            </div>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard de Evaluaciones</h1>
+            <p className="text-muted-foreground">
+              Gestión centralizada del sistema de evaluaciones
+            </p>
           </div>
-          <Button onClick={() => { refetchStats(); refetchRecent(); }} className="bg-white text-gray-900 hover:bg-gray-100">
+          <Button onClick={() => { refetchStats(); refetchRecent(); }}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualizar datos
           </Button>

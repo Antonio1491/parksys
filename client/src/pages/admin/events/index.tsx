@@ -108,20 +108,15 @@ export default function EventsIndex() {
   return (
     <AdminLayout>
       <div className="space-y-6 p-6">
-      {/* Header con fondo coloreado */}
-      <div 
-        className="py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
-        style={{ backgroundColor: "#14b8a6" }}
-      >
-        <div className="flex items-center gap-3">
-          <Calendar className="w-8 h-8 text-white" />
-          <div>
-            <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Gestión de Eventos</h1>
-            <p className="text-base font-normal text-white font-poppins">Administra eventos, categorías y programación de actividades</p>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Gestión de Eventos</h1>
+          <p className="text-gray-600 mt-2">
+            Administra eventos, categorías y programación de actividades
+          </p>
         </div>
         <Link href="/admin/events/new">
-          <Button className="bg-white text-gray-900 hover:bg-gray-100">
+          <Button className="bg-blue-600 hover:bg-blue-700">
             <CalendarPlus className="w-4 h-4 mr-2" />
             Nuevo Evento
           </Button>
