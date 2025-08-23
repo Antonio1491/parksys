@@ -172,14 +172,11 @@ export default function VisitorsDashboard() {
   };
 
   return (
-    <AdminLayout
-      title="Dashboard de Visitantes"
-      description="Vista integral de datos de visitantes, evaluaciones y retroalimentación"
-    >
+    <AdminLayout>
       <div className="space-y-6">
         {/* Header con fondo coloreado */}
         <div 
-          className="py-8 px-6 -mx-4 -mt-6"
+          className="py-8 px-4 -mx-4 -mt-6"
           style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center gap-2 mb-4">
