@@ -90,7 +90,7 @@ const SponsorshipDashboard = () => {
             <BarChart className="w-8 h-8 text-white" />
             <h1 className="text-3xl font-bold text-white font-poppins">Dashboard</h1>
           </div>
-          <p className="text-white mt-2">Resumen general del sistema de patrocinios</p>
+          <p className="text-base font-normal text-white font-poppins mt-2">Resumen general del sistema de patrocinios</p>
         </div>
         <div className="text-sm text-white">
           Última actualización: {format(new Date(), 'dd/MM/yyyy HH:mm', { locale: es })}

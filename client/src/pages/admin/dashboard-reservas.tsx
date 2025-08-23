@@ -119,7 +119,7 @@ export default function DashboardReservas() {
               <h1 className="text-3xl font-bold text-white font-poppins">
                 Dashboard de Reservas
               </h1>
-              <p className="text-white mt-1">
+              <p className="text-base font-normal text-white font-poppins mt-1">
                 Análisis y métricas de reservas de espacios en parques
               </p>
             </div>

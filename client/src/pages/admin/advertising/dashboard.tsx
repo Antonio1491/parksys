@@ -17,7 +17,7 @@ const AdvertisingDashboard = () => {
             <Monitor className="w-8 h-8 text-white" />
             <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Publicidad Digital</h1>
           </div>
-          <p className="text-white mt-2">Gestión completa de espacios publicitarios y campañas digitales</p>
+          <p className="text-base font-normal text-white font-poppins mt-2">Gestión completa de espacios publicitarios y campañas digitales</p>
         </div>
 
         {/* Estadísticas principales */}

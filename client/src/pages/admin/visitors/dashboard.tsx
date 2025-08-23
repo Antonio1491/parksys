@@ -184,7 +184,10 @@ export default function VisitorsDashboard() {
         >
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-8 h-8 text-white" />
-            <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Visitantes</h1>
+            <div>
+              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Visitantes</h1>
+              <p className="text-base font-normal text-white font-poppins">Vista integral de datos de visitantes y retroalimentación</p>
+            </div>
           </div>
           
           <div className="flex flex-wrap gap-4 items-center">

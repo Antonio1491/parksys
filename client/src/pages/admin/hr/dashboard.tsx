@@ -80,7 +80,7 @@ export default function HRDashboard() {
             <BarChart3 className="w-8 h-8 text-white" />
             <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Recursos Humanos</h1>
           </div>
-          <p className="text-white mt-2">Panel de control integral para gestión de personal</p>
+          <p className="text-base font-normal text-white font-poppins mt-2">Panel de control integral para gestión de personal</p>
         </div>
 
         {/* Previous header area with additional content */}

@@ -172,7 +172,7 @@ const TreesDashboard: React.FC = () => {
               <TreePine className="w-8 h-8 text-white" />
               <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Arbolado</h1>
             </div>
-            <p className="text-white mt-2">Análisis y estadísticas del arbolado urbano</p>
+            <p className="text-base font-normal text-white font-poppins mt-2">Análisis y estadísticas del arbolado urbano</p>
           </div>
           <Button onClick={handleRefresh} variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
             <RefreshCw className="h-4 w-4 mr-2" />

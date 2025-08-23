@@ -146,7 +146,7 @@ const FinanceDashboard = () => {
               <h1 className="text-3xl font-bold text-white font-poppins">
                 Dashboard Financiero
               </h1>
-              <p className="text-white">
+              <p className="text-base font-normal text-white font-poppins">
                 Gestión integral de finanzas del parque
               </p>
             </div>

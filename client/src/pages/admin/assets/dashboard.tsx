@@ -141,7 +141,7 @@ const AssetsDashboard: React.FC = () => {
           <Tag className="w-8 h-8 text-white" />
           <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Activos</h1>
         </div>
-        <p className="text-white mt-2">Panel de control y estadísticas de activos del parque</p>
+        <p className="text-base font-normal text-white font-poppins mt-2">Panel de control y estadísticas de activos del parque</p>
       </div>
 
       <div className="flex justify-between items-center mb-6">
