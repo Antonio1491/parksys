@@ -179,7 +179,7 @@ export default function VisitorsDashboard() {
       <div className="space-y-6">
         {/* Header con fondo coloreado */}
         <div 
-          className="p-6 -mx-4"
+          className="p-6 -mx-4 -mt-6"
           style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center gap-2 mb-4">

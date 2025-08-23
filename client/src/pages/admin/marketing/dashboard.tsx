@@ -82,7 +82,7 @@ const SponsorshipDashboard = () => {
       <div className="space-y-6">
       {/* Header con fondo coloreado */}
       <div 
-        className="p-4 -mx-4 flex items-center justify-between"
+        className="p-4 -mx-4 -mt-6 flex items-center justify-between"
         style={{ backgroundColor: "#14b8a6" }}
       >
         <div>
