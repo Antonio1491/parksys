@@ -527,7 +527,7 @@ const ParksDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex items-end space-x-4 overflow-x-auto pb-4">
+              <div className="space-y-4">
                 {data.parkEvaluations?.length > 0 ? (
                   data.parkEvaluations
                     .sort((a, b) => b.averageRating - a.averageRating)
@@ -544,12 +544,15 @@ const ParksDashboard = () => {
                       return (
                         <div
                           key={park.parkId}
-                          className="flex flex-col items-center space-y-2 min-w-20"
+                          className="space-y-2"
                         >
-                          {/* Puntuación arriba */}
-                          <div className="text-center">
+                          {/* Nombre del parque arriba */}
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm font-medium text-gray-700">
+                              {park.parkName}
+                            </div>
                             <span
-                              className="text-xs font-semibold"
+                              className="text-sm font-semibold"
                               style={{
                                 color: getRatingColor(park.averageRating),
                               }}
@@ -558,37 +561,23 @@ const ParksDashboard = () => {
                             </span>
                           </div>
                           
-                          {/* Barra vertical */}
-                          <div className="bg-gray-200 rounded-full w-8 h-48 relative flex items-end">
+                          {/* Barra de progreso debajo */}
+                          <div className="bg-gray-200 rounded-full h-6 relative">
                             <div
-                              className="w-8 rounded-full flex flex-col items-center justify-center transition-all duration-700 shadow-sm relative"
+                              className="h-6 rounded-full flex items-center justify-between px-3 transition-all duration-700 shadow-sm"
                               style={{
-                                height: `${Math.max(percentage, 8)}%`,
+                                width: `${Math.max(percentage, 10)}%`,
                                 backgroundColor: getRatingColor(
                                   park.averageRating,
                                 ),
                               }}
                             >
-                              <span className="text-white text-xs font-bold transform -rotate-90 whitespace-nowrap">
+                              <span className="text-white text-xs font-bold">
                                 {park.averageRating.toFixed(1)} ⭐
                               </span>
-                            </div>
-                          </div>
-                          
-                          {/* Evaluaciones */}
-                          <div className="text-center">
-                            <span className="text-xs text-gray-500">
-                              ({park.evaluationCount})
-                            </span>
-                          </div>
-                          
-                          {/* Nombre del parque rotado */}
-                          <div className="h-24 flex items-end justify-center">
-                            <div
-                              className="text-sm font-medium text-gray-700 transform -rotate-90 origin-bottom whitespace-nowrap"
-                              style={{ transformOrigin: 'center center' }}
-                            >
-                              {park.parkName}
+                              <span className="text-white text-xs">
+                                ({park.evaluationCount} eval.)
+                              </span>
                             </div>
                           </div>
                         </div>
