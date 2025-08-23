@@ -112,38 +112,43 @@ const OrganizadorPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header con título */}
-        <Card className="p-4 bg-gray-50">
+        {/* Header con fondo coloreado */}
+        <div 
+          className="py-8 px-4 -mx-4 -mt-6 mb-6"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+                <BarChart3 className="w-8 h-8 text-white" />
+                <div>
+                  <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Actividades</h1>
+                  <p className="text-base font-normal text-white font-poppins">Gestión de actividades y eventos en parques</p>
+                </div>
               </div>
-              <p className="text-gray-600 mt-2">Gestión de actividades y eventos en parques</p>
             </div>
             <div className="flex gap-2">
               <Link href="/admin/activities">
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100">
                   <Eye size={16} />
                   Ver Todas las Actividades
                 </Button>
               </Link>
               <Link href="/admin/activities/categories">
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100">
                   <Tag size={16} />
                   Gestionar Categorías
                 </Button>
               </Link>
               <Link href="/admin/organizador/nueva-actividad">
-                <Button className="flex items-center gap-2">
+                <Button className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100">
                   <Plus size={16} />
                   Nueva Actividad
                 </Button>
               </Link>
             </div>
           </div>
-        </Card>
+        </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
