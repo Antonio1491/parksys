@@ -554,13 +554,13 @@ const ParksDashboard = () => {
                             </div>
 
                             {/* Columna vertical */}
-                            <div className="relative h-80 w-12 flex flex-col justify-end">
+                            <div className="relative h-80 w-6 flex flex-col justify-end">
                               {/* Fondo de la columna */}
-                              <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-lg border border-gray-300"></div>
+                              <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
                               
                               {/* Relleno de la columna según promedio */}
                               <div
-                                className="absolute bottom-0 w-full rounded-t-lg transition-all duration-700 border border-opacity-20"
+                                className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
                                 style={{
                                   height: `${Math.max(heightPercentage, 5)}%`,
                                   backgroundColor: getRatingColor(park.averageRating),
