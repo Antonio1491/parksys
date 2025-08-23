@@ -83,6 +83,31 @@ const Header: React.FC = () => {
   const isUsersActive =
     location === "/volunteers" || location === "/instructors";
 
+  // Estados activos para menús administrativos
+  const isDashboardActive = location === "/admin";
+  const isGestionActive = 
+    location === "/admin/parks/dashboard" || 
+    location === "/admin/organizador" ||
+    location === "/admin/amenities-dashboard" ||
+    location === "/admin/trees/dashboard" ||
+    location === "/admin/visitors/dashboard" ||
+    location === "/admin/events" ||
+    location === "/admin/dashboard-reservas" ||
+    location === "/admin/evaluaciones";
+  const isOMActive = 
+    location === "/admin/assets/dashboard" || 
+    location === "/admin/incidents/dashboard" || 
+    location === "/admin/volunteers/dashboard";
+  const isFinanzasActive = 
+    location === "/admin/finance/reports" || 
+    location === "/admin/accounting/dashboard" || 
+    location === "/admin/concessions/reports";
+  const isMarketingActive = 
+    location === "/admin/marketing" || 
+    location === "/admin/advertising" || 
+    location === "/admin/communications";
+  const isRHActive = location === "/admin/hr/dashboard";
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 shadow-sm border-b border-gray-200"
@@ -270,16 +295,22 @@ const Header: React.FC = () => {
                     <nav className="flex items-center space-x-4">
                   {/* Menú Dashboard */}
                   <Link href="/admin" className="flex flex-col items-center hover:opacity-80">
-                    <div className="w-9 h-5 flex items-center justify-center rounded-full transition-colors">
-                      <Gauge className="h-5 w-5 text-white" />
+                    <div 
+                      className="w-9 h-5 flex items-center justify-center rounded-full transition-colors"
+                      style={{ backgroundColor: isDashboardActive ? "#f4f5f7" : "transparent" }}
+                    >
+                      <Gauge className={`h-5 w-5 ${isDashboardActive ? "text-gray-700" : "text-white"}`} />
                     </div>
                   </Link>
 
                   {/* Menú Gestión */}
                   <div className="relative group">
                     <div className="flex flex-col items-center">
-                      <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <FolderOpen className="h-5 w-5 text-white" />
+                      <button 
+                        className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
+                        style={{ backgroundColor: isGestionActive ? "#f4f5f7" : "transparent" }}
+                      >
+                        <FolderOpen className={`h-5 w-5 ${isGestionActive ? "text-gray-700" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -341,8 +372,11 @@ const Header: React.FC = () => {
                   {/* Menú O & M */}
                   <div className="relative group">
                     <div className="flex flex-col items-center">
-                      <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <Wrench className="h-5 w-5 text-white" />
+                      <button 
+                        className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
+                        style={{ backgroundColor: isOMActive ? "#f4f5f7" : "transparent" }}
+                      >
+                        <Wrench className={`h-5 w-5 ${isOMActive ? "text-gray-700" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -374,8 +408,11 @@ const Header: React.FC = () => {
                   {/* Menú Admin & Finanzas */}
                   <div className="relative group">
                     <div className="flex flex-col items-center">
-                      <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <DollarSign className="h-5 w-5 text-white" />
+                      <button 
+                        className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
+                        style={{ backgroundColor: isFinanzasActive ? "#f4f5f7" : "transparent" }}
+                      >
+                        <DollarSign className={`h-5 w-5 ${isFinanzasActive ? "text-gray-700" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -407,8 +444,11 @@ const Header: React.FC = () => {
                   {/* Menú MKT & Comm */}
                   <div className="relative group">
                     <div className="flex flex-col items-center">
-                      <button className="w-9 h-9 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
-                        <Megaphone className="h-5 w-5 text-white" />
+                      <button 
+                        className="w-9 h-9 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
+                        style={{ backgroundColor: isMarketingActive ? "#f4f5f7" : "transparent" }}
+                      >
+                        <Megaphone className={`h-5 w-5 ${isMarketingActive ? "text-gray-700" : "text-white"}`} />
                       </button>
                     </div>
 
@@ -439,8 +479,11 @@ const Header: React.FC = () => {
 
                   {/* Menú RH */}
                   <Link href="/admin/hr/dashboard" className="flex flex-col items-center hover:opacity-80">
-                    <div className="w-9 h-5 flex items-center justify-center rounded-full transition-colors">
-                      <Users className="h-5 w-5 text-white" />
+                    <div 
+                      className="w-9 h-5 flex items-center justify-center rounded-full transition-colors"
+                      style={{ backgroundColor: isRHActive ? "#f4f5f7" : "transparent" }}
+                    >
+                      <Users className={`h-5 w-5 ${isRHActive ? "text-gray-700" : "text-white"}`} />
                     </div>
                   </Link>
                 </nav>
