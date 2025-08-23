@@ -260,12 +260,14 @@ const Header: React.FC = () => {
               {/* Menús administrativos - Solo mostrar en páginas administrativas */}
               {isAdmin && (
                 <>
-                  {/* Leyenda Métricas */}
-                  <div className="text-lg font-semibold text-gray-700 mr-2">
-                    Métricas
-                  </div>
-                  
-                  <nav className="flex items-center space-x-4 ml-1">
+                  {/* Contenedor de Métricas y Botones */}
+                  <div className="flex items-center bg-white/20 rounded-lg px-4 py-2 backdrop-blur-sm">
+                    {/* Leyenda Métricas */}
+                    <div className="text-lg font-semibold text-gray-700 mr-4">
+                      Métricas
+                    </div>
+                    
+                    <nav className="flex items-center space-x-4">
                   {/* Menú Dashboard */}
                   <Link href="/admin" className="flex flex-col items-center hover:opacity-80">
                     <div className="w-9 h-5 flex items-center justify-center rounded-full transition-colors">
@@ -445,7 +447,8 @@ const Header: React.FC = () => {
                       <Users className="h-5 w-5 text-gray-700" />
                     </div>
                   </Link>
-                </nav>
+                  </nav>
+                  </div>
                 </>
               )}
             </div>
