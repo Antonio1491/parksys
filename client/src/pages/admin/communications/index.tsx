@@ -18,14 +18,19 @@ const CommunicationsPage: React.FC = () => {
     <AdminLayout>
       <div className="space-y-6">
 
-        {/* Header con título */}
-        <Card className="p-4 bg-gray-50">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-8 h-8 text-gray-900" />
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard de Comunicaciones</h1>
+        {/* Header con fondo coloreado */}
+        <div 
+          className="py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
+          <div className="flex items-center gap-3">
+            <MessageSquare className="w-8 h-8 text-white" />
+            <div>
+              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Comunicaciones</h1>
+              <p className="text-base font-normal text-white font-poppins">Panel de control para gestión de comunicaciones y campañas</p>
+            </div>
           </div>
-          <p className="text-gray-600 mt-2">Panel de control para gestión de comunicaciones y campañas</p>
-        </Card>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-4 gap-6">

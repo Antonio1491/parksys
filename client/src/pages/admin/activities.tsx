@@ -688,17 +688,19 @@ const AdminActivities = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header con patrón Card estandarizado */}
-        <Card className="p-4 bg-gray-50">
-          <div className="flex items-center justify-between">
+        {/* Header con fondo coloreado */}
+        <div 
+          className="py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
+          style={{ backgroundColor: "#14b8a6" }}
+        >
+          <div className="flex items-center gap-3">
+            <Calendar className="w-8 h-8 text-white" />
             <div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-gray-900">Actividades</h1>
-              </div>
-              <p className="text-gray-600 mt-2">Gestiona todas las actividades del sistema</p>
+              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Actividades</h1>
+              <p className="text-base font-normal text-white font-poppins">Gestiona todas las actividades del sistema</p>
             </div>
-            <div className="flex items-center gap-3">
+          </div>
+          <div className="flex items-center gap-3">
             {/* Toggle de vista */}
             <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
               <Button
@@ -759,7 +761,7 @@ const AdminActivities = () => {
             </Button>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4">
