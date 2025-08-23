@@ -120,33 +120,29 @@ export default function VisitorsDashboard() {
   // Fetch parks data
   const { data: parksData } = useQuery({
     queryKey: ['/api/parks'],
-    suspense: false,
     retry: 1
   });
 
   // Fetch dashboard metrics
   const { data: dashboardData, isLoading: isDashboardLoading } = useQuery({
     queryKey: ['/api/visitors/dashboard-metrics', { park: selectedPark, dateRange }],
-    suspense: false,
     retry: 1
   });
 
   // Fetch parks performance data
   const { data: parksPerformance, isLoading: isParksLoading } = useQuery({
     queryKey: ['/api/visitors/parks-performance', { park: selectedPark, dateRange }],
-    suspense: false,
     retry: 1
   });
 
   // Fetch trend data
   const { data: trendData, isLoading: isTrendLoading } = useQuery({
     queryKey: ['/api/visitors/trends', { park: selectedPark, dateRange }],
-    suspense: false,
     retry: 1
   });
 
-  const parks = parksData?.data || [];
-  const metrics: DashboardMetrics = dashboardData?.metrics || {
+  const parks = (parksData as any)?.data || [];
+  const metrics: DashboardMetrics = (dashboardData as any)?.metrics || {
     visitors: { total: 0, thisMonth: 0, lastMonth: 0, avgDaily: 0, uniqueParks: 0, totalRecords: 0 },
     evaluations: { total: 0, averageRating: 0, thisMonth: 0, lastMonth: 0, recommendationRate: 0, categoryAverages: {} },
     feedback: { total: 0, pending: 0, resolved: 0, thisMonth: 0, lastMonth: 0, byType: {}, resolutionRate: 0 }
@@ -323,7 +319,7 @@ export default function VisitorsDashboard() {
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={trendData?.trends || []}>
+                  <LineChart data={(trendData as any)?.trends || []}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
@@ -429,7 +425,7 @@ export default function VisitorsDashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {parksPerformance?.parks?.map((park: ParkData) => (
+                {(parksPerformance as any)?.parks?.map((park: ParkData) => (
                   <div key={park.parkId} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold">{park.parkName}</h3>
