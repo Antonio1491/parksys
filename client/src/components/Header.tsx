@@ -280,7 +280,6 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
                         <FolderOpen className="h-5 w-5 text-white" />
-                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
@@ -344,7 +343,6 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
                         <Wrench className="h-5 w-5 text-white" />
-                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
@@ -378,7 +376,6 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-5 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
                         <DollarSign className="h-5 w-5 text-white" />
-                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
@@ -412,7 +409,6 @@ const Header: React.FC = () => {
                     <div className="flex flex-col items-center">
                       <button className="w-9 h-9 flex items-center justify-center rounded-full hover:opacity-80 transition-colors">
                         <Megaphone className="h-5 w-5 text-white" />
-                        <ChevronDown className="h-3 w-3 text-white" />
                       </button>
                     </div>
 
