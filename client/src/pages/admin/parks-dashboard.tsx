@@ -451,6 +451,66 @@ const ParksDashboard = () => {
           </div>
         </div>
 
+        {/* Mapa de parques - Movido después de las tarjetas */}
+        <Card className="border-0 shadow-xl rounded-3xl">
+          <CardHeader className="bg-white rounded-t-lg">
+            <CardTitle className="text-xl font-bold text-gray-800">
+              Ubicación de Parques
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              Mapa interactivo mostrando la ubicación de todos los parques en
+              el sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-96 w-full">
+              <MapContainer
+                center={mexicoCenter}
+                zoom={6}
+                className="h-full w-full rounded-lg"
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {data.parksWithCoordinates
+                  ?.filter(
+                    (park) =>
+                      park.latitude != null &&
+                      park.longitude != null &&
+                      !isNaN(park.latitude) &&
+                      !isNaN(park.longitude),
+                  )
+                  .map((park) => (
+                    <Marker
+                      key={park.id}
+                      position={[park.latitude, park.longitude]}
+                    >
+                      <Popup>
+                        <div className="space-y-2">
+                          <h3 className="font-semibold">{park.name}</h3>
+                          <p className="text-sm text-gray-600">
+                            {park.municipality}
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            <Badge variant="outline" className="text-xs">
+                              {park.type}
+                            </Badge>
+                            {park.area && (
+                              <Badge variant="secondary" className="text-xs">
+                                {(park.area / 10000).toFixed(1)} ha
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+              </MapContainer>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Separador visual */}
         <div className="border-t border-gray-200 my-8"></div>
 
@@ -796,65 +856,6 @@ const ParksDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Mapa de parques */}
-          <Card className="border-0 shadow-xl rounded-3xl">
-            <CardHeader className="bg-white rounded-t-lg">
-              <CardTitle className="text-xl font-bold text-gray-800">
-                Ubicación de Parques
-              </CardTitle>
-              <CardDescription className="text-gray-600">
-                Mapa interactivo mostrando la ubicación de todos los parques en
-                el sistema
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-96 w-full">
-                <MapContainer
-                  center={mexicoCenter}
-                  zoom={6}
-                  className="h-full w-full rounded-lg"
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  {data.parksWithCoordinates
-                    ?.filter(
-                      (park) =>
-                        park.latitude != null &&
-                        park.longitude != null &&
-                        !isNaN(park.latitude) &&
-                        !isNaN(park.longitude),
-                    )
-                    .map((park) => (
-                      <Marker
-                        key={park.id}
-                        position={[park.latitude, park.longitude]}
-                      >
-                        <Popup>
-                          <div className="space-y-2">
-                            <h3 className="font-semibold">{park.name}</h3>
-                            <p className="text-sm text-gray-600">
-                              {park.municipality}
-                            </p>
-                            <div className="flex flex-wrap gap-1">
-                              <Badge variant="outline" className="text-xs">
-                                {park.type}
-                              </Badge>
-                              {park.area && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {(park.area / 10000).toFixed(1)} ha
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    ))}
-                </MapContainer>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </AdminLayout>
