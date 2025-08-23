@@ -86,7 +86,7 @@ const Header: React.FC = () => {
   // Estados activos para menús administrativos
   const isDashboardActive = location === "/admin";
   const isGestionActive = 
-    location === "/admin/parks/dashboard" || 
+    location === "/admin/parks-dashboard" || 
     location === "/admin/organizador" ||
     location === "/admin/amenities-dashboard" ||
     location === "/admin/trees/dashboard" ||
