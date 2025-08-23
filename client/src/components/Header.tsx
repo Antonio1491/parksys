@@ -261,7 +261,7 @@ const Header: React.FC = () => {
               {isAdmin && (
                 <>
                   {/* Contenedor de Métricas y Botones */}
-                  <div className="flex items-center bg-white/20 rounded-lg px-4 py-2 backdrop-blur-sm">
+                  <div className="flex items-center bg-white rounded-lg px-4 py-2 border border-gray-300 shadow-sm">
                     {/* Leyenda Métricas */}
                     <div className="text-lg font-semibold text-gray-700 mr-4">
                       Métricas
