@@ -457,10 +457,6 @@ const ParksDashboard = () => {
             <CardTitle className="text-xl font-bold text-gray-800">
               Ubicación de Parques
             </CardTitle>
-            <CardDescription className="text-gray-600">
-              Mapa interactivo mostrando la ubicación de todos los parques en
-              el sistema
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-96 w-full">
