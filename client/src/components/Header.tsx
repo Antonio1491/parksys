@@ -263,7 +263,7 @@ const Header: React.FC = () => {
             {isAdmin && (
               <div className="flex items-center rounded-3xl px-4 py-1 shadow-sm absolute left-1/2 transform -translate-x-1/2" style={{ backgroundColor: "#003d49" }}>
                     {/* Leyenda Métricas */}
-                    <div className="text-lg font-semibold text-white mr-4">
+                    <div className="text-base font-light text-white mr-4 font-poppins">
                       Métricas
                     </div>
                     
