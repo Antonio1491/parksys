@@ -583,7 +583,7 @@ const ParksDashboard = () => {
                   )}
                 </div>
                 {data.parkEvaluations?.length > 0 && (
-                  <div className="mt-4 text-center">
+                  <div className="mt-2 text-center">
                     <p className="text-sm text-gray-500 font-poppins font-thin">
                       Mostrando todos los {data.parkEvaluations.length} parques
                       registrados en el sistema
