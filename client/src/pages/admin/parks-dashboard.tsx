@@ -518,10 +518,9 @@ const ParksDashboard = () => {
               <CardContent className="pt-6">
                 <div className="w-full">
                   {data.parkEvaluations?.length > 0 ? (
-                    <div className="flex justify-center items-end gap-3 min-h-[320px] px-4 overflow-x-auto">
+                    <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                       {data.parkEvaluations
                         .sort((a, b) => b.averageRating - a.averageRating)
-                        .slice(0, 8) // Reducido a 8 columnas para mejor legibilidad en columna única
                         .map((park, index) => {
                           const heightPercentage = (park.averageRating / 5) * 100;
                           const getRatingColor = (rating: number) => {
@@ -586,7 +585,7 @@ const ParksDashboard = () => {
                 {data.parkEvaluations?.length > 0 && (
                   <div className="mt-4 text-center">
                     <p className="text-sm text-gray-500 font-poppins font-thin">
-                      Mostrando {Math.min(data.parkEvaluations.length, 8)} de {data.parkEvaluations.length} parques
+                      Mostrando todos los {data.parkEvaluations.length} parques
                       registrados en el sistema
                     </p>
                   </div>
