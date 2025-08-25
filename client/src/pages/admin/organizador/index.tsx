@@ -37,11 +37,10 @@ const OrganizadorPage: React.FC = () => {
   });
 
   // Obtener instructores
-  const { data: instructorsResponse, isLoading: isLoadingInstructors } = useQuery({
+  const { data: instructors = [], isLoading: isLoadingInstructors } = useQuery({
     queryKey: ['/api/instructors'],
     retry: 1,
   });
-  const instructors = (instructorsResponse as any)?.data || [];
 
   // Crear mapeo de categorías por ID
   const categoriesMap = Array.isArray(categories) ? categories.reduce((acc: any, category: any) => {
@@ -60,7 +59,7 @@ const OrganizadorPage: React.FC = () => {
 
   // Calcular estadísticas de instructores
   const totalInstructors = Array.isArray(instructors) ? instructors.length : 0;
-  const activeInstructors = Array.isArray(instructors) ? instructors.filter((i: any) => i.isActive === true || i.isActive === 1).length : 0;
+  const activeInstructors = Array.isArray(instructors) ? instructors.filter((i: any) => i.status === 'active').length : 0;
   
   // Crear mapeo inverso de categorías por string del category
   const categoryStringMap: any = {
