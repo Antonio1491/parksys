@@ -18,6 +18,14 @@ import {
   Award,
   MessageSquare,
 } from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+} from "recharts";
 import AdminLayout from "@/components/AdminLayout";
 import {
   Card,
@@ -602,6 +610,210 @@ const ParksDashboard = () => {
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* NUEVO: Gráfico de Pastel de Evaluación Promedio por Parque */}
+          <Card className="border-0 shadow-lg max-w-6xl mx-auto rounded-3xl">
+            <CardHeader className="bg-white rounded-t-lg">
+              <CardTitle className="text-lg font-bold text-gray-800">
+                Distribución de Evaluaciones por Parque
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Categorización de parques según su nivel de evaluación promedio
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="w-full">
+                {data.parkEvaluations?.length > 0 ? (
+                  (() => {
+                    // Preparar datos para el gráfico de pastel
+                    const evaluationRanges = data.parkEvaluations.reduce((acc, park) => {
+                      const rating = park.averageRating;
+                      if (rating >= 4.0) {
+                        acc.excelente += 1;
+                      } else if (rating >= 3.0) {
+                        acc.bueno += 1;
+                      } else if (rating >= 2.0) {
+                        acc.regular += 1;
+                      } else {
+                        acc.malo += 1;
+                      }
+                      return acc;
+                    }, { excelente: 0, bueno: 0, regular: 0, malo: 0 });
+
+                    const pieData = [
+                      {
+                        name: "Excelente (4.0-5.0)",
+                        value: evaluationRanges.excelente,
+                        color: "#22C55E",
+                        range: "≥ 4.0"
+                      },
+                      {
+                        name: "Bueno (3.0-3.9)", 
+                        value: evaluationRanges.bueno,
+                        color: "#84CC16",
+                        range: "3.0-3.9"
+                      },
+                      {
+                        name: "Regular (2.0-2.9)",
+                        value: evaluationRanges.regular,
+                        color: "#F59E0B",
+                        range: "2.0-2.9"
+                      },
+                      {
+                        name: "Necesita mejoras (<2.0)",
+                        value: evaluationRanges.malo,
+                        color: "#EF4444",
+                        range: "< 2.0"
+                      }
+                    ].filter(item => item.value > 0);
+
+                    const CustomTooltip = ({ active, payload }: any) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        const percentage = ((data.value / data.payload.total) * 100).toFixed(1);
+                        return (
+                          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                            <p className="font-semibold text-gray-800">{data.name}</p>
+                            <p className="text-sm text-gray-600">
+                              {data.value} parque{data.value !== 1 ? 's' : ''}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {percentage}% del total
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Rango: {data.range} ⭐
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    };
+
+                    const CustomLegend = ({ payload }: any) => {
+                      return (
+                        <div className="flex flex-wrap justify-center gap-4 mt-4">
+                          {payload.map((entry: any, index: number) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <div 
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: entry.color }}
+                              />
+                              <span className="text-sm text-gray-700">
+                                {entry.value} ({entry.payload.value})
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    };
+
+                    // Agregar total a cada elemento para el tooltip
+                    const total = pieData.reduce((sum, item) => sum + item.value, 0);
+                    const pieDataWithTotal = pieData.map(item => ({ ...item, total }));
+
+                    return (
+                      <div className="flex flex-col lg:flex-row items-center gap-8">
+                        {/* Gráfico de pastel */}
+                        <div className="w-full lg:w-1/2 h-96">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={pieDataWithTotal}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={120}
+                                innerRadius={40}
+                                paddingAngle={2}
+                                dataKey="value"
+                              >
+                                {pieDataWithTotal.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip content={<CustomTooltip />} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+
+                        {/* Información detallada */}
+                        <div className="w-full lg:w-1/2 space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            {pieData.map((item, index) => (
+                              <div 
+                                key={index}
+                                className="p-4 rounded-lg border"
+                                style={{ borderColor: item.color, backgroundColor: `${item.color}10` }}
+                              >
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div 
+                                    className="w-4 h-4 rounded-full"
+                                    style={{ backgroundColor: item.color }}
+                                  />
+                                  <span className="text-sm font-semibold text-gray-800">
+                                    {item.name}
+                                  </span>
+                                </div>
+                                <div className="text-2xl font-bold" style={{ color: item.color }}>
+                                  {item.value}
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  {((item.value / total) * 100).toFixed(1)}% del total
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Resumen estadístico */}
+                          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                            <h4 className="text-sm font-semibold text-gray-800 mb-3">
+                              Resumen de Evaluaciones
+                            </h4>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-gray-600">Total de parques:</span>
+                                <span className="font-semibold ml-2">{total}</span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Evaluación promedio general:</span>
+                                <span className="font-semibold ml-2">
+                                  {data.averageRating ? data.averageRating.toFixed(1) : "N/A"} ⭐
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Parques con alta calificación:</span>
+                                <span className="font-semibold ml-2 text-green-600">
+                                  {((evaluationRanges.excelente + evaluationRanges.bueno) / total * 100).toFixed(0)}%
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Parques que necesitan atención:</span>
+                                <span className="font-semibold ml-2 text-orange-600">
+                                  {((evaluationRanges.regular + evaluationRanges.malo) / total * 100).toFixed(0)}%
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="flex flex-col items-center space-y-2">
+                      <CheckCircle className="h-12 w-12 text-gray-300" />
+                      <p className="text-lg font-medium">
+                        No hay evaluaciones disponibles
+                      </p>
+                      <p className="text-sm">
+                        Los datos de evaluación aparecerán aquí una vez que los
+                        visitantes evalúen los parques
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
