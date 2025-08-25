@@ -227,11 +227,6 @@ export default function InstructorsManagementPage() {
     setCurrentPage(1);
   }, [searchQuery, statusFilter, specialtyFilter, ratingFilter, experienceFilter]);
 
-  const handleDeleteInstructor = (instructor: Instructor) => {
-    setInstructorToDelete(instructor);
-    setShowDeleteDialog(true);
-  };
-
   const confirmDelete = () => {
     if (instructorToDelete) {
       deleteInstructorMutation.mutate(instructorToDelete.id);
@@ -250,15 +245,10 @@ export default function InstructorsManagementPage() {
 
   // Manejar click en botón de eliminar instructor individual
   const handleDeleteClick = (instructorId: number) => {
-    setDeleteInstructorId(instructorId);
+    const instructor = instructors.find(i => i.id === instructorId);
+    setInstructorToDelete(instructor);
+    setDeleteInstructorId(instructorId); // opcional si usas ambos
     setShowDeleteDialog(true);
-  };
-
-  // Manejar confirmación de eliminar instructor individual
-  const handleConfirmDelete = () => {
-    if (deleteInstructorId !== null) {
-      deleteInstructorMutation.mutate(deleteInstructorId);
-    }
   };
   
   // Formatear fecha
