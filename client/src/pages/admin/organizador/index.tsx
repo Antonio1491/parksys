@@ -187,7 +187,7 @@ const OrganizadorPage: React.FC = () => {
                   className="text-xs font-semibold"
                   style={{ color: "#14b8a6" }}
                 >
-                  {isLoadingActivities ? '...' : activeActivities}
+                  {isLoadingActivities ? '...' : `${activeActivities} (${totalActivities > 0 ? Math.round((activeActivities / totalActivities) * 100) : 0}%)`}
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
