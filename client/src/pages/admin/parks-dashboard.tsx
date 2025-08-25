@@ -583,7 +583,7 @@ const ParksDashboard = () => {
           <Card className="border-0 shadow-lg rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
-                Porcentaje de Área Verde
+                🌿 Porcentaje de Área Verde
               </CardTitle>
               <CardDescription className="text-gray-600">
                 Proporción de área verde respecto al área total de cada parque
@@ -611,7 +611,7 @@ const ParksDashboard = () => {
                             {/* Valor del porcentaje arriba con área en hectáreas */}
                             <div className="mb-2 text-center">
                               <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                                🌿 {park.greenPercentage.toFixed(1)}%
+                                {park.greenPercentage.toFixed(1)}%
                               </div>
                               <div className="text-xs font-poppins font-thin text-gray-500">
                                 ({(park.greenArea / 10000).toFixed(1)} ha)
