@@ -504,9 +504,9 @@ const ParksDashboard = () => {
                         .map((park, index) => {
                           const heightPercentage = (park.averageRating / 5) * 100;
                           const getRatingColor = (rating: number) => {
-                            if (rating >= 4.0) return "#22C55E"; // Verde para calificaciones positivas
-                            if (rating >= 2.5) return "#F59E0B"; // Amarillo/naranja para medias
-                            return "#EF4444"; // Rojo para bajas
+                            if (rating >= 4.0) return "#69c45c"; // Verde para calificaciones positivas
+                            if (rating >= 2.5) return "#bcb57e"; // Amarillo/naranja para medias
+                            return "#a86767"; // Rojo para bajas
                           };
 
                           return (
@@ -522,7 +522,7 @@ const ParksDashboard = () => {
                               </div>
 
                               {/* Columna vertical */}
-                              <div className="relative h-64 w-6 flex flex-col justify-end">
+                              <div className="relative h-64 w-4 flex flex-col justify-end">
                                 {/* Fondo de la columna */}
                                 <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
                                 
@@ -597,11 +597,11 @@ const ParksDashboard = () => {
                       .sort((a, b) => b.greenPercentage - a.greenPercentage)
                       .map((park, index) => {
                         const getPercentageColor = (percentage: number) => {
-                          if (percentage >= 80) return "#22C55E"; // Verde excelente
-                          if (percentage >= 60) return "#84CC16"; // Verde bueno
-                          if (percentage >= 40) return "#EAB308"; // Amarillo regular
-                          if (percentage >= 20) return "#F97316"; // Naranja bajo
-                          return "#EF4444"; // Rojo muy bajo
+                          if (percentage >= 80) return "#69c45c"; // Verde excelente
+                          if (percentage >= 60) return "#9cb767"; // Verde bueno
+                          if (percentage >= 40) return "#bcb57e"; // Amarillo regular
+                          if (percentage >= 20) return "#a58567"; // Naranja bajo
+                          return "#a86767"; // Rojo muy bajo
                         };
 
                         const heightPercentage = park.greenPercentage;
@@ -680,112 +680,83 @@ const ParksDashboard = () => {
                 sistema
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-2 h-64 overflow-y-auto">
+            <CardContent className="pt-6">
+              <div className="w-full">
                 {data.incidentsByPark?.length > 0 ? (
-                  data.incidentsByPark
-                    .sort((a, b) => b.totalIncidents - a.totalIncidents)
-                    .map((park, index) => {
-                      const getIncidentColor = (incidents: number) => {
-                        if (incidents >= 20) return "#EF4444"; // Rojo crítico
-                        if (incidents >= 15) return "#F97316"; // Naranja alto
-                        if (incidents >= 10) return "#EAB308"; // Amarillo medio
-                        if (incidents >= 5) return "#84CC16"; // Verde bajo
-                        return "#22C55E"; // Verde muy bajo
-                      };
+                  <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+                    {data.incidentsByPark
+                      .sort((a, b) => b.totalIncidents - a.totalIncidents)
+                      .map((park, index) => {
+                        const getIncidentColor = (incidents: number) => {
+                          if (incidents >= 20) return "#EF4444"; // Rojo crítico
+                          if (incidents >= 15) return "#F97316"; // Naranja alto
+                          if (incidents >= 10) return "#EAB308"; // Amarillo medio
+                          if (incidents >= 5) return "#84CC16"; // Verde bajo
+                          return "#22C55E"; // Verde muy bajo
+                        };
 
-                      const totalSystemIncidents = data.incidentsByPark.reduce(
-                        (sum, p) => sum + p.totalIncidents,
-                        0,
-                      );
-                      const systemPercentage =
-                        (park.totalIncidents / totalSystemIncidents) * 100;
-                      const maxIncidents = Math.max(
-                        ...data.incidentsByPark.map((p) => p.totalIncidents),
-                      );
-                      const totalIncidentsPercentage =
-                        (park.totalIncidents / maxIncidents) * 80; // Escala máxima 80%
-                      const systemPercentageWidth =
-                        (systemPercentage / 100) * totalIncidentsPercentage;
+                        const maxIncidents = Math.max(
+                          ...data.incidentsByPark.map((p) => p.totalIncidents),
+                        );
+                        const heightPercentage = maxIncidents > 0 ? (park.totalIncidents / maxIncidents) * 100 : 0;
 
-                      return (
-                        <div
-                          key={park.parkId}
-                          className="flex items-center space-x-1"
-                        >
-                          <div className="w-20 text-xs font-medium text-right text-gray-700 truncate">
-                            {park.parkName}
-                          </div>
-                          <div className="flex-1 flex items-center">
-                            <div className="flex-1 relative h-5">
-                              {/* Barra gris para incidencias totales */}
-                              <div
-                                className="bg-gray-400 rounded-full h-5 relative transition-all duration-700 shadow-sm"
-                                style={{
-                                  width: `${Math.max(totalIncidentsPercentage, 8)}%`,
-                                }}
-                              >
-                                {/* Total de incidencias */}
-                                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-                                  <span className="text-white text-xs font-bold truncate px-1">
-                                    {park.totalIncidents} total
-                                  </span>
-                                </div>
+                        return (
+                          <div key={park.parkId} className="relative flex flex-col items-center">
+                            {/* Valores en la parte superior */}
+                            <div className="absolute -top-16 text-center w-full z-10">
+                              <div className="text-sm font-bold text-gray-800">
+                                🚨 {park.totalIncidents}
                               </div>
-
-                              {/* Barra verde superpuesta (porcentaje del sistema total) */}
-                              <div
-                                className="absolute top-0 left-0 rounded-full h-5 flex items-center justify-end pr-1 transition-all duration-700 shadow-sm"
-                                style={{
-                                  width: `${Math.max(systemPercentageWidth, 2)}%`,
-                                  backgroundColor: "#22C55E",
-                                }}
-                              >
-                                <span className="text-white text-xs font-bold">
-                                  {systemPercentage.toFixed(1)}%
-                                </span>
+                              <div className="text-xs text-gray-600">
+                                total
                               </div>
                             </div>
+
+                            {/* Columna vertical */}
+                            <div className="relative h-64 w-4 flex flex-col justify-end">
+                              {/* Fondo de la columna */}
+                              <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                              
+                              {/* Relleno de la columna según incidencias */}
+                              <div 
+                                className="w-full rounded-t-3xl transition-all duration-700 ease-out relative"
+                                style={{ 
+                                  height: `${Math.max(heightPercentage, 4)}%`,
+                                  backgroundColor: getIncidentColor(park.totalIncidents)
+                                }}
+                              >
+                              </div>
+                            </div>
+
+                            {/* Etiqueta del parque (rotada) */}
+                            <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-left">
+                              <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
+                                {park.parkName}
+                              </span>
+                            </div>
                           </div>
-                          <div className="w-20 text-right">
-                            <div className="text-xs text-green-600 font-semibold">
-                              {systemPercentage.toFixed(1)}% del sistema
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              Este mes: {park.incidentsThisMonth}
-                            </div>
-                            <div
-                              className="text-xs font-semibold"
-                              style={{
-                                color: getIncidentColor(park.totalIncidents),
-                              }}
-                            >
-                              {park.totalIncidents} total
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })
+                        );
+                      })}
+                  </div>
                 ) : (
-                  <div className="text-center py-6 text-gray-500">
+                  <div className="text-center py-8 text-gray-500">
                     <div className="flex flex-col items-center space-y-2">
-                      <CheckCircle className="h-10 w-10 text-gray-300" />
-                      <p className="text-sm font-medium">
+                      <CheckCircle className="h-12 w-12 text-gray-300" />
+                      <p className="text-lg font-medium">
                         No hay incidencias registradas
                       </p>
-                      <p className="text-xs">
-                        Los datos aparecerán cuando se registren incidencias en
-                        los parques
+                      <p className="text-sm">
+                        Los datos aparecerán cuando se registren incidencias en los parques
                       </p>
                     </div>
                   </div>
                 )}
               </div>
               {data.incidentsByPark?.length > 0 && (
-                <div className="mt-3 text-center">
-                  <p className="text-xs text-gray-500">
-                    Mostrando los {data.incidentsByPark.length} parques con
-                    incidencias registradas
+                <div className="mt-2 text-center">
+                  <p className="text-sm text-gray-500 font-poppins font-thin">
+                    Mostrando todos los {data.incidentsByPark.length} parques
+                    registrados en el sistema
                   </p>
                 </div>
               )}
