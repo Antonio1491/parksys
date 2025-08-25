@@ -132,12 +132,6 @@ const ParksDashboard = () => {
         <div className="space-y-6">
           <div className="mb-8">
             <div className="flex items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-poppins">
-                  <span style={{ color: "#00444f" }}>MÉTRICAS</span>{" "}
-                  <span style={{ color: "#504378" }}>Parques</span>
-                </h1>
-              </div>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -162,19 +156,6 @@ const ParksDashboard = () => {
   if (error) {
     return (
       <AdminLayout>
-        <div className="mb-8">
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold font-poppins">
-                <span style={{ color: "#00444f" }}>MÉTRICAS</span>{" "}
-                <span style={{ color: "#504378" }}>Parques</span>
-              </h1>
-              <p className="mt-2" style={{ color: "#00444f" }}>
-                Estadísticas generales del sistema de parques
-              </p>
-            </div>
-          </div>
-        </div>
         <div className="text-center py-8">
           <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
           <p className="text-gray-600">
@@ -190,15 +171,6 @@ const ParksDashboard = () => {
       <AdminLayout>
         <div className="mb-8">
           <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold font-poppins">
-                <span style={{ color: "#00444f" }}>MÉTRICAS</span>{" "}
-                <span style={{ color: "#504378" }}>Parques</span>
-              </h1>
-              <p className="mt-2" style={{ color: "#00444f" }}>
-                Estadísticas generales del sistema de parques
-              </p>
-            </div>
           </div>
         </div>
         <div className="text-center py-8">
@@ -595,9 +567,6 @@ const ParksDashboard = () => {
           </div>
 
         </div>
-
-        {/* Separador visual */}
-        <div className="border-t border-gray-200 my-8"></div>
 
         {/* Sección continua con el resto del dashboard */}
         <div className="space-y-6">
