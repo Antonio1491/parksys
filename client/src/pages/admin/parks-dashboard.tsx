@@ -694,20 +694,18 @@ const ParksDashboard = () => {
                           return "#22C55E"; // Verde muy bajo
                         };
 
-                        const maxIncidents = Math.max(
-                          ...data.incidentsByPark!.map((p) => p.totalIncidents),
-                        );
-                        const heightPercentage = maxIncidents > 0 ? (park.totalIncidents / maxIncidents) * 100 : 0;
+                        const totalGlobalIncidents = data.incidentsByPark!.reduce((sum, p) => sum + p.totalIncidents, 0);
+                        const heightPercentage = totalGlobalIncidents > 0 ? (park.totalIncidents / totalGlobalIncidents) * 100 : 0;
 
                         return (
                           <div key={park.parkId} className="flex flex-col items-center relative">
-                            {/* Valor del total arriba con información adicional */}
+                            {/* Valor del porcentaje arriba con información adicional */}
                             <div className="mb-2 text-center">
                               <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                                {park.totalIncidents}
+                                {heightPercentage.toFixed(1)}%
                               </div>
                               <div className="text-xs font-poppins font-thin text-gray-500">
-                                (total)
+                                ({park.totalIncidents} total)
                               </div>
                             </div>
 
