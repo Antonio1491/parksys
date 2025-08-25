@@ -673,7 +673,7 @@ const ParksDashboard = () => {
           <Card className="border-0 shadow-lg rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
-                Incidencias por Parque
+                🚨 Incidencias por Parque
               </CardTitle>
               <CardDescription className="text-gray-600">
                 Barra gris: Total histórico | Barra verde: % del total del
@@ -705,7 +705,7 @@ const ParksDashboard = () => {
                             {/* Valores en la parte superior */}
                             <div className="absolute -top-16 text-center w-full z-10">
                               <div className="text-sm font-bold text-gray-800">
-                                🚨 {park.totalIncidents}
+                                {park.totalIncidents}
                               </div>
                               <div className="text-xs text-gray-600">
                                 total
