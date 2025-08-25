@@ -569,8 +569,8 @@ const ParksDashboard = () => {
                               ></div>
                             </div>
 
-                            {/* Nombre del parque a la izquierda de la columna (alineado al inicio de la barra) - VERTICAL */}
-                            <div className="absolute bottom-0 -left-8 transform -rotate-90 origin-bottom-right w-32">
+                            {/* Nombre del parque a la izquierda de la columna (movido más arriba) - VERTICAL */}
+                            <div className="absolute bottom-16 -left-8 transform -rotate-90 origin-bottom-right w-32">
                               <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
                                 {park.parkName}
                               </div>
