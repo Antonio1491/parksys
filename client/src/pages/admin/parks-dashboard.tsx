@@ -488,7 +488,7 @@ const ParksDashboard = () => {
             <Card className="border-0 shadow-lg rounded-3xl h-full">
               <CardHeader className="bg-white rounded-t-lg">
                 <CardTitle className="text-lg font-bold text-gray-800">
-                  Evaluación Promedio por Parque
+                  ⭐ Evaluación Promedio por Parque
                 </CardTitle>
                 <CardDescription className="text-gray-600">
                   Nivel de satisfacción promedio de visitantes por parque basado
@@ -514,7 +514,7 @@ const ParksDashboard = () => {
                               {/* Valor del promedio arriba con número de evaluaciones */}
                               <div className="mb-2 text-center">
                                 <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                                  ⭐ {park.averageRating.toFixed(1)}/5
+                                  {park.averageRating.toFixed(1)}/5
                                 </div>
                                 <div className="text-xs font-poppins font-thin text-gray-500">
                                   ({park.evaluationCount} eval)
