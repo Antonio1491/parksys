@@ -627,91 +627,53 @@ const ParksDashboard = () => {
               <div className="w-full">
                 {data.parkEvaluations?.length > 0 ? (
                   (() => {
-                    // Preparar datos para el gráfico de pastel
-                    const evaluationRanges = data.parkEvaluations.reduce((acc, park) => {
-                      const rating = park.averageRating;
-                      if (rating >= 4.0) {
-                        acc.excelente += 1;
-                      } else if (rating >= 3.0) {
-                        acc.bueno += 1;
-                      } else if (rating >= 2.0) {
-                        acc.regular += 1;
-                      } else {
-                        acc.malo += 1;
-                      }
-                      return acc;
-                    }, { excelente: 0, bueno: 0, regular: 0, malo: 0 });
+                    // Preparar datos para el gráfico de pastel por parque individual
+                    const sortedParks = data.parkEvaluations
+                      .sort((a, b) => b.averageRating - a.averageRating)
+                      .slice(0, 10); // Mostrar solo los top 10 para mejor visualización
 
-                    const pieData = [
-                      {
-                        name: "Excelente (4.0-5.0)",
-                        value: evaluationRanges.excelente,
-                        color: "#22C55E",
-                        range: "≥ 4.0"
-                      },
-                      {
-                        name: "Bueno (3.0-3.9)", 
-                        value: evaluationRanges.bueno,
-                        color: "#84CC16",
-                        range: "3.0-3.9"
-                      },
-                      {
-                        name: "Regular (2.0-2.9)",
-                        value: evaluationRanges.regular,
-                        color: "#F59E0B",
-                        range: "2.0-2.9"
-                      },
-                      {
-                        name: "Necesita mejoras (<2.0)",
-                        value: evaluationRanges.malo,
-                        color: "#EF4444",
-                        range: "< 2.0"
-                      }
-                    ].filter(item => item.value > 0);
+                    // Generar colores únicos para cada parque
+                    const generateColors = (count: number) => {
+                      const colors = [
+                        "#22C55E", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6",
+                        "#06B6D4", "#F97316", "#84CC16", "#EC4899", "#6366F1",
+                        "#14B8A6", "#F59E0B", "#10B981", "#8B5CF6", "#F97316"
+                      ];
+                      return colors.slice(0, count);
+                    };
+
+                    const colors = generateColors(sortedParks.length);
+                    
+                    const pieData = sortedParks.map((park, index) => ({
+                      name: park.parkName,
+                      value: park.averageRating,
+                      evaluationCount: park.evaluationCount,
+                      color: colors[index],
+                      parkId: park.parkId
+                    }));
 
                     const CustomTooltip = ({ active, payload }: any) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
-                        const percentage = ((data.value / data.payload.total) * 100).toFixed(1);
+                        const totalRating = pieData.reduce((sum, park) => sum + park.value, 0);
+                        const percentage = ((data.value / totalRating) * 100).toFixed(1);
                         return (
                           <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
                             <p className="font-semibold text-gray-800">{data.name}</p>
                             <p className="text-sm text-gray-600">
-                              {data.value} parque{data.value !== 1 ? 's' : ''}
+                              ⭐ {data.value.toFixed(1)}/5.0
                             </p>
                             <p className="text-sm text-gray-600">
-                              {percentage}% del total
+                              {data.evaluationCount} evaluaciones
                             </p>
                             <p className="text-xs text-gray-500">
-                              Rango: {data.range} ⭐
+                              {percentage}% del total de puntuación
                             </p>
                           </div>
                         );
                       }
                       return null;
                     };
-
-                    const CustomLegend = ({ payload }: any) => {
-                      return (
-                        <div className="flex flex-wrap justify-center gap-4 mt-4">
-                          {payload.map((entry: any, index: number) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <div 
-                                className="w-3 h-3 rounded-full"
-                                style={{ backgroundColor: entry.color }}
-                              />
-                              <span className="text-sm text-gray-700">
-                                {entry.value} ({entry.payload.value})
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      );
-                    };
-
-                    // Agregar total a cada elemento para el tooltip
-                    const total = pieData.reduce((sum, item) => sum + item.value, 0);
-                    const pieDataWithTotal = pieData.map(item => ({ ...item, total }));
 
                     return (
                       <div className="flex flex-col lg:flex-row items-center gap-8">
@@ -720,15 +682,15 @@ const ParksDashboard = () => {
                           <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                               <Pie
-                                data={pieDataWithTotal}
+                                data={pieData}
                                 cx="50%"
                                 cy="50%"
                                 outerRadius={120}
                                 innerRadius={40}
-                                paddingAngle={2}
+                                paddingAngle={1}
                                 dataKey="value"
                               >
-                                {pieDataWithTotal.map((entry, index) => (
+                                {pieData.map((entry, index) => (
                                   <Cell key={`cell-${index}`} fill={entry.color} />
                                 ))}
                               </Pie>
@@ -737,29 +699,38 @@ const ParksDashboard = () => {
                           </ResponsiveContainer>
                         </div>
 
-                        {/* Información detallada */}
-                        <div className="w-full lg:w-1/2 space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            {pieData.map((item, index) => (
+                        {/* Lista de parques */}
+                        <div className="w-full lg:w-1/2 space-y-3">
+                          <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                            Top {pieData.length} Parques por Evaluación
+                          </h4>
+                          <div className="max-h-80 overflow-y-auto space-y-2">
+                            {pieData.map((park, index) => (
                               <div 
-                                key={index}
-                                className="p-4 rounded-lg border"
-                                style={{ borderColor: item.color, backgroundColor: `${item.color}10` }}
+                                key={park.parkId}
+                                className="flex items-center justify-between p-3 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors"
                               >
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex items-center gap-3">
                                   <div 
-                                    className="w-4 h-4 rounded-full"
-                                    style={{ backgroundColor: item.color }}
+                                    className="w-4 h-4 rounded-full flex-shrink-0"
+                                    style={{ backgroundColor: park.color }}
                                   />
-                                  <span className="text-sm font-semibold text-gray-800">
-                                    {item.name}
-                                  </span>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-800 truncate max-w-32">
+                                      {park.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {park.evaluationCount} evaluaciones
+                                    </p>
+                                  </div>
                                 </div>
-                                <div className="text-2xl font-bold" style={{ color: item.color }}>
-                                  {item.value}
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                  {((item.value / total) * 100).toFixed(1)}% del total
+                                <div className="text-right">
+                                  <div className="text-sm font-bold" style={{ color: park.color }}>
+                                    ⭐ {park.value.toFixed(1)}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    #{index + 1}
+                                  </div>
                                 </div>
                               </div>
                             ))}
@@ -767,34 +738,44 @@ const ParksDashboard = () => {
 
                           {/* Resumen estadístico */}
                           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                            <h4 className="text-sm font-semibold text-gray-800 mb-3">
-                              Resumen de Evaluaciones
-                            </h4>
+                            <h5 className="text-sm font-semibold text-gray-800 mb-3">
+                              Estadísticas del Top {pieData.length}
+                            </h5>
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
-                                <span className="text-gray-600">Total de parques:</span>
-                                <span className="font-semibold ml-2">{total}</span>
+                                <span className="text-gray-600">Mejor evaluado:</span>
+                                <div className="font-semibold text-green-600">
+                                  {pieData[0]?.name} ({pieData[0]?.value.toFixed(1)} ⭐)
+                                </div>
                               </div>
                               <div>
-                                <span className="text-gray-600">Evaluación promedio general:</span>
-                                <span className="font-semibold ml-2">
-                                  {data.averageRating ? data.averageRating.toFixed(1) : "N/A"} ⭐
-                                </span>
+                                <span className="text-gray-600">Promedio del top:</span>
+                                <div className="font-semibold text-blue-600">
+                                  {(pieData.reduce((sum, park) => sum + park.value, 0) / pieData.length).toFixed(1)} ⭐
+                                </div>
                               </div>
                               <div>
-                                <span className="text-gray-600">Parques con alta calificación:</span>
-                                <span className="font-semibold ml-2 text-green-600">
-                                  {((evaluationRanges.excelente + evaluationRanges.bueno) / total * 100).toFixed(0)}%
-                                </span>
+                                <span className="text-gray-600">Total evaluaciones:</span>
+                                <div className="font-semibold text-gray-700">
+                                  {pieData.reduce((sum, park) => sum + park.evaluationCount, 0)}
+                                </div>
                               </div>
                               <div>
-                                <span className="text-gray-600">Parques que necesitan atención:</span>
-                                <span className="font-semibold ml-2 text-orange-600">
-                                  {((evaluationRanges.regular + evaluationRanges.malo) / total * 100).toFixed(0)}%
-                                </span>
+                                <span className="text-gray-600">Rango de calificación:</span>
+                                <div className="font-semibold text-gray-700">
+                                  {Math.min(...pieData.map(p => p.value)).toFixed(1)} - {Math.max(...pieData.map(p => p.value)).toFixed(1)} ⭐
+                                </div>
                               </div>
                             </div>
                           </div>
+
+                          {data.parkEvaluations.length > 10 && (
+                            <div className="text-center mt-4">
+                              <p className="text-xs text-gray-500">
+                                Mostrando los 10 parques mejor evaluados de {data.parkEvaluations.length} total
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
