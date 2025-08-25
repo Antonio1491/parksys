@@ -451,8 +451,8 @@ const ParksDashboard = () => {
           </div>
         </div>
 
-        {/* Fila dividida en 2 columnas */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Fila dividida en 3 columnas */}
+        <div className="grid gap-6 lg:grid-cols-3">
           
           {/* Columna izquierda: Mapa de parques */}
           <Card className="border-0 shadow-xl rounded-3xl overflow-hidden">
@@ -503,9 +503,96 @@ const ParksDashboard = () => {
             </div>
           </Card>
 
-          {/* Columna derecha: Disponible para contenido adicional */}
-          <div className="space-y-4">
-            {/* Espacio disponible para contenido adicional */}
+          {/* Columnas derecha: Gráfico de Evaluación Promedio por Parque (ocupa 2 columnas) */}
+          <div className="lg:col-span-2">
+            <Card className="border-0 shadow-lg rounded-3xl h-full">
+              <CardHeader className="bg-white rounded-t-lg">
+                <CardTitle className="text-lg font-bold text-gray-800">
+                  Evaluación Promedio por Parque
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Nivel de satisfacción promedio de visitantes por parque basado
+                  en evaluaciones
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="w-full">
+                  {data.parkEvaluations?.length > 0 ? (
+                    <div className="flex justify-center items-end gap-3 min-h-[280px] px-4 overflow-x-auto">
+                      {data.parkEvaluations
+                        .sort((a, b) => b.averageRating - a.averageRating)
+                        .slice(0, 10) // Reducido a 10 columnas para el espacio disponible
+                        .map((park, index) => {
+                          const heightPercentage = (park.averageRating / 5) * 100;
+                          const getRatingColor = (rating: number) => {
+                            if (rating >= 4.0) return "#22C55E"; // Verde para calificaciones positivas
+                            if (rating >= 2.5) return "#F59E0B"; // Amarillo/naranja para medias
+                            return "#EF4444"; // Rojo para bajas
+                          };
+
+                          return (
+                            <div key={park.parkId} className="flex flex-col items-center relative">
+                              {/* Valor del promedio arriba con número de evaluaciones */}
+                              <div className="mb-2 text-center">
+                                <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
+                                  ⭐ {park.averageRating.toFixed(1)}/5
+                                </div>
+                                <div className="text-xs font-poppins font-thin text-gray-500">
+                                  ({park.evaluationCount} eval)
+                                </div>
+                              </div>
+
+                              {/* Columna vertical */}
+                              <div className="relative h-60 w-5 flex flex-col justify-end">
+                                {/* Fondo de la columna */}
+                                <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                                
+                                {/* Relleno de la columna según promedio */}
+                                <div
+                                  className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                                  style={{
+                                    height: `${Math.max(heightPercentage, 5)}%`,
+                                    backgroundColor: getRatingColor(park.averageRating),
+                                    borderColor: getRatingColor(park.averageRating),
+                                  }}
+                                ></div>
+                              </div>
+
+                              {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                              <div className="absolute bottom-20 -left-20 transform -rotate-90 origin-bottom-right w-32">
+                                <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                                  {park.parkName}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="flex flex-col items-center space-y-2">
+                        <CheckCircle className="h-12 w-12 text-gray-300" />
+                        <p className="text-lg font-medium">
+                          No hay evaluaciones disponibles
+                        </p>
+                        <p className="text-sm">
+                          Los datos de evaluación aparecerán aquí una vez que los
+                          visitantes evalúen los parques
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {data.parkEvaluations?.length > 0 && (
+                  <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-500 font-poppins font-thin">
+                      Mostrando {Math.min(data.parkEvaluations.length, 10)} de {data.parkEvaluations.length} parques
+                      registrados en el sistema
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
         </div>
@@ -515,97 +602,6 @@ const ParksDashboard = () => {
 
         {/* Sección continua con el resto del dashboard */}
         <div className="space-y-6">
-          {/* NUEVO: Gráfico de Evaluación Promedio por Parque - Columnas Verticales */}
-          <Card className="border-0 shadow-lg max-w-6xl mx-auto rounded-3xl">
-            <CardHeader className="bg-white rounded-t-lg">
-              <CardTitle className="text-lg font-bold text-gray-800">
-                Evaluación Promedio por Parque
-              </CardTitle>
-              <CardDescription className="text-gray-600">
-                Nivel de satisfacción promedio de visitantes por parque basado
-                en evaluaciones
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="w-full">
-                {data.parkEvaluations?.length > 0 ? (
-                  <div className="flex justify-center items-end gap-4 min-h-[400px] px-4 overflow-x-auto">
-                    {data.parkEvaluations
-                      .sort((a, b) => b.averageRating - a.averageRating)
-                      .slice(0, 13) // Mostrar solo 13 columnas
-                      .map((park, index) => {
-                        const heightPercentage = (park.averageRating / 5) * 100;
-                        const getRatingColor = (rating: number) => {
-                          if (rating >= 4.0) return "#22C55E"; // Verde para calificaciones positivas
-                          if (rating >= 2.5) return "#F59E0B"; // Amarillo/naranja para medias
-                          return "#EF4444"; // Rojo para bajas
-                        };
-
-                        return (
-                          <div key={park.parkId} className="flex flex-col items-center relative">
-                            {/* Valor del promedio arriba con número de evaluaciones */}
-                            <div className="mb-2 text-center">
-                              <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                                ⭐ {park.averageRating.toFixed(1)}/5
-                              </div>
-                              <div className="text-xs font-poppins font-thin text-gray-500">
-                                ({park.evaluationCount} eval)
-                              </div>
-                            </div>
-
-                            {/* Columna vertical */}
-                            <div className="relative h-80 w-6 flex flex-col justify-end">
-                              {/* Fondo de la columna */}
-                              <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                              
-                              {/* Relleno de la columna según promedio */}
-                              <div
-                                className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                                style={{
-                                  height: `${Math.max(heightPercentage, 5)}%`,
-                                  backgroundColor: getRatingColor(park.averageRating),
-                                  borderColor: getRatingColor(park.averageRating),
-                                }}
-                              ></div>
-                            </div>
-
-                            {/* Nombre del parque a la izquierda de la columna (movido más arriba) - VERTICAL */}
-                            <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                              <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                                {park.parkName}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <div className="flex flex-col items-center space-y-2">
-                      <CheckCircle className="h-12 w-12 text-gray-300" />
-                      <p className="text-lg font-medium">
-                        No hay evaluaciones disponibles
-                      </p>
-                      <p className="text-sm">
-                        Los datos de evaluación aparecerán aquí una vez que los
-                        visitantes evalúen los parques
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {data.parkEvaluations?.length > 0 && (
-                <div className="mt-8 text-center">
-                  <p className="text-sm text-gray-500 font-poppins font-thin">
-                    Mostrando {Math.min(data.parkEvaluations.length, 13)} de {data.parkEvaluations.length} parques
-                    registrados en el sistema
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-
           {/* Gráfico de Porcentaje de Área Verde */}
           <Card className="border-0 shadow-lg max-w-4xl mx-auto rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
