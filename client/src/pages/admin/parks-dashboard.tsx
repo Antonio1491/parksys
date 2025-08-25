@@ -451,8 +451,8 @@ const ParksDashboard = () => {
           </div>
         </div>
 
-        {/* Fila dividida en 3 columnas */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        {/* Fila dividida en 2 columnas */}
+        <div className="grid gap-6 lg:grid-cols-2">
           
           {/* Columna izquierda: Mapa de parques */}
           <Card className="border-0 shadow-xl rounded-3xl overflow-hidden">
@@ -503,8 +503,8 @@ const ParksDashboard = () => {
             </div>
           </Card>
 
-          {/* Columnas derecha: Gráfico de Evaluación Promedio por Parque (ocupa 2 columnas) */}
-          <div className="lg:col-span-2">
+          {/* Columna derecha: Gráfico de Evaluación Promedio por Parque */}
+          <div>
             <Card className="border-0 shadow-lg rounded-3xl h-full">
               <CardHeader className="bg-white rounded-t-lg">
                 <CardTitle className="text-lg font-bold text-gray-800">
@@ -518,10 +518,10 @@ const ParksDashboard = () => {
               <CardContent className="pt-6">
                 <div className="w-full">
                   {data.parkEvaluations?.length > 0 ? (
-                    <div className="flex justify-center items-end gap-3 min-h-[280px] px-4 overflow-x-auto">
+                    <div className="flex justify-center items-end gap-3 min-h-[320px] px-4 overflow-x-auto">
                       {data.parkEvaluations
                         .sort((a, b) => b.averageRating - a.averageRating)
-                        .slice(0, 10) // Reducido a 10 columnas para el espacio disponible
+                        .slice(0, 8) // Reducido a 8 columnas para mejor legibilidad en columna única
                         .map((park, index) => {
                           const heightPercentage = (park.averageRating / 5) * 100;
                           const getRatingColor = (rating: number) => {
@@ -543,7 +543,7 @@ const ParksDashboard = () => {
                               </div>
 
                               {/* Columna vertical */}
-                              <div className="relative h-60 w-5 flex flex-col justify-end">
+                              <div className="relative h-64 w-6 flex flex-col justify-end">
                                 {/* Fondo de la columna */}
                                 <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
                                 
@@ -559,7 +559,7 @@ const ParksDashboard = () => {
                               </div>
 
                               {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                              <div className="absolute bottom-20 -left-20 transform -rotate-90 origin-bottom-right w-32">
+                              <div className="absolute bottom-24 -left-22 transform -rotate-90 origin-bottom-right w-32">
                                 <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
                                   {park.parkName}
                                 </div>
@@ -586,7 +586,7 @@ const ParksDashboard = () => {
                 {data.parkEvaluations?.length > 0 && (
                   <div className="mt-4 text-center">
                     <p className="text-sm text-gray-500 font-poppins font-thin">
-                      Mostrando {Math.min(data.parkEvaluations.length, 10)} de {data.parkEvaluations.length} parques
+                      Mostrando {Math.min(data.parkEvaluations.length, 8)} de {data.parkEvaluations.length} parques
                       registrados en el sistema
                     </p>
                   </div>
