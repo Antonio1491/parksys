@@ -52,10 +52,10 @@ const OrganizadorPage: React.FC = () => {
   const totalActivities = Array.isArray(activities) ? activities.length : 0;
   const activeActivities = Array.isArray(activities) ? activities.filter((a: any) => new Date(a.startDate) >= new Date()).length : 0;
   
-  // Calcular estadísticas por estado
-  const activitiesInProgress = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'Activa').length : 0;
-  const scheduledActivities = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'Programada').length : 0;
-  const cancelledActivities = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'Cancelada').length : 0;
+  // Calcular estadísticas por estado (valores reales de la base de datos)
+  const activitiesInProgress = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'activa').length : 0;
+  const scheduledActivities = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'programada').length : 0;
+  const cancelledActivities = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'cancelada').length : 0;
 
   // Calcular estadísticas de instructores
   const totalInstructors = Array.isArray(instructors) ? instructors.length : 0;
