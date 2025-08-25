@@ -701,14 +701,14 @@ const ParksDashboard = () => {
                         const heightPercentage = maxIncidents > 0 ? (park.totalIncidents / maxIncidents) * 100 : 0;
 
                         return (
-                          <div key={park.parkId} className="relative flex flex-col items-center">
-                            {/* Valores en la parte superior */}
-                            <div className="absolute -top-16 text-center w-full z-10">
-                              <div className="text-sm font-bold text-gray-800">
+                          <div key={park.parkId} className="flex flex-col items-center relative">
+                            {/* Valor del total arriba con información adicional */}
+                            <div className="mb-2 text-center">
+                              <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
                                 {park.totalIncidents}
                               </div>
-                              <div className="text-xs text-gray-600">
-                                total
+                              <div className="text-xs font-poppins font-thin text-gray-500">
+                                (total)
                               </div>
                             </div>
 
@@ -718,21 +718,21 @@ const ParksDashboard = () => {
                               <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
                               
                               {/* Relleno de la columna según incidencias */}
-                              <div 
-                                className="w-full rounded-t-3xl transition-all duration-700 ease-out relative"
-                                style={{ 
-                                  height: `${Math.max(heightPercentage, 4)}%`,
-                                  backgroundColor: getIncidentColor(park.totalIncidents)
+                              <div
+                                className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                                style={{
+                                  height: `${Math.max(heightPercentage, 5)}%`,
+                                  backgroundColor: getIncidentColor(park.totalIncidents),
+                                  borderColor: getIncidentColor(park.totalIncidents),
                                 }}
-                              >
-                              </div>
+                              ></div>
                             </div>
 
-                            {/* Etiqueta del parque (rotada) */}
-                            <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-left">
-                              <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
+                            {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                            <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                              <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
                                 {park.parkName}
-                              </span>
+                              </div>
                             </div>
                           </div>
                         );
