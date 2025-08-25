@@ -247,7 +247,7 @@ const ParksDashboard = () => {
                       {data.greenFlagPercentage?.toFixed(0) || 0}%)
                     </span>
                   </div>
-                  <div className="w-full bg-gray-600 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="h-2 rounded-full transition-all duration-700"
                       style={{
@@ -310,7 +310,7 @@ const ParksDashboard = () => {
                       %)
                     </span>
                   </div>
-                  <div className="w-full bg-gray-600 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="h-2 rounded-full transition-all duration-700"
                       style={{
@@ -341,7 +341,7 @@ const ParksDashboard = () => {
                   </CardTitle>
                   <div
                     className="rounded-full p-1.5"
-                    style={{ backgroundColor: "#1E5AA6" }}
+                    style={{ backgroundColor: "#14b8a6" }}
                   >
                     <MessageSquare className="h-4 w-4 text-white" />
                   </div>
@@ -367,7 +367,7 @@ const ParksDashboard = () => {
                   </CardTitle>
                   <div
                     className="rounded-full p-1.5"
-                    style={{ backgroundColor: "#B275B0" }}
+                    style={{ backgroundColor: "#14b8a6" }}
                   >
                     <AlertTriangle className="h-4 w-4 text-white" />
                   </div>
@@ -438,51 +438,49 @@ const ParksDashboard = () => {
           
           {/* Columna izquierda: Mapa de parques */}
           <Card className="border-0 shadow-xl rounded-3xl overflow-hidden">
-            <div className="h-[28rem] w-full">
-              <MapContainer
-                center={mexicoCenter}
-                zoom={6}
-                className="h-full w-full rounded-3xl"
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {data.parksWithCoordinates
-                  ?.filter(
-                    (park) =>
-                      park.latitude != null &&
-                      park.longitude != null &&
-                      !isNaN(park.latitude) &&
-                      !isNaN(park.longitude),
-                  )
-                  .map((park) => (
-                    <Marker
-                      key={park.id}
-                      position={[park.latitude, park.longitude]}
-                    >
-                      <Popup>
-                        <div className="space-y-2">
-                          <h3 className="font-semibold">{park.name}</h3>
-                          <p className="text-sm text-gray-600">
-                            {park.municipality}
-                          </p>
-                          <div className="flex flex-wrap gap-1">
-                            <Badge variant="outline" className="text-xs">
-                              {park.type}
-                            </Badge>
-                            {park.area && (
-                              <Badge variant="secondary" className="text-xs">
-                                {(park.area / 10000).toFixed(1)} ha
+            <CardContent className="p-0"> {/* <- sin padding */}
+              <div className="relative h-[28rem] w-full">
+                <MapContainer
+                  center={mexicoCenter}
+                  zoom={6}
+                  className="absolute inset-0 !h-full !w-full"
+                  style={{ height: "100%", width: "100%", background: "transparent" }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  {data.parksWithCoordinates
+                    ?.filter(
+                      (park) =>
+                        park.latitude != null &&
+                        park.longitude != null &&
+                        !isNaN(park.latitude) &&
+                        !isNaN(park.longitude),
+                    )
+                    .map((park) => (
+                      <Marker key={park.id} position={[park.latitude, park.longitude]}>
+                        <Popup>
+                          <div className="space-y-2">
+                            <h3 className="font-semibold">{park.name}</h3>
+                            <p className="text-sm text-gray-600">{park.municipality}</p>
+                            <div className="flex flex-wrap gap-1">
+                              <Badge variant="outline" className="text-xs">
+                                {park.type}
                               </Badge>
-                            )}
+                              {park.area && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {(park.area / 10000).toFixed(1)} ha
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  ))}
-              </MapContainer>
-            </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                </MapContainer>
+              </div>
+            </CardContent>
           </Card>
 
           {/* Columna derecha: Gráfico de Evaluación Promedio por Parque */}
@@ -578,10 +576,11 @@ const ParksDashboard = () => {
 
         </div>
 
-        {/* Sección continua con el resto del dashboard */}
-        <div className="space-y-6">
-          {/* Gráfico de Porcentaje de Área Verde */}
-          <Card className="border-0 shadow-lg max-w-4xl mx-auto rounded-3xl">
+        {/* Tercera fila: Grid de 2 columnas con gráficos */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          
+          {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
+          <Card className="border-0 shadow-lg rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
                 Porcentaje de Área Verde
@@ -591,11 +590,11 @@ const ParksDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="flex items-end justify-center space-x-6 h-80 px-8 py-4">
+              <div className="flex items-end justify-center space-x-4 h-64 px-4 py-4">
                 {data.greenAreaPercentages?.length > 0 ? (
                   data.greenAreaPercentages
                     .sort((a, b) => b.greenPercentage - a.greenPercentage)
-                    .slice(0, 10) // Mostrar máximo 10 parques para mejor legibilidad
+                    .slice(0, 6) // Mostrar máximo 6 parques para mejor legibilidad en columna
                     .map((park, index) => {
                       const getPercentageColor = (percentage: number) => {
                         if (percentage >= 80) return "#22C55E"; // Verde excelente
@@ -610,7 +609,7 @@ const ParksDashboard = () => {
                       );
                       
                       // Altura de la barra basada en el porcentaje de área verde
-                      const barHeight = (park.greenPercentage / maxPercentage) * 240; // Máximo 240px de altura
+                      const barHeight = (park.greenPercentage / maxPercentage) * 180; // Máximo 180px de altura
 
                       return (
                         <div
@@ -680,7 +679,7 @@ const ParksDashboard = () => {
               {data.greenAreaPercentages?.length > 0 && (
                 <div className="mt-8 text-center">
                   <p className="text-sm text-gray-500 font-poppins font-thin">
-                    Mostrando {Math.min(data.greenAreaPercentages.length, 10)} de {data.greenAreaPercentages.length} parques
+                    Mostrando {Math.min(data.greenAreaPercentages.length, 6)} de {data.greenAreaPercentages.length} parques
                     registrados en el sistema
                   </p>
                 </div>
@@ -688,8 +687,8 @@ const ParksDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* NUEVO: Gráfico de Incidencias por Parque */}
-          <Card className="border-0 shadow-lg max-w-4xl mx-auto rounded-3xl">
+          {/* Columna derecha: Gráfico de Incidencias por Parque */}
+          <Card className="border-0 shadow-lg rounded-3xl">
             <CardHeader className="bg-white rounded-t-lg">
               <CardTitle className="text-lg font-bold text-gray-800">
                 Incidencias por Parque
@@ -700,7 +699,7 @@ const ParksDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="space-y-3">
+              <div className="space-y-2 h-64 overflow-y-auto">
                 {data.incidentsByPark?.length > 0 ? (
                   data.incidentsByPark
                     .sort((a, b) => b.totalIncidents - a.totalIncidents)
@@ -730,9 +729,9 @@ const ParksDashboard = () => {
                       return (
                         <div
                           key={park.parkId}
-                          className="flex items-center space-x-2"
+                          className="flex items-center space-x-1"
                         >
-                          <div className="w-28 text-xs font-medium text-right text-gray-700 truncate">
+                          <div className="w-20 text-xs font-medium text-right text-gray-700 truncate">
                             {park.parkName}
                           </div>
                           <div className="flex-1 flex items-center">
@@ -766,7 +765,7 @@ const ParksDashboard = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="w-24 text-right">
+                          <div className="w-20 text-right">
                             <div className="text-xs text-green-600 font-semibold">
                               {systemPercentage.toFixed(1)}% del sistema
                             </div>
