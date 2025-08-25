@@ -617,10 +617,11 @@ const ParksDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="space-y-3">
+              <div className="flex items-end justify-center space-x-6 h-80 px-8 py-4">
                 {data.greenAreaPercentages?.length > 0 ? (
                   data.greenAreaPercentages
                     .sort((a, b) => b.greenPercentage - a.greenPercentage)
+                    .slice(0, 10) // Mostrar máximo 10 parques para mejor legibilidad
                     .map((park, index) => {
                       const getPercentageColor = (percentage: number) => {
                         if (percentage >= 80) return "#22C55E"; // Verde excelente
@@ -630,100 +631,83 @@ const ParksDashboard = () => {
                         return "#EF4444"; // Rojo muy bajo
                       };
 
-                      const maxArea = Math.max(
-                        ...data.greenAreaPercentages.map((p) => p.totalArea),
+                      const maxPercentage = Math.max(
+                        ...data.greenAreaPercentages.map((p) => p.greenPercentage),
                       );
-                      const totalAreaPercentage =
-                        (park.totalArea / maxArea) * 100; // Ancho de la barra gris basado en el área total
-                      const greenAreaWidth =
-                        (park.greenPercentage / 100) * totalAreaPercentage; // Ancho de la barra verde basado en el porcentaje
+                      
+                      // Altura de la barra basada en el porcentaje de área verde
+                      const barHeight = (park.greenPercentage / maxPercentage) * 240; // Máximo 240px de altura
 
                       return (
                         <div
                           key={park.parkId}
-                          className="flex items-center space-x-2"
+                          className="relative flex flex-col items-center"
                         >
-                          <div className="w-28 text-xs font-medium text-right text-gray-700 truncate">
-                            {park.parkName}
-                          </div>
-                          <div className="flex-1 flex items-center">
-                            <div className="flex-1 relative h-5">
-                              {/* Barra gris proporcional al área total */}
+                          {/* Columna de área verde */}
+                          <div className="relative flex flex-col items-center">
+                            {/* Valor del porcentaje arriba de la barra */}
+                            <div className="mb-2 text-center">
                               <div
-                                className="bg-gray-400 rounded-full h-5 relative transition-all duration-700 shadow-sm"
+                                className="text-xs font-bold"
                                 style={{
-                                  width: `${Math.max(totalAreaPercentage, 8)}%`,
+                                  color: getPercentageColor(park.greenPercentage),
                                 }}
                               >
-                                {/* Área total en la barra gris */}
-                                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-                                  <span className="text-white text-xs font-bold truncate px-1">
-                                    {park.totalArea.toLocaleString("es-MX", {
-                                      notation: "compact",
-                                    })}{" "}
-                                    m²
-                                  </span>
-                                </div>
+                                {park.greenPercentage.toFixed(1)}%
                               </div>
+                              <div className="text-xs text-gray-500">
+                                {(park.greenArea / 10000).toLocaleString("es-MX", {
+                                  minimumFractionDigits: 1,
+                                  maximumFractionDigits: 1,
+                                })} ha
+                              </div>
+                            </div>
 
-                              {/* Barra verde superpuesta (área verde) */}
-                              <div
-                                className="absolute top-0 left-0 rounded-full h-5 flex items-center justify-end pr-1 transition-all duration-700 shadow-sm"
-                                style={{
-                                  width: `${Math.max(greenAreaWidth, 2)}%`,
-                                  backgroundColor: getPercentageColor(
-                                    park.greenPercentage,
-                                  ),
-                                }}
-                              >
-                                <span className="text-white text-xs font-bold">
-                                  {park.greenPercentage.toFixed(0)}%
+                            {/* Barra vertical */}
+                            <div
+                              className="w-12 rounded-t-lg transition-all duration-700 shadow-lg relative"
+                              style={{
+                                height: `${Math.max(barHeight, 20)}px`,
+                                backgroundColor: getPercentageColor(park.greenPercentage),
+                              }}
+                            >
+                              {/* Área total en el centro de la barra */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-white text-xs font-bold transform -rotate-90 whitespace-nowrap">
+                                  {park.totalArea.toLocaleString("es-MX", {
+                                    notation: "compact",
+                                  })} m²
                                 </span>
                               </div>
                             </div>
                           </div>
-                          <div className="w-20 text-right">
-                            <div className="text-xs text-gray-600">
-                              {(park.greenArea / 10000).toLocaleString(
-                                "es-MX",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                },
-                              )}{" "}
-                              ha
-                            </div>
-                            <div
-                              className="text-xs font-semibold"
-                              style={{
-                                color: getPercentageColor(park.greenPercentage),
-                              }}
-                            >
-                              {park.greenPercentage.toFixed(1)}%
+
+                          {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                          <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                            <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                              {park.parkName}
                             </div>
                           </div>
                         </div>
                       );
                     })
                 ) : (
-                  <div className="text-center py-6 text-gray-500">
-                    <div className="flex flex-col items-center space-y-2">
-                      <CheckCircle className="h-10 w-10 text-gray-300" />
-                      <p className="text-sm font-medium">
-                        No hay datos de área verde disponibles
-                      </p>
-                      <p className="text-xs">
-                        Los datos aparecerán cuando se registren en los parques
-                      </p>
-                    </div>
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <CheckCircle className="h-12 w-12 text-gray-300" />
+                    <p className="text-lg font-medium">
+                      No hay datos de área verde disponibles
+                    </p>
+                    <p className="text-sm">
+                      Los datos aparecerán cuando se registren en los parques
+                    </p>
                   </div>
                 )}
               </div>
               {data.greenAreaPercentages?.length > 0 && (
-                <div className="mt-3 text-center">
-                  <p className="text-xs text-gray-500">
-                    Mostrando todos los {data.greenAreaPercentages.length}{" "}
-                    parques registrados en el sistema
+                <div className="mt-8 text-center">
+                  <p className="text-sm text-gray-500 font-poppins font-thin">
+                    Mostrando {Math.min(data.greenAreaPercentages.length, 10)} de {data.greenAreaPercentages.length} parques
+                    registrados en el sistema
                   </p>
                 </div>
               )}
