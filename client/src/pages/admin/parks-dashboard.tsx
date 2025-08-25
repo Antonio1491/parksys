@@ -456,7 +456,7 @@ const ParksDashboard = () => {
           
           {/* Columna izquierda: Mapa de parques */}
           <Card className="border-0 shadow-xl rounded-3xl overflow-hidden">
-            <div className="h-96 w-full">
+            <div className="h-[28rem] w-full">
               <MapContainer
                 center={mexicoCenter}
                 zoom={6}
