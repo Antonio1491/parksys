@@ -151,17 +151,57 @@ const OrganizadorPage: React.FC = () => {
         </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">Total Actividades</h3>
-              <p className="text-3xl font-bold mt-2">{isLoadingActivities ? '...' : totalActivities}</p>
+        <Card
+          className="border-0 shadow-lg text-white rounded-3xl"
+          style={{ backgroundColor: "#003D49" }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base font-medium text-gray-100">
+              Total de Actividades
+            </CardTitle>
+            <div
+              className="rounded-full p-2"
+              style={{ backgroundColor: "#14b8a6" }}
+            >
+              <Calendar className="h-5 w-5 text-white" />
             </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <Calendar className="h-6 w-6 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-white">
+              {isLoadingActivities ? '...' : totalActivities}
             </div>
-          </div>
-        </div>
+            <p className="text-xs text-white mb-3">
+              Actividades registradas en el sistema
+            </p>
+            
+            {/* Actividades en funcionamiento */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Users className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                  <span className="text-xs text-gray-200">
+                    En Funcionamiento
+                  </span>
+                </div>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: "#14b8a6" }}
+                >
+                  {isLoadingActivities ? '...' : activeActivities}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-700"
+                  style={{
+                    width: `${totalActivities > 0 ? (activeActivities / totalActivities) * 100 : 0}%`,
+                    backgroundColor: "#14b8a6"
+                  }}
+                ></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
           <div className="flex justify-between items-start">
