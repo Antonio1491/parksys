@@ -789,6 +789,7 @@ export type ExtendedPark = typeof parks.$inferSelect & {
   images?: typeof parkImages.$inferSelect[];
   primaryImage?: string | null;
   mainImageUrl?: string | null;
+  typology?: typeof parkTypology.$inferSelect;
 };
 
 export type ExtendedVolunteer = typeof volunteers.$inferSelect & {
@@ -1329,11 +1330,23 @@ export const municipalities = pgTable("municipalities", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Tabla de tipologías de parques según NOM-001-SEDATU-2021
+export const parkTypology = pgTable("park_typology", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // Vecinal, Comunitario, Barrial, Urbano, Metropolitano
+  minArea: text("min_area"), // Superficie mínima en m²
+  maxArea: text("max_area"), // Superficie máxima en m²
+  code: varchar("code", { length: 50 }), // A-1, B-2, C-3, D-4, E-5
+  normativeReference: varchar("normative_reference", { length: 255 }), // NOM-001-SEDATU-2021
+  country: varchar("country", { length: 100 }).notNull() // Mexico
+});
+
 export const parks = pgTable("parks", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   municipalityId: integer("municipality_id").notNull(),
-  parkType: text("park_type").notNull(),
+  parkType: text("park_type").notNull(), // Campo legacy mantenido para retrocompatibilidad
+  typologyId: integer("typology_id").references(() => parkTypology.id), // Relación con tipología oficial
   description: text("description"),
   address: text("address").notNull(),
   postalCode: text("postal_code"),
@@ -1620,6 +1633,9 @@ export type InsertMunicipality = z.infer<typeof insertMunicipalitySchema>;
 export type Park = typeof parks.$inferSelect;
 export type InsertPark = z.infer<typeof insertParkSchema>;
 
+export type ParkTypology = typeof parkTypology.$inferSelect;
+export type InsertParkTypology = typeof parkTypology.$inferInsert;
+
 export type TreeSpecies = typeof treeSpecies.$inferSelect;
 export type InsertTreeSpecies = z.infer<typeof insertTreeSpeciesSchema>;
 
@@ -1660,7 +1676,15 @@ export const parksRelations = relations(parks, ({ one }) => ({
   municipality: one(municipalities, {
     fields: [parks.municipalityId],
     references: [municipalities.id],
+  }),
+  typology: one(parkTypology, {
+    fields: [parks.typologyId],
+    references: [parkTypology.id],
   })
+}));
+
+export const parkTypologyRelations = relations(parkTypology, ({ many }) => ({
+  parks: many(parks)
 }));
 
 // Enumeraciones
