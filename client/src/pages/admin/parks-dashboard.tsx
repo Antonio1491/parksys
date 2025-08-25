@@ -619,7 +619,7 @@ const ParksDashboard = () => {
                             </div>
 
                             {/* Columna vertical */}
-                            <div className="relative h-64 w-6 flex flex-col justify-end">
+                            <div className="relative h-64 w-4 flex flex-col justify-end">
                               {/* Fondo de la columna */}
                               <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
                               
