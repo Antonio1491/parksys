@@ -439,7 +439,7 @@ const ParksDashboard = () => {
           {/* Columna izquierda: Mapa de parques */}
           <Card className="border-0 shadow-xl rounded-3xl overflow-hidden">
             <CardContent className="p-0"> {/* <- sin padding */}
-              <div className="relative h-[28rem] w-full">
+              <div className="relative h-[30rem] w-full">
                 <MapContainer
                   center={mexicoCenter}
                   zoom={6}
@@ -495,7 +495,7 @@ const ParksDashboard = () => {
                   en evaluaciones
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="pt-0">
                 <div className="w-full">
                   {data.parkEvaluations?.length > 0 ? (
                     <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
