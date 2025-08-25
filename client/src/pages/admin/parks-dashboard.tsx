@@ -180,9 +180,22 @@ const ParksDashboard = () => {
     );
   }
 
-  // Centro del mapa basado en México
-  const mexicoCenter: [number, number] = [19.4326, -99.1332]; // Ciudad de México
+  // Cálculo de los límites del mapa basado en las coordenadas de los parques
+  const validCoordinates = data.parksWithCoordinates
+  ?.filter(
+    (park) =>
+      park.latitude != null &&
+      park.longitude != null &&
+      !isNaN(park.latitude) &&
+      !isNaN(park.longitude)
+  )
+  .map((park) => [park.latitude, park.longitude] as [number, number]);
 
+  const parksBounds =
+    validCoordinates.length > 0
+      ? L.latLngBounds(validCoordinates).pad(0.1) // 10% de expansión
+      : L.latLngBounds([[20.6767, -103.3476]]); // fallback: Guadalajara
+  
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -437,12 +450,12 @@ const ParksDashboard = () => {
         <div className="grid gap-6 lg:grid-cols-2">
           
           {/* Columna izquierda: Mapa de parques */}
-          <Card className="border-0 shadow-xl rounded-3xl overflow-hidden">
-            <CardContent className="p-0"> {/* <- sin padding */}
-              <div className="relative h-[30rem] w-full">
+          <Card className="border-0 shadow-xl rounded-3xl overflow-hidden min-h-[28rem] h-full">
+            <CardContent className="p-0 h-full"> {/* <- sin padding */}
+              <div className="relative h-full min-h-[28rem] w-full">
                 <MapContainer
-                  center={mexicoCenter}
-                  zoom={6}
+                  bounds={parksBounds}
+                  scrollWheelZoom={false}
                   className="absolute inset-0 !h-full !w-full"
                   style={{ height: "100%", width: "100%", background: "transparent" }}
                 >
@@ -450,24 +463,16 @@ const ParksDashboard = () => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  {data.parksWithCoordinates
-                    ?.filter(
-                      (park) =>
-                        park.latitude != null &&
-                        park.longitude != null &&
-                        !isNaN(park.latitude) &&
-                        !isNaN(park.longitude),
-                    )
-                    .map((park) => (
-                      <Marker key={park.id} position={[park.latitude, park.longitude]}>
+                  {validCoordinates?.map(([lat, lng], index) => {
+                    const park = data.parksWithCoordinates[index];
+                    return (
+                      <Marker key={park.id} position={[lat, lng]}>
                         <Popup>
                           <div className="space-y-2">
                             <h3 className="font-semibold">{park.name}</h3>
                             <p className="text-sm text-gray-600">{park.municipality}</p>
                             <div className="flex flex-wrap gap-1">
-                              <Badge variant="outline" className="text-xs">
-                                {park.type}
-                              </Badge>
+                              <Badge variant="outline" className="text-xs">{park.type}</Badge>
                               {park.area && (
                                 <Badge variant="secondary" className="text-xs">
                                   {(park.area / 10000).toFixed(1)} ha
@@ -477,7 +482,8 @@ const ParksDashboard = () => {
                           </div>
                         </Popup>
                       </Marker>
-                    ))}
+                    );
+                  })}
                 </MapContainer>
               </div>
             </CardContent>
@@ -508,7 +514,6 @@ const ParksDashboard = () => {
                             if (rating >= 2.5) return "#bcb57e"; // Amarillo/naranja para medias
                             return "#a86767"; // Rojo para bajas
                           };
-
                           return (
                             <div key={park.parkId} className="flex flex-col items-center relative">
                               {/* Valor del promedio arriba con número de evaluaciones */}
@@ -687,11 +692,11 @@ const ParksDashboard = () => {
                       .sort((a, b) => b.totalIncidents - a.totalIncidents)
                       .map((park, index) => {
                         const getIncidentColor = (incidents: number) => {
-                          if (incidents >= 20) return "#EF4444"; // Rojo crítico
-                          if (incidents >= 15) return "#F97316"; // Naranja alto
-                          if (incidents >= 10) return "#EAB308"; // Amarillo medio
-                          if (incidents >= 5) return "#84CC16"; // Verde bajo
-                          return "#22C55E"; // Verde muy bajo
+                          if (incidents >= 20) return "#a86767"; // Rojo crítico
+                          if (incidents >= 15) return "#a58567"; // Naranja alto
+                          if (incidents >= 10) return "#bcb57e"; // Amarillo medio
+                          if (incidents >= 5) return "#9cb767"; // Verde bajo
+                          return "#69c45c"; // Verde muy bajo
                         };
 
                         const totalGlobalIncidents = data.incidentsByPark!.reduce((sum, p) => sum + p.totalIncidents, 0);

@@ -120,18 +120,18 @@ const OrganizadorPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-8 h-8 text-white" />
+                <Calendar className="w-8 h-8 text-white" />
                 <div>
-                  <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Actividades</h1>
-                  <p className="text-base font-normal text-white font-poppins">Gestión de actividades y eventos en parques</p>
+                  <h1 className="text-3xl font-bold text-white font-poppins">Actividades</h1>
+                  <p className="text-base font-normal text-white font-poppins">Estadísticas de las actividades en los parques</p>
                 </div>
               </div>
             </div>
             <div className="flex gap-2">
               <Link href="/admin/activities">
                 <Button variant="outline" className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100">
-                  <Eye size={16} />
-                  Ver Todas las Actividades
+                  <Calendar size={16} />
+                  Ver Actividades
                 </Button>
               </Link>
               <Link href="/admin/activities/categories">
