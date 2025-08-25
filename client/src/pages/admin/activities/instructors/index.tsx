@@ -862,7 +862,7 @@ export default function InstructorsManagementPage() {
             <AlertDialogTitle>¿Eliminar instructor?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta acción eliminará permanentemente el instructor "{instructorToDelete?.firstName} {instructorToDelete?.lastName}" 
-              y su usuario asociado del sistema. Esta acción no se puede deshacer.
+              . Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

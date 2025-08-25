@@ -595,7 +595,6 @@ const ParksDashboard = () => {
                   <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                     {data.greenAreaPercentages
                       .sort((a, b) => b.greenPercentage - a.greenPercentage)
-                      .slice(0, 6) // Mostrar máximo 6 parques para mejor legibilidad en columna
                       .map((park, index) => {
                         const getPercentageColor = (percentage: number) => {
                           if (percentage >= 80) return "#22C55E"; // Verde excelente
@@ -662,7 +661,7 @@ const ParksDashboard = () => {
               {data.greenAreaPercentages?.length > 0 && (
                 <div className="mt-2 text-center">
                   <p className="text-sm text-gray-500 font-poppins font-thin">
-                    Mostrando {Math.min(data.greenAreaPercentages.length, 6)} de {data.greenAreaPercentages.length} parques
+                    Mostrando todos los {data.greenAreaPercentages.length} parques
                     registrados en el sistema
                   </p>
                 </div>
