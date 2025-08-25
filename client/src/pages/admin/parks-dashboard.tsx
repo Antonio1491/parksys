@@ -591,7 +591,7 @@ const ParksDashboard = () => {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="w-full">
-                {data.greenAreaPercentages?.length > 0 ? (
+                {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 ? (
                   <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                     {data.greenAreaPercentages
                       .sort((a, b) => b.greenPercentage - a.greenPercentage)
@@ -658,7 +658,7 @@ const ParksDashboard = () => {
                   </div>
                 )}
               </div>
-              {data.greenAreaPercentages?.length > 0 && (
+              {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 && (
                 <div className="mt-2 text-center">
                   <p className="text-sm text-gray-500 font-poppins font-thin">
                     Mostrando todos los {data.greenAreaPercentages.length} parques
@@ -676,13 +676,12 @@ const ParksDashboard = () => {
                 🚨 Incidencias por Parque
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Barra gris: Total histórico | Barra verde: % del total del
-                sistema
+                Por ciento del total global
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="w-full">
-                {data.incidentsByPark?.length > 0 ? (
+                {data.incidentsByPark && data.incidentsByPark.length > 0 ? (
                   <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                     {data.incidentsByPark
                       .sort((a, b) => b.totalIncidents - a.totalIncidents)
@@ -696,7 +695,7 @@ const ParksDashboard = () => {
                         };
 
                         const maxIncidents = Math.max(
-                          ...data.incidentsByPark.map((p) => p.totalIncidents),
+                          ...data.incidentsByPark!.map((p) => p.totalIncidents),
                         );
                         const heightPercentage = maxIncidents > 0 ? (park.totalIncidents / maxIncidents) * 100 : 0;
 
@@ -752,7 +751,7 @@ const ParksDashboard = () => {
                   </div>
                 )}
               </div>
-              {data.incidentsByPark?.length > 0 && (
+              {data.incidentsByPark && data.incidentsByPark.length > 0 && (
                 <div className="mt-2 text-center">
                   <p className="text-sm text-gray-500 font-poppins font-thin">
                     Mostrando todos los {data.incidentsByPark.length} parques
