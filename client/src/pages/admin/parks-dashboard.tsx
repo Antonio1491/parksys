@@ -217,7 +217,7 @@ const ParksDashboard = () => {
                 </CardTitle>
                 <div
                   className="rounded-full p-2"
-                  style={{ backgroundColor: "#513C73" }}
+                  style={{ backgroundColor: "#14b8a6" }}
                 >
                   <MapPin className="h-5 w-5 text-white" />
                 </div>
@@ -234,20 +234,26 @@ const ParksDashboard = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                      <Award className="h-3 w-3 text-green-400" />
+                      <Award className="h-3 w-3" style={{ color: "#14b8a6" }} />
                       <span className="text-xs text-gray-200">
                         Green Flag Award
                       </span>
                     </div>
-                    <span className="text-xs font-semibold text-green-400">
+                    <span
+                      className="text-xs font-semibold"
+                      style={{ color: "#14b8a6" }}
+                    >
                       {data.greenFlagParks || 0}/{data.totalParks} (
                       {data.greenFlagPercentage?.toFixed(0) || 0}%)
                     </span>
                   </div>
                   <div className="w-full bg-gray-600 rounded-full h-2">
                     <div
-                      className="bg-green-500 h-2 rounded-full transition-all duration-700"
-                      style={{ width: `${data.greenFlagPercentage || 0}%` }}
+                      className="h-2 rounded-full transition-all duration-700"
+                      style={{
+                        width: `${data.greenFlagPercentage || 0}%`,
+                        backgroundColor: "#14b8a6"
+                      }}
                     ></div>
                   </div>
                 </div>
@@ -265,7 +271,7 @@ const ParksDashboard = () => {
                 </CardTitle>
                 <div
                   className="rounded-full p-2"
-                  style={{ backgroundColor: "#513C73" }}
+                  style={{ backgroundColor: "#14b8a6" }}
                 >
                   <Trees className="h-5 w-5 text-white" />
                 </div>
@@ -284,10 +290,13 @@ const ParksDashboard = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                      <Trees className="h-3 w-3 text-green-400" />
+                      <Trees className="h-3 w-3" style={{ color: "#14b8a6" }} />
                       <span className="text-xs text-gray-200">Área Verde</span>
                     </div>
-                    <span className="text-xs font-semibold text-green-400">
+                    <span
+                      className="text-xs font-semibold"
+                      style={{ color: "#14b8a6" }}
+                    >
                       {data.totalGreenArea
                         ? `${(data.totalGreenArea / 10000).toFixed(1)} ha`
                         : "0 ha"}
@@ -303,13 +312,14 @@ const ParksDashboard = () => {
                   </div>
                   <div className="w-full bg-gray-600 rounded-full h-2">
                     <div
-                      className="bg-green-500 h-2 rounded-full transition-all duration-700"
+                      className="h-2 rounded-full transition-all duration-700"
                       style={{
                         width: `${
                           data.totalSurface && data.totalGreenArea
                             ? (data.totalGreenArea / data.totalSurface) * 100
                             : 0
                         }%`,
+                        backgroundColor: "#14b8a6"
                       }}
                     ></div>
                   </div>
@@ -385,7 +395,7 @@ const ParksDashboard = () => {
                 </CardTitle>
                 <div
                   className="rounded-full p-2"
-                  style={{ backgroundColor: "#513C73" }}
+                  style={{ backgroundColor: "#14b8a6" }}
                 >
                   <CheckCircle className="h-5 w-5 text-white" />
                 </div>
