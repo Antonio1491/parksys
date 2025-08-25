@@ -36,6 +36,13 @@ const OrganizadorPage: React.FC = () => {
     retry: 1,
   });
 
+  // Obtener instructores
+  const { data: instructorsResponse, isLoading: isLoadingInstructors } = useQuery({
+    queryKey: ['/api/instructors'],
+    retry: 1,
+  });
+  const instructors = (instructorsResponse as any)?.data || [];
+
   // Crear mapeo de categorías por ID
   const categoriesMap = Array.isArray(categories) ? categories.reduce((acc: any, category: any) => {
     acc[category.id] = category;
@@ -50,6 +57,10 @@ const OrganizadorPage: React.FC = () => {
   const activitiesInProgress = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'Activa').length : 0;
   const scheduledActivities = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'Programada').length : 0;
   const cancelledActivities = Array.isArray(activities) ? activities.filter((a: any) => a.status === 'Cancelada').length : 0;
+
+  // Calcular estadísticas de instructores
+  const totalInstructors = Array.isArray(instructors) ? instructors.length : 0;
+  const activeInstructors = Array.isArray(instructors) ? instructors.filter((i: any) => i.isActive === true || i.isActive === 1).length : 0;
   
   // Crear mapeo inverso de categorías por string del category
   const categoryStringMap: any = {
@@ -261,17 +272,57 @@ const OrganizadorPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">Categorías Activas</h3>
-              <p className="text-3xl font-bold mt-2">{isLoadingActivities ? '...' : Object.keys(categoryCounts).length}</p>
+        <Card
+          className="border-0 shadow-lg text-white rounded-3xl"
+          style={{ backgroundColor: "#003D49" }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base font-medium text-gray-100">
+              Instructores del Sistema
+            </CardTitle>
+            <div
+              className="rounded-full p-2"
+              style={{ backgroundColor: "#14b8a6" }}
+            >
+              <Tag className="h-5 w-5 text-white" />
             </div>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <Tag className="h-6 w-6 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-white">
+              {isLoadingInstructors ? '...' : totalInstructors}
             </div>
-          </div>
-        </div>
+            <p className="text-xs text-white mb-3">
+              Instructores registrados en total
+            </p>
+            
+            {/* Instructores activos */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Tag className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                  <span className="text-xs text-gray-200">
+                    Instructores Activos
+                  </span>
+                </div>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: "#14b8a6" }}
+                >
+                  {isLoadingInstructors ? '...' : `${activeInstructors} (${totalInstructors > 0 ? Math.round((activeInstructors / totalInstructors) * 100) : 0}%)`}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-700"
+                  style={{
+                    width: `${totalInstructors > 0 ? (activeInstructors / totalInstructors) * 100 : 0}%`,
+                    backgroundColor: "#14b8a6"
+                  }}
+                ></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
