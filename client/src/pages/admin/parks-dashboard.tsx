@@ -471,6 +471,7 @@ const ParksDashboard = () => {
         <GraphicCard
           title="🌿 Porcentaje de Área Verde por Parque"
           description="Distribución del área verde en cada parque municipal"
+          className="min-h-[28rem] h-full"
         >
           <div className="w-full h-full">
             {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 ? (
@@ -544,6 +545,7 @@ const ParksDashboard = () => {
         <GraphicCard
           title="⚠️ Incidencias por Parque"
           description="Registro de incidencias mensuales y estado de resolución por parque"
+          className="min-h-[28rem] h-full"
         >
           <div className="w-full">
             {data.incidentsByPark && data.incidentsByPark.length > 0 ? (
