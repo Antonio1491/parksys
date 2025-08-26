@@ -168,6 +168,19 @@ const OrganizadorPage: React.FC = () => {
     .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
     .slice(0, 5) : [];
 
+  // Calcular parque con más y menos actividades
+  const parkWithMostActivities = parkActivityData.length > 0 ? 
+    parkActivityData.reduce((max, park) => park.totalActivities > max.totalActivities ? park : max) : null;
+  const parkWithLeastActivities = parkActivityData.length > 0 ? 
+    parkActivityData.filter(p => p.totalActivities > 0).reduce((min, park) => park.totalActivities < min.totalActivities ? park : min) : null;
+
+  // Calcular instructor con mejor y peor calificación
+  const instructorsWithRating = Array.isArray(instructors) ? instructors.filter((i: any) => i.rating && i.rating > 0) : [];
+  const instructorWithBestRating = instructorsWithRating.length > 0 ? 
+    instructorsWithRating.reduce((max: any, instructor: any) => instructor.rating > max.rating ? instructor : max) : null;
+  const instructorWithWorstRating = instructorsWithRating.length > 0 ? 
+    instructorsWithRating.reduce((min: any, instructor: any) => instructor.rating < min.rating ? instructor : min) : null;
+
   const maxParkCount = Math.max(...Object.values(parkCounts).map(Number), 1);
   return (
     <AdminLayout>
@@ -471,6 +484,147 @@ const OrganizadorPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Nueva fila: Estadísticas de extremos */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        {/* Tarjeta izquierda: Parques con más y menos actividades (2 columnas) */}
+        <Card className="border-0 shadow-lg text-white rounded-3xl lg:col-span-2" style={{ backgroundColor: "#003D49" }}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-medium text-gray-100">
+              Rendimiento de Parques
+            </CardTitle>
+            <div className="rounded-full p-2" style={{ backgroundColor: "#14b8a6" }}>
+              <MapPin className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Parque con más actividades */}
+              <div className="bg-gray-800/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  <span className="text-sm font-medium text-gray-200">Más Actividades</span>
+                </div>
+                {parkWithMostActivities ? (
+                  <>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {parkWithMostActivities.totalActivities}
+                    </div>
+                    <p className="text-sm text-gray-300 truncate">
+                      {parkWithMostActivities.parkName}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-400">
+                        {parkWithMostActivities.activeActivities} activas
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-sm">Sin datos</div>
+                )}
+              </div>
+
+              {/* Parque con menos actividades */}
+              <div className="bg-gray-800/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-400"></div>
+                  <span className="text-sm font-medium text-gray-200">Menos Actividades</span>
+                </div>
+                {parkWithLeastActivities ? (
+                  <>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {parkWithLeastActivities.totalActivities}
+                    </div>
+                    <p className="text-sm text-gray-300 truncate">
+                      {parkWithLeastActivities.parkName}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-400">
+                        {parkWithLeastActivities.activeActivities} activas
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-sm">Sin datos</div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tarjeta derecha: Instructores con mejor y peor calificación */}
+        <Card className="border-0 shadow-lg text-white rounded-3xl" style={{ backgroundColor: "#003D49" }}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-medium text-gray-100">
+              Evaluaciones de Instructores
+            </CardTitle>
+            <div className="rounded-full p-2" style={{ backgroundColor: "#14b8a6" }}>
+              <Users className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <div className="space-y-4">
+              
+              {/* Instructor con mejor calificación */}
+              <div className="bg-gray-800/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  <span className="text-sm font-medium text-gray-200">Mejor Calificado</span>
+                </div>
+                {instructorWithBestRating ? (
+                  <>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {instructorWithBestRating.rating.toFixed(1)} ⭐
+                    </div>
+                    <p className="text-sm text-gray-300 truncate">
+                      {instructorWithBestRating.fullName || `${instructorWithBestRating.firstName} ${instructorWithBestRating.lastName}`}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-400">
+                        {instructorWithBestRating.activitiesCount || 0} actividades
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-sm">Sin calificaciones</div>
+                )}
+              </div>
+
+              {/* Instructor con peor calificación */}
+              <div className="bg-gray-800/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                  <span className="text-sm font-medium text-gray-200">Menor Calificado</span>
+                </div>
+                {instructorWithWorstRating ? (
+                  <>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {instructorWithWorstRating.rating.toFixed(1)} ⭐
+                    </div>
+                    <p className="text-sm text-gray-300 truncate">
+                      {instructorWithWorstRating.fullName || `${instructorWithWorstRating.firstName} ${instructorWithWorstRating.lastName}`}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-400">
+                        {instructorWithWorstRating.activitiesCount || 0} actividades
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-sm">Sin calificaciones</div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
