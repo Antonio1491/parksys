@@ -15,7 +15,7 @@ const GraphicCard = ({
   className = "" 
 }: GraphicCardProps) => {
   return (
-    <Card className={`border-0 shadow-lg rounded-3xl ${className}`}>
+    <Card className={`border-0 shadow-lg rounded-3xl h-full min-h-[24rem] ${className}`}>
       <CardHeader className="bg-white rounded-t-lg">
         <CardTitle className="text-lg font-bold text-gray-800">
           {title}
@@ -26,7 +26,7 @@ const GraphicCard = ({
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 h-full flex flex-col justify-between">
         {children}
       </CardContent>
     </Card>

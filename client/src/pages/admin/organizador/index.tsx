@@ -48,6 +48,12 @@ const OrganizadorPage: React.FC = () => {
     retry: 1,
   });
 
+  // Obtener estadísticas de especialidades de instructores
+  const { data: specialtiesStats, isLoading: isLoadingSpecialtiesStats } = useQuery({
+    queryKey: ['/api/instructor-specialties/stats'],
+    retry: 1,
+  });
+
   // Crear mapeo de categorías por ID
   const categoriesMap = Array.isArray(categories) ? categories.reduce((acc: any, category: any) => {
     acc[category.id] = category;
@@ -224,58 +230,107 @@ const OrganizadorPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card
-          className="border-0 shadow-lg text-white rounded-3xl"
-          style={{ backgroundColor: "#003D49" }}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-medium text-gray-100">
-              Estados de Actividades
-            </CardTitle>
-            <div
-              className="rounded-full p-2"
-              style={{ backgroundColor: "#14b8a6" }}
-            >
-              <Users className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {/* Actividades En Curso */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <span className="text-sm text-gray-200">En Curso</span>
-                </div>
-                <span className="text-lg font-bold text-white">
-                  {isLoadingActivities ? '...' : activitiesInProgress}
-                </span>
+        {/* Columna 2: Dividida en 2 mitades verticales - Estados de Actividades y Especialidades */}
+        <div className="flex flex-row gap-3">
+          
+          {/* Columna 2a (mitad izquierda): Estados de Actividades */}
+          <Card
+            className="border-0 shadow-lg text-white flex-1 rounded-3xl"
+            style={{ backgroundColor: "#003D49" }}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+              <CardTitle className="text-sm font-medium text-gray-100">
+                Estados de Actividades
+              </CardTitle>
+              <div
+                className="rounded-full p-1.5"
+                style={{ backgroundColor: "#14b8a6" }}
+              >
+                <Users className="h-4 w-4 text-white" />
               </div>
+            </CardHeader>
+            <CardContent className="py-2">
+              <div className="space-y-2">
+                {/* Actividades En Curso */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    <span className="text-xs text-gray-200">En Curso</span>
+                  </div>
+                  <span className="text-sm font-bold text-white">
+                    {isLoadingActivities ? '...' : activitiesInProgress}
+                  </span>
+                </div>
 
-              {/* Actividades Programadas */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-400"></div>
-                  <span className="text-sm text-gray-200">Programadas</span>
+                {/* Actividades Programadas */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                    <span className="text-xs text-gray-200">Programadas</span>
+                  </div>
+                  <span className="text-sm font-bold text-white">
+                    {isLoadingActivities ? '...' : scheduledActivities}
+                  </span>
                 </div>
-                <span className="text-lg font-bold text-white">
-                  {isLoadingActivities ? '...' : scheduledActivities}
-                </span>
-              </div>
 
-              {/* Actividades Canceladas */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <span className="text-sm text-gray-200">Canceladas</span>
+                {/* Actividades Canceladas */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                    <span className="text-xs text-gray-200">Canceladas</span>
+                  </div>
+                  <span className="text-sm font-bold text-white">
+                    {isLoadingActivities ? '...' : cancelledActivities}
+                  </span>
                 </div>
-                <span className="text-lg font-bold text-white">
-                  {isLoadingActivities ? '...' : cancelledActivities}
-                </span>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Columna 2b (mitad derecha): Especialidades de Instructores */}
+          <Card
+            className="border-0 shadow-lg text-white flex-1 rounded-3xl"
+            style={{ backgroundColor: "#003D49" }}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+              <CardTitle className="text-sm font-medium text-gray-100">
+                Especialidades
+              </CardTitle>
+              <div
+                className="rounded-full p-1.5"
+                style={{ backgroundColor: "#14b8a6" }}
+              >
+                <Tag className="h-4 w-4 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="py-2">
+              <div className="text-2xl font-bold text-white mb-1">
+                {isLoadingSpecialtiesStats ? '...' : (specialtiesStats?.totalUniqueSpecialties || 0)}
+              </div>
+              <p className="text-xs text-white mb-2">
+                Especialidades únicas registradas
+              </p>
+              
+              {/* Top especialidad */}
+              {specialtiesStats?.topSpecialties?.[0] && (
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-200 truncate">
+                        {specialtiesStats.topSpecialties[0].name}
+                      </span>
+                    </div>
+                    <span className="text-xs font-semibold text-white">
+                      {specialtiesStats.topSpecialties[0].count}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+        </div>
 
         <Card
           className="border-0 shadow-lg text-white rounded-3xl"

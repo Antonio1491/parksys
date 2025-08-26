@@ -1195,6 +1195,11 @@ app.get("/api/activity-registrations/global-stats", async (req, res) => {
   }
 });
 
+// Registrar rutas de especialidades de instructores
+import instructorSpecialtiesRoutes from "./instructor-specialties-routes";
+app.use('/api', instructorSpecialtiesRoutes);
+console.log("📊 Rutas de especialidades de instructores registradas");
+
 // Importar rutas simplificadas de activos - COMENTADO para evitar conflictos
 // import { simpleAssetRouter } from "./simple-asset-routes";
 
