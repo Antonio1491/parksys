@@ -27,9 +27,7 @@ export const GraphicCard = ({
         )}
       </CardHeader>
       <CardContent className="pt-0 h-full flex flex-col justify-between">
-       <div className="w-full h-full">
         {children}
-       </div>
       </CardContent>
     </Card>
   );
