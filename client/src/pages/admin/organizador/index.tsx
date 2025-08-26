@@ -128,14 +128,6 @@ const OrganizadorPage: React.FC = () => {
     return acc;
   }, {}) : {};
 
-  // Debug: verificar estructura de datos (temporal)
-  console.log('🔧 Datos de parques:', { 
-    parksResponse: !!parksResponse, 
-    parksArray: Array.isArray(parks), 
-    parksLength: parks?.length || 0,
-    firstPark: parks?.[0] ? { id: parks[0].id, name: parks[0].name } : null,
-    parkNamesMapKeys: Object.keys(parkNamesMap) 
-  });
 
   // Obtener parques con más actividades
   const topParks = Object.entries(parkCounts)
@@ -147,16 +139,13 @@ const OrganizadorPage: React.FC = () => {
     .sort((a, b) => Number(b.count) - Number(a.count))
     .slice(0, 5);
 
-  // Crear datos para el gráfico de actividades por parque
-  const parkActivityData = Object.entries(parkCounts)
-    .map(([parkId, totalCount]) => ({
-      parkId: parseInt(parkId),
-      parkName: parkNamesMap[parkId] || `Parque ${parkId}`,
-      totalActivities: Number(totalCount),
-      activeActivities: Number(activeParkCounts[parkId] || 0)
-    }))
-    .sort((a, b) => b.totalActivities - a.totalActivities)
-    .slice(0, 8); // Mostrar top 8 parques
+  // Crear datos para el gráfico de actividades por parque (mostrar todos los 13 parques)
+  const parkActivityData = Array.isArray(parks) ? parks.map(park => ({
+    parkId: park.id,
+    parkName: park.name,
+    totalActivities: Number(parkCounts[park.id] || 0),
+    activeActivities: Number(activeParkCounts[park.id] || 0)
+  })).sort((a, b) => b.totalActivities - a.totalActivities) : [];
 
   // Actividades próximas (próximas 5)
   const upcomingActivities = Array.isArray(activities) ? activities
