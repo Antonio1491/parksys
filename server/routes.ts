@@ -1674,7 +1674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           p.id as park_id,
           p.name as park_name,
           COUNT(a.id) as total_activities,
-          COUNT(CASE WHEN a.status = 'Activa' THEN 1 END) as active_activities
+          COUNT(CASE WHEN a.status = 'activa' THEN 1 END) as active_activities
         FROM parks p
         INNER JOIN activities a ON p.id = a.park_id
         GROUP BY p.id, p.name
