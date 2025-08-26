@@ -53,6 +53,18 @@ interface ParksDashboardData {
   } | null;
   greenFlagParks: number;
   greenFlagPercentage: number;
+  parkWithMostActivities: {
+    parkId: number;
+    parkName: string;
+    totalActivities: number;
+    activeActivities: number;
+  } | null;
+  parkWithLeastActivities: {
+    parkId: number;
+    parkName: string;
+    totalActivities: number;
+    activeActivities: number;
+  } | null;
   parksWithCoordinates: Array<{
     id: number;
     name: string;
@@ -562,7 +574,24 @@ const ParksDashboard = () => {
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
                   <span className="text-sm font-medium text-gray-200">Más Actividades</span>
                 </div>
-                <div className="text-gray-400 text-sm">Datos no disponibles</div>
+                {data.parkWithMostActivities ? (
+                  <>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {data.parkWithMostActivities.totalActivities}
+                    </div>
+                    <p className="text-sm text-gray-300 truncate">
+                      {data.parkWithMostActivities.parkName}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-400">
+                        {data.parkWithMostActivities.activeActivities} activas
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-sm">Sin datos</div>
+                )}
               </div>
 
               {/* Parque con menos actividades */}
@@ -571,7 +600,24 @@ const ParksDashboard = () => {
                   <div className="w-3 h-3 rounded-full bg-orange-400"></div>
                   <span className="text-sm font-medium text-gray-200">Menos Actividades</span>
                 </div>
-                <div className="text-gray-400 text-sm">Datos no disponibles</div>
+                {data.parkWithLeastActivities ? (
+                  <>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {data.parkWithLeastActivities.totalActivities}
+                    </div>
+                    <p className="text-sm text-gray-300 truncate">
+                      {data.parkWithLeastActivities.parkName}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-400">
+                        {data.parkWithLeastActivities.activeActivities} activas
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-sm">Sin datos</div>
+                )}
               </div>
             </div>
           </CardContent>
