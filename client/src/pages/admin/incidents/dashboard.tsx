@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
+import GraphicCard from '@/components/ui/graphic-card';
 import {
   Card,
   CardContent,
@@ -440,24 +441,81 @@ const IncidentsDashboard = () => {
         
         {/* Incidencias por parque y últimas incidencias */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="overflow-hidden">
-            <CardHeader>
-              <CardTitle>Incidencias por parque</CardTitle>
-              <CardDescription>
-                Distribución de incidencias por ubicación
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="h-80 w-full">
-                <React.Suspense fallback={<div className="flex items-center justify-center h-full">Cargando gráfico...</div>}>
-                  <RechartsComponents type="horizontalBar" data={sampleData.parkData} />
-                </React.Suspense>
-              </div>
-            </CardContent>
-            <CardFooter className="text-sm text-gray-500 border-t">
-              <div>El Parque Metropolitano concentra el mayor número de incidencias reportadas.</div>
-            </CardFooter>
-          </Card>
+          {/* Gráfico de barras de Incidencias por Parque movido desde parks-dashboard */}
+          <GraphicCard
+            title="⚠️ Incidencias por Parque"
+            description="Registro de incidencias mensuales y estado de resolución por parque"
+            className="h-full"
+          >
+            <div className="w-full">
+              {sampleData.parkData && sampleData.parkData.length > 0 ? (
+                <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+                  {sampleData.parkData
+                    .sort((a, b) => b.value - a.value)
+                    .slice(0, 12) // Limitar a 12 parques para mejor visualización
+                    .map((park, index) => {
+                      const maxIncidents = Math.max(...sampleData.parkData.map(p => p.value));
+                      const heightPercentage = maxIncidents > 0 ? (park.value / maxIncidents) * 100 : 0;
+                      const getIncidentColor = (value: number) => {
+                        if (value === 0) return "#e5e7eb"; // Gris para sin incidentes
+                        if (value >= 20) return "#ef4444"; // Rojo para muchas incidencias
+                        if (value >= 15) return "#f59e0b"; // Naranja para incidencias medias
+                        return "#10b981"; // Verde para pocas incidencias
+                      };
+                      return (
+                        <div key={index} className="flex flex-col items-center relative">
+                          {/* Valor de incidencias arriba */}
+                          <div className="mb-2 text-center">
+                            <div className="text-sm font-poppins font-thin text-gray-700">
+                              {park.value}
+                            </div>
+                            <div className="text-xs font-poppins font-thin text-gray-500">
+                              incidencias
+                            </div>
+                          </div>
+
+                          {/* Columna vertical */}
+                          <div className="relative h-48 w-4 flex flex-col justify-end">
+                            {/* Fondo de la columna */}
+                            <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                            
+                            {/* Relleno de la columna según incidencias */}
+                            <div
+                              className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                              style={{
+                                height: `${Math.max(heightPercentage, 5)}%`,
+                                backgroundColor: getIncidentColor(park.value),
+                                borderColor: getIncidentColor(park.value),
+                              }}
+                            ></div>
+                          </div>
+
+                          {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                          <div className="absolute bottom-24 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                            <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                              {park.name}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <div className="flex flex-col items-center space-y-2">
+                    <AlertTriangle className="h-12 w-12 text-gray-300" />
+                    <p className="text-lg font-medium">
+                      No hay incidencias registradas
+                    </p>
+                    <p className="text-sm">
+                      Los datos de incidencias aparecerán aquí una vez que se
+                      registren en el sistema
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </GraphicCard>
           
           <Card>
             <CardHeader className="pb-2">

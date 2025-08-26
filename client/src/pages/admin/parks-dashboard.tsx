@@ -464,10 +464,10 @@ const ParksDashboard = () => {
 
       </div>
 
-      {/* Tercera fila: Grid de 2 columnas con gráficos */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Tercera fila: Gráfico de Área Verde */}
+      <div className="grid gap-6 lg:grid-cols-1">
         
-        {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
+        {/* Gráfico de Porcentaje de Área Verde */}
         <GraphicCard
           title="🌿 Porcentaje de Área Verde por Parque"
           description="Distribución del área verde en cada parque municipal"
@@ -541,83 +541,6 @@ const ParksDashboard = () => {
           </div>
         </GraphicCard>
 
-        {/* Columna derecha: Gráfico de Incidencias por Parque */}
-        <GraphicCard
-          title="⚠️ Incidencias por Parque"
-          description="Registro de incidencias mensuales y estado de resolución por parque"
-          className="h-full"
-        >
-          <div className="w-full">
-            {data.incidentsByPark && data.incidentsByPark.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                {data.incidentsByPark
-                  .sort((a, b) => b.incidentsThisMonth - a.incidentsThisMonth)
-                  .slice(0, 12) // Limitar a 12 parques para mejor visualización
-                  .map((park) => {
-                    const maxIncidents = Math.max(...data.incidentsByPark!.map(p => p.incidentsThisMonth));
-                    const heightPercentage = maxIncidents > 0 ? (park.incidentsThisMonth / maxIncidents) * 100 : 0;
-                    const getIncidentColor = (open: number, total: number) => {
-                      if (total === 0) return "#e5e7eb"; // Gris para sin incidentes
-                      const resolved = total - open;
-                      const resolvedPercentage = (resolved / total) * 100;
-                      if (resolvedPercentage >= 80) return "#10b981"; // Verde para alta resolución
-                      if (resolvedPercentage >= 50) return "#f59e0b"; // Naranja para resolución media
-                      return "#ef4444"; // Rojo para baja resolución
-                    };
-                    return (
-                      <div key={park.parkId} className="flex flex-col items-center relative">
-                        {/* Valor de incidencias arriba */}
-                        <div className="mb-2 text-center">
-                          <div className="text-sm font-poppins font-thin text-gray-700">
-                            {park.incidentsThisMonth}
-                          </div>
-                          <div className="text-xs font-poppins font-thin text-gray-500">
-                            {park.openIncidents} abiertas
-                          </div>
-                        </div>
-
-                        {/* Columna vertical */}
-                        <div className="relative h-48 w-4 flex flex-col justify-end">
-                          {/* Fondo de la columna */}
-                          <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                          
-                          {/* Relleno de la columna según incidencias */}
-                          <div
-                            className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                            style={{
-                              height: `${Math.max(heightPercentage, 5)}%`,
-                              backgroundColor: getIncidentColor(park.openIncidents, park.incidentsThisMonth),
-                              borderColor: getIncidentColor(park.openIncidents, park.incidentsThisMonth),
-                            }}
-                          ></div>
-                        </div>
-
-                        {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                        <div className="absolute bottom-24 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                          <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                            {park.parkName}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <div className="flex flex-col items-center space-y-2">
-                  <AlertTriangle className="h-12 w-12 text-gray-300" />
-                  <p className="text-lg font-medium">
-                    No hay incidencias registradas
-                  </p>
-                  <p className="text-sm">
-                    Los datos de incidencias aparecerán aquí una vez que se
-                    registren en el sistema
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </GraphicCard>
 
       </div>
 
