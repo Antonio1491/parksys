@@ -471,11 +471,11 @@ const ParksDashboard = () => {
         <GraphicCard
           title="🌿 Porcentaje de Área Verde por Parque"
           description="Distribución del área verde en cada parque municipal"
-          className="min-h-[28rem] h-full"
+          className="h-full"
         >
-          <div className="w-full h-full">
+          <div className="w-full">
             {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[280px] px-4 overflow-x-auto">
+              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                 {data.greenAreaPercentages
                   .sort((a, b) => b.greenPercentage - a.greenPercentage)
                   .map((park) => {
@@ -545,11 +545,11 @@ const ParksDashboard = () => {
         <GraphicCard
           title="⚠️ Incidencias por Parque"
           description="Registro de incidencias mensuales y estado de resolución por parque"
-          className="min-h-[28rem] h-full"
+          className="h-full"
         >
           <div className="w-full">
             {data.incidentsByPark && data.incidentsByPark.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[280px] px-4 overflow-x-auto">
+              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                 {data.incidentsByPark
                   .sort((a, b) => b.incidentsThisMonth - a.incidentsThisMonth)
                   .slice(0, 12) // Limitar a 12 parques para mejor visualización
