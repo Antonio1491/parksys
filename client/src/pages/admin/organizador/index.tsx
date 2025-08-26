@@ -294,7 +294,7 @@ const OrganizadorPage: React.FC = () => {
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
               <CardTitle className="text-sm font-medium text-gray-100">
-                Especialidades
+                Especialidades de los instructores
               </CardTitle>
               <div
                 className="rounded-full p-1.5"
