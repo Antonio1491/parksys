@@ -4,27 +4,17 @@ import {
   Map,
   MapPin,
   Trees,
-  TreePine,
-  Calendar,
-  Users,
-  TrendingUp,
-  Activity,
   AlertTriangle,
   CheckCircle,
-  Wrench,
-  UserCheck,
-  AlertCircle,
-  Package,
   Award,
   MessageSquare,
 } from "lucide-react";
-import AdminLayout from "@/components/AdminLayout";
+import DashboardLayout from "@/components/ui/dashboard-layout";
+import MetricCard from "@/components/ui/metric-card";
+import GraphicCard from "@/components/ui/graphic-card";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,19 +37,11 @@ interface ParksDashboardData {
   totalParks: number;
   totalSurface: number;
   totalGreenArea: number;
-  totalVisitors: number;
   activeParks: number;
-  maintenanceAreas: number;
-  totalActivities: number;
-  totalVolunteers: number;
-  totalTrees: number;
-  totalAmenities: number;
-  totalInstructors: number;
   totalIncidents: number;
   resolvedIncidents: number;
   totalReports: number;
   resolvedReports: number;
-  totalAssets: number;
   averageRating: number;
   bestEvaluatedPark: {
     parkId: number;
@@ -69,21 +51,6 @@ interface ParksDashboardData {
   } | null;
   greenFlagParks: number;
   greenFlagPercentage: number;
-  parksByMunicipality: Array<{
-    municipalityName: string;
-    count: number;
-  }>;
-  parksByType: Array<{
-    type: string;
-    count: number;
-  }>;
-  recentActivities: Array<{
-    id: number;
-    title: string;
-    parkName: string;
-    date: string;
-    participants: number;
-  }>;
   parksWithCoordinates: Array<{
     id: number;
     name: string;
@@ -93,10 +60,6 @@ interface ParksDashboardData {
     type: string;
     area: number;
     status: string;
-  }>;
-  conservationStatus: Array<{
-    status: string;
-    count: number;
   }>;
   parkEvaluations: Array<{
     parkId: number;
@@ -128,55 +91,53 @@ const ParksDashboard = () => {
 
   if (isLoading) {
     return (
-      <AdminLayout>
-        <div className="space-y-6">
-          <div className="mb-8">
-            <div className="flex items-center gap-4">
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[...Array(8)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-16 mb-2" />
-                  <Skeleton className="h-3 w-32" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      <DashboardLayout 
+        icon={Map} 
+        title="Parques" 
+        subtitle="Métricas / Módulo de Gestión"
+      >
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(8)].map((_, i) => (
+            <Card key={i}>
+              <CardContent>
+                <Skeleton className="h-8 w-16 mb-2" />
+                <Skeleton className="h-3 w-32" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
   if (error) {
     return (
-      <AdminLayout>
+      <DashboardLayout 
+        icon={Map} 
+        title="Parques" 
+        subtitle="Métricas / Módulo de Gestión"
+      >
         <div className="text-center py-8">
           <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
           <p className="text-gray-600">
             Error al cargar los datos del dashboard
           </p>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
   if (!data) {
     return (
-      <AdminLayout>
-        <div className="mb-8">
-          <div className="flex items-center gap-4">
-          </div>
-        </div>
+      <DashboardLayout 
+        icon={Map} 
+        title="Parques" 
+        subtitle="Métricas / Módulo de Gestión"
+      >
         <div className="text-center py-8">
           <p className="text-gray-600">No hay datos disponibles</p>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
@@ -197,577 +158,468 @@ const ParksDashboard = () => {
       : L.latLngBounds([[20.6767, -103.3476]]); // fallback: Guadalajara
   
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Main Header con fondo coloreado */}
-        <div 
-          className="mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
-          style={{ backgroundColor: "#14b8a6" }}
-        >
-          <div className="flex items-center gap-3">
-            <Map className="h-6 w-6 text-white" />
-            <h1 className="text-3xl font-bold text-white font-poppins">
-              Parques
-            </h1>
-          </div>
-          <p className="text-base font-normal text-white font-poppins">
-            Métricas / Módulo de Gestión
-          </p>
-        </div>
+    <DashboardLayout 
+      icon={Map} 
+      title="Parques" 
+      subtitle="Métricas / Módulo de Gestión"
+    >
+      {/* Sección 1: Métricas Principales - Grid de 4 columnas con columna 3 dividida */}
+      <div className="space-y-4">
+        <div className="grid gap-6 lg:grid-cols-4">
+          
+          {/* Columna 1: Total de Parques + Green Flag Award */}
+          <MetricCard
+            title="Total de Parques"
+            value={data.totalParks}
+            subtitle={`${data.activeParks} activos`}
+            icon={MapPin}
+          >
+            {/* Barra de certificación Green Flag Award */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Award className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                  <span className="text-xs text-gray-200">
+                    Green Flag Award
+                  </span>
+                </div>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: "#14b8a6" }}
+                >
+                  {data.greenFlagParks || 0}/{data.totalParks} (
+                  {data.greenFlagPercentage?.toFixed(0) || 0}%)
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-700"
+                  style={{
+                    width: `${data.greenFlagPercentage || 0}%`,
+                    backgroundColor: "#14b8a6"
+                  }}
+                ></div>
+              </div>
+            </div>
+          </MetricCard>
 
-        {/* Sección 1: Métricas Principales - Grid de 4 columnas con columna 3 dividida */}
-        <div className="space-y-4">
-          <div className="grid gap-6 lg:grid-cols-4">
+          {/* Columna 2: Superficie Total + Área Verde */}
+          <MetricCard
+            title="Superficie Total"
+            value={data.totalSurface ? `${(data.totalSurface / 10000).toFixed(1)} ha` : "N/A"}
+            subtitle="Superficie total de parques"
+            icon={Trees}
+          >
+            {/* Barra de porcentaje de área verde */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Trees className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                  <span className="text-xs text-gray-200">Área Verde</span>
+                </div>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: "#14b8a6" }}
+                >
+                  {data.totalGreenArea
+                    ? `${(data.totalGreenArea / 10000).toFixed(1)} ha`
+                    : "0 ha"}
+                  (
+                  {data.totalSurface && data.totalGreenArea
+                    ? (
+                        (data.totalGreenArea / data.totalSurface) *
+                        100
+                      ).toFixed(0)
+                    : 0}
+                  %)
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-700"
+                  style={{
+                    width: `${
+                      data.totalSurface && data.totalGreenArea
+                        ? (data.totalGreenArea / data.totalSurface) * 100
+                        : 0
+                    }%`,
+                    backgroundColor: "#14b8a6"
+                  }}
+                ></div>
+              </div>
+            </div>
+          </MetricCard>
+
+          {/* Columna 3: Dividida en 2 mitades verticales - Reportes e Incidencias */}
+          <div className="flex flex-row gap-3">
             
-            {/* Columna 1: Total de Parques + Green Flag Award */}
+            {/* Columna 3a (mitad izquierda): Reportes Públicos */}
             <Card
-              className="border-0 shadow-lg text-white rounded-3xl"
+              className="border-0 shadow-lg text-white flex-1 rounded-3xl"
               style={{ backgroundColor: "#003D49" }}
             >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-medium text-gray-100">
-                  Total de Parques
-                </CardTitle>
-                <div
-                  className="rounded-full p-2"
-                  style={{ backgroundColor: "#14b8a6" }}
-                >
-                  <MapPin className="h-5 w-5 text-white" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-white">
-                  {data.totalParks}
-                </div>
-                <p className="text-xs text-white mb-3">
-                  {data.activeParks} activos
-                </p>
-
-                {/* Barra de certificación Green Flag Award */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Award className="h-3 w-3" style={{ color: "#14b8a6" }} />
-                      <span className="text-xs text-gray-200">
-                        Green Flag Award
-                      </span>
-                    </div>
-                    <span
-                      className="text-xs font-semibold"
-                      style={{ color: "#14b8a6" }}
-                    >
-                      {data.greenFlagParks || 0}/{data.totalParks} (
-                      {data.greenFlagPercentage?.toFixed(0) || 0}%)
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full transition-all duration-700"
-                      style={{
-                        width: `${data.greenFlagPercentage || 0}%`,
-                        backgroundColor: "#14b8a6"
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Columna 2: Superficie Total + Área Verde */}
-            <Card
-              className="border-0 shadow-lg text-white rounded-3xl"
-              style={{ backgroundColor: "#003D49" }}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-medium text-gray-100">
-                  Superficie Total
-                </CardTitle>
-                <div
-                  className="rounded-full p-2"
-                  style={{ backgroundColor: "#14b8a6" }}
-                >
-                  <Trees className="h-5 w-5 text-white" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-white">
-                  {data.totalSurface
-                    ? `${(data.totalSurface / 10000).toFixed(1)} ha`
-                    : "N/A"}
-                </div>
-                <p className="text-xs text-white mb-3">
-                  Superficie total de parques
-                </p>
-
-                {/* Barra de porcentaje de área verde */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Trees className="h-3 w-3" style={{ color: "#14b8a6" }} />
-                      <span className="text-xs text-gray-200">Área Verde</span>
-                    </div>
-                    <span
-                      className="text-xs font-semibold"
-                      style={{ color: "#14b8a6" }}
-                    >
-                      {data.totalGreenArea
-                        ? `${(data.totalGreenArea / 10000).toFixed(1)} ha`
-                        : "0 ha"}
-                      (
-                      {data.totalSurface && data.totalGreenArea
-                        ? (
-                            (data.totalGreenArea / data.totalSurface) *
-                            100
-                          ).toFixed(0)
-                        : 0}
-                      %)
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full transition-all duration-700"
-                      style={{
-                        width: `${
-                          data.totalSurface && data.totalGreenArea
-                            ? (data.totalGreenArea / data.totalSurface) * 100
-                            : 0
-                        }%`,
-                        backgroundColor: "#14b8a6"
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Columna 3: Dividida en 2 mitades verticales - Reportes e Incidencias */}
-            <div className="flex flex-row gap-3">
-              
-              {/* Columna 3a (mitad izquierda): Reportes Públicos */}
-              <Card
-                className="border-0 shadow-lg text-white flex-1 rounded-3xl"
-                style={{ backgroundColor: "#003D49" }}
-              >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                  <CardTitle className="text-sm font-medium text-gray-100">
+              <CardContent className="pt-4 pb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-100">
                     Reportes Públicos
-                  </CardTitle>
+                  </span>
                   <div
                     className="rounded-full p-1.5"
                     style={{ backgroundColor: "#14b8a6" }}
                   >
                     <MessageSquare className="h-4 w-4 text-white" />
                   </div>
-                </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-2xl font-bold text-white">
-                    {data.totalReports || 0}
-                  </div>
-                  <p className="text-xs text-white">
-                    {data.resolvedReports || 0} resueltos
-                  </p>
-                </CardContent>
-              </Card>
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {data.totalReports || 0}
+                </div>
+                <p className="text-xs text-white">
+                  {data.resolvedReports || 0} resueltos
+                </p>
+              </CardContent>
+            </Card>
 
-              {/* Columna 3b (mitad derecha): Incidencias */}
-              <Card
-                className="border-0 shadow-lg text-white flex-1 rounded-3xl"
-                style={{ backgroundColor: "#003D49" }}
-              >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                  <CardTitle className="text-sm font-medium text-gray-100">
+            {/* Columna 3b (mitad derecha): Incidencias */}
+            <Card
+              className="border-0 shadow-lg text-white flex-1 rounded-3xl"
+              style={{ backgroundColor: "#003D49" }}
+            >
+              <CardContent className="pt-4 pb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-100">
                     Incidencias
-                  </CardTitle>
+                  </span>
                   <div
                     className="rounded-full p-1.5"
                     style={{ backgroundColor: "#14b8a6" }}
                   >
                     <AlertTriangle className="h-4 w-4 text-white" />
                   </div>
-                </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-2xl font-bold text-white">
-                    {data.totalIncidents || 0}
-                  </div>
-                  <p className="text-xs text-white">
-                    {data.resolvedIncidents || 0} atendidas
-                  </p>
-                </CardContent>
-              </Card>
-              
-            </div>
-
-            {/* Columna 4: Calificación + Parque mejor evaluado */}
-            <Card
-              className="border-0 shadow-lg text-white rounded-3xl"
-              style={{ backgroundColor: "#003D49" }}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-medium text-gray-100">
-                  Calificación Promedio
-                </CardTitle>
-                <div
-                  className="rounded-full p-2"
-                  style={{ backgroundColor: "#14b8a6" }}
-                >
-                  <CheckCircle className="h-5 w-5 text-white" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-white">
-                  {data.averageRating ? data.averageRating.toFixed(1) : "N/A"}
+                <div className="text-2xl font-bold text-white">
+                  {data.totalIncidents || 0}
                 </div>
-                <p className="text-xs text-white mb-3">
-                  Promedio de evaluaciones
+                <p className="text-xs text-white">
+                  {data.resolvedIncidents || 0} atendidas
                 </p>
-                
-                {/* Parque mejor evaluado */}
-                {data.bestEvaluatedPark && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <Award className="h-3 w-3 text-yellow-400" />
-                        <span className="text-xs text-gray-200">
-                          Mejor Evaluado
-                        </span>
-                      </div>
-                      <span className="text-xs font-semibold text-yellow-400">
-                        {data.bestEvaluatedPark.averageRating.toFixed(1)} ⭐
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-200 truncate">
-                      {data.bestEvaluatedPark.parkName}
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
-
-          </div>
-        </div>
-
-        {/* Fila dividida en 2 columnas */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          
-          {/* Columna izquierda: Mapa de parques */}
-          <Card className="border-0 shadow-xl rounded-3xl overflow-hidden min-h-[28rem] h-full">
-            <CardContent className="p-0 h-full"> {/* <- sin padding */}
-              <div className="relative h-full min-h-[28rem] w-full">
-                <MapContainer
-                  bounds={parksBounds}
-                  scrollWheelZoom={false}
-                  className="absolute inset-0 !h-full !w-full"
-                  style={{ height: "100%", width: "100%", background: "transparent" }}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  {validCoordinates?.map(([lat, lng], index) => {
-                    const park = data.parksWithCoordinates[index];
-                    return (
-                      <Marker key={park.id} position={[lat, lng]}>
-                        <Popup>
-                          <div className="space-y-2">
-                            <h3 className="font-semibold">{park.name}</h3>
-                            <p className="text-sm text-gray-600">{park.municipality}</p>
-                            <div className="flex flex-wrap gap-1">
-                              <Badge variant="outline" className="text-xs">{park.type}</Badge>
-                              {park.area && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {(park.area / 10000).toFixed(1)} ha
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    );
-                  })}
-                </MapContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Columna derecha: Gráfico de Evaluación Promedio por Parque */}
-          <div>
-            <Card className="border-0 shadow-lg rounded-3xl h-full">
-              <CardHeader className="bg-white rounded-t-lg">
-                <CardTitle className="text-lg font-bold text-gray-800">
-                  ⭐ Evaluación Promedio por Parque
-                </CardTitle>
-                <CardDescription className="text-gray-600">
-                  Nivel de satisfacción promedio de visitantes por parque basado
-                  en evaluaciones
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="w-full">
-                  {data.parkEvaluations?.length > 0 ? (
-                    <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                      {data.parkEvaluations
-                        .sort((a, b) => b.averageRating - a.averageRating)
-                        .map((park, index) => {
-                          const heightPercentage = (park.averageRating / 5) * 100;
-                          const getRatingColor = (rating: number) => {
-                            if (rating >= 4.0) return "#69c45c"; // Verde para calificaciones positivas
-                            if (rating >= 2.5) return "#bcb57e"; // Amarillo/naranja para medias
-                            return "#a86767"; // Rojo para bajas
-                          };
-                          return (
-                            <div key={park.parkId} className="flex flex-col items-center relative">
-                              {/* Valor del promedio arriba con número de evaluaciones */}
-                              <div className="mb-2 text-center">
-                                <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                                  {park.averageRating.toFixed(1)}/5
-                                </div>
-                                <div className="text-xs font-poppins font-thin text-gray-500">
-                                  ({park.evaluationCount} eval)
-                                </div>
-                              </div>
-
-                              {/* Columna vertical */}
-                              <div className="relative h-64 w-4 flex flex-col justify-end">
-                                {/* Fondo de la columna */}
-                                <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                                
-                                {/* Relleno de la columna según promedio */}
-                                <div
-                                  className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                                  style={{
-                                    height: `${Math.max(heightPercentage, 5)}%`,
-                                    backgroundColor: getRatingColor(park.averageRating),
-                                    borderColor: getRatingColor(park.averageRating),
-                                  }}
-                                ></div>
-                              </div>
-
-                              {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                              <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                                <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                                  {park.parkName}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <div className="flex flex-col items-center space-y-2">
-                        <CheckCircle className="h-12 w-12 text-gray-300" />
-                        <p className="text-lg font-medium">
-                          No hay evaluaciones disponibles
-                        </p>
-                        <p className="text-sm">
-                          Los datos de evaluación aparecerán aquí una vez que los
-                          visitantes evalúen los parques
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {data.parkEvaluations?.length > 0 && (
-                  <div className="mt-2 text-center">
-                    <p className="text-sm text-gray-500 font-poppins font-thin">
-                      Mostrando todos los {data.parkEvaluations.length} parques
-                      registrados en el sistema
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            
           </div>
 
-        </div>
-
-        {/* Tercera fila: Grid de 2 columnas con gráficos */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          
-          {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
-          <Card className="border-0 shadow-lg rounded-3xl">
-            <CardHeader className="bg-white rounded-t-lg">
-              <CardTitle className="text-lg font-bold text-gray-800">
-                🌿 Porcentaje de Área Verde
-              </CardTitle>
-              <CardDescription className="text-gray-600">
-                Proporción de área verde respecto al área total de cada parque
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="w-full">
-                {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 ? (
-                  <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                    {data.greenAreaPercentages
-                      .sort((a, b) => b.greenPercentage - a.greenPercentage)
-                      .map((park, index) => {
-                        const getPercentageColor = (percentage: number) => {
-                          if (percentage >= 80) return "#69c45c"; // Verde excelente
-                          if (percentage >= 60) return "#9cb767"; // Verde bueno
-                          if (percentage >= 40) return "#bcb57e"; // Amarillo regular
-                          if (percentage >= 20) return "#a58567"; // Naranja bajo
-                          return "#a86767"; // Rojo muy bajo
-                        };
-
-                        const heightPercentage = park.greenPercentage;
-
-                        return (
-                          <div key={park.parkId} className="flex flex-col items-center relative">
-                            {/* Valor del porcentaje arriba con área en hectáreas */}
-                            <div className="mb-2 text-center">
-                              <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                                {park.greenPercentage.toFixed(1)}%
-                              </div>
-                              <div className="text-xs font-poppins font-thin text-gray-500">
-                                ({(park.greenArea / 10000).toFixed(1)} ha)
-                              </div>
-                            </div>
-
-                            {/* Columna vertical */}
-                            <div className="relative h-64 w-4 flex flex-col justify-end">
-                              {/* Fondo de la columna */}
-                              <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                              
-                              {/* Relleno de la columna según porcentaje */}
-                              <div
-                                className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                                style={{
-                                  height: `${Math.max(heightPercentage, 5)}%`,
-                                  backgroundColor: getPercentageColor(park.greenPercentage),
-                                  borderColor: getPercentageColor(park.greenPercentage),
-                                }}
-                              ></div>
-                            </div>
-
-                            {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                            <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                              <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                                {park.parkName}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+          {/* Columna 4: Calificación + Parque mejor evaluado */}
+          <MetricCard
+            title="Calificación Promedio"
+            value={data.averageRating ? data.averageRating.toFixed(1) : "N/A"}
+            subtitle="Promedio de evaluaciones"
+            icon={CheckCircle}
+          >
+            {/* Parque mejor evaluado */}
+            {data.bestEvaluatedPark && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Award className="h-3 w-3 text-yellow-400" />
+                    <span className="text-xs text-gray-200">
+                      Mejor Evaluado
+                    </span>
                   </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <div className="flex flex-col items-center space-y-2">
-                      <CheckCircle className="h-12 w-12 text-gray-300" />
-                      <p className="text-lg font-medium">
-                        No hay datos de área verde disponibles
-                      </p>
-                      <p className="text-sm">
-                        Los datos aparecerán cuando se registren en los parques
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 && (
-                <div className="mt-2 text-center">
-                  <p className="text-sm text-gray-500 font-poppins font-thin">
-                    Mostrando todos los {data.greenAreaPercentages.length} parques
-                    registrados en el sistema
-                  </p>
+                  <span className="text-xs font-semibold text-yellow-400">
+                    {data.bestEvaluatedPark.averageRating.toFixed(1)} ⭐
+                  </span>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Columna derecha: Gráfico de Incidencias por Parque */}
-          <Card className="border-0 shadow-lg rounded-3xl">
-            <CardHeader className="bg-white rounded-t-lg">
-              <CardTitle className="text-lg font-bold text-gray-800">
-                🚨 Incidencias por Parque
-              </CardTitle>
-              <CardDescription className="text-gray-600">
-                Por ciento del total global
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="w-full">
-                {data.incidentsByPark && data.incidentsByPark.length > 0 ? (
-                  <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                    {data.incidentsByPark
-                      .sort((a, b) => b.totalIncidents - a.totalIncidents)
-                      .map((park, index) => {
-                        const getIncidentColor = (incidents: number) => {
-                          if (incidents >= 20) return "#a86767"; // Rojo crítico
-                          if (incidents >= 15) return "#a58567"; // Naranja alto
-                          if (incidents >= 10) return "#bcb57e"; // Amarillo medio
-                          if (incidents >= 5) return "#9cb767"; // Verde bajo
-                          return "#69c45c"; // Verde muy bajo
-                        };
-
-                        const totalGlobalIncidents = data.incidentsByPark!.reduce((sum, p) => sum + p.totalIncidents, 0);
-                        const heightPercentage = totalGlobalIncidents > 0 ? (park.totalIncidents / totalGlobalIncidents) * 100 : 0;
-
-                        return (
-                          <div key={park.parkId} className="flex flex-col items-center relative">
-                            {/* Valor del porcentaje arriba con información adicional */}
-                            <div className="mb-2 text-center">
-                              <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                                {heightPercentage.toFixed(1)}%
-                              </div>
-                              <div className="text-xs font-poppins font-thin text-gray-500">
-                                ({park.totalIncidents} total)
-                              </div>
-                            </div>
-
-                            {/* Columna vertical */}
-                            <div className="relative h-64 w-4 flex flex-col justify-end">
-                              {/* Fondo de la columna */}
-                              <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                              
-                              {/* Relleno de la columna según incidencias */}
-                              <div
-                                className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                                style={{
-                                  height: `${Math.max(heightPercentage, 5)}%`,
-                                  backgroundColor: getIncidentColor(park.totalIncidents),
-                                  borderColor: getIncidentColor(park.totalIncidents),
-                                }}
-                              ></div>
-                            </div>
-
-                            {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                            <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                              <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                                {park.parkName}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <div className="flex flex-col items-center space-y-2">
-                      <CheckCircle className="h-12 w-12 text-gray-300" />
-                      <p className="text-lg font-medium">
-                        No hay incidencias registradas
-                      </p>
-                      <p className="text-sm">
-                        Los datos aparecerán cuando se registren incidencias en los parques
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {data.incidentsByPark && data.incidentsByPark.length > 0 && (
-                <div className="mt-2 text-center">
-                  <p className="text-sm text-gray-500 font-poppins font-thin">
-                    Mostrando todos los {data.incidentsByPark.length} parques
-                    registrados en el sistema
-                  </p>
+                <div className="text-xs text-gray-200 truncate">
+                  {data.bestEvaluatedPark.parkName}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
+          </MetricCard>
 
         </div>
       </div>
-    </AdminLayout>
+
+      {/* Fila dividida en 2 columnas */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        
+        {/* Columna izquierda: Mapa de parques */}
+        <Card className="border-0 shadow-xl rounded-3xl overflow-hidden min-h-[28rem] h-full">
+          <CardContent className="p-0 h-full">
+            <div className="relative h-full min-h-[28rem] w-full">
+              <MapContainer
+                bounds={parksBounds}
+                scrollWheelZoom={false}
+                className="absolute inset-0 !h-full !w-full"
+                style={{ height: "100%", width: "100%", background: "transparent" }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {validCoordinates?.map(([lat, lng], index) => {
+                  const park = data.parksWithCoordinates[index];
+                  return (
+                    <Marker key={park.id} position={[lat, lng]}>
+                      <Popup>
+                        <div className="space-y-2">
+                          <h3 className="font-semibold">{park.name}</h3>
+                          <p className="text-sm text-gray-600">{park.municipality}</p>
+                          <div className="flex flex-wrap gap-1">
+                            <Badge variant="outline" className="text-xs">{park.type}</Badge>
+                            {park.area && (
+                              <Badge variant="secondary" className="text-xs">
+                                {(park.area / 10000).toFixed(1)} ha
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MapContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Columna derecha: Gráfico de Evaluación Promedio por Parque */}
+        <GraphicCard
+          title="⭐ Evaluación Promedio por Parque"
+          description="Nivel de satisfacción promedio de visitantes por parque basado en evaluaciones"
+          className="h-full"
+        >
+          <div className="w-full">
+            {data.parkEvaluations?.length > 0 ? (
+              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+                {data.parkEvaluations
+                  .sort((a, b) => b.averageRating - a.averageRating)
+                  .map((park) => {
+                    const heightPercentage = (park.averageRating / 5) * 100;
+                    const getRatingColor = (rating: number) => {
+                      if (rating >= 4.0) return "#69c45c"; // Verde para calificaciones positivas
+                      if (rating >= 2.5) return "#bcb57e"; // Amarillo/naranja para medias
+                      return "#a86767"; // Rojo para bajas
+                    };
+                    return (
+                      <div key={park.parkId} className="flex flex-col items-center relative">
+                        {/* Valor del promedio arriba con número de evaluaciones */}
+                        <div className="mb-2 text-center">
+                          <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
+                            {park.averageRating.toFixed(1)}/5
+                          </div>
+                          <div className="text-xs font-poppins font-thin text-gray-500">
+                            ({park.evaluationCount} eval)
+                          </div>
+                        </div>
+
+                        {/* Columna vertical */}
+                        <div className="relative h-64 w-4 flex flex-col justify-end">
+                          {/* Fondo de la columna */}
+                          <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                          
+                          {/* Relleno de la columna según promedio */}
+                          <div
+                            className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                            style={{
+                              height: `${Math.max(heightPercentage, 5)}%`,
+                              backgroundColor: getRatingColor(park.averageRating),
+                              borderColor: getRatingColor(park.averageRating),
+                            }}
+                          ></div>
+                        </div>
+
+                        {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                        <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                          <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                            {park.parkName}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <div className="flex flex-col items-center space-y-2">
+                  <CheckCircle className="h-12 w-12 text-gray-300" />
+                  <p className="text-lg font-medium">
+                    No hay evaluaciones disponibles
+                  </p>
+                  <p className="text-sm">
+                    Los datos de evaluación aparecerán aquí una vez que los
+                    visitantes evalúen los parques
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          {data.parkEvaluations?.length > 0 && (
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-500 font-poppins font-thin">
+                Mostrando todos los {data.parkEvaluations.length} parques
+                registrados en el sistema
+              </p>
+            </div>
+          )}
+        </GraphicCard>
+
+      </div>
+
+      {/* Tercera fila: Grid de 2 columnas con gráficos */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        
+        {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
+        <GraphicCard
+          title="🌿 Porcentaje de Área Verde por Parque"
+          description="Distribución del área verde en cada parque municipal"
+        >
+          <div className="w-full">
+            {data.greenAreaPercentages?.length > 0 ? (
+              <div className="flex justify-center items-end gap-2 min-h-[280px] px-4 overflow-x-auto">
+                {data.greenAreaPercentages
+                  .sort((a, b) => b.greenPercentage - a.greenPercentage)
+                  .map((park) => {
+                    const heightPercentage = park.greenPercentage;
+                    const getGreenColor = (percentage: number) => {
+                      if (percentage >= 70) return "#10b981"; // Verde intenso para alto porcentaje
+                      if (percentage >= 40) return "#22c55e"; // Verde medio
+                      if (percentage >= 20) return "#84cc16"; // Verde lima para bajo
+                      return "#eab308"; // Amarillo para muy bajo
+                    };
+                    return (
+                      <div key={park.parkId} className="flex flex-col items-center relative">
+                        {/* Valor del porcentaje arriba */}
+                        <div className="mb-2 text-center">
+                          <div className="text-sm font-poppins font-thin text-gray-700">
+                            {park.greenPercentage.toFixed(0)}%
+                          </div>
+                          <div className="text-xs font-poppins font-thin text-gray-500">
+                            {(park.greenArea / 10000).toFixed(1)} ha
+                          </div>
+                        </div>
+
+                        {/* Columna vertical */}
+                        <div className="relative h-48 w-4 flex flex-col justify-end">
+                          {/* Fondo de la columna */}
+                          <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                          
+                          {/* Relleno de la columna según porcentaje */}
+                          <div
+                            className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                            style={{
+                              height: `${Math.max(heightPercentage, 5)}%`,
+                              backgroundColor: getGreenColor(park.greenPercentage),
+                              borderColor: getGreenColor(park.greenPercentage),
+                            }}
+                          ></div>
+                        </div>
+
+                        {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                        <div className="absolute bottom-24 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                          <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                            {park.parkName}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <div className="flex flex-col items-center space-y-2">
+                  <Trees className="h-12 w-12 text-gray-300" />
+                  <p className="text-lg font-medium">
+                    No hay datos de área verde disponibles
+                  </p>
+                  <p className="text-sm">
+                    Los datos aparecerán aquí una vez que se registren las
+                    áreas verdes de los parques
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </GraphicCard>
+
+        {/* Columna derecha: Gráfico de Incidencias por Parque */}
+        <GraphicCard
+          title="⚠️ Incidencias por Parque"
+          description="Registro de incidencias mensuales y estado de resolución por parque"
+        >
+          <div className="w-full">
+            {data.incidentsByPark?.length > 0 ? (
+              <div className="flex justify-center items-end gap-2 min-h-[280px] px-4 overflow-x-auto">
+                {data.incidentsByPark
+                  .sort((a, b) => b.incidentsThisMonth - a.incidentsThisMonth)
+                  .slice(0, 12) // Limitar a 12 parques para mejor visualización
+                  .map((park) => {
+                    const maxIncidents = Math.max(...data.incidentsByPark!.map(p => p.incidentsThisMonth));
+                    const heightPercentage = maxIncidents > 0 ? (park.incidentsThisMonth / maxIncidents) * 100 : 0;
+                    const getIncidentColor = (open: number, total: number) => {
+                      if (total === 0) return "#e5e7eb"; // Gris para sin incidentes
+                      const resolved = total - open;
+                      const resolvedPercentage = (resolved / total) * 100;
+                      if (resolvedPercentage >= 80) return "#10b981"; // Verde para alta resolución
+                      if (resolvedPercentage >= 50) return "#f59e0b"; // Naranja para resolución media
+                      return "#ef4444"; // Rojo para baja resolución
+                    };
+                    return (
+                      <div key={park.parkId} className="flex flex-col items-center relative">
+                        {/* Valor de incidencias arriba */}
+                        <div className="mb-2 text-center">
+                          <div className="text-sm font-poppins font-thin text-gray-700">
+                            {park.incidentsThisMonth}
+                          </div>
+                          <div className="text-xs font-poppins font-thin text-gray-500">
+                            {park.openIncidents} abiertas
+                          </div>
+                        </div>
+
+                        {/* Columna vertical */}
+                        <div className="relative h-48 w-4 flex flex-col justify-end">
+                          {/* Fondo de la columna */}
+                          <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                          
+                          {/* Relleno de la columna según incidencias */}
+                          <div
+                            className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                            style={{
+                              height: `${Math.max(heightPercentage, 5)}%`,
+                              backgroundColor: getIncidentColor(park.openIncidents, park.incidentsThisMonth),
+                              borderColor: getIncidentColor(park.openIncidents, park.incidentsThisMonth),
+                            }}
+                          ></div>
+                        </div>
+
+                        {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                        <div className="absolute bottom-24 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                          <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                            {park.parkName}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <div className="flex flex-col items-center space-y-2">
+                  <AlertTriangle className="h-12 w-12 text-gray-300" />
+                  <p className="text-lg font-medium">
+                    No hay incidencias registradas
+                  </p>
+                  <p className="text-sm">
+                    Los datos de incidencias aparecerán aquí una vez que se
+                    registren en el sistema
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </GraphicCard>
+
+      </div>
+
+    </DashboardLayout>
   );
 };
 
