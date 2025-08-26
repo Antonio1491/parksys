@@ -15,6 +15,8 @@ import GraphicCard from "@/components/ui/graphic-card";
 import {
   Card,
   CardContent,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -464,10 +466,10 @@ const ParksDashboard = () => {
 
       </div>
 
-      {/* Tercera fila: Gráfico de Área Verde */}
-      <div className="grid gap-6 lg:grid-cols-1">
+      {/* Tercera fila: Gráfico de Área Verde y Rendimiento de Parques */}
+      <div className="grid gap-6 lg:grid-cols-2">
         
-        {/* Gráfico de Porcentaje de Área Verde */}
+        {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
         <GraphicCard
           title="🌿 Porcentaje de Área Verde por Parque"
           description="Distribución del área verde en cada parque municipal"
@@ -541,6 +543,39 @@ const ParksDashboard = () => {
           </div>
         </GraphicCard>
 
+        {/* Columna derecha: Rendimiento de Parques */}
+        <Card className="border-0 shadow-lg text-white rounded-3xl" style={{ backgroundColor: "#003D49" }}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-medium text-gray-100">
+              Rendimiento de Parques
+            </CardTitle>
+            <div className="rounded-full p-2" style={{ backgroundColor: "#14b8a6" }}>
+              <MapPin className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Parque con más actividades */}
+              <div className="bg-gray-800/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  <span className="text-sm font-medium text-gray-200">Más Actividades</span>
+                </div>
+                <div className="text-gray-400 text-sm">Datos no disponibles</div>
+              </div>
+
+              {/* Parque con menos actividades */}
+              <div className="bg-gray-800/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-400"></div>
+                  <span className="text-sm font-medium text-gray-200">Menos Actividades</span>
+                </div>
+                <div className="text-gray-400 text-sm">Datos no disponibles</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
       </div>
 

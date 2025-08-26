@@ -655,78 +655,10 @@ const OrganizadorPage: React.FC = () => {
 
       </div>
 
-      {/* Nueva fila: Estadísticas de extremos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* Nueva fila: Evaluaciones de Instructores */}
+      <div className="grid grid-cols-1 gap-6 mb-8">
         
-        {/* Tarjeta izquierda: Parques con más y menos actividades */}
-        <Card className="border-0 shadow-lg text-white rounded-3xl" style={{ backgroundColor: "#003D49" }}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-lg font-medium text-gray-100">
-              Rendimiento de Parques
-            </CardTitle>
-            <div className="rounded-full p-2" style={{ backgroundColor: "#14b8a6" }}>
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              {/* Parque con más actividades */}
-              <div className="bg-gray-800/50 rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <span className="text-sm font-medium text-gray-200">Más Actividades</span>
-                </div>
-                {parkWithMostActivities ? (
-                  <>
-                    <div className="text-2xl font-bold text-white mb-1">
-                      {parkWithMostActivities.totalActivities}
-                    </div>
-                    <p className="text-sm text-gray-300 truncate">
-                      {parkWithMostActivities.parkName}
-                    </p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
-                      <span className="text-xs text-gray-400">
-                        {parkWithMostActivities.activeActivities} activas
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-400 text-sm">Sin datos</div>
-                )}
-              </div>
-
-              {/* Parque con menos actividades */}
-              <div className="bg-gray-800/50 rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-3 h-3 rounded-full bg-orange-400"></div>
-                  <span className="text-sm font-medium text-gray-200">Menos Actividades</span>
-                </div>
-                {parkWithLeastActivities ? (
-                  <>
-                    <div className="text-2xl font-bold text-white mb-1">
-                      {parkWithLeastActivities.totalActivities}
-                    </div>
-                    <p className="text-sm text-gray-300 truncate">
-                      {parkWithLeastActivities.parkName}
-                    </p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
-                      <span className="text-xs text-gray-400">
-                        {parkWithLeastActivities.activeActivities} activas
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-400 text-sm">Sin datos</div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tarjeta derecha: Instructores con mejor y peor calificación */}
+        {/* Instructores con mejor y peor calificación */}
         <Card className="border-0 shadow-lg text-white rounded-3xl" style={{ backgroundColor: "#003D49" }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-lg font-medium text-gray-100">
