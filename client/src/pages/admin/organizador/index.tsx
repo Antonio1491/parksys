@@ -29,7 +29,7 @@ const OrganizadorPage: React.FC = () => {
     queryKey: ['/api/parks'],
     retry: 1,
   });
-  const parks = (parksResponse as any)?.data || [];
+  const parks = Array.isArray(parksResponse) ? parksResponse : (parksResponse as any)?.data || [];
 
   // Obtener categorías de actividades
   const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
@@ -127,6 +127,15 @@ const OrganizadorPage: React.FC = () => {
     acc[park.id] = park.name;
     return acc;
   }, {}) : {};
+
+  // Debug: verificar estructura de datos (temporal)
+  console.log('🔧 Datos de parques:', { 
+    parksResponse: !!parksResponse, 
+    parksArray: Array.isArray(parks), 
+    parksLength: parks?.length || 0,
+    firstPark: parks?.[0] ? { id: parks[0].id, name: parks[0].name } : null,
+    parkNamesMapKeys: Object.keys(parkNamesMap) 
+  });
 
   // Obtener parques con más actividades
   const topParks = Object.entries(parkCounts)
