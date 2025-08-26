@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { GraphicCard } from '@/components/ui/graphic-card';
 import { Calendar, Plus, Tag, Users, MapPin, Clock, Edit, Eye, BarChart3, CheckCircle } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import AdminLayout from '@/components/AdminLayout';
 
 // Página principal del módulo de Organizador
@@ -146,6 +147,20 @@ const OrganizadorPage: React.FC = () => {
     totalActivities: Number(parkCounts[park.id] || 0),
     activeActivities: Number(activeParkCounts[park.id] || 0)
   })).sort((a, b) => b.totalActivities - a.totalActivities) : [];
+
+  // Datos para el gráfico de pastel de categorías
+  const categoryPieData = Object.entries(categoryCounts).map(([categoryName, count]: [string, any]) => ({
+    name: categoryName,
+    value: Number(count),
+    color: categoryName === 'Arte y Cultura' ? '#10b981' :
+           categoryName === 'Recreación y Bienestar' ? '#3b82f6' :
+           categoryName === 'Eventos de Temporada' ? '#f59e0b' :
+           categoryName === 'Deportivo' ? '#ef4444' :
+           categoryName === 'Comunidad' ? '#8b5cf6' :
+           categoryName === 'Naturaleza y Ciencia' ? '#14b8a6' :
+           categoryName === 'Fitness y Ejercicio' ? '#6366f1' :
+           '#059669'
+  }));
 
   // Actividades próximas (próximas 5)
   const upcomingActivities = Array.isArray(activities) ? activities
@@ -539,40 +554,44 @@ const OrganizadorPage: React.FC = () => {
               </Button>
             </Link>
           </div>
-          <div className="space-y-2">
+          <div className="h-80">
             {isLoadingActivities || isLoadingCategories ? (
               <div className="text-center py-4 text-gray-500">Cargando categorías...</div>
-            ) : Object.keys(categoryCounts).length === 0 ? (
+            ) : categoryPieData.length === 0 ? (
               <div className="text-center py-4 text-gray-500">No hay categorías disponibles</div>
             ) : (
-              Object.entries(categoryCounts).map(([categoryName, count]: [string, any]) => (
-                <div key={categoryName} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <Badge className={`${
-                      categoryName === 'Arte y Cultura' ? 'bg-green-100 text-green-800' :
-                      categoryName === 'Recreación y Bienestar' ? 'bg-blue-100 text-blue-800' :
-                      categoryName === 'Eventos de Temporada' ? 'bg-orange-100 text-orange-800' :
-                      categoryName === 'Deportivo' ? 'bg-red-100 text-red-800' :
-                      categoryName === 'Comunidad' ? 'bg-purple-100 text-purple-800' :
-                      categoryName === 'Naturaleza y Ciencia' ? 'bg-teal-100 text-teal-800' :
-                      categoryName === 'Fitness y Ejercicio' ? 'bg-indigo-100 text-indigo-800' :
-                      'bg-emerald-100 text-emerald-800'
-                    } hover:${
-                      categoryName === 'Arte y Cultura' ? 'bg-green-100' :
-                      categoryName === 'Recreación y Bienestar' ? 'bg-blue-100' :
-                      categoryName === 'Eventos de Temporada' ? 'bg-orange-100' :
-                      categoryName === 'Deportivo' ? 'bg-red-100' :
-                      categoryName === 'Comunidad' ? 'bg-purple-100' :
-                      categoryName === 'Naturaleza y Ciencia' ? 'bg-teal-100' :
-                      categoryName === 'Fitness y Ejercicio' ? 'bg-indigo-100' :
-                      'bg-emerald-100'
-                    }`}>
-                      {categoryName}
-                    </Badge>
-                  </div>
-                  <span className="text-sm text-gray-500">{count} actividades</span>
-                </div>
-              ))
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryPieData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    innerRadius={30}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {categoryPieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value: any) => [`${value} actividades`, 'Cantidad']}
+                    labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                  />
+                  <Legend 
+                    wrapperStyle={{
+                      paddingTop: '20px',
+                      fontSize: '12px'
+                    }}
+                    formatter={(value: string) => (
+                      <span style={{ color: '#374151', fontSize: '12px' }}>
+                        {value}
+                      </span>
+                    )}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
             )}
           </div>
         </div>
