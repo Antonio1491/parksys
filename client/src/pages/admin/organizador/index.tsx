@@ -487,10 +487,10 @@ const OrganizadorPage: React.FC = () => {
       </div>
 
       {/* Nueva fila: Estadísticas de extremos */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
-        {/* Tarjeta izquierda: Parques con más y menos actividades (2 columnas) */}
-        <Card className="border-0 shadow-lg text-white rounded-3xl lg:col-span-2" style={{ backgroundColor: "#003D49" }}>
+        {/* Tarjeta izquierda: Parques con más y menos actividades */}
+        <Card className="border-0 shadow-lg text-white rounded-3xl" style={{ backgroundColor: "#003D49" }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-lg font-medium text-gray-100">
               Rendimiento de Parques
