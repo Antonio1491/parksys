@@ -4,7 +4,6 @@ import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
 // NOTA CRÍTICA: NO IMPORTAR Select, SelectContent, SelectItem, SelectTrigger, SelectValue
@@ -12,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Users, Calendar, Package, AlertTriangle, TreePine, Activity, Camera, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award } from "lucide-react";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -28,6 +27,16 @@ interface Park {
   certificaciones?: string;
   createdAt: string;
   updatedAt: string;
+  // Nuevo campo
+  typology?: {
+    id: number;
+    name: string;
+    code?: string;
+    normativeReference?: string;
+    country: string;
+    minArea?: string;
+    maxArea?: string;
+  };
 }
 
 interface ParkDependencies {
@@ -218,8 +227,21 @@ const AdminParksContent = () => {
     };
     return colorMap[type] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
-
-
+  // Get park typology display label and color
+  const getTypologyLabel = (name?: string) => {
+    if (!name) return "Sin tipología";
+    return name;
+  };
+  const getTypologyColor = (code?: string) => {
+    const colorMap: Record<string, string> = {
+      'A-1': 'bg-green-100 text-green-800 border-green-200',
+      'B-2': 'bg-blue-100 text-blue-800 border-blue-200',
+      'C-3': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'D-4': 'bg-red-100 text-red-800 border-red-200',
+      'E-5': 'bg-purple-100 text-purple-800 border-purple-200'
+    };
+    return code ? colorMap[code] ?? 'bg-gray-100 text-gray-800 border-gray-200' : 'bg-gray-100 text-gray-800 border-gray-200';
+  };
 
   // Clear search
   const handleClearSearch = () => {
@@ -325,11 +347,11 @@ const AdminParksContent = () => {
                         <Package className="h-4 w-4 mr-1" />
                         <span>{park.area ? park.area.toLocaleString() : 'N/A'} m²</span>
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={`border ${getParkTypeColor(park.parkType)}`}
+                      <Badge
+                        variant="outline"
+                        className={`border ${getTypologyColor(park.typology?.code)}`}
                       >
-                        {getParkTypeLabel(park.parkType)}
+                        {getTypologyLabel(park.typology?.name)}
                       </Badge>
                     </div>
                   </div>
@@ -399,11 +421,11 @@ const AdminParksContent = () => {
                     </Badge>
                   )}
                 </div>
-                <Badge 
-                  variant="outline" 
-                  className={`border ${getParkTypeColor(park.parkType)}`}
+                <Badge
+                  variant="outline"
+                  className={`border ${getTypologyColor(park.typology?.code)}`}
                 >
-                  {getParkTypeLabel(park.parkType)}
+                  {getTypologyLabel(park.typology?.name)}
                 </Badge>
               </div>
             </CardHeader>
