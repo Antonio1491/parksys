@@ -472,7 +472,7 @@ const ParksDashboard = () => {
           title="🌿 Porcentaje de Área Verde por Parque"
           description="Distribución del área verde en cada parque municipal"
         >
-          <div className="w-full">
+          <div className="w-full h-full">
             {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 ? (
               <div className="flex justify-center items-end gap-2 min-h-[280px] px-4 overflow-x-auto">
                 {data.greenAreaPercentages
