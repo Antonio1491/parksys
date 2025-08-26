@@ -352,27 +352,27 @@ const OrganizadorPage: React.FC = () => {
               Nuevas inscripciones esta semana
             </p>
             
-            {/* Capacidad disponible */}
+            {/* Plazas ocupadas */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
                   <Users className="h-3 w-3" style={{ color: "#14b8a6" }} />
                   <span className="text-xs text-gray-200">
-                    Capacidad Disponible
+                    Plazas Ocupadas
                   </span>
                 </div>
                 <span
                   className="text-xs font-semibold"
                   style={{ color: "#14b8a6" }}
                 >
-                  {isLoadingRegistrationStats ? '...' : `${registrationStats?.availableCapacity || 0} plazas`}
+                  {isLoadingRegistrationStats ? '...' : `${registrationStats?.approvedRegistrations || 0} de ${registrationStats?.totalCapacity || 0}`}
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
                   className="h-2 rounded-full transition-all duration-700"
                   style={{
-                    width: `${(registrationStats?.totalCapacity || 0) > 0 ? Math.max(10, 100 - (registrationStats?.occupancyPercentage || 0)) : 0}%`,
+                    width: `${registrationStats?.occupancyPercentage || 0}%`,
                     backgroundColor: "#14b8a6"
                   }}
                 ></div>
