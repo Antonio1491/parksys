@@ -42,6 +42,12 @@ const OrganizadorPage: React.FC = () => {
     retry: 1,
   });
 
+  // Obtener estadísticas de inscripciones globales
+  const { data: registrationStats, isLoading: isLoadingRegistrationStats } = useQuery({
+    queryKey: ['/api/activity-registrations/global-stats'],
+    retry: 1,
+  });
+
   // Crear mapeo de categorías por ID
   const categoriesMap = Array.isArray(categories) ? categories.reduce((acc: any, category: any) => {
     acc[category.id] = category;
@@ -165,7 +171,7 @@ const OrganizadorPage: React.FC = () => {
           </div>
         </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card
           className="border-0 shadow-lg text-white rounded-3xl"
           style={{ backgroundColor: "#003D49" }}
@@ -318,6 +324,61 @@ const OrganizadorPage: React.FC = () => {
                     backgroundColor: "#14b8a6"
                   }}
                 ></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="border-0 shadow-lg text-white rounded-3xl"
+          style={{ backgroundColor: "#003D49" }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base font-medium text-gray-100">
+              Inscripciones Semanales
+            </CardTitle>
+            <div
+              className="rounded-full p-2"
+              style={{ backgroundColor: "#14b8a6" }}
+            >
+              <Users className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-white">
+              {isLoadingRegistrationStats ? '...' : (registrationStats?.weeklyRegistrations || 0)}
+            </div>
+            <p className="text-xs text-white mb-3">
+              Nuevas inscripciones esta semana
+            </p>
+            
+            {/* Capacidad disponible */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Users className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                  <span className="text-xs text-gray-200">
+                    Capacidad Disponible
+                  </span>
+                </div>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: "#14b8a6" }}
+                >
+                  {isLoadingRegistrationStats ? '...' : `${registrationStats?.availableCapacity || 0} plazas`}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-700"
+                  style={{
+                    width: `${(registrationStats?.totalCapacity || 0) > 0 ? Math.max(10, 100 - (registrationStats?.occupancyPercentage || 0)) : 0}%`,
+                    backgroundColor: "#14b8a6"
+                  }}
+                ></div>
+              </div>
+              <div className="text-xs text-gray-300 mt-1">
+                Ocupación: {isLoadingRegistrationStats ? '...' : `${registrationStats?.occupancyPercentage || 0}%`}
               </div>
             </div>
           </CardContent>

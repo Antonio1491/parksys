@@ -1122,20 +1122,11 @@ app.get("/api/activity-registrations/stats/:activityId", async (req, res) => {
     const pendingRegistrations = parseInt(String(activity.pending_registrations)) || 0;
     
     // Las plazas disponibles se calculan con la capacidad total
-    const availableSlots = Math.max(0, totalCapacity - totalRegistrations);
-
-    console.log(`📊 Estadísticas calculadas para actividad ${activityId}:`);
-    console.log(`   Capacidad total: ${totalCapacity}`);
-    console.log(`   Registros totales: ${totalRegistrations}`);
-    console.log(`   Plazas disponibles: ${availableSlots}`);
+    const availableSlots = Math.max(0, totalCapacity - approvedRegistrations);
 
     const stats = {
       activityId,
-      title: activity.title,
       capacity: totalCapacity,
-      maxRegistrations: activity.max_registrations,
-      registrationEnabled: activity.registration_enabled,
-      requiresApproval: activity.requires_approval,
       totalRegistrations,
       approved: approvedRegistrations,
       pending: pendingRegistrations,
@@ -1145,12 +1136,62 @@ app.get("/api/activity-registrations/stats/:activityId", async (req, res) => {
 
     res.json(stats);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error obteniendo estadísticas de actividad:", error);
-    res.status(500).json({ 
-      error: "Error interno del servidor",
-      details: error.message 
-    });
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+// Endpoint para obtener estadísticas globales de inscripciones (para dashboard)
+app.get("/api/activity-registrations/global-stats", async (req, res) => {
+  try {
+    console.log('📊 Calculando estadísticas globales de inscripciones...');
+
+    const { db } = await import("./db");
+    const { sql } = await import("drizzle-orm");
+
+    // Obtener inscripciones de la última semana
+    const weeklyRegistrationsResult = await db.execute(
+      sql`SELECT COUNT(*) as weekly_registrations
+          FROM activity_registrations 
+          WHERE registration_date >= CURRENT_DATE - INTERVAL '7 days'
+          AND status = 'approved'`
+    );
+
+    // Obtener capacidad total y ocupación actual de actividades activas
+    const capacityStatsResult = await db.execute(
+      sql`SELECT 
+        SUM(COALESCE(a.capacity, 0)) as total_capacity,
+        COUNT(ar.id) as total_registrations,
+        COUNT(CASE WHEN ar.status = 'approved' THEN 1 END) as approved_registrations
+      FROM activities a
+      LEFT JOIN activity_registrations ar ON a.id = ar.activity_id
+      WHERE a.registration_enabled = true
+      AND a.start_date >= CURRENT_DATE`
+    );
+
+    const weeklyRegistrations = parseInt(String(weeklyRegistrationsResult.rows[0]?.weekly_registrations)) || 0;
+    const totalCapacity = parseInt(String(capacityStatsResult.rows[0]?.total_capacity)) || 0;
+    const approvedRegistrations = parseInt(String(capacityStatsResult.rows[0]?.approved_registrations)) || 0;
+    
+    const availableCapacity = Math.max(0, totalCapacity - approvedRegistrations);
+    const occupancyPercentage = totalCapacity > 0 ? Math.round((approvedRegistrations / totalCapacity) * 100) : 0;
+
+    const globalStats = {
+      weeklyRegistrations,
+      totalCapacity,
+      approvedRegistrations,
+      availableCapacity,
+      occupancyPercentage
+    };
+
+    console.log('📊 Estadísticas globales calculadas:', globalStats);
+
+    res.json(globalStats);
+
+  } catch (error) {
+    console.error("Error obteniendo estadísticas globales:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
