@@ -1700,6 +1700,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activeActivities: parseInt(parkWithLeastActivities.active_activities)
       } : null;
 
+      // Consulta para parques con árboles
+      const treesByParkResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          COUNT(t.id) as total_trees,
+          COUNT(CASE WHEN t.condition = 'excellent' OR t.condition = 'good' THEN 1 END) as healthy_trees
+        FROM parks p
+        INNER JOIN trees t ON p.id = t.park_id
+        GROUP BY p.id, p.name
+        HAVING COUNT(t.id) > 0
+        ORDER BY total_trees DESC, p.name ASC
+      `);
+
+      // Parque con más árboles
+      const parkWithMostTrees = treesByParkResult.rows[0] ? {
+        parkId: parseInt(treesByParkResult.rows[0].park_id),
+        parkName: treesByParkResult.rows[0].park_name,
+        totalTrees: parseInt(treesByParkResult.rows[0].total_trees),
+        healthyTrees: parseInt(treesByParkResult.rows[0].healthy_trees)
+      } : null;
+
+      // Parque con menos árboles (último en la lista)
+      const parkWithLeastTrees = treesByParkResult.rows.length > 0 ? 
+        treesByParkResult.rows[treesByParkResult.rows.length - 1] : null;
+      const parkWithLeastTreesData = parkWithLeastTrees ? {
+        parkId: parseInt(parkWithLeastTrees.park_id),
+        parkName: parkWithLeastTrees.park_name,
+        totalTrees: parseInt(parkWithLeastTrees.total_trees),
+        healthyTrees: parseInt(parkWithLeastTrees.healthy_trees)
+      } : null;
+
       // Incidencias por parque - Solo parques con incidencias
       const incidentsByParkResult = await pool.query(`
         SELECT 
@@ -1739,6 +1771,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         greenFlagPercentage,
         parkWithMostActivities,
         parkWithLeastActivities: parkWithLeastActivitiesData,
+        parkWithMostTrees,
+        parkWithLeastTrees: parkWithLeastTreesData,
         parksByMunicipality: parksByMunicipalityResult.rows.map(row => ({
           municipalityName: row.municipality_name,
           count: parseInt(row.count)

@@ -65,6 +65,18 @@ interface ParksDashboardData {
     totalActivities: number;
     activeActivities: number;
   } | null;
+  parkWithMostTrees: {
+    parkId: number;
+    parkName: string;
+    totalTrees: number;
+    healthyTrees: number;
+  } | null;
+  parkWithLeastTrees: {
+    parkId: number;
+    parkName: string;
+    totalTrees: number;
+    healthyTrees: number;
+  } | null;
   parksWithCoordinates: Array<{
     id: number;
     name: string;
@@ -610,6 +622,64 @@ const ParksDashboard = () => {
                     {data.parkWithLeastActivities.parkName}
                     {(() => {
                       const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithLeastActivities?.parkId)?.area;
+                      return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                    })()}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Nueva MetricCard para Árboles */}
+        <MetricCard
+          title="Árboles"
+          value={data.parkWithMostTrees ? data.parkWithMostTrees.totalTrees : "N/A"}
+          subtitle="Parque con más árboles"
+          icon={Trees}
+          iconColor="#10b981"
+          backgroundColor="#003D49"
+        >
+          {/* Parque con más árboles */}
+          {data.parkWithMostTrees && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  <span className="text-xs text-gray-200">
+                    Más Árboles
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-green-400">
+                  {data.parkWithMostTrees.totalTrees} árboles
+                </span>
+              </div>
+              <div className="text-xs text-gray-200 truncate">
+                {data.parkWithMostTrees.parkName}
+                {(() => {
+                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithMostTrees?.parkId)?.area;
+                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                })()}
+              </div>
+              
+              {/* Parque con menos árboles */}
+              {data.parkWithLeastTrees && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 rounded-full bg-orange-400"></div>
+                      <span className="text-xs text-gray-200">
+                        Menos Árboles
+                      </span>
+                    </div>
+                    <span className="text-xs font-semibold text-orange-400">
+                      {data.parkWithLeastTrees.totalTrees} árboles
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-200 truncate">
+                    {data.parkWithLeastTrees.parkName}
+                    {(() => {
+                      const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithLeastTrees?.parkId)?.area;
                       return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
                     })()}
                   </div>
