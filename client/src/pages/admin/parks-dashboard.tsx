@@ -573,10 +573,10 @@ const ParksDashboard = () => {
           </div>
         </GraphicCard>
 
-        {/* Columna derecha: Dividida en 2 filas para Actividades y Árboles */}
-        <div className="space-y-6 h-full">
+        {/* Columna derecha: Dividida en 2 columnas verticales para Actividades y Árboles */}
+        <div className="grid grid-cols-2 gap-6 h-full">
           
-          {/* Fila superior: Actividades */}
+          {/* Columna izquierda: Actividades */}
           <MetricCard
             title="Actividades"
             value={data.parkWithMostActivities ? data.parkWithMostActivities.totalActivities : "N/A"}
@@ -635,7 +635,7 @@ const ParksDashboard = () => {
           )}
           </MetricCard>
 
-          {/* Fila inferior: Árboles */}
+          {/* Columna derecha: Árboles */}
           <MetricCard
           title="Árboles"
           value={data.parkWithMostTrees ? data.parkWithMostTrees.totalTrees : "N/A"}
