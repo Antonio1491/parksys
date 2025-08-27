@@ -38,9 +38,7 @@ const MetricCard = ({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-bold text-white">
-          {value}
-        </div>
+        {value}
         {subtitle && (
           <p className="text-xs text-white mb-3">
             {subtitle}
