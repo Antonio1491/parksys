@@ -490,8 +490,8 @@ const ParksDashboard = () => {
 
       </div>
 
-      {/* Tercera fila: Gráfico de Área Verde y Rendimiento de Parques */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Tercera fila: Gráfico de Área Verde, Actividades y Árboles */}
+      <div className="grid gap-6 lg:grid-cols-3">
         
         {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
         <GraphicCard
@@ -573,7 +573,7 @@ const ParksDashboard = () => {
           </div>
         </GraphicCard>
 
-        {/* Columna derecha: Actividades */}
+        {/* Columna central: Actividades */}
         <MetricCard
           title="Actividades"
           value={data.parkWithMostActivities ? data.parkWithMostActivities.totalActivities : "N/A"}
@@ -631,7 +631,7 @@ const ParksDashboard = () => {
           )}
         </MetricCard>
 
-        {/* Nueva MetricCard para Árboles */}
+        {/* Columna derecha: Árboles */}
         <MetricCard
           title="Árboles"
           value={data.parkWithMostTrees ? data.parkWithMostTrees.totalTrees : "N/A"}
