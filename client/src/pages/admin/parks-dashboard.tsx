@@ -504,7 +504,7 @@ const ParksDashboard = () => {
                       <div key={park.parkId} className="flex flex-col items-center relative">
                         {/* Valor del porcentaje arriba */}
                         <div className="mb-2 text-center">
-                          <div className="text-sm font-poppins font-thin text-gray-700">
+                          <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
                             {park.greenPercentage.toFixed(0)}%
                           </div>
                           <div className="text-xs font-poppins font-thin text-gray-500">
@@ -513,7 +513,7 @@ const ParksDashboard = () => {
                         </div>
 
                         {/* Columna vertical */}
-                        <div className="relative h-48 w-4 flex flex-col justify-end">
+                        <div className="relative h-64 w-4 flex flex-col justify-end">
                           {/* Fondo de la columna */}
                           <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
                           
@@ -529,7 +529,7 @@ const ParksDashboard = () => {
                         </div>
 
                         {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                        <div className="absolute bottom-24 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                        <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
                           <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
                             {park.parkName}
                           </div>
@@ -553,75 +553,71 @@ const ParksDashboard = () => {
               </div>
             )}
           </div>
+          <div className="mt-2 text-center">
+            <p className="text-sm text-gray-500 font-poppins font-thin">
+              Mostrando todos los {data.totalParks} parques
+              registrados en el sistema
+            </p>
+          </div>
         </GraphicCard>
 
-        {/* Columna derecha: Rendimiento de Parques */}
-        <Card className="border-0 shadow-lg text-white rounded-3xl" style={{ backgroundColor: "#003D49" }}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-lg font-medium text-gray-100">
-              Rendimiento de Parques
-            </CardTitle>
-            <div className="rounded-full p-2" style={{ backgroundColor: "#14b8a6" }}>
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              {/* Parque con más actividades */}
-              <div className="bg-gray-800/50 rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-2">
+        {/* Columna derecha: Actividades */}
+        <MetricCard
+          title="Actividades"
+          value={data.parkWithMostActivities ? data.parkWithMostActivities.totalActivities : "N/A"}
+          subtitle="Parque con más actividades"
+          icon={MapPin}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
+        >
+          {/* Parque con más actividades */}
+          {data.parkWithMostActivities && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <span className="text-sm font-medium text-gray-200">Más Actividades</span>
+                  <span className="text-xs text-gray-200">
+                    Más Actividades
+                  </span>
                 </div>
-                {data.parkWithMostActivities ? (
-                  <>
-                    <div className="text-2xl font-bold text-white mb-1">
-                      {data.parkWithMostActivities.totalActivities}
-                    </div>
-                    <p className="text-sm text-gray-300 truncate">
-                      {data.parkWithMostActivities.parkName}
-                    </p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
-                      <span className="text-xs text-gray-400">
-                        {data.parkWithMostActivities.activeActivities} activas
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-400 text-sm">Sin datos</div>
-                )}
+                <span className="text-xs font-semibold text-green-400">
+                  {data.parkWithMostActivities.totalActivities} actividades
+                </span>
               </div>
-
+              <div className="text-xs text-gray-200 truncate">
+                {data.parkWithMostActivities.parkName}
+                {(() => {
+                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithMostActivities?.parkId)?.area;
+                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                })()}
+              </div>
+              
               {/* Parque con menos actividades */}
-              <div className="bg-gray-800/50 rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-3 h-3 rounded-full bg-orange-400"></div>
-                  <span className="text-sm font-medium text-gray-200">Menos Actividades</span>
-                </div>
-                {data.parkWithLeastActivities ? (
-                  <>
-                    <div className="text-2xl font-bold text-white mb-1">
-                      {data.parkWithLeastActivities.totalActivities}
-                    </div>
-                    <p className="text-sm text-gray-300 truncate">
-                      {data.parkWithLeastActivities.parkName}
-                    </p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
-                      <span className="text-xs text-gray-400">
-                        {data.parkWithLeastActivities.activeActivities} activas
+              {data.parkWithLeastActivities && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 rounded-full bg-orange-400"></div>
+                      <span className="text-xs text-gray-200">
+                        Menos Actividades
                       </span>
                     </div>
-                  </>
-                ) : (
-                  <div className="text-gray-400 text-sm">Sin datos</div>
-                )}
-              </div>
+                    <span className="text-xs font-semibold text-orange-400">
+                      {data.parkWithLeastActivities.totalActivities} actividades
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-200 truncate">
+                    {data.parkWithLeastActivities.parkName}
+                    {(() => {
+                      const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithLeastActivities?.parkId)?.area;
+                      return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                    })()}
+                  </div>
+                </>
+              )}
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </MetricCard>
 
       </div>
 

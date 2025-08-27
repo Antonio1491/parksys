@@ -16,7 +16,7 @@ export const GraphicCard = ({
 }: GraphicCardProps) => {
   return (
     <Card className={`border-0 shadow-lg rounded-3xl min-h-[28rem] ${className}`}>
-      <CardHeader className="bg-white rounded-t-lg">
+      <CardHeader className="bg-white">
         <CardTitle className="text-lg font-bold text-gray-800">
           {title}
         </CardTitle>

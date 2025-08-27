@@ -232,72 +232,104 @@ const OrganizadorPage: React.FC = () => {
           <div className="flex flex-row gap-3">
           
             {/* Columna 2a (mitad izquierda): Estados de Actividades */}
-            <div className="flex-1">
-              <MetricCard
-                title="Estados de Actividades"
-                value={isLoadingActivities ? '...' : activitiesInProgress}
-                subtitle="Actividades en curso"
-                icon={Users}
-                iconColor="#14b8a6"
-                backgroundColor="#003D49"
+             <Card
+              className="border-0 shadow-lg text-white flex-1 rounded-3xl"
+              style={{ backgroundColor: "#003D49" }}
               >
-                <div className="space-y-2">
-                  {/* Actividades Programadas */}
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                 <CardTitle className="text-sm font-medium text-gray-100">
+                    Estados de Actividades
+                  </CardTitle>
+                  <div
+                    className="rounded-full p-1.5"
+                    style={{ backgroundColor: "#14b8a6" }}
+                  >
+                    <Users className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent className="py-2">
+                  <div className="space-y-2">
+                  {/* Actividades En Curso */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-                      <span className="text-xs text-gray-200">Programadas</span>
+                      <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                      <span className="text-xs text-gray-200">En Curso</span>
                     </div>
                     <span className="text-sm font-bold text-white">
-                      {isLoadingActivities ? '...' : scheduledActivities}
+                      {isLoadingActivities ? '...' : activitiesInProgress}
                     </span>
                   </div>
 
-                  {/* Actividades Canceladas */}
+                {/* Actividades Programadas */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                    <span className="text-xs text-gray-200">Programadas</span>
+                  </div>
+                  <span className="text-sm font-bold text-white">
+                    {isLoadingActivities ? '...' : scheduledActivities}
+                  </span>
+                </div>
+
+                {/* Actividades Canceladas */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                    <span className="text-xs text-gray-200">Canceladas</span>
+                  </div>
+                  <span className="text-sm font-bold text-white">
+                    {isLoadingActivities ? '...' : cancelledActivities}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Columna 2b (mitad derecha): Especialidades de Instructores */}
+          <Card
+            className="border-0 shadow-lg text-white flex-1 rounded-3xl"
+            style={{ backgroundColor: "#003D49" }}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+              <CardTitle className="text-sm font-medium text-gray-100">
+                Especialidades de los instructores
+              </CardTitle>
+              <div
+                className="rounded-full p-1.5"
+                style={{ backgroundColor: "#14b8a6" }}
+              >
+                <Tag className="h-4 w-4 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="py-2">
+              <div className="text-2xl font-bold text-white mb-1">
+                {isLoadingSpecialtiesStats ? '...' : (specialtiesStats?.totalUniqueSpecialties || 0)}
+              </div>
+              <p className="text-xs text-white mb-2">
+                Especialidades únicas registradas
+              </p>
+              
+              {/* Top especialidad */}
+              {specialtiesStats?.topSpecialties?.[0] && (
+                <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                      <span className="text-xs text-gray-200">Canceladas</span>
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-xs text-gray-200 truncate">
+                        {specialtiesStats.topSpecialties[0].name}
+                      </span>
                     </div>
-                    <span className="text-sm font-bold text-white">
-                      {isLoadingActivities ? '...' : cancelledActivities}
+                    <span className="text-xs font-semibold text-white">
+                      {specialtiesStats.topSpecialties[0].count}
                     </span>
                   </div>
                 </div>
-              </MetricCard>
-            </div>
-
-            {/* Columna 2b (mitad derecha): Especialidades de Instructores */}
-            <div className="flex-1">
-              <MetricCard
-                title="Especialidades de los instructores"
-                value={isLoadingSpecialtiesStats ? '...' : (specialtiesStats?.totalUniqueSpecialties || 0)}
-                subtitle="Especialidades únicas registradas"
-                icon={Tag}
-                iconColor="#14b8a6"
-                backgroundColor="#003D49"
-              >
-                {/* Top especialidad */}
-                {specialtiesStats?.topSpecialties?.[0] && (
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
-                        <span className="text-xs text-gray-200 truncate">
-                          {specialtiesStats.topSpecialties[0].name}
-                        </span>
-                      </div>
-                      <span className="text-xs font-semibold text-white">
-                        {specialtiesStats.topSpecialties[0].count}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </MetricCard>
-            </div>
-          
+              )}
+            </CardContent>
+          </Card>
         </div>
-
+        
+        {/* Columna 3 - Instructores del Sistema */}
         <MetricCard
           title="Instructores del Sistema"
           value={isLoadingInstructors ? '...' : totalInstructors}
@@ -334,6 +366,7 @@ const OrganizadorPage: React.FC = () => {
           </div>
         </MetricCard>
 
+        {/* Columna 4 - Inscripciones Semanales */}    
         <MetricCard
           title="Inscripciones Semanales"
           value={isLoadingRegistrationStats ? '...' : (registrationStats?.weeklyRegistrations || 0)}
