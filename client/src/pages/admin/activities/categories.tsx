@@ -284,14 +284,14 @@ const ActivityCategoriesPage: React.FC = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header con patrón Card estandarizado */}
-        <Card className="p-4 bg-gray-50">
-          <div className="flex items-center justify-between">
+        <Card className="p-4 bg-[#14b8a6]">
+          <div className="flex items-center justify-between bg-[#14b8a6]">
             <div>
               <div className="flex items-center gap-2">
                 <Tag className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-gray-900">Categorías</h1>
+                <h1 className="text-3xl font-bold text-[#ffffff] bg-[#14b8a6]">Categorías</h1>
               </div>
-              <p className="text-gray-600 mt-2">Gestión de categorías para actividades en parques</p>
+              <p className="mt-2 text-[#ffffff]">Gestión de categorías para actividades en parques</p>
             </div>
             <div className="flex gap-2">
               <Button 
