@@ -54,10 +54,12 @@ const parkSchema = z.object({
   area: z.string().nullable().optional(),
   foundationYear: z.coerce.number().nullable().optional(),
 
-  // Horarios como objeto con días y horas
-  scheduleEnabled: z.record(z.string(), z.boolean()).optional(),
-  openingTime: z.string().nullable().optional(),
-  closingTime: z.string().nullable().optional(),
+  // Horarios individuales por día
+  dailySchedule: z.record(z.string(), z.object({
+    enabled: z.boolean(),
+    openingTime: z.string().nullable().optional(),
+    closingTime: z.string().nullable().optional()
+  })).optional(),
   administrator: z.string().nullable().optional(),
   contactPhone: z.string().nullable().optional(),
   contactEmail: z.string().nullable().optional(),
@@ -113,18 +115,16 @@ const AdminParkEdit: React.FC = () => {
       area: '',
       foundationYear: null,
 
-      // Horarios por defecto
-      scheduleEnabled: {
-        'Lunes': false,
-        'Martes': false,
-        'Miércoles': false,
-        'Jueves': false,
-        'Viernes': false,
-        'Sábado': false,
-        'Domingo': false
+      // Horarios por defecto por día
+      dailySchedule: {
+        'Lunes': { enabled: false, openingTime: '', closingTime: '' },
+        'Martes': { enabled: false, openingTime: '', closingTime: '' },
+        'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
+        'Jueves': { enabled: false, openingTime: '', closingTime: '' },
+        'Viernes': { enabled: false, openingTime: '', closingTime: '' },
+        'Sábado': { enabled: false, openingTime: '', closingTime: '' },
+        'Domingo': { enabled: false, openingTime: '', closingTime: '' }
       },
-      openingTime: '',
-      closingTime: '',
       administrator: '',
       contactPhone: '',
       contactEmail: '',
@@ -149,17 +149,15 @@ const AdminParkEdit: React.FC = () => {
         area: park.area || '',
         foundationYear: park.foundationYear || undefined,
         // Parsear horarios existentes o usar valores por defecto
-        scheduleEnabled: {
-          'Lunes': false,
-          'Martes': false,
-          'Miércoles': false,
-          'Jueves': false,
-          'Viernes': false,
-          'Sábado': false,
-          'Domingo': false
+        dailySchedule: {
+          'Lunes': { enabled: false, openingTime: '', closingTime: '' },
+          'Martes': { enabled: false, openingTime: '', closingTime: '' },
+          'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
+          'Jueves': { enabled: false, openingTime: '', closingTime: '' },
+          'Viernes': { enabled: false, openingTime: '', closingTime: '' },
+          'Sábado': { enabled: false, openingTime: '', closingTime: '' },
+          'Domingo': { enabled: false, openingTime: '', closingTime: '' }
         },
-        openingTime: '',
-        closingTime: '',
         administrator: park.administrator || '',
         contactPhone: park.contactPhone || '',
         contactEmail: park.contactEmail || '',
@@ -187,13 +185,9 @@ const AdminParkEdit: React.FC = () => {
       administrator: values.administrator || undefined,
       contactPhone: values.contactPhone || undefined,
       contactEmail: values.contactEmail || undefined,
-      // Convertir horarios del nuevo formato a string para el backend
-      openingHours: values.scheduleEnabled && Object.keys(values.scheduleEnabled).some(day => values.scheduleEnabled?.[day]) 
-        ? JSON.stringify({
-            days: values.scheduleEnabled,
-            openingTime: values.openingTime,
-            closingTime: values.closingTime
-          })
+      // Convertir horarios individuales por día a JSON para el backend
+      openingHours: values.dailySchedule && Object.values(values.dailySchedule).some(schedule => schedule.enabled)
+        ? JSON.stringify(values.dailySchedule)
         : undefined,
       certificaciones: values.certificaciones || undefined
     };
@@ -454,83 +448,100 @@ const AdminParkEdit: React.FC = () => {
                   
 
                   
-                  {/* Configuración de horarios en 3 columnas */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Configuración de Horarios</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {/* Columna 1: Días de la semana */}
-                      <div>
-                        <FormLabel className="text-sm font-medium">Días de apertura</FormLabel>
-                        <FormField
-                          control={form.control}
-                          name="scheduleEnabled"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="space-y-3 mt-2">
-                                {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day) => (
-                                  <div key={day} className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={day}
-                                      checked={field.value?.[day] || false}
-                                      onCheckedChange={(checked) => {
-                                        const currentValues = field.value || {};
-                                        field.onChange({
-                                          ...currentValues,
-                                          [day]: checked
-                                        });
-                                      }}
-                                    />
-                                    <label htmlFor={day} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                      {day}
-                                    </label>
-                                  </div>
-                                ))}
+                  {/* Configuración de horarios individuales por día */}
+                  <FormField
+                    control={form.control}
+                    name="dailySchedule"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-medium">Configuración de Horarios</h3>
+                          
+                          {/* Encabezados */}
+                          <div className="grid grid-cols-4 gap-4 pb-2 border-b">
+                            <div className="font-medium text-sm">Día</div>
+                            <div className="font-medium text-sm text-center">Activo</div>
+                            <div className="font-medium text-sm text-center">Apertura</div>
+                            <div className="font-medium text-sm text-center">Cierre</div>
+                          </div>
+
+                          {/* Filas por cada día */}
+                          <div className="space-y-3">
+                            {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day) => (
+                              <div key={day} className="grid grid-cols-4 gap-4 items-center py-2">
+                                {/* Nombre del día */}
+                                <div className="font-medium text-sm">
+                                  {day}
+                                </div>
+
+                                {/* Checkbox de habilitado */}
+                                <div className="flex justify-center">
+                                  <Checkbox
+                                    id={`${day}-enabled`}
+                                    checked={field.value?.[day]?.enabled || false}
+                                    onCheckedChange={(checked) => {
+                                      const currentSchedule = field.value || {};
+                                      const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
+                                      field.onChange({
+                                        ...currentSchedule,
+                                        [day]: {
+                                          ...daySchedule,
+                                          enabled: checked as boolean
+                                        }
+                                      });
+                                    }}
+                                  />
+                                </div>
+
+                                {/* Hora de apertura */}
+                                <div>
+                                  <Input
+                                    type="time"
+                                    value={field.value?.[day]?.openingTime || ''}
+                                    onChange={(e) => {
+                                      const currentSchedule = field.value || {};
+                                      const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
+                                      field.onChange({
+                                        ...currentSchedule,
+                                        [day]: {
+                                          ...daySchedule,
+                                          openingTime: e.target.value
+                                        }
+                                      });
+                                    }}
+                                    disabled={!field.value?.[day]?.enabled}
+                                    className="text-center"
+                                  />
+                                </div>
+
+                                {/* Hora de cierre */}
+                                <div>
+                                  <Input
+                                    type="time"
+                                    value={field.value?.[day]?.closingTime || ''}
+                                    onChange={(e) => {
+                                      const currentSchedule = field.value || {};
+                                      const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
+                                      field.onChange({
+                                        ...currentSchedule,
+                                        [day]: {
+                                          ...daySchedule,
+                                          closingTime: e.target.value
+                                        }
+                                      });
+                                    }}
+                                    disabled={!field.value?.[day]?.enabled}
+                                    className="text-center"
+                                  />
+                                </div>
                               </div>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Columna 2: Horario de apertura */}
-                      <FormField
-                        control={form.control}
-                        name="openingTime"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Horario de apertura</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="time" 
-                                placeholder="08:00"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Columna 3: Horario de cierre */}
-                      <FormField
-                        control={form.control}
-                        name="closingTime"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Horario de cierre</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="time" 
-                                placeholder="20:00"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
+                            ))}
+                          </div>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Administrador */}
