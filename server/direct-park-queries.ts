@@ -4,7 +4,7 @@ import { pool } from './db';
 // Función para obtener la lista de parques
 export async function getParksDirectly(filters?: any) {
   try {
-    // Construir la consulta SQL básica
+    // Construir la consulta SQL básica CON tipología
     let queryStr = `
       SELECT DISTINCT
         p.id, p.name, p.municipality_id as "municipalityId", 
@@ -14,8 +14,12 @@ export async function getParksDirectly(filters?: any) {
         p.administrator, p.conservation_status as "conservationStatus",
         p.regulation_url as "regulationUrl", p.opening_hours as "openingHours", 
         p.contact_email as "contactEmail", p.contact_phone as "contactPhone",
-        p.video_url as "videoUrl", p.certificaciones
+        p.video_url as "videoUrl", p.certificaciones, p.typology_id,
+        pt.id as "typologyId", pt.name as "typologyName", pt.code as "typologyCode",
+        pt.normative_reference as "typologyNormativeReference", pt.country as "typologyCountry",
+        pt.min_area as "typologyMinArea", pt.max_area as "typologyMaxArea"
       FROM parks p
+      LEFT JOIN park_typology pt ON p.typology_id = pt.id
       WHERE 1=1
     `;
     
@@ -213,7 +217,18 @@ export async function getParksDirectly(filters?: any) {
         console.error(`Error al obtener actividades para parque ${park.id}:`, err);
       }
 
-      // Agregar el parque con su imagen, amenidades y actividades al array
+      // Construir objeto tipology si existe
+      const typology = park.typologyId ? {
+        id: park.typologyId,
+        name: park.typologyName,
+        code: park.typologyCode,
+        normativeReference: park.typologyNormativeReference,
+        country: park.typologyCountry,
+        minArea: park.typologyMinArea,
+        maxArea: park.typologyMaxArea
+      } : undefined;
+
+      // Agregar el parque con su imagen, amenidades, actividades y tipología al array
       parksWithImages.push({
         ...park,
         createdAt: new Date(),
@@ -224,7 +239,8 @@ export async function getParksDirectly(filters?: any) {
         mainImageUrl: primaryImage,
         primaryImage: primaryImage,  // Este campo es el que usa ParkCard
         amenities: amenities,       // Añadimos las amenidades
-        activities: activities      // Añadimos las actividades
+        activities: activities,     // Añadimos las actividades
+        typology: typology          // Añadimos la tipología
       });
     }
     
