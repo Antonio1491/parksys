@@ -8,6 +8,7 @@ import {
   CheckCircle,
   Award,
   MessageSquare,
+  Calendar,
 } from "lucide-react";
 import DashboardLayout from "@/components/ui/dashboard-layout";
 import MetricCard from "@/components/ui/metric-card";
@@ -579,9 +580,7 @@ const ParksDashboard = () => {
           {/* Mitad izquierda: Actividades */}
           <MetricCard
             title="Actividades"
-            value={data.parkWithMostActivities ? data.parkWithMostActivities.totalActivities : "N/A"}
-            subtitle="Parque con más actividades"
-            icon={MapPin}
+            icon={Calendar}
             iconColor="#14b8a6"
             backgroundColor="#003D49"
             className="text-xs"
@@ -591,11 +590,11 @@ const ParksDashboard = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <span className="text-m font-semibold text-gray-200">
+                    <span className="text-xl font-semibold text-gray-200">
                       {data.parkWithMostActivities.parkName}
                     </span>
                   </div>
-                  <span className="text- font-semibold text-green-400">
+                  <span className="text-xl font-semibold text-green-400">
                     {data.parkWithMostActivities.totalActivities}
                   </span>
                 </div>
