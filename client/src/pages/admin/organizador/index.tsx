@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { GraphicCard } from '@/components/ui/graphic-card';
+import MetricCard from '@/components/ui/metric-card';
 import { Calendar, Plus, Tag, Users, MapPin, Clock, Edit, Eye, BarChart3, CheckCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import DashboardLayout from '@/components/ui/dashboard-layout';
@@ -189,80 +190,43 @@ const OrganizadorPage: React.FC = () => {
       subtitle="Estadísticas de las actividades en los parques"
       backgroundColor="#14b8a6"
     >
-      {/* Botones de navegación */}
-      <div className="flex gap-2 mb-6 justify-end">
-        <Link href="/admin/activities">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Calendar size={16} />
-            Ver Actividades
-          </Button>
-        </Link>
-        <Link href="/admin/activities/categories">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Tag size={16} />
-            Gestionar Categorías
-          </Button>
-        </Link>
-        <Link href="/admin/organizador/nueva-actividad">
-          <Button className="flex items-center gap-2">
-            <Plus size={16} />
-            Nueva Actividad
-          </Button>
-        </Link>
-      </div>
-
+      {/* Sección 1: Métricas Principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card
-          className="border-0 shadow-lg text-white rounded-3xl"
-          style={{ backgroundColor: "#003D49" }}
+        <MetricCard
+          title="Total de Actividades"
+          value={isLoadingActivities ? '...' : totalActivities}
+          subtitle="Actividades registradas en el sistema"
+          icon={Calendar}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-medium text-gray-100">
-              Total de Actividades
-            </CardTitle>
-            <div
-              className="rounded-full p-2"
-              style={{ backgroundColor: "#14b8a6" }}
-            >
-              <Calendar className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              {isLoadingActivities ? '...' : totalActivities}
-            </div>
-            <p className="text-xs text-white mb-3">
-              Actividades registradas en el sistema
-            </p>
-            
-            {/* Actividades en funcionamiento */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <Users className="h-3 w-3" style={{ color: "#14b8a6" }} />
-                  <span className="text-xs text-gray-200">
-                    En Funcionamiento
-                  </span>
-                </div>
-                <span
-                  className="text-xs font-semibold"
-                  style={{ color: "#14b8a6" }}
-                >
-                  {isLoadingActivities ? '...' : `${activeActivities} (${totalActivities > 0 ? Math.round((activeActivities / totalActivities) * 100) : 0}%)`}
+          {/* Actividades en funcionamiento */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Users className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                <span className="text-xs text-gray-200">
+                  En Funcionamiento
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full transition-all duration-700"
-                  style={{
-                    width: `${totalActivities > 0 ? (activeActivities / totalActivities) * 100 : 0}%`,
-                    backgroundColor: "#14b8a6"
-                  }}
-                ></div>
-              </div>
+              <span
+                className="text-xs font-semibold"
+                style={{ color: "#14b8a6" }}
+              >
+                {isLoadingActivities ? '...' : `${activeActivities} (${totalActivities > 0 ? Math.round((activeActivities / totalActivities) * 100) : 0}%)`}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="h-2 rounded-full transition-all duration-700"
+                style={{
+                  width: `${totalActivities > 0 ? (activeActivities / totalActivities) * 100 : 0}%`,
+                  backgroundColor: "#14b8a6"
+                }}
+              ></div>
+            </div>
+          </div>
+        </MetricCard>
 
         {/* Columna 2: Dividida en 2 mitades verticales - Estados de Actividades y Especialidades */}
         <div className="flex flex-row gap-3">
@@ -366,115 +330,83 @@ const OrganizadorPage: React.FC = () => {
           
         </div>
 
-        <Card
-          className="border-0 shadow-lg text-white rounded-3xl"
-          style={{ backgroundColor: "#003D49" }}
+        <MetricCard
+          title="Instructores del Sistema"
+          value={isLoadingInstructors ? '...' : totalInstructors}
+          subtitle="Instructores registrados en total"
+          icon={Tag}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-medium text-gray-100">
-              Instructores del Sistema
-            </CardTitle>
-            <div
-              className="rounded-full p-2"
-              style={{ backgroundColor: "#14b8a6" }}
-            >
-              <Tag className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              {isLoadingInstructors ? '...' : totalInstructors}
-            </div>
-            <p className="text-xs text-white mb-3">
-              Instructores registrados en total
-            </p>
-            
-            {/* Instructores activos */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <Tag className="h-3 w-3" style={{ color: "#14b8a6" }} />
-                  <span className="text-xs text-gray-200">
-                    Instructores Activos
-                  </span>
-                </div>
-                <span
-                  className="text-xs font-semibold"
-                  style={{ color: "#14b8a6" }}
-                >
-                  {isLoadingInstructors ? '...' : `${activeInstructors} (${totalInstructors > 0 ? Math.round((activeInstructors / totalInstructors) * 100) : 0}%)`}
+          {/* Instructores activos */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Tag className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                <span className="text-xs text-gray-200">
+                  Instructores Activos
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full transition-all duration-700"
-                  style={{
-                    width: `${totalInstructors > 0 ? (activeInstructors / totalInstructors) * 100 : 0}%`,
-                    backgroundColor: "#14b8a6"
-                  }}
-                ></div>
-              </div>
+              <span
+                className="text-xs font-semibold"
+                style={{ color: "#14b8a6" }}
+              >
+                {isLoadingInstructors ? '...' : `${activeInstructors} (${totalInstructors > 0 ? Math.round((activeInstructors / totalInstructors) * 100) : 0}%)`}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="h-2 rounded-full transition-all duration-700"
+                style={{
+                  width: `${totalInstructors > 0 ? (activeInstructors / totalInstructors) * 100 : 0}%`,
+                  backgroundColor: "#14b8a6"
+                }}
+              ></div>
+            </div>
+          </div>
+        </MetricCard>
 
-        <Card
-          className="border-0 shadow-lg text-white rounded-3xl"
-          style={{ backgroundColor: "#003D49" }}
+        <MetricCard
+          title="Inscripciones Semanales"
+          value={isLoadingRegistrationStats ? '...' : (registrationStats?.weeklyRegistrations || 0)}
+          subtitle="Nuevas inscripciones esta semana"
+          icon={Users}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-medium text-gray-100">
-              Inscripciones Semanales
-            </CardTitle>
-            <div
-              className="rounded-full p-2"
-              style={{ backgroundColor: "#14b8a6" }}
-            >
-              <Users className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              {isLoadingRegistrationStats ? '...' : (registrationStats?.weeklyRegistrations || 0)}
-            </div>
-            <p className="text-xs text-white mb-3">
-              Nuevas inscripciones esta semana
-            </p>
-            
-            {/* Plazas ocupadas */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <Users className="h-3 w-3" style={{ color: "#14b8a6" }} />
-                  <span className="text-xs text-gray-200">
-                    Plazas Ocupadas
-                  </span>
-                </div>
-                <span
-                  className="text-xs font-semibold"
-                  style={{ color: "#14b8a6" }}
-                >
-                  {isLoadingRegistrationStats ? '...' : `${registrationStats?.approvedRegistrations || 0} de ${registrationStats?.totalCapacity || 0}`}
+          {/* Plazas ocupadas */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Users className="h-3 w-3" style={{ color: "#14b8a6" }} />
+                <span className="text-xs text-gray-200">
+                  Plazas Ocupadas
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full transition-all duration-700"
-                  style={{
-                    width: `${registrationStats?.occupancyPercentage || 0}%`,
-                    backgroundColor: "#14b8a6"
-                  }}
-                ></div>
-              </div>
-              <div className="text-xs text-gray-300 mt-1">
-                Ocupación: {isLoadingRegistrationStats ? '...' : `${registrationStats?.occupancyPercentage || 0}%`}
-              </div>
+              <span
+                className="text-xs font-semibold"
+                style={{ color: "#14b8a6" }}
+              >
+                {isLoadingRegistrationStats ? '...' : `${registrationStats?.approvedRegistrations || 0} de ${registrationStats?.totalCapacity || 0}`}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="h-2 rounded-full transition-all duration-700"
+                style={{
+                  width: `${registrationStats?.occupancyPercentage || 0}%`,
+                  backgroundColor: "#14b8a6"
+                }}
+              ></div>
+            </div>
+            <div className="text-xs text-gray-300 mt-1">
+              Ocupación: {isLoadingRegistrationStats ? '...' : `${registrationStats?.occupancyPercentage || 0}%`}
+            </div>
+          </div>
+        </MetricCard>
       </div>
 
-      {/* Gráfico de Actividades por Parque y Actividades Próximas */}
+      {/* Sección 2 - Gráfico de Actividades por Parque y Actividades Próximas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
         {/* Columna izquierda: Gráfico de Actividades por Parque */}

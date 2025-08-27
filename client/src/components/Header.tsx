@@ -87,7 +87,7 @@ const Header: React.FC = () => {
   const isDashboardActive = location === "/admin";
   const isGestionActive = 
     location.startsWith("/admin/parks") || 
-    location.startsWith("/admin/organizador") ||
+    location.startsWith("/admin/activities") ||
     location.startsWith("/admin/amenities") ||
     location.startsWith("/admin/trees") ||
     location.startsWith("/admin/visitors") ||
@@ -326,7 +326,7 @@ const Header: React.FC = () => {
                           Parques
                         </Link>
                         <Link
-                              href="/admin/organizador"
+                              href="/admin/activities/dashboard"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                         >
                           Actividades

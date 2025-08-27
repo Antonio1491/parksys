@@ -108,7 +108,7 @@ const ParksDashboard = () => {
       <DashboardLayout 
         icon={Map} 
         title="Parques" 
-        subtitle="Métricas / Módulo de Gestión"
+        subtitle="Estadísticas de los parques del sistema"
       >
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(8)].map((_, i) => (
@@ -129,7 +129,7 @@ const ParksDashboard = () => {
       <DashboardLayout 
         icon={Map} 
         title="Parques" 
-        subtitle="Métricas / Módulo de Gestión"
+        subtitle="Estadísticas de los parques del sistema"
       >
         <div className="text-center py-8">
           <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
@@ -146,7 +146,7 @@ const ParksDashboard = () => {
       <DashboardLayout 
         icon={Map} 
         title="Parques" 
-        subtitle="Métricas / Módulo de Gestión"
+        subtitle="Estadísticas de los parques del sistema"
       >
         <div className="text-center py-8">
           <p className="text-gray-600">No hay datos disponibles</p>
@@ -175,7 +175,7 @@ const ParksDashboard = () => {
     <DashboardLayout 
       icon={Map} 
       title="Parques" 
-      subtitle="Métricas / Módulo de Gestión"
+      subtitle="Estadísticas de los parques del sistema"
     >
       {/* Sección 1: Métricas Principales - Grid de 4 columnas con columna 3 dividida */}
       <div className="space-y-4">
