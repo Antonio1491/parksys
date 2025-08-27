@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -107,6 +108,10 @@ interface ParksDashboardData {
     incidentsThisMonth: number;
     openIncidents: number;
     resolvedIncidents: number;
+  }>;
+  parksByType?: Array<{
+    type: string;
+    count: number;
   }>;
 }
 
@@ -695,6 +700,136 @@ const ParksDashboard = () => {
           
         </div>
         
+      </div>
+
+      {/* Cuarta fila: Gráfico de pastel de clasificación por tipo */}
+      <div className="grid gap-6 lg:grid-cols-1">
+        <GraphicCard
+          title="🏛️ Clasificación de Parques por Tipo"
+          description="Distribución de parques según su clasificación y escala en el sistema municipal"
+          className="h-full"
+        >
+          <div className="w-full">
+            {data.parksByType && data.parksByType.length > 0 ? (
+              <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
+                {/* Gráfico de pastel */}
+                <div className="w-full lg:w-1/2 h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={data.parksByType.map((item, index) => ({
+                          ...item,
+                          color: [
+                            '#0088FE', // Azul
+                            '#00C49F', // Verde turquesa
+                            '#FFBB28', // Amarillo
+                            '#FF8042', // Naranja
+                            '#8884D8', // Morado
+                            '#82CA9D', // Verde lima
+                            '#FFC658', // Amarillo naranja
+                            '#FF7C7C', // Rosa
+                            '#8DD1E1', // Azul claro
+                            '#D084D0'  // Morado claro
+                          ][index % 10]
+                        }))}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={120}
+                        paddingAngle={2}
+                        dataKey="count"
+                      >
+                        {data.parksByType.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={[
+                            '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', 
+                            '#82CA9D', '#FFC658', '#FF7C7C', '#8DD1E1', '#D084D0'
+                          ][index % 10]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number, name: string) => [
+                          `${value} parque${value !== 1 ? 's' : ''}`, 
+                          name === 'count' ? 'Cantidad' : name
+                        ]}
+                        labelFormatter={(label) => `Tipo: ${label}`}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Leyenda personalizada */}
+                <div className="w-full lg:w-1/2 space-y-3">
+                  <h4 className="font-semibold text-gray-700 mb-4">Tipos de Parques</h4>
+                  {data.parksByType.map((item, index) => {
+                    const color = [
+                      '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', 
+                      '#82CA9D', '#FFC658', '#FF7C7C', '#8DD1E1', '#D084D0'
+                    ][index % 10];
+                    const percentage = ((item.count / data.totalParks) * 100).toFixed(1);
+                    
+                    // Formatear nombres de tipos de parques
+                    const formatParkType = (type: string) => {
+                      const typeMap: { [key: string]: string } = {
+                        'metropolitano': 'Metropolitano',
+                        'botanico': 'Botánico',
+                        'deportivo': 'Deportivo',
+                        'urbano': 'Urbano',
+                        'natural': 'Natural',
+                        'lineal': 'Lineal',
+                        'comunitario': 'Comunitario',
+                        'vecinal': 'Vecinal',
+                        'tematico': 'Temático',
+                        'de_bolsillo': 'De Bolsillo'
+                      };
+                      return typeMap[type] || type.charAt(0).toUpperCase() + type.slice(1);
+                    };
+
+                    return (
+                      <div key={item.type} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-4 h-4 rounded-full" 
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="font-medium text-gray-700">
+                            {formatParkType(item.type)}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-gray-900">
+                            {item.count} parque{item.count !== 1 ? 's' : ''}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {percentage}%
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <div className="flex flex-col items-center space-y-2">
+                  <Map className="h-12 w-12 text-gray-300" />
+                  <p className="text-lg font-medium">
+                    No hay clasificación de parques disponible
+                  </p>
+                  <p className="text-sm">
+                    Los datos aparecerán aquí una vez que se clasifiquen los parques por tipo
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          {data.parksByType && data.parksByType.length > 0 && (
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-500 font-poppins font-thin">
+                Total: {data.totalParks} parques distribuidos en {data.parksByType.length} tipos diferentes
+              </p>
+            </div>
+          )}
+        </GraphicCard>
       </div>
 
     </DashboardLayout>
