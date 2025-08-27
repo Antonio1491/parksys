@@ -406,7 +406,7 @@ const AdminSidebarComplete: React.FC = () => {
 
   return (
     <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40" style={{ top: '80px', height: 'calc(100vh - 80px)', backgroundColor: '#003D49' }}>
-            {/* Navigation */}
+      {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-2 w-full">
         <Accordion
           type="multiple"
@@ -1288,14 +1288,13 @@ const AdminSidebarComplete: React.FC = () => {
 
         </Accordion>
       </ScrollArea>
-
       {/* Footer con logo de ParkSys */}
       <div className="p-8 border-t border-teal-600" style={{ backgroundColor: '#003D49' }}>
         <div className="flex flex-col items-center justify-center gap-4">
           <img 
             src={parksysLogo} 
             alt="ParkSys - Sistema de parques" 
-            className="h-15 w-auto opacity-80 hover:opacity-100 transition-opacity"
+            className="h-15 w-auto opacity-80 hover:opacity-100 transition-opacity pl-[5px] pr-[5px]"
           />
           <a 
             href="https://parquesdemexico.org/"
