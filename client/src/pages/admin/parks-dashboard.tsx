@@ -490,8 +490,8 @@ const ParksDashboard = () => {
 
       </div>
 
-      {/* Tercera fila: Gráfico de Área Verde, Actividades y Árboles */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* Tercera fila: Gráfico de Área Verde y Tarjetas de Actividades/Árboles */}
+      <div className="grid gap-6 lg:grid-cols-2">
         
         {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
         <GraphicCard
@@ -573,121 +573,112 @@ const ParksDashboard = () => {
           </div>
         </GraphicCard>
 
-        {/* Columna central: Actividades */}
-        <MetricCard
-          title="Actividades"
-          value={data.parkWithMostActivities ? data.parkWithMostActivities.totalActivities : "N/A"}
-          subtitle="Parque con más actividades"
-          icon={MapPin}
-          iconColor="#14b8a6"
-          backgroundColor="#003D49"
-        >
-          {/* Parque con más actividades */}
-          {data.parkWithMostActivities && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <span className="text-xs text-gray-200">
-                    Más Actividades
-                  </span>
-                </div>
-                <span className="text-xs font-semibold text-green-400">
-                  {data.parkWithMostActivities.totalActivities} actividades
-                </span>
-              </div>
-              <div className="text-xs text-gray-200 truncate">
-                {data.parkWithMostActivities.parkName}
-                {(() => {
-                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithMostActivities?.parkId)?.area;
-                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
-                })()}
-              </div>
-              
-              {/* Parque con menos actividades */}
-              {data.parkWithLeastActivities && (
-                <>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-orange-400"></div>
-                      <span className="text-xs text-gray-200">
-                        Menos Actividades
-                      </span>
-                    </div>
-                    <span className="text-xs font-semibold text-orange-400">
-                      {data.parkWithLeastActivities.totalActivities} actividades
+        {/* Columna derecha: Actividades y Árboles lado a lado */}
+        <div className="grid gap-3 grid-cols-2">
+          
+          {/* Mitad izquierda: Actividades */}
+          <MetricCard
+            title="Actividades"
+            value={data.parkWithMostActivities ? data.parkWithMostActivities.totalActivities : "N/A"}
+            subtitle="Parque con más actividades"
+            icon={MapPin}
+            iconColor="#14b8a6"
+            backgroundColor="#003D49"
+            className="text-xs"
+          >
+            {/* Parque con más actividades */}
+            {data.parkWithMostActivities && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    <span className="text-xs text-gray-200">
+                      Más
                     </span>
                   </div>
-                  <div className="text-xs text-gray-200 truncate">
-                    {data.parkWithLeastActivities.parkName}
-                    {(() => {
-                      const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithLeastActivities?.parkId)?.area;
-                      return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
-                    })()}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-        </MetricCard>
+                  <span className="text-xs font-semibold text-green-400">
+                    {data.parkWithMostActivities.totalActivities}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-200 truncate">
+                  {data.parkWithMostActivities.parkName}
+                </div>
+                
+                {/* Parque con menos actividades */}
+                {data.parkWithLeastActivities && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-orange-400"></div>
+                        <span className="text-xs text-gray-200">
+                          Menos
+                        </span>
+                      </div>
+                      <span className="text-xs font-semibold text-orange-400">
+                        {data.parkWithLeastActivities.totalActivities}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-200 truncate">
+                      {data.parkWithLeastActivities.parkName}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </MetricCard>
 
-        {/* Columna derecha: Árboles */}
-        <MetricCard
-          title="Árboles"
-          value={data.parkWithMostTrees ? data.parkWithMostTrees.totalTrees : "N/A"}
-          subtitle="Parque con más árboles"
-          icon={Trees}
-          iconColor="#10b981"
-          backgroundColor="#003D49"
-        >
-          {/* Parque con más árboles */}
-          {data.parkWithMostTrees && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <span className="text-xs text-gray-200">
-                    Más Árboles
-                  </span>
-                </div>
-                <span className="text-xs font-semibold text-green-400">
-                  {data.parkWithMostTrees.totalTrees} árboles
-                </span>
-              </div>
-              <div className="text-xs text-gray-200 truncate">
-                {data.parkWithMostTrees.parkName}
-                {(() => {
-                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithMostTrees?.parkId)?.area;
-                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
-                })()}
-              </div>
-              
-              {/* Parque con menos árboles */}
-              {data.parkWithLeastTrees && (
-                <>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-orange-400"></div>
-                      <span className="text-xs text-gray-200">
-                        Menos Árboles
-                      </span>
-                    </div>
-                    <span className="text-xs font-semibold text-orange-400">
-                      {data.parkWithLeastTrees.totalTrees} árboles
+          {/* Mitad derecha: Árboles */}
+          <MetricCard
+            title="Árboles"
+            value={data.parkWithMostTrees ? data.parkWithMostTrees.totalTrees : "N/A"}
+            subtitle="Parque con más árboles"
+            icon={Trees}
+            iconColor="#10b981"
+            backgroundColor="#003D49"
+            className="text-xs"
+          >
+            {/* Parque con más árboles */}
+            {data.parkWithMostTrees && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    <span className="text-xs text-gray-200">
+                      Más
                     </span>
                   </div>
-                  <div className="text-xs text-gray-200 truncate">
-                    {data.parkWithLeastTrees.parkName}
-                    {(() => {
-                      const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithLeastTrees?.parkId)?.area;
-                      return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
-                    })()}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-        </MetricCard>
+                  <span className="text-xs font-semibold text-green-400">
+                    {data.parkWithMostTrees.totalTrees}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-200 truncate">
+                  {data.parkWithMostTrees.parkName}
+                </div>
+                
+                {/* Parque con menos árboles */}
+                {data.parkWithLeastTrees && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-orange-400"></div>
+                        <span className="text-xs text-gray-200">
+                          Menos
+                        </span>
+                      </div>
+                      <span className="text-xs font-semibold text-orange-400">
+                        {data.parkWithLeastTrees.totalTrees}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-200 truncate">
+                      {data.parkWithLeastTrees.parkName}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </MetricCard>
+          
+        </div>
 
       </div>
 
