@@ -37,16 +37,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import AdminLayout from '@/components/AdminLayout';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import ScheduleConfiguration from '@/components/ScheduleConfiguration';
 
 // Define el esquema de validación para el formulario
 const parkSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   municipalityId: z.coerce.number().refine(val => val > 0, 'Seleccione un municipio'),
-  parkType: z.string().min(1, 'Seleccione un tipo de parque'),
   address: z.string().min(1, 'La dirección es requerida'),
   description: z.string().nullable().optional(),
   postalCode: z.string().nullable().optional(),
@@ -55,7 +54,10 @@ const parkSchema = z.object({
   area: z.string().nullable().optional(),
   foundationYear: z.coerce.number().nullable().optional(),
 
-  openingHours: z.string().nullable().optional(),
+  // Horarios como objeto con días y horas
+  scheduleEnabled: z.record(z.string(), z.boolean()).optional(),
+  openingTime: z.string().nullable().optional(),
+  closingTime: z.string().nullable().optional(),
   administrator: z.string().nullable().optional(),
   contactPhone: z.string().nullable().optional(),
   contactEmail: z.string().nullable().optional(),
@@ -103,7 +105,6 @@ const AdminParkEdit: React.FC = () => {
     defaultValues: {
       name: '',
       municipalityId: 0,
-      parkType: '',
       address: '',
       description: '',
       postalCode: '',
@@ -112,7 +113,18 @@ const AdminParkEdit: React.FC = () => {
       area: '',
       foundationYear: null,
 
-      openingHours: '',
+      // Horarios por defecto
+      scheduleEnabled: {
+        'Lunes': false,
+        'Martes': false,
+        'Miércoles': false,
+        'Jueves': false,
+        'Viernes': false,
+        'Sábado': false,
+        'Domingo': false
+      },
+      openingTime: '',
+      closingTime: '',
       administrator: '',
       contactPhone: '',
       contactEmail: '',
@@ -129,7 +141,6 @@ const AdminParkEdit: React.FC = () => {
       const formValues = {
         name: park.name || '',
         municipalityId: park.municipalityId || 0,
-        parkType: park.parkType || '',
         address: park.address || '',
         description: park.description || '',
         postalCode: park.postalCode || '',
@@ -137,11 +148,18 @@ const AdminParkEdit: React.FC = () => {
         longitude: park.longitude || '',
         area: park.area || '',
         foundationYear: park.foundationYear || undefined,
-        hasAccessibility: !!park.hasAccessibility,
-        hasSportsAreas: !!park.hasSportsAreas,
-        hasPlayground: !!park.hasPlayground,
-        hasRestrooms: !!park.hasRestrooms,
-        openingHours: park.openingHours || '',
+        // Parsear horarios existentes o usar valores por defecto
+        scheduleEnabled: {
+          'Lunes': false,
+          'Martes': false,
+          'Miércoles': false,
+          'Jueves': false,
+          'Viernes': false,
+          'Sábado': false,
+          'Domingo': false
+        },
+        openingTime: '',
+        closingTime: '',
         administrator: park.administrator || '',
         contactPhone: park.contactPhone || '',
         contactEmail: park.contactEmail || '',
@@ -169,7 +187,14 @@ const AdminParkEdit: React.FC = () => {
       administrator: values.administrator || undefined,
       contactPhone: values.contactPhone || undefined,
       contactEmail: values.contactEmail || undefined,
-      openingHours: values.openingHours || undefined,
+      // Convertir horarios del nuevo formato a string para el backend
+      openingHours: values.scheduleEnabled && Object.keys(values.scheduleEnabled).some(day => values.scheduleEnabled?.[day]) 
+        ? JSON.stringify({
+            days: values.scheduleEnabled,
+            openingTime: values.openingTime,
+            closingTime: values.closingTime
+          })
+        : undefined,
       certificaciones: values.certificaciones || undefined
     };
     
@@ -306,34 +331,6 @@ const AdminParkEdit: React.FC = () => {
                     />
                   </div>
                   
-                  {/* Tipo de parque */}
-                  <FormField
-                    control={form.control}
-                    name="parkType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-red-600">Tipo de Parque *</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un tipo de parque" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Urbano">Parque Urbano</SelectItem>
-                            <SelectItem value="Metropolitano">Parque Metropolitano</SelectItem>
-                            <SelectItem value="Lineal">Parque Lineal</SelectItem>
-                            <SelectItem value="Comunitario">Parque Comunitario</SelectItem>
-                            <SelectItem value="Natural">Parque Natural</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   
                   {/* Descripción */}
                   <FormField
@@ -457,25 +454,82 @@ const AdminParkEdit: React.FC = () => {
                   
 
                   
-                  {/* Horario de apertura configurado */}
-                  <div>
-                    <FormField
-                      control={form.control}
-                      name="openingHours"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Horarios de apertura</FormLabel>
-                          <FormControl>
-                            <ScheduleConfiguration
-                              value={field.value || ''}
-                              onChange={field.onChange}
-                              className="mt-2"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  {/* Configuración de horarios en 3 columnas */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Configuración de Horarios</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* Columna 1: Días de la semana */}
+                      <div>
+                        <FormLabel className="text-sm font-medium">Días de apertura</FormLabel>
+                        <FormField
+                          control={form.control}
+                          name="scheduleEnabled"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="space-y-3 mt-2">
+                                {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day) => (
+                                  <div key={day} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={day}
+                                      checked={field.value?.[day] || false}
+                                      onCheckedChange={(checked) => {
+                                        const currentValues = field.value || {};
+                                        field.onChange({
+                                          ...currentValues,
+                                          [day]: checked
+                                        });
+                                      }}
+                                    />
+                                    <label htmlFor={day} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                      {day}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Columna 2: Horario de apertura */}
+                      <FormField
+                        control={form.control}
+                        name="openingTime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Horario de apertura</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="time" 
+                                placeholder="08:00"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Columna 3: Horario de cierre */}
+                      <FormField
+                        control={form.control}
+                        name="closingTime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Horario de cierre</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="time" 
+                                placeholder="20:00"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
