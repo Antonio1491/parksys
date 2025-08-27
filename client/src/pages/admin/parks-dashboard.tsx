@@ -591,7 +591,7 @@ const ParksDashboard = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-gray-200">
+                    <span className="text-xs text-gray-600">
                       {data.parkWithMostActivities.parkName}
                     </span>
                   </div>
