@@ -15,7 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { GraphicCard } from '@/components/ui/graphic-card';
 import { Calendar, Plus, Tag, Users, MapPin, Clock, Edit, Eye, BarChart3, CheckCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 
 // Página principal del módulo de Organizador
 const OrganizadorPage: React.FC = () => {
@@ -183,45 +183,33 @@ const OrganizadorPage: React.FC = () => {
 
   const maxParkCount = Math.max(...Object.values(parkCounts).map(Number), 1);
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header con fondo coloreado */}
-        <div 
-          className="py-8 px-4 -mx-4 -mt-6 mb-6"
-          style={{ backgroundColor: "#14b8a6" }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-8 h-8 text-white" />
-                <div>
-                  <h1 className="text-3xl font-bold text-white font-poppins">Actividades</h1>
-                  <p className="text-base font-normal text-white font-poppins">Estadísticas de las actividades en los parques</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Link href="/admin/activities">
-                <Button variant="outline" className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100">
-                  <Calendar size={16} />
-                  Ver Actividades
-                </Button>
-              </Link>
-              <Link href="/admin/activities/categories">
-                <Button variant="outline" className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100">
-                  <Tag size={16} />
-                  Gestionar Categorías
-                </Button>
-              </Link>
-              <Link href="/admin/organizador/nueva-actividad">
-                <Button className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100">
-                  <Plus size={16} />
-                  Nueva Actividad
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+    <DashboardLayout
+      icon={Calendar}
+      title="Actividades"
+      subtitle="Estadísticas de las actividades en los parques"
+      backgroundColor="#14b8a6"
+    >
+      {/* Botones de navegación */}
+      <div className="flex gap-2 mb-6 justify-end">
+        <Link href="/admin/activities">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Calendar size={16} />
+            Ver Actividades
+          </Button>
+        </Link>
+        <Link href="/admin/activities/categories">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Tag size={16} />
+            Gestionar Categorías
+          </Button>
+        </Link>
+        <Link href="/admin/organizador/nueva-actividad">
+          <Button className="flex items-center gap-2">
+            <Plus size={16} />
+            Nueva Actividad
+          </Button>
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card
@@ -812,8 +800,7 @@ const OrganizadorPage: React.FC = () => {
       </div>
 
 
-      </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 };
 
