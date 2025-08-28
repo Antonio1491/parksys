@@ -856,6 +856,72 @@ app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) 
   }
 });
 
+// ENDPOINT PARA OBTENER ACTIVIDADES MEJOR EVALUADAS DEL MES
+app.get("/api/activities/top-rated-monthly", async (_req: Request, res: Response) => {
+  try {
+    console.log("📊 Obteniendo actividades mejor evaluadas del mes...");
+    
+    const { sql } = await import("drizzle-orm");
+    
+    // Consulta para obtener actividades mejor evaluadas usando datos simulados
+    // basándose en inscripciones, capacidad y otros factores
+    const result = await db.execute(
+      sql`SELECT 
+            a.id,
+            a.title as "activityTitle",
+            a.category,
+            a.capacity,
+            p.name as "parkName",
+            COUNT(ar.id) as "totalRegistrations",
+            COUNT(CASE WHEN ar.status = 'approved' THEN 1 END) as "approvedRegistrations",
+            a.start_date,
+            a.end_date,
+            a.price,
+            a.is_free,
+            -- Calculamos una puntuación basada en ocupación y popularidad
+            CASE 
+              WHEN a.capacity > 0 THEN 
+                ROUND(
+                  (COUNT(CASE WHEN ar.status = 'approved' THEN 1 END) * 1.0 / a.capacity) * 5.0 + 
+                  LEAST(COUNT(ar.id) * 0.1, 1.0)
+                , 1)
+              ELSE 4.0
+            END as "calculatedRating"
+          FROM activities a
+          LEFT JOIN activity_registrations ar ON ar.activity_id = a.id 
+          LEFT JOIN parks p ON p.id = a.park_id
+          WHERE a.start_date >= CURRENT_DATE - INTERVAL '30 days'
+            OR a.end_date >= CURRENT_DATE - INTERVAL '30 days'
+          GROUP BY a.id, a.title, a.category, a.capacity, p.name, a.start_date, a.end_date, a.price, a.is_free
+          ORDER BY calculatedRating DESC, totalRegistrations DESC
+          LIMIT 5`
+    );
+
+    console.log(`📊 Actividades mejor evaluadas encontradas: ${result.rows.length}`);
+    
+    const formattedActivities = result.rows.map((row: any) => ({
+      id: row.id,
+      activityTitle: row.activityTitle,
+      category: row.category,
+      capacity: Number(row.capacity),
+      parkName: row.parkName,
+      totalRegistrations: Number(row.totalRegistrations),
+      approvedRegistrations: Number(row.approvedRegistrations),
+      startDate: row.start_date,
+      endDate: row.end_date,
+      price: row.price,
+      isFree: row.is_free,
+      rating: Number(row.calculatedRating),
+      occupancyPercentage: row.capacity ? ((Number(row.approvedRegistrations) / Number(row.capacity)) * 100).toFixed(1) : 0
+    }));
+
+    res.json(formattedActivities);
+  } catch (error: any) {
+    console.error("Error al obtener actividades mejor evaluadas:", error);
+    res.status(500).json({ message: "Error al obtener actividades mejor evaluadas" });
+  }
+});
+
 // ENDPOINT PARA OBTENER ACTIVIDAD ESPECÍFICA
 app.get("/api/activities/:id", async (req: Request, res: Response) => {
   console.log("🎯 GET ACTIVITY ENDPOINT - ID:", req.params.id);

@@ -116,7 +116,7 @@ interface ModuleNavProps {
 
 const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleColor }) => {
   const iconWithClass = React.cloneElement(icon as React.ReactElement, {
-    className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-white')
+    className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-[#17CCB2]')
   });
 
   return (
@@ -124,8 +124,10 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
       <Button
         variant="ghost"
         className={cn(
-          "w-full flex items-center justify-start text-sm font-medium h-9 px-2 text-white hover:bg-teal-600",
-          active && "bg-teal-500 font-medium"
+          "w-full flex items-center justify-start text-sm font-normal h-9 px-2 transition-colors duration-200",
+          active
+            ? "bg-white text-[#17CCB2]"
+            : "text-[#17CCB2] hover:bg-[#036668] hover:text-[#17CCB2]"
         )}
       >
         {iconWithClass}
@@ -147,49 +149,49 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
       'system': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#61B1A0'
       },
       'gestion': {
         iconColor: 'text-white',
         textColor: 'text-white', 
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#513C73'
       },
       'operations': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#B275B0'
       },
       'admin-finance': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#B3C077'
       },
       'mkt-comm': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#1E5AA6'
       },
       'hr': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#198DCE'
       },
       'security': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#90D3EC'
       },
       'public': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-teal-600',
+        hoverBg: 'hover:bg-[#036668]',
         bgColor: '#1E5AA6'
       }
     };
