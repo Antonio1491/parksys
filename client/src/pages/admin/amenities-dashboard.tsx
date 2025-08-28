@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import AdminLayout from "@/components/AdminLayout";
+import DashboardLayout from "@/components/ui/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,20 +64,30 @@ export default function AmenitiesDashboard() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
+      <DashboardLayout
+        icon={Activity}
+        title="Amenidades"
+        subtitle="Análisis y estadísticas de amenidades en parques"
+        backgroundColor="#14b8a6"
+      >
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
             <p className="mt-2 text-gray-600">Cargando estadísticas...</p>
           </div>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
   if (error) {
     return (
-      <AdminLayout>
+      <DashboardLayout
+        icon={Activity}
+        title="Amenidades"
+        subtitle="Análisis y estadísticas de amenidades en parques"
+        backgroundColor="#14b8a6"
+      >
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -88,7 +98,7 @@ export default function AmenitiesDashboard() {
             </Button>
           </div>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
@@ -120,20 +130,15 @@ export default function AmenitiesDashboard() {
   const insights = generateInsights();
 
   return (
-    <AdminLayout>
+    <DashboardLayout
+      icon={Activity}
+      title="Amenidades"
+      subtitle="Análisis y estadísticas de amenidades en parques"
+      backgroundColor="#14b8a6"
+    >
       <div className="space-y-6">
-        {/* Header con fondo coloreado */}
-        <div 
-          className="py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
-          style={{ backgroundColor: "#14b8a6" }}
-        >
-          <div>
-            <div className="flex items-center gap-2">
-              <Activity className="w-8 h-8 text-white" />
-              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Amenidades</h1>
-            </div>
-            <p className="text-base font-normal text-white font-poppins mt-2">Análisis y estadísticas de amenidades en parques</p>
-          </div>
+        {/* Botón de actualización */}
+        <div className="flex justify-end mb-6">
           <Button onClick={handleRefresh} variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualizar
@@ -337,6 +342,6 @@ export default function AmenitiesDashboard() {
           </Card>
         )}
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 };
