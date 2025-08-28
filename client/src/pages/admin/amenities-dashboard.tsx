@@ -261,45 +261,86 @@ export default function AmenitiesDashboard() {
 
         {/* Utilización por parque y estado */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Utilización por parque */}
+          {/* Amenidades por parque */}
           <GraphicCard 
             title="Amenidades por Parque"
             description="Distribución de amenidades en cada parque"
+            className="h-full"
           >
-            <div className="h-80 overflow-y-auto">
-              <div className="space-y-3">
-                {(data?.utilizationByPark || []).map((park: any, index: number) => {
-                  const maxValue = Math.max(...(data?.utilizationByPark || []).map((p: any) => p.amenitiesCount));
-                  const percentage = maxValue > 0 ? (park.amenitiesCount / maxValue) * 100 : 0;
-                  
-                  return (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div className="w-32 text-sm font-medium text-right text-gray-700 truncate">
-                        {park.parkName}
-                      </div>
-                      <div className="flex-1 flex items-center space-x-2">
-                        <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
-                          <div 
-                            className="bg-teal-500 h-6 rounded-full flex items-center justify-end pr-2 transition-all duration-500"
-                            style={{ width: `${Math.max(percentage, 5)}%` }}
-                          >
-                            <span className="text-white text-xs font-medium">
+            <div className="w-full">
+              {(data?.utilizationByPark || []).length > 0 ? (
+                <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+                  {(data?.utilizationByPark || [])
+                    .sort((a, b) => b.amenitiesCount - a.amenitiesCount)
+                    .map((park: any, index: number) => {
+                      const maxValue = Math.max(...(data?.utilizationByPark || []).map((p: any) => p.amenitiesCount));
+                      const heightPercentage = maxValue > 0 ? (park.amenitiesCount / maxValue) * 100 : 0;
+                      const getAmenityColor = (count: number) => {
+                        if (count >= maxValue * 0.7) return "#14b8a6"; // Teal para muchas amenidades
+                        if (count >= maxValue * 0.4) return "#3b82f6"; // Azul para cantidad media
+                        return "#8b5cf6"; // Púrpura para pocas amenidades
+                      };
+                      
+                      return (
+                        <div key={index} className="flex flex-col items-center relative">
+                          {/* Valor del conteo arriba */}
+                          <div className="mb-2 text-center">
+                            <div className="text-sm font-medium text-gray-700 flex items-center gap-1">
                               {park.amenitiesCount}
-                            </span>
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              amenidades
+                            </div>
+                          </div>
+
+                          {/* Columna vertical */}
+                          <div className="relative h-64 w-4 flex flex-col justify-end">
+                            {/* Fondo de la columna */}
+                            <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                            
+                            {/* Relleno de la columna según cantidad */}
+                            <div
+                              className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                              style={{
+                                height: `${Math.max(heightPercentage, 5)}%`,
+                                backgroundColor: getAmenityColor(park.amenitiesCount),
+                                borderColor: getAmenityColor(park.amenitiesCount),
+                              }}
+                            ></div>
+                          </div>
+
+                          {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                          <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                            <div className="text-xs text-gray-700 whitespace-nowrap">
+                              {park.parkName}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              {(data?.utilizationByPark || []).length === 0 && (
-                <div className="text-center text-gray-500 py-8">
-                  No hay datos de parques disponibles
+                      );
+                    })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <div className="flex flex-col items-center space-y-2">
+                    <Activity className="h-12 w-12 text-gray-300" />
+                    <p className="text-lg font-medium">
+                      No hay datos de amenidades disponibles
+                    </p>
+                    <p className="text-sm">
+                      Los datos de amenidades por parque aparecerán aquí una vez que se asignen amenidades a los parques
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
+            {(data?.utilizationByPark || []).length > 0 && (
+              <div className="mt-2 text-center">
+                <p className="text-sm text-gray-500">
+                  Mostrando todos los {(data?.utilizationByPark || []).length} parques
+                  registrados en el sistema
+                </p>
+              </div>
+            )}
           </GraphicCard>
 
           {/* Estado de amenidades */}
