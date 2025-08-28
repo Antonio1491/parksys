@@ -107,8 +107,6 @@ const AdminParksContent = () => {
     return park.certificaciones && park.certificaciones.trim() !== '';
   };
 
-
-
   // Fetch all parks with auto-refresh configuration
   const { 
     data: parks = [], 
