@@ -45,7 +45,6 @@ interface DashboardData {
   totalAmenities: number;
   totalParks: number;
   averageAmenitiesPerPark: number;
-  parkWithMostAmenities: { name: string; count: number } | null;
   mostPopularAmenities: AmenityStats[];
   amenityDistribution: { name: string; value: number; color: string }[];
   utilizationByPark: { parkName: string; amenitiesCount: number }[];
@@ -157,47 +156,14 @@ export default function AmenitiesDashboard() {
           />
 
           <MetricCard
-            title="Total Parques"
-            value={
-              <div className="text-2xl font-bold text-white mb-2">
-                {data?.totalParks || 0}
-              </div>
-            }
-            subtitle="Parques en el sistema"
-            icon={MapPin}
-            iconColor="#14b8a6"
-            backgroundColor="#003D49"
-          />
-
-          <MetricCard
             title="Promedio por Parque"
             value={
-              <div className="space-y-1">
-                <div className="text-2xl font-bold text-white">
-                  {data?.averageAmenitiesPerPark.toFixed(1) || '0'}
-                </div>
-                {data?.parkWithMostAmenities && (
-                  <div className="text-xs text-gray-300">
-                    Máximo: {data.parkWithMostAmenities.name} ({data.parkWithMostAmenities.count})
-                  </div>
-                )}
+              <div className="text-2xl font-bold text-white mb-2">
+                {data?.averageAmenitiesPerPark.toFixed(1) || '0'}
               </div>
             }
             subtitle="Amenidades por parque"
             icon={TrendingUp}
-            iconColor="#14b8a6"
-            backgroundColor="#003D49"
-          />
-
-          <MetricCard
-            title="Estado del Sistema"
-            value={
-              <div className="text-2xl font-bold text-green-400 mb-2">
-                Activo
-              </div>
-            }
-            subtitle="Sistema operativo"
-            icon={CheckCircle}
             iconColor="#14b8a6"
             backgroundColor="#003D49"
           />
