@@ -1,7 +1,9 @@
+import * as React from "react"
+
 type PageHeaderProps = {
   title: string;
   subtitle?: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   actions?: React.ReactNode[]; // hasta 3 botones
   backgroundColor?: string;
 };
@@ -19,9 +21,7 @@ export const PageHeader = ({
   >
     {/* Sección izquierda: ícono + título + subtítulo */}
     <div className="flex items-start gap-3">
-      {React.cloneElement(icon as React.ReactElement, {
-        className: 'h-6 w-6 text-white mt-1',
-      })}
+      {React.cloneElement(icon as React.ReactElement, {className: 'h-6 w-6 text-white mt-1',})}
       <div>
         <h1 className="text-3xl font-bold text-white font-poppins">
           {title}

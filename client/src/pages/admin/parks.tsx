@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
+import { PageHeader } from "@/components/ui/page-header";
 // NOTA CRÍTICA: NO IMPORTAR Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 // El usuario específicamente NO quiere filtros en esta página
 
@@ -540,19 +540,21 @@ const AdminParksContent = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header con título */}
-        <div className="mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
-          style={{ backgroundColor: '#14b8a6' }}
-        >
-          <div className="flex items-center gap-3">
-            <MapPin className="h-6 w-6 text-white" />
-            <h1 className="text-3xl font-bold text-white font-poppins">
-              Parques
-            </h1>
-          </div>
-          <p className="text-base font-normal text-white font-poppins">
-            Gestión General del Sistema
-          </p>
-        </div>
+        <PageHeader
+          title="Parques"
+          subtitle="Gestión General del Sistema"
+          icon={<MapPin className="h-6 w-6 text-white" />}
+          className="-mx-4 -mt-6 px-4 py-8 mb-4"
+          style={{ backgroundColor: "#14b8a6" }}
+          titleClassName="text-3xl font-bold text-white font-poppins"
+          subtitleClassName="text-base font-normal text-white font-poppins"
+          actions={[
+            <Button key="nuevo" variant="secondary">
+              <Plus className="w-4 h-4" />
+              Nuevo Parque
+            </Button>,
+          ]}
+        />
         
         {/* View mode toggle and actions */}
         <div className="flex justify-between items-center">
