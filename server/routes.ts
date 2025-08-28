@@ -2861,6 +2861,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         count: parseInt(parkUtilization.rows[0].amenities_count) || 0
       } : null;
 
+      // Obtener la amenidad con más módulos registrados
+      const amenityWithMostModules = amenityStats.length > 0 ? {
+        name: amenityStats[0].name,
+        count: amenityStats[0].totalModules
+      } : null;
+
       console.log("[AMENITIES DASHBOARD] Estadísticas calculadas:");
       console.log("- Total amenidades:", amenities.length);
       console.log("- Total parques:", totalParks);
@@ -2870,6 +2876,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const dashboardData = {
         totalAmenities: amenities.length,
         totalParks: totalParks,
+        totalModules: totalAmenityAssignments,
+        amenityWithMostModules: amenityWithMostModules,
         averageAmenitiesPerPark: totalParks > 0 ? Math.round((totalAmenityAssignments / totalParks) * 100) / 100 : 0,
         parkWithMostAmenities: parkWithMostAmenities,
         mostPopularAmenities: amenityStats.slice(0, 5),

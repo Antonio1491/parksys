@@ -337,18 +337,20 @@ const AdminSidebarComplete: React.FC = () => {
 
   // Rutas de submenus colapsables
   const submenuRoutes: Record<string, string[]> = {
-    visitantes: ['/admin/visitors'],
     parques: ['/admin/parks'],
-    arbolado: ['/admin/trees'],
-    fauna: ['/admin/fauna'],
     actividades: [
       '/admin/organizador',
       '/admin/activities',
       '/admin/activities/instructors',
     ],
-    eventos: ['/admin/events', '/admin/eventos-ambu'],
-    reservas: ['/admin/space-reservations', '/admin/dashboard-reservas'],
     amenidades: ['/admin/amenities'],
+    
+    visitantes: ['/admin/visitors'],
+        
+    fauna: ['/admin/fauna'],
+        eventos: ['/admin/events', '/admin/eventos-ambu'],
+    reservas: ['/admin/space-reservations', '/admin/dashboard-reservas'],
+    
     evaluaciones: ['/admin/evaluaciones'],
     'roles-sistema': [
       '/admin/roles',

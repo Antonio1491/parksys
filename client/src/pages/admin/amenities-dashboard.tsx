@@ -44,6 +44,8 @@ interface AmenityStats {
 interface DashboardData {
   totalAmenities: number;
   totalParks: number;
+  totalModules: number;
+  amenityWithMostModules: { name: string; count: number } | null;
   averageAmenitiesPerPark: number;
   parkWithMostAmenities: { name: string; count: number } | null;
   mostPopularAmenities: AmenityStats[];
@@ -172,6 +174,39 @@ export default function AmenitiesDashboard() {
             }
             subtitle="Amenidades por parque"
             icon={TrendingUp}
+            iconColor="#14b8a6"
+            backgroundColor="#003D49"
+          />
+
+          <MetricCard
+            title="Total Parques"
+            value={
+              <div className="text-2xl font-bold text-white mb-2">
+                {data?.totalParks || 0}
+              </div>
+            }
+            subtitle="Parques en el sistema"
+            icon={MapPin}
+            iconColor="#14b8a6"
+            backgroundColor="#003D49"
+          />
+
+          <MetricCard
+            title="Total Módulos"
+            value={
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-white">
+                  {data?.totalModules || 0}
+                </div>
+                {data?.amenityWithMostModules && (
+                  <div className="text-xs text-gray-300">
+                    Líder: {data.amenityWithMostModules.name} ({data.amenityWithMostModules.count})
+                  </div>
+                )}
+              </div>
+            }
+            subtitle="Módulos registrados"
+            icon={Users}
             iconColor="#14b8a6"
             backgroundColor="#003D49"
           />
