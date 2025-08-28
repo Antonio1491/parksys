@@ -69,6 +69,12 @@ const OrganizadorPage: React.FC = () => {
     retry: 1,
   });
 
+  // Obtener promedio global de evaluaciones de actividades
+  const { data: averageRating = {}, isLoading: isLoadingAverageRating } = useQuery({
+    queryKey: ['/api/activities/average-rating'],
+    retry: 1,
+  });
+
   // Crear mapeo de categorías por ID
   const categoriesMap = Array.isArray(categories) ? categories.reduce((acc: any, category: any) => {
     acc[category.id] = category;
@@ -217,7 +223,7 @@ const OrganizadorPage: React.FC = () => {
     >
       {/* Sección 1: Métricas Principales */}
         {/* Columna 1 - Total de Actividades */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <MetricCard
               title="Total de Actividades"
               value={isLoadingActivities ? '...' : totalActivities}
@@ -427,6 +433,45 @@ const OrganizadorPage: React.FC = () => {
             </div>
             <div className="text-xs text-gray-300 mt-1">
               Ocupación: {isLoadingRegistrationStats ? '...' : `${registrationStats?.occupancyPercentage || 0}%`}
+            </div>
+          </div>
+        </MetricCard>
+
+        {/* Columna 5 - Promedio Global de Evaluaciones */}
+        <MetricCard
+          title="Promedio de Evaluaciones"
+          value={isLoadingAverageRating ? '...' : (averageRating.averageRating ? `${averageRating.averageRating.toFixed(1)} ⭐` : 'N/A')}
+          subtitle="Promedio global de todas las actividades"
+          icon={Star}
+          iconColor="#f59e0b"
+          backgroundColor="#003D49"
+        >
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" style={{ color: "#f59e0b" }} />
+                <span className="text-xs text-gray-200">
+                  Actividades Evaluadas
+                </span>
+              </div>
+              <span
+                className="text-xs font-semibold"
+                style={{ color: "#f59e0b" }}
+              >
+                {isLoadingAverageRating ? '...' : `${averageRating.totalActivities || 0}`}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="h-2 rounded-full transition-all duration-700"
+                style={{
+                  width: `${averageRating.averageRating ? (averageRating.averageRating / 5) * 100 : 0}%`,
+                  backgroundColor: "#f59e0b"
+                }}
+              ></div>
+            </div>
+            <div className="text-xs text-gray-300 mt-1">
+              Basado en {isLoadingAverageRating ? '...' : `${averageRating.totalRegistrations || 0} inscripciones`}
             </div>
           </div>
         </MetricCard>

@@ -856,6 +856,66 @@ app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) 
   }
 });
 
+// ENDPOINT PARA OBTENER PROMEDIO GLOBAL DE EVALUACIONES DE ACTIVIDADES
+app.get("/api/activities/average-rating", async (_req: Request, res: Response) => {
+  try {
+    console.log("📊 Calculando promedio global de evaluaciones de actividades...");
+    
+    const { sql } = await import("drizzle-orm");
+    
+    // Consulta para calcular el promedio global basado en actividades con inscripciones
+    const result = await db.execute(
+      sql`SELECT 
+            COUNT(DISTINCT a.id) as "totalActivities",
+            AVG(
+              CASE 
+                WHEN a.capacity > 0 THEN 
+                  ROUND(
+                    (COUNT(CASE WHEN ar.status = 'approved' THEN 1 END) * 1.0 / a.capacity) * 5.0 + 
+                    LEAST(COUNT(ar.id) * 0.1, 1.0)
+                  , 1)
+                ELSE 4.0
+              END
+            ) as "averageRating",
+            COUNT(ar.id) as "totalRegistrations",
+            SUM(CASE WHEN ar.status = 'approved' THEN 1 ELSE 0 END) as "approvedRegistrations"
+          FROM activities a
+          LEFT JOIN activity_registrations ar ON ar.activity_id = a.id
+          WHERE a.start_date >= CURRENT_DATE - INTERVAL '90 days'
+            OR a.end_date >= CURRENT_DATE - INTERVAL '90 days'
+          GROUP BY ()
+          HAVING COUNT(DISTINCT a.id) > 0`
+    );
+
+    console.log(`📊 Resultado del promedio global: ${result.rows.length} filas`);
+    
+    if (result.rows.length > 0) {
+      const row = result.rows[0] as any;
+      const averageData = {
+        totalActivities: Number(row.totalActivities) || 0,
+        averageRating: Number(row.averageRating) || 0,
+        totalRegistrations: Number(row.totalRegistrations) || 0,
+        approvedRegistrations: Number(row.approvedRegistrations) || 0
+      };
+      
+      console.log(`📊 Promedio global calculado: ${averageData.averageRating} (${averageData.totalActivities} actividades)`);
+      res.json(averageData);
+    } else {
+      // Si no hay datos, devolver valores por defecto
+      console.log("📊 No hay datos de evaluaciones disponibles");
+      res.json({
+        totalActivities: 0,
+        averageRating: 0,
+        totalRegistrations: 0,
+        approvedRegistrations: 0
+      });
+    }
+  } catch (error: any) {
+    console.error("Error al calcular promedio global de evaluaciones:", error);
+    res.status(500).json({ message: "Error al calcular promedio global de evaluaciones" });
+  }
+});
+
 // ENDPOINT PARA OBTENER ACTIVIDADES MEJOR EVALUADAS DEL MES
 app.get("/api/activities/top-rated-monthly", async (_req: Request, res: Response) => {
   try {
