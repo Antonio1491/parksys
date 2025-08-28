@@ -45,6 +45,7 @@ interface DashboardData {
   totalAmenities: number;
   totalParks: number;
   averageAmenitiesPerPark: number;
+  parkWithMostAmenities: { name: string; count: number } | null;
   mostPopularAmenities: AmenityStats[];
   amenityDistribution: { name: string; value: number; color: string }[];
   utilizationByPark: { parkName: string; amenitiesCount: number }[];
@@ -171,8 +172,15 @@ export default function AmenitiesDashboard() {
           <MetricCard
             title="Promedio por Parque"
             value={
-              <div className="text-2xl font-bold text-white mb-2">
-                {data?.averageAmenitiesPerPark.toFixed(1) || '0'}
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-white">
+                  {data?.averageAmenitiesPerPark.toFixed(1) || '0'}
+                </div>
+                {data?.parkWithMostAmenities && (
+                  <div className="text-xs text-gray-300">
+                    Máximo: {data.parkWithMostAmenities.name} ({data.parkWithMostAmenities.count})
+                  </div>
+                )}
               </div>
             }
             subtitle="Amenidades por parque"
