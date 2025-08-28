@@ -774,14 +774,14 @@ app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) 
       sql`SELECT 
             p.id,
             p.name as "parkName",
-            p.location,
+            p.address,
             SUM(vc.adults + vc.children + vc.seniors + vc.pets) as "totalMonthlyVisitors",
             AVG(vc.adults + vc.children + vc.seniors + vc.pets) as "avgDailyVisitors",
             COUNT(vc.id) as "recordedDays"
           FROM parks p
           LEFT JOIN visitor_counts vc ON vc.park_id = p.id 
           WHERE vc.date >= CURRENT_DATE - INTERVAL '30 days'
-          GROUP BY p.id, p.name, p.location
+          GROUP BY p.id, p.name, p.address
           HAVING SUM(vc.adults + vc.children + vc.seniors + vc.pets) > 0
           ORDER BY totalMonthlyVisitors DESC
           LIMIT 5`
@@ -792,7 +792,7 @@ app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) 
     const formattedParks = result.rows.map((row: any) => ({
       id: row.id,
       parkName: row.parkName,
-      location: row.location,
+      location: row.address,
       totalMonthlyVisitors: Number(row.totalMonthlyVisitors),
       avgDailyVisitors: Number(row.avgDailyVisitors).toFixed(0),
       recordedDays: Number(row.recordedDays)

@@ -418,69 +418,61 @@ const OrganizadorPage: React.FC = () => {
         
         {/* Columna izquierda: Actividades Mejor Evaluadas */}
         <GraphicCard
-          title="⭐ Actividades Mejor Evaluadas"
-          description="Las 5 actividades con mejor calificación y el parque donde se realizan"
+          title="📊 Parques con Mayor Aforo Mensual"
+          description="Los 5 parques con mayor número de visitantes en el último mes"
         >
           <div className="w-full min-h-[320px]">
-            {isLoadingTopRated ? (
+            {isLoadingTopParks ? (
               <div className="flex items-center justify-center h-[320px] text-gray-500">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
-                  <p>Cargando actividades mejor evaluadas...</p>
+                  <p>Cargando parques con mayor aforo...</p>
                 </div>
               </div>
-            ) : Array.isArray(topRatedActivities) && topRatedActivities.length > 0 ? (
+            ) : Array.isArray(topMonthlyParks) && topMonthlyParks.length > 0 ? (
               <div className="space-y-4 p-4">
-                {topRatedActivities.map((activity: any, index: number) => (
-                  <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-teal-50 to-green-50 rounded-lg border-l-4 border-teal-500">
+                {topMonthlyParks.map((park: any, index: number) => (
+                  <div key={park.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border-l-4 border-blue-500">
                     {/* Posición */}
                     <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
                         {index + 1}
                       </div>
                     </div>
                     
-                    {/* Información de la actividad */}
+                    {/* Información del parque */}
                     <div className="flex-grow min-w-0">
-                      <h4 className="font-semibold text-gray-900 truncate" title={activity.title}>
-                        {activity.title}
+                      <h4 className="font-semibold text-gray-900 truncate" title={park.parkName}>
+                        {park.parkName}
                       </h4>
                       <div className="flex items-center space-x-2 mt-1">
                         <MapPin className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-600 truncate" title={activity.parkName}>
-                          {activity.parkName}
+                        <span className="text-sm text-gray-600 truncate" title={park.location}>
+                          {park.location || 'Ubicación no especificada'}
                         </span>
                       </div>
-                      {activity.categoryName && (
-                        <div className="flex items-center space-x-2 mt-1">
-                          <Tag className="h-3 w-3 text-gray-400" />
-                          <span className="text-xs text-gray-500">
-                            {activity.categoryName}
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Users className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">
+                          {park.totalMonthlyVisitors.toLocaleString()} visitantes mensuales
+                        </span>
+                      </div>
                     </div>
                     
-                    {/* Calificación y estadísticas */}
+                    {/* Estadísticas de visitantes */}
                     <div className="flex-shrink-0 text-right">
                       <div className="flex items-center space-x-1 mb-1">
-                        <span className="text-lg font-bold text-teal-700">
-                          {activity.rating.toFixed(1)}
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="text-lg font-bold text-blue-700">
+                          {park.totalMonthlyVisitors.toLocaleString()}
                         </span>
-                        <span className="text-yellow-500">⭐</span>
                       </div>
                       <div className="text-xs text-gray-500">
-                        {activity.registrationCount > 0 ? (
-                          <span>{activity.registrationCount} inscripciones</span>
-                        ) : (
-                          <span>Sin inscripciones</span>
-                        )}
+                        <span>visitantes/mes</span>
                       </div>
-                      {activity.isFree ? (
-                        <div className="text-xs text-green-600 font-medium">Gratis</div>
-                      ) : (
-                        <div className="text-xs text-blue-600 font-medium">${activity.price}</div>
-                      )}
+                      <div className="text-xs text-blue-600 font-medium">
+                        {park.avgDailyVisitors} promedio diario
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -489,7 +481,7 @@ const OrganizadorPage: React.FC = () => {
               <div className="flex items-center justify-center h-[320px] text-gray-500">
                 <div className="text-center">
                   <CheckCircle className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                  <p>No hay actividades evaluadas disponibles</p>
+                  <p>No hay datos de aforo disponibles</p>
                 </div>
               </div>
             )}
