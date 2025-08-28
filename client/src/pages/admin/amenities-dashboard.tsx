@@ -181,19 +181,6 @@ export default function AmenitiesDashboard() {
           />
 
           <MetricCard
-            title="Total Parques"
-            value={
-              <div className="text-2xl font-bold text-white mb-2">
-                {data?.totalParks || 0}
-              </div>
-            }
-            subtitle="Parques en el sistema"
-            icon={MapPin}
-            iconColor="#14b8a6"
-            backgroundColor="#003D49"
-          />
-
-          <MetricCard
             title="Total Módulos"
             value={
               <div className="space-y-1">
