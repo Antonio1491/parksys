@@ -269,38 +269,15 @@ export default function AmenitiesDashboard() {
             </div>
           </div>
 
-          {/* Top 5 amenidades más populares */}
+          {/* Amenidades por parque - Movido de la tercera fila */}
           <GraphicCard 
-            title="Top 5 Amenidades Más Populares"
-            description="Amenidades con mayor presencia en parques"
-          >
-            <div className="space-y-3">
-              {(data?.mostPopularAmenities || []).map((amenity: any, index: number) => (
-                <div key={amenity.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Badge variant="secondary">{index + 1}</Badge>
-                    <span className="font-medium">{amenity.name}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold">{amenity.parksCount}</div>
-                    <div className="text-xs text-gray-500">{amenity.utilizationRate}% uso</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </GraphicCard>
-        </div>
-
-        {/* Utilización por parque y estado */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Amenidades por parque */}
-          <GraphicCard 
-            title="Total de Amenidades por Parque"
+            title="Amenidades por Parque"
+            description="Distribución de amenidades en cada parque"
             className="h-full"
           >
             <div className="w-full">
               {(data?.utilizationByPark || []).length > 0 ? (
-                <div className="flex justify-center items-end gap-9 min-h-[320px] px-4 overflow-x-auto">
+                <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                   {(data?.utilizationByPark || [])
                     .sort((a, b) => b.amenitiesCount - a.amenitiesCount)
                     .map((park: any, index: number) => {
@@ -320,6 +297,7 @@ export default function AmenitiesDashboard() {
                               {park.amenitiesCount}
                             </div>
                             <div className="text-xs text-gray-500">
+                              amenidades
                             </div>
                           </div>
 
@@ -371,6 +349,34 @@ export default function AmenitiesDashboard() {
                 </p>
               </div>
             )}
+          </GraphicCard>
+        </div>
+
+        {/* Top 5 amenidades con más módulos - Movido de la segunda fila */}
+        <div className="grid grid-cols-1 gap-6">
+          <GraphicCard 
+            title="Top 5 Amenidades con Más Módulos"
+            description="Amenidades ordenadas por cantidad total de módulos"
+          >
+            <div className="space-y-3">
+              {(data?.mostPopularAmenities || [])
+                .sort((a, b) => b.totalModules - a.totalModules)
+                .slice(0, 5)
+                .map((amenity: any, index: number) => (
+                <div key={amenity.id} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Badge variant="secondary">{index + 1}</Badge>
+                    <span className="font-medium">{amenity.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold">{amenity.totalModules}</div>
+                    <div className="text-xs text-gray-500">
+                      {amenity.totalModules === 1 ? 'módulo' : 'módulos'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </GraphicCard>
         </div>
       </div>
