@@ -316,48 +316,6 @@ const OrganizadorPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Columna 2b (mitad derecha): Especialidades de Instructores */}
-          <Card
-            className="border-0 shadow-lg text-white flex-1 rounded-3xl"
-            style={{ backgroundColor: "#003D49" }}
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-              <CardTitle className="text-sm font-medium text-gray-100">
-                Especialidades de los instructores
-              </CardTitle>
-              <div
-                className="rounded-full p-1.5"
-                style={{ backgroundColor: "#14b8a6" }}
-              >
-                <Tag className="h-4 w-4 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent className="py-2">
-              <div className="text-2xl font-bold text-white mb-1">
-                {isLoadingSpecialtiesStats ? '...' : (specialtiesStats?.totalUniqueSpecialties || 0)}
-              </div>
-              <p className="text-xs text-white mb-2">
-                Especialidades únicas registradas
-              </p>
-              
-              {/* Top especialidad */}
-              {specialtiesStats?.topSpecialties?.[0] && (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
-                      <span className="text-xs text-gray-200 truncate">
-                        {specialtiesStats.topSpecialties[0].name}
-                      </span>
-                    </div>
-                    <span className="text-xs font-semibold text-white">
-                      {specialtiesStats.topSpecialties[0].count}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
         
         {/* Columna 3 - Instructores del Sistema */}
@@ -773,81 +731,10 @@ const OrganizadorPage: React.FC = () => {
 
       </div>
 
-      {/* Nueva fila: Evaluaciones de Instructores y Actividades Mejor Evaluadas */}
+      {/* Cuarta fila: Evaluaciones de Instructores */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-        {/* Columna izquierda: Actividades Mejor Evaluadas */}
-        <GraphicCard
-          title="⭐ Actividades Mejor Evaluadas"
-          description="Las 5 actividades con mejor puntuación del mes"
-        >
-          <div className="w-full min-h-[320px]">
-            {isLoadingTopRated ? (
-              <div className="flex items-center justify-center h-[320px] text-gray-500">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
-                  <p>Cargando actividades mejor evaluadas...</p>
-                </div>
-              </div>
-            ) : Array.isArray(topRatedActivities) && topRatedActivities.length > 0 ? (
-              <div className="space-y-4 p-4">
-                {topRatedActivities.map((activity: any, index: number) => (
-                  <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500">
-                    {/* Posición */}
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center font-bold text-sm">
-                        {index + 1}
-                      </div>
-                    </div>
-                    
-                    {/* Información de la actividad */}
-                    <div className="flex-grow min-w-0">
-                      <h4 className="font-semibold text-gray-900 truncate" title={activity.activityTitle}>
-                        {activity.activityTitle}
-                      </h4>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-600 truncate" title={activity.parkName}>
-                          {activity.parkName || 'Parque no especificado'}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Tag className="h-3 w-3 text-gray-400" />
-                        <span className="text-xs text-gray-500 capitalize">
-                          {activity.category || 'Sin categoría'}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* Calificación y estadísticas */}
-                    <div className="flex-shrink-0 text-right">
-                      <div className="flex items-center space-x-1 mb-1">
-                        <span className="text-lg font-bold text-yellow-700">
-                          {activity.rating} ⭐
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        <span>{activity.totalRegistrations} inscripciones</span>
-                      </div>
-                      <div className="text-xs text-yellow-600 font-medium">
-                        {activity.occupancyPercentage}% ocupación
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-[320px] text-gray-500">
-                <div className="text-center">
-                  <Star className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                  <p>No hay evaluaciones disponibles</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </GraphicCard>
-        
-        {/* Columna derecha: Evaluaciones de Instructores */}
+        {/* Columna izquierda: Evaluaciones de Instructores */}
         <div className="grid grid-cols-1 gap-6">
         
           {/* Instructores con mejor y peor calificación */}
@@ -918,6 +805,127 @@ const OrganizadorPage: React.FC = () => {
           </CardContent>
           </Card>
         </div>
+        
+        {/* Columna derecha: Actividades Mejor Evaluadas */}
+        <GraphicCard
+          title="⭐ Actividades Mejor Evaluadas"
+          description="Las 5 actividades con mejor puntuación del mes"
+        >
+          <div className="w-full min-h-[320px]">
+            {isLoadingTopRated ? (
+              <div className="flex items-center justify-center h-[320px] text-gray-500">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
+                  <p>Cargando actividades mejor evaluadas...</p>
+                </div>
+              </div>
+            ) : Array.isArray(topRatedActivities) && topRatedActivities.length > 0 ? (
+              <div className="space-y-4 p-4">
+                {topRatedActivities.map((activity: any, index: number) => (
+                  <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500">
+                    {/* Posición */}
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center font-bold text-sm">
+                        {index + 1}
+                      </div>
+                    </div>
+                    
+                    {/* Información de la actividad */}
+                    <div className="flex-grow min-w-0">
+                      <h4 className="font-semibold text-gray-900 truncate" title={activity.activityTitle}>
+                        {activity.activityTitle}
+                      </h4>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm text-gray-600 truncate" title={activity.parkName}>
+                          {activity.parkName || 'Parque no especificado'}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Tag className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500 capitalize">
+                          {activity.category || 'Sin categoría'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Calificación y estadísticas */}
+                    <div className="flex-shrink-0 text-right">
+                      <div className="flex items-center space-x-1 mb-1">
+                        <span className="text-lg font-bold text-yellow-700">
+                          {activity.rating} ⭐
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        <span>{activity.totalRegistrations} inscripciones</span>
+                      </div>
+                      <div className="text-xs text-yellow-600 font-medium">
+                        {activity.occupancyPercentage}% ocupación
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-[320px] text-gray-500">
+                <div className="text-center">
+                  <Star className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                  <p>No hay evaluaciones disponibles</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </GraphicCard>
+        
+      </div>
+
+      {/* Quinta fila: Especialidades de los instructores */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        {/* Columna izquierda: Especialidades de los instructores */}
+        <Card
+          className="border-0 shadow-lg text-white rounded-3xl"
+          style={{ backgroundColor: "#003D49" }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-medium text-gray-100">
+              Especialidades de los instructores
+            </CardTitle>
+            <div
+              className="rounded-full p-2"
+              style={{ backgroundColor: "#14b8a6" }}
+            >
+              <Tag className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <div className="space-y-4">
+              <div className="text-3xl font-bold text-white mb-2">
+                {isLoadingSpecialtiesStats ? '...' : (specialtiesStats?.totalUniqueSpecialties || 0)}
+              </div>
+              <div className="text-sm text-gray-300">
+                Especialidades únicas registradas
+              </div>
+              
+              {/* Top especialidad */}
+              {specialtiesStats?.topSpecialties?.[0] && (
+                <div className="space-y-2 mt-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#14b8a6" }}></div>
+                      <span className="text-sm text-gray-200 truncate">
+                        {specialtiesStats.topSpecialties[0].name}
+                      </span>
+                    </div>
+                    <span className="text-lg font-bold text-white">
+                      {specialtiesStats.topSpecialties[0].count}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
         
       </div>
 

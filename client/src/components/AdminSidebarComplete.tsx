@@ -255,7 +255,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
   );
 };
 
-// Componente para submenús colapsables dentro de "Gestión"
+// Componente para submenús colapsables
 export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
   title,
   icon,
