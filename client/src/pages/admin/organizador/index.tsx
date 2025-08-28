@@ -654,10 +654,10 @@ const OrganizadorPage: React.FC = () => {
         
       </div>
 
-      {/* Sección 3 - Gráfico de Actividades con Mayor Aforo */}
-      <div className="grid grid-cols-1 gap-6 mb-8">
+      {/* Tercera fila: Actividades con Mayor Aforo y Actividades Mejor Evaluadas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
-        {/* Actividades con Más Aforo */}
+        {/* Columna izquierda: Actividades con Más Aforo */}
         <GraphicCard
           title="📊 Actividades con más aforo"
           description="Las 5 actividades con mayor número de inscripciones en el último mes"
@@ -723,6 +723,77 @@ const OrganizadorPage: React.FC = () => {
                 <div className="text-center">
                   <CheckCircle className="mx-auto h-12 w-12 text-gray-300 mb-4" />
                   <p>No hay datos de inscripciones disponibles</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </GraphicCard>
+        
+        {/* Columna derecha: Actividades Mejor Evaluadas */}
+        <GraphicCard
+          title="⭐ Actividades Mejor Evaluadas"
+          description="Las 5 actividades con mejor puntuación del mes"
+        >
+          <div className="w-full min-h-[320px]">
+            {isLoadingTopRated ? (
+              <div className="flex items-center justify-center h-[320px] text-gray-500">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
+                  <p>Cargando actividades mejor evaluadas...</p>
+                </div>
+              </div>
+            ) : Array.isArray(topRatedActivities) && topRatedActivities.length > 0 ? (
+              <div className="space-y-4 p-4">
+                {topRatedActivities.map((activity: any, index: number) => (
+                  <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500">
+                    {/* Posición */}
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center font-bold text-sm">
+                        {index + 1}
+                      </div>
+                    </div>
+                    
+                    {/* Información de la actividad */}
+                    <div className="flex-grow min-w-0">
+                      <h4 className="font-semibold text-gray-900 truncate" title={activity.activityTitle}>
+                        {activity.activityTitle}
+                      </h4>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm text-gray-600 truncate" title={activity.parkName}>
+                          {activity.parkName || 'Parque no especificado'}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Tag className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500 capitalize">
+                          {activity.category || 'Sin categoría'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Calificación y estadísticas */}
+                    <div className="flex-shrink-0 text-right">
+                      <div className="flex items-center space-x-1 mb-1">
+                        <span className="text-lg font-bold text-yellow-700">
+                          {activity.rating} ⭐
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        <span>{activity.totalRegistrations} inscripciones</span>
+                      </div>
+                      <div className="text-xs text-yellow-600 font-medium">
+                        {activity.occupancyPercentage}% ocupación
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-[320px] text-gray-500">
+                <div className="text-center">
+                  <Star className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                  <p>No hay evaluaciones disponibles</p>
                 </div>
               </div>
             )}
@@ -805,77 +876,6 @@ const OrganizadorPage: React.FC = () => {
           </CardContent>
           </Card>
         </div>
-        
-        {/* Columna derecha: Actividades Mejor Evaluadas */}
-        <GraphicCard
-          title="⭐ Actividades Mejor Evaluadas"
-          description="Las 5 actividades con mejor puntuación del mes"
-        >
-          <div className="w-full min-h-[320px]">
-            {isLoadingTopRated ? (
-              <div className="flex items-center justify-center h-[320px] text-gray-500">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
-                  <p>Cargando actividades mejor evaluadas...</p>
-                </div>
-              </div>
-            ) : Array.isArray(topRatedActivities) && topRatedActivities.length > 0 ? (
-              <div className="space-y-4 p-4">
-                {topRatedActivities.map((activity: any, index: number) => (
-                  <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500">
-                    {/* Posición */}
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center font-bold text-sm">
-                        {index + 1}
-                      </div>
-                    </div>
-                    
-                    {/* Información de la actividad */}
-                    <div className="flex-grow min-w-0">
-                      <h4 className="font-semibold text-gray-900 truncate" title={activity.activityTitle}>
-                        {activity.activityTitle}
-                      </h4>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-600 truncate" title={activity.parkName}>
-                          {activity.parkName || 'Parque no especificado'}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Tag className="h-3 w-3 text-gray-400" />
-                        <span className="text-xs text-gray-500 capitalize">
-                          {activity.category || 'Sin categoría'}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* Calificación y estadísticas */}
-                    <div className="flex-shrink-0 text-right">
-                      <div className="flex items-center space-x-1 mb-1">
-                        <span className="text-lg font-bold text-yellow-700">
-                          {activity.rating} ⭐
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        <span>{activity.totalRegistrations} inscripciones</span>
-                      </div>
-                      <div className="text-xs text-yellow-600 font-medium">
-                        {activity.occupancyPercentage}% ocupación
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-[320px] text-gray-500">
-                <div className="text-center">
-                  <Star className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                  <p>No hay evaluaciones disponibles</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </GraphicCard>
         
       </div>
 
