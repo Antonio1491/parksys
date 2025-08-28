@@ -670,6 +670,10 @@ const OrganizadorPage: React.FC = () => {
                     innerRadius={30}
                     paddingAngle={2}
                     dataKey="value"
+                    label={({ value, percent }: any) => 
+                      `${value} (${(percent * 100).toFixed(0)}%)`
+                    }
+                    labelLine={false}
                   >
                     {categoryPieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -684,11 +688,15 @@ const OrganizadorPage: React.FC = () => {
                       paddingTop: '20px',
                       fontSize: '12px'
                     }}
-                    formatter={(value: string) => (
-                      <span style={{ color: '#374151', fontSize: '12px' }}>
-                        {value}
-                      </span>
-                    )}
+                    formatter={(value: string, entry: any) => {
+                      const categoryData = categoryPieData.find(item => item.name === value);
+                      const count = categoryData ? categoryData.value : 0;
+                      return (
+                        <span style={{ color: '#374151', fontSize: '12px', fontWeight: '500' }}>
+                          {value} ({count} actividades)
+                        </span>
+                      );
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
