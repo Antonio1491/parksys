@@ -57,9 +57,9 @@ const OrganizadorPage: React.FC = () => {
     retry: 1,
   });
 
-  // Obtener actividades mejor evaluadas
-  const { data: topRatedActivities = [], isLoading: isLoadingTopRated } = useQuery({
-    queryKey: ['/api/activities/top-rated'],
+  // Obtener parques con mayor aforo mensual
+  const { data: topMonthlyParks = [], isLoading: isLoadingTopParks } = useQuery({
+    queryKey: ['/api/parks/top-monthly-visitors'],
     retry: 1,
   });
 
@@ -705,56 +705,48 @@ const OrganizadorPage: React.FC = () => {
         </div>
         
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4">🏆 Actividades Destacadas</h2>
+          <h2 className="text-xl font-semibold mb-4">📊 Parques con Mayor Aforo Mensual</h2>
           <div className="space-y-3">
-            {isLoadingTopRated ? (
-              <div className="text-center py-4 text-gray-500">Cargando actividades destacadas...</div>
-            ) : Array.isArray(topRatedActivities) && topRatedActivities.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">No hay actividades evaluadas</div>
+            {isLoadingTopParks ? (
+              <div className="text-center py-4 text-gray-500">Cargando parques con mayor aforo...</div>
+            ) : Array.isArray(topMonthlyParks) && topMonthlyParks.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">No hay datos de aforo disponibles</div>
             ) : (
-              topRatedActivities.map((activity: any, index: number) => (
-                <div key={activity.id} className="flex items-center p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200">
+              topMonthlyParks.map((park: any, index: number) => (
+                <div key={park.id} className="flex items-center p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border border-blue-200">
                   {/* Posición */}
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white flex items-center justify-center font-bold text-sm mr-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-teal-500 text-white flex items-center justify-center font-bold text-sm mr-3">
                     {index + 1}
                   </div>
                   
                   <div className="flex-grow">
                     <div className="flex justify-between items-start mb-2">
                       <span className="font-medium text-gray-900 leading-tight">
-                        {activity.title.length > 30 ? `${activity.title.substring(0, 30)}...` : activity.title}
+                        {park.parkName.length > 25 ? `${park.parkName.substring(0, 25)}...` : park.parkName}
                       </span>
                       <div className="flex items-center space-x-1 ml-2">
-                        <span className="text-sm font-bold text-amber-700">
-                          {activity.rating.toFixed(1)}
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-bold text-blue-700">
+                          {park.totalMonthlyVisitors.toLocaleString()}
                         </span>
-                        <span className="text-yellow-500">⭐</span>
                       </div>
                     </div>
                     
                     <div className="flex items-center justify-between text-xs text-gray-600">
                       <div className="flex items-center space-x-1">
                         <MapPin className="h-3 w-3" />
-                        <span className="truncate max-w-[120px]" title={activity.parkName}>
-                          {activity.parkName}
+                        <span className="truncate max-w-[120px]" title={park.location}>
+                          {park.location || 'Ubicación no especificada'}
                         </span>
                       </div>
                       
                       <div className="flex items-center space-x-2">
-                        {activity.registrationCount > 0 && (
-                          <span className="text-teal-600">
-                            {activity.registrationCount} inscripciones
-                          </span>
-                        )}
-                        {activity.isFree ? (
-                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-                            Gratis
-                          </span>
-                        ) : (
-                          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                            ${activity.price}
-                          </span>
-                        )}
+                        <span className="text-teal-600">
+                          {park.avgDailyVisitors} promedio diario
+                        </span>
+                        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                          {park.recordedDays} días registrados
+                        </span>
                       </div>
                     </div>
                   </div>

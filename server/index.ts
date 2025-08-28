@@ -762,62 +762,46 @@ app.post("/api/activities", async (req: Request, res: Response) => {
   }
 });
 
-// ENDPOINT PARA OBTENER ACTIVIDADES MEJOR EVALUADAS
-app.get("/api/activities/top-rated", async (_req: Request, res: Response) => {
+// ENDPOINT PARA OBTENER PARQUES CON MAYOR AFORO MENSUAL
+app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) => {
   try {
-    console.log("🌟 Obteniendo actividades mejor evaluadas...");
+    console.log("📊 Obteniendo parques con mayor aforo mensual...");
     
     const { sql } = await import("drizzle-orm");
     
-    // Consulta para obtener actividades con sus inscripciones y calcular rating simulado
+    // Consulta para obtener parques con mayor aforo mensual
     const result = await db.execute(
       sql`SELECT 
-            a.id, 
-            a.title, 
+            p.id,
             p.name as "parkName",
-            COUNT(ar.id) as "registrationCount",
-            a.capacity,
-            ac.name as "categoryName",
-            a.price,
-            a.is_free as "isFree",
-            -- Calcular rating simulado basado en popularidad e interacción
-            CASE 
-              WHEN COUNT(ar.id) >= 3 THEN 4.8
-              WHEN COUNT(ar.id) = 2 THEN 4.5
-              WHEN COUNT(ar.id) = 1 THEN 4.2
-              WHEN a.capacity > 20 THEN 4.0
-              ELSE 3.8
-            END as "rating"
-          FROM activities a
-          JOIN parks p ON p.id = a.park_id
-          LEFT JOIN activity_categories ac ON ac.id = a.category_id
-          LEFT JOIN activity_registrations ar ON ar.activity_id = a.id
-          GROUP BY a.id, a.title, p.name, a.capacity, ac.name, a.price, a.is_free
-          ORDER BY 
-            COUNT(ar.id) DESC, 
-            a.capacity DESC,
-            a.title ASC
+            p.location,
+            SUM(vc.adults + vc.children + vc.seniors + vc.pets) as "totalMonthlyVisitors",
+            AVG(vc.adults + vc.children + vc.seniors + vc.pets) as "avgDailyVisitors",
+            COUNT(vc.id) as "recordedDays"
+          FROM parks p
+          LEFT JOIN visitor_counts vc ON vc.park_id = p.id 
+          WHERE vc.date >= CURRENT_DATE - INTERVAL '30 days'
+          GROUP BY p.id, p.name, p.location
+          HAVING SUM(vc.adults + vc.children + vc.seniors + vc.pets) > 0
+          ORDER BY totalMonthlyVisitors DESC
           LIMIT 5`
     );
 
-    console.log(`🌟 Actividades mejor evaluadas encontradas: ${result.rows.length}`);
+    console.log(`📊 Parques con mayor aforo encontrados: ${result.rows.length}`);
     
-    const formattedActivities = result.rows.map((row: any) => ({
+    const formattedParks = result.rows.map((row: any) => ({
       id: row.id,
-      title: row.title,
       parkName: row.parkName,
-      registrationCount: Number(row.registrationCount),
-      capacity: row.capacity,
-      categoryName: row.categoryName,
-      price: row.price,
-      isFree: row.isFree,
-      rating: Number(row.rating)
+      location: row.location,
+      totalMonthlyVisitors: Number(row.totalMonthlyVisitors),
+      avgDailyVisitors: Number(row.avgDailyVisitors).toFixed(0),
+      recordedDays: Number(row.recordedDays)
     }));
 
-    res.json(formattedActivities);
+    res.json(formattedParks);
   } catch (error: any) {
-    console.error("Error al obtener actividades mejor evaluadas:", error);
-    res.status(500).json({ message: "Error al obtener actividades mejor evaluadas" });
+    console.error("Error al obtener parques con mayor aforo mensual:", error);
+    res.status(500).json({ message: "Error al obtener parques con mayor aforo mensual" });
   }
 });
 

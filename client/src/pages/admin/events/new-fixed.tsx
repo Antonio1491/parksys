@@ -238,7 +238,7 @@ const NewEventPageFixed: React.FC = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <Card className="p-4 bg-gray-50">
+        <Card className="p-4 bg-[#3cb8a6]">
           <div className="flex items-center gap-2">
             <Plus className="w-8 h-8 text-gray-900" />
             <h1 className="text-3xl font-bold text-gray-900">Nuevo Evento</h1>
