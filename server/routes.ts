@@ -2882,11 +2882,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         parkWithMostAmenities: parkWithMostAmenities,
         mostPopularAmenities: amenityStats.slice(0, 5),
         allAmenities: amenityStats,
-        amenityDistribution: amenityStats.slice(0, 6).map((amenity: any, index: number) => ({
-          name: amenity.name.length > 12 ? amenity.name.substring(0, 12) + '...' : amenity.name,
-          value: amenity.parksCount,
-          color: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'][index % 6]
-        })),
+        amenityDistribution: (() => {
+          // Agrupar amenidades por categoría y contar el total en cada categoría
+          const categoryGroups = amenityStats.reduce((acc: any, amenity: any) => {
+            const category = amenity.category || 'Sin categoría';
+            if (!acc[category]) {
+              acc[category] = 0;
+            }
+            acc[category] += 1;
+            return acc;
+          }, {});
+
+          // Convertir a formato para el gráfico
+          const categoryColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+          return Object.entries(categoryGroups).map(([category, count], index) => ({
+            name: category,
+            value: count,
+            color: categoryColors[index % categoryColors.length]
+          }));
+        })(),
         utilizationByPark: parkUtilization.rows.map((park: any) => ({
           parkName: park.park_name.length > 20 ? park.park_name.substring(0, 20) + '...' : park.park_name,
           amenitiesCount: parseInt(park.amenities_count) || 0

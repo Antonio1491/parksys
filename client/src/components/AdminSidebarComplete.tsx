@@ -493,13 +493,16 @@ const AdminSidebarComplete: React.FC = () => {
             defaultOpen={location.startsWith('/admin/visitors') || location.startsWith('/admin/parks') || location.startsWith('/admin/trees') || location.startsWith('/admin/organizador') || location.startsWith('/admin/activities') || location.startsWith('/admin/events') || location.startsWith('/admin/space-reservations') || location.startsWith('/admin/dashboard-reservas')}
           >
             {/* PARQUES */}
-            <NavItem
-              href="/admin/parks"
+            <CollapsibleSubmenu
+              id="parques"
+              title={t('navigation.parks')}
               icon={<Map className="h-4 w-4" />}
-              active={location.startsWith('/admin/parks')}
-              >
-              {t('navigation.parks')}
-            </NavItem>
+              href="/admin/parks"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/parks')}
+            />
 
             {/* ACTIVIDADES */}
             <CollapsibleSubmenu
@@ -555,13 +558,16 @@ const AdminSidebarComplete: React.FC = () => {
             </CollapsibleSubmenu>
 
             {/* AMENIDADES */}
-            <NavItem
-              href="/admin/amenities"
+            <CollapsibleSubmenu
+              id="amenidades"
+              title="Amenidades"
               icon={<Package className="h-4 w-4" />}
-              active={location.startsWith('/admin/amenities')}
-            >
-              Amenidades
-            </NavItem>
+              href="/admin/amenities"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/amenities')}
+            />
 
             {/* ARBOLADO */}
             <CollapsibleSubmenu
@@ -596,13 +602,16 @@ const AdminSidebarComplete: React.FC = () => {
             </CollapsibleSubmenu>
 
             {/* FAUNA */}
-            <NavItem
-              href="/admin/fauna/species"
+            <CollapsibleSubmenu
+              id="fauna"
+              title="Fauna"
               icon={<Heart className="h-4 w-4" />}
-              active={location.startsWith('/admin/fauna/species')}
-            >
-              Fauna
-            </NavItem>
+              href="/admin/fauna/species"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/fauna/species')}
+            />
 
             {/* VISITANTES */}
             <CollapsibleSubmenu
@@ -790,8 +799,6 @@ const AdminSidebarComplete: React.FC = () => {
               </NavItem>
             </CollapsibleSubmenu>
           </ModuleNav>
-
-
 
           {/* 3. O & M - OPERACIONES Y MANTENIMIENTO CON SUBMENÚS COLAPSABLES */}
           <ModuleNav 
@@ -1218,27 +1225,38 @@ const AdminSidebarComplete: React.FC = () => {
             icon={<Users className="h-5 w-5" />}
             value="hr"
           >
-            <NavItem 
-              href="/admin/hr/employees" 
+            <CollapsibleSubmenu
+              id="empleados"
+              title="Empleados"
               icon={<Users className="h-5 w-5" />}
-              active={location.startsWith('/admin/hr/employees')}
-            >
-              Empleados
-            </NavItem>
-            <NavItem 
-              href="/admin/hr/payroll" 
+              href="/admin/hr/employees"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/hr/employees')}
+            />
+
+            <CollapsibleSubmenu
+              id="nomina"
+              title="Nómina"
               icon={<DollarSign className="h-5 w-5" />}
-              active={location.startsWith('/admin/hr/payroll')}
-            >
-              Nómina
-            </NavItem>
-            <NavItem 
-              href="/admin/hr/vacations" 
+              href="/admin/hr/payroll"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/hr/payroll')}
+            />
+
+            <CollapsibleSubmenu
+              id="vacaciones"
+              title="Vacaciones"
               icon={<Calendar className="h-5 w-5" />}
-              active={location.startsWith('/admin/hr/vacations')}
-            >
-              Vacaciones
-            </NavItem>
+              href="/admin/hr/vacations"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/hr/vacations')}
+            />
           </ModuleNav>
 
           {/* 7. CONFIGURACIÓN Y SEGURIDAD */}
@@ -1288,22 +1306,28 @@ const AdminSidebarComplete: React.FC = () => {
             </CollapsibleSubmenu>
 
             {/* POLÍTICAS */}
-            <NavItem
-              href="/admin/configuracion-seguridad/policies"
+            <CollapsibleSubmenu
+              id="politicas"
+              title="Políticas"
               icon={<FileText className="h-4 w-4" />}
-              active={location.startsWith('/admin/configuracion-seguridad/policies')}
-            >
-              Políticas
-            </NavItem>
+              href="/admin/configuracion-seguridad/policies"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/configuracion-seguridad/policies')}
+            />
 
             {/* NOTIFICACIONES */}
-            <NavItem
-              href="/admin/configuracion-seguridad/notifications"
+            <CollapsibleSubmenu
+              id="notificaciones"
+              title="Notificaciones"
               icon={<Bell className="h-4 w-4" />}
-              active={location.startsWith('/admin/configuracion-seguridad/notifications')}
-            >
-              Notificaciones
-            </NavItem>
+              href="/admin/configuracion-seguridad/notifications"
+              collapsible={false}
+              isExpanded={false}
+              onToggle={() => {}}
+              isActive={location.startsWith('/admin/configuracion-seguridad/notifications')}
+            />
 
             {/* AUDITORÍA */}
             <CollapsibleSubmenu
