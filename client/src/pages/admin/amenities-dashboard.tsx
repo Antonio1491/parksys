@@ -269,21 +269,26 @@ export default function AmenitiesDashboard() {
             </div>
           </div>
 
-          {/* Top 5 amenidades más populares */}
+          {/* Top 5 amenidades con más módulos */}
           <GraphicCard 
-            title="Top 5 Amenidades Más Populares"
-            description="Amenidades con mayor presencia en parques"
+            title="Top 5 Amenidades con Más Módulos"
+            description="Amenidades ordenadas por cantidad total de módulos"
           >
             <div className="space-y-3">
-              {(data?.mostPopularAmenities || []).map((amenity: any, index: number) => (
+              {(data?.mostPopularAmenities || [])
+                .sort((a, b) => b.totalModules - a.totalModules)
+                .slice(0, 5)
+                .map((amenity: any, index: number) => (
                 <div key={amenity.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Badge variant="secondary">{index + 1}</Badge>
                     <span className="font-medium">{amenity.name}</span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold">{amenity.parksCount}</div>
-                    <div className="text-xs text-gray-500">{amenity.utilizationRate}% uso</div>
+                    <div className="font-bold">{amenity.totalModules}</div>
+                    <div className="text-xs text-gray-500">
+                      {amenity.totalModules === 1 ? 'módulo' : 'módulos'}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -373,27 +378,6 @@ export default function AmenitiesDashboard() {
                 </p>
               </div>
             )}
-          </GraphicCard>
-
-          {/* Estado de amenidades */}
-          <GraphicCard 
-            title="Estado de Amenidades"
-            description="Distribución por estado operativo"
-          >
-            <div className="space-y-3">
-              {(data?.statusDistribution || []).map((status: any) => (
-                <div key={status.status} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: status.color }}
-                    ></div>
-                    <span className="font-medium">{status.status}</span>
-                  </div>
-                  <Badge variant="outline">{status.count}</Badge>
-                </div>
-              ))}
-            </div>
           </GraphicCard>
         </div>
       </div>
