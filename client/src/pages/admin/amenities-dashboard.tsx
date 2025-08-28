@@ -306,23 +306,6 @@ export default function AmenitiesDashboard() {
             </div>
           </GraphicCard>
         </div>
-
-        {/* Insights automáticos */}
-        {insights.length > 0 && (
-          <GraphicCard 
-            title="Insights Automáticos"
-            description="Análisis y recomendaciones basadas en datos"
-          >
-            <div className="space-y-3">
-              {insights.map((insight, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-teal-500 mt-0.5" />
-                  <p className="text-gray-700">{insight}</p>
-                </div>
-              ))}
-            </div>
-          </GraphicCard>
-        )}
       </div>
     </DashboardLayout>
   );

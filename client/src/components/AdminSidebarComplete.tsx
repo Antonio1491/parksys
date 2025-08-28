@@ -480,6 +480,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Calendar className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('actividades')}
               onToggle={toggleSubmenu}
+              isActive={activeSubmenuId === 'actividades'}
             >
               <NavItem 
                 href="/admin/activities/categories" 
