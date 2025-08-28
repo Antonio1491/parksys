@@ -528,7 +528,7 @@ const AdminParksContent = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header con título */}
-        <Card className="p-4 text-[#0c0a09] bg-[#14b8a6]">
+        <Card className="p-4 text-[#0c0a09] bg-[#14b8a6] text-card-foreground">
           <div className="flex items-center gap-2">
             <MapPin className="w-8 h-8 text-gray-900" />
             <h1 className="text-3xl font-bold text-gray-900">Parques</h1>
