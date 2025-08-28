@@ -762,7 +762,58 @@ app.post("/api/activities", async (req: Request, res: Response) => {
   }
 });
 
-// ENDPOINT PARA OBTENER PARQUES CON MAYOR AFORO MENSUAL
+// ENDPOINT PARA OBTENER ACTIVIDADES CON MÁS AFORO MENSUAL
+app.get("/api/activities/top-monthly-registrations", async (_req: Request, res: Response) => {
+  try {
+    console.log("📊 Obteniendo actividades con más inscripciones del mes...");
+    
+    const { sql } = await import("drizzle-orm");
+    
+    // Consulta para obtener actividades con más inscripciones del mes
+    const result = await db.execute(
+      sql`SELECT 
+            a.id,
+            a.title as "activityTitle",
+            a.category,
+            a.capacity,
+            p.name as "parkName",
+            COUNT(ar.id) as "monthlyRegistrations",
+            COUNT(CASE WHEN ar.status = 'approved' THEN 1 END) as "approvedRegistrations",
+            a.start_date,
+            a.end_date
+          FROM activities a
+          LEFT JOIN activity_registrations ar ON ar.activity_id = a.id 
+          LEFT JOIN parks p ON p.id = a.park_id
+          WHERE ar.created_at >= CURRENT_DATE - INTERVAL '30 days'
+          GROUP BY a.id, a.title, a.category, a.capacity, p.name, a.start_date, a.end_date
+          HAVING COUNT(ar.id) > 0
+          ORDER BY monthlyRegistrations DESC
+          LIMIT 5`
+    );
+
+    console.log(`📊 Actividades con mayor aforo encontradas: ${result.rows.length}`);
+    
+    const formattedActivities = result.rows.map((row: any) => ({
+      id: row.id,
+      activityTitle: row.activityTitle,
+      category: row.category,
+      capacity: Number(row.capacity),
+      parkName: row.parkName,
+      monthlyRegistrations: Number(row.monthlyRegistrations),
+      approvedRegistrations: Number(row.approvedRegistrations),
+      startDate: row.start_date,
+      endDate: row.end_date,
+      occupancyPercentage: row.capacity ? ((Number(row.approvedRegistrations) / Number(row.capacity)) * 100).toFixed(1) : 0
+    }));
+
+    res.json(formattedActivities);
+  } catch (error: any) {
+    console.error("Error al obtener actividades con mayor aforo mensual:", error);
+    res.status(500).json({ message: "Error al obtener actividades con mayor aforo mensual" });
+  }
+});
+
+// ENDPOINT PARA OBTENER PARQUES CON MAYOR AFORO MENSUAL (MANTENIDO PARA COMPATIBILIDAD)
 app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) => {
   try {
     console.log("📊 Obteniendo parques con mayor aforo mensual...");

@@ -57,9 +57,9 @@ const OrganizadorPage: React.FC = () => {
     retry: 1,
   });
 
-  // Obtener parques con mayor aforo mensual
-  const { data: topMonthlyParks = [], isLoading: isLoadingTopParks } = useQuery({
-    queryKey: ['/api/parks/top-monthly-visitors'],
+  // Obtener actividades con mayor aforo mensual
+  const { data: topMonthlyActivities = [], isLoading: isLoadingTopActivities } = useQuery({
+    queryKey: ['/api/activities/top-monthly-registrations'],
     retry: 1,
   });
 
@@ -575,23 +575,23 @@ const OrganizadorPage: React.FC = () => {
       {/* Sección 3 - Gráfico de Parques con Mayor Aforo y Actividades Próximas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
-        {/* Columna izquierda: Actividades Mejor Evaluadas */}
+        {/* Columna izquierda: Actividades con Más Aforo */}
         <GraphicCard
-          title="📊 Parques con Mayor Aforo Mensual"
-          description="Los 5 parques con mayor número de visitantes en el último mes"
+          title="📊 Actividades con más aforo"
+          description="Las 5 actividades con mayor número de inscripciones en el último mes"
         >
           <div className="w-full min-h-[320px]">
-            {isLoadingTopParks ? (
+            {isLoadingTopActivities ? (
               <div className="flex items-center justify-center h-[320px] text-gray-500">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
-                  <p>Cargando parques con mayor aforo...</p>
+                  <p>Cargando actividades con mayor aforo...</p>
                 </div>
               </div>
-            ) : Array.isArray(topMonthlyParks) && topMonthlyParks.length > 0 ? (
+            ) : Array.isArray(topMonthlyActivities) && topMonthlyActivities.length > 0 ? (
               <div className="space-y-4 p-4">
-                {topMonthlyParks.map((park: any, index: number) => (
-                  <div key={park.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border-l-4 border-blue-500">
+                {topMonthlyActivities.map((activity: any, index: number) => (
+                  <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border-l-4 border-blue-500">
                     {/* Posición */}
                     <div className="flex-shrink-0">
                       <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
@@ -599,38 +599,38 @@ const OrganizadorPage: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Información del parque */}
+                    {/* Información de la actividad */}
                     <div className="flex-grow min-w-0">
-                      <h4 className="font-semibold text-gray-900 truncate" title={park.parkName}>
-                        {park.parkName}
+                      <h4 className="font-semibold text-gray-900 truncate" title={activity.activityTitle}>
+                        {activity.activityTitle}
                       </h4>
                       <div className="flex items-center space-x-2 mt-1">
                         <MapPin className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-600 truncate" title={park.location}>
-                          {park.location || 'Ubicación no especificada'}
+                        <span className="text-sm text-gray-600 truncate" title={activity.parkName}>
+                          {activity.parkName || 'Parque no especificado'}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2 mt-1">
-                        <Users className="h-3 w-3 text-gray-400" />
-                        <span className="text-xs text-gray-500">
-                          {park.totalMonthlyVisitors.toLocaleString()} visitantes mensuales
+                        <Tag className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500 capitalize">
+                          {activity.category || 'Sin categoría'}
                         </span>
                       </div>
                     </div>
                     
-                    {/* Estadísticas de visitantes */}
+                    {/* Estadísticas de inscripciones */}
                     <div className="flex-shrink-0 text-right">
                       <div className="flex items-center space-x-1 mb-1">
                         <Users className="h-4 w-4 text-blue-600" />
                         <span className="text-lg font-bold text-blue-700">
-                          {park.totalMonthlyVisitors.toLocaleString()}
+                          {activity.monthlyRegistrations}
                         </span>
                       </div>
                       <div className="text-xs text-gray-500">
-                        <span>visitantes/mes</span>
+                        <span>inscripciones/mes</span>
                       </div>
                       <div className="text-xs text-blue-600 font-medium">
-                        {park.avgDailyVisitors} promedio diario
+                        {activity.occupancyPercentage}% ocupación
                       </div>
                     </div>
                   </div>
@@ -640,7 +640,7 @@ const OrganizadorPage: React.FC = () => {
               <div className="flex items-center justify-center h-[320px] text-gray-500">
                 <div className="text-center">
                   <CheckCircle className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                  <p>No hay datos de aforo disponibles</p>
+                  <p>No hay datos de inscripciones disponibles</p>
                 </div>
               </div>
             )}
