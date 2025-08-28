@@ -765,21 +765,23 @@ const ParksDashboard = () => {
                     ][index % 10];
                     const percentage = ((item.count / data.totalParks) * 100).toFixed(1);
                     
-                    // Formatear nombres de tipos de parques
+                    // Formatear nombres de tipos de parques (tipología oficial)
                     const formatParkType = (type: string) => {
+                      // Los nombres vienen de la tabla park_typology, ya están correctamente formateados
                       const typeMap: { [key: string]: string } = {
+                        'Metropolitano': 'Metropolitano',
+                        'Urbano': 'Urbano',
+                        'Comunitario': 'Comunitario',
+                        'Vecinal': 'Vecinal',
+                        'Barrial': 'Barrial',
+                        // Mantener compatibilidad con posibles valores legacy
                         'metropolitano': 'Metropolitano',
-                        'botanico': 'Botánico',
-                        'deportivo': 'Deportivo',
                         'urbano': 'Urbano',
-                        'natural': 'Natural',
-                        'lineal': 'Lineal',
                         'comunitario': 'Comunitario',
                         'vecinal': 'Vecinal',
-                        'tematico': 'Temático',
-                        'de_bolsillo': 'De Bolsillo'
+                        'barrial': 'Barrial'
                       };
-                      return typeMap[type] || type.charAt(0).toUpperCase() + type.slice(1);
+                      return typeMap[type] || type;
                     };
 
                     return (

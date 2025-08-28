@@ -1533,12 +1533,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ORDER BY count DESC
       `);
       
-      // Parques por tipo
+      // Parques por tipo (usando tipología oficial)
       const parksByTypeResult = await pool.query(`
-        SELECT park_type as type, COUNT(*) as count
-        FROM parks
-        WHERE park_type IS NOT NULL
-        GROUP BY park_type
+        SELECT pt.name as type, COUNT(*) as count
+        FROM parks p
+        LEFT JOIN park_typology pt ON p.typology_id = pt.id
+        WHERE pt.name IS NOT NULL
+        GROUP BY pt.name
         ORDER BY count DESC
       `);
       
