@@ -432,6 +432,79 @@ const OrganizadorPage: React.FC = () => {
         </MetricCard>
       </div>
 
+      {/* Nueva sección: Actividades Próximas */}
+      <div className="grid grid-cols-1 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <h2 className="text-xl font-semibold mb-4">Actividades Próximas</h2>
+          <div className="max-h-[400px] overflow-y-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Categoría</TableHead>
+                  <TableHead>Parque</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingActivities ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                      Cargando actividades...
+                    </TableCell>
+                  </TableRow>
+                ) : upcomingActivities.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                      No hay actividades próximas programadas
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  upcomingActivities.map((activity: any) => (
+                    <TableRow key={activity.id}>
+                      <TableCell className="font-medium">{activity.title}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {(() => {
+                            const categoryId = activity.categoryId || activity.category_id;
+                            if (categoryId && categoriesMap[categoryId]) {
+                              return categoriesMap[categoryId].name;
+                            }
+                            else if (activity.category && categoryStringMap[activity.category]) {
+                              return categoryStringMap[activity.category];
+                            }
+                            return 'Sin categoría';
+                          })()}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{parkNamesMap[activity.parkId] || `Parque ${activity.parkId}`}</TableCell>
+                      <TableCell>
+                        {new Date(activity.startDate).toLocaleDateString('es-ES')}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Link href={`/admin/organizador/catalogo/${activity.id}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Link href={`/admin/organizador/catalogo/editar/${activity.id}`}>
+                            <Button variant="outline" size="sm">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </div>
+
       {/* Sección 2 - Gráficos de categorías y actividades por parque */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
@@ -578,10 +651,10 @@ const OrganizadorPage: React.FC = () => {
         
       </div>
 
-      {/* Sección 3 - Gráfico de Parques con Mayor Aforo y Actividades Próximas */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* Sección 3 - Gráfico de Actividades con Mayor Aforo */}
+      <div className="grid grid-cols-1 gap-6 mb-8">
         
-        {/* Columna izquierda: Actividades con Más Aforo */}
+        {/* Actividades con Más Aforo */}
         <GraphicCard
           title="📊 Actividades con más aforo"
           description="Las 5 actividades con mayor número de inscripciones en el último mes"
@@ -652,77 +725,6 @@ const OrganizadorPage: React.FC = () => {
             )}
           </div>
         </GraphicCard>
-
-        {/* Columna derecha: Actividades Próximas */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4">Actividades Próximas</h2>
-          <div className="max-h-[400px] overflow-y-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Categoría</TableHead>
-                  <TableHead>Parque</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingActivities ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                      Cargando actividades...
-                    </TableCell>
-                  </TableRow>
-                ) : upcomingActivities.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                      No hay actividades próximas programadas
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  upcomingActivities.map((activity: any) => (
-                    <TableRow key={activity.id}>
-                      <TableCell className="font-medium">{activity.title}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {(() => {
-                            const categoryId = activity.categoryId || activity.category_id;
-                            if (categoryId && categoriesMap[categoryId]) {
-                              return categoriesMap[categoryId].name;
-                            }
-                            else if (activity.category && categoryStringMap[activity.category]) {
-                              return categoryStringMap[activity.category];
-                            }
-                            return 'Sin categoría';
-                          })()}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{parkNamesMap[activity.parkId] || `Parque ${activity.parkId}`}</TableCell>
-                      <TableCell>
-                        {new Date(activity.startDate).toLocaleDateString('es-ES')}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Link href={`/admin/organizador/catalogo/${activity.id}`}>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          <Link href={`/admin/organizador/catalogo/editar/${activity.id}`}>
-                            <Button variant="outline" size="sm">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
 
       </div>
 
