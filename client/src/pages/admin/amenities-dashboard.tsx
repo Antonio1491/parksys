@@ -340,7 +340,7 @@ export default function AmenitiesDashboard() {
                           </div>
 
                           {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                          <div className="absolute bottom-32 -left-36 transform -rotate-90 origin-bottom-right w-32">
+                          <div className="absolute bottom-32 -left-32 transform -rotate-90 origin-bottom-right w-32">
                             <div className="text-xs text-gray-700 whitespace-nowrap">
                               {park.parkName}
                             </div>
