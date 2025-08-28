@@ -8,6 +8,10 @@ import {
   CheckCircle,
   Award,
   MessageSquare,
+  Users,
+  Calendar,
+  ParkingCircle,
+  Activity
 } from "lucide-react";
 import DashboardLayout from "@/components/ui/dashboard-layout";
 import MetricCard from "@/components/ui/metric-card";
@@ -113,6 +117,43 @@ interface ParksDashboardData {
     type: string;
     count: number;
   }>;
+  // NUEVAS MÉTRICAS:
+  mostVisitedPark?: {
+    parkId: number;
+    parkName: string;
+    weeklyVisitors: number;
+    visitRecords: number;
+  } | null;
+  parkWithMostAmenities?: {
+    parkId: number;
+    parkName: string;
+    amenityCount: number;
+  } | null;
+  parkWithLeastAmenities?: {
+    parkId: number;
+    parkName: string;
+    amenityCount: number;
+  } | null;
+  mostRequestedPark?: {
+    parkId: number;
+    parkName: string;
+    reservationRequests: number;
+    approvedReservations: number;
+    pendingReservations: number;
+  } | null;
+  parkWithMostAvailableSpaces?: {
+    parkId: number;
+    parkName: string;
+    totalSpaces: number;
+    availableSpaces: number;
+  } | null;
+  parkWithMostEvents?: {
+    parkId: number;
+    parkName: string;
+    scheduledEvents: number;
+    upcomingEvents: number;
+    activeEvents: number;
+  } | null;
 }
 
 const ParksDashboard = () => {
@@ -700,7 +741,185 @@ const ParksDashboard = () => {
         
       </div>
 
-      {/* Cuarta fila: Gráfico de pastel de clasificación por tipo */}
+      {/* Quinta fila: Nuevas métricas de visitantes, amenidades, reservas y eventos */}
+      <div className="grid gap-6 lg:grid-cols-4">
+        
+        {/* Parque más visitado */}
+        <MetricCard
+          title="Visitantes"
+          value={data.mostVisitedPark ? data.mostVisitedPark.weeklyVisitors : "N/A"}
+          subtitle="Más visitado semanalmente"
+          icon={Users}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
+          className="h-full"
+        >
+          {data.mostVisitedPark && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-teal-400"></div>
+                  <span className="text-xs text-gray-200">
+                    Más Visitado
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-teal-400">
+                  {data.mostVisitedPark.weeklyVisitors} visitantes/semana
+                </span>
+              </div>
+              <div className="text-xl text-gray-200 truncate">
+                {data.mostVisitedPark.parkName}
+                {(() => {
+                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.mostVisitedPark?.parkId)?.area;
+                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                })()}
+              </div>
+              <div className="text-xs text-gray-300">
+                {data.mostVisitedPark.visitRecords} registros de visitas
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Amenidades */}
+        <MetricCard
+          title="Amenidades"
+          value={data.parkWithMostAmenities ? data.parkWithMostAmenities.amenityCount : "N/A"}
+          subtitle="Parque con más amenidades"
+          icon={Award}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
+          className="h-full"
+        >
+          {data.parkWithMostAmenities && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                  <span className="text-xs text-gray-200">
+                    Más Amenidades
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-yellow-400">
+                  {data.parkWithMostAmenities.amenityCount} amenidades
+                </span>
+              </div>
+              <div className="text-xl text-gray-200 truncate">
+                {data.parkWithMostAmenities.parkName}
+                {(() => {
+                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithMostAmenities?.parkId)?.area;
+                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                })()}
+              </div>
+              {data.parkWithLeastAmenities && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 rounded-full bg-orange-400"></div>
+                      <span className="text-xs text-gray-200">
+                        Menos Amenidades
+                      </span>
+                    </div>
+                    <span className="text-xs font-semibold text-orange-400">
+                      {data.parkWithLeastAmenities.amenityCount} amenidades
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-200 truncate">
+                    {data.parkWithLeastAmenities.parkName}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Reservas */}
+        <MetricCard
+          title="Reservas"
+          value={data.mostRequestedPark ? data.mostRequestedPark.reservationRequests : "N/A"}
+          subtitle="Parque más solicitado"
+          icon={Calendar}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
+          className="h-full"
+        >
+          {data.mostRequestedPark && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-blue-400"></div>
+                  <span className="text-xs text-gray-200">
+                    Más Solicitado
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-blue-400">
+                  {data.mostRequestedPark.reservationRequests} solicitudes
+                </span>
+              </div>
+              <div className="text-xl text-gray-200 truncate">
+                {data.mostRequestedPark.parkName}
+                {(() => {
+                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.mostRequestedPark?.parkId)?.area;
+                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                })()}
+              </div>
+              <div className="text-xs text-gray-300 space-y-1">
+                <div>✅ {data.mostRequestedPark.approvedReservations} aprobadas</div>
+                <div>⏳ {data.mostRequestedPark.pendingReservations} pendientes</div>
+              </div>
+            </div>
+          )}
+          {data.parkWithMostAvailableSpaces && (
+            <div className="mt-4 pt-3 border-t border-gray-600">
+              <div className="text-xs text-gray-300">
+                Espacios disponibles: {data.parkWithMostAvailableSpaces.parkName} 
+                ({data.parkWithMostAvailableSpaces.availableSpaces}/{data.parkWithMostAvailableSpaces.totalSpaces})
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Eventos */}
+        <MetricCard
+          title="Eventos"
+          value={data.parkWithMostEvents ? data.parkWithMostEvents.scheduledEvents : "N/A"}
+          subtitle="Parque con más eventos"
+          icon={Activity}
+          iconColor="#14b8a6"
+          backgroundColor="#003D49"
+          className="h-full"
+        >
+          {data.parkWithMostEvents && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-purple-400"></div>
+                  <span className="text-xs text-gray-200">
+                    Más Eventos
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-purple-400">
+                  {data.parkWithMostEvents.scheduledEvents} eventos
+                </span>
+              </div>
+              <div className="text-xl text-gray-200 truncate">
+                {data.parkWithMostEvents.parkName}
+                {(() => {
+                  const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithMostEvents?.parkId)?.area;
+                  return parkArea ? ` - ${(parkArea / 10000).toFixed(1)} ha` : '';
+                })()}
+              </div>
+              <div className="text-xs text-gray-300 space-y-1">
+                <div>📅 {data.parkWithMostEvents.upcomingEvents} próximos</div>
+                <div>🔴 {data.parkWithMostEvents.activeEvents} activos</div>
+              </div>
+            </div>
+          )}
+        </MetricCard>
+        
+      </div>
+
+      {/* Sexta fila: Gráfico de pastel de clasificación por tipo */}
       <div className="grid gap-6 lg:grid-cols-1">
         <GraphicCard
           title="🏛️ Clasificación de Parques por Tipo"

@@ -309,7 +309,14 @@ const AdminParksContent = () => {
                       </div>
                       <div className="flex items-center">
                         <Package className="h-4 w-4 mr-1" />
-                        <span>{park.area ? park.area.toLocaleString() : 'N/A'} m²</span>
+                        <span>
+                          {park.area
+                            ? `${(park.area / 10000).toLocaleString(undefined, {
+                                minimumFractionDigits: 1,
+                                maximumFractionDigits: 1,
+                              })} ha`
+                            : 'N/A'}
+                        </span>
                       </div>
                       <Badge
                         variant="outline"

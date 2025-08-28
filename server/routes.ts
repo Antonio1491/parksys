@@ -1748,6 +1748,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
         HAVING COUNT(i.id) > 0
         ORDER BY total_incidents DESC, p.name ASC
       `);
+
+      // NUEVAS MÉTRICAS SOLICITADAS:
+
+      // 1. Parque más visitado por semana (últimas 4 semanas)
+      const mostVisitedParkResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          SUM(vc.adults + vc.children + COALESCE(vc.seniors, 0) + COALESCE(vc.pets, 0)) as total_weekly_visitors,
+          COUNT(vc.id) as visit_records
+        FROM parks p
+        INNER JOIN visitor_counts vc ON p.id = vc.park_id
+        WHERE vc.date >= CURRENT_DATE - INTERVAL '7 days'
+        GROUP BY p.id, p.name
+        HAVING SUM(vc.adults + vc.children + COALESCE(vc.seniors, 0) + COALESCE(vc.pets, 0)) > 0
+        ORDER BY total_weekly_visitors DESC
+        LIMIT 1
+      `);
+      
+      const mostVisitedPark = mostVisitedParkResult.rows[0] ? {
+        parkId: parseInt(mostVisitedParkResult.rows[0].park_id),
+        parkName: mostVisitedParkResult.rows[0].park_name,
+        weeklyVisitors: parseInt(mostVisitedParkResult.rows[0].total_weekly_visitors),
+        visitRecords: parseInt(mostVisitedParkResult.rows[0].visit_records)
+      } : null;
+
+      // 2. Parques con más y menos amenidades
+      const amenitiesComparisonResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          COUNT(pa.amenity_id) as amenity_count
+        FROM parks p
+        LEFT JOIN park_amenities pa ON p.id = pa.park_id
+        GROUP BY p.id, p.name
+        ORDER BY amenity_count DESC, p.name ASC
+      `);
+
+      const parkWithMostAmenities = amenitiesComparisonResult.rows[0] ? {
+        parkId: parseInt(amenitiesComparisonResult.rows[0].park_id),
+        parkName: amenitiesComparisonResult.rows[0].park_name,
+        amenityCount: parseInt(amenitiesComparisonResult.rows[0].amenity_count)
+      } : null;
+
+      const parkWithLeastAmenities = amenitiesComparisonResult.rows.length > 0 ? 
+        amenitiesComparisonResult.rows[amenitiesComparisonResult.rows.length - 1] : null;
+      const parkWithLeastAmenitiesData = parkWithLeastAmenities ? {
+        parkId: parseInt(parkWithLeastAmenities.park_id),
+        parkName: parkWithLeastAmenities.park_name,
+        amenityCount: parseInt(parkWithLeastAmenities.amenity_count)
+      } : null;
+
+      // 3. Parque más solicitado en reservas y con más espacios disponibles
+      const reservationsDataResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          COUNT(sr.id) as reservation_requests,
+          COUNT(CASE WHEN sr.status = 'approved' THEN 1 END) as approved_reservations,
+          COUNT(CASE WHEN sr.status = 'pending' THEN 1 END) as pending_reservations
+        FROM parks p
+        LEFT JOIN reservable_spaces rs ON p.id = rs.park_id
+        LEFT JOIN space_reservations sr ON rs.id = sr.space_id
+        GROUP BY p.id, p.name
+        ORDER BY reservation_requests DESC, p.name ASC
+      `);
+
+      const mostRequestedPark = reservationsDataResult.rows[0] && 
+        parseInt(reservationsDataResult.rows[0].reservation_requests) > 0 ? {
+        parkId: parseInt(reservationsDataResult.rows[0].park_id),
+        parkName: reservationsDataResult.rows[0].park_name,
+        reservationRequests: parseInt(reservationsDataResult.rows[0].reservation_requests),
+        approvedReservations: parseInt(reservationsDataResult.rows[0].approved_reservations),
+        pendingReservations: parseInt(reservationsDataResult.rows[0].pending_reservations)
+      } : null;
+
+      // Espacios disponibles por parque (aproximación basada en reservas activas)
+      const availableSpacesResult = await pool.query(`
+        SELECT 
+          p.id as park_id,
+          p.name as park_name,
+          COUNT(rs.id) as total_spaces,
+          COUNT(rs.id) - COUNT(CASE WHEN sr.status = 'approved' AND sr.reservation_date >= CURRENT_DATE THEN 1 END) as available_spaces
+        FROM parks p
+        LEFT JOIN reservable_spaces rs ON p.id = rs.park_id
+        LEFT JOIN space_reservations sr ON rs.id = sr.space_id 
+        GROUP BY p.id, p.name
+        HAVING COUNT(rs.id) > 0
+        ORDER BY available_spaces DESC, p.name ASC
+        LIMIT 1
+      `).catch(() => ({ rows: [] }));
+
+      const parkWithMostAvailableSpaces = availableSpacesResult.rows[0] ? {
+        parkId: parseInt(availableSpacesResult.rows[0].park_id),
+        parkName: availableSpacesResult.rows[0].park_name,
+        totalSpaces: parseInt(availableSpacesResult.rows[0].total_spaces),
+        availableSpaces: parseInt(availableSpacesResult.rows[0].available_spaces)
+      } : null;
+
+      // 4. Parque con más eventos programados
+      const eventsDataResult = await pool.query(`
+        SELECT 
+          ep.park_id,
+          p.name as park_name,
+          COUNT(e.id) as scheduled_events,
+          COUNT(CASE WHEN e.start_date >= CURRENT_DATE THEN 1 END) as upcoming_events,
+          COUNT(CASE WHEN e.status = 'active' OR e.status = 'scheduled' THEN 1 END) as active_events
+        FROM events e
+        INNER JOIN event_parks ep ON e.id = ep.event_id
+        INNER JOIN parks p ON ep.park_id = p.id
+        WHERE e.start_date IS NOT NULL
+        GROUP BY ep.park_id, p.name
+        ORDER BY scheduled_events DESC, upcoming_events DESC, p.name ASC
+        LIMIT 1
+      `);
+
+      const parkWithMostEvents = eventsDataResult.rows[0] ? {
+        parkId: parseInt(eventsDataResult.rows[0].park_id),
+        parkName: eventsDataResult.rows[0].park_name,
+        scheduledEvents: parseInt(eventsDataResult.rows[0].scheduled_events),
+        upcomingEvents: parseInt(eventsDataResult.rows[0].upcoming_events),
+        activeEvents: parseInt(eventsDataResult.rows[0].active_events)
+      } : null;
       
       const dashboardData = {
         totalParks,
@@ -1823,7 +1946,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           incidentsThisMonth: parseInt(row.incidents_this_month),
           openIncidents: parseInt(row.open_incidents),
           resolvedIncidents: parseInt(row.resolved_incidents)
-        }))
+        })),
+        // NUEVAS MÉTRICAS:
+        mostVisitedPark,
+        parkWithMostAmenities,
+        parkWithLeastAmenities: parkWithLeastAmenitiesData,
+        mostRequestedPark,
+        parkWithMostAvailableSpaces,
+        parkWithMostEvents
       };
       
       console.log("Estadísticas del dashboard de parques calculadas exitosamente");
