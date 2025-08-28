@@ -410,7 +410,14 @@ const AdminParksContent = () => {
                 
                 <div className="flex items-center text-sm text-gray-600">
                   <Package className="h-4 w-4 mr-2" />
-                  <span>{park.area ? park.area.toLocaleString() : 'N/A'} m²</span>
+                  <span>
+                    {park.area
+                      ? `${(park.area / 10000).toLocaleString(undefined, {
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 1,
+                        })} ha`
+                      : 'N/A'}
+                  </span>
                 </div>
                 
                 {park.description && (

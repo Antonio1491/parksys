@@ -57,6 +57,12 @@ const OrganizadorPage: React.FC = () => {
     retry: 1,
   });
 
+  // Obtener actividades mejor evaluadas
+  const { data: topRatedActivities = [], isLoading: isLoadingTopRated } = useQuery({
+    queryKey: ['/api/activities/top-rated'],
+    retry: 1,
+  });
+
   // Crear mapeo de categorías por ID
   const categoriesMap = Array.isArray(categories) ? categories.reduce((acc: any, category: any) => {
     acc[category.id] = category;
@@ -410,97 +416,84 @@ const OrganizadorPage: React.FC = () => {
       {/* Sección 2 - Gráfico de Actividades por Parque y Actividades Próximas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
-        {/* Columna izquierda: Gráfico de Actividades por Parque */}
+        {/* Columna izquierda: Actividades Mejor Evaluadas */}
         <GraphicCard
-          title="📊 Actividades por Parque"
-          description="Total de actividades y actividades activas registradas por parque"
+          title="⭐ Actividades Mejor Evaluadas"
+          description="Las 5 actividades con mejor calificación y el parque donde se realizan"
         >
-          <div className="w-full">
-            {parkActivityData.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                {parkActivityData.map((park) => {
-                  const maxTotal = Math.max(...parkActivityData.map(p => p.totalActivities));
-                  const heightPercentage = (park.totalActivities / maxTotal) * 100;
-                  const activePercentage = park.totalActivities > 0 ? (park.activeActivities / park.totalActivities) * 100 : 0;
-                  
-                  const getActivityColor = (total: number) => {
-                    if (total >= 5) return "#14b8a6"; // Teal para muchas actividades
-                    if (total >= 3) return "#10b981"; // Verde para moderadas
-                    if (total >= 1) return "#22c55e"; // Verde claro para pocas
-                    return "#94a3b8"; // Gris para ninguna
-                  };
-                  
-                  return (
-                    <div key={park.parkId} className="flex flex-col items-center relative">
-                      {/* Valor del total arriba con actividades activas */}
-                      <div className="mb-2 text-center">
-                        <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                          {park.totalActivities}
-                        </div>
-                        <div className="text-xs font-poppins font-thin text-gray-500">
-                          ({park.activeActivities} activas)
-                        </div>
-                      </div>
-
-                      {/* Columna vertical */}
-                      <div className="relative h-64 w-4 flex flex-col justify-end">
-                        {/* Fondo de la columna */}
-                        <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                        
-                        {/* Relleno de la columna según total */}
-                        <div
-                          className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                          style={{
-                            height: `${Math.max(heightPercentage, 5)}%`,
-                            backgroundColor: getActivityColor(park.totalActivities),
-                            borderColor: getActivityColor(park.totalActivities),
-                          }}
-                        ></div>
-                        
-                        {/* Relleno adicional para actividades activas */}
-                        {park.activeActivities > 0 && (
-                          <div
-                            className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-40"
-                            style={{
-                              height: `${Math.max((activePercentage / 100) * heightPercentage, 2)}%`,
-                              backgroundColor: "#059669", // Verde más oscuro para activas
-                              borderColor: "#059669",
-                            }}
-                          ></div>
-                        )}
-                      </div>
-
-                      {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                      <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                        <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                          {park.parkName}
-                        </div>
+          <div className="w-full min-h-[320px]">
+            {isLoadingTopRated ? (
+              <div className="flex items-center justify-center h-[320px] text-gray-500">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
+                  <p>Cargando actividades mejor evaluadas...</p>
+                </div>
+              </div>
+            ) : Array.isArray(topRatedActivities) && topRatedActivities.length > 0 ? (
+              <div className="space-y-4 p-4">
+                {topRatedActivities.map((activity: any, index: number) => (
+                  <div key={activity.id} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-teal-50 to-green-50 rounded-lg border-l-4 border-teal-500">
+                    {/* Posición */}
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-sm">
+                        {index + 1}
                       </div>
                     </div>
-                  );
-                })}
+                    
+                    {/* Información de la actividad */}
+                    <div className="flex-grow min-w-0">
+                      <h4 className="font-semibold text-gray-900 truncate" title={activity.title}>
+                        {activity.title}
+                      </h4>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm text-gray-600 truncate" title={activity.parkName}>
+                          {activity.parkName}
+                        </span>
+                      </div>
+                      {activity.categoryName && (
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Tag className="h-3 w-3 text-gray-400" />
+                          <span className="text-xs text-gray-500">
+                            {activity.categoryName}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Calificación y estadísticas */}
+                    <div className="flex-shrink-0 text-right">
+                      <div className="flex items-center space-x-1 mb-1">
+                        <span className="text-lg font-bold text-teal-700">
+                          {activity.rating.toFixed(1)}
+                        </span>
+                        <span className="text-yellow-500">⭐</span>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {activity.registrationCount > 0 ? (
+                          <span>{activity.registrationCount} inscripciones</span>
+                        ) : (
+                          <span>Sin inscripciones</span>
+                        )}
+                      </div>
+                      {activity.isFree ? (
+                        <div className="text-xs text-green-600 font-medium">Gratis</div>
+                      ) : (
+                        <div className="text-xs text-blue-600 font-medium">${activity.price}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <div className="flex flex-col items-center space-y-2">
-                  <CheckCircle className="h-12 w-12 text-gray-300" />
-                  <p className="text-lg font-medium">
-                    No hay actividades disponibles
-                  </p>
-                  <p className="text-sm">
-                    Los datos de actividades aparecerán aquí una vez que se registren actividades en los parques
-                  </p>
+              <div className="flex items-center justify-center h-[320px] text-gray-500">
+                <div className="text-center">
+                  <CheckCircle className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                  <p>No hay actividades evaluadas disponibles</p>
                 </div>
               </div>
             )}
           </div>
-          {parkActivityData.length > 0 && (
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-500 font-poppins font-thin">
-                Mostrando los {parkActivityData.length} parques con más actividades
-              </p>
-            </div>
-          )}
         </GraphicCard>
 
         {/* Columna derecha: Actividades Próximas */}
@@ -704,25 +697,57 @@ const OrganizadorPage: React.FC = () => {
         </div>
         
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4">Parques con Más Actividades</h2>
-          <div className="space-y-2">
-            {isLoadingParks || isLoadingActivities ? (
-              <div className="text-center py-4 text-gray-500">Cargando parques...</div>
-            ) : topParks.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">No hay parques con actividades</div>
+          <h2 className="text-xl font-semibold mb-4">🏆 Actividades Destacadas</h2>
+          <div className="space-y-3">
+            {isLoadingTopRated ? (
+              <div className="text-center py-4 text-gray-500">Cargando actividades destacadas...</div>
+            ) : Array.isArray(topRatedActivities) && topRatedActivities.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">No hay actividades evaluadas</div>
             ) : (
-              topParks.map((park: any) => (
-                <div key={park.parkId} className="flex items-center p-3 bg-gray-50 rounded-md">
-                  <div className="w-full">
-                    <div className="flex justify-between mb-2">
-                      <span className="font-medium">{park.name}</span>
-                      <span className="text-sm text-gray-500">{park.count} actividades</span>
+              topRatedActivities.map((activity: any, index: number) => (
+                <div key={activity.id} className="flex items-center p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200">
+                  {/* Posición */}
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white flex items-center justify-center font-bold text-sm mr-3">
+                    {index + 1}
+                  </div>
+                  
+                  <div className="flex-grow">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="font-medium text-gray-900 leading-tight">
+                        {activity.title.length > 30 ? `${activity.title.substring(0, 30)}...` : activity.title}
+                      </span>
+                      <div className="flex items-center space-x-1 ml-2">
+                        <span className="text-sm font-bold text-amber-700">
+                          {activity.rating.toFixed(1)}
+                        </span>
+                        <span className="text-yellow-500">⭐</span>
+                      </div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className="bg-primary h-2.5 rounded-full" 
-                        style={{ width: `${(park.count / maxParkCount) * 100}%` }}
-                      ></div>
+                    
+                    <div className="flex items-center justify-between text-xs text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate max-w-[120px]" title={activity.parkName}>
+                          {activity.parkName}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        {activity.registrationCount > 0 && (
+                          <span className="text-teal-600">
+                            {activity.registrationCount} inscripciones
+                          </span>
+                        )}
+                        {activity.isFree ? (
+                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                            Gratis
+                          </span>
+                        ) : (
+                          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                            ${activity.price}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

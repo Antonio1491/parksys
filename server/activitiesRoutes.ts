@@ -120,6 +120,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
     }
   });
 
+
   // Obtener actividades para un parque específico
   apiRouter.get("/parks/:id/activities", async (req: Request, res: Response) => {
     try {

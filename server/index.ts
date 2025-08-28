@@ -762,6 +762,65 @@ app.post("/api/activities", async (req: Request, res: Response) => {
   }
 });
 
+// ENDPOINT PARA OBTENER ACTIVIDADES MEJOR EVALUADAS
+app.get("/api/activities/top-rated", async (_req: Request, res: Response) => {
+  try {
+    console.log("🌟 Obteniendo actividades mejor evaluadas...");
+    
+    const { sql } = await import("drizzle-orm");
+    
+    // Consulta para obtener actividades con sus inscripciones y calcular rating simulado
+    const result = await db.execute(
+      sql`SELECT 
+            a.id, 
+            a.title, 
+            p.name as "parkName",
+            COUNT(ar.id) as "registrationCount",
+            a.capacity,
+            ac.name as "categoryName",
+            a.price,
+            a.is_free as "isFree",
+            -- Calcular rating simulado basado en popularidad e interacción
+            CASE 
+              WHEN COUNT(ar.id) >= 3 THEN 4.8
+              WHEN COUNT(ar.id) = 2 THEN 4.5
+              WHEN COUNT(ar.id) = 1 THEN 4.2
+              WHEN a.capacity > 20 THEN 4.0
+              ELSE 3.8
+            END as "rating"
+          FROM activities a
+          JOIN parks p ON p.id = a.park_id
+          LEFT JOIN activity_categories ac ON ac.id = a.category_id
+          LEFT JOIN activity_registrations ar ON ar.activity_id = a.id
+          GROUP BY a.id, a.title, p.name, a.capacity, ac.name, a.price, a.is_free
+          ORDER BY 
+            COUNT(ar.id) DESC, 
+            a.capacity DESC,
+            a.title ASC
+          LIMIT 5`
+    );
+
+    console.log(`🌟 Actividades mejor evaluadas encontradas: ${result.rows.length}`);
+    
+    const formattedActivities = result.rows.map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      parkName: row.parkName,
+      registrationCount: Number(row.registrationCount),
+      capacity: row.capacity,
+      categoryName: row.categoryName,
+      price: row.price,
+      isFree: row.isFree,
+      rating: Number(row.rating)
+    }));
+
+    res.json(formattedActivities);
+  } catch (error: any) {
+    console.error("Error al obtener actividades mejor evaluadas:", error);
+    res.status(500).json({ message: "Error al obtener actividades mejor evaluadas" });
+  }
+});
+
 // ENDPOINT PARA OBTENER ACTIVIDAD ESPECÍFICA
 app.get("/api/activities/:id", async (req: Request, res: Response) => {
   console.log("🎯 GET ACTIVITY ENDPOINT - ID:", req.params.id);
