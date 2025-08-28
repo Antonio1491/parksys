@@ -426,7 +426,153 @@ const OrganizadorPage: React.FC = () => {
         </MetricCard>
       </div>
 
-      {/* Sección 2 - Gráfico de Actividades por Parque y Actividades Próximas */}
+      {/* Sección 2 - Gráficos de categorías y actividades por parque */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        {/* Columna izquierda: Actividades por Parque */}
+        <GraphicCard
+          title="🎯 Actividades por Parque"
+          description="Número total de actividades por parque"
+          className="h-full"
+        >
+          <div className="w-full">
+            {activitiesByPark.length > 0 ? (
+              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+                {activitiesByPark.map((park) => {
+                  const maxActivities = Math.max(...activitiesByPark.map(p => p.totalActivities), 1);
+                  const heightPercentage = (park.totalActivities / maxActivities) * 100;
+                  
+                  const getActivityColor = (total: number) => {
+                    if (total >= 4) return "#69c45c"; // Verde para muchas actividades (mismo color que evaluaciones altas)
+                    if (total >= 2) return "#bcb57e"; // Amarillo para medias (mismo color que evaluaciones medias)
+                    return "#a86767"; // Rojo para pocas (mismo color que evaluaciones bajas)
+                  };
+
+                  return (
+                    <div key={park.parkId} className="flex flex-col items-center relative">
+                      {/* Valor del total arriba con número de activas */}
+                      <div className="mb-2 text-center">
+                        <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
+                          {park.totalActivities}
+                        </div>
+                        <div className="text-xs font-poppins font-thin text-gray-500">
+                          ({park.activeActivities} activas)
+                        </div>
+                      </div>
+
+                      {/* Columna vertical */}
+                      <div className="relative h-64 w-4 flex flex-col justify-end">
+                        {/* Fondo de la columna */}
+                        <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                        
+                        {/* Relleno de la columna según total de actividades */}
+                        <div
+                          className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                          style={{
+                            height: `${Math.max(heightPercentage, 5)}%`,
+                            backgroundColor: getActivityColor(park.totalActivities),
+                            borderColor: getActivityColor(park.totalActivities),
+                          }}
+                        ></div>
+                      </div>
+
+                      {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                      <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                        <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                          {park.parkName}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center min-h-[320px] text-gray-500">
+                <div className="text-center">
+                  <Activity className="h-12 w-12 text-gray-300" />
+                  <p className="text-lg font-medium">
+                    No hay parques disponibles
+                  </p>
+                  <p className="text-sm">
+                    Los datos de actividades por parque aparecerán aquí una vez que se registren parques
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          {activitiesByPark.length > 0 && (
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-500 font-poppins font-thin">
+                Mostrando todos los {activitiesByPark.length} parques
+              </p>
+            </div>
+          )}
+        </GraphicCard>
+
+        {/* Columna derecha: Categorías de Actividades */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Categorías de Actividades</h2>
+            <Link href="/admin/activities/categories">
+              <Button variant="outline" size="sm">
+                <Tag className="h-4 w-4 mr-2" />
+                Gestionar Categorías
+              </Button>
+            </Link>
+          </div>
+          <div className="h-80">
+            {isLoadingActivities || isLoadingCategories ? (
+              <div className="text-center py-4 text-gray-500">Cargando categorías...</div>
+            ) : categoryPieData.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">No hay categorías disponibles</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryPieData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    innerRadius={30}
+                    paddingAngle={2}
+                    dataKey="value"
+                    label={({ value, percent }: any) => 
+                      `${value} (${(percent * 100).toFixed(0)}%)`
+                    }
+                    labelLine={false}
+                  >
+                    {categoryPieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value: any) => [`${value} actividades`, 'Cantidad']}
+                    labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                  />
+                  <Legend 
+                    wrapperStyle={{
+                      paddingTop: '20px',
+                      fontSize: '12px'
+                    }}
+                    formatter={(value: string, entry: any) => {
+                      const categoryData = categoryPieData.find(item => item.name === value);
+                      const count = categoryData ? categoryData.value : 0;
+                      return (
+                        <span style={{ color: '#374151', fontSize: '12px', fontWeight: '500' }}>
+                          {value} ({count} actividades)
+                        </span>
+                      );
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+        
+      </div>
+
+      {/* Sección 3 - Gráfico de Parques con Mayor Aforo y Actividades Próximas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
         {/* Columna izquierda: Actividades Mejor Evaluadas */}
@@ -647,151 +793,6 @@ const OrganizadorPage: React.FC = () => {
 
       </div>
 
-      {/* Sección 3 - Gráficos de categorías y actividades por parque */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        
-        {/* Columna izquierda: Actividades por Parque */}
-        <GraphicCard
-          title="🎯 Actividades por Parque"
-          description="Número total de actividades por parque"
-          className="h-full"
-        >
-          <div className="w-full">
-            {activitiesByPark.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                {activitiesByPark.map((park) => {
-                  const maxActivities = Math.max(...activitiesByPark.map(p => p.totalActivities), 1);
-                  const heightPercentage = (park.totalActivities / maxActivities) * 100;
-                  
-                  const getActivityColor = (total: number) => {
-                    if (total >= 4) return "#69c45c"; // Verde para muchas actividades (mismo color que evaluaciones altas)
-                    if (total >= 2) return "#bcb57e"; // Amarillo para medias (mismo color que evaluaciones medias)
-                    return "#a86767"; // Rojo para pocas (mismo color que evaluaciones bajas)
-                  };
-
-                  return (
-                    <div key={park.parkId} className="flex flex-col items-center relative">
-                      {/* Valor del total arriba con número de activas */}
-                      <div className="mb-2 text-center">
-                        <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                          {park.totalActivities}
-                        </div>
-                        <div className="text-xs font-poppins font-thin text-gray-500">
-                          ({park.activeActivities} activas)
-                        </div>
-                      </div>
-
-                      {/* Columna vertical */}
-                      <div className="relative h-64 w-4 flex flex-col justify-end">
-                        {/* Fondo de la columna */}
-                        <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                        
-                        {/* Relleno de la columna según total de actividades */}
-                        <div
-                          className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                          style={{
-                            height: `${Math.max(heightPercentage, 5)}%`,
-                            backgroundColor: getActivityColor(park.totalActivities),
-                            borderColor: getActivityColor(park.totalActivities),
-                          }}
-                        ></div>
-                      </div>
-
-                      {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                      <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                        <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                          {park.parkName}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center min-h-[320px] text-gray-500">
-                <div className="text-center">
-                  <Activity className="h-12 w-12 text-gray-300" />
-                  <p className="text-lg font-medium">
-                    No hay parques disponibles
-                  </p>
-                  <p className="text-sm">
-                    Los datos de actividades por parque aparecerán aquí una vez que se registren parques
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-          {activitiesByPark.length > 0 && (
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-500 font-poppins font-thin">
-                Mostrando todos los {activitiesByPark.length} parques
-              </p>
-            </div>
-          )}
-        </GraphicCard>
-
-        {/* Columna derecha: Categorías de Actividades */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Categorías de Actividades</h2>
-            <Link href="/admin/activities/categories">
-              <Button variant="outline" size="sm">
-                <Tag className="h-4 w-4 mr-2" />
-                Gestionar Categorías
-              </Button>
-            </Link>
-          </div>
-          <div className="h-80">
-            {isLoadingActivities || isLoadingCategories ? (
-              <div className="text-center py-4 text-gray-500">Cargando categorías...</div>
-            ) : categoryPieData.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">No hay categorías disponibles</div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categoryPieData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    innerRadius={30}
-                    paddingAngle={2}
-                    dataKey="value"
-                    label={({ value, percent }: any) => 
-                      `${value} (${(percent * 100).toFixed(0)}%)`
-                    }
-                    labelLine={false}
-                  >
-                    {categoryPieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value: any) => [`${value} actividades`, 'Cantidad']}
-                    labelStyle={{ color: '#374151', fontWeight: 'bold' }}
-                  />
-                  <Legend 
-                    wrapperStyle={{
-                      paddingTop: '20px',
-                      fontSize: '12px'
-                    }}
-                    formatter={(value: string, entry: any) => {
-                      const categoryData = categoryPieData.find(item => item.name === value);
-                      const count = categoryData ? categoryData.value : 0;
-                      return (
-                        <span style={{ color: '#374151', fontSize: '12px', fontWeight: '500' }}>
-                          {value} ({count} actividades)
-                        </span>
-                      );
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
-        
-      </div>
 
 
     </DashboardLayout>
