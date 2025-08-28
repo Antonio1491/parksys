@@ -540,13 +540,19 @@ const AdminParksContent = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header con título */}
-        <Card className="p-4 text-[#0c0a09] bg-[#14b8a6] text-card-foreground">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-8 h-8 text-gray-900" />
-            <h1 className="text-3xl font-bold text-gray-900">Parques</h1>
+        <div className="mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
+          style={{ backgroundColor: '#14b8a6' }}
+        >
+          <div className="flex items-center gap-3">
+            <MapPin className="h-6 w-6 text-white" />
+            <h1 className="text-3xl font-bold text-white font-poppins">
+              Parques
+            </h1>
           </div>
-          <p className="text-gray-600 mt-2">Gestión General del Sistema</p>
-        </Card>
+          <p className="text-base font-normal text-white font-poppins">
+            Gestión General del Sistema
+          </p>
+        </div>
         
         {/* View mode toggle and actions */}
         <div className="flex justify-between items-center">
