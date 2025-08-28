@@ -176,14 +176,11 @@ const OrganizadorPage: React.FC = () => {
       const activeActivities = parkActivities.filter((activity: any) => activity.status === 'activa');
       return {
         parkId: park.id,
-        parkName: park.name.length > 12 ? park.name.substring(0, 12) + '...' : park.name,
+        parkName: park.name,
         totalActivities: parkActivities.length,
-        activeActivities: activeActivities.length,
-        fullParkName: park.name
+        activeActivities: activeActivities.length
       };
-    }).filter((item: any) => item.totalActivities > 0)
-     .sort((a: any, b: any) => b.totalActivities - a.totalActivities)
-     .slice(0, 8) : []; // Mostrar solo los 8 parques con más actividades
+    }).sort((a: any, b: any) => b.totalActivities - a.totalActivities) : []; // Mostrar todos los parques
 
   // Actividades próximas (próximas 5)
   const upcomingActivities = Array.isArray(activities) ? activities
@@ -650,26 +647,26 @@ const OrganizadorPage: React.FC = () => {
 
       </div>
 
-      {/* Sección 3 - Gráfico de Actividades por Parque */}
-      <div className="mb-8">
+      {/* Sección 3 - Gráficos de categorías y actividades por parque */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        {/* Columna izquierda: Actividades por Parque */}
         <GraphicCard
           title="🎯 Actividades por Parque"
-          description="Distribución de actividades totales y activas por parque"
+          description="Número total de actividades por parque"
           className="h-full"
         >
           <div className="w-full">
             {activitiesByPark.length > 0 ? (
-              <div className="flex justify-center items-end gap-3 min-h-[320px] px-4 overflow-x-auto">
+              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                 {activitiesByPark.map((park) => {
-                  const maxActivities = Math.max(...activitiesByPark.map(p => p.totalActivities));
+                  const maxActivities = Math.max(...activitiesByPark.map(p => p.totalActivities), 1);
                   const heightPercentage = (park.totalActivities / maxActivities) * 100;
-                  const activePercentage = park.totalActivities > 0 ? (park.activeActivities / park.totalActivities) * 100 : 0;
                   
                   const getActivityColor = (total: number) => {
-                    if (total >= 8) return "#059669"; // Verde para muchas actividades
-                    if (total >= 4) return "#0d9488"; // Teal para actividades medias
-                    if (total >= 2) return "#06b6d4"; // Cyan para pocas actividades
-                    return "#6b7280"; // Gris para muy pocas
+                    if (total >= 4) return "#69c45c"; // Verde para muchas actividades (mismo color que evaluaciones altas)
+                    if (total >= 2) return "#bcb57e"; // Amarillo para medias (mismo color que evaluaciones medias)
+                    return "#a86767"; // Rojo para pocas (mismo color que evaluaciones bajas)
                   };
 
                   return (
@@ -677,7 +674,7 @@ const OrganizadorPage: React.FC = () => {
                       {/* Valor del total arriba con número de activas */}
                       <div className="mb-2 text-center">
                         <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                          {park.totalActivities} total
+                          {park.totalActivities}
                         </div>
                         <div className="text-xs font-poppins font-thin text-gray-500">
                           ({park.activeActivities} activas)
@@ -685,7 +682,7 @@ const OrganizadorPage: React.FC = () => {
                       </div>
 
                       {/* Columna vertical */}
-                      <div className="relative h-64 w-6 flex flex-col justify-end">
+                      <div className="relative h-64 w-4 flex flex-col justify-end">
                         {/* Fondo de la columna */}
                         <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
                         
@@ -697,26 +694,14 @@ const OrganizadorPage: React.FC = () => {
                             backgroundColor: getActivityColor(park.totalActivities),
                             borderColor: getActivityColor(park.totalActivities),
                           }}
-                        >
-                          {/* Indicador de actividades activas */}
-                          {park.activeActivities > 0 && (
-                            <div
-                              className="absolute bottom-0 w-full rounded-t-3xl border-2 border-white"
-                              style={{
-                                height: `${Math.max(activePercentage, 10)}%`,
-                                backgroundColor: "#10b981",
-                                opacity: 0.8
-                              }}
-                            ></div>
-                          )}
-                        </div>
+                        ></div>
                       </div>
 
-                      {/* Nombre del parque */}
-                      <div className="mt-2 text-center">
-                        <p className="text-xs font-medium text-gray-700 max-w-[60px] break-words leading-tight" title={park.fullParkName}>
+                      {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                      <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                        <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
                           {park.parkName}
-                        </p>
+                        </div>
                       </div>
                     </div>
                   );
@@ -727,10 +712,10 @@ const OrganizadorPage: React.FC = () => {
                 <div className="text-center">
                   <Activity className="h-12 w-12 text-gray-300" />
                   <p className="text-lg font-medium">
-                    No hay actividades disponibles
+                    No hay parques disponibles
                   </p>
                   <p className="text-sm">
-                    Los datos de actividades por parque aparecerán aquí una vez que se registren actividades
+                    Los datos de actividades por parque aparecerán aquí una vez que se registren parques
                   </p>
                 </div>
               </div>
@@ -739,25 +724,13 @@ const OrganizadorPage: React.FC = () => {
           {activitiesByPark.length > 0 && (
             <div className="mt-2 text-center">
               <p className="text-sm text-gray-500 font-poppins font-thin">
-                Mostrando los {activitiesByPark.length} parques con más actividades
+                Mostrando todos los {activitiesByPark.length} parques
               </p>
-              <div className="flex justify-center gap-4 mt-2 text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded" style={{ backgroundColor: "#6b7280" }}></div>
-                  <span>Total actividades</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded" style={{ backgroundColor: "#10b981" }}></div>
-                  <span>Activas</span>
-                </div>
-              </div>
             </div>
           )}
         </GraphicCard>
-      </div>
 
-      {/* Sección 4 - Gráficos de categorías */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Columna derecha: Categorías de Actividades */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Categorías de Actividades</h2>
