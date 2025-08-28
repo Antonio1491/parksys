@@ -877,12 +877,7 @@ const OrganizadorPage: React.FC = () => {
           </Card>
         </div>
         
-      </div>
-
-      {/* Quinta fila: Especialidades de los instructores */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        
-        {/* Columna izquierda: Especialidades de los instructores */}
+        {/* Columna derecha: Especialidades de los instructores */}
         <Card
           className="border-0 shadow-lg text-white rounded-3xl"
           style={{ backgroundColor: "#003D49" }}

@@ -125,7 +125,7 @@ interface CollapsibleSubmenuProps {
 
 const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleColor }) => {
   const iconWithClass = React.cloneElement(icon as React.ReactElement, {
-    className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-[#17CCB2]')
+    className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-[#3DB59F]')
   });
 
   return (
@@ -135,8 +135,8 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
         className={cn(
           "w-full flex items-center justify-start text-sm font-normal h-9 px-2 transition-colors duration-200",
           active
-            ? "bg-gray-300 text-[#17CCB2]"
-            : "text-[#17CCB2] hover:bg-[#036668] hover:text-[#17CCB2]"
+            ? "bg-gray-200 text-[#3DB59F]"
+            : "text-[#3DB59F] hover:bg-[#036668] hover:text-[#3DB59F]"
         )}
       >
         {iconWithClass}
@@ -255,53 +255,37 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
   );
 };
 
-// Componente para submenús colapsables
-export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
-  title,
-  icon,
-  children,
-  href,
-  collapsible = true,
-  isActive = false
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const handleClick = () => {
-    if (collapsible) setIsExpanded(prev => !prev);
-  };
-
-  const Wrapper = href ? Link : 'div';
-
+// Componente para submenús colapsables dentro de "Gestión"
+const CollapsibleSubmenu: React.FC<{
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+}> = ({ id, title, icon, children, isExpanded, onToggle }) => {
   return (
-    <Wrapper href={href}>
+    <div className="mb-0">
       <button
-        onClick={handleClick}
-        className={`w-full flex items-center p-2 text-sm font-normal rounded-lg transition-colors ${
-          isActive ? 'bg-[#036668]' : 'bg-transparent hover:bg-[#036668]'
-        }`}
+        onClick={() => onToggle(id)}
+        className="w-full flex items-center justify-between p-2 text-sm font-medium text-white hover:bg-teal-600 rounded-lg transition-colors"
       >
-        {icon && React.cloneElement(icon as React.ReactElement, {
-          className: 'h-4 w-4 text-white'
-        })}
-        <span className="ml-2 text-white">{title}</span>
-        {collapsible && (
-          <ChevronRight
-            className={`ml-auto h-4 w-4 text-white transition-transform ${
-              isExpanded ? 'rotate-90' : ''
-            }`}
-          />
-        )}
+        <div className="flex items-center">
+          <span className="text-white">{React.cloneElement(icon as React.ReactElement, { className: 'h-4 w-4 text-white' })}</span>
+          <span className="ml-2">{title}</span>
+        </div>
+        <ChevronRight 
+          className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''} text-white`}
+        />
       </button>
-
-      {collapsible && isExpanded && (
-        <div className="ml-6 mt-1 space-y-1">
+      {isExpanded && (
+        <div className="pl-4 border-l-2 border-teal-500 ml-2 space-y-1 mt-2">
           {children}
         </div>
       )}
-    </Wrapper>
+    </div>
   );
 };
-
 
 const AdminSidebarComplete: React.FC = () => {
   const [location] = useLocation();
