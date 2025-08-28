@@ -219,7 +219,7 @@ export default function AmenitiesDashboard() {
             title="Distribución de Amenidades"
             description="Visualización de la distribución de tipos de amenidades"
           >
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={data?.amenityDistribution || []}
@@ -233,6 +233,11 @@ export default function AmenitiesDashboard() {
                   ))}
                 </Pie>
                 <Tooltip />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36}
+                  formatter={(value: string) => value.charAt(0).toUpperCase() + value.slice(1)}
+                />
               </PieChart>
             </ResponsiveContainer>
           </GraphicCard>
