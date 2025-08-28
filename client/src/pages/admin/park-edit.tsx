@@ -468,7 +468,7 @@ const AdminParkEdit: React.FC = () => {
                           {/* Filas por cada día */}
                           <div className="space-y-3">
                             {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day) => (
-                              <div key={day} className="grid grid-cols-4 gap-4 items-center py-2">
+                              <div key={day} className="grid grid-cols-4 gap-4 items-center">
                                 {/* Nombre del día */}
                                 <div className="font-medium text-sm">
                                   {day}

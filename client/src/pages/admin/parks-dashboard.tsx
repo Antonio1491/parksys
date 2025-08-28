@@ -584,8 +584,6 @@ const ParksDashboard = () => {
           {/* Columna izquierda: Actividades */}
           <MetricCard
             title="Actividades"
-            value={data.parkWithMostActivities ? data.parkWithMostActivities.totalActivities : "N/A"}
-            subtitle="Parque con más actividades"
             icon={MapPin}
             iconColor="#14b8a6"
             backgroundColor="#003D49"
@@ -605,7 +603,7 @@ const ParksDashboard = () => {
                   {data.parkWithMostActivities.totalActivities} actividades
                 </span>
               </div>
-              <div className="text-xs text-gray-200 truncate">
+              <div className="text-xl text-gray-200 truncate">
                 {data.parkWithMostActivities.parkName}
                 {(() => {
                   const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithMostActivities?.parkId)?.area;
@@ -627,7 +625,7 @@ const ParksDashboard = () => {
                       {data.parkWithLeastActivities.totalActivities} actividades
                     </span>
                   </div>
-                  <div className="text-xs text-gray-200 truncate">
+                  <div className="text-xl text-gray-200 truncate">
                     {data.parkWithLeastActivities.parkName}
                     {(() => {
                       const parkArea = data.parksWithCoordinates?.find(p => p.id === data.parkWithLeastActivities?.parkId)?.area;
