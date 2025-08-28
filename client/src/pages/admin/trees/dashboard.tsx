@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/components/ui/dashboard-layout';
+import MetricCard from '@/components/ui/metric-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -172,76 +173,75 @@ const TreesDashboard: React.FC = () => {
       backgroundColor="#22c55e"
     >
       <div className="space-y-6">
-        {/* Botón de actualización */}
-        <div className="flex justify-end">
-          <Button onClick={handleRefresh} variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Actualizar
-          </Button>
-        </div>
 
         {/* Métricas principales */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-green-800">Total de Árboles</CardTitle>
-              <TreePine className="h-5 w-5 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-900">{totalTrees}</div>
-              <div className="flex items-center mt-2">
-                <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
-                <span className="text-sm text-green-600 font-medium">Inventario activo</span>
+          <MetricCard
+            title="Total de Árboles"
+            value={
+              <div className="text-2xl font-bold text-white mb-2">
+                {totalTrees}
               </div>
-            </CardContent>
-          </Card>
+            }
+            subtitle="Inventario activo"
+            icon={TreePine}
+            iconColor="#22c55e"
+            backgroundColor="#003D49"
+          />
 
-          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-800">Especies Registradas</CardTitle>
-              <Leaf className="h-5 w-5 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-900">{totalSpecies}</div>
-              <div className="flex items-center mt-2">
-                <Activity className="h-4 w-4 text-blue-600 mr-1" />
-                <span className="text-sm text-blue-600 font-medium">Biodiversidad</span>
+          <MetricCard
+            title="Especies Registradas"
+            value={
+              <div className="text-2xl font-bold text-white mb-2">
+                {totalSpecies}
               </div>
-            </CardContent>
-          </Card>
+            }
+            subtitle="Biodiversidad"
+            icon={Leaf}
+            iconColor="#22c55e"
+            backgroundColor="#003D49"
+          />
 
-          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-amber-800">Salud General</CardTitle>
-              <CheckCircle className="h-5 w-5 text-amber-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-amber-900">{healthPercentage}%</div>
-              <div className="flex items-center mt-2">
-                <Progress value={healthPercentage} className="w-full mt-2" />
+          <MetricCard
+            title="Salud General"
+            value={
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-white">
+                  {healthPercentage}%
+                </div>
+                <div className="w-full bg-gray-600 rounded-full h-2">
+                  <div 
+                    className="bg-green-400 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${healthPercentage}%` }}
+                  ></div>
+                </div>
               </div>
-              <p className="text-xs text-amber-700 mt-1">Árboles en buen estado</p>
-            </CardContent>
-          </Card>
+            }
+            subtitle="Árboles en buen estado"
+            icon={CheckCircle}
+            iconColor="#22c55e"
+            backgroundColor="#003D49"
+          />
 
-          <Card className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-red-800">Mantenimientos</CardTitle>
-              <Scissors className="h-5 w-5 text-red-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-red-900">{pendingMaintenances}</div>
-              <div className="flex items-center mt-2">
-                <Clock className="h-4 w-4 text-red-600 mr-1" />
-                <span className="text-sm text-red-600 font-medium">Pendientes</span>
+          <MetricCard
+            title="Mantenimientos"
+            value={
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-white">
+                  {pendingMaintenances}
+                </div>
+                {urgentMaintenances > 0 && (
+                  <div className="text-xs text-red-300">
+                    {urgentMaintenances} urgentes
+                  </div>
+                )}
               </div>
-              {urgentMaintenances > 0 && (
-                <Badge variant="destructive" className="mt-2">
-                  {urgentMaintenances} urgentes
-                </Badge>
-              )}
-            </CardContent>
-          </Card>
+            }
+            subtitle="Pendientes"
+            icon={Scissors}
+            iconColor="#22c55e"
+            backgroundColor="#003D49"
+          />
         </div>
 
         {/* Alertas importantes */}
