@@ -279,7 +279,7 @@ const CollapsibleSubmenu: React.FC<{
 
 const AdminSidebarComplete: React.FC = () => {
   const [location] = useLocation();
-  const { user, logout } = useAuth();
+  const { } = useAuth();
   const { t } = useTranslation('common');
   
   // Estados para controlar los submenús colapsables dentro de "Gestión"
