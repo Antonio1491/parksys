@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import AdminSidebarComplete from './AdminSidebarComplete';
 import Header from './Header';
-import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AdminLayoutProps {

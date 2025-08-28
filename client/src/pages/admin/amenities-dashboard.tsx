@@ -216,69 +216,58 @@ export default function AmenitiesDashboard() {
         {/* Gráficos principales */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Distribución de amenidades */}
-          <GraphicCard 
-            title="Distribución de Amenidades"
-            description="Visualización de la distribución de tipos de amenidades"
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={data?.amenityDistribution || []}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                >
-                  {(data?.amenityDistribution || []).map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                  formatter={(value: string) => value.charAt(0).toUpperCase() + value.slice(1)}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            
-            {/* Valores absolutos y porcentajes */}
-            {data?.amenityDistribution && (
-              <div className="mt-4 border-t pt-4">
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {(() => {
-                    const total = (data.amenityDistribution || []).reduce((sum, item) => sum + item.value, 0);
-                    return (data.amenityDistribution || [])
-                      .sort((a, b) => b.value - a.value)
-                      .map((category, index) => {
-                        const percentage = total > 0 ? ((category.value / total) * 100).toFixed(1) : '0';
+          {/* Distribución de amenidades - Estilo igual al de Categorías de Actividades */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Distribución de Amenidades</h2>
+            </div>
+            <div className="h-80">
+              {!data?.amenityDistribution || data.amenityDistribution.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">No hay categorías disponibles</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data?.amenityDistribution || []}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={30}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ value, percent }: any) => 
+                        `${value} (${(percent * 100).toFixed(0)}%)`
+                      }
+                      labelLine={false}
+                    >
+                      {(data?.amenityDistribution || []).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: any) => [`${value} amenidades`, 'Cantidad']}
+                      labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                    />
+                    <Legend 
+                      wrapperStyle={{
+                        paddingTop: '20px',
+                        fontSize: '12px'
+                      }}
+                      formatter={(value: string, entry: any) => {
+                        const categoryData = (data?.amenityDistribution || []).find(item => item.name === value);
+                        const count = categoryData ? categoryData.value : 0;
                         return (
-                          <div key={index} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-3 h-3 rounded-full"
-                                style={{ backgroundColor: category.color }}
-                              />
-                              <span className="text-gray-700 capitalize font-medium">
-                                {category.name}
-                              </span>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-semibold text-gray-900">
-                                {category.value}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {percentage}%
-                              </div>
-                            </div>
-                          </div>
+                          <span style={{ color: '#374151', fontSize: '12px', fontWeight: '500' }}>
+                            {value.charAt(0).toUpperCase() + value.slice(1)} ({count} amenidades)
+                          </span>
                         );
-                      });
-                  })()}
-                </div>
-              </div>
-            )}
-          </GraphicCard>
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
 
           {/* Top 5 amenidades más populares */}
           <GraphicCard 
