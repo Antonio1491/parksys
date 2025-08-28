@@ -22,7 +22,7 @@ const DashboardLayout = ({
       <div className="space-y-6">
         {/* Main Header con fondo coloreado */}
         <div 
-          className="mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
+          className="mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between bg-[#14b8a6]"
           style={{ backgroundColor }}
         >
           <div className="flex items-center gap-3">
