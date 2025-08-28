@@ -364,6 +364,34 @@ const AdminSidebarComplete: React.FC = () => {
     if (location.startsWith('/admin/configuracion-seguridad/maintenance')) return 'mantenimiento-sistema';
     return null;
   };
+
+  // Función helper para determinar si un submenu está activo
+  const isSubmenuActive = (submenuId: string) => {
+    const routeMap: { [key: string]: string[] } = {
+      'actividades': ['/admin/activities', '/admin/organizador'],
+      'arbolado': ['/admin/trees'],
+      'visitantes': ['/admin/visitors'],
+      'eventos': ['/admin/events', '/admin/eventos-ambu'],
+      'reservas': ['/admin/space-reservations', '/admin/dashboard-reservas'],
+      'activos': ['/admin/assets'],
+      'incidencias': ['/admin/incidents'],
+      'voluntarios': ['/admin/volunteers'],
+      'finanzas': ['/admin/finance'],
+      'contabilidad': ['/admin/accounting'],
+      'concesiones': ['/admin/concessions'],
+      'marketing': ['/admin/marketing'],
+      'advertising': ['/admin/advertising'],
+      'comunicacion': ['/admin/communications'],
+      'control-acceso': ['/admin/configuracion-seguridad/access/'],
+      'auditoria': ['/admin/configuracion-seguridad/audit'],
+      'mantenimiento-sistema': ['/admin/configuracion-seguridad/maintenance']
+    };
+
+    const routes = routeMap[submenuId];
+    if (!routes) return false;
+    
+    return routes.some(route => location.startsWith(route));
+  };
   
   // Inicializar submenús expandidos basado en la ruta actual
   useEffect(() => {
@@ -480,6 +508,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Calendar className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('actividades')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('actividades')}
             >
               <NavItem 
                 href="/admin/activities/categories" 
@@ -541,6 +570,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<TreePine className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('arbolado')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('arbolado')}
             >
               <NavItem 
                 href="/admin/trees/inventory" 
@@ -581,6 +611,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Users className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('visitantes')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('visitantes')}
             >
               <NavItem 
                 href="/admin/visitors/count" 
@@ -607,6 +638,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<CalendarDays className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('eventos')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('eventos')}
             >
               <NavItem 
                 href="/admin/events/new" 
@@ -666,6 +698,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<CalendarClock className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('reservas')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('reservas')}
             >
               <NavItem 
                 href="/admin/space-reservations" 
@@ -704,6 +737,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Star className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('evaluaciones')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('evaluaciones')}
             >
               <NavItem 
                 href="/admin/evaluaciones/parques" 
@@ -778,6 +812,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Package className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('activos')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('activos')}
             >
               <NavItem 
                 href="/admin/assets/categories" 
@@ -830,6 +865,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<AlertTriangle className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('incidencias')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('incidencias')}
             >
               <NavItem 
                 href="/admin/incidents" 
@@ -854,6 +890,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<HeartHandshake className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('voluntarios')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('voluntarios')}
             >
               <NavItem 
                 href="/admin/volunteers" 
@@ -899,6 +936,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Target className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('finanzas')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('finanzas')}
             >
               <NavItem 
                 href="/admin/finance/budget-planning" 
@@ -937,6 +975,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<BookOpen className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('contabilidad')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('contabilidad')}
             >
               <NavItem 
                 href="/admin/accounting/categories" 
@@ -989,6 +1028,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Store className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('concesiones')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('concesiones')}
             >
               <NavItem 
                 href="/admin/concessions/catalog" 
@@ -1035,6 +1075,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Megaphone className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('marketing')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('marketing')}
             >
               <NavItem 
                 href="/admin/marketing/sponsors" 
@@ -1080,6 +1121,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Monitor className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('advertising')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('advertising')}
             >
               <NavItem 
                 href="/admin/advertising/spaces" 
@@ -1125,6 +1167,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<MessageSquare className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('comunicacion')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('comunicacion')}
             >
               <NavItem 
                 href="/admin/communications/templates" 
@@ -1218,6 +1261,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Shield className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('control-acceso')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('control-acceso')}
             >
               <NavItem 
                 href="/admin/configuracion-seguridad/access/roles" 
@@ -1268,6 +1312,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<ClipboardList className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('auditoria')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('auditoria')}
             >
               <NavItem 
                 href="/admin/configuracion-seguridad/audit" 
@@ -1292,6 +1337,7 @@ const AdminSidebarComplete: React.FC = () => {
               icon={<Database className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('mantenimiento-sistema')}
               onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('mantenimiento-sistema')}
             >
               <NavItem 
                 href="/admin/configuracion-seguridad/maintenance" 
