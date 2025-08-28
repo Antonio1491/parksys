@@ -145,8 +145,8 @@ export default function AmenitiesDashboard() {
     >
       <div className="space-y-6">
 
-        {/* KPIs principales */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {/* KPIs principales - 4 columnas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <MetricCard
             title="Total Amenidades"
             value={
@@ -181,6 +181,19 @@ export default function AmenitiesDashboard() {
           />
 
           <MetricCard
+            title="Total Parques"
+            value={
+              <div className="text-2xl font-bold text-white mb-2">
+                {data?.totalParks || 0}
+              </div>
+            }
+            subtitle="Parques en el sistema"
+            icon={MapPin}
+            iconColor="#14b8a6"
+            backgroundColor="#003D49"
+          />
+
+          <MetricCard
             title="Total Módulos"
             value={
               <div className="space-y-1">
@@ -200,6 +213,10 @@ export default function AmenitiesDashboard() {
             backgroundColor="#003D49"
           />
 
+        </div>
+
+        {/* Metric card adicional - Categorías */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <MetricCard
             title="Categorías"
             value={
