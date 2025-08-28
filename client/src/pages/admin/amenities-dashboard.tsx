@@ -16,7 +16,8 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  Legend
 } from "recharts";
 import { 
   MapPin, 
