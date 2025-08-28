@@ -373,6 +373,9 @@ export default function AmenitiesDashboard() {
                     <div className="text-xs text-gray-500">
                       {amenity.totalModules === 1 ? 'módulo' : 'módulos'}
                     </div>
+                    <div className="text-xs text-blue-600 mt-1">
+                      {amenity.parksCount} {amenity.parksCount === 1 ? 'parque' : 'parques'}
+                    </div>
                   </div>
                 </div>
               ))}
