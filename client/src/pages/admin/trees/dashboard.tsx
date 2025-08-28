@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -83,14 +83,19 @@ const TreesDashboard: React.FC = () => {
 
   if (treesLoading || maintenancesLoading || speciesLoading) {
     return (
-      <AdminLayout>
-        <div className="flex h-screen items-center justify-center">
+      <DashboardLayout
+        icon={TreePine}
+        title="Arbolado"
+        subtitle="Análisis y estadísticas del arbolado urbano"
+        backgroundColor="#22c55e"
+      >
+        <div className="flex h-64 items-center justify-center">
           <div className="text-center">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
             <p className="mt-2 text-gray-600">Cargando datos del arbolado...</p>
           </div>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
@@ -160,20 +165,15 @@ const TreesDashboard: React.FC = () => {
   const urgentMaintenances = maintenances?.filter(m => m?.urgency === 'alta')?.length || 0;
 
   return (
-    <AdminLayout>
+    <DashboardLayout
+      icon={TreePine}
+      title="Arbolado"
+      subtitle="Análisis y estadísticas del arbolado urbano"
+      backgroundColor="#22c55e"
+    >
       <div className="space-y-6">
-        {/* Header con fondo coloreado */}
-        <div 
-          className="py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
-          style={{ backgroundColor: "#14b8a6" }}
-        >
-          <div>
-            <div className="flex items-center gap-2">
-              <TreePine className="w-8 h-8 text-white" />
-              <h1 className="text-3xl font-bold text-white font-poppins">Dashboard de Arbolado</h1>
-            </div>
-            <p className="text-base font-normal text-white font-poppins mt-2">Análisis y estadísticas del arbolado urbano</p>
-          </div>
+        {/* Botón de actualización */}
+        <div className="flex justify-end">
           <Button onClick={handleRefresh} variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualizar
@@ -373,7 +373,7 @@ const TreesDashboard: React.FC = () => {
           </Card>
         </div>
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 };
 
