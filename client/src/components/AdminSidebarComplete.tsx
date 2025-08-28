@@ -335,44 +335,6 @@ const AdminSidebarComplete: React.FC = () => {
     );
   };
 
-  // Rutas de submenus colapsables
-  const submenuRoutes: Record<string, string[]> = {
-    parques: ['/admin/parks'],
-    actividades: [
-      '/admin/organizador',
-      '/admin/activities',
-      '/admin/activities/instructors',
-    ],
-    amenidades: ['/admin/amenities'],
-    
-    visitantes: ['/admin/visitors'],
-        
-    fauna: ['/admin/fauna'],
-        eventos: ['/admin/events', '/admin/eventos-ambu'],
-    reservas: ['/admin/space-reservations', '/admin/dashboard-reservas'],
-    
-    evaluaciones: ['/admin/evaluaciones'],
-    'roles-sistema': [
-      '/admin/roles',
-      '/admin/permissions',
-      '/admin/role-',
-    ],
-    activos: ['/admin/assets'],
-    incidencias: ['/admin/incidents'],
-    voluntarios: ['/admin/volunteers'],
-    finanzas: ['/admin/finance'],
-    contabilidad: ['/admin/accounting'],
-    concesiones: ['/admin/concessions'],
-    marketing: ['/admin/marketing'],
-    advertising: ['/admin/advertising'],
-    comunicacion: ['/admin/communications'],
-    'control-acceso': ['/admin/configuracion-seguridad/access/'],
-    politicas: ['/admin/configuracion-seguridad/policies'],
-    notificaciones: ['/admin/configuracion-seguridad/notifications'],
-    auditoria: ['/admin/configuracion-seguridad/audit'],
-    'mantenimiento-sistema': ['/admin/configuracion-seguridad/maintenance'],
-  };
-  
   // Determinar qué submenú debe estar abierto basado en la ruta actual
   const getActiveSubmenu = () => {
     if (location.startsWith('/admin/visitors')) return 'visitantes';
