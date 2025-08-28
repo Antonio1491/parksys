@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { GraphicCard } from '@/components/ui/graphic-card';
 import MetricCard from '@/components/ui/metric-card';
-import { Calendar, Plus, Tag, Users, MapPin, Clock, Edit, Eye, BarChart3, CheckCircle } from 'lucide-react';
+import { Calendar, Plus, Tag, Users, MapPin, Clock, Edit, Eye, BarChart3, CheckCircle, Activity } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import DashboardLayout from '@/components/ui/dashboard-layout';
 
@@ -168,6 +168,22 @@ const OrganizadorPage: React.FC = () => {
            categoryName === 'Fitness y Ejercicio' ? '#6366f1' :
            '#059669'
   }));
+
+  // Crear datos para el gráfico de actividades por parque
+  const activitiesByPark = Array.isArray(activities) && Array.isArray(parks) ? 
+    parks.map((park: any) => {
+      const parkActivities = activities.filter((activity: any) => activity.parkId === park.id);
+      const activeActivities = parkActivities.filter((activity: any) => activity.status === 'activa');
+      return {
+        parkId: park.id,
+        parkName: park.name.length > 12 ? park.name.substring(0, 12) + '...' : park.name,
+        totalActivities: parkActivities.length,
+        activeActivities: activeActivities.length,
+        fullParkName: park.name
+      };
+    }).filter((item: any) => item.totalActivities > 0)
+     .sort((a: any, b: any) => b.totalActivities - a.totalActivities)
+     .slice(0, 8) : []; // Mostrar solo los 8 parques con más actividades
 
   // Actividades próximas (próximas 5)
   const upcomingActivities = Array.isArray(activities) ? activities
@@ -634,7 +650,113 @@ const OrganizadorPage: React.FC = () => {
 
       </div>
 
+      {/* Sección 3 - Gráfico de Actividades por Parque */}
+      <div className="mb-8">
+        <GraphicCard
+          title="🎯 Actividades por Parque"
+          description="Distribución de actividades totales y activas por parque"
+          className="h-full"
+        >
+          <div className="w-full">
+            {activitiesByPark.length > 0 ? (
+              <div className="flex justify-center items-end gap-3 min-h-[320px] px-4 overflow-x-auto">
+                {activitiesByPark.map((park) => {
+                  const maxActivities = Math.max(...activitiesByPark.map(p => p.totalActivities));
+                  const heightPercentage = (park.totalActivities / maxActivities) * 100;
+                  const activePercentage = park.totalActivities > 0 ? (park.activeActivities / park.totalActivities) * 100 : 0;
+                  
+                  const getActivityColor = (total: number) => {
+                    if (total >= 8) return "#059669"; // Verde para muchas actividades
+                    if (total >= 4) return "#0d9488"; // Teal para actividades medias
+                    if (total >= 2) return "#06b6d4"; // Cyan para pocas actividades
+                    return "#6b7280"; // Gris para muy pocas
+                  };
 
+                  return (
+                    <div key={park.parkId} className="flex flex-col items-center relative">
+                      {/* Valor del total arriba con número de activas */}
+                      <div className="mb-2 text-center">
+                        <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
+                          {park.totalActivities} total
+                        </div>
+                        <div className="text-xs font-poppins font-thin text-gray-500">
+                          ({park.activeActivities} activas)
+                        </div>
+                      </div>
+
+                      {/* Columna vertical */}
+                      <div className="relative h-64 w-6 flex flex-col justify-end">
+                        {/* Fondo de la columna */}
+                        <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                        
+                        {/* Relleno de la columna según total de actividades */}
+                        <div
+                          className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                          style={{
+                            height: `${Math.max(heightPercentage, 5)}%`,
+                            backgroundColor: getActivityColor(park.totalActivities),
+                            borderColor: getActivityColor(park.totalActivities),
+                          }}
+                        >
+                          {/* Indicador de actividades activas */}
+                          {park.activeActivities > 0 && (
+                            <div
+                              className="absolute bottom-0 w-full rounded-t-3xl border-2 border-white"
+                              style={{
+                                height: `${Math.max(activePercentage, 10)}%`,
+                                backgroundColor: "#10b981",
+                                opacity: 0.8
+                              }}
+                            ></div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Nombre del parque */}
+                      <div className="mt-2 text-center">
+                        <p className="text-xs font-medium text-gray-700 max-w-[60px] break-words leading-tight" title={park.fullParkName}>
+                          {park.parkName}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center min-h-[320px] text-gray-500">
+                <div className="text-center">
+                  <Activity className="h-12 w-12 text-gray-300" />
+                  <p className="text-lg font-medium">
+                    No hay actividades disponibles
+                  </p>
+                  <p className="text-sm">
+                    Los datos de actividades por parque aparecerán aquí una vez que se registren actividades
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          {activitiesByPark.length > 0 && (
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-500 font-poppins font-thin">
+                Mostrando los {activitiesByPark.length} parques con más actividades
+              </p>
+              <div className="flex justify-center gap-4 mt-2 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded" style={{ backgroundColor: "#6b7280" }}></div>
+                  <span>Total actividades</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded" style={{ backgroundColor: "#10b981" }}></div>
+                  <span>Activas</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </GraphicCard>
+      </div>
+
+      {/* Sección 4 - Gráficos de categorías */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-4">
