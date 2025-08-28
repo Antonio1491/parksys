@@ -2867,9 +2867,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         count: amenityStats[0].totalModules
       } : null;
 
+      // Obtener información de categorías
+      const categoryInfo = (() => {
+        // Agrupar amenidades por categoría y contar amenidades en cada categoría
+        const categoryGroups = amenityStats.reduce((acc: any, amenity: any) => {
+          const category = amenity.category || 'Sin categoría';
+          if (!acc[category]) {
+            acc[category] = { count: 0, amenityNames: [] };
+          }
+          acc[category].count += 1;
+          acc[category].amenityNames.push(amenity.name);
+          return acc;
+        }, {});
+
+        const categories = Object.entries(categoryGroups);
+        const totalCategories = categories.length;
+        
+        // Encontrar la categoría con más amenidades
+        const categoryWithMostAmenities = categories.length > 0 ? 
+          categories.reduce((max: any, current: any) => 
+            current[1].count > max[1].count ? current : max
+          ) : null;
+
+        return {
+          totalCategories,
+          categoryWithMostAmenities: categoryWithMostAmenities ? {
+            name: categoryWithMostAmenities[0],
+            count: categoryWithMostAmenities[1].count
+          } : null
+        };
+      })();
+
       console.log("[AMENITIES DASHBOARD] Estadísticas calculadas:");
       console.log("- Total amenidades:", amenities.length);
       console.log("- Total parques:", totalParks);
+      console.log("- Total categorías:", categoryInfo.totalCategories);
+      console.log("- Categoría con más amenidades:", categoryInfo.categoryWithMostAmenities?.name, "(" + categoryInfo.categoryWithMostAmenities?.count + ")");
       console.log("- Parques con amenidades:", parksWithAmenitiesCount);
       console.log("- Total asignaciones:", totalAmenityAssignments);
 
@@ -2877,6 +2910,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalAmenities: amenities.length,
         totalParks: totalParks,
         totalModules: totalAmenityAssignments,
+        totalCategories: categoryInfo.totalCategories,
+        categoryWithMostAmenities: categoryInfo.categoryWithMostAmenities,
         amenityWithMostModules: amenityWithMostModules,
         averageAmenitiesPerPark: totalParks > 0 ? Math.round((totalAmenityAssignments / totalParks) * 100) / 100 : 0,
         parkWithMostAmenities: parkWithMostAmenities,

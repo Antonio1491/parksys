@@ -28,7 +28,8 @@ import {
   AlertCircle,
   CheckCircle,
   Calendar,
-  RefreshCw
+  RefreshCw,
+  Tag
 } from "lucide-react";
 
 interface AmenityStats {
@@ -145,7 +146,7 @@ export default function AmenitiesDashboard() {
       <div className="space-y-6">
 
         {/* KPIs principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           <MetricCard
             title="Total Amenidades"
             value={
@@ -180,19 +181,6 @@ export default function AmenitiesDashboard() {
           />
 
           <MetricCard
-            title="Total Parques"
-            value={
-              <div className="text-2xl font-bold text-white mb-2">
-                {data?.totalParks || 0}
-              </div>
-            }
-            subtitle="Parques en el sistema"
-            icon={MapPin}
-            iconColor="#14b8a6"
-            backgroundColor="#003D49"
-          />
-
-          <MetricCard
             title="Total Módulos"
             value={
               <div className="space-y-1">
@@ -208,6 +196,26 @@ export default function AmenitiesDashboard() {
             }
             subtitle="Módulos registrados"
             icon={Users}
+            iconColor="#14b8a6"
+            backgroundColor="#003D49"
+          />
+
+          <MetricCard
+            title="Categorías"
+            value={
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-white">
+                  {data?.totalCategories || 0}
+                </div>
+                {data?.categoryWithMostAmenities && (
+                  <div className="text-xs text-gray-300">
+                    Líder: {data.categoryWithMostAmenities.name} ({data.categoryWithMostAmenities.count})
+                  </div>
+                )}
+              </div>
+            }
+            subtitle="Categorías registradas"
+            icon={Tag}
             iconColor="#14b8a6"
             backgroundColor="#003D49"
           />
@@ -272,21 +280,20 @@ export default function AmenitiesDashboard() {
           {/* Amenidades por parque - Movido de la tercera fila */}
           <GraphicCard 
             title="Amenidades por Parque"
-            description="Distribución de amenidades en cada parque"
             className="h-full"
           >
             <div className="w-full">
               {(data?.utilizationByPark || []).length > 0 ? (
-                <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+                <div className="flex justify-center items-end gap-8 min-h-[320px] px-4 overflow-x-auto">
                   {(data?.utilizationByPark || [])
                     .sort((a, b) => b.amenitiesCount - a.amenitiesCount)
                     .map((park: any, index: number) => {
                       const maxValue = Math.max(...(data?.utilizationByPark || []).map((p: any) => p.amenitiesCount));
                       const heightPercentage = maxValue > 0 ? (park.amenitiesCount / maxValue) * 100 : 0;
                       const getAmenityColor = (count: number) => {
-                        if (count >= maxValue * 0.7) return "#14b8a6"; // Teal para muchas amenidades
-                        if (count >= maxValue * 0.4) return "#3b82f6"; // Azul para cantidad media
-                        return "#8b5cf6"; // Púrpura para pocas amenidades
+                        if (count >= maxValue * 0.7) return "#69c45c"; // Teal para muchas amenidades
+                        if (count >= maxValue * 0.4) return "#bcb57e"; // Azul para cantidad media
+                        return "#a86767"; // Púrpura para pocas amenidades
                       };
                       
                       return (
@@ -297,7 +304,6 @@ export default function AmenitiesDashboard() {
                               {park.amenitiesCount}
                             </div>
                             <div className="text-xs text-gray-500">
-                              amenidades
                             </div>
                           </div>
 
