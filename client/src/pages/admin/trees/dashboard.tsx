@@ -170,14 +170,14 @@ const TreesDashboard: React.FC = () => {
       icon={TreePine}
       title="Arbolado"
       subtitle="Análisis y estadísticas del arbolado urbano"
-      backgroundColor="#22c55e"
+      backgroundColor="#14b8a6"
     >
       <div className="space-y-6">
 
         {/* Métricas principales */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
-            title="Total de Árboles"
+            title="Total Global"
             value={
               <div className="text-2xl font-bold text-white mb-2">
                 {totalTrees}
@@ -185,7 +185,7 @@ const TreesDashboard: React.FC = () => {
             }
             subtitle="Inventario activo"
             icon={TreePine}
-            iconColor="#22c55e"
+            iconColor="#14b8a6"
             backgroundColor="#003D49"
           />
 
@@ -198,7 +198,7 @@ const TreesDashboard: React.FC = () => {
             }
             subtitle="Biodiversidad"
             icon={Leaf}
-            iconColor="#22c55e"
+            iconColor="#14b8a6"
             backgroundColor="#003D49"
           />
 
@@ -219,7 +219,7 @@ const TreesDashboard: React.FC = () => {
             }
             subtitle="Árboles en buen estado"
             icon={CheckCircle}
-            iconColor="#22c55e"
+            iconColor="#14b8a6"
             backgroundColor="#003D49"
           />
 
@@ -239,7 +239,7 @@ const TreesDashboard: React.FC = () => {
             }
             subtitle="Pendientes"
             icon={Scissors}
-            iconColor="#22c55e"
+            iconColor="#14b8a6"
             backgroundColor="#003D49"
           />
         </div>
