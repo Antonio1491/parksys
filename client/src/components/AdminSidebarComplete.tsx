@@ -362,6 +362,7 @@ const AdminSidebarComplete: React.FC = () => {
     if (location.startsWith('/admin/configuracion-seguridad/notifications')) return 'notificaciones';
     if (location.startsWith('/admin/configuracion-seguridad/audit')) return 'auditoria';
     if (location.startsWith('/admin/configuracion-seguridad/maintenance')) return 'mantenimiento-sistema';
+    if (location.startsWith('/admin/configuracion-seguridad/exports')) return 'mantenimiento-sistema';
     return null;
   };
 
@@ -1392,6 +1393,16 @@ const AdminSidebarComplete: React.FC = () => {
                 Actualizaciones
               </NavItem>
             </CollapsibleSubmenu>
+
+            {/* EXPORTACIONES */}
+            <CollapsibleSubmenu
+              id="exportaciones"
+              title="Exportaciones"
+              icon={<Download className="h-4 w-4" />}
+              href="/admin/configuracion-seguridad/exports"
+              collapsible={false}
+              isActive={location.startsWith('/admin/configuracion-seguridad/exports')}
+            />
           </ModuleNav>
 
         </Accordion>

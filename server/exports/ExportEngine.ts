@@ -1,7 +1,7 @@
 import { ExportOptions, ExportResult, ExportError, ExportConfig } from '../../shared/exports/config';
 import { BrandingConfig, DEFAULT_BRANDING } from '../../shared/exports/branding';
 import { getExportConfig } from '../../shared/exports/registry';
-import { db } from '../db';
+import { storage } from '../storage';
 import { CSVFormatter } from './formatters/CSVFormatter';
 import { XLSXFormatter } from './formatters/XLSXFormatter';
 import { PDFFormatter } from './formatters/PDFFormatter';
@@ -99,43 +99,37 @@ export class ExportEngine {
   }
 
   private async fetchData(options: ExportOptions, config: ExportConfig): Promise<any[]> {
-    
     try {
-      let query = `SELECT * FROM ${this.getTableName(options.entity)}`;
-      const params: any[] = [];
-      const whereConditions: string[] = [];
-
-      // Aplicar filtros
-      if (options.filters) {
-        Object.entries(options.filters).forEach(([key, value], index) => {
-          if (value !== undefined && value !== null && value !== '') {
-            whereConditions.push(`${key} = $${params.length + 1}`);
-            params.push(value);
-          }
-        });
+      console.log(`[EXPORT] Fetching data for entity: ${options.entity}`);
+      
+      let data: any[] = [];
+      
+      // Usar métodos del storage según la entidad
+      switch (options.entity) {
+        case 'parks':
+          data = await storage.getParks(options.filters);
+          break;
+        case 'assets':
+          data = await storage.getAssets(options.filters);
+          break;
+        case 'users':
+          data = await storage.getUsers();
+          break;
+        default:
+          // Para otras entidades, usar un método genérico o mostrar mensaje
+          console.warn(`[EXPORT] Entidad ${options.entity} no implementada aún en storage`);
+          data = [];
       }
 
-      if (whereConditions.length > 0) {
-        query += ` WHERE ${whereConditions.join(' AND ')}`;
-      }
+      console.log(`[EXPORT] Found ${data.length} records for ${options.entity}`);
 
-      // Aplicar ordenamiento
-      const sorting = options.sorting || config.sorting?.default;
-      if (sorting) {
-        query += ` ORDER BY ${sorting.field} ${sorting.direction.toUpperCase()}`;
-      }
-
-      // Aplicar límites
+      // Aplicar límites si están especificados
       if (options.limit) {
-        query += ` LIMIT ${options.limit}`;
-        if (options.offset) {
-          query += ` OFFSET ${options.offset}`;
-        }
+        const offset = options.offset || 0;
+        data = data.slice(offset, offset + options.limit);
       }
 
-      console.log(`[EXPORT] Executing query: ${query}`, params);
-      const result = await db.query(query, params);
-      return result.rows || [];
+      return data;
 
     } catch (error) {
       console.error(`[EXPORT] Database error for entity ${options.entity}:`, error);

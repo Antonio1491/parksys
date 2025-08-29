@@ -1384,6 +1384,13 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/configuracion-seguridad/Mantenimiento')))}
           </Suspense>
         </Route>
+
+        {/* Exportaciones */}
+        <Route path="/admin/configuracion-seguridad/exports">
+          <Suspense fallback={<div className="p-8 text-center">Cargando configuración de exportaciones...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/configuracion-seguridad/ExportacionesConfig')))}
+          </Suspense>
+        </Route>
         
         <Route path="/admin/configuracion-seguridad/maintenance/backup">
           <Suspense fallback={<div className="p-8 text-center">Cargando respaldos...</div>}>
