@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/ui/dashboard-layout";
 import MetricCard from "@/components/ui/metric-card";
 import GraphicCard from "@/components/ui/graphic-card";
+import VerticalBarChart from "@/components/ui/vertical-bar-chart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -227,7 +228,7 @@ export default function AmenitiesDashboard() {
           {/* Distribución de amenidades - Estilo igual al de Categorías de Actividades */}
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Distribución de Amenidades</h2>
+              <h2 className="text-xl font-semibold">Categorías de Amenidades</h2>
             </div>
             <div className="h-80">
               {!data?.amenityDistribution || data.amenityDistribution.length === 0 ? (
@@ -282,79 +283,22 @@ export default function AmenitiesDashboard() {
             title="Amenidades por Parque"
             className="h-full"
           >
-            <div className="w-full">
-              {(data?.utilizationByPark || []).length > 0 ? (
-                <div className="flex justify-center items-end gap-8 min-h-[320px] px-4 overflow-x-auto">
-                  {(data?.utilizationByPark || [])
-                    .sort((a, b) => b.amenitiesCount - a.amenitiesCount)
-                    .map((park: any, index: number) => {
-                      const maxValue = Math.max(...(data?.utilizationByPark || []).map((p: any) => p.amenitiesCount));
-                      const heightPercentage = maxValue > 0 ? (park.amenitiesCount / maxValue) * 100 : 0;
-                      const getAmenityColor = (count: number) => {
-                        if (count >= maxValue * 0.7) return "#69c45c"; // Teal para muchas amenidades
-                        if (count >= maxValue * 0.4) return "#bcb57e"; // Azul para cantidad media
-                        return "#a86767"; // Púrpura para pocas amenidades
-                      };
-                      
-                      return (
-                        <div key={index} className="flex flex-col items-center relative">
-                          {/* Valor del conteo arriba */}
-                          <div className="mb-2 text-center">
-                            <div className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                              {park.amenitiesCount}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                            </div>
-                          </div>
-
-                          {/* Columna vertical */}
-                          <div className="relative h-64 w-4 flex flex-col justify-end">
-                            {/* Fondo de la columna */}
-                            <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                            
-                            {/* Relleno de la columna según cantidad */}
-                            <div
-                              className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                              style={{
-                                height: `${Math.max(heightPercentage, 5)}%`,
-                                backgroundColor: getAmenityColor(park.amenitiesCount),
-                                borderColor: getAmenityColor(park.amenitiesCount),
-                              }}
-                            ></div>
-                          </div>
-
-                          {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                          <div className="absolute bottom-32 -left-32 transform -rotate-90 origin-bottom-right w-32">
-                            <div className="text-xs text-gray-700 whitespace-nowrap">
-                              {park.parkName}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <div className="flex flex-col items-center space-y-2">
-                    <Activity className="h-12 w-12 text-gray-300" />
-                    <p className="text-lg font-medium">
-                      No hay datos de amenidades disponibles
-                    </p>
-                    <p className="text-sm">
-                      Los datos de amenidades por parque aparecerán aquí una vez que se asignen amenidades a los parques
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-            {(data?.utilizationByPark || []).length > 0 && (
-              <div className="mt-2 text-center">
-                <p className="text-sm text-gray-500">
-                  Mostrando todos los {(data?.utilizationByPark || []).length} parques
-                  registrados en el sistema
-                </p>
-              </div>
-            )}
+            <VerticalBarChart
+              data={(data?.utilizationByPark || []).map((park: any) => ({
+                label: park.parkName,
+                value: park.amenitiesCount,
+                id: park.parkName
+              }))}
+              emptyStateTitle="No hay datos de amenidades disponibles"
+              emptyStateDescription="Los datos de amenidades por parque aparecerán aquí una vez que se asignen amenidades a los parques"
+              footerText={
+                (data?.utilizationByPark || []).length > 0 
+                  ? `Mostrando todos los ${(data?.utilizationByPark || []).length} parques registrados en el sistema`
+                  : undefined
+              }
+              sortDescending={true}
+              showLabels={true}
+            />
           </GraphicCard>
         </div>
 

@@ -541,13 +541,13 @@ const ParksDashboard = () => {
         
         {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
         <GraphicCard
-          title="🌿 Porcentaje de Área Verde por Parque"
-          description="Distribución del área verde en cada parque municipal"
+          title="🌿 Porciento de Área Verde por Parque"
+          description="Distribución del área verde en cada parque"
           className="h-full"
         >
           <div className="w-full">
             {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+              <div className="flex justify-center items-end gap-4 min-h-[320px] px-4 overflow-x-auto">
                 {data.greenAreaPercentages
                   .sort((a, b) => b.greenPercentage - a.greenPercentage)
                   .map((park) => {
