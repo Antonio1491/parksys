@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/components/ui/dashboard-layout';
 import MetricCard from '@/components/ui/metric-card';
+import GraphicCard from '@/components/ui/graphic-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -148,6 +149,15 @@ const TreesDashboard: React.FC = () => {
   const topSpecies = Object.entries(speciesCount)
     .sort(([,a], [,b]) => b - a)
     .slice(0, 5);
+
+  // Datos para el gráfico de árboles por parque (formato similar al de evaluaciones)
+  const treesByParkData = Object.entries(treesByPark)
+    .filter(([parkName]) => parkName !== 'Sin parque')
+    .map(([parkName, count], index) => ({
+      parkId: index + 1,
+      parkName,
+      treeCount: count
+    }));
 
   // Datos para gráficas
   const healthChartData = Object.entries(healthStats).map(([status, count]) => ({
@@ -376,6 +386,89 @@ const TreesDashboard: React.FC = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Gráfico de Árboles por Parque */}
+        <div className="grid gap-6 md:grid-cols-1">
+          <GraphicCard
+            title="🌳 Árboles Registrados por Parque"
+            description="Cantidad de árboles inventariados en cada parque municipal"
+            className="h-full"
+          >
+            <div className="w-full">
+              {treesByParkData?.length > 0 ? (
+                <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
+                  {treesByParkData
+                    .sort((a, b) => b.treeCount - a.treeCount)
+                    .map((park) => {
+                      const maxTrees = Math.max(...treesByParkData.map(p => p.treeCount));
+                      const heightPercentage = (park.treeCount / maxTrees) * 100;
+                      const getTreeColor = (count: number) => {
+                        if (count >= maxTrees * 0.8) return "#22c55e"; // Verde intenso para mayor cantidad
+                        if (count >= maxTrees * 0.5) return "#10b981"; // Verde medio
+                        if (count >= maxTrees * 0.3) return "#14b8a6"; // Verde teal
+                        return "#6b7280"; // Gris para menor cantidad
+                      };
+                      return (
+                        <div key={park.parkId} className="flex flex-col items-center relative">
+                          {/* Valor de árboles arriba */}
+                          <div className="mb-2 text-center">
+                            <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
+                              {park.treeCount}
+                            </div>
+                            <div className="text-xs font-poppins font-thin text-gray-500">
+                              árboles
+                            </div>
+                          </div>
+
+                          {/* Columna vertical */}
+                          <div className="relative h-64 w-4 flex flex-col justify-end">
+                            {/* Fondo de la columna */}
+                            <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                            
+                            {/* Relleno de la columna según cantidad */}
+                            <div
+                              className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                              style={{
+                                height: `${Math.max(heightPercentage, 5)}%`,
+                                backgroundColor: getTreeColor(park.treeCount),
+                                borderColor: getTreeColor(park.treeCount),
+                              }}
+                            ></div>
+                          </div>
+
+                          {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
+                          <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
+                            <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
+                              {park.parkName}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <div className="flex flex-col items-center space-y-2">
+                    <TreePine className="h-12 w-12 text-gray-300" />
+                    <p className="text-lg font-medium">
+                      No hay datos de árboles por parque disponibles
+                    </p>
+                    <p className="text-sm">
+                      Los datos aparecerán aquí una vez que se registren árboles en los parques
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            {treesByParkData?.length > 0 && (
+              <div className="mt-2 text-center">
+                <p className="text-sm text-gray-500 font-poppins font-thin">
+                  Mostrando {treesByParkData.length} parques con árboles registrados
+                </p>
+              </div>
+            )}
+          </GraphicCard>
         </div>
 
         {/* Información adicional */}
