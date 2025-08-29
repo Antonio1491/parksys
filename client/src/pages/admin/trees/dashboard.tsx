@@ -183,6 +183,11 @@ const TreesDashboard: React.FC = () => {
   const pendingMaintenances = maintenances?.filter(m => m?.status === 'pending')?.length || 0;
   const urgentMaintenances = maintenances?.filter(m => m?.urgency === 'alta')?.length || 0;
 
+  // Cálculo del progreso de mantenimientos
+  // Árboles únicos que han recibido mantenimiento (basado en lastMaintenanceDate)
+  const treesWithMaintenance = trees?.filter(tree => tree?.lastMaintenanceDate && tree.lastMaintenanceDate !== '')?.length || 0;
+  const maintenanceProgress = totalTrees > 0 ? Math.round((treesWithMaintenance / totalTrees) * 100) : 0;
+
   return (
     <DashboardLayout
       icon={TreePine}
@@ -253,16 +258,20 @@ const TreesDashboard: React.FC = () => {
             value={
               <div className="space-y-1">
                 <div className="text-2xl font-bold text-white">
-                  {pendingMaintenances}
+                  {totalMaintenances}
                 </div>
-                {urgentMaintenances > 0 && (
-                  <div className="text-xs text-red-300">
-                    {urgentMaintenances} urgentes
-                  </div>
-                )}
+                <div className="text-xs text-green-300">
+                  {maintenanceProgress}% árboles atendidos
+                </div>
+                <div className="w-full bg-gray-600 rounded-full h-2">
+                  <div 
+                    className="bg-green-400 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${maintenanceProgress}%` }}
+                  ></div>
+                </div>
               </div>
             }
-            subtitle="Pendientes"
+            subtitle="Total global"
             icon={Scissors}
             iconColor="#14b8a6"
             backgroundColor="#003D49"
