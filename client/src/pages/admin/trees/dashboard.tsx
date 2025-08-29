@@ -367,74 +367,59 @@ const TreesDashboard: React.FC = () => {
 
         {/* Gráficas y estadísticas */}
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Estado de salud de árboles */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5" />
-                Estado de Salud de Árboles
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={320}>
-                <PieChart>
-                  <Pie
-                    data={healthChartData}
-                    cx="50%"
-                    cy="45%"
-                    labelLine={false}
-                    label={false}
-                    outerRadius={75}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {healthChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value, name, props) => [
-                      `${value} árboles (${props.payload.percentage}%)`,
-                      'Cantidad'
-                    ]}
-                    labelFormatter={(label) => `Estado: ${label}`}
-                  />
-                  <Legend 
-                    verticalAlign="bottom" 
-                    height={36}
-                    formatter={(value, entry) => `${value}: ${entry.payload.value} (${entry.payload.percentage}%)`}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              
-              {/* Tabla de detalles */}
-              <div className="mt-4 space-y-2">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Detalle por Estado de Salud</h4>
-                <div className="grid grid-cols-1 gap-2">
-                  {healthChartData.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-4 h-4 rounded-full border border-gray-300"
-                          style={{ backgroundColor: item.color }}
-                        ></div>
-                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-gray-900">{item.value} árboles</div>
-                        <div className="text-xs text-gray-500">{item.percentage}% del total</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {healthChartData.length === 0 && (
-                  <div className="text-center py-4 text-gray-500">
-                    <p className="text-sm">No hay datos de estado de salud disponibles</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Estado de salud de árboles - Estilo igual al de Distribución de Amenidades */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Estado de Salud de Árboles</h2>
+            </div>
+            <div className="h-80">
+              {!healthChartData || healthChartData.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">No hay datos de estado de salud disponibles</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={healthChartData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={30}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ value, percent }: any) => 
+                        `${value} (${(percent * 100).toFixed(0)}%)`
+                      }
+                      labelLine={false}
+                    >
+                      {healthChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: any) => [`${value} árboles`, 'Cantidad']}
+                      labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                    />
+                    <Legend 
+                      wrapperStyle={{
+                        paddingTop: '20px',
+                        fontSize: '12px'
+                      }}
+                      formatter={(value: string, entry: any) => {
+                        const statusData = healthChartData.find(item => item.name === value);
+                        const count = statusData ? statusData.value : 0;
+                        const percentage = statusData ? statusData.percentage : '0';
+                        return (
+                          <span style={{ color: '#374151', fontSize: '12px', fontWeight: '500' }}>
+                            {value} ({count} árboles - {percentage}%)
+                          </span>
+                        );
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
 
           {/* Especies más comunes */}
           <Card>
