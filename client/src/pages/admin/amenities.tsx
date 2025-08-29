@@ -487,7 +487,7 @@ const AdminAmenitiesPage = () => {
           </Link>,
           <Dialog key="nueva-amenidad" open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="principal">
+              <Button variant="primary">
                 <Plus className="mr-2 h-4 w-4" />
                 Nueva Amenidad
               </Button>

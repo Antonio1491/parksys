@@ -585,20 +585,6 @@ const AdminParksContent = () => {
               <List className="h-4 w-4 mr-2" />
               Lista
             </Button>
-            
-            {/* Separator */}
-            <div className="h-6 w-px bg-gray-300 mx-2"></div>
-            
-            {/* Action buttons */}
-
-            <Button variant="outline" size="sm" onClick={() => window.location.href = "/admin/parks-import"}>
-              <FileUp className="h-4 w-4 mr-2" />
-              Importar Parques
-            </Button>
-            <Button size="sm" onClick={() => window.location.href = "/admin/parks/new"}>
-              <Plus className="h-4 w-4 mr-2" />
-              {tParks('newPark')}
-            </Button>
           </div>
         </div>
         
