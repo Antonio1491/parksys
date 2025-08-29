@@ -591,7 +591,7 @@ const AssetCategoriesPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-6 w-full">
         {/* Header con PageHeader component */}
         <PageHeader
           title="Categorías de Activos"
