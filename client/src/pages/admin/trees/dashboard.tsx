@@ -94,7 +94,7 @@ const TreesDashboard: React.FC = () => {
         icon={TreePine}
         title="Arbolado"
         subtitle="Análisis y estadísticas del arbolado urbano"
-        backgroundColor="#22c55e"
+        backgroundColor="#14b8a6"
       >
         <div className="flex h-64 items-center justify-center">
           <div className="text-center">

@@ -21,6 +21,7 @@ interface VerticalBarChartProps {
   sortDescending?: boolean;
   className?: string;
   minBarHeightPercentage?: number;
+  formatValue?: (value: number, item?: BarChartData) => string;
 }
 
 export default function VerticalBarChart({
@@ -35,6 +36,7 @@ export default function VerticalBarChart({
   sortDescending = true,
   className = "",
   minBarHeightPercentage = 5,
+  formatValue,
 }: VerticalBarChartProps) {
 
   // Función para obtener color basado en el rango de altura
@@ -77,7 +79,7 @@ export default function VerticalBarChart({
               {/* Valor del conteo arriba */}
               <div className="mb-2 text-center">
                 <div className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  {item.value}
+                  {formatValue ? formatValue(item.value, item) : item.value}
                 </div>
               </div>
 
