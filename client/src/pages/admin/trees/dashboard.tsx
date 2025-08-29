@@ -22,7 +22,7 @@ import {
   Wrench,
   RefreshCw
 } from 'lucide-react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface TreeData {
   id: number;
@@ -58,26 +58,23 @@ const TreesDashboard: React.FC = () => {
   // Consultas para obtener datos
   const { data: treesResponse, isLoading: treesLoading, refetch: refetchTrees } = useQuery({
     queryKey: ['/api/trees'],
-    suspense: false,
     retry: 1
   });
 
   const { data: maintenancesResponse, isLoading: maintenancesLoading, refetch: refetchMaintenances } = useQuery({
     queryKey: ['/api/trees/maintenances'],
-    suspense: false,
     retry: 1
   });
 
   const { data: speciesResponse, isLoading: speciesLoading, refetch: refetchSpecies } = useQuery({
     queryKey: ['/api/tree-species'],
-    suspense: false,
     retry: 1
   });
 
   // Extraer datos con manejo defensivo para diferentes formatos de respuesta
-  const trees = Array.isArray(treesResponse) ? treesResponse : (treesResponse?.data || []);
-  const maintenances = Array.isArray(maintenancesResponse) ? maintenancesResponse : (maintenancesResponse?.data || []);
-  const species = Array.isArray(speciesResponse) ? speciesResponse : (speciesResponse?.data || []);
+  const trees = Array.isArray(treesResponse) ? treesResponse : ((treesResponse as any)?.data || []);
+  const maintenances = Array.isArray(maintenancesResponse) ? maintenancesResponse : ((maintenancesResponse as any)?.data || []);
+  const species = Array.isArray(speciesResponse) ? speciesResponse : ((speciesResponse as any)?.data || []);
 
   const handleRefresh = async () => {
     await Promise.all([refetchTrees(), refetchMaintenances(), refetchSpecies()]);
@@ -136,28 +133,28 @@ const TreesDashboard: React.FC = () => {
   };
 
   // Estadísticas de salud de árboles con normalización
-  const healthStats = trees?.reduce((acc, tree) => {
+  const healthStats = trees?.reduce((acc: Record<string, number>, tree: any) => {
     const status = normalizeHealthStatus(tree?.healthStatus || '');
     acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>) || {};
 
   // Estadísticas de mantenimiento por urgencia
-  const urgencyStats = maintenances?.reduce((acc, maintenance) => {
+  const urgencyStats = maintenances?.reduce((acc: Record<string, number>, maintenance: any) => {
     const urgency = maintenance?.urgency || 'media';
     acc[urgency] = (acc[urgency] || 0) + 1;
     return acc;
   }, {} as Record<string, number>) || {};
 
   // Estadísticas de mantenimiento por tipo
-  const maintenanceTypeStats = maintenances?.reduce((acc, maintenance) => {
+  const maintenanceTypeStats = maintenances?.reduce((acc: Record<string, number>, maintenance: any) => {
     const type = maintenance?.maintenanceType || 'General';
     acc[type] = (acc[type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>) || {};
 
   // Árboles por parque
-  const treesByPark = trees?.reduce((acc, tree) => {
+  const treesByPark = trees?.reduce((acc: Record<string, number>, tree: any) => {
     const parkName = tree?.parkName || 'Sin parque';
     acc[parkName] = (acc[parkName] || 0) + 1;
     return acc;
@@ -165,18 +162,18 @@ const TreesDashboard: React.FC = () => {
 
   // Top 3 parques con más árboles
   const topParks = Object.entries(treesByPark)
-    .sort(([,a], [,b]) => b - a)
+    .sort(([,a], [,b]) => (b as number) - (a as number))
     .slice(0, 3);
 
   // Especies más comunes
-  const speciesCount = trees?.reduce((acc, tree) => {
+  const speciesCount = trees?.reduce((acc: Record<string, number>, tree: any) => {
     const speciesName = tree?.speciesName || 'Especie desconocida';
     acc[speciesName] = (acc[speciesName] || 0) + 1;
     return acc;
   }, {} as Record<string, number>) || {};
 
   const topSpecies = Object.entries(speciesCount)
-    .sort(([,a], [,b]) => b - a)
+    .sort(([,a], [,b]) => (b as number) - (a as number))
     .slice(0, 5);
 
   // Datos para el gráfico de árboles por parque (formato similar al de evaluaciones)
@@ -211,10 +208,10 @@ const TreesDashboard: React.FC = () => {
   // Datos para gráficas con colores únicos y porcentajes
   const healthChartData = Object.entries(healthStats).map(([status, count]) => ({
     name: status,
-    value: count,
-    percentage: totalTrees > 0 ? ((count / totalTrees) * 100).toFixed(1) : '0.0',
+    value: count as number,
+    percentage: totalTrees > 0 ? (((count as number) / totalTrees) * 100).toFixed(1) : '0.0',
     color: getHealthColor(status)
-  })).filter(item => item.value > 0); // Solo mostrar categorías con datos
+  })).filter(item => (item.value as number) > 0); // Solo mostrar categorías con datos
 
   const speciesChartData = topSpecies.map(([species, count]) => ({
     species: species.length > 15 ? species.substring(0, 15) + '...' : species,
@@ -237,12 +234,12 @@ const TreesDashboard: React.FC = () => {
   const healthPercentage = totalTrees > 0 ? Math.round((healthyTrees / totalTrees) * 100) : 0;
 
   // Mantenimientos pendientes con validación defensiva
-  const pendingMaintenances = maintenances?.filter(m => m?.status === 'pending')?.length || 0;
-  const urgentMaintenances = maintenances?.filter(m => m?.urgency === 'alta')?.length || 0;
+  const pendingMaintenances = maintenances?.filter((m: any) => m?.status === 'pending')?.length || 0;
+  const urgentMaintenances = maintenances?.filter((m: any) => m?.urgency === 'alta')?.length || 0;
 
   // Cálculo del progreso de mantenimientos
   // Árboles únicos que han recibido mantenimiento (basado en lastMaintenanceDate)
-  const treesWithMaintenance = trees?.filter(tree => tree?.lastMaintenanceDate && tree.lastMaintenanceDate !== '')?.length || 0;
+  const treesWithMaintenance = trees?.filter((tree: any) => tree?.lastMaintenanceDate && tree.lastMaintenanceDate !== '')?.length || 0;
   const maintenanceProgress = totalTrees > 0 ? Math.round((treesWithMaintenance / totalTrees) * 100) : 0;
 
   return (
