@@ -48,6 +48,7 @@ import {
 } from '@/components/ui/table';
 import { Tag, Plus, Edit, Trash2, Search } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { PageHeader } from '@/components/ui/page-header';
 
 // Schema de validación para editar categorías
 const categorySchema = z.object({
@@ -283,27 +284,22 @@ const ActivityCategoriesPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header con patrón Card estandarizado */}
-        <Card className="p-4 bg-[#14b8a6]">
-          <div className="flex items-center justify-between bg-[#14b8a6]">
-            <div>
-              <div className="flex items-center gap-2">
-                <Tag className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-[#ffffff] bg-[#14b8a6]">Categorías</h1>
-              </div>
-              <p className="mt-2 text-[#ffffff]">Gestión de categorías para actividades en parques</p>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                className="flex items-center gap-2"
-                onClick={handleCreateCategory}
-              >
-                <Plus size={16} />
-                Nueva Categoría
-              </Button>
-            </div>
-          </div>
-        </Card>
+        {/* Header con PageHeader component */}
+        <PageHeader
+          title="Categorías"
+          subtitle="Gestión de categorías para actividades en parques"
+          icon={<Tag />}
+          actions={[
+            <Button 
+              key="nueva-categoria"
+              className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100"
+              onClick={handleCreateCategory}
+            >
+              <Plus size={16} />
+              Nueva Categoría
+            </Button>
+          ]}
+        />
 
         {/* Estadísticas rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
