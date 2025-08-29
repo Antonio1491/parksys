@@ -504,6 +504,7 @@ const ParksDashboard = () => {
             }
             sortDescending={true}
             showLabels={true}
+            formatValue={(value) => `${Math.round(value)}%`}
           />
         </GraphicCard>
 
