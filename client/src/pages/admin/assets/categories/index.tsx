@@ -601,10 +601,10 @@ const AssetCategoriesPage: React.FC = () => {
             <Button 
               key="nueva-categoria"
               onClick={() => openCreateDialog()}
-              variant="principal"
+              variant="primary"
             >
               <FolderPlus className="mr-2" size={20} />
-              Nueva Categoría Principal
+              Nueva Categoría
             </Button>
           ]}
         />
