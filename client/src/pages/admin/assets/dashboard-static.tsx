@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -118,20 +118,23 @@ const AssetsDashboardStatic: React.FC = () => {
   };
 
   return (
-    <AdminLayout>
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Dashboard de Activos</h1>
-          <Button variant="outline" onClick={() => setLocation('/admin/assets')}>
-            Ver Inventario
-          </Button>
-        </div>
+    <DashboardLayout
+      icon={Layers}
+      title="Dashboard de Activos"
+      subtitle="Gestión y monitoreo de activos municipales"
+      backgroundColor="#003D49"
+    >
+      <div className="flex items-center justify-end mb-6">
+        <Button variant="outline" onClick={() => setLocation('/admin/assets')}>
+          Ver Inventario
+        </Button>
+      </div>
 
-        <Alert className="mb-6 bg-blue-50 border-blue-200">
-          <AlertDescription className="text-blue-800">
-            Esta es una visualización con datos de ejemplo para mostrar las funcionalidades del dashboard.
-          </AlertDescription>
-        </Alert>
+      <Alert className="mb-6 bg-blue-50 border-blue-200">
+        <AlertDescription className="text-blue-800">
+          Esta es una visualización con datos de ejemplo para mostrar las funcionalidades del dashboard.
+        </AlertDescription>
+      </Alert>
 
         {/* Tarjetas de resumen */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -190,7 +193,6 @@ const AssetsDashboardStatic: React.FC = () => {
                 <Progress
                   value={stats.maintenanceAssetsPercentage}
                   className="h-2 bg-gray-200"
-                  indicatorClassName="bg-blue-500"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   {stats.maintenanceAssetsPercentage}% del total
@@ -214,7 +216,6 @@ const AssetsDashboardStatic: React.FC = () => {
                 <Progress
                   value={(stats.inactiveAssets / stats.totalAssets) * 100}
                   className="h-2 bg-gray-200"
-                  indicatorClassName="bg-amber-500"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   {Math.round((stats.inactiveAssets / stats.totalAssets) * 100)}% del total
@@ -268,7 +269,6 @@ const AssetsDashboardStatic: React.FC = () => {
                       <Progress
                         value={percentage}
                         className="h-2 bg-gray-200"
-                        indicatorClassName={color}
                       />
                     </div>
                   );
@@ -418,8 +418,7 @@ const AssetsDashboardStatic: React.FC = () => {
             </Table>
           </CardContent>
         </Card>
-      </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 };
 

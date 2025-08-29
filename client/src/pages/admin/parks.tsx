@@ -549,7 +549,7 @@ const AdminParksContent = () => {
           titleClassName="text-3xl font-bold text-white font-poppins"
           subtitleClassName="text-base font-normal text-white font-poppins"
           actions={[
-            <Button key="nuevo" variant="primary">
+            <Button key="nuevo" variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
               <Plus className="w-4 h-4" />
               Nuevo Parque
             </Button>,
