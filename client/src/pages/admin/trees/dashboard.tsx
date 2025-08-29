@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/components/ui/dashboard-layout';
 import MetricCard from '@/components/ui/metric-card';
 import GraphicCard from '@/components/ui/graphic-card';
+import VerticalBarChart from '@/components/ui/vertical-bar-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -198,6 +199,52 @@ const TreesDashboard: React.FC = () => {
   const topSpecies = Object.entries(speciesCount)
     .sort(([,a], [,b]) => (b as number) - (a as number))
     .slice(0, 5);
+
+  // Especies por parque - calcular diversidad de especies por parque
+  const speciesByPark = (() => {
+    const parkSpecies: Record<string, Set<string>> = {};
+    
+    // Inicializar con todos los parques
+    parks?.forEach((park: any) => {
+      const parkName = park?.name || `Parque ${park?.id}`;
+      parkSpecies[parkName] = new Set();
+    });
+
+    // Agregar especies por parque
+    trees?.forEach((tree: any) => {
+      const parkName = tree?.parkName || 'Sin parque';
+      const speciesName = tree?.speciesName || 'Especie desconocida';
+      
+      if (!parkSpecies[parkName]) {
+        parkSpecies[parkName] = new Set();
+      }
+      parkSpecies[parkName].add(speciesName);
+    });
+
+    // Convertir a formato con conteos
+    const result: Record<string, number> = {};
+    Object.entries(parkSpecies).forEach(([parkName, speciesSet]) => {
+      result[parkName] = speciesSet.size;
+    });
+
+    return result;
+  })();
+
+  // Datos para gráfico de especies por parque con porcentajes
+  const speciesByParkData = Object.entries(speciesByPark)
+    .map(([parkName, speciesCount]) => {
+      const totalSpeciesInSystem = totalSpecies > 0 ? totalSpecies : 1;
+      const percentage = (speciesCount / totalSpeciesInSystem) * 100;
+      return {
+        label: parkName,
+        value: percentage,
+        id: parkName,
+        speciesCount: speciesCount,
+        percentage: percentage.toFixed(1)
+      };
+    })
+    .filter(park => park.speciesCount > 0) // Solo mostrar parques con especies
+    .sort((a, b) => b.value - a.value);
 
   // Datos para el gráfico de árboles por parque (formato similar al de evaluaciones) - TODOS los parques
   const treesByParkData = Object.entries(treesByPark)
@@ -478,8 +525,31 @@ const TreesDashboard: React.FC = () => {
           </Card>
         </div>
 
-        {/* Gráfico de Árboles por Parque */}
-        <div className="grid gap-6 md:grid-cols-1">
+        {/* Especies por Parque - Nuevo gráfico con VerticalBarChart */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <GraphicCard
+            title="🌿 Especies por Parque"
+            description="Distribución de diversidad de especies en cada parque y porcentaje del total del sistema"
+            className="h-full"
+          >
+            <VerticalBarChart
+              data={speciesByParkData}
+              emptyStateTitle="No hay datos de especies por parque disponibles"
+              emptyStateDescription="Los datos aparecerán aquí una vez que se registren especies en los parques"
+              footerText={
+                speciesByParkData.length > 0
+                  ? `Mostrando ${speciesByParkData.length} parques con especies registradas`
+                  : undefined
+              }
+              sortDescending={true}
+              showLabels={true}
+              formatValue={(value, item) => 
+                item ? `${(item as any).speciesCount} esp. (${(item as any).percentage}%)` : `${value.toFixed(1)}%`
+              }
+            />
+          </GraphicCard>
+
+          {/* Gráfico de Árboles por Parque */}
           <GraphicCard
             title="🌳 Árboles Registrados por Parque"
             description="Cantidad de árboles inventariados en cada parque municipal"
