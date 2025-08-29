@@ -45,6 +45,7 @@ import { useToast } from "@/hooks/use-toast";
 import AdminLayout from "@/components/AdminLayout";
 import AmenityIcon from "@/components/AmenityIcon";
 import { apiRequest } from "@/lib/queryClient";
+import { PageHeader } from "@/components/ui/page-header";
 
 const AVAILABLE_ICONS = [
   { name: "playground", label: "Juegos infantiles" },
@@ -472,28 +473,21 @@ const AdminAmenitiesPage = () => {
 
   return (
     <AdminLayout>
-      {/* Header con patrón Card estandarizado */}
-      <Card className="p-4 bg-gray-50 mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <Activity className="w-8 h-8 text-gray-900" />
-              <h2 className="text-3xl font-bold text-gray-900">Gestión de Amenidades</h2>
-            </div>
-            <p className="text-gray-600 mt-2">
-              Gestiona las amenidades disponibles para los parques
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Link href="/admin/amenities-import">
-              <Button variant="outline">
-                <FileUp className="mr-2 h-4 w-4" />
-                Importar
-              </Button>
-            </Link>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+      {/* Header con PageHeader component */}
+      <PageHeader
+        title="Gestión de Amenidades"
+        subtitle="Gestiona las amenidades disponibles para los parques"
+        icon={<Activity />}
+        actions={[
+          <Link key="importar" href="/admin/amenities-import">
+            <Button variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
+              <FileUp className="mr-2 h-4 w-4" />
+              Importar
+            </Button>
+          </Link>,
+          <Dialog key="nueva-amenidad" open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="bg-white text-gray-900 hover:bg-gray-100">
                 <Plus className="mr-2 h-4 w-4" />
                 Nueva Amenidad
               </Button>
@@ -754,9 +748,8 @@ const AdminAmenitiesPage = () => {
               </form>
             </DialogContent>
           </Dialog>
-          </div>
-        </div>
-      </Card>
+        ]}
+      />
 
       {/* Controles de filtrado y ordenamiento */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

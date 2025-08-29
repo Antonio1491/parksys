@@ -292,7 +292,7 @@ const ActivityCategoriesPage: React.FC = () => {
           actions={[
             <Button 
               key="nueva-categoria"
-              className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100"
+              variant="primary"
               onClick={handleCreateCategory}
             >
               <Plus size={16} />
