@@ -480,14 +480,14 @@ const AdminAmenitiesPage = () => {
         icon={<Activity />}
         actions={[
           <Link key="importar" href="/admin/amenities-import">
-            <Button variant="outline" className="bg-white text-gray-900 hover:bg-gray-100">
+            <Button variant="outline">
               <FileUp className="mr-2 h-4 w-4" />
               Importar
             </Button>
           </Link>,
           <Dialog key="nueva-amenidad" open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-white text-gray-900 hover:bg-gray-100">
+              <Button variant="principal">
                 <Plus className="mr-2 h-4 w-4" />
                 Nueva Amenidad
               </Button>
