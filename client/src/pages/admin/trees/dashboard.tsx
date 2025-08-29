@@ -192,8 +192,15 @@ const TreesDashboard: React.FC = () => {
           <MetricCard
             title="Especies Registradas"
             value={
-              <div className="text-2xl font-bold text-white mb-2">
-                {totalSpecies}
+              <div className="space-y-1">
+                <div className="text-2xl font-bold text-white">
+                  {totalSpecies}
+                </div>
+                {topSpecies.length > 0 && (
+                  <div className="text-xs text-green-300">
+                    Más común: {topSpecies[0][0]} ({topSpecies[0][1]} ejemplares)
+                  </div>
+                )}
               </div>
             }
             subtitle="Biodiversidad"
