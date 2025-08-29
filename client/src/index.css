@@ -19,6 +19,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --principal: 71 37% 61%;
+}
+
 @layer components {
   .menu-icon {
     @apply text-green-500;
