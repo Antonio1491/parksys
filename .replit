@@ -41,7 +41,6 @@ localPort = 24678
 externalPort = 3000
 
 [agent]
-integrations = ["javascript_sendgrid==1.0.0", "javascript_stripe==1.0.0"]
 
 [objectStorage]
 defaultBucketID = "replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2"

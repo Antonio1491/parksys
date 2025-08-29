@@ -1434,6 +1434,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export parks to CSV
+  apiRouter.get("/parks/export/csv", async (req: Request, res: Response) => {
+    try {
+      const { getParksDirectly } = await import('./direct-park-queries');
+      const parks = await getParksDirectly();
+      
+      // Validar que hay datos para exportar
+      if (!parks || parks.length === 0) {
+        return res.status(404).json({ message: "No parks found to export" });
+      }
+
+      // Preparar datos para CSV
+      const csvData = parks.map(park => ({
+        'ID': park.id,
+        'Nombre': park.name,
+        'Tipo de Parque': park.parkType || 'N/A',
+        'Descripción': park.description || 'N/A',
+        'Dirección': park.address || 'N/A',
+        'Código Postal': park.postalCode || 'N/A',
+        'Área (m²)': park.area || 'N/A',
+        'Año de Fundación': park.foundationYear || 'N/A',
+        'Administrador': park.administrator || 'N/A',
+        'Estado de Conservación': park.conservationStatus || 'N/A',
+        'Email de Contacto': park.contactEmail || 'N/A',
+        'Teléfono de Contacto': park.contactPhone || 'N/A',
+        'Latitud': park.latitude || 'N/A',
+        'Longitud': park.longitude || 'N/A',
+        'Horarios de Apertura': typeof park.openingHours === 'string' ? park.openingHours : JSON.stringify(park.openingHours || {}),
+        'URL de Regulación': park.regulationUrl || 'N/A',
+        'Certificaciones': park.certificaciones || 'N/A'
+      }));
+
+      // Convertir a CSV manualmente
+      const headers = Object.keys(csvData[0]);
+      const csvRows = [headers.join(',')];
+      
+      csvData.forEach(row => {
+        const values = headers.map(header => {
+          const value = row[header];
+          // Escapar comillas y valores que contienen comas
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        });
+        csvRows.push(values.join(','));
+      });
+      
+      const csvString = '\uFEFF' + csvRows.join('\n'); // BOM para UTF-8
+
+      // Configurar headers para descarga
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="parques_${new Date().toISOString().split('T')[0]}.csv"`);
+      
+      res.send(csvString);
+    } catch (error) {
+      console.error("Error al exportar parques a CSV:", error);
+      res.status(500).json({ message: "Error exporting parks to CSV" });
+    }
+  });
+
+  // Export parks to Excel
+  apiRouter.get("/parks/export/xlsx", async (req: Request, res: Response) => {
+    try {
+      const { getParksDirectly } = await import('./direct-park-queries');
+      const parks = await getParksDirectly();
+      
+      // Validar que hay datos para exportar
+      if (!parks || parks.length === 0) {
+        return res.status(404).json({ message: "No parks found to export" });
+      }
+
+      // Preparar datos para Excel
+      const excelData = parks.map(park => ({
+        'ID': park.id,
+        'Nombre': park.name,
+        'Tipo de Parque': park.parkType || 'N/A',
+        'Descripción': park.description || 'N/A',
+        'Dirección': park.address || 'N/A',
+        'Código Postal': park.postalCode || 'N/A',
+        'Área (m²)': park.area || 'N/A',
+        'Año de Fundación': park.foundationYear || 'N/A',
+        'Administrador': park.administrator || 'N/A',
+        'Estado de Conservación': park.conservationStatus || 'N/A',
+        'Email de Contacto': park.contactEmail || 'N/A',
+        'Teléfono de Contacto': park.contactPhone || 'N/A',
+        'Latitud': park.latitude || 'N/A',
+        'Longitud': park.longitude || 'N/A',
+        'Horarios de Apertura': typeof park.openingHours === 'string' ? park.openingHours : JSON.stringify(park.openingHours || {}),
+        'URL de Regulación': park.regulationUrl || 'N/A',
+        'Certificaciones': park.certificaciones || 'N/A'
+      }));
+
+      // Crear archivo Excel
+      const XLSX = await import('xlsx');
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      
+      // Agregar la hoja al libro
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Parques');
+      
+      // Generar buffer
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      
+      // Configurar headers para descarga
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="parques_${new Date().toISOString().split('T')[0]}.xlsx"`);
+      
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error al exportar parques a Excel:", error);
+      res.status(500).json({ message: "Error exporting parks to Excel" });
+    }
+  });
+
   // Parks with amenities 
   apiRouter.get("/parks-with-amenities", async (_req: Request, res: Response) => {
     try {

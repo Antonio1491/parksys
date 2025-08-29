@@ -549,7 +549,11 @@ const AdminParksContent = () => {
           titleClassName="text-3xl font-bold text-white font-poppins"
           subtitleClassName="text-base font-normal text-white font-poppins"
           actions={[
-            <Button key="nuevo" variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
+            <Button variant="outline" onClick={() => window.location.href = "/admin/parks-import"}>
+              <FileUp className="h-4 w-4 mr-2" />
+              Importar Parques
+            </Button>,
+            <Button variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
               <Plus className="w-4 h-4" />
               Nuevo Parque
             </Button>,

@@ -8,6 +8,7 @@ import {
   Tag, 
   BarChart3, 
   Layers,
+  Package,
   DollarSign
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,10 +120,9 @@ const AssetsDashboardStatic: React.FC = () => {
 
   return (
     <DashboardLayout
-      icon={Layers}
-      title="Dashboard de Activos"
-      subtitle="Gestión y monitoreo de activos municipales"
-      backgroundColor="#003D49"
+      icon={Package}
+      title="Activos"
+      subtitle="Gestión y monitoreo de activos del sistema"
     >
       <div className="flex items-center justify-end mb-6">
         <Button variant="outline" onClick={() => setLocation('/admin/assets')}>
