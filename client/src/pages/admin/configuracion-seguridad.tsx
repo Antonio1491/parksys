@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Settings, Users, Bell, FileText, Wrench } from 'lucide-react';
+import { Shield, Settings, Users, Bell, FileText, Wrench, Download } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 
 // Importar componentes de las pestañas
@@ -11,6 +11,7 @@ import Politicas from './configuracion-seguridad/Politicas';
 import NotificacionesAdmin from './configuracion-seguridad/NotificacionesAdmin';
 import Auditoria from './configuracion-seguridad/Auditoria';
 import Mantenimiento from './configuracion-seguridad/Mantenimiento';
+import ExportacionesConfig from './configuracion-seguridad/ExportacionesConfig';
 
 export default function ConfiguracionSeguridad() {
   const [activeTab, setActiveTab] = useState("panel");
@@ -31,7 +32,7 @@ export default function ConfiguracionSeguridad() {
 
         {/* Navegación por pestañas */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 h-12">
+          <TabsList className="grid w-full grid-cols-7 h-12">
             <TabsTrigger value="panel" className="flex flex-col items-center gap-1 h-full">
               <Settings className="h-4 w-4" />
               <span className="text-xs">Panel de Control</span>
@@ -55,6 +56,10 @@ export default function ConfiguracionSeguridad() {
             <TabsTrigger value="mantenimiento" className="flex flex-col items-center gap-1 h-full">
               <Wrench className="h-4 w-4" />
               <span className="text-xs">Mantenimiento</span>
+            </TabsTrigger>
+            <TabsTrigger value="exportaciones" className="flex flex-col items-center gap-1 h-full">
+              <Download className="h-4 w-4" />
+              <span className="text-xs">Exportaciones</span>
             </TabsTrigger>
           </TabsList>
 
@@ -80,6 +85,10 @@ export default function ConfiguracionSeguridad() {
 
           <TabsContent value="mantenimiento">
             <Mantenimiento />
+          </TabsContent>
+
+          <TabsContent value="exportaciones">
+            <ExportacionesConfig />
           </TabsContent>
         </Tabs>
       </div>

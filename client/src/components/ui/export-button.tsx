@@ -1,0 +1,224 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Download, FileSpreadsheet, FileText, File, ChevronDown } from 'lucide-react';
+import { useExport } from '@/hooks/use-export';
+import { ExportConfigForm } from './export-config-form';
+import { ExportOptions } from '../../../../shared/exports/config';
+
+interface ExportButtonProps {
+  entity: string;
+  variant?: 'button' | 'dropdown' | 'menu';
+  size?: 'sm' | 'default' | 'lg';
+  className?: string;
+  disabled?: boolean;
+  filters?: Record<string, any>;
+  customFields?: string[];
+  onExportStart?: () => void;
+  onExportComplete?: (filename: string) => void;
+  onExportError?: (error: any) => void;
+}
+
+const formatIcons = {
+  csv: FileText,
+  xlsx: FileSpreadsheet,
+  pdf: File,
+  json: File
+};
+
+const formatLabels = {
+  csv: 'CSV',
+  xlsx: 'Excel',
+  pdf: 'PDF',
+  json: 'JSON'
+};
+
+export function ExportButton({
+  entity,
+  variant = 'button',
+  size = 'default',
+  className = '',
+  disabled = false,
+  filters,
+  customFields,
+  onExportStart,
+  onExportComplete,
+  onExportError
+}: ExportButtonProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { exportData, isExporting, config, isReady, supportedFormats, defaultFormat } = useExport(entity, {
+    onSuccess: (filename) => {
+      onExportComplete?.(filename);
+      setIsDialogOpen(false);
+    },
+    onError: onExportError
+  });
+
+  if (!isReady || !config) {
+    return (
+      <Button variant="outline" size={size} disabled className={className}>
+        <Download className="mr-2 h-4 w-4" />
+        Exportar
+      </Button>
+    );
+  }
+
+  // Exportación rápida sin configuración
+  const handleQuickExport = async (format: string) => {
+    onExportStart?.();
+    
+    const options: Omit<ExportOptions, 'entity'> = {
+      format: format as any,
+      template: 'corporate',
+      fields: customFields,
+      filters,
+      branding: {
+        includeLogo: true,
+        includeHeader: true,
+        includeFooter: true
+      }
+    };
+
+    await exportData(options);
+  };
+
+  // Exportación con configuración avanzada
+  const handleAdvancedExport = async (options: Omit<ExportOptions, 'entity'>) => {
+    onExportStart?.();
+    
+    const finalOptions = {
+      ...options,
+      fields: options.fields || customFields,
+      filters: options.filters || filters
+    };
+
+    await exportData(finalOptions);
+  };
+
+  if (variant === 'dropdown') {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size={size} disabled={disabled || isExporting} className={className}>
+            <Download className="mr-2 h-4 w-4" />
+            {isExporting ? 'Exportando...' : 'Exportar'}
+            <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {supportedFormats.map((format) => {
+            const Icon = formatIcons[format as keyof typeof formatIcons];
+            return (
+              <DropdownMenuItem
+                key={format}
+                onClick={() => handleQuickExport(format)}
+                disabled={isExporting}
+              >
+                <Icon className="mr-2 h-4 w-4" />
+                Exportar como {formatLabels[format as keyof typeof formatLabels]}
+              </DropdownMenuItem>
+            );
+          })}
+          <DropdownMenuItem onClick={() => setIsDialogOpen(true)} disabled={isExporting}>
+            <Download className="mr-2 h-4 w-4" />
+            Configurar exportación...
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  if (variant === 'menu') {
+    return (
+      <>
+        {supportedFormats.map((format) => {
+          const Icon = formatIcons[format as keyof typeof formatIcons];
+          return (
+            <Button
+              key={format}
+              variant="ghost"
+              size="sm"
+              onClick={() => handleQuickExport(format)}
+              disabled={disabled || isExporting}
+              className={`w-full justify-start ${className}`}
+            >
+              <Icon className="mr-2 h-4 w-4" />
+              {formatLabels[format as keyof typeof formatLabels]}
+            </Button>
+          );
+        })}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsDialogOpen(true)}
+          disabled={disabled || isExporting}
+          className={`w-full justify-start ${className}`}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Configurar...
+        </Button>
+      </>
+    );
+  }
+
+  // Variante button (default)
+  return (
+    <>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size={size} disabled={disabled || isExporting} className={className}>
+            <Download className="mr-2 h-4 w-4" />
+            {isExporting ? 'Exportando...' : 'Exportar'}
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Configurar Exportación</DialogTitle>
+            <DialogDescription>
+              Configurar opciones de exportación para {config.displayName}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ExportConfigForm
+            config={config}
+            defaultFormat={defaultFormat}
+            isExporting={isExporting}
+            initialFilters={filters}
+            initialFields={customFields}
+            onExport={handleAdvancedExport}
+            onCancel={() => setIsDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Botón de exportación rápida para formatos soportados */}
+      {supportedFormats.length === 1 && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleQuickExport(supportedFormats[0])}
+          disabled={disabled || isExporting}
+          className="ml-1"
+          title={`Exportación rápida ${formatLabels[supportedFormats[0] as keyof typeof formatLabels]}`}
+        >
+          {React.createElement(formatIcons[supportedFormats[0] as keyof typeof formatIcons], {
+            className: "h-4 w-4"
+          })}
+        </Button>
+      )}
+    </>
+  );
+}

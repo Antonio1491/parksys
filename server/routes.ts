@@ -82,6 +82,7 @@ import feedbackRouter from "./feedback-routes";
 import { registerEventCategoriesRoutes } from "./event-categories-routes";
 import { seedEventCategories } from "./seed-event-categories";
 import { registerInstructorEvaluationRoutes } from "./instructor-evaluations-routes";
+import exportRoutes from "./routes/exports";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server first
@@ -1371,6 +1372,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registrar rutas de feedback de visitantes
   app.use('/api/feedback', feedbackRouter);
   console.log('✅ Rutas de feedback de visitantes registradas');
+
+  // Registrar rutas de exportación
+  app.use(exportRoutes);
+  console.log('✅ Rutas de exportación registradas');
 
   // Get all parks with option to filter
   apiRouter.get("/parks", async (req: Request, res: Response) => {

@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
+import { ExportButton } from "@/components/ui/export-button";
 
 interface Park {
   id: number;
@@ -549,6 +550,11 @@ const AdminParksContent = () => {
           titleClassName="text-3xl font-bold text-white font-poppins"
           subtitleClassName="text-base font-normal text-white font-poppins"
           actions={[
+            <ExportButton
+              entity="parks" 
+              variant="dropdown"
+              className="text-white border-white hover:bg-white/10"
+            />,
             <Button variant="outline" onClick={() => window.location.href = "/admin/parks-import"}>
               <FileUp className="h-4 w-4 mr-2" />
               Importar Parques
