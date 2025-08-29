@@ -16,6 +16,7 @@ import {
 import DashboardLayout from "@/components/ui/dashboard-layout";
 import MetricCard from "@/components/ui/metric-card";
 import GraphicCard from "@/components/ui/graphic-card";
+import VerticalBarChart from "@/components/ui/vertical-bar-chart";
 import {
   Card,
   CardContent,
@@ -453,85 +454,28 @@ const ParksDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Columna derecha: Gráfico de Evaluación Promedio por Parque */}
+        {/* Columna derecha: Gráfico de Evaluación Promedio por Parque - Usando VerticalBarChart */}
         <GraphicCard
           title="⭐ Evaluación Promedio por Parque"
           description="Nivel de satisfacción promedio de visitantes por parque basado en evaluaciones"
           className="h-full"
         >
-          <div className="w-full">
-            {data.parkEvaluations?.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                {data.parkEvaluations
-                  .sort((a, b) => b.averageRating - a.averageRating)
-                  .map((park) => {
-                    const heightPercentage = (park.averageRating / 5) * 100;
-                    const getRatingColor = (rating: number) => {
-                      if (rating >= 4.0) return "#69c45c"; // Verde para calificaciones positivas
-                      if (rating >= 2.5) return "#bcb57e"; // Amarillo/naranja para medias
-                      return "#a86767"; // Rojo para bajas
-                    };
-                    return (
-                      <div key={park.parkId} className="flex flex-col items-center relative">
-                        {/* Valor del promedio arriba con número de evaluaciones */}
-                        <div className="mb-2 text-center">
-                          <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                            {park.averageRating.toFixed(1)}/5
-                          </div>
-                          <div className="text-xs font-poppins font-thin text-gray-500">
-                            ({park.evaluationCount} eval)
-                          </div>
-                        </div>
-
-                        {/* Columna vertical */}
-                        <div className="relative h-64 w-4 flex flex-col justify-end">
-                          {/* Fondo de la columna */}
-                          <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                          
-                          {/* Relleno de la columna según promedio */}
-                          <div
-                            className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                            style={{
-                              height: `${Math.max(heightPercentage, 5)}%`,
-                              backgroundColor: getRatingColor(park.averageRating),
-                              borderColor: getRatingColor(park.averageRating),
-                            }}
-                          ></div>
-                        </div>
-
-                        {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                        <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                          <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                            {park.parkName}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <div className="flex flex-col items-center space-y-2">
-                  <CheckCircle className="h-12 w-12 text-gray-300" />
-                  <p className="text-lg font-medium">
-                    No hay evaluaciones disponibles
-                  </p>
-                  <p className="text-sm">
-                    Los datos de evaluación aparecerán aquí una vez que los
-                    visitantes evalúen los parques
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-          {data.parkEvaluations?.length > 0 && (
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-500 font-poppins font-thin">
-                Mostrando todos los {data.parkEvaluations.length} parques
-                registrados en el sistema
-              </p>
-            </div>
-          )}
+          <VerticalBarChart
+            data={(data.parkEvaluations || []).map((park) => ({
+              label: park.parkName,
+              value: park.averageRating,
+              id: park.parkId
+            }))}
+            emptyStateTitle="No hay evaluaciones disponibles"
+            emptyStateDescription="Los datos de evaluación aparecerán aquí una vez que los visitantes evalúen los parques"
+            footerText={
+              data.parkEvaluations?.length > 0 
+                ? `Mostrando todos los ${data.parkEvaluations.length} parques registrados en el sistema`
+                : undefined
+            }
+            sortDescending={true}
+            showLabels={true}
+          />
         </GraphicCard>
 
       </div>
@@ -545,78 +489,22 @@ const ParksDashboard = () => {
           description="Distribución del área verde en cada parque"
           className="h-full"
         >
-          <div className="w-full">
-            {data.greenAreaPercentages && data.greenAreaPercentages.length > 0 ? (
-              <div className="flex justify-center items-end gap-4 min-h-[320px] px-4 overflow-x-auto">
-                {data.greenAreaPercentages
-                  .sort((a, b) => b.greenPercentage - a.greenPercentage)
-                  .map((park) => {
-                    const heightPercentage = park.greenPercentage;
-                    const getGreenColor = (percentage: number) => {
-                      if (percentage >= 70) return "#10b981"; // Verde intenso para alto porcentaje
-                      if (percentage >= 40) return "#22c55e"; // Verde medio
-                      if (percentage >= 20) return "#84cc16"; // Verde lima para bajo
-                      return "#eab308"; // Amarillo para muy bajo
-                    };
-                    return (
-                      <div key={park.parkId} className="flex flex-col items-center relative">
-                        {/* Valor del porcentaje arriba */}
-                        <div className="mb-2 text-center">
-                          <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                            {park.greenPercentage.toFixed(0)}%
-                          </div>
-                          <div className="text-xs font-poppins font-thin text-gray-500">
-                            {(park.greenArea / 10000).toFixed(1)} ha
-                          </div>
-                        </div>
-
-                        {/* Columna vertical */}
-                        <div className="relative h-64 w-4 flex flex-col justify-end">
-                          {/* Fondo de la columna */}
-                          <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                          
-                          {/* Relleno de la columna según porcentaje */}
-                          <div
-                            className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                            style={{
-                              height: `${Math.max(heightPercentage, 5)}%`,
-                              backgroundColor: getGreenColor(park.greenPercentage),
-                              borderColor: getGreenColor(park.greenPercentage),
-                            }}
-                          ></div>
-                        </div>
-
-                        {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                        <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                          <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                            {park.parkName}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <div className="flex flex-col items-center space-y-2">
-                  <Trees className="h-12 w-12 text-gray-300" />
-                  <p className="text-lg font-medium">
-                    No hay datos de área verde disponibles
-                  </p>
-                  <p className="text-sm">
-                    Los datos aparecerán aquí una vez que se registren las
-                    áreas verdes de los parques
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="mt-2 text-center">
-            <p className="text-sm text-gray-500 font-poppins font-thin">
-              Mostrando todos los {data.totalParks} parques
-              registrados en el sistema
-            </p>
-          </div>
+          <VerticalBarChart
+            data={(data.greenAreaPercentages || []).map((park) => ({
+              label: park.parkName,
+              value: park.greenPercentage,
+              id: park.parkId
+            }))}
+            emptyStateTitle="No hay datos de área verde disponibles"
+            emptyStateDescription="Los datos aparecerán aquí una vez que se registren las áreas verdes de los parques"
+            footerText={
+              data.greenAreaPercentages && data.greenAreaPercentages.length > 0
+                ? `Mostrando todos los ${data.greenAreaPercentages.length} parques registrados en el sistema`
+                : undefined
+            }
+            sortDescending={true}
+            showLabels={true}
+          />
         </GraphicCard>
 
         {/* Columna derecha: Dividida en 2 columnas verticales para Actividades y Árboles */}
