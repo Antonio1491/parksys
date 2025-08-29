@@ -69,16 +69,16 @@ export default function VerticalBarChart({
 
   return (
     <div className={className}>
-      <div className={`flex justify-center items-end ${gap} min-h-[320px] px-4 overflow-x-auto`}>
+      <div className={`flex justify-center items-end ${gap} min-h-[320px] pl-36 pr-8 py-4 overflow-x-auto overflow-y-visible`}>
         {sortedData.map((item, index) => {
           const heightPercentage = maxValue > 0 ? (item.value / maxValue) * 100 : 0;
           const barColor = getBarColor(item.value, maxValue);
           
           return (
-            <div key={item.id || index} className="flex flex-col items-center relative">
+            <div key={item.id || index} className="flex flex-col items-center relative min-w-[24px] flex-shrink-0">
               {/* Valor del conteo arriba */}
-              <div className="mb-2 text-center">
-                <div className="text-sm font-medium text-gray-700 flex items-center gap-1">
+              <div className="mb-2 text-center min-h-[40px] flex items-end justify-center">
+                <div className="text-sm font-medium text-gray-700">
                   {formatValue ? formatValue(item.value, item) : item.value}
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function VerticalBarChart({
 
               {/* Etiqueta del elemento a la izquierda de la columna - VERTICAL */}
               {showLabels && (
-                <div className="absolute bottom-32 -left-32 transform -rotate-90 origin-bottom-right w-32">
+                <div className="absolute bottom-32 -left-32 transform -rotate-90 origin-bottom-right w-32 overflow-visible">
                   <div className="text-xs text-gray-700 whitespace-nowrap">
                     {item.label}
                   </div>
