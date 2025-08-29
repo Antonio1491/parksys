@@ -106,9 +106,38 @@ const TreesDashboard: React.FC = () => {
   const totalSpecies = species?.length || 0;
   const totalMaintenances = maintenances?.length || 0;
 
-  // Estadísticas de salud de árboles
+  // Función para normalizar el estado de salud
+  const normalizeHealthStatus = (status: string) => {
+    if (!status || status.trim() === '') return 'Desconocido';
+    const normalized = status.trim().toLowerCase();
+    switch (normalized) {
+      case 'excelente':
+      case 'excellent':
+        return 'Excelente';
+      case 'bueno':
+      case 'good':
+      case 'bien':
+        return 'Bueno';
+      case 'regular':
+      case 'fair':
+      case 'medio':
+        return 'Regular';
+      case 'malo':
+      case 'bad':
+      case 'poor':
+        return 'Malo';
+      case 'crítico':
+      case 'critical':
+      case 'critico':
+        return 'Crítico';
+      default:
+        return 'Desconocido';
+    }
+  };
+
+  // Estadísticas de salud de árboles con normalización
   const healthStats = trees?.reduce((acc, tree) => {
-    const status = tree?.healthStatus || 'Desconocido';
+    const status = normalizeHealthStatus(tree?.healthStatus || '');
     acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>) || {};
@@ -159,15 +188,33 @@ const TreesDashboard: React.FC = () => {
       treeCount: count
     }));
 
-  // Datos para gráficas
+  // Función para obtener colores únicos por estado de salud
+  const getHealthColor = (status: string) => {
+    switch (status) {
+      case 'Excelente':
+        return '#22c55e'; // Verde intenso
+      case 'Bueno':
+        return '#84cc16'; // Verde lima
+      case 'Regular':
+        return '#eab308'; // Amarillo
+      case 'Malo':
+        return '#f97316'; // Naranja
+      case 'Crítico':
+        return '#ef4444'; // Rojo
+      case 'Desconocido':
+        return '#6b7280'; // Gris
+      default:
+        return '#9ca3af'; // Gris claro por defecto
+    }
+  };
+
+  // Datos para gráficas con colores únicos y porcentajes
   const healthChartData = Object.entries(healthStats).map(([status, count]) => ({
     name: status,
     value: count,
-    color: status === 'Excelente' ? '#22c55e' : 
-           status === 'Bueno' ? '#84cc16' : 
-           status === 'Regular' ? '#eab308' : 
-           status === 'Malo' ? '#f97316' : '#ef4444'
-  }));
+    percentage: totalTrees > 0 ? ((count / totalTrees) * 100).toFixed(1) : '0.0',
+    color: getHealthColor(status)
+  })).filter(item => item.value > 0); // Solo mostrar categorías con datos
 
   const speciesChartData = topSpecies.map(([species, count]) => ({
     species: species.length > 15 ? species.substring(0, 15) + '...' : species,
@@ -185,7 +232,7 @@ const TreesDashboard: React.FC = () => {
            type === 'Replantación' ? '#8b5cf6' : '#6b7280'
   }));
 
-  // Cálculo del porcentaje de árboles saludables
+  // Cálculo del porcentaje de árboles saludables (usando categorías normalizadas)
   const healthyTrees = (healthStats['Excelente'] || 0) + (healthStats['Bueno'] || 0);
   const healthPercentage = totalTrees > 0 ? Math.round((healthyTrees / totalTrees) * 100) : 0;
 
@@ -309,15 +356,15 @@ const TreesDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={320}>
                 <PieChart>
                   <Pie
                     data={healthChartData}
                     cx="50%"
-                    cy="50%"
+                    cy="45%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
+                    label={false}
+                    outerRadius={75}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -325,9 +372,47 @@ const TreesDashboard: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip 
+                    formatter={(value, name, props) => [
+                      `${value} árboles (${props.payload.percentage}%)`,
+                      'Cantidad'
+                    ]}
+                    labelFormatter={(label) => `Estado: ${label}`}
+                  />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36}
+                    formatter={(value, entry) => `${value}: ${entry.payload.value} (${entry.payload.percentage}%)`}
+                  />
                 </PieChart>
               </ResponsiveContainer>
+              
+              {/* Tabla de detalles */}
+              <div className="mt-4 space-y-2">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Detalle por Estado de Salud</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {healthChartData.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-4 h-4 rounded-full border border-gray-300"
+                          style={{ backgroundColor: item.color }}
+                        ></div>
+                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-gray-900">{item.value} árboles</div>
+                        <div className="text-xs text-gray-500">{item.percentage}% del total</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {healthChartData.length === 0 && (
+                  <div className="text-center py-4 text-gray-500">
+                    <p className="text-sm">No hay datos de estado de salud disponibles</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
