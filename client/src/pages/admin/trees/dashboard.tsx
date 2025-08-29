@@ -287,6 +287,31 @@ const TreesDashboard: React.FC = () => {
     count
   }));
 
+  // Función para obtener colores únicos por especie
+  const getSpeciesColor = (index: number) => {
+    const colors = [
+      '#22c55e', // Verde
+      '#3b82f6', // Azul
+      '#f59e0b', // Amarillo
+      '#ef4444', // Rojo
+      '#8b5cf6', // Púrpura
+      '#10b981', // Verde esmeralda
+      '#f97316', // Naranja
+      '#6366f1', // Índigo
+      '#ec4899', // Rosa
+      '#84cc16'  // Verde lima
+    ];
+    return colors[index % colors.length];
+  };
+
+  // Datos para gráfico de especies con colores únicos y porcentajes
+  const speciesPieChartData = topSpecies.map(([species, count], index) => ({
+    name: species.length > 20 ? species.substring(0, 20) + '...' : species,
+    value: count as number,
+    percentage: totalTrees > 0 ? (((count as number) / totalTrees) * 100).toFixed(1) : '0.0',
+    color: getSpeciesColor(index)
+  })).filter(item => (item.value as number) > 0);
+
   // Datos para gráfica de tipos de mantenimiento
   const maintenanceTypeChartData = Object.entries(maintenanceTypeStats).map(([type, count]) => ({
     type: type,
@@ -467,32 +492,59 @@ const TreesDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Especies más comunes */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Leaf className="h-5 w-5" />
-                Especies Más Comunes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={speciesChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="species" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                    fontSize={12}
-                  />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#22c55e" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          {/* Especies más comunes - Estilo igual al de Estado de Salud */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Especies Más Comunes</h2>
+            </div>
+            <div className="h-80">
+              {!speciesPieChartData || speciesPieChartData.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">No hay datos de especies disponibles</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={speciesPieChartData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={30}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ value, percent }: any) => 
+                        `${value} (${(percent * 100).toFixed(0)}%)`
+                      }
+                      labelLine={false}
+                    >
+                      {speciesPieChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: any) => [`${value} árboles`, 'Cantidad']}
+                      labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                    />
+                    <Legend 
+                      wrapperStyle={{
+                        paddingTop: '20px',
+                        fontSize: '12px'
+                      }}
+                      formatter={(value: string, entry: any) => {
+                        const speciesData = speciesPieChartData.find(item => item.name === value);
+                        const count = speciesData ? speciesData.value : 0;
+                        const percentage = speciesData ? speciesData.percentage : '0';
+                        return (
+                          <span style={{ color: '#374151', fontSize: '12px', fontWeight: '500' }}>
+                            {value} ({count} árboles - {percentage}%)
+                          </span>
+                        );
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Tipos de Mantenimiento */}
