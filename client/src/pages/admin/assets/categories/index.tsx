@@ -591,7 +591,7 @@ const AssetCategoriesPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6 w-full">
+      <div className="space-y-6">
         {/* Header con PageHeader component */}
         <PageHeader
           title="Categorías de Activos"
@@ -603,7 +603,7 @@ const AssetCategoriesPage: React.FC = () => {
               onClick={() => openCreateDialog()}
               variant="primary"
             >
-              <FolderPlus className="mr-2" size={20} />
+              <Plus className="mr-2" size={16} />
               Nueva Categoría
             </Button>
           ]}
