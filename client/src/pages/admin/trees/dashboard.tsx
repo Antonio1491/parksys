@@ -119,6 +119,13 @@ const TreesDashboard: React.FC = () => {
     return acc;
   }, {} as Record<string, number>) || {};
 
+  // Estadísticas de mantenimiento por tipo
+  const maintenanceTypeStats = maintenances?.reduce((acc, maintenance) => {
+    const type = maintenance?.maintenanceType || 'General';
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>) || {};
+
   // Árboles por parque
   const treesByPark = trees?.reduce((acc, tree) => {
     const parkName = tree?.parkName || 'Sin parque';
@@ -155,6 +162,17 @@ const TreesDashboard: React.FC = () => {
   const speciesChartData = topSpecies.map(([species, count]) => ({
     species: species.length > 15 ? species.substring(0, 15) + '...' : species,
     count
+  }));
+
+  // Datos para gráfica de tipos de mantenimiento
+  const maintenanceTypeChartData = Object.entries(maintenanceTypeStats).map(([type, count]) => ({
+    type: type,
+    count: count,
+    color: type === 'Poda' ? '#22c55e' : 
+           type === 'Riego' ? '#3b82f6' : 
+           type === 'Fertilización' ? '#f59e0b' : 
+           type === 'Tratamiento fitosanitario' ? '#ef4444' : 
+           type === 'Replantación' ? '#8b5cf6' : '#6b7280'
   }));
 
   // Cálculo del porcentaje de árboles saludables
@@ -316,6 +334,35 @@ const TreesDashboard: React.FC = () => {
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="count" fill="#22c55e" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tipos de Mantenimiento */}
+        <div className="grid gap-6 md:grid-cols-1">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                Tipos de Mantenimientos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={maintenanceTypeChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="type" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    fontSize={12}
+                  />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [`${value} mantenimientos`, 'Cantidad']} />
+                  <Bar dataKey="count" fill="#14b8a6" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
