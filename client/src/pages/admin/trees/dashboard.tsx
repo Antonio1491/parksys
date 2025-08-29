@@ -493,7 +493,7 @@ const TreesDashboard: React.FC = () => {
           </div>
 
           {/* Especies más comunes - Estilo igual al de Estado de Salud */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Especies Más Comunes</h2>
             </div>
@@ -577,7 +577,7 @@ const TreesDashboard: React.FC = () => {
         </div>
 
         {/* Especies por Parque - Nuevo gráfico con VerticalBarChart */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-2 md:grid-cols-2">
           <GraphicCard
             title="🌿 Especies por Parque"
             description="Distribución de diversidad de especies en cada parque y porcentaje del total del sistema"
