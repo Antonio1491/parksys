@@ -243,7 +243,6 @@ const TreesDashboard: React.FC = () => {
         percentage: percentage.toFixed(1)
       };
     })
-    .filter(park => park.speciesCount > 0) // Solo mostrar parques con especies
     .sort((a, b) => b.value - a.value);
 
   // Datos para el gráfico de árboles por parque (formato similar al de evaluaciones) - TODOS los parques
