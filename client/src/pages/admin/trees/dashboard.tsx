@@ -71,16 +71,23 @@ const TreesDashboard: React.FC = () => {
     retry: 1
   });
 
+  // Consulta para obtener todos los parques
+  const { data: parksResponse, isLoading: parksLoading, refetch: refetchParks } = useQuery({
+    queryKey: ['/api/parks'],
+    retry: 1
+  });
+
   // Extraer datos con manejo defensivo para diferentes formatos de respuesta
   const trees = Array.isArray(treesResponse) ? treesResponse : ((treesResponse as any)?.data || []);
   const maintenances = Array.isArray(maintenancesResponse) ? maintenancesResponse : ((maintenancesResponse as any)?.data || []);
   const species = Array.isArray(speciesResponse) ? speciesResponse : ((speciesResponse as any)?.data || []);
+  const parks = Array.isArray(parksResponse) ? parksResponse : ((parksResponse as any)?.data || []);
 
   const handleRefresh = async () => {
-    await Promise.all([refetchTrees(), refetchMaintenances(), refetchSpecies()]);
+    await Promise.all([refetchTrees(), refetchMaintenances(), refetchSpecies(), refetchParks()]);
   };
 
-  if (treesLoading || maintenancesLoading || speciesLoading) {
+  if (treesLoading || maintenancesLoading || speciesLoading || parksLoading) {
     return (
       <DashboardLayout
         icon={TreePine}
@@ -153,12 +160,28 @@ const TreesDashboard: React.FC = () => {
     return acc;
   }, {} as Record<string, number>) || {};
 
-  // Árboles por parque
-  const treesByPark = trees?.reduce((acc: Record<string, number>, tree: any) => {
-    const parkName = tree?.parkName || 'Sin parque';
-    acc[parkName] = (acc[parkName] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>) || {};
+  // Árboles por parque - incluir TODOS los parques del sistema
+  const treesByPark = (() => {
+    // Inicializar con todos los parques con 0 árboles
+    const allParks: Record<string, number> = {};
+    parks?.forEach((park: any) => {
+      const parkName = park?.name || `Parque ${park?.id}`;
+      allParks[parkName] = 0;
+    });
+
+    // Contar árboles por parque
+    trees?.forEach((tree: any) => {
+      const parkName = tree?.parkName || 'Sin parque';
+      if (allParks.hasOwnProperty(parkName)) {
+        allParks[parkName] = (allParks[parkName] || 0) + 1;
+      } else {
+        // Si un árbol tiene un parque que no está en la lista de parques
+        allParks[parkName] = (allParks[parkName] || 0) + 1;
+      }
+    });
+
+    return allParks;
+  })();
 
   // Top 3 parques con más árboles
   const topParks = Object.entries(treesByPark)
@@ -176,14 +199,14 @@ const TreesDashboard: React.FC = () => {
     .sort(([,a], [,b]) => (b as number) - (a as number))
     .slice(0, 5);
 
-  // Datos para el gráfico de árboles por parque (formato similar al de evaluaciones)
+  // Datos para el gráfico de árboles por parque (formato similar al de evaluaciones) - TODOS los parques
   const treesByParkData = Object.entries(treesByPark)
-    .filter(([parkName]) => parkName !== 'Sin parque')
     .map(([parkName, count], index) => ({
       parkId: index + 1,
       parkName,
       treeCount: count
-    }));
+    }))
+    .sort((a, b) => (b.treeCount as number) - (a.treeCount as number)); // Ordenar por cantidad de árboles
 
   // Función para obtener colores únicos por estado de salud
   const getHealthColor = (status: string) => {
@@ -481,15 +504,16 @@ const TreesDashboard: React.FC = () => {
               {treesByParkData?.length > 0 ? (
                 <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
                   {treesByParkData
-                    .sort((a, b) => b.treeCount - a.treeCount)
                     .map((park) => {
-                      const maxTrees = Math.max(...treesByParkData.map(p => p.treeCount));
-                      const heightPercentage = (park.treeCount / maxTrees) * 100;
+                      const maxTrees = Math.max(...treesByParkData.map(p => p.treeCount as number));
+                      const heightPercentage = maxTrees > 0 ? ((park.treeCount as number) / maxTrees) * 100 : 5;
                       const getTreeColor = (count: number) => {
+                        if (maxTrees === 0) return "#e5e7eb"; // Gris claro si no hay árboles
                         if (count >= maxTrees * 0.8) return "#22c55e"; // Verde intenso para mayor cantidad
                         if (count >= maxTrees * 0.5) return "#10b981"; // Verde medio
                         if (count >= maxTrees * 0.3) return "#14b8a6"; // Verde teal
-                        return "#6b7280"; // Gris para menor cantidad
+                        if (count > 0) return "#84cc16"; // Verde lima para pocos árboles
+                        return "#e5e7eb"; // Gris claro para 0 árboles
                       };
                       return (
                         <div key={park.parkId} className="flex flex-col items-center relative">
@@ -546,7 +570,7 @@ const TreesDashboard: React.FC = () => {
             {treesByParkData?.length > 0 && (
               <div className="mt-2 text-center">
                 <p className="text-sm text-gray-500 font-poppins font-thin">
-                  Mostrando {treesByParkData.length} parques con árboles registrados
+                  Mostrando {treesByParkData.length} parques municipales
                 </p>
               </div>
             )}
