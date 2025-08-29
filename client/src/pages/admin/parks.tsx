@@ -11,7 +11,7 @@ import { PageHeader } from "@/components/ui/page-header";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award } from "lucide-react";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -543,13 +543,13 @@ const AdminParksContent = () => {
         <PageHeader
           title="Parques"
           subtitle="Gestión General del Sistema"
-          icon={<MapPin className="h-6 w-6 text-white" />}
+          icon={<Map className="h-6 w-6 text-white" />}
           className="-mx-4 -mt-6 px-4 py-8 mb-4"
           style={{ backgroundColor: "#14b8a6" }}
           titleClassName="text-3xl font-bold text-white font-poppins"
           subtitleClassName="text-base font-normal text-white font-poppins"
           actions={[
-            <Button key="nuevo" variant="secondary">
+            <Button key="nuevo" variant="primary">
               <Plus className="w-4 h-4" />
               Nuevo Parque
             </Button>,
