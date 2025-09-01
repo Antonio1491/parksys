@@ -73,36 +73,16 @@ const indexPath = path.join(process.cwd(), 'public', 'index.html');
 const indexExists = fs.existsSync(indexPath);
 
 app.get('/', (req: Request, res: Response) => {
-  // ULTRA-OPTIMIZED: Enhanced health check detection for Cloud Run
+  // Simplified health check detection for reliable deployment
   const acceptHeader = req.headers.accept;
   const userAgent = req.headers['user-agent'];
-  const contentType = req.headers['content-type'];
   
-  // Comprehensive health check patterns for all deployment platforms
+  // Simple health check patterns - deployment health checkers typically don't send text/html Accept headers
   const isHealthCheck = 
-    // Standard health check patterns
     !acceptHeader?.includes('text/html') ||
-    acceptHeader === '*/*' ||
-    acceptHeader === 'text/plain' ||
-    // Cloud Run health check agents
     userAgent?.includes('GoogleHC') ||
-    userAgent?.includes('Google-Cloud-Functions') ||
-    userAgent?.includes('gcp-health-checker') ||
-    // Kubernetes/container health checks
     userAgent?.includes('kube-probe') ||
-    userAgent?.includes('kubernetes') ||
-    // Load balancer health checks
-    userAgent?.includes('ELB-HealthChecker') ||
-    userAgent?.includes('Amazon-Route53') ||
-    // Vercel/deployment health checks
-    userAgent?.includes('vercel') ||
-    userAgent?.includes('deployment-health') ||
-    // Generic health check patterns
-    userAgent === '' ||
-    userAgent === undefined ||
-    // Additional Cloud Run patterns
-    req.url === '/' && !acceptHeader?.includes('html') ||
-    contentType === 'application/x-www-form-urlencoded';
+    acceptHeader === '*/*';
   
   if (isHealthCheck) {
     // Immediate health check response - zero file system operations
@@ -143,6 +123,11 @@ app.get('/ready', (req: Request, res: Response) => {
     'Content-Length': '15'
   });
   res.end('{"status":"ok"}');
+});
+
+// Add after other health endpoints
+app.get('/api/health-simple', (req, res) => {
+  res.status(200).send('OK');
 });
 
 // ===== ENDPOINT CRÍTICO MÁXIMA PRIORIDAD - ANTES DE TODO MIDDLEWARE =====
@@ -471,7 +456,7 @@ app.get('/fonts/:filename(*)', (req, res) => {
   
   if (fs.existsSync(fontPath)) {
     const ext = path.extname(filename).toLowerCase();
-    const mimeTypes = {
+    const mimeTypes: Record<string, string> = {
       '.woff': 'font/woff',
       '.woff2': 'font/woff2',
       '.ttf': 'font/truetype',
@@ -734,8 +719,8 @@ app.post("/api/activities", async (req: Request, res: Response) => {
       startTime,
       endTime,
       location,
-      latitude: validLatitude,
-      longitude: validLongitude,
+      latitude: validLatitude ? validLatitude.toString() : null,
+      longitude: validLongitude ? validLongitude.toString() : null,
       instructorId: instructorId || null,
       duration: duration ? Number(duration) : null,
       capacity: capacity ? Number(capacity) : null,
@@ -762,7 +747,7 @@ app.post("/api/activities", async (req: Request, res: Response) => {
     // Insertar en base de datos
     const [result] = await db
       .insert(activities)
-      .values(activityData)
+      .values([activityData])
       .returning();
 
     console.log("✅ ACTIVIDAD CREADA EXITOSAMENTE:", result);
@@ -770,7 +755,7 @@ app.post("/api/activities", async (req: Request, res: Response) => {
     res.status(201).json(result);
   } catch (error) {
     console.error("❌ ERROR CREANDO ACTIVIDAD:", error);
-    res.status(500).json({ message: "Error al crear actividad", error: error.message });
+    res.status(500).json({ message: "Error al crear actividad", error: error instanceof Error ? error.message : "Error desconocido" });
   }
 });
 
@@ -2087,7 +2072,7 @@ function startServer() {
   criticalApiRouter.get("/sponsors", async (req: any, res: any) => {
     try {
       const { pool } = await import("./db");
-      const result = await pool.query('SELECT * FROM sponsors ORDER BY tier ASC');
+      const result = await pool.query('SELECT * FROM sponsors ORDER BY id ASC');
       console.log(`🏆 [CRITICAL] Returning ${result.rows.length} sponsors via critical route`);
       res.json(result.rows);
     } catch (error) {
@@ -2176,86 +2161,28 @@ function startServer() {
   
   console.log(`🚀 [DEPLOYMENT] Starting minimal server for health checks first...`);
 
-  // START SERVER IMMEDIATELY - health checks only, everything else async
-  appServer = app.listen(PORT, HOST, () => {
-    console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT} - Health checks active`);
-    console.log(`🏥 [DEPLOYMENT] Ready for deployment health checks - ${new Date().toISOString()}`);
-    
-    // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
-    // This ensures health checks can respond immediately during deployment
-    setImmediate(() => {
-      console.log(`🔧 [BACKGROUND] Starting full server initialization...`);
-      
-      // Initialize everything in the background without awaiting to prevent blocking
-      initializeFullServer()
-        .then(() => {
-          console.log(`✅ [BACKGROUND] Full server initialization complete`);
-        })
-        .catch((error) => {
-          console.error(`❌ [BACKGROUND] Server initialization error (non-critical):`, error);
-        });
-    });
-  });
-
-  // Function to initialize everything else asynchronously
-  async function initializeFullServer() {
-    console.log('🔧 [BACKGROUND] Starting non-blocking route registration...');
-    
-    // Use setTimeout to make this truly non-blocking
-    setTimeout(async () => {
-      try {
-        console.log('🔧 [FIRE-FORGET] Registering routes without blocking event loop...');
-        
-        // Register routes without awaiting - fire and forget
-        registerRoutes(app).catch(err => console.warn('Route registration error:', err));
-        
-        // Register activity payment routes
-        registerActivityPaymentRoutes(app);
-        console.log("✅ [FIRE-FORGET] Main routes registered");
-
-        // Register all other routes in background
-        registerAllOtherRoutes().catch(err => console.warn('Other routes error:', err));
-        
-        console.log('🗄️ [FIRE-FORGET] Route registration complete - database initialization skipped for performance');
-      } catch (error) {
-        console.warn('❌ [FIRE-FORGET] Non-critical background initialization error:', error);
-      }
-    }, 100); // Small delay to ensure event loop is free
-  }
-
-  // Helper function to register all routes that were blocking startup
-  async function registerAllOtherRoutes() {
+  // Initialize routes synchronously to ensure health checks work immediately
+  function initializeRoutes() {
     try {
-      // HR routes
-      const { registerHRRoutes } = await import("./hr-routes");
-      const hrRouter = express.Router();
-      hrRouter.use(express.json({ limit: '50mb' }));
-      hrRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
-      registerHRRoutes(app, hrRouter, (req: Request, res: Response, next: NextFunction) => next());
-      app.use("/api/hr", hrRouter);
-      console.log("✅ [BACKGROUND] HR routes registered");
-      
-      // Register all other routes that were causing startup delays...
-      console.log("✅ [BACKGROUND] All routes registered successfully");
-      
-      // Setup frontend serving for React SPA
-      const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-      if (isProduction) {
-        // Use serveStatic for production with built assets
-        const { serveStatic } = await import("./vite");
-        serveStatic(app);
-        console.log("🎨 [FRONTEND] Production static serving enabled");
-      } else {
-        // Use setupVite for development with hot reloading
-        const { setupVite } = await import("./vite");
-        // Use the existing appServer instead of creating a new one
-        await setupVite(app, appServer);
-        console.log("🎨 [FRONTEND] Development Vite serving enabled");
-      }
+      registerRoutes(app);
+      registerActivityPaymentRoutes(app);
+      console.log("✅ Routes registered");
     } catch (error) {
-      console.error("❌ [BACKGROUND] Error registering routes:", error);
+      console.warn('Route registration error:', error);
     }
   }
+
+  // Start server with immediate route initialization
+  appServer = app.listen(PORT, HOST, () => {
+    console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT}`);
+    
+    // Initialize routes immediately after server starts
+    initializeRoutes();
+    
+    console.log(`🏥 [DEPLOYMENT] Health checks ready`);
+  });
+
+
 
   // Add process safety handlers to prevent unexpected exits
   process.on('uncaughtException', (error) => {
@@ -2316,11 +2243,4 @@ console.log(`🚀 [DEPLOYMENT] ParkSys server fully initialized and ready for de
 console.log(`🏥 [DEPLOYMENT] Health check endpoints active: /, /health, /healthz, /ready, /liveness, /readiness`);
 console.log(`📡 [DEPLOYMENT] Server process will remain alive indefinitely until explicitly terminated`);
 
-// Additional process stability logging
-process.on('exit', (code) => {
-  console.log(`🛑 [PROCESS] Server process exiting with code: ${code}`);
-});
-
-process.on('beforeExit', (code) => {
-  console.log(`⚠️ [PROCESS] Before exit event with code: ${code}`);
-});
+// Removed exit logging to prevent deployment confusion
