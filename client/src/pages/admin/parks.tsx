@@ -545,10 +545,7 @@ const AdminParksContent = () => {
           title="Parques"
           subtitle="Gestión General del Sistema"
           icon={<Map className="h-6 w-6 text-white" />}
-          className="-mx-4 -mt-6 px-4 py-8 mb-4"
-          style={{ backgroundColor: "#14b8a6" }}
-          titleClassName="text-3xl font-bold text-white font-poppins"
-          subtitleClassName="text-base font-normal text-white font-poppins"
+          backgroundColor="#14b8a6"
           actions={[
             <ExportButton
               entity="parks" 

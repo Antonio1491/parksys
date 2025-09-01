@@ -1,7 +1,7 @@
 import { ExportFormatter } from '../ExportEngine';
 import { ExportOptions, ExportConfig } from '../../../shared/exports/config';
 import { BrandingConfig } from '../../../shared/exports/branding';
-import * as moment from 'moment';
+import moment from 'moment';
 
 export class CSVFormatter implements ExportFormatter {
   format = 'csv';

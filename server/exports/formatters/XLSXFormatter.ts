@@ -1,8 +1,8 @@
-import * as ExcelJS from 'exceljs';
+import ExcelJS from 'exceljs';
 import { ExportFormatter } from '../ExportEngine';
 import { ExportOptions, ExportConfig } from '../../../shared/exports/config';
 import { BrandingConfig } from '../../../shared/exports/branding';
-import * as moment from 'moment';
+import moment from 'moment';
 
 export class XLSXFormatter implements ExportFormatter {
   format = 'xlsx';
