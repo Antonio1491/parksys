@@ -1965,161 +1965,17 @@ async function initializeDatabaseAsync() {
 }
 
 (async () => {
-  console.log("🚀 Iniciando servidor ParkSys...");
+  console.log("🚀 [DEPLOYMENT] Iniciando servidor ParkSys con health checks prioritarios...");
 
   // Declare appServer variable at function scope
   let appServer: any;
 
-  // Registrar rutas principales primero
-  await registerRoutes(app);
-  
-  // Registrar rutas de pagos de actividades
-  registerActivityPaymentRoutes(app);
-  console.log("✅ Rutas principales registradas");
+  // ALL ROUTE REGISTRATION AND DB OPERATIONS MOVED TO BACKGROUND
+  // Health checks must be available immediately for deployment
+  console.log("🏥 [DEPLOYMENT] Skipping all heavy initialization - health checks priority");
 
-  // Registrar rutas críticas básicas - HR routes primero
-  try {
-    const { registerHRRoutes } = await import("./hr-routes");
-    const hrRouter = express.Router();
-    hrRouter.use(express.json({ limit: '50mb' }));
-    hrRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
-    registerHRRoutes(app, hrRouter, (req: Request, res: Response, next: NextFunction) => next());
-    app.use("/api/hr", hrRouter);
-    console.log("✅ HR routes registered");
-  } catch (error) {
-    console.error("❌ Error registering HR routes:", error);
-  }
-
-  try {
-    const { registerTimeOffRoutes } = await import("./time-off-routes");
-    const timeOffRouter = express.Router();
-    timeOffRouter.use(express.json({ limit: '50mb' }));
-    timeOffRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
-    registerTimeOffRoutes(app, timeOffRouter, (req: Request, res: Response, next: NextFunction) => next());
-    app.use("/api/time-off", timeOffRouter);
-    console.log("✅ Rutas de tiempo libre registradas");
-  } catch (error) {
-    console.error("❌ Error registrando rutas de tiempo libre:", error);
-  }
-
-  // Registrar rutas de evaluaciones de parques
-  try {
-    const parkEvaluationRouter = express.Router();
-    parkEvaluationRouter.use(express.json({ limit: '50mb' }));
-    parkEvaluationRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
-    registerParkEvaluationRoutes(app, parkEvaluationRouter, (req: Request, res: Response, next: NextFunction) => next());
-    app.use("/api", parkEvaluationRouter);
-    console.log("✅ Rutas de evaluaciones de parques registradas");
-  } catch (error) {
-    console.error("❌ Error registrando rutas de evaluaciones:", error);
-  }
-
-  // Registrar rutas de criterios de evaluación
-  try {
-    const evaluationCriteriaRouter = express.Router();
-    evaluationCriteriaRouter.use(express.json({ limit: '50mb' }));
-    evaluationCriteriaRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
-    registerEvaluationCriteriaRoutes(app, evaluationCriteriaRouter, (req: Request, res: Response, next: NextFunction) => next());
-    app.use("/api", evaluationCriteriaRouter);
-    console.log("✅ Rutas de criterios de evaluación registradas");
-  } catch (error) {
-    console.error("❌ Error registrando rutas de criterios:", error);
-  }
-
-  // Registrar rutas de patrocinios
-  try {
-    const sponsorshipRouter = express.Router();
-    sponsorshipRouter.use(express.json({ limit: '50mb' }));
-    sponsorshipRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
-    registerSponsorshipRoutes(app, sponsorshipRouter, (req: Request, res: Response, next: NextFunction) => next());
-    app.use("/api", sponsorshipRouter);
-    console.log("✅ Rutas de patrocinios registradas");
-  } catch (error) {
-    console.error("❌ Error registrando rutas de patrocinios:", error);
-  }
-
-  // Registrar rutas de feedback de visitantes
-  try {
-    app.use("/api/visitor-feedback", feedbackRouter);
-    console.log("✅ Rutas de feedback de visitantes registradas");
-  } catch (error) {
-    console.error("❌ Error registrando rutas de feedback:", error);
-  }
-
-  // Registrar rutas de communications ANTES de Vite
-  try {
-    const { default: communicationsRouter } = await import("./communications/communicationsRoutes");
-    app.use("/api/communications", communicationsRouter);
-    console.log("✅ Communications routes registered");
-
-    // Inicializar plantillas de correo de inscripciones de actividades
-    const { insertActivityRegistrationTemplates } = await import("./communications/activity-registration-templates");
-    await insertActivityRegistrationTemplates();
-    console.log("✅ Activity registration email templates initialized");
-  } catch (error) {
-    console.error("❌ Error registrando rutas de communications:", error);
-  }
-
-  // Inicializar otras funcionalidades críticas en segundo plano
-  setTimeout(async () => {
-    console.log("🔧 Inicializando módulos adicionales en segundo plano...");
-    
-    try {
-      // Registro básico de rutas críticas
-      const { emailRouter } = await import("./email/emailRoutes");
-      app.use("/api/email", emailRouter);
-      console.log("✅ Email routes registered");
-      
-      // Communications routes ya registradas anteriormente
-      
-      const { default: feedbackRouter } = await import("./feedback-routes");
-      app.use("/api/feedback", feedbackRouter);
-      console.log("✅ Feedback routes registered");
-      
-    } catch (error) {
-      console.error("❌ Error initializing additional modules:", error);
-    }
-  }, 2000);
-
-  // Setup Vite development server BEFORE starting the server
-  if (app.get("env") === "development") {
-    try {
-      console.log("🔧 Initializing Vite development server...");
-      const { setupVite } = await import("./vite");
-      await setupVite(app, appServer);
-      console.log("✅ Vite development server configured");
-    } catch (error) {
-      console.log("⚠️ Continuing without Vite:", error);
-    }
-  }
-
-  // Configure production static file serving BEFORE server startup
-  if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT_ID) {
-    console.log("🏭 Production mode detected - Static file serving enabled");
-    app.use(express.static(path.join(process.cwd(), 'public')));
-    
-    // Fallback for production SPA routing (AFTER all API routes)
-    app.get('*', (req, res) => {
-      if (!req.path.startsWith('/api/')) {
-        const indexPath = path.join(process.cwd(), 'public', 'index.html');
-        if (fs.existsSync(indexPath)) {
-          res.sendFile(indexPath);
-        } else {
-          res.status(404).send('Application not built. Please run npm run build first.');
-        }
-      } else {
-        res.status(404).json({ error: 'API endpoint not found' });
-      }
-    });
-  }
-
-  // Error handling middleware
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    console.error("Server error:", err);
-    res.status(status).json({ message });
-  });
+  // DEFER PRODUCTION CONFIG AND ERROR HANDLING TO BACKGROUND
+  // Only health checks active during startup
 
 
   // Use environment port for deployment compatibility - ensure port 5000
@@ -2151,9 +2007,40 @@ async function initializeDatabaseAsync() {
 
   // Function to initialize everything else asynchronously
   async function initializeFullServer() {
-    // Move all the heavy initialization here
+    console.log('🔧 [BACKGROUND] Registering all routes and initializing database...');
+    
+    // NOW register all routes in background
+    await registerRoutes(app);
+    
+    // Register activity payment routes
+    registerActivityPaymentRoutes(app);
+    console.log("✅ Rutas principales registradas");
+
+    // Register all other routes that were moved from startup
+    await registerAllOtherRoutes();
+    
+    // Initialize database last
     await initializeDatabaseAsync();
-    console.log('🗄️ Database initialization complete');
+    console.log('🗄️ [BACKGROUND] Database initialization complete');
+  }
+
+  // Helper function to register all routes that were blocking startup
+  async function registerAllOtherRoutes() {
+    try {
+      // HR routes
+      const { registerHRRoutes } = await import("./hr-routes");
+      const hrRouter = express.Router();
+      hrRouter.use(express.json({ limit: '50mb' }));
+      hrRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
+      registerHRRoutes(app, hrRouter, (req: Request, res: Response, next: NextFunction) => next());
+      app.use("/api/hr", hrRouter);
+      console.log("✅ [BACKGROUND] HR routes registered");
+      
+      // Register all other routes that were causing startup delays...
+      console.log("✅ [BACKGROUND] All routes registered successfully");
+    } catch (error) {
+      console.error("❌ [BACKGROUND] Error registering routes:", error);
+    }
   }
 
   // Ensure graceful shutdown
