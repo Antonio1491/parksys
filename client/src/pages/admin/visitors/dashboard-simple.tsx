@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, MessageSquare, BarChart3, TrendingUp } from 'lucide-react';
+import { Calendar, Users, MessageSquare, BarChart3, TrendingUp, CalendarDays } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import DashboardLayout from '@/components/ui/dashboard-layout';
 
@@ -55,6 +55,32 @@ export default function VisitorsDashboardSimple() {
     group.count > max.count ? group : max, demographicGroups[0]);
   
   const dominantPercentage = totalVisitors > 0 ? (dominantGroup.count / totalVisitors) * 100 : 0;
+
+  // Calcular visitantes de la semana actual (lunes a domingo)
+  const getWeekStart = (date: Date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Ajustar para que la semana empiece en lunes
+    return new Date(d.setDate(diff));
+  };
+  
+  const getWeekEnd = (date: Date) => {
+    const weekStart = getWeekStart(date);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    return weekEnd;
+  };
+  
+  const today = new Date();
+  const weekStart = getWeekStart(today);
+  const weekEnd = getWeekEnd(today);
+  
+  const weeklyVisitors = Array.isArray(visitorData) ? visitorData.filter(record => {
+    if (!record.date) return false;
+    const recordDate = new Date(record.date);
+    return recordDate >= weekStart && recordDate <= weekEnd;
+  }).reduce((sum, record) => 
+    sum + (record.adults || 0) + (record.children || 0) + (record.seniors || 0), 0) : 0;
 
   // Datos para gráficas - Visitantes por método
   const methodData = Array.isArray(visitorData) ? visitorData.reduce((acc, record) => {
@@ -161,7 +187,7 @@ export default function VisitorsDashboardSimple() {
     >
       <div className="space-y-6">
         {/* Tarjetas de métricas principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Total Visitantes</CardTitle>
@@ -189,6 +215,19 @@ export default function VisitorsDashboardSimple() {
                   />
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Visitantes Semanales</CardTitle>
+              <CalendarDays className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">{weeklyVisitors.toLocaleString()}</div>
+              <p className="text-xs text-gray-500 mt-1">
+                Semana actual ({weekStart.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} - {weekEnd.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})
+              </p>
             </CardContent>
           </Card>
 
