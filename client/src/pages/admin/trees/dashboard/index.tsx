@@ -227,21 +227,21 @@ const TreesDashboardPage = () => {
               </TabsContent>
               
               <TabsContent value="byPark" className="p-4 bg-white rounded-md shadow mt-2">
-                <h3 className="text-lg font-medium mb-4">Distribución por Parque</h3>
+                <h3 className="text-lg font-medium mb-4">Especies por Parque</h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={dist.byPark}
                       margin={{ top: 5, right: 30, left: 20, bottom: 60 }}
-                      layout="vertical"
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis 
-                        type="category" 
-                        dataKey="name" 
-                        width={150}
+                      <XAxis 
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={70}
                       />
+                      <YAxis />
                       <Tooltip formatter={(value) => [`${value} árboles`, 'Cantidad']} />
                       <Legend />
                       <Bar dataKey="count" name="Cantidad" fill="#16a34a" />
