@@ -2220,6 +2220,27 @@ function startServer() {
 startServer();
 
 // Keep the process alive with a heartbeat to prevent exit
-setInterval(() => {
+const heartbeat = setInterval(() => {
   // Silent heartbeat to keep event loop active
+  // Also log periodic status for deployment monitoring
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`🔄 [HEARTBEAT] Server alive - ${new Date().toISOString()}`);
+  }
 }, 30000); // 30 seconds
+
+// Prevent the heartbeat from keeping the process alive in tests
+heartbeat.unref ? heartbeat.unref() : null;
+
+// Log successful startup for deployment verification
+console.log(`🚀 [DEPLOYMENT] ParkSys server fully initialized and ready for deployment health checks`);
+console.log(`🏥 [DEPLOYMENT] Health check endpoints active: /, /health, /healthz, /ready, /liveness, /readiness`);
+console.log(`📡 [DEPLOYMENT] Server process will remain alive indefinitely until explicitly terminated`);
+
+// Additional process stability logging
+process.on('exit', (code) => {
+  console.log(`🛑 [PROCESS] Server process exiting with code: ${code}`);
+});
+
+process.on('beforeExit', (code) => {
+  console.log(`⚠️ [PROCESS] Before exit event with code: ${code}`);
+});
