@@ -103,7 +103,6 @@
   body, html, #root {
     min-height: 100vh !important;
     height: auto !important;
-    overflow-x: hidden !important;
   }
   
   /* Eliminar altura mínima problemática en AdminLayout */
