@@ -2155,6 +2155,17 @@ function startServer() {
     }
   });
 
+  // Register critical login API route
+  criticalApiRouter.post("/login", async (req: any, res: any) => {
+    try {
+      const { handleLogin } = await import('./api/auth');
+      await handleLogin(req, res);
+    } catch (error) {
+      console.error('❌ [CRITICAL] Error in login route:', error);
+      res.status(500).json({ message: "Error durante el inicio de sesión" });
+    }
+  });
+
   // Mount critical API router immediately
   app.use('/api', criticalApiRouter);
   console.log("🚀 [IMMEDIATE] Critical API routes registered");
