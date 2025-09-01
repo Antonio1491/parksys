@@ -25,40 +25,27 @@ import evaluacionesRoutes from "./evaluaciones-routes";
 
 const app = express();
 
-// ===== DEPLOYMENT HEALTH CHECK - ABSOLUTE PRIORITY =====
-// Health checks MUST be first, before ANY middleware or routes
-// Optimized for Cloud Run / GCP deployment requirements
+// ===== ULTRA-MINIMAL HEALTH CHECK - ZERO DEPENDENCIES =====
+// This must respond instantly for deployment health checks
+const healthResponse = Buffer.from('OK');
+const healthHeaders = {
+  'Content-Type': 'text/plain',
+  'Content-Length': '2'
+};
+
 app.get('/', (req: Request, res: Response) => {
-  // Immediate response - no logging delays during deployment
-  res.writeHead(200, {
-    'Content-Type': 'text/plain',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Content-Length': '2'
-  });
-  res.end('OK');
-  
-  // Log after response (non-blocking)
-  process.nextTick(() => {
-    console.log(`🏥 [${new Date().toISOString()}] Root health check - ${req.get('User-Agent') || 'unknown'}`);
-  });
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
 });
 
 app.get('/health', (req: Request, res: Response) => {
-  res.writeHead(200, {
-    'Content-Type': 'text/plain',
-    'Content-Length': '2'
-  });
-  res.end('OK');
-  process.nextTick(() => console.log('🏥 Health endpoint accessed'));
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
 });
 
 app.get('/healthz', (req: Request, res: Response) => {
-  res.writeHead(200, {
-    'Content-Type': 'text/plain', 
-    'Content-Length': '2'
-  });
-  res.end('OK');
-  process.nextTick(() => console.log('🏥 Healthz endpoint accessed'));
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
 });
 
 app.get('/ping', (req: Request, res: Response) => {
@@ -67,7 +54,6 @@ app.get('/ping', (req: Request, res: Response) => {
     'Content-Length': '4'
   });
   res.end('pong');
-  process.nextTick(() => console.log('🏥 Ping endpoint accessed'));
 });
 
 app.get('/ready', (req: Request, res: Response) => {
@@ -76,7 +62,6 @@ app.get('/ready', (req: Request, res: Response) => {
     'Content-Length': '15'
   });
   res.end('{"status":"ok"}');
-  process.nextTick(() => console.log('🏥 Ready endpoint accessed'));
 });
 
 // ===== ENDPOINT CRÍTICO MÁXIMA PRIORIDAD - ANTES DE TODO MIDDLEWARE =====
@@ -2136,56 +2121,40 @@ async function initializeDatabaseAsync() {
     res.status(status).json({ message });
   });
 
+
   // Use environment port for deployment compatibility - ensure port 5000
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
   const HOST = '0.0.0.0';
   
-  console.log(`🚀 Starting server on ${HOST}:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+  console.log(`🚀 [DEPLOYMENT] Starting minimal server for health checks first...`);
 
-  // START SERVER - after all configuration is complete
+  // START SERVER IMMEDIATELY - health checks only, everything else async
   appServer = app.listen(PORT, HOST, () => {
-    console.log(`✅ Server listening on ${HOST}:${PORT} - Health checks ready`);
-    console.log(`🏥 Health endpoints available at /, /health, /healthz, /ping, /ready`);
-    console.log(`🚀 [DEPLOYMENT] Server ready for health checks - Timestamp: ${new Date().toISOString()}`);
+    console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT} - Health checks active`);
+    console.log(`🏥 [DEPLOYMENT] Ready for deployment health checks - ${new Date().toISOString()}`);
     
-    // Test health endpoint immediately after server start
-    setTimeout(async () => {
+    // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
+    // This ensures health checks can respond immediately during deployment
+    setImmediate(async () => {
       try {
-        const http = await import('http');
-        const options = {
-          hostname: 'localhost',
-          port: PORT,
-          path: '/',
-          method: 'GET',
-          timeout: 1000
-        };
+        console.log(`🔧 [BACKGROUND] Starting full server initialization...`);
         
-        const req = http.default.request(options, (res: any) => {
-          console.log(`🏥 [SELF-TEST] Health check response: ${res.statusCode}`);
-        });
+        // Initialize everything in the background
+        await initializeFullServer();
         
-        req.on('error', (err: any) => {
-          console.log(`⚠️ [SELF-TEST] Health check error: ${err.message}`);
-        });
-        
-        req.on('timeout', () => {
-          console.log(`⚠️ [SELF-TEST] Health check timeout`);
-          req.destroy();
-        });
-        
-        req.end();
+        console.log(`✅ [BACKGROUND] Full server initialization complete`);
       } catch (error) {
-        console.log(`⚠️ [SELF-TEST] Could not perform self-test: ${error}`);
+        console.error(`❌ [BACKGROUND] Server initialization error (non-critical):`, error);
       }
-    }, 100);
-    
-    // Initialize database asynchronously after server is listening
-    setTimeout(() => {
-      initializeDatabaseAsync().catch(error => {
-        console.error("❌ Database initialization error (non-critical):", error);
-      });
-    }, 200);
+    });
   });
+
+  // Function to initialize everything else asynchronously
+  async function initializeFullServer() {
+    // Move all the heavy initialization here
+    await initializeDatabaseAsync();
+    console.log('🗄️ Database initialization complete');
+  }
 
   // Ensure graceful shutdown
   process.on('SIGTERM', () => {
