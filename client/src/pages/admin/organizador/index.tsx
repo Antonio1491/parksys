@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { GraphicCard } from '@/components/ui/graphic-card';
 import MetricCard from '@/components/ui/metric-card';
+import VerticalBarChart from '@/components/ui/vertical-bar-chart';
 import { Calendar, Plus, Tag, Users, MapPin, Clock, Edit, Eye, BarChart3, CheckCircle, Activity, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import DashboardLayout from '@/components/ui/dashboard-layout';
@@ -517,78 +518,25 @@ const OrganizadorPage: React.FC = () => {
           description="Número total de actividades por parque"
           className="h-full"
         >
-          <div className="w-full">
-            {activitiesByPark.length > 0 ? (
-              <div className="flex justify-center items-end gap-2 min-h-[320px] px-4 overflow-x-auto">
-                {activitiesByPark.map((park) => {
-                  const maxActivities = Math.max(...activitiesByPark.map(p => p.totalActivities), 1);
-                  const heightPercentage = (park.totalActivities / maxActivities) * 100;
-                  
-                  const getActivityColor = (total: number) => {
-                    if (total >= 4) return "#69c45c"; // Verde para muchas actividades (mismo color que evaluaciones altas)
-                    if (total >= 2) return "#bcb57e"; // Amarillo para medias (mismo color que evaluaciones medias)
-                    return "#a86767"; // Rojo para pocas (mismo color que evaluaciones bajas)
-                  };
-
-                  return (
-                    <div key={park.parkId} className="flex flex-col items-center relative">
-                      {/* Valor del total arriba con número de activas */}
-                      <div className="mb-2 text-center">
-                        <div className="text-sm font-poppins font-thin text-gray-700 flex items-center gap-1">
-                          {park.totalActivities}
-                        </div>
-                        <div className="text-xs font-poppins font-thin text-gray-500">
-                          ({park.activeActivities} activas)
-                        </div>
-                      </div>
-
-                      {/* Columna vertical */}
-                      <div className="relative h-64 w-4 flex flex-col justify-end">
-                        {/* Fondo de la columna */}
-                        <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                        
-                        {/* Relleno de la columna según total de actividades */}
-                        <div
-                          className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                          style={{
-                            height: `${Math.max(heightPercentage, 5)}%`,
-                            backgroundColor: getActivityColor(park.totalActivities),
-                            borderColor: getActivityColor(park.totalActivities),
-                          }}
-                        ></div>
-                      </div>
-
-                      {/* Nombre del parque a la izquierda de la columna - VERTICAL */}
-                      <div className="absolute bottom-32 -left-28 transform -rotate-90 origin-bottom-right w-32">
-                        <div className="text-xs font-poppins font-thin text-gray-700 whitespace-nowrap">
-                          {park.parkName}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center min-h-[320px] text-gray-500">
-                <div className="text-center">
-                  <Activity className="h-12 w-12 text-gray-300" />
-                  <p className="text-lg font-medium">
-                    No hay parques disponibles
-                  </p>
-                  <p className="text-sm">
-                    Los datos de actividades por parque aparecerán aquí una vez que se registren parques
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-          {activitiesByPark.length > 0 && (
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-500 font-poppins font-thin">
-                Mostrando todos los {activitiesByPark.length} parques
-              </p>
-            </div>
-          )}
+          <VerticalBarChart
+            data={activitiesByPark.map(park => ({
+              label: park.parkName,
+              value: park.totalActivities,
+              id: park.parkId
+            }))}
+            height="h-64"
+            barWidth="w-4"
+            gap="gap-2"
+            showLabels={true}
+            sortDescending={true}
+            emptyStateTitle="No hay parques disponibles"
+            emptyStateDescription="Los datos de actividades por parque aparecerán aquí una vez que se registren parques"
+            footerText={`Mostrando todos los ${activitiesByPark.length} parques`}
+            formatValue={(value, item) => {
+              const park = activitiesByPark.find(p => p.parkId === item?.id);
+              return park ? `${value}\n(${park.activeActivities} activas)` : value.toString();
+            }}
+          />
         </GraphicCard>
 
         {/* Columna derecha: Categorías de Actividades */}
