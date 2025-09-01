@@ -19,8 +19,8 @@ import {
   Save,
   RefreshCw
 } from 'lucide-react';
-import { EXPORT_REGISTRY, getAvailableEntities } from '../../../../shared/exports/registry';
-import { DEFAULT_BRANDING } from '../../../../shared/exports/branding';
+import { EXPORT_REGISTRY, getAvailableEntities } from '@shared/exports/registry';
+import { DEFAULT_BRANDING } from '@shared/exports/branding';
 import { ExportButton } from '@/components/ui/export-button';
 
 export default function ExportacionesConfig() {
