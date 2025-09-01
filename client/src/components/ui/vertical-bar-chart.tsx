@@ -76,7 +76,7 @@ export default function VerticalBarChart({
             const barColor = getBarColor(item.value, maxValue);
           
             return (
-              <div key={item.id || index} className="flex flex-col items-center relative min-w-[48px] flex-shrink-0">
+              <div key={item.id || index} className="flex flex-col items-center relative min-w-[48px] flex-shrink-0 border-l border-gray-200 first:border-l-0">
                 {/* Valor del conteo arriba */}
                 <div className="mb-2 text-center min-h-[40px] flex items-end justify-center">
                   <div className="text-sm font-medium text-gray-700">
