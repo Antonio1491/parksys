@@ -79,7 +79,7 @@ export default function VerticalBarChart({
               <div key={item.id || index} className="flex flex-col items-center relative min-w-[48px] flex-shrink-0">
                 {/* Valor del conteo arriba */}
                 <div className="mb-2 text-center min-h-[40px] flex items-end justify-center">
-                  <div className="text-sm font-medium text-gray-700 max-w-[40px] truncate text-center">
+                  <div className="text-sm font-medium text-gray-700">
                     {formatValue ? formatValue(item.value, item) : item.value}
                   </div>
                 </div>

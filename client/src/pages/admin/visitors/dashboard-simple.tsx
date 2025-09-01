@@ -75,10 +75,29 @@ export default function VisitorsDashboardSimple() {
   const weekStart = getWeekStart(today);
   const weekEnd = getWeekEnd(today);
   
+  // Debug: log para verificar datos
+  console.log('📅 Fechas de la semana:', { 
+    today: today.toISOString().split('T')[0],
+    weekStart: weekStart.toISOString().split('T')[0], 
+    weekEnd: weekEnd.toISOString().split('T')[0] 
+  });
+  console.log('📊 Datos de visitantes:', visitorData?.slice(0, 3));
+  
   const weeklyVisitors = Array.isArray(visitorData) ? visitorData.filter(record => {
     if (!record.date) return false;
     const recordDate = new Date(record.date);
-    return recordDate >= weekStart && recordDate <= weekEnd;
+    const isInRange = recordDate >= weekStart && recordDate <= weekEnd;
+    
+    // Debug: log para cada registro
+    if (isInRange) {
+      console.log('✅ Registro en rango semanal:', {
+        date: record.date,
+        recordDate: recordDate.toISOString().split('T')[0],
+        visitors: (record.adults || 0) + (record.children || 0) + (record.seniors || 0)
+      });
+    }
+    
+    return isInRange;
   }).reduce((sum, record) => 
     sum + (record.adults || 0) + (record.children || 0) + (record.seniors || 0), 0) : 0;
 
@@ -93,6 +112,9 @@ export default function VisitorsDashboardSimple() {
     acc[parkName] = (acc[parkName] || 0) + visitors;
     return acc;
   }, {} as Record<string, number>) : {};
+  
+  console.log('🏆 Visitantes por parque esta semana:', weeklyParkVisitors);
+  console.log('📈 Total visitantes semanales calculado:', weeklyVisitors);
 
   const topWeeklyPark = Object.entries(weeklyParkVisitors).length > 0 
     ? Object.entries(weeklyParkVisitors).reduce((max, [parkName, visitors]) => 
