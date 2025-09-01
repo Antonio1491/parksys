@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -142,54 +142,53 @@ export default function EvaluacionesDashboard() {
 
   if (isStatsLoading || isRecentLoading) {
     return (
-      <AdminLayout>
-        <div className="container mx-auto p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Dashboard de Evaluaciones</h1>
-            <p className="text-muted-foreground">
-              Gestión centralizada del sistema de evaluaciones
-            </p>
-          </div>
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          </div>
+      <DashboardLayout 
+        icon={BarChart3}
+        title="Evaluaciones"
+        subtitle="Gestión centralizada del sistema de evaluaciones"
+        backgroundColor="#ef4444"
+      >
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
   if (isStatsError || isRecentError) {
     return (
-      <AdminLayout>
-        <div className="container mx-auto p-6">
-          <Card className="mt-6">
-            <CardContent>
-              <div className="text-center py-8">
-                <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <h2 className="text-lg font-medium mb-2">Error al cargar estadísticas</h2>
-                <p className="text-gray-500 mb-4">Ha ocurrido un error al intentar obtener los datos. Por favor, intenta nuevamente.</p>
-                <Button onClick={() => { refetchStats(); refetchRecent(); }}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Reintentar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
+      <DashboardLayout 
+        icon={BarChart3}
+        title="Evaluaciones"
+        subtitle="Gestión centralizada del sistema de evaluaciones"
+        backgroundColor="#ef4444"
+      >
+        <Card className="mt-6">
+          <CardContent>
+            <div className="text-center py-8">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-lg font-medium mb-2">Error al cargar estadísticas</h2>
+              <p className="text-gray-500 mb-4">Ha ocurrido un error al intentar obtener los datos. Por favor, intenta nuevamente.</p>
+              <Button onClick={() => { refetchStats(); refetchRecent(); }}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Reintentar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">Dashboard de Evaluaciones</h1>
-            <p className="text-muted-foreground">
-              Gestión centralizada del sistema de evaluaciones
-            </p>
-          </div>
+    <DashboardLayout 
+      icon={BarChart3}
+      title="Evaluaciones"
+      subtitle="Gestión centralizada del sistema de evaluaciones"
+      backgroundColor="#ef4444"
+    >
+      <div className="space-y-6">
+        <div className="flex items-center justify-end">
           <Button onClick={() => { refetchStats(); refetchRecent(); }}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualizar datos
@@ -426,6 +425,6 @@ export default function EvaluacionesDashboard() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 }
