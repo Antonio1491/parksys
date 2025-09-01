@@ -26,6 +26,7 @@ import evaluacionesRoutes from "./evaluaciones-routes";
 const app = express();
 
 // ===== DEPLOYMENT HEALTH CHECK - ABSOLUTE PRIORITY =====
+// Health checks MUST be first, before ANY middleware or routes
 app.get('/', (req: Request, res: Response) => {
   console.log('🏥 Root health check accessed:', {
     userAgent: req.get('User-Agent'),
@@ -34,22 +35,32 @@ app.get('/', (req: Request, res: Response) => {
     path: req.path,
     timestamp: new Date().toISOString()
   });
-  res.status(200).send('OK');
+  res.setHeader('Content-Type', 'text/plain');
+  res.status(200).end('OK');
 });
 
 app.get('/health', (req: Request, res: Response) => {
   console.log('🏥 Health endpoint accessed');
-  res.status(200).send('OK');
+  res.setHeader('Content-Type', 'text/plain');
+  res.status(200).end('OK');
 });
 
 app.get('/healthz', (req: Request, res: Response) => {
   console.log('🏥 Healthz endpoint accessed');
-  res.status(200).send('OK');
+  res.setHeader('Content-Type', 'text/plain');
+  res.status(200).end('OK');
 });
 
 app.get('/ping', (req: Request, res: Response) => {
   console.log('🏥 Ping endpoint accessed');
-  res.status(200).send('OK');
+  res.setHeader('Content-Type', 'text/plain');
+  res.status(200).end('OK');
+});
+
+app.get('/ready', (req: Request, res: Response) => {
+  console.log('🏥 Ready endpoint accessed');
+  res.setHeader('Content-Type', 'text/plain');
+  res.status(200).end('OK');
 });
 
 // ===== ENDPOINT CRÍTICO MÁXIMA PRIORIDAD - ANTES DE TODO MIDDLEWARE =====
@@ -2081,6 +2092,26 @@ async function initializeDatabaseAsync() {
     }
   }
 
+  // Configure production static file serving BEFORE server startup
+  if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT_ID) {
+    console.log("🏭 Production mode detected - Static file serving enabled");
+    app.use(express.static(path.join(process.cwd(), 'public')));
+    
+    // Fallback for production SPA routing (AFTER all API routes)
+    app.get('*', (req, res) => {
+      if (!req.path.startsWith('/api/')) {
+        const indexPath = path.join(process.cwd(), 'public', 'index.html');
+        if (fs.existsSync(indexPath)) {
+          res.sendFile(indexPath);
+        } else {
+          res.status(404).send('Application not built. Please run npm run build first.');
+        }
+      } else {
+        res.status(404).json({ error: 'API endpoint not found' });
+      }
+    });
+  }
+
   // Error handling middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -2095,7 +2126,7 @@ async function initializeDatabaseAsync() {
   
   console.log(`🚀 Starting server on ${HOST}:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
 
-  // START SERVER - after Vite is configured
+  // START SERVER - after all configuration is complete
   appServer = app.listen(PORT, HOST, () => {
     console.log(`✅ Server listening on ${HOST}:${PORT} - Health checks ready`);
     console.log(`🏥 Health endpoints available at /, /health, /healthz, /ping`);
@@ -2107,26 +2138,6 @@ async function initializeDatabaseAsync() {
       });
     }, 50);
   });
-
-  // Configure production static file serving if needed
-  if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT_ID) {
-    console.log("🏭 Production mode detected - Static file serving enabled");
-    app.use(express.static(path.join(process.cwd(), 'public')));
-    
-    // Fallback for production SPA routing
-    app.get('*', (req, res) => {
-      if (!req.path.startsWith('/api/')) {
-        const indexPath = path.join(process.cwd(), 'public', 'index.html');
-        if (fs.existsSync(indexPath)) {
-          res.sendFile(indexPath);
-        } else {
-          res.status(404).send('Application not built. Please run npm run build first.');
-        }
-      } else {
-        res.status(404).json({ error: 'API endpoint not found' });
-      }
-    });
-  }
 
   // Ensure graceful shutdown
   process.on('SIGTERM', () => {
