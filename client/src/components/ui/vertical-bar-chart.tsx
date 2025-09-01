@@ -75,44 +75,45 @@ export default function VerticalBarChart({
             const heightPercentage = maxValue > 0 ? (item.value / maxValue) * 100 : 0;
             const barColor = getBarColor(item.value, maxValue);
           
-          return (
-            <div key={item.id || index} className="flex flex-col items-center relative min-w-[24px] flex-shrink-0">
-              {/* Valor del conteo arriba */}
-              <div className="mb-2 text-center min-h-[40px] flex items-end justify-center">
-                <div className="text-sm font-medium text-gray-700">
-                  {formatValue ? formatValue(item.value, item) : item.value}
-                </div>
-              </div>
-
-              {/* Columna vertical */}
-              <div className={`relative ${height} ${barWidth} flex flex-col justify-end`}>
-                {/* Fondo de la columna */}
-                <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
-                
-                {/* Relleno de la columna según cantidad */}
-                <div
-                  className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
-                  style={{
-                    height: `${Math.max(heightPercentage, minBarHeightPercentage)}%`,
-                    backgroundColor: barColor,
-                    borderColor: barColor,
-                  }}
-                ></div>
-              </div>
-
-              {/* Etiqueta del elemento a la izquierda de la columna - VERTICAL */}
-              {showLabels && (
-                <div className="absolute bottom-32 -left-32 transform -rotate-90 origin-bottom-right w-32 overflow-visible">
-                  <div className="text-xs text-gray-700 whitespace-nowrap">
-                    {item.label}
+            return (
+              <div key={item.id || index} className="flex flex-col items-center relative min-w-[24px] flex-shrink-0">
+                {/* Valor del conteo arriba */}
+                <div className="mb-2 text-center min-h-[40px] flex items-end justify-center">
+                  <div className="text-sm font-medium text-gray-700">
+                    {formatValue ? formatValue(item.value, item) : item.value}
                   </div>
                 </div>
-              )}
-            </div>
-          );
-        })}
+
+                {/* Columna vertical */}
+                <div className={`relative ${height} ${barWidth} flex flex-col justify-end`}>
+                  {/* Fondo de la columna */}
+                  <div className="absolute bottom-0 w-full h-full bg-gray-200 rounded-t-3xl border border-gray-300"></div>
+                
+                  {/* Relleno de la columna según cantidad */}
+                  <div
+                    className="absolute bottom-0 w-full rounded-t-3xl transition-all duration-700 border border-opacity-20"
+                    style={{
+                      height: `${Math.max(heightPercentage, minBarHeightPercentage)}%`,
+                      backgroundColor: barColor,
+                      borderColor: barColor,
+                    }}
+                  ></div>
+                </div>
+
+                {/* Etiqueta del elemento a la izquierda de la columna - VERTICAL */}
+                {showLabels && (
+                  <div className="absolute bottom-32 -left-32 transform -rotate-90 origin-bottom-right w-32 overflow-visible">
+                    <div className="text-xs text-gray-700 whitespace-nowrap">
+                      {item.label}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-      
+
       {/* Footer opcional */}
       {footerText && data.length > 0 && (
         <div className="mt-2 text-center">

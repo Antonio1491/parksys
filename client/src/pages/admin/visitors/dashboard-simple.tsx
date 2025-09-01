@@ -40,6 +40,22 @@ export default function VisitorsDashboardSimple() {
 
   const totalFeedback = Array.isArray(feedbackData) ? feedbackData.length : 0;
 
+  // Calcular grupo demográfico dominante
+  const adults = Array.isArray(visitorData) ? visitorData.reduce((sum, record) => sum + (record.adults || 0), 0) : 0;
+  const children = Array.isArray(visitorData) ? visitorData.reduce((sum, record) => sum + (record.children || 0), 0) : 0;
+  const seniors = Array.isArray(visitorData) ? visitorData.reduce((sum, record) => sum + (record.seniors || 0), 0) : 0;
+  
+  const demographicGroups = [
+    { name: 'Adultos', count: adults, color: '#00a587' },
+    { name: 'Niños', count: children, color: '#00d4aa' },
+    { name: 'Adultos Mayores', count: seniors, color: '#067f5f' }
+  ];
+  
+  const dominantGroup = demographicGroups.reduce((max, group) => 
+    group.count > max.count ? group : max, demographicGroups[0]);
+  
+  const dominantPercentage = totalVisitors > 0 ? (dominantGroup.count / totalVisitors) * 100 : 0;
+
   // Datos para gráficas - Visitantes por método
   const methodData = Array.isArray(visitorData) ? visitorData.reduce((acc, record) => {
     const method = record.countingMethod || 'Directo';
@@ -154,6 +170,25 @@ export default function VisitorsDashboardSimple() {
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{totalVisitors.toLocaleString()}</div>
               <p className="text-xs text-gray-500 mt-1">Registros históricos</p>
+              
+              {/* Barra de progreso del grupo dominante */}
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600">Grupo dominante: {dominantGroup.name}</span>
+                  <span className="font-medium" style={{ color: dominantGroup.color }}>
+                    {dominantPercentage.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="h-2 rounded-full transition-all duration-300 ease-in-out"
+                    style={{ 
+                      width: `${dominantPercentage}%`,
+                      backgroundColor: dominantGroup.color 
+                    }}
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
