@@ -117,7 +117,7 @@ export function ExportButton({
             {isExporting ? 'Exportando...' : 'Exportar'}
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-full mx-4">
           <DialogHeader>
             <DialogTitle>Configurar Exportación</DialogTitle>
             <DialogDescription>
@@ -144,7 +144,7 @@ export function ExportButton({
           size="sm"
           onClick={() => handleQuickExport(supportedFormats[0])}
           disabled={disabled || isExporting}
-          className="ml-1"
+          className="ml-1 shrink-0"
           title={`Exportación rápida ${formatLabels[supportedFormats[0] as keyof typeof formatLabels]}`}
         >
           {React.createElement(formatIcons[supportedFormats[0] as keyof typeof formatIcons], {

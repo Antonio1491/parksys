@@ -548,8 +548,7 @@ const AdminParksContent = () => {
           backgroundColor="#14b8a6"
           actions={[
             <ExportButton
-              entity="parks" 
-              variant="dropdown"
+              entity="parks"
             />,
             <Button variant="outline" onClick={() => window.location.href = "/admin/parks-import"}>
               <Upload className="h-4 w-4 mr-2" />
