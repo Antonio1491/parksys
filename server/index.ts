@@ -27,40 +27,56 @@ const app = express();
 
 // ===== DEPLOYMENT HEALTH CHECK - ABSOLUTE PRIORITY =====
 // Health checks MUST be first, before ANY middleware or routes
+// Optimized for Cloud Run / GCP deployment requirements
 app.get('/', (req: Request, res: Response) => {
-  console.log('🏥 Root health check accessed:', {
-    userAgent: req.get('User-Agent'),
-    accept: req.get('Accept'),
-    method: req.method,
-    path: req.path,
-    timestamp: new Date().toISOString()
+  // Immediate response - no logging delays during deployment
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Content-Length': '2'
   });
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200).end('OK');
+  res.end('OK');
+  
+  // Log after response (non-blocking)
+  process.nextTick(() => {
+    console.log(`🏥 [${new Date().toISOString()}] Root health check - ${req.get('User-Agent') || 'unknown'}`);
+  });
 });
 
 app.get('/health', (req: Request, res: Response) => {
-  console.log('🏥 Health endpoint accessed');
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200).end('OK');
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+    'Content-Length': '2'
+  });
+  res.end('OK');
+  process.nextTick(() => console.log('🏥 Health endpoint accessed'));
 });
 
 app.get('/healthz', (req: Request, res: Response) => {
-  console.log('🏥 Healthz endpoint accessed');
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200).end('OK');
+  res.writeHead(200, {
+    'Content-Type': 'text/plain', 
+    'Content-Length': '2'
+  });
+  res.end('OK');
+  process.nextTick(() => console.log('🏥 Healthz endpoint accessed'));
 });
 
 app.get('/ping', (req: Request, res: Response) => {
-  console.log('🏥 Ping endpoint accessed');
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200).end('OK');
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+    'Content-Length': '4'
+  });
+  res.end('pong');
+  process.nextTick(() => console.log('🏥 Ping endpoint accessed'));
 });
 
 app.get('/ready', (req: Request, res: Response) => {
-  console.log('🏥 Ready endpoint accessed');
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200).end('OK');
+  res.writeHead(200, {
+    'Content-Type': 'application/json',
+    'Content-Length': '15'
+  });
+  res.end('{"status":"ok"}');
+  process.nextTick(() => console.log('🏥 Ready endpoint accessed'));
 });
 
 // ===== ENDPOINT CRÍTICO MÁXIMA PRIORIDAD - ANTES DE TODO MIDDLEWARE =====
@@ -2129,14 +2145,46 @@ async function initializeDatabaseAsync() {
   // START SERVER - after all configuration is complete
   appServer = app.listen(PORT, HOST, () => {
     console.log(`✅ Server listening on ${HOST}:${PORT} - Health checks ready`);
-    console.log(`🏥 Health endpoints available at /, /health, /healthz, /ping`);
+    console.log(`🏥 Health endpoints available at /, /health, /healthz, /ping, /ready`);
+    console.log(`🚀 [DEPLOYMENT] Server ready for health checks - Timestamp: ${new Date().toISOString()}`);
+    
+    // Test health endpoint immediately after server start
+    setTimeout(async () => {
+      try {
+        const http = await import('http');
+        const options = {
+          hostname: 'localhost',
+          port: PORT,
+          path: '/',
+          method: 'GET',
+          timeout: 1000
+        };
+        
+        const req = http.default.request(options, (res: any) => {
+          console.log(`🏥 [SELF-TEST] Health check response: ${res.statusCode}`);
+        });
+        
+        req.on('error', (err: any) => {
+          console.log(`⚠️ [SELF-TEST] Health check error: ${err.message}`);
+        });
+        
+        req.on('timeout', () => {
+          console.log(`⚠️ [SELF-TEST] Health check timeout`);
+          req.destroy();
+        });
+        
+        req.end();
+      } catch (error) {
+        console.log(`⚠️ [SELF-TEST] Could not perform self-test: ${error}`);
+      }
+    }, 100);
     
     // Initialize database asynchronously after server is listening
     setTimeout(() => {
       initializeDatabaseAsync().catch(error => {
         console.error("❌ Database initialization error (non-critical):", error);
       });
-    }, 50);
+    }, 200);
   });
 
   // Ensure graceful shutdown
