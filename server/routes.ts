@@ -28,6 +28,7 @@ import { registerAssetAssignmentRoutes } from "./asset_assignment_routes";
 import { registerSpaceReservationRoutes } from "./space-reservations-routes";
 import { registerReservableSpacesRoutes } from "./reservable-spaces-routes";
 import { ObjectStorageService } from "./objectStorage";
+import { registerObjectStorageRoutes } from "./objectStorageRoutes";
 import { registerTreeRoutes } from "./tree_routes";
 import { registerTreeMaintenanceRoutes } from "./tree_maintenance_routes";
 import { registerTreeInventoryRoutes } from "./tree_inventory_routes";
@@ -283,6 +284,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerSpaceReservationRoutes(app, apiRouter, isAuthenticated);
   registerReservableSpacesRoutes(app);
   registerSpacePaymentRoutes(app);
+  
+  // Object Storage routes for images and files
+  registerObjectStorageRoutes(app, apiRouter, isAuthenticated);
 
   // Object Storage routes for spaces multimedia (with authentication)
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
