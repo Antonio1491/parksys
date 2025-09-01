@@ -146,7 +146,6 @@ export default function EvaluacionesDashboard() {
         icon={BarChart3}
         title="Evaluaciones"
         subtitle="Gestión centralizada del sistema de evaluaciones"
-        backgroundColor="#ef4444"
       >
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -161,7 +160,6 @@ export default function EvaluacionesDashboard() {
         icon={BarChart3}
         title="Evaluaciones"
         subtitle="Gestión centralizada del sistema de evaluaciones"
-        backgroundColor="#ef4444"
       >
         <Card className="mt-6">
           <CardContent>

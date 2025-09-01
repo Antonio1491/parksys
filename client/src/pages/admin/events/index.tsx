@@ -110,7 +110,6 @@ export default function EventsIndex() {
       icon={Calendar}
       title="Eventos"
       subtitle="Administra eventos, categorías y programación de actividades"
-      backgroundColor="#8b5cf6"
     >
       <div className="space-y-6">
       <div className="flex items-center justify-end">
