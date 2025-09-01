@@ -344,46 +344,6 @@ export default function VisitorsDashboardSimple() {
           </Card>
         </div>
 
-        {/* Resumen ejecutivo */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-blue-600" />
-              Resumen Ejecutivo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-lg font-semibold text-gray-900">Participación Ciudadana</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  {totalFeedback} comentarios registrados
-                </div>
-                <Badge variant="secondary" className="mt-2">
-                  Retroalimentación activa
-                </Badge>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-gray-900">Actividad</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  {totalVisitors.toLocaleString()} visitantes totales
-                </div>
-                <Badge variant="default" className="mt-2">
-                  Alta afluencia
-                </Badge>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-gray-900">Tendencia</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  {last7Days.length > 0 ? last7Days[last7Days.length - 1].visitors : 0} visitantes hoy
-                </div>
-                <Badge variant="outline" className="mt-2">
-                  Última actualización
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </DashboardLayout>
   );
