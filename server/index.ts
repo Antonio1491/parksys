@@ -34,8 +34,23 @@ const healthHeaders = {
 };
 
 app.get('/', (req: Request, res: Response) => {
-  res.writeHead(200, healthHeaders);
-  res.end(healthResponse);
+  // Check if this is a health check request (no Accept header for HTML)
+  const acceptHeader = req.headers.accept || '';
+  const isHealthCheck = !acceptHeader.includes('text/html');
+  
+  if (isHealthCheck) {
+    // Health check response for deployment
+    res.writeHead(200, healthHeaders);
+    res.end(healthResponse);
+  } else {
+    // Serve the React app for browser requests
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(503).send('Application not built. Please run npm run build first.');
+    }
+  }
 });
 
 app.get('/health', (req: Request, res: Response) => {
@@ -1974,9 +1989,9 @@ async function initializeDatabaseAsync() {
   // Health checks must be available immediately for deployment
   console.log("🏥 [DEPLOYMENT] Skipping all heavy initialization - health checks priority");
 
-  // DEFER PRODUCTION CONFIG AND ERROR HANDLING TO BACKGROUND
-  // Only health checks active during startup
-
+  // CRITICAL: Setup static file serving immediately for the app to work
+  app.use(express.static(path.join(process.cwd(), 'public')));
+  console.log("🗂️ [IMMEDIATE] Static files configured");
 
   // Use environment port for deployment compatibility - ensure port 5000
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
