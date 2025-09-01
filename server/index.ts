@@ -68,28 +68,51 @@ app.get('/cloudrun-health', (req, res) => {
   res.end(healthResponse);
 });
 
+// Pre-compute index.html path and existence at startup (not per request)
+const indexPath = path.join(process.cwd(), 'public', 'index.html');
+const indexExists = fs.existsSync(indexPath);
+
 app.get('/', (req: Request, res: Response) => {
-  // ULTRA-OPTIMIZED: Check if this is a health check request
+  // ULTRA-OPTIMIZED: Enhanced health check detection for Cloud Run
   const acceptHeader = req.headers.accept;
   const userAgent = req.headers['user-agent'];
+  const contentType = req.headers['content-type'];
   
-  // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
-  const isHealthCheck = !acceptHeader?.includes('text/html') || 
-    userAgent?.includes('GoogleHC') || 
+  // Comprehensive health check patterns for all deployment platforms
+  const isHealthCheck = 
+    // Standard health check patterns
+    !acceptHeader?.includes('text/html') ||
+    acceptHeader === '*/*' ||
+    acceptHeader === 'text/plain' ||
+    // Cloud Run health check agents
+    userAgent?.includes('GoogleHC') ||
+    userAgent?.includes('Google-Cloud-Functions') ||
+    userAgent?.includes('gcp-health-checker') ||
+    // Kubernetes/container health checks
     userAgent?.includes('kube-probe') ||
+    userAgent?.includes('kubernetes') ||
+    // Load balancer health checks
     userAgent?.includes('ELB-HealthChecker') ||
-    acceptHeader === '*/*';
+    userAgent?.includes('Amazon-Route53') ||
+    // Vercel/deployment health checks
+    userAgent?.includes('vercel') ||
+    userAgent?.includes('deployment-health') ||
+    // Generic health check patterns
+    userAgent === '' ||
+    userAgent === undefined ||
+    // Additional Cloud Run patterns
+    req.url === '/' && !acceptHeader?.includes('html') ||
+    contentType === 'application/x-www-form-urlencoded';
   
   if (isHealthCheck) {
-    // Immediate health check response - no file system operations
+    // Immediate health check response - zero file system operations
     res.writeHead(200, healthHeaders);
     res.end(healthResponse);
     return;
   }
   
-  // Serve the React app for browser requests (only when not health check)
-  const indexPath = path.join(process.cwd(), 'public', 'index.html');
-  if (fs.existsSync(indexPath)) {
+  // Serve React app for browser requests (using pre-computed existence)
+  if (indexExists) {
     res.sendFile(indexPath);
   } else {
     res.status(503).send('Application not built. Please run npm run build first.');
