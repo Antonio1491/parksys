@@ -2019,7 +2019,8 @@ async function initializeDatabaseAsync() {
   }, 30000); // 30 second delay to avoid blocking health checks
 }
 
-(async () => {
+// Main server startup function - DO NOT WRAP IN ASYNC IIFE TO PREVENT PROCESS EXIT
+function startServer() {
   console.log("🚀 [DEPLOYMENT] Iniciando servidor ParkSys con health checks prioritarios...");
 
   // Declare appServer variable at function scope
@@ -2102,17 +2103,17 @@ async function initializeDatabaseAsync() {
     
     // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
     // This ensures health checks can respond immediately during deployment
-    setImmediate(async () => {
-      try {
-        console.log(`🔧 [BACKGROUND] Starting full server initialization...`);
-        
-        // Initialize everything in the background
-        await initializeFullServer();
-        
-        console.log(`✅ [BACKGROUND] Full server initialization complete`);
-      } catch (error) {
-        console.error(`❌ [BACKGROUND] Server initialization error (non-critical):`, error);
-      }
+    setImmediate(() => {
+      console.log(`🔧 [BACKGROUND] Starting full server initialization...`);
+      
+      // Initialize everything in the background without awaiting to prevent blocking
+      initializeFullServer()
+        .then(() => {
+          console.log(`✅ [BACKGROUND] Full server initialization complete`);
+        })
+        .catch((error) => {
+          console.error(`❌ [BACKGROUND] Server initialization error (non-critical):`, error);
+        });
     });
   });
 
@@ -2213,4 +2214,12 @@ async function initializeDatabaseAsync() {
       process.exit(0);
     }
   });
-})();
+}
+
+// Start the server - this ensures the process stays alive
+startServer();
+
+// Keep the process alive with a heartbeat to prevent exit
+setInterval(() => {
+  // Silent heartbeat to keep event loop active
+}, 30000); // 30 seconds
