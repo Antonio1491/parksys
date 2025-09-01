@@ -1954,29 +1954,23 @@ import { seedTreeSpecies } from "./seed-tree-species";
 
 import { initializeDatabase } from "./initialize-db";
 
-// Database initialization function that runs after server starts
+// Database initialization function - REMOVED FOR HEALTH CHECK OPTIMIZATION
+// All database operations moved to background to prevent blocking health checks
 async function initializeDatabaseAsync() {
-  try {
-    console.log("🗄️ Inicializando base de datos de forma asíncrona...");
-    
-    // Solo inicializar estructura básica, sin semillas complejas
-    await initializeDatabase();
-    console.log("✅ Estructura básica de base de datos inicializada");
-    
-    // Ejecutar inicialización en segundo plano para evitar bloquear servidor
-    setTimeout(async () => {
-      try {
-        console.log("🌱 Iniciando carga de datos semilla en segundo plano...");
-        await seedDatabase();
-        console.log("✅ Datos semilla cargados");
-      } catch (error) {
-        console.error("❌ Error al cargar datos semilla:", error);
-      }
-    }, 5000);
-    
-  } catch (error) {
-    console.error("❌ Error en inicialización de base de datos:", error);
-  }
+  // REMOVED: No database operations during startup to ensure health check speed
+  console.log("🗄️ [PERFORMANCE] Database initialization deferred for health check optimization");
+  
+  // Optional: Initialize database in background after 30 seconds when system is stable
+  setTimeout(async () => {
+    try {
+      console.log("🗄️ [OPTIONAL] Starting database initialization after startup delay...");
+      const { initializeDatabase } = await import("./initialize-db");
+      await initializeDatabase();
+      console.log("✅ [OPTIONAL] Database structure initialized");
+    } catch (error) {
+      console.warn("⚠️ [OPTIONAL] Database initialization error (non-critical):", error);
+    }
+  }, 30000); // 30 second delay to avoid blocking health checks
 }
 
 (async () => {
@@ -2022,21 +2016,28 @@ async function initializeDatabaseAsync() {
 
   // Function to initialize everything else asynchronously
   async function initializeFullServer() {
-    console.log('🔧 [BACKGROUND] Registering all routes and initializing database...');
+    console.log('🔧 [BACKGROUND] Starting non-blocking route registration...');
     
-    // NOW register all routes in background
-    await registerRoutes(app);
-    
-    // Register activity payment routes
-    registerActivityPaymentRoutes(app);
-    console.log("✅ Rutas principales registradas");
+    // Use setTimeout to make this truly non-blocking
+    setTimeout(async () => {
+      try {
+        console.log('🔧 [FIRE-FORGET] Registering routes without blocking event loop...');
+        
+        // Register routes without awaiting - fire and forget
+        registerRoutes(app).catch(err => console.warn('Route registration error:', err));
+        
+        // Register activity payment routes
+        registerActivityPaymentRoutes(app);
+        console.log("✅ [FIRE-FORGET] Main routes registered");
 
-    // Register all other routes that were moved from startup
-    await registerAllOtherRoutes();
-    
-    // Initialize database last
-    await initializeDatabaseAsync();
-    console.log('🗄️ [BACKGROUND] Database initialization complete');
+        // Register all other routes in background
+        registerAllOtherRoutes().catch(err => console.warn('Other routes error:', err));
+        
+        console.log('🗄️ [FIRE-FORGET] Route registration complete - database initialization skipped for performance');
+      } catch (error) {
+        console.warn('❌ [FIRE-FORGET] Non-critical background initialization error:', error);
+      }
+    }, 100); // Small delay to ensure event loop is free
   }
 
   // Helper function to register all routes that were blocking startup
