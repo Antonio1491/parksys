@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 import { 
   Mail, 
   Send, 
@@ -15,17 +15,12 @@ import {
 
 const CommunicationsPage: React.FC = () => {
   return (
-    <AdminLayout>
+    <DashboardLayout 
+      icon={MessageSquare}
+      title="Comunicaciones"
+      subtitle="Panel de control para gestión de comunicaciones y campañas"
+    >
       <div className="space-y-6">
-
-        {/* Header con título */}
-        <Card className="p-4 bg-gray-50">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-8 h-8 text-gray-900" />
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard de Comunicaciones</h1>
-          </div>
-          <p className="text-gray-600 mt-2">Panel de control para gestión de comunicaciones y campañas</p>
-        </Card>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-4 gap-6">
@@ -126,7 +121,7 @@ const CommunicationsPage: React.FC = () => {
           </Card>
         </div>
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 };
 
