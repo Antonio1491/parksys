@@ -129,12 +129,12 @@ router.get('/dashboard-metrics', async (req, res) => {
     const feedbackMetrics = await db
       .select({
         total: sql<number>`COUNT(*)`,
-        pending: sql<number>`SUM(CASE WHEN ${feedback.status} = 'pending' THEN 1 ELSE 0 END)`,
-        resolved: sql<number>`SUM(CASE WHEN ${feedback.status} = 'resolved' THEN 1 ELSE 0 END)`,
-        shareCount: sql<number>`SUM(CASE WHEN ${feedback.formType} = 'share' THEN 1 ELSE 0 END)`,
-        problemCount: sql<number>`SUM(CASE WHEN ${feedback.formType} = 'report_problem' THEN 1 ELSE 0 END)`,
-        improvementCount: sql<number>`SUM(CASE WHEN ${feedback.formType} = 'suggest_improvement' THEN 1 ELSE 0 END)`,
-        eventCount: sql<number>`SUM(CASE WHEN ${feedback.formType} = 'propose_event' THEN 1 ELSE 0 END)`
+        pending: sql<number>`SUM(CASE WHEN ${parkFeedback.status} = 'pending' THEN 1 ELSE 0 END)`,
+        resolved: sql<number>`SUM(CASE WHEN ${parkFeedback.status} = 'resolved' THEN 1 ELSE 0 END)`,
+        shareCount: sql<number>`SUM(CASE WHEN ${parkFeedback.formType} = 'share' THEN 1 ELSE 0 END)`,
+        problemCount: sql<number>`SUM(CASE WHEN ${parkFeedback.formType} = 'report_problem' THEN 1 ELSE 0 END)`,
+        improvementCount: sql<number>`SUM(CASE WHEN ${parkFeedback.formType} = 'suggest_improvement' THEN 1 ELSE 0 END)`,
+        eventCount: sql<number>`SUM(CASE WHEN ${parkFeedback.formType} = 'propose_event' THEN 1 ELSE 0 END)`
       })
       .from(parkFeedback)
       .where(and(...feedbackConditions));
@@ -255,8 +255,8 @@ router.get('/parks-performance', async (req, res) => {
         visitors: sql<number>`COALESCE(SUM(${visitorCounts.adults} + ${visitorCounts.children} + ${visitorCounts.seniors}), 0)`,
         evaluations: sql<number>`COUNT(DISTINCT ${parkEvaluations.id})`,
         avgRating: sql<number>`COALESCE(AVG(${parkEvaluations.overallRating}), 0)`,
-        feedback: sql<number>`COUNT(DISTINCT ${feedback.id})`,
-        pendingFeedback: sql<number>`SUM(CASE WHEN ${feedback.status} = 'pending' THEN 1 ELSE 0 END)`
+        feedback: sql<number>`COUNT(DISTINCT ${parkFeedback.id})`,
+        pendingFeedback: sql<number>`SUM(CASE WHEN ${parkFeedback.status} = 'pending' THEN 1 ELSE 0 END)`
       })
       .from(parks)
       .leftJoin(visitorCounts, and(
@@ -267,9 +267,9 @@ router.get('/parks-performance', async (req, res) => {
         eq(parks.id, parkEvaluations.parkId),
         gte(parkEvaluations.createdAt, dateFilter)
       ))
-      .leftJoin(feedback, and(
+      .leftJoin(parkFeedback, and(
         eq(parks.id, parkFeedback.parkId),
-        gte(parkFeedback.createdAt, dateFilter)
+        gte(parkFeedback.createdAt, sql`${dateFilter}::timestamp`)
       ))
       .groupBy(parks.id, parks.name)
       .orderBy(desc(sql<number>`COALESCE(SUM(${visitorCounts.adults} + ${visitorCounts.children} + ${visitorCounts.seniors}), 0)`));
@@ -330,7 +330,7 @@ router.get('/trends', async (req, res) => {
     // Obtener datos usando Drizzle ORM
     const visitorData = await db.select({
       date: visitorCounts.date,
-      visitors: sql<number>`sum(${visitorCounts.count})::int`
+      visitors: sql<number>`sum(${visitorCounts.adults} + ${visitorCounts.children} + ${visitorCounts.seniors})::int`
     })
     .from(visitorCounts)
     .where(and(...visitorConditions))
@@ -389,6 +389,98 @@ router.get('/trends', async (req, res) => {
     res.json({ trends });
   } catch (error) {
     console.error('❌ Error obteniendo datos de tendencias:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Obtener datos de visitantes mensuales por parque
+router.get('/monthly-by-park', async (req, res) => {
+  try {
+    const { months = 12 } = req.query; // Número de meses hacia atrás a mostrar
+    
+    const currentDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(currentDate.getMonth() - parseInt(months as string));
+    
+    // Obtener todos los parques
+    const allParks = await db.select({
+      id: parks.id,
+      name: parks.name
+    })
+    .from(parks)
+    .orderBy(parks.name);
+    
+    // Obtener datos de visitantes agrupados por mes y parque
+    const visitorData = await db
+      .select({
+        parkId: visitorCounts.parkId,
+        parkName: parks.name,
+        month: sql<string>`TO_CHAR(${visitorCounts.date}, 'YYYY-MM')`,
+        monthName: sql<string>`TO_CHAR(${visitorCounts.date}, 'FMMonth YYYY')`,
+        totalVisitors: sql<number>`SUM(${visitorCounts.adults} + ${visitorCounts.children} + ${visitorCounts.seniors})`
+      })
+      .from(visitorCounts)
+      .innerJoin(parks, eq(parks.id, visitorCounts.parkId))
+      .where(gte(visitorCounts.date, startDate.toISOString().split('T')[0]))
+      .groupBy(visitorCounts.parkId, parks.name, sql`TO_CHAR(${visitorCounts.date}, 'YYYY-MM')`, sql`TO_CHAR(${visitorCounts.date}, 'FMMonth YYYY')`)
+      .orderBy(sql`TO_CHAR(${visitorCounts.date}, 'YYYY-MM')`, parks.name);
+
+    // Crear estructura de datos para el gráfico
+    const monthsMap = new Map();
+    const parkColors = ['#00a587', '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5', '#ecfdf5', '#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe', '#eff6ff'];
+    
+    // Inicializar meses
+    for (let i = parseInt(months as string) - 1; i >= 0; i--) {
+      const monthDate = new Date();
+      monthDate.setMonth(currentDate.getMonth() - i);
+      const monthKey = monthDate.toISOString().substring(0, 7); // YYYY-MM
+      const monthName = monthDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      
+      const monthData: any = { 
+        month: monthKey, 
+        monthName: monthName.charAt(0).toUpperCase() + monthName.slice(1)
+      };
+      
+      // Inicializar todos los parques con 0 visitantes
+      allParks.forEach(park => {
+        monthData[`park_${park.id}`] = 0;
+      });
+      
+      monthsMap.set(monthKey, monthData);
+    }
+    
+    // Llenar con datos reales
+    visitorData.forEach(row => {
+      const monthData = monthsMap.get(row.month);
+      if (monthData) {
+        monthData[`park_${row.parkId}`] = row.totalVisitors;
+      }
+    });
+    
+    const chartData = Array.from(monthsMap.values());
+    
+    // Preparar configuración de parques para el gráfico
+    const parkConfig = allParks.map((park, index) => ({
+      id: park.id,
+      name: park.name,
+      dataKey: `park_${park.id}`,
+      color: parkColors[index % parkColors.length]
+    }));
+
+    console.log('📊 [MONTHLY BY PARK] Datos mensuales por parque obtenidos:', {
+      chartDataLength: chartData.length,
+      parksCount: parkConfig.length,
+      months: parseInt(months as string)
+    });
+
+    res.json({ 
+      chartData, 
+      parkConfig,
+      totalParks: allParks.length,
+      monthsShown: parseInt(months as string)
+    });
+  } catch (error) {
+    console.error('❌ Error obteniendo datos mensuales por parque:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });

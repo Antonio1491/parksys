@@ -1444,6 +1444,9 @@ app.use('/api/fauna', faunaRoutes);
 // Registrar las rutas de conteo de visitantes
 app.use('/api', visitorCountRoutes);
 
+// Registrar las rutas del dashboard de visitantes
+app.use('/api/visitors', visitorsDashboardRoutes);
+
 // Registrar las rutas de evaluaciones (DESPUÉS del endpoint directo)
 app.use(evaluacionesRoutes);
 console.log("📊 Rutas del módulo de evaluaciones registradas correctamente");
@@ -2097,6 +2100,22 @@ async function initializeDatabaseAsync() {
       
       // Register all other routes that were causing startup delays...
       console.log("✅ [BACKGROUND] All routes registered successfully");
+      
+      // Setup frontend serving for React SPA
+      const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+      if (isProduction) {
+        // Use serveStatic for production with built assets
+        const { serveStatic } = await import("./vite");
+        serveStatic(app);
+        console.log("🎨 [FRONTEND] Production static serving enabled");
+      } else {
+        // Use setupVite for development with hot reloading
+        const { setupVite } = await import("./vite");
+        const http = await import("http");
+        const server = http.createServer(app);
+        await setupVite(app, server);
+        console.log("🎨 [FRONTEND] Development Vite serving enabled");
+      }
     } catch (error) {
       console.error("❌ [BACKGROUND] Error registering routes:", error);
     }

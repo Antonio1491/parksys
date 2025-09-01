@@ -141,6 +141,12 @@ export default function VisitorsDashboard() {
     retry: 1
   });
 
+  // Fetch monthly visitor data by park
+  const { data: monthlyByParkData, isLoading: isMonthlyLoading } = useQuery({
+    queryKey: ['/api/visitors/monthly-by-park', { months: 12 }],
+    retry: 1
+  });
+
   const parks = (parksData as any)?.data || [];
   const metrics: DashboardMetrics = (dashboardData as any)?.metrics || {
     visitors: { total: 0, thisMonth: 0, lastMonth: 0, avgDaily: 0, uniqueParks: 0, totalRecords: 0 },
@@ -152,6 +158,7 @@ export default function VisitorsDashboard() {
     queryClient.invalidateQueries({ queryKey: ['/api/visitors/dashboard-metrics'] });
     queryClient.invalidateQueries({ queryKey: ['/api/visitors/parks-performance'] });
     queryClient.invalidateQueries({ queryKey: ['/api/visitors/trends'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/visitors/monthly-by-park'] });
     toast({
       title: "Datos actualizados",
       description: "El dashboard se ha actualizado con los datos más recientes"
@@ -413,8 +420,59 @@ export default function VisitorsDashboard() {
           </CardContent>
         </Card>
 
+        {/* Visitantes Mensuales por Parque */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Visitantes Mensuales por Parque (Últimos 12 Meses)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isMonthlyLoading ? (
+              <div className="h-96 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00a587]"></div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={(monthlyByParkData as any)?.chartData || []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="monthName" 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={100}
+                    fontSize={12}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value: number, name: string) => {
+                      const parkConfig = (monthlyByParkData as any)?.parkConfig || [];
+                      const park = parkConfig.find((p: any) => p.dataKey === name);
+                      return [formatNumber(value), park?.name || name];
+                    }}
+                  />
+                  <Legend 
+                    wrapperStyle={{ paddingTop: '20px' }}
+                    formatter={(value: string) => {
+                      const parkConfig = (monthlyByParkData as any)?.parkConfig || [];
+                      const park = parkConfig.find((p: any) => p.dataKey === value);
+                      return park?.name || value;
+                    }}
+                  />
+                  {((monthlyByParkData as any)?.parkConfig || []).map((parkConf: any) => (
+                    <Bar 
+                      key={parkConf.dataKey}
+                      dataKey={parkConf.dataKey} 
+                      stackId="visitors"
+                      fill={parkConf.color}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Rendimiento por parques */}
-        <Card>
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Rendimiento por Parques</CardTitle>
           </CardHeader>
