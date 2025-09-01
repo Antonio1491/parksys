@@ -2167,9 +2167,8 @@ async function initializeDatabaseAsync() {
       } else {
         // Use setupVite for development with hot reloading
         const { setupVite } = await import("./vite");
-        const http = await import("http");
-        const server = http.createServer(app);
-        await setupVite(app, server);
+        // Use the existing appServer instead of creating a new one
+        await setupVite(app, appServer);
         console.log("🎨 [FRONTEND] Development Vite serving enabled");
       }
     } catch (error) {
@@ -2177,14 +2176,41 @@ async function initializeDatabaseAsync() {
     }
   }
 
-  // Ensure graceful shutdown
+  // Add process safety handlers to prevent unexpected exits
+  process.on('uncaughtException', (error) => {
+    console.error('🚨 [PROCESS] Uncaught Exception:', error);
+    console.error('🚨 [PROCESS] Server will continue running...');
+    // Don't exit - keep server running for deployment health checks
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('🚨 [PROCESS] Unhandled Promise Rejection at:', promise, 'reason:', reason);
+    console.error('🚨 [PROCESS] Server will continue running...');
+    // Don't exit - keep server running for deployment health checks
+  });
+
+  // Ensure graceful shutdown only on explicit termination signals
   process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
+    console.log('🛑 [DEPLOYMENT] SIGTERM received, shutting down gracefully');
     if (appServer) {
       appServer.close(() => {
-        console.log('Process terminated');
+        console.log('✅ [DEPLOYMENT] Process terminated gracefully');
         process.exit(0);
       });
+    } else {
+      process.exit(0);
+    }
+  });
+
+  process.on('SIGINT', () => {
+    console.log('🛑 [DEPLOYMENT] SIGINT received, shutting down gracefully');  
+    if (appServer) {
+      appServer.close(() => {
+        console.log('✅ [DEPLOYMENT] Process terminated gracefully');
+        process.exit(0);
+      });
+    } else {
+      process.exit(0);
     }
   });
 })();
