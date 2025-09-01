@@ -82,6 +82,24 @@ export default function VisitorsDashboardSimple() {
   }).reduce((sum, record) => 
     sum + (record.adults || 0) + (record.children || 0) + (record.seniors || 0), 0) : 0;
 
+  // Calcular el parque con más visitantes de la semana
+  const weeklyParkVisitors = Array.isArray(visitorData) ? visitorData.filter(record => {
+    if (!record.date) return false;
+    const recordDate = new Date(record.date);
+    return recordDate >= weekStart && recordDate <= weekEnd;
+  }).reduce((acc, record) => {
+    const parkName = record.parkName || 'Parque Desconocido';
+    const visitors = (record.adults || 0) + (record.children || 0) + (record.seniors || 0);
+    acc[parkName] = (acc[parkName] || 0) + visitors;
+    return acc;
+  }, {} as Record<string, number>) : {};
+
+  const topWeeklyPark = Object.entries(weeklyParkVisitors).length > 0 
+    ? Object.entries(weeklyParkVisitors).reduce((max, [parkName, visitors]) => 
+        visitors > max.visitors ? { name: parkName, visitors } : max, 
+        { name: '', visitors: 0 })
+    : { name: 'Sin datos', visitors: 0 };
+
   // Datos para gráficas - Visitantes por método
   const methodData = Array.isArray(visitorData) ? visitorData.reduce((acc, record) => {
     const method = record.countingMethod || 'Directo';
@@ -228,6 +246,19 @@ export default function VisitorsDashboardSimple() {
               <p className="text-xs text-gray-500 mt-1">
                 Semana actual ({weekStart.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} - {weekEnd.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})
               </p>
+              {topWeeklyPark.visitors > 0 && (
+                <div className="mt-2 pt-2 border-t border-gray-200">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-600">Parque líder:</span>
+                    <span className="font-medium text-orange-700">
+                      {topWeeklyPark.name}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {topWeeklyPark.visitors.toLocaleString()} visitantes
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
