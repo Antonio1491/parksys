@@ -112,13 +112,23 @@ export function ExportButton({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size={size} disabled={disabled || isExporting} className={className}>
+          <Button 
+            variant="outline" 
+            size={size} 
+            disabled={disabled || isExporting} 
+            className={`${className} border-0 shadow-none hover:shadow-none focus:shadow-none`}
+          >
             <Download className="mr-2 h-4 w-4" />
             {isExporting ? 'Exportando...' : 'Exportar'}
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent 
+          align="end" 
+          className="w-56 max-w-[calc(100vw-2rem)]"
+          sideOffset={4}
+          collisionPadding={16}
+        >
           {supportedFormats.map((format) => {
             const Icon = formatIcons[format as keyof typeof formatIcons];
             return (
