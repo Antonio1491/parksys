@@ -25,6 +25,33 @@ import evaluacionesRoutes from "./evaluaciones-routes";
 
 const app = express();
 
+// ===== DEPLOYMENT HEALTH CHECK - ABSOLUTE PRIORITY =====
+app.get('/', (req: Request, res: Response) => {
+  console.log('🏥 Root health check accessed:', {
+    userAgent: req.get('User-Agent'),
+    accept: req.get('Accept'),
+    method: req.method,
+    path: req.path,
+    timestamp: new Date().toISOString()
+  });
+  res.status(200).send('OK');
+});
+
+app.get('/health', (req: Request, res: Response) => {
+  console.log('🏥 Health endpoint accessed');
+  res.status(200).send('OK');
+});
+
+app.get('/healthz', (req: Request, res: Response) => {
+  console.log('🏥 Healthz endpoint accessed');
+  res.status(200).send('OK');
+});
+
+app.get('/ping', (req: Request, res: Response) => {
+  console.log('🏥 Ping endpoint accessed');
+  res.status(200).send('OK');
+});
+
 // ===== ENDPOINT CRÍTICO MÁXIMA PRIORIDAD - ANTES DE TODO MIDDLEWARE =====
 app.put('/api/evaluations/parks/:id', (req, res) => {
   console.log(`🚨 [ULTRA-PRIORITY] Endpoint capturado ANTES de middleware!`);
@@ -107,31 +134,7 @@ app.put('/api/evaluations/parks/:id', (req, res) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Simplified health check middleware - optimized for fast deployment health checks
-app.use((req: Request, res: Response, next: NextFunction) => {
-  // Fast health check endpoints
-  if (req.path === '/health' || req.path === '/healthz' || req.path === '/ping') {
-    return res.status(200).send('OK');
-  }
-  
-  // Root path health check for deployment services (simple and fast)
-  if (req.path === '/') {
-    const userAgent = req.get('User-Agent') || '';
-    const acceptsHtml = req.get('Accept')?.includes('text/html');
-    
-    // If accepts HTML and not a known health checker, let frontend handle it
-    if (acceptsHtml && !userAgent.includes('GoogleHC') && !userAgent.includes('Cloud Run') && !userAgent.includes('kube-probe')) {
-      return next();
-    }
-    
-    // Simple OK response for deployment health checks
-    if (!acceptsHtml) {
-      return res.status(200).send('OK');
-    }
-  }
-  
-  next();
-});
+// Remove complex health check middleware - let direct endpoints handle all health checks
 
 // Middleware CORS para Replit
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -151,11 +154,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 
 
-
-// Simple root endpoint for deployment health checks
-app.get('/', (req: Request, res: Response) => {
-  res.status(200).send('OK');
-});
 
 // Simple API health check - priority over static files
 app.get('/api/status', (req: Request, res: Response) => {
@@ -225,18 +223,7 @@ app.get('/api/health', (req: Request, res: Response) => {
   }
 });
 
-// Fast health check endpoints
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).send('OK');
-});
-
-app.get('/healthz', (req: Request, res: Response) => {
-  res.status(200).send('OK');
-});
-
-app.get('/ping', (req: Request, res: Response) => {
-  res.status(200).send('OK');
-});
+// Health check endpoints moved to top of file - removing duplicates
 
 // Test endpoint para debugging del proxy
 app.get('/test-proxy', (req: Request, res: Response) => {
