@@ -25,31 +25,74 @@ import evaluacionesRoutes from "./evaluaciones-routes";
 
 const app = express();
 
-// ===== ULTRA-MINIMAL HEALTH CHECK - ZERO DEPENDENCIES =====
-// This must respond instantly for deployment health checks
+// ===== CLOUD RUN OPTIMIZED HEALTH CHECKS - ABSOLUTE PRIORITY =====
+// These endpoints must be FIRST to avoid any middleware overhead
+// Pre-computed responses for maximum speed - no string processing during requests
+
 const healthResponse = Buffer.from('OK');
 const healthHeaders = {
   'Content-Type': 'text/plain',
-  'Content-Length': '2'
+  'Content-Length': '2',
+  'Cache-Control': 'no-cache',
+  'Connection': 'close'
 };
 
+const readyResponse = Buffer.from('{"status":"ready"}');
+const readyHeaders = {
+  'Content-Type': 'application/json',
+  'Content-Length': '17',
+  'Cache-Control': 'no-cache',
+  'Connection': 'close'
+};
+
+// CLOUD RUN PRIORITY ENDPOINTS - Must be first, before ANY middleware
+// These endpoints use res.writeHead + res.end for maximum performance
+app.get('/liveness', (req, res) => {
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
+});
+
+app.get('/readiness', (req, res) => {
+  res.writeHead(200, readyHeaders);
+  res.end(readyResponse);
+});
+
+// Multiple health check paths for different deployment platforms
+app.get('/health-check', (req, res) => {
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
+});
+
+app.get('/cloudrun-health', (req, res) => {
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
+});
+
 app.get('/', (req: Request, res: Response) => {
-  // Check if this is a health check request (no Accept header for HTML)
-  const acceptHeader = req.headers.accept || '';
-  const isHealthCheck = !acceptHeader.includes('text/html');
+  // ULTRA-OPTIMIZED: Check if this is a health check request
+  const acceptHeader = req.headers.accept;
+  const userAgent = req.headers['user-agent'];
+  
+  // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
+  const isHealthCheck = !acceptHeader?.includes('text/html') || 
+    userAgent?.includes('GoogleHC') || 
+    userAgent?.includes('kube-probe') ||
+    userAgent?.includes('ELB-HealthChecker') ||
+    acceptHeader === '*/*';
   
   if (isHealthCheck) {
-    // Health check response for deployment
+    // Immediate health check response - no file system operations
     res.writeHead(200, healthHeaders);
     res.end(healthResponse);
+    return;
+  }
+  
+  // Serve the React app for browser requests (only when not health check)
+  const indexPath = path.join(process.cwd(), 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
   } else {
-    // Serve the React app for browser requests
-    const indexPath = path.join(process.cwd(), 'public', 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.status(503).send('Application not built. Please run npm run build first.');
-    }
+    res.status(503).send('Application not built. Please run npm run build first.');
   }
 });
 
