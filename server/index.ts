@@ -25,7 +25,7 @@ import evaluacionesRoutes from "./evaluaciones-routes";
 
 const app = express();
 
-// ===== CLOUD RUN OPTIMIZED HEALTH CHECKS - ABSOLUTE PRIORITY =====
+// ===== DEPLOYMENT HEALTH CHECKS - ABSOLUTE PRIORITY =====
 // These endpoints must be FIRST to avoid any middleware overhead
 // Pre-computed responses for maximum speed - no string processing during requests
 
@@ -33,65 +33,95 @@ const healthResponse = Buffer.from('OK');
 const healthHeaders = {
   'Content-Type': 'text/plain',
   'Content-Length': '2',
-  'Cache-Control': 'no-cache',
-  'Connection': 'close'
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  'Connection': 'close',
+  'X-Health-Check': 'true'
 };
 
 const readyResponse = Buffer.from('{"status":"ready"}');
 const readyHeaders = {
   'Content-Type': 'application/json',
   'Content-Length': '17',
-  'Cache-Control': 'no-cache',
-  'Connection': 'close'
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  'Connection': 'close',
+  'X-Health-Check': 'true'
 };
 
-// CLOUD RUN PRIORITY ENDPOINTS - Must be first, before ANY middleware
+// DEPLOYMENT-SPECIFIC: Create a dedicated health check response for deployment systems
+const deployHealthResponse = Buffer.from('HEALTHY');
+const deployHealthHeaders = {
+  'Content-Type': 'text/plain',
+  'Content-Length': '7',
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  'Connection': 'close',
+  'X-Deployment-Health': 'ok'
+};
+
+// DEPLOYMENT PRIORITY ENDPOINTS - Must be first, before ANY middleware
 // These endpoints use res.writeHead + res.end for maximum performance
 app.get('/liveness', (req, res) => {
-  res.writeHead(200, healthHeaders);
-  res.end(healthResponse);
+  res.writeHead(200, deployHealthHeaders);
+  res.end(deployHealthResponse);
 });
 
 app.get('/readiness', (req, res) => {
-  res.writeHead(200, readyHeaders);
-  res.end(readyResponse);
+  res.writeHead(200, deployHealthHeaders);
+  res.end(deployHealthResponse);
 });
 
 // Multiple health check paths for different deployment platforms
 app.get('/health-check', (req, res) => {
-  res.writeHead(200, healthHeaders);
-  res.end(healthResponse);
+  res.writeHead(200, deployHealthHeaders);
+  res.end(deployHealthResponse);
 });
 
 app.get('/cloudrun-health', (req, res) => {
-  res.writeHead(200, healthHeaders);
-  res.end(healthResponse);
+  res.writeHead(200, deployHealthHeaders);
+  res.end(deployHealthResponse);
+});
+
+// Additional deployment health endpoints
+app.get('/up', (req, res) => {
+  res.writeHead(200, deployHealthHeaders);
+  res.end(deployHealthResponse);
+});
+
+app.get('/healthcheck', (req, res) => {
+  res.writeHead(200, deployHealthHeaders);
+  res.end(deployHealthResponse);
 });
 
 // Pre-compute index.html path and existence at startup (not per request)
 const indexPath = path.join(process.cwd(), 'public', 'index.html');
 const indexExists = fs.existsSync(indexPath);
 
+// DEPLOYMENT PRIORITY: Dedicated health check endpoint that overrides everything
+app.get('/_health', (req: Request, res: Response) => {
+  res.writeHead(200, deployHealthHeaders);
+  res.end(deployHealthResponse);
+});
+
 app.get('/', (req: Request, res: Response) => {
-  // Simplified health check detection for reliable deployment
+  // ULTRA-AGGRESSIVE health check detection for deployment systems
   const acceptHeader = req.headers.accept;
-  const userAgent = req.headers['user-agent'];
+  const userAgent = req.headers['user-agent']?.toLowerCase() || '';
+  const xForwardedFor = req.headers['x-forwarded-for'];
+  const xRealIp = req.headers['x-real-ip'];
   
-  // Simple health check patterns - deployment health checkers typically don't send text/html Accept headers
-  const isHealthCheck = 
-    !acceptHeader?.includes('text/html') ||
-    userAgent?.includes('GoogleHC') ||
-    userAgent?.includes('kube-probe') ||
-    acceptHeader === '*/*';
+  // DEPLOYMENT HEALTH CHECKERS: Assume health check unless explicitly a browser
+  const isBrowserRequest = 
+    acceptHeader?.includes('text/html') &&
+    userAgent.includes('mozilla') &&
+    (userAgent.includes('chrome') || userAgent.includes('firefox') || userAgent.includes('safari'));
   
-  if (isHealthCheck) {
-    // Immediate health check response - zero file system operations
-    res.writeHead(200, healthHeaders);
-    res.end(healthResponse);
+  if (!isBrowserRequest) {
+    // IMMEDIATE health check response for all non-browser requests
+    res.writeHead(200, deployHealthHeaders);
+    res.end(deployHealthResponse);
     return;
   }
   
-  // Serve React app for browser requests (using pre-computed existence)
+  // Only serve React app for confirmed browser requests
   if (indexExists) {
     res.sendFile(indexPath);
   } else {
@@ -125,9 +155,31 @@ app.get('/ready', (req: Request, res: Response) => {
   res.end('{"status":"ok"}');
 });
 
-// Add after other health endpoints
+// DEPLOYMENT DEDICATED HEALTH CHECKS - Multiple endpoints for maximum compatibility
 app.get('/api/health-simple', (req, res) => {
   res.status(200).send('OK');
+});
+
+// Additional health check endpoints for different deployment platforms
+app.get('/status-check', (req, res) => {
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
+});
+
+app.get('/live', (req, res) => {
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
+});
+
+app.get('/deployment-health', (req, res) => {
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
+});
+
+// Ultra-fast health check for deployment systems
+app.get('/health-deploy', (req, res) => {
+  res.writeHead(200, healthHeaders);
+  res.end(healthResponse);
 });
 
 // ===== ENDPOINT CRÍTICO MÁXIMA PRIORIDAD - ANTES DE TODO MIDDLEWARE =====
