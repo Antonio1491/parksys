@@ -69,7 +69,7 @@ export default function VerticalBarChart({
 
   return (
     <div className={className}>
-      <div className={`flex justify-center items-end ${gap} min-h-[320px] pl-36 pr-8 py-4 overflow-x-auto overflow-y-visible`}>
+      <div className={`flex justify-center items-end ${gap} min-h-[320px] pl-8 md:pl-36 pr-8 py-4 overflow-x-auto overflow-y-visible`}>
         {sortedData.map((item, index) => {
           const heightPercentage = maxValue > 0 ? (item.value / maxValue) * 100 : 0;
           const barColor = getBarColor(item.value, maxValue);

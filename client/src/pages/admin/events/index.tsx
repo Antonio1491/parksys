@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 
 interface EventStats {
   total: number;
@@ -106,15 +106,14 @@ export default function EventsIndex() {
   };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Eventos</h1>
-          <p className="text-gray-600 mt-2">
-            Administra eventos, categorías y programación de actividades
-          </p>
-        </div>
+    <DashboardLayout 
+      icon={Calendar}
+      title="Eventos"
+      subtitle="Administra eventos, categorías y programación de actividades"
+      backgroundColor="#8b5cf6"
+    >
+      <div className="space-y-6">
+      <div className="flex items-center justify-end">
         <Link href="/admin/events/new">
           <Button className="bg-blue-600 hover:bg-blue-700">
             <CalendarPlus className="w-4 h-4 mr-2" />
@@ -302,6 +301,6 @@ export default function EventsIndex() {
         </CardContent>
       </Card>
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 }
