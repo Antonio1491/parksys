@@ -1,0 +1,1 @@
+import{aH as i,j as a}from"./index-BKCBrrzQ.js";import{D as n}from"./DocumentationViewer-Dk84N7dZ.js";import"./purify.es-BFmuJLeH.js";function r(){const[,t]=i();return a.jsx("div",{className:"min-h-screen bg-gray-50 py-8",children:a.jsx(n,{documentId:"actividades-manual",onBack:()=>t("/admin")})})}export{r as default};

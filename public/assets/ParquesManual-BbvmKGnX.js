@@ -1,0 +1,1 @@
+import{j as r}from"./index-BKCBrrzQ.js";import{D as t}from"./DocumentationViewer-Dk84N7dZ.js";import"./purify.es-BFmuJLeH.js";function u(){return r.jsx(t,{documentId:"parques-manual"})}export{u as default};
