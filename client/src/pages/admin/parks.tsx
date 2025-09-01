@@ -555,7 +555,7 @@ const AdminParksContent = () => {
               variant="dropdown"
             />,
             <Button variant="outline" onClick={() => window.location.href = "/admin/parks-import"}>
-              <FileUp className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4 mr-2" />
               Importar
             </Button>,
             <Button variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
