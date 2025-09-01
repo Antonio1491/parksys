@@ -107,58 +107,26 @@ app.put('/api/evaluations/parks/:id', (req, res) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Early health check middleware - highest priority for deployment compatibility
+// Simplified health check middleware - optimized for fast deployment health checks
 app.use((req: Request, res: Response, next: NextFunction) => {
-  // Handle specific health check endpoints, NOT the root path for browser requests
+  // Fast health check endpoints
   if (req.path === '/health' || req.path === '/healthz' || req.path === '/ping') {
-    const userAgent = req.get('User-Agent') || '';
-    const isHealthCheck = 
-      userAgent.includes('GoogleHC') || 
-      userAgent.includes('Cloud Run') ||
-      userAgent.includes('kube-probe') ||
-      userAgent.includes('curl') ||
-      userAgent.includes('Deployment') ||
-      userAgent.includes('HealthCheck') ||
-      req.query.health === 'check' ||
-      req.query.healthcheck === 'true' ||
-      !req.get('Accept')?.includes('text/html');
-
-    if (isHealthCheck || req.path !== '/') {
-      return res.status(200).json({
-        status: 'ok',
-        health: 'ready',
-        service: 'ParkSys',
-        timestamp: new Date().toISOString(),
-        port: process.env.PORT || 5000
-      });
-    }
+    return res.status(200).send('OK');
   }
   
-  // Only handle root path health checks for deployment services, not browser requests
+  // Root path health check for deployment services (simple and fast)
   if (req.path === '/') {
     const userAgent = req.get('User-Agent') || '';
     const acceptsHtml = req.get('Accept')?.includes('text/html');
     
-    // If it's a browser request (accepts HTML), let it continue to Vite/frontend
+    // If accepts HTML and not a known health checker, let frontend handle it
     if (acceptsHtml && !userAgent.includes('GoogleHC') && !userAgent.includes('Cloud Run') && !userAgent.includes('kube-probe')) {
       return next();
     }
     
-    // Only respond with health check for deployment services
-    const isDeploymentHealthCheck = 
-      userAgent.includes('GoogleHC') || 
-      userAgent.includes('Cloud Run') ||
-      userAgent.includes('kube-probe') ||
-      userAgent.includes('Deployment');
-      
-    if (isDeploymentHealthCheck) {
-      return res.status(200).json({
-        status: 'ok',
-        health: 'ready',
-        service: 'ParkSys',
-        timestamp: new Date().toISOString(),
-        port: process.env.PORT || 5000
-      });
+    // Simple OK response for deployment health checks
+    if (!acceptsHtml) {
+      return res.status(200).send('OK');
     }
   }
   
@@ -181,43 +149,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // ENDPOINT DUPLICADO REMOVIDO - AHORA ESTÁ AL INICIO DEL ARCHIVO
 
-// Multiple health check endpoints for Cloud Run compatibility
-app.get('/healthz', (req: Request, res: Response) => {
-  try {
-    res.status(200).json({
-      status: 'ok',
-      message: 'ParkSys - Bosques Urbanos de Guadalajara',
-      timestamp: new Date().toISOString(),
-      service: 'Urban Parks Management System',
-      version: '1.0.0',
-      health: 'ready'
-    });
-  } catch (error) {
-    res.status(503).json({ 
-      status: 'error', 
-      message: 'Service temporarily unavailable',
-      timestamp: new Date().toISOString()
-    });
-  }
-});
 
-// Alternative health check endpoints
-app.get('/health-check', (req: Request, res: Response) => {
-  try {
-    res.status(200).json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      service: 'ParkSys'
-    });
-  } catch (error) {
-    res.status(503).json({ status: 'unhealthy', timestamp: new Date().toISOString() });
-  }
-});
 
-app.get('/ping', (req: Request, res: Response) => {
-  res.status(200).send('pong');
-});
 
 // Root endpoint removed - let health check middleware and Vite handle all requests
 

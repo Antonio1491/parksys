@@ -553,7 +553,6 @@ const AdminParksContent = () => {
             <ExportButton
               entity="parks" 
               variant="dropdown"
-              className="text-white border-white hover:bg-white/10"
             />,
             <Button variant="outline" onClick={() => window.location.href = "/admin/parks-import"}>
               <FileUp className="h-4 w-4 mr-2" />
