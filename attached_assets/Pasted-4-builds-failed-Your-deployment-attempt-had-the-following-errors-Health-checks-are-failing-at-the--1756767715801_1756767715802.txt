@@ -1,0 +1,92 @@
+4 builds failed
+Your deployment attempt had the following errors:
+Health checks are failing at the / endpoint
+Server process exits with code 0 before health check completion
+Application is not responding to deployment health check requests in time
+Agent suggestions
+process.on('exit', (code) => {
+  console.log(`🛑 [PROCESS] Server process exiting with code: ${code}`);
+});
+// Removed exit logging to prevent deployment confusion
+const isHealthCheck = 
+    // Standard health check patterns
+    !acceptHeader?.includes('text/html') ||
+    acceptHeader === '*/*' ||
+    acceptHeader === 'text/plain' ||
+    // Cloud Run health check agents
+    userAgent?.includes('GoogleHC') ||
+    userAgent?.includes('Google-Cloud-Functions') ||
+    userAgent?.includes('gcp-health-checker') ||
+    // ... many more conditions
+const isHealthCheck = 
+    !acceptHeader?.includes('text/html') ||
+    userAgent?.includes('GoogleHC') ||
+    userAgent?.includes('kube-probe') ||
+    acceptHeader === '*/*';
+// Add after other health endpoints
+app.get('/api/health-simple', (req, res) => {
+  res.status(200).send('OK');
+});
+async function initializeFullServer() {
+    console.log('🔧 [BACKGROUND] Starting non-blocking route registration...');
+    
+    // Use setTimeout to make this truly non-blocking
+    setTimeout(async () => {
+      try {
+        console.log('🔧 [FIRE-FORGET] Registering routes without blocking event loop...');
+        
+        // Register routes without awaiting - fire and forget
+        registerRoutes(app).catch(err => console.warn('Route registration error:', err));
+        
+        // Register activity payment routes
+        registerActivityPaymentRoutes(app);
+        console.log("✅ [FIRE-FORGET] Main routes registered");
+
+        // Register all other routes in background
+        registerAllOtherRoutes().catch(err => console.warn('Other routes error:', err));
+        
+        console.log('🗄️ [FIRE-FORGET] Route registration complete - database initialization skipped for performance');
+      } catch (error) {
+        console.warn('❌ [FIRE-FORGET] Non-critical background initialization error:', error);
+      }
+    }, 100); // Small delay to ensure event loop is free
+  }
+// Initialize routes synchronously to ensure health checks work immediately
+function initializeRoutes() {
+  try {
+    registerRoutes(app);
+    registerActivityPaymentRoutes(app);
+    console.log("✅ Routes registered");
+  } catch (error) {
+    console.warn('Route registration error:', error);
+  }
+}
+// START SERVER IMMEDIATELY - health checks only, everything else async
+  appServer = app.listen(PORT, HOST, () => {
+    console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT} - Health checks active`);
+    console.log(`🏥 [DEPLOYMENT] Ready for deployment health checks - ${new Date().toISOString()}`);
+    
+    // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
+    // This ensures health checks can respond immediately during deployment
+    setImmediate(() => {
+      console.log(`🔧 [BACKGROUND] Starting full server initialization...`);
+      
+      // Initialize everything in the background without awaiting to prevent blocking
+      initializeFullServer()
+        .then(() => {
+          console.log(`✅ [BACKGROUND] Full server initialization complete`);
+        })
+        .catch((error) => {
+          console.error(`❌ [BACKGROUND] Server initialization error (non-critical):`, error);
+        });
+    });
+  });
+// Start server with immediate route initialization
+  appServer = app.listen(PORT, HOST, () => {
+    console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT}`);
+    
+    // Initialize routes immediately after server starts
+    initializeRoutes();
+    
+    console.log(`🏥 [DEPLOYMENT] Health checks ready`);
+  });
