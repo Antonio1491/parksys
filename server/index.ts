@@ -2100,11 +2100,57 @@ function startServer() {
   criticalApiRouter.get("/events", async (req: any, res: any) => {
     try {
       const { pool } = await import("./db");
-      const result = await pool.query('SELECT * FROM events ORDER BY event_date DESC LIMIT 50');
+      const result = await pool.query('SELECT * FROM events ORDER BY start_date DESC LIMIT 50');
       console.log(`📅 [CRITICAL] Returning ${result.rows.length} events via critical route`);
       res.json(result.rows);
     } catch (error) {
       console.error('❌ [CRITICAL] Error in events route:', error);
+      res.json([]);
+    }
+  });
+
+  // Register critical users API route
+  criticalApiRouter.get("/users", async (req: any, res: any) => {
+    try {
+      const { storage } = await import('./storage');
+      const users = await storage.getUsers();
+      
+      // Remove passwords from response for security
+      const safeUsers = users.map((user: any) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      console.log(`👥 [CRITICAL] Returning ${safeUsers.length} users via critical route`);
+      res.json(safeUsers);
+    } catch (error) {
+      console.error('❌ [CRITICAL] Error in users route:', error);
+      res.json([]);
+    }
+  });
+
+  // Register critical volunteers API route
+  criticalApiRouter.get("/volunteers", async (req: any, res: any) => {
+    try {
+      const { pool } = await import("./db");
+      const result = await pool.query('SELECT * FROM volunteers ORDER BY created_at DESC');
+      console.log(`🤝 [CRITICAL] Returning ${result.rows.length} volunteers via critical route`);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('❌ [CRITICAL] Error in volunteers route:', error);
+      res.json([]);
+    }
+  });
+
+  // Register critical active-concessions API route
+  criticalApiRouter.get("/active-concessions", async (req: any, res: any) => {
+    try {
+      const { pool } = await import("./db");
+      const result = await pool.query('SELECT * FROM active_concessions ORDER BY created_at DESC');
+      console.log(`🏪 [CRITICAL] Returning ${result.rows.length} active concessions via critical route`);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('❌ [CRITICAL] Error in active-concessions route:', error);
       res.json([]);
     }
   });
