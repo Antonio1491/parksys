@@ -2033,6 +2033,62 @@ async function initializeDatabaseAsync() {
   app.use(express.static(path.join(process.cwd(), 'public')));
   console.log("🗂️ [IMMEDIATE] Static files configured");
 
+  // CRITICAL: Register essential API routes BEFORE Vite setup to prevent route conflicts
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+  
+  // Create API router for immediate registration
+  const criticalApiRouter = express.Router();
+  
+  // Register critical parks API route immediately
+  criticalApiRouter.get("/parks", async (req: any, res: any) => {
+    try {
+      const { getParksDirectly } = await import('./direct-park-queries');
+      const filters: any = {};
+      
+      if (req.query.municipalityId) {
+        filters.municipalityId = Number(req.query.municipalityId);
+      }
+      
+      const parks = await getParksDirectly(filters);
+      console.log(`🏞️ [CRITICAL] Returning ${parks?.length || 0} parks via critical route`);
+      res.json(parks || []);
+    } catch (error) {
+      console.error('❌ [CRITICAL] Error in parks route:', error);
+      res.status(500).json({ message: "Error fetching parks" });
+    }
+  });
+
+  // Register critical sponsors API route
+  criticalApiRouter.get("/sponsors", async (req: any, res: any) => {
+    try {
+      const { pool } = await import("./db");
+      const result = await pool.query('SELECT * FROM sponsors ORDER BY tier ASC');
+      console.log(`🏆 [CRITICAL] Returning ${result.rows.length} sponsors via critical route`);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('❌ [CRITICAL] Error in sponsors route:', error);
+      res.json([]);
+    }
+  });
+
+  // Register critical events API route
+  criticalApiRouter.get("/events", async (req: any, res: any) => {
+    try {
+      const { pool } = await import("./db");
+      const result = await pool.query('SELECT * FROM events ORDER BY event_date DESC LIMIT 50');
+      console.log(`📅 [CRITICAL] Returning ${result.rows.length} events via critical route`);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('❌ [CRITICAL] Error in events route:', error);
+      res.json([]);
+    }
+  });
+
+  // Mount critical API router immediately
+  app.use('/api', criticalApiRouter);
+  console.log("🚀 [IMMEDIATE] Critical API routes registered");
+
   // Use environment port for deployment compatibility - ensure port 5000
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
   const HOST = '0.0.0.0';
