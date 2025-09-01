@@ -594,8 +594,10 @@ const TreesDashboard: React.FC = () => {
               }
               sortDescending={true}
               showLabels={true}
-              formatValue={(value, item) => 
-                item ? `${(item as any).speciesCount} esp. (${(item as any).percentage}%)` : `${value.toFixed(1)}%`
+              formatValue={(value, item) =>
+                item
+                  ? `${(item as any).speciesCount} (${Math.round((item as any).percentage)}%)`
+                  : `${Math.round(value)}%`
               }
             />
           </GraphicCard>

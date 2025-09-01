@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, Star, MessageSquare, BarChart3, TrendingUp, Activity } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 
 // Dashboard integral de visitantes que combina datos de conteo, evaluaciones y feedback
 export default function VisitorsDashboardSimple() {
@@ -146,9 +146,11 @@ export default function VisitorsDashboardSimple() {
 
   if (isLoading) {
     return (
-      <AdminLayout 
-        title="Dashboard Integral de Visitantes"
+      <DashboardLayout 
+        icon={BarChart3}
+        title="Visitantes"
         subtitle="Vista consolidada de visitantes, evaluaciones y retroalimentación"
+        backgroundColor="#14b8a6"
       >
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
@@ -156,14 +158,16 @@ export default function VisitorsDashboardSimple() {
             <p className="text-gray-600">Cargando datos del dashboard...</p>
           </div>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
   return (
-    <AdminLayout 
-      title="Dashboard Integral de Visitantes"
+    <DashboardLayout 
+      icon={BarChart3}
+      title="Visitantes"
       subtitle="Vista consolidada de visitantes, evaluaciones y retroalimentación"
+      backgroundColor="#14b8a6"
     >
       <div className="space-y-6">
         {/* Tarjetas de métricas principales */}
@@ -356,6 +360,6 @@ export default function VisitorsDashboardSimple() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 }

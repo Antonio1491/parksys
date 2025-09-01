@@ -26,7 +26,8 @@ export const GraphicCard = ({
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="pt-0 overflow-hidden">
+      <CardContent className="pt-0 overflow-x-auto overflow-y-visible">
+        
         {children}
       </CardContent>
     </Card>
