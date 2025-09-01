@@ -152,7 +152,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 
 
-// Root endpoint removed - let health check middleware and Vite handle all requests
+// Simple root endpoint for deployment health checks
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).send('OK');
+});
 
 // Simple API health check - priority over static files
 app.get('/api/status', (req: Request, res: Response) => {
@@ -222,21 +225,17 @@ app.get('/api/health', (req: Request, res: Response) => {
   }
 });
 
-// Additional health check endpoint
+// Fast health check endpoints
 app.get('/health', (req: Request, res: Response) => {
-  try {
-    res.status(200).json({ 
-      status: 'healthy',
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString(),
-      memory: process.memoryUsage()
-    });
-  } catch (error) {
-    res.status(503).json({ 
-      status: 'unhealthy',
-      timestamp: new Date().toISOString()
-    });
-  }
+  res.status(200).send('OK');
+});
+
+app.get('/healthz', (req: Request, res: Response) => {
+  res.status(200).send('OK');
+});
+
+app.get('/ping', (req: Request, res: Response) => {
+  res.status(200).send('OK');
 });
 
 // Test endpoint para debugging del proxy
