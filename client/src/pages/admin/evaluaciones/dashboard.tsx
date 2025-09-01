@@ -183,7 +183,6 @@ export default function EvaluacionesDashboard() {
       icon={BarChart3}
       title="Evaluaciones"
       subtitle="Gestión centralizada del sistema de evaluaciones"
-      backgroundColor="#ef4444"
     >
       <div className="space-y-6">
         <div className="flex items-center justify-end">

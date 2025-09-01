@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, Star, MessageSquare, BarChart3, TrendingUp, Activity } from 'lucide-react';
+import { Calendar, Users, MessageSquare, BarChart3, TrendingUp } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import DashboardLayout from '@/components/ui/dashboard-layout';
 
@@ -11,11 +11,6 @@ export default function VisitorsDashboardSimple() {
   // Queries usando endpoints existentes
   const { data: visitorCounts = [], isLoading: loadingVisitors } = useQuery({
     queryKey: ['/api/visitor-counts'],
-    retry: 1
-  });
-
-  const { data: parkEvaluations = [], isLoading: loadingEvaluations } = useQuery({
-    queryKey: ['/api/park-evaluations/export-all'],
     retry: 1
   });
 
@@ -29,19 +24,12 @@ export default function VisitorsDashboardSimple() {
     retry: 1
   });
 
-  const { data: parksResponse, isLoading: loadingParks } = useQuery({
-    queryKey: ['/api/parks'],
-    retry: 1
-  });
-
   // Verificar si hay datos cargando
-  const isLoading = loadingVisitors || loadingEvaluations || loadingFeedback || loadingParks;
+  const isLoading = loadingVisitors || loadingFeedback;
 
   // Acceso seguro a datos - corregir estructura de respuesta
-  const parks = parksResponse?.data || parksResponse || [];
-  const visitorData = visitorCounts?.data || visitorCounts || [];
-  const evaluationsData = parkEvaluations?.evaluations || parkEvaluations?.data || parkEvaluations || [];
-  const feedbackData = parkFeedback?.feedback || parkFeedback?.data || parkFeedback || [];
+  const visitorData = (visitorCounts as any)?.data || visitorCounts || [];
+  const feedbackData = (parkFeedback as any)?.feedback || (parkFeedback as any)?.data || parkFeedback || [];
 
 
 
@@ -50,14 +38,7 @@ export default function VisitorsDashboardSimple() {
     ? visitorData.reduce((sum, record) => sum + (record.adults || 0) + (record.children || 0) + (record.seniors || 0), 0)
     : 0;
 
-  const totalEvaluations = Array.isArray(evaluationsData) ? evaluationsData.length : 0;
   const totalFeedback = Array.isArray(feedbackData) ? feedbackData.length : 0;
-  const totalParks = Array.isArray(parks) ? parks.length : 0;
-
-  // Promedio de calificaciones
-  const averageRating = Array.isArray(evaluationsData) && evaluationsData.length > 0
-    ? (evaluationsData.reduce((sum: number, evaluation: any) => sum + (evaluation.overall_rating || evaluation.overallRating || 0), 0) / evaluationsData.length).toFixed(1)
-    : 0;
 
   // Datos para gráficas - Visitantes por método
   const methodData = Array.isArray(visitorData) ? visitorData.reduce((acc, record) => {
@@ -86,16 +67,20 @@ export default function VisitorsDashboardSimple() {
     color: '#067f5f'
   }] : [];
 
-  // Top parques por visitantes
-  const parkVisitors = Array.isArray(visitorData) && Array.isArray(parks) ? parks.map(park => {
-    const parkRecords = visitorData.filter(vc => vc.parkId === park.id);
-    const totalParkVisitors = parkRecords.reduce((sum, record) => 
-      sum + (record.adults || 0) + (record.children || 0) + (record.seniors || 0), 0);
-    return {
-      name: park.name,
-      visitors: totalParkVisitors
-    };
-  }).sort((a, b) => b.visitors - a.visitors).slice(0, 5) : [];
+  // Datos agregados por parque desde visitor data
+  const parkVisitorsData = Array.isArray(visitorData) ? visitorData.reduce((acc: Record<string, number>, record: any) => {
+    const parkName = record.parkName || `Parque ${record.parkId}`;
+    if (!acc[parkName]) {
+      acc[parkName] = 0;
+    }
+    acc[parkName] += (record.adults || 0) + (record.children || 0) + (record.seniors || 0);
+    return acc;
+  }, {}) : {};
+
+  const parkVisitors = Object.entries(parkVisitorsData)
+    .map(([name, visitors]) => ({ name, visitors }))
+    .sort((a, b) => b.visitors - a.visitors)
+    .slice(0, 5);
 
   // Datos de tendencias (últimos 7 días)
   const last7Days = Array.isArray(visitorData) ? (() => {
@@ -111,14 +96,6 @@ export default function VisitorsDashboardSimple() {
       const dayTotal = dayRecords.reduce((sum, record) => 
         sum + (record.adults || 0) + (record.children || 0) + (record.seniors || 0), 0);
       
-      const dayEvaluations = Array.isArray(evaluationsData) ? evaluationsData.filter((evaluation: any) => {
-        try {
-          const evalDate = new Date(evaluation.created_at || evaluation.createdAt).toISOString().split('T')[0];
-          return evalDate === dateStr;
-        } catch (e) {
-          return false;
-        }
-      }).length : 0;
       
       const dayFeedback = Array.isArray(feedbackData) ? feedbackData.filter((feedback: any) => {
         try {
@@ -133,7 +110,6 @@ export default function VisitorsDashboardSimple() {
         daysData.push({
           date: date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }),
           visitors: dayTotal,
-          evaluations: dayEvaluations,
           feedback: dayFeedback
         });
       } catch (e) {
@@ -149,8 +125,7 @@ export default function VisitorsDashboardSimple() {
       <DashboardLayout 
         icon={BarChart3}
         title="Visitantes"
-        subtitle="Vista consolidada de visitantes, evaluaciones y retroalimentación"
-        backgroundColor="#14b8a6"
+        subtitle="Vista consolidada de visitantes y retroalimentación"
       >
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
@@ -166,12 +141,11 @@ export default function VisitorsDashboardSimple() {
     <DashboardLayout 
       icon={BarChart3}
       title="Visitantes"
-      subtitle="Vista consolidada de visitantes, evaluaciones y retroalimentación"
-      backgroundColor="#14b8a6"
+      subtitle="Vista consolidada de visitantes y retroalimentación"
     >
       <div className="space-y-6">
         {/* Tarjetas de métricas principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Total Visitantes</CardTitle>
@@ -185,34 +159,12 @@ export default function VisitorsDashboardSimple() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Evaluaciones</CardTitle>
-              <Star className="h-4 w-4 text-yellow-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{totalEvaluations}</div>
-              <p className="text-xs text-gray-500 mt-1">Promedio: {averageRating} ⭐</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Retroalimentación</CardTitle>
               <MessageSquare className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{totalFeedback}</div>
               <p className="text-xs text-gray-500 mt-1">Comentarios ciudadanos</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Parques Activos</CardTitle>
-              <Activity className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{totalParks}</div>
-              <p className="text-xs text-gray-500 mt-1">En sistema</p>
             </CardContent>
           </Card>
         </div>
@@ -234,7 +186,6 @@ export default function VisitorsDashboardSimple() {
                   <YAxis />
                   <Tooltip />
                   <Line type="monotone" dataKey="visitors" stroke="#00a587" strokeWidth={2} name="Visitantes" />
-                  <Line type="monotone" dataKey="evaluations" stroke="#f59e0b" strokeWidth={2} name="Evaluaciones" />
                   <Line type="monotone" dataKey="feedback" stroke="#10b981" strokeWidth={2} name="Feedback" />
                 </LineChart>
               </ResponsiveContainer>
@@ -283,7 +234,7 @@ export default function VisitorsDashboardSimple() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {parkVisitors.map((park, index) => (
+                {parkVisitors.map((park: any, index: number) => (
                   <div key={park.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Badge variant="secondary" className="w-6 h-6 p-0 flex items-center justify-center text-xs">
@@ -332,28 +283,28 @@ export default function VisitorsDashboardSimple() {
               <div className="text-center">
                 <div className="text-lg font-semibold text-gray-900">Participación Ciudadana</div>
                 <div className="text-sm text-gray-600 mt-1">
-                  {totalEvaluations + totalFeedback} interacciones registradas
+                  {totalFeedback} comentarios registrados
                 </div>
                 <Badge variant="secondary" className="mt-2">
-                  {totalParks > 0 ? ((totalEvaluations + totalFeedback) / totalParks).toFixed(1) : 0} por parque
+                  Retroalimentación activa
                 </Badge>
               </div>
               <div className="text-center">
-                <div className="text-lg font-semibold text-gray-900">Satisfacción</div>
+                <div className="text-lg font-semibold text-gray-900">Actividad</div>
                 <div className="text-sm text-gray-600 mt-1">
-                  Calificación promedio: {averageRating}/5
+                  {totalVisitors.toLocaleString()} visitantes totales
                 </div>
-                <Badge variant={parseFloat(averageRating as string) >= 4 ? "default" : "secondary"} className="mt-2">
-                  {parseFloat(averageRating as string) >= 4 ? "Excelente" : "Bueno"}
+                <Badge variant="default" className="mt-2">
+                  Alta afluencia
                 </Badge>
               </div>
               <div className="text-center">
-                <div className="text-lg font-semibold text-gray-900">Cobertura</div>
+                <div className="text-lg font-semibold text-gray-900">Tendencia</div>
                 <div className="text-sm text-gray-600 mt-1">
-                  {totalParks} parques en sistema
+                  {last7Days.length > 0 ? last7Days[last7Days.length - 1].visitors : 0} visitantes hoy
                 </div>
                 <Badge variant="outline" className="mt-2">
-                  {totalVisitors > 0 ? (totalVisitors / totalParks).toFixed(0) : 0} visitantes/parque
+                  Última actualización
                 </Badge>
               </div>
             </div>
