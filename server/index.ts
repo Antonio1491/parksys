@@ -1583,6 +1583,14 @@ app.put("/api/dev/parks/:id", async (req: Request, res: Response) => {
       updateFields.push(`municipality_id = $${paramIndex++}`);
       values.push(parkData.municipalityId);
     }
+    if (parkData.municipality !== undefined) {
+      updateFields.push(`municipality_text = $${paramIndex++}`);
+      values.push(parkData.municipality);
+    }
+    if (parkData.municipalityText !== undefined) {
+      updateFields.push(`municipality_text = $${paramIndex++}`);
+      values.push(parkData.municipalityText);
+    }
     if (parkData.contactEmail !== undefined) {
       updateFields.push(`contact_email = $${paramIndex++}`);
       values.push(parkData.contactEmail);

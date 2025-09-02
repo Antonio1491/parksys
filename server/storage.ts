@@ -26,6 +26,7 @@ const {
 export interface IStorage {
   getParks(filters?: any): Promise<any[]>;
   getExtendedParks(filters?: any): Promise<any[]>;
+  getExtendedPark(id: number): Promise<any>;
   getPark(id: number): Promise<any>;
   createPark(data: any): Promise<any>;
   updatePark(id: number, data: any): Promise<any>;
@@ -136,6 +137,53 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error al obtener parques extendidos:", error);
       return [];
+    }
+  }
+
+  async getExtendedPark(id: number): Promise<any> {
+    try {
+      console.log("Consultando parque con ID:", id);
+      
+      // Obtener datos básicos del parque con municipalityText
+      const park = await this.getPark(id);
+      if (!park) {
+        console.log("Parque no encontrado");
+        return null;
+      }
+      
+      console.log("Datos básicos del parque obtenidos:", park.name);
+      
+      // Obtener datos relacionados
+      const [documents, amenities, images, activities, trees, assets] = await Promise.all([
+        this.getParkDocuments(id),
+        this.getParkAmenities(id), 
+        this.getParkImages(id),
+        this.getParkActivities(id),
+        this.getParkTrees(id),
+        this.getParkAssets(id)
+      ]);
+      
+      console.log("Documentos encontrados para parque", id + ":", documents.length);
+      console.log("Amenidades encontradas:", amenities.length);
+      console.log("Imágenes encontradas:", images.length);
+      console.log("Actividades encontradas:", activities.length);
+      console.log("Estadísticas de árboles obtenidas:", trees.total);
+      console.log("Activos encontrados:", assets.length);
+      
+      console.log("Preparando objeto de parque extendido");
+      
+      return {
+        ...park,
+        amenities: amenities || [],
+        activities: activities || [],
+        documents: documents || [],
+        images: images || [],
+        trees: trees || { total: 0, bySpecies: {}, byHealth: { 'Bueno': 0, 'Regular': 0, 'Malo': 0, 'Desconocido': 0 } },
+        assets: assets || []
+      };
+    } catch (error) {
+      console.error("Error al obtener parque extendido:", error);
+      return null;
     }
   }
   
