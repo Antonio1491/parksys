@@ -1,13 +1,32 @@
 import express from "express";
+import path from "path";
+import fs from "fs";
 
 const app = express();
 
 // ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
 const HEALTH_RESPONSE = 'HEALTHY';
 
-// Root endpoint - ALWAYS returns health response for deployment
+// Root endpoint - Smart routing for health checks vs browsers
 app.get('/', (req, res) => {
-  res.status(200).send(HEALTH_RESPONSE);
+  const userAgent = req.get('User-Agent') || '';
+  const acceptHeader = req.get('Accept') || '';
+  
+  // Simple but effective browser detection
+  // Real browsers always send Accept: text/html and complex User-Agent
+  const isBrowser = acceptHeader.includes('text/html') && 
+                    userAgent.length > 20 && 
+                    (userAgent.includes('Mozilla') || userAgent.includes('Chrome') || 
+                     userAgent.includes('Safari') || userAgent.includes('Edge') || 
+                     userAgent.includes('Firefox') || userAgent.includes('Opera'));
+  
+  if (isBrowser) {
+    // Redirect browsers to /app endpoint which serves React properly
+    res.redirect(302, '/app');
+  } else {
+    // Health check response for deployment systems - instant
+    res.status(200).send(HEALTH_RESPONSE);
+  }
 });
 
 // All health check endpoints - instant responses
