@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useLocation as useWouterLocation } from 'wouter';
+import React, { useState } from 'react';
+import { useLocation as useWouterLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -47,11 +47,11 @@ const parkSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   municipality: z.string().min(1, 'El municipio es requerido'),
   address: z.string().min(1, 'La dirección es requerida'),
-  description: z.string().nullable().optional(),
-  postalCode: z.string().nullable().optional(),
-  latitude: z.string().nullable().optional(),
-  longitude: z.string().nullable().optional(),
-  area: z.string().nullable().optional(),
+  description: z.string().optional(),
+  postalCode: z.string().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+  area: z.string().optional(),
   foundationYear: z.coerce.number().nullable().optional(),
 
   // Horarios individuales por día
@@ -60,46 +60,19 @@ const parkSchema = z.object({
     openingTime: z.string().nullable().optional(),
     closingTime: z.string().nullable().optional()
   })).optional(),
-  administrator: z.string().nullable().optional(),
-  contactPhone: z.string().nullable().optional(),
-  contactEmail: z.string().nullable().optional(),
-  certificaciones: z.string().nullable().optional(),
+  administrator: z.string().optional(),
+  contactPhone: z.string().optional(),
+  contactEmail: z.string().optional(),
+  certificaciones: z.string().optional(),
 });
 
 type ParkFormValues = z.infer<typeof parkSchema>;
 
-// Municipios del área metropolitana de Guadalajara
-const GUADALAJARA_MUNICIPALITIES = [
-  { id: 1, name: 'Guadalajara' },
-  { id: 2, name: 'Zapopan' },
-  { id: 3, name: 'San Pedro Tlaquepaque' },
-  { id: 4, name: 'Tonalá' },
-  { id: 5, name: 'Tlajomulco de Zúñiga' },
-  { id: 6, name: 'El Salto' },
-  { id: 7, name: 'Ixtlahuacán de los Membrillos' },
-  { id: 8, name: 'Juanacatlán' },
-  { id: 9, name: 'Zapotlanejo' }
-];
 
 const AdminParkEdit: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
   const [_, setLocation] = useWouterLocation();
-  const isEdit = !!id;
   const [activeTab, setActiveTab] = useState('basic');
   const { toast } = useToast();
-  
-
-  
-  // Consulta los datos del parque si estamos editando
-  const { data: park, isLoading } = useQuery({
-    queryKey: [`/api/parks/${id}`],
-    enabled: isEdit,
-    gcTime: 0,
-    staleTime: 0
-  });
-  
-  // Usar la lista estática de municipios del área metropolitana de Guadalajara
-  const municipalities = GUADALAJARA_MUNICIPALITIES;
   
   // Definir el formulario con react-hook-form
   const form = useForm<ParkFormValues>({
@@ -132,43 +105,6 @@ const AdminParkEdit: React.FC = () => {
     },
   });
   
-  // Cargar los datos del parque en el formulario cuando estén disponibles
-  useEffect(() => {
-    if (park && isEdit) {
-      console.log("Datos del parque cargados:", park);
-      
-      // Crear un objeto con los valores por defecto en caso de que falten propiedades
-      const formValues = {
-        name: park.name || '',
-        municipality: park.municipality?.name || park.municipality || '',
-        address: park.address || '',
-        description: park.description || '',
-        postalCode: park.postalCode || '',
-        latitude: park.latitude || '',
-        longitude: park.longitude || '',
-        area: park.area || '',
-        foundationYear: park.foundationYear || undefined,
-        // Parsear horarios existentes o usar valores por defecto
-        dailySchedule: {
-          'Lunes': { enabled: false, openingTime: '', closingTime: '' },
-          'Martes': { enabled: false, openingTime: '', closingTime: '' },
-          'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
-          'Jueves': { enabled: false, openingTime: '', closingTime: '' },
-          'Viernes': { enabled: false, openingTime: '', closingTime: '' },
-          'Sábado': { enabled: false, openingTime: '', closingTime: '' },
-          'Domingo': { enabled: false, openingTime: '', closingTime: '' }
-        },
-        administrator: park.administrator || '',
-        contactPhone: park.contactPhone || '',
-        contactEmail: park.contactEmail || '',
-        certificaciones: park.certificaciones || '',
-      };
-      
-      form.reset(formValues);
-      
-
-    }
-  }, [park, isEdit, form, id]);
   
   const onSubmit = (values: ParkFormValues) => {
     console.log('Formulario enviado con valores:', values);
@@ -196,11 +132,11 @@ const AdminParkEdit: React.FC = () => {
     mutation.mutate(cleanedValues);
   };
   
-  // Mutación para crear o actualizar el parque
+  // Mutación para crear el parque
   const mutation = useMutation({
     mutationFn: async (values: ParkFormValues) => {
-      const endpoint = isEdit ? `/api/parks/${id}` : '/api/parks';
-      const method = isEdit ? 'PUT' : 'POST';
+      const endpoint = '/api/parks';
+      const method = 'POST';
       
       console.log('Iniciando mutación:', { endpoint, method, values });
       
@@ -216,8 +152,8 @@ const AdminParkEdit: React.FC = () => {
       console.log('Mutación exitosa:', data);
       queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
       toast({
-        title: isEdit ? 'Parque actualizado' : 'Parque creado',
-        description: `El parque ha sido ${isEdit ? 'actualizado' : 'creado'} correctamente.`,
+        title: 'Parque creado',
+        description: 'El parque ha sido creado correctamente.',
       });
       setLocation('/admin/parks');
     },
@@ -225,26 +161,17 @@ const AdminParkEdit: React.FC = () => {
       console.error('Error en onError:', error);
       toast({
         title: 'Error',
-        description: `Ocurrió un error al ${isEdit ? 'actualizar' : 'crear'} el parque: ${error.message}`,
+        description: `Ocurrió un error al crear el parque: ${error.message}`,
         variant: 'destructive',
       });
     },
   });
   
-  if (isLoading && isEdit) {
-    return (
-      <AdminLayout title="Cargando parque...">
-        <div className="flex items-center justify-center h-full">
-          <Loader className="h-12 w-12 text-primary animate-spin" />
-        </div>
-      </AdminLayout>
-    );
-  }
   
   return (
     <AdminLayout
-      title={isEdit ? `Editar parque: ${park?.name || ''}` : 'Nuevo parque'}
-      subtitle={isEdit ? "Actualiza la información del parque" : "Ingresa la información para crear un nuevo parque"}
+      title="Nuevo parque"
+      subtitle="Ingresa la información para crear un nuevo parque"
     >
       <div className="p-6">
         <div className="max-w-6xl mx-auto space-y-6">
@@ -605,7 +532,7 @@ const AdminParkEdit: React.FC = () => {
                     disabled={mutation.isPending}
                   >
                     {mutation.isPending && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                    {isEdit ? 'Guardar Cambios' : 'Crear Parque'}
+                    Crear Parque
                   </Button>
                 </CardFooter>
               </Card>
