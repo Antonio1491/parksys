@@ -24,8 +24,18 @@ const ParksImport = () => {
   } | null>(null);
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('');
 
-  // Municipios simplificado - eliminado para reducir queries
-  const municipalities = [];
+  // Lista de municipios del Área Metropolitana de Guadalajara
+  const municipalities = [
+    { id: 1, name: 'Guadalajara' },
+    { id: 2, name: 'Zapopan' },
+    { id: 3, name: 'San Pedro Tlaquepaque' },
+    { id: 4, name: 'Tonalá' },
+    { id: 5, name: 'Tlajomulco de Zúñiga' },
+    { id: 6, name: 'El Salto' },
+    { id: 7, name: 'Ixtlahuacán de los Membrillos' },
+    { id: 8, name: 'Juanacatlán' },
+    { id: 9, name: 'Zapotlanejo' }
+  ];
   const loadingMunicipalities = false;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,9 +111,9 @@ const ParksImport = () => {
       formData.append('file', selectedFile);
       formData.append('municipalityId', selectedMunicipality);
       
-      const response = await apiRequest('/api/parks/import', {
+      const response = await fetch('/api/parks/import', {
         method: 'POST',
-        data: formData,
+        body: formData,
       });
       
       const result = await response.json();
@@ -198,7 +208,7 @@ const ParksImport = () => {
                     <SelectValue placeholder="Seleccione un municipio" />
                   </SelectTrigger>
                   <SelectContent>
-                    {municipalities?.map(municipality => (
+                    {municipalities.map(municipality => (
                       <SelectItem key={municipality.id} value={municipality.id.toString()}>
                         {municipality.name}
                       </SelectItem>
