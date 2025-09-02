@@ -369,6 +369,20 @@ export const processImportFile = async (req: Request, res: Response) => {
       'email_contacto': 'contactEmail',
       'certificaciones': 'certificaciones'
     };
+
+    // Función para convertir strings a números cuando sea necesario
+    const convertToNumber = (value: any): number | null => {
+      if (value === null || value === undefined || value === '') return null;
+      const num = Number(value);
+      return isNaN(num) ? null : num;
+    };
+
+    // Función para limpiar strings
+    const cleanString = (value: any): string | null => {
+      if (value === null || value === undefined) return null;
+      const str = String(value).trim();
+      return str === '' ? null : str;
+    };
     
     // Mapear tipos de parque en español a inglés
     const parkTypeMappings: { [key: string]: string } = {
@@ -392,6 +406,16 @@ export const processImportFile = async (req: Request, res: Response) => {
         if (englishKey) {
           let value = row[key];
           
+          // Convertir números
+          if (['municipalityId', 'foundationYear', 'latitude', 'longitude', 'area'].includes(englishKey)) {
+            value = convertToNumber(value);
+          }
+          
+          // Limpiar strings
+          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail'].includes(englishKey)) {
+            value = cleanString(value);
+          }
+          
           // Convertir 'estacionamiento' a booleano
           if (englishKey === 'hasParking') {
             if (typeof value === 'string') {
@@ -409,6 +433,15 @@ export const processImportFile = async (req: Request, res: Response) => {
           transformedData[englishKey] = value;
         }
       });
+      
+      // Agregar campos requeridos que faltan con valores por defecto
+      if (!transformedData.parkType) {
+        transformedData.parkType = 'urbano'; // Tipo por defecto
+      }
+      
+      if (!transformedData.status) {
+        transformedData.status = 'active'; // Estado por defecto
+      }
       
       return transformedData;
     });
