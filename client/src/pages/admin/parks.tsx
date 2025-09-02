@@ -105,7 +105,7 @@ const AdminParksContent = () => {
 
   // Helper function to check if park is certified
   const isParkCertified = (park: Park) => {
-    return park.certificaciones && park.certificaciones.trim() !== '';
+    return park.certificaciones && park.certificaciones.trim() !== '' && park.certificaciones !== 'Ninguna';
   };
 
   // Fetch all parks with auto-refresh configuration
@@ -317,12 +317,6 @@ const AdminParksContent = () => {
                             : 'N/A'}
                         </span>
                       </div>
-                      <Badge
-                        variant="outline"
-                        className={`border ${getTypologyColor(park.typology?.code)}`}
-                      >
-                        {getTypologyLabel(park.typology?.name)}
-                      </Badge>
                     </div>
                   </div>
                   {park.description && (
@@ -391,12 +385,6 @@ const AdminParksContent = () => {
                     </Badge>
                   )}
                 </div>
-                <Badge
-                  variant="outline"
-                  className={`border ${getTypologyColor(park.typology?.code)}`}
-                >
-                  {getTypologyLabel(park.typology?.name)}
-                </Badge>
               </div>
             </CardHeader>
             

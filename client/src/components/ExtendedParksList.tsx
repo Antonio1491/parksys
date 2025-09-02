@@ -34,7 +34,7 @@ const generateParkSlug = (parkName: string, parkId: number) => {
 function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksListProps) {
   // Función para verificar si el parque tiene certificaciones
   const hasCertifications = (park: ExtendedPark) => {
-    return park.certificaciones && park.certificaciones.trim().length > 0;
+    return park.certificaciones && park.certificaciones.trim() !== '' && park.certificaciones !== 'Ninguna';
   };
 
   // Función para verificar si el parque tiene Green Flag Award
@@ -46,7 +46,7 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
 
   // Función para obtener el número de certificaciones
   const getCertificationsCount = (park: ExtendedPark) => {
-    if (!park.certificaciones) return 0;
+    if (!park.certificaciones || park.certificaciones === 'Ninguna') return 0;
     return park.certificaciones.split(',').filter(cert => cert.trim().length > 0).length;
   };
 

@@ -74,7 +74,7 @@ export const generateImportTemplate = (req: Request, res: Response) => {
     // Crear una hoja de datos con encabezados actualizados según formulario
     const headers = [
       'nombre',
-      'municipio_id',
+      'municipio',
       'direccion',
       'descripcion',
       'codigo_postal',
@@ -99,7 +99,7 @@ export const generateImportTemplate = (req: Request, res: Response) => {
     const exampleData = [
       {
         nombre: 'Parque Ejemplo',
-        municipio_id: '1',
+        municipio: 'Guadalajara',
         direccion: 'Av. Ejemplo 123, Col. Centro',
         descripcion: 'Descripción detallada del parque ejemplo',
         codigo_postal: '44100',
@@ -121,7 +121,7 @@ export const generateImportTemplate = (req: Request, res: Response) => {
       },
       {
         nombre: 'Parque Modelo',
-        municipio_id: '2',
+        municipio: 'Zapopan',
         direccion: 'Calle Modelo 456, Col. Moderna',
         descripcion: 'Parque lineal con ciclovía y áreas verdes',
         codigo_postal: '44190',
@@ -152,7 +152,7 @@ export const generateImportTemplate = (req: Request, res: Response) => {
         // Mapeo actualizado de campos según formulario
         const fieldMapping: { [key: string]: string } = {
           'nombre': 'name',
-          'municipio_id': 'municipalityId',
+          'municipio': 'municipalityText',
           'direccion': 'address',
           'descripcion': 'description',
           'codigo_postal': 'postalCode',
@@ -182,16 +182,16 @@ export const generateImportTemplate = (req: Request, res: Response) => {
     // Información sobre municipios válidos (AMG)
     const municipalityInfo = [
       [''],
-      ['IDs de Municipios (AMG):'],
-      ['1 - Guadalajara'],
-      ['2 - Zapopan'],
-      ['3 - San Pedro Tlaquepaque'],
-      ['4 - Tonalá'],
-      ['5 - Tlajomulco de Zúñiga'],
-      ['6 - El Salto'],
-      ['7 - Ixtlahuacán de los Membrillos'],
-      ['8 - Juanacatlán'],
-      ['9 - Zapotlanejo']
+      ['Municipios válidos (AMG):'],
+      ['Guadalajara'],
+      ['Zapopan'],
+      ['San Pedro Tlaquepaque'],
+      ['Tonalá'],
+      ['Tlajomulco de Zúñiga'],
+      ['El Salto'],
+      ['Ixtlahuacán de los Membrillos'],
+      ['Juanacatlán'],
+      ['Zapotlanejo']
     ];
     
     // Información sobre campos obligatorios
@@ -199,7 +199,7 @@ export const generateImportTemplate = (req: Request, res: Response) => {
       [''],
       ['Campos obligatorios:'],
       ['nombre'],
-      ['municipio_id'],
+      ['municipio'],
       ['direccion']
     ];
     
@@ -349,7 +349,7 @@ export const processImportFile = async (req: Request, res: Response) => {
     // Mapeo ACTUALIZADO de nombres de columnas según nueva plantilla
     const fieldMappings: { [key: string]: string } = {
       'nombre': 'name',
-      'municipio_id': 'municipalityId',
+      'municipio': 'municipalityText',
       'direccion': 'address',
       'descripcion': 'description',
       'codigo_postal': 'postalCode',
@@ -407,18 +407,13 @@ export const processImportFile = async (req: Request, res: Response) => {
           let value = row[key];
           
           // Convertir números (pero NO latitude/longitude que deben ser strings)
-          if (['municipalityId', 'foundationYear', 'area'].includes(englishKey)) {
+          if (['foundationYear', 'area'].includes(englishKey)) {
             const numValue = convertToNumber(value);
-            // Para municipalityId, asignar valor por defecto si es null
-            if (englishKey === 'municipalityId' && numValue === null) {
-              value = 1; // Valor por defecto
-            } else {
-              value = numValue;
-            }
+            value = numValue;
           }
           
-          // Limpiar y mantener como strings (incluyendo coordenadas)
-          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail', 'latitude', 'longitude'].includes(englishKey)) {
+          // Limpiar y mantener como strings (incluyendo coordenadas y municipio)
+          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail', 'latitude', 'longitude', 'municipalityText'].includes(englishKey)) {
             value = cleanString(value);
             // Para coordenadas, asegurar que no sean null
             if ((englishKey === 'latitude' || englishKey === 'longitude') && value === null) {
