@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useLocation as useWouterLocation } from 'wouter';
+import React, { useEffect, useState } from 'react';
+import { useParams, useLocation as useWouterLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -70,9 +70,19 @@ type ParkFormValues = z.infer<typeof parkSchema>;
 
 
 const AdminParkEdit: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [_, setLocation] = useWouterLocation();
+  const isEdit = !!id;
   const [activeTab, setActiveTab] = useState('basic');
   const { toast } = useToast();
+  
+  // Consulta los datos del parque si estamos editando
+  const { data: park, isLoading } = useQuery({
+    queryKey: [`/api/parks/${id}`],
+    enabled: isEdit,
+    gcTime: 0,
+    staleTime: 0
+  });
   
   // Definir el formulario con react-hook-form
   const form = useForm<ParkFormValues>({
@@ -105,6 +115,39 @@ const AdminParkEdit: React.FC = () => {
     },
   });
   
+  // Cargar los datos del parque en el formulario cuando estén disponibles
+  useEffect(() => {
+    if (park && isEdit) {
+      console.log("Datos del parque cargados:", park);
+      
+      const formValues = {
+        name: park.name || '',
+        municipality: park.municipality?.name || park.municipality || '',
+        address: park.address || '',
+        description: park.description || '',
+        postalCode: park.postalCode || '',
+        latitude: park.latitude || '',
+        longitude: park.longitude || '',
+        area: park.area || '',
+        foundationYear: park.foundationYear || null,
+        dailySchedule: {
+          'Lunes': { enabled: false, openingTime: '', closingTime: '' },
+          'Martes': { enabled: false, openingTime: '', closingTime: '' },
+          'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
+          'Jueves': { enabled: false, openingTime: '', closingTime: '' },
+          'Viernes': { enabled: false, openingTime: '', closingTime: '' },
+          'Sábado': { enabled: false, openingTime: '', closingTime: '' },
+          'Domingo': { enabled: false, openingTime: '', closingTime: '' }
+        },
+        administrator: park.administrator || '',
+        contactPhone: park.contactPhone || '',
+        contactEmail: park.contactEmail || '',
+        certificaciones: park.certificaciones || '',
+      };
+      
+      form.reset(formValues);
+    }
+  }, [park, isEdit, form]);
   
   const onSubmit = (values: ParkFormValues) => {
     console.log('Formulario enviado con valores:', values);
@@ -132,11 +175,11 @@ const AdminParkEdit: React.FC = () => {
     mutation.mutate(cleanedValues);
   };
   
-  // Mutación para crear el parque
+  // Mutación para crear o actualizar el parque
   const mutation = useMutation({
     mutationFn: async (values: ParkFormValues) => {
-      const endpoint = '/api/parks';
-      const method = 'POST';
+      const endpoint = isEdit ? `/api/parks/${id}` : '/api/parks';
+      const method = isEdit ? 'PUT' : 'POST';
       
       console.log('Iniciando mutación:', { endpoint, method, values });
       
@@ -152,8 +195,8 @@ const AdminParkEdit: React.FC = () => {
       console.log('Mutación exitosa:', data);
       queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
       toast({
-        title: 'Parque creado',
-        description: 'El parque ha sido creado correctamente.',
+        title: isEdit ? 'Parque actualizado' : 'Parque creado',
+        description: `El parque ha sido ${isEdit ? 'actualizado' : 'creado'} correctamente.`,
       });
       setLocation('/admin/parks');
     },
@@ -161,17 +204,27 @@ const AdminParkEdit: React.FC = () => {
       console.error('Error en onError:', error);
       toast({
         title: 'Error',
-        description: `Ocurrió un error al crear el parque: ${error.message}`,
+        description: `Ocurrió un error al ${isEdit ? 'actualizar' : 'crear'} el parque: ${error.message}`,
         variant: 'destructive',
       });
     },
   });
   
   
+  if (isLoading && isEdit) {
+    return (
+      <AdminLayout title="Cargando parque...">
+        <div className="flex items-center justify-center h-full">
+          <Loader className="h-12 w-12 text-primary animate-spin" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout
-      title="Nuevo parque"
-      subtitle="Ingresa la información para crear un nuevo parque"
+      title={isEdit ? `Editar parque: ${park?.name || ''}` : 'Nuevo parque'}
+      subtitle={isEdit ? "Actualiza la información del parque" : "Ingresa la información para crear un nuevo parque"}
     >
       <div className="p-6">
         <div className="max-w-6xl mx-auto space-y-6">
@@ -532,7 +585,7 @@ const AdminParkEdit: React.FC = () => {
                     disabled={mutation.isPending}
                   >
                     {mutation.isPending && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                    Crear Parque
+                    {isEdit ? 'Guardar Cambios' : 'Crear Parque'}
                   </Button>
                 </CardFooter>
               </Card>
