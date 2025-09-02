@@ -399,6 +399,71 @@ async function initializeApplication() {
     
     // Basic middleware already configured before server start - skipping duplicates
 
+    // ===== CRITICAL API ROUTES (DIRECT REGISTRATION) =====
+    // Register essential API routes directly to bypass TypeScript errors
+    
+    // Parks API
+    app.get('/api/parks', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query('SELECT * FROM parks ORDER BY id');
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching parks:', error);
+        res.status(500).json({ error: 'Error loading parks' });
+      }
+    });
+
+    // Activities with photos API
+    app.get('/api/actividades-fotos', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT 
+            a.id, a.title, a.description, a.start_date as "startDate",
+            a.end_date as "endDate", a.category, a.park_id as "parkId",
+            a.location, a.capacity, a.price, a.status,
+            p.name as "parkName", img.image_url as "imageUrl",
+            img.caption as "imageCaption"
+          FROM activities a
+          LEFT JOIN parks p ON a.park_id = p.id
+          LEFT JOIN activity_images img ON a.id = img.activity_id
+          WHERE img.image_url IS NOT NULL
+          ORDER BY a.created_at DESC
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching activities with photos:', error);
+        res.status(500).json({ error: 'Error loading activities' });
+      }
+    });
+
+    // Sponsors API
+    app.get('/api/sponsors', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query('SELECT * FROM sponsors ORDER BY tier DESC, id');
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching sponsors:', error);
+        res.status(500).json({ error: 'Error loading sponsors' });
+      }
+    });
+
+    // Events API
+    app.get('/api/events', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query('SELECT * FROM events ORDER BY start_date DESC');
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({ error: 'Error loading events' });
+      }
+    });
+
+    console.log('✅ Critical API routes registered directly');
+
     // React application route (separate from health checks)
     app.get('/app', (req, res) => {
       const indexPath = path.default.join(process.cwd(), 'public', 'index.html');

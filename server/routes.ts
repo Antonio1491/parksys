@@ -2439,8 +2439,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const images = extendedPark?.images || [];
 
       // Use simplified queries for other data that don't require complex joins
-      const activities = await storage.getAllActivities();
-      const parkActivities = activities.filter(activity => activity.parkId === parkId).slice(0, 20);
+      const activities = await storage.getActivities();
+      const parkActivities = (activities || []).filter((activity: any) => activity.parkId === parkId).slice(0, 20);
 
       // Get trees data with statistics for this park
       const treesQuery = await pool.query(
