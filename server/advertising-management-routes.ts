@@ -29,8 +29,6 @@ router.get('/placements', async (req, res) => {
         ads.title,
         ads.content,
         ads.is_active as ad_active,
-        ads.start_date,
-        ads.end_date,
         amf.file_url,
         amf.filename
       FROM ad_space_mappings sm
@@ -39,8 +37,6 @@ router.get('/placements', async (req, res) => {
       WHERE sm.space_id = $1 
         AND sm.is_active = true
         AND (ads.is_active IS NULL OR ads.is_active = true)
-        AND (ads.start_date IS NULL OR ads.start_date <= CURRENT_DATE)
-        AND (ads.end_date IS NULL OR ads.end_date >= CURRENT_DATE)
       ORDER BY sm.priority DESC, sm.created_at DESC
       LIMIT 1
     `;
@@ -65,8 +61,6 @@ router.get('/placements', async (req, res) => {
         fileUrl: placement.file_url,
         filename: placement.filename,
         priority: placement.priority,
-        startDate: placement.start_date,
-        endDate: placement.end_date,
         isActive: placement.ad_active
       }
     });

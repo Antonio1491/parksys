@@ -21,11 +21,47 @@ process.on('unhandledRejection', (reason, promise) => {
 // ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
 const HEALTH_RESPONSE = 'HEALTHY';
 
-// ===== DEDICATED HEALTH CHECK ENDPOINT - ALWAYS STATUS 200 =====
-// Root endpoint - ONLY for health checks, never fails
+// ===== SMART ROOT ENDPOINT - HEALTH CHECK + REACT APP =====
+// Handle both health checks AND browser requests intelligently
 app.get('/', (req, res) => {
-  // Deployment platforms expect instant 200 response
-  res.status(200).send(HEALTH_RESPONSE);
+  try {
+    // Check User-Agent and Accept headers to distinguish requests
+    const userAgent = req.get('User-Agent') || '';
+    const acceptHeader = req.get('Accept') || '';
+    
+    // Health checkers typically don't have text/html in Accept header
+    // AND may have specific User-Agent patterns
+    const isHealthChecker = !acceptHeader.includes('text/html') &&
+                           (userAgent.includes('GoogleHC') ||
+                            userAgent.includes('kube-probe') ||
+                            userAgent.includes('ELB-HealthChecker') ||
+                            userAgent.includes('Consul Health Check') ||
+                            userAgent === '' ||
+                            !userAgent.includes('Mozilla'));
+    
+    if (isHealthChecker) {
+      // Health check request - instant response
+      res.status(200).send(HEALTH_RESPONSE);
+    } else {
+      // Browser request - serve React app
+      const indexPath = path.join(process.cwd(), 'public', 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath, (err) => {
+          if (err) {
+            console.error('❌ Error serving React app:', err);
+            res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Application Error</h1></body></html>');
+          }
+        });
+      } else {
+        console.error('❌ index.html not found for browser request');
+        res.status(503).send('<!DOCTYPE html><html><head><title>Service Unavailable</title></head><body><h1>Application Building...</h1><p>Please wait while the application finishes building.</p></body></html>');
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error in root endpoint:', error);
+    // Always fallback to health check response to prevent deployment failures
+    res.status(200).send(HEALTH_RESPONSE);
+  }
 });
 
 // ===== REACT APP SERVING ON SEPARATE ROUTE =====
@@ -350,16 +386,18 @@ async function initializeApplication() {
       const volunteerFieldRouter = await import("./volunteerFieldRoutes");
       app.use('/', volunteerFieldRouter.default || volunteerFieldRouter);
       console.log('✅ Volunteer field router registered');
-    } catch (error) {
-      console.log('⚠️ Volunteer field router skipped:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('⚠️ Volunteer field router skipped:', errorMessage);
     }
 
     try {
       const { skillsRouter } = await import("./update-skills-route");
       app.use('/', skillsRouter);
       console.log('✅ Skills router registered');
-    } catch (error) {
-      console.log('⚠️ Skills router skipped:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('⚠️ Skills router skipped:', errorMessage);
     }
 
     try {
@@ -374,16 +412,18 @@ async function initializeApplication() {
       const { registerInstructorInvitationRoutes } = await import("./instructorInvitationRoutes");
       registerInstructorInvitationRoutes(app);
       console.log('✅ Instructor invitation routes registered');
-    } catch (error: any) {
-      console.log('⚠️ Instructor invitation routes skipped:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('⚠️ Instructor invitation routes skipped:', errorMessage);
     }
 
     try {
       const { registerInstructorApplicationRoutes } = await import("./instructorApplicationRoutes");
       registerInstructorApplicationRoutes(app);
       console.log('✅ Instructor application routes registered');
-    } catch (error: any) {
-      console.log('⚠️ Instructor application routes skipped:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('⚠️ Instructor application routes skipped:', errorMessage);
     }
 
     try {
