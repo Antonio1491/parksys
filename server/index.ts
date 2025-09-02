@@ -21,33 +21,31 @@ process.on('unhandledRejection', (reason, promise) => {
 // ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
 const HEALTH_RESPONSE = 'HEALTHY';
 
-// Root endpoint - Ultra-fast routing for health checks vs browsers  
+// ===== DEDICATED HEALTH CHECK ENDPOINT - ALWAYS STATUS 200 =====
+// Root endpoint - ONLY for health checks, never fails
 app.get('/', (req, res) => {
+  // Deployment platforms expect instant 200 response
+  res.status(200).send(HEALTH_RESPONSE);
+});
+
+// ===== REACT APP SERVING ON SEPARATE ROUTE =====
+app.get('/app*', (req, res) => {
   try {
-    // Ultra-fast browser detection - only check Accept header
-    const acceptHeader = req.get('Accept') || '';
-    
-    if (acceptHeader.includes('text/html')) {
-      // Browser requesting HTML - serve React app
-      const indexPath = path.join(process.cwd(), 'public', 'index.html');
-      if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath, (err) => {
-          if (err) {
-            console.error('❌ Error serving index.html:', err);
-            res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Application Error</h1></body></html>');
-          }
-        });
-      } else {
-        console.error('❌ index.html not found at:', indexPath);
-        res.status(503).send('<!DOCTYPE html><html><head><title>Not Built</title></head><body><h1>Application not built</h1></body></html>');
-      }
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          console.error('❌ Error serving React app:', err);
+          res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Application Error</h1></body></html>');
+        }
+      });
     } else {
-      // Health checker - instant response
-      res.status(200).send(HEALTH_RESPONSE);
+      console.error('❌ index.html not found at:', indexPath);
+      res.status(503).send('<!DOCTYPE html><html><head><title>Service Unavailable</title></head><body><h1>Application Building...</h1></body></html>');
     }
   } catch (error) {
-    console.error('❌ Error in root endpoint:', error);
-    res.status(500).send(HEALTH_RESPONSE); // Fallback to health response
+    console.error('❌ Error in app endpoint:', error);
+    res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Server Error</h1></body></html>');
   }
 });
 
@@ -397,6 +395,14 @@ async function initializeApplication() {
     }
 
     try {
+      const advertisingManagementRoutes = await import("./advertising-management-routes");
+      app.use('/api/advertising-management', advertisingManagementRoutes.default || advertisingManagementRoutes);
+      console.log('✅ Advertising management routes registered');
+    } catch (error: any) {
+      console.log('⚠️ Advertising management routes skipped:', error.message);
+    }
+
+    try {
       const faunaRoutes = await import("./faunaRoutes");
       app.use('/', faunaRoutes.default || faunaRoutes);
       console.log('✅ Fauna routes registered');
@@ -432,7 +438,7 @@ async function initializeApplication() {
         return;
       }
       
-      // For HTML requests, serve the main app
+      // For HTML requests (browsers), serve the main app
       if (req.get('Accept')?.includes('text/html')) {
         const indexPath = path.join(process.cwd(), 'public', 'index.html');
         if (fs.existsSync(indexPath)) {
@@ -441,8 +447,8 @@ async function initializeApplication() {
           res.status(503).send('<!DOCTYPE html><html><head><title>Service Unavailable</title></head><body><h1>Service Unavailable</h1><p>Application is starting up...</p></body></html>');
         }
       } else {
-        // For API requests, return JSON error
-        res.status(404).json({ error: 'Not Found', path: req.originalUrl });
+        // For API requests, return JSON error but don't crash
+        res.status(404).json({ error: 'API endpoint not found', path: req.originalUrl });
       }
     });
     
@@ -464,7 +470,67 @@ async function initializeApplication() {
 
   } catch (error: any) {
     console.error('❌ Background initialization failed:', error);
+    console.error('Stack trace:', error.stack);
     // Never crash - server continues for health checks
+    // Log the error but keep server alive for health checks
+  }
+
+  // ===== CRITICAL: FORCE DATABASE TABLES CREATION =====
+  try {
+    // Import database connection
+    const { pool } = await import("./db");
+    
+    // Ensure advertising tables exist for the placements endpoint
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ad_spaces (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        page_type VARCHAR(100),
+        position VARCHAR(100),
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS advertisements (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        content TEXT,
+        is_active BOOLEAN DEFAULT true,
+        start_date DATE,
+        end_date DATE,
+        media_file_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ad_space_mappings (
+        id SERIAL PRIMARY KEY,
+        space_id INTEGER REFERENCES ad_spaces(id),
+        advertisement_id INTEGER REFERENCES advertisements(id),
+        priority INTEGER DEFAULT 1,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ad_media_files (
+        id SERIAL PRIMARY KEY,
+        filename VARCHAR(255),
+        file_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    console.log('✅ Critical advertising tables ensured to exist');
+  } catch (error: any) {
+    console.error('❌ Error creating advertising tables:', error);
+    // Continue without crashing
   }
 }
 
