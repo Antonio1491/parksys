@@ -120,6 +120,27 @@ const AdminParkEdit: React.FC = () => {
     if (park && isEdit) {
       console.log("Datos del parque cargados:", park);
       
+      // Procesar horarios desde la base de datos
+      let dailyScheduleFromDB = {
+        'Lunes': { enabled: false, openingTime: '', closingTime: '' },
+        'Martes': { enabled: false, openingTime: '', closingTime: '' },
+        'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
+        'Jueves': { enabled: false, openingTime: '', closingTime: '' },
+        'Viernes': { enabled: false, openingTime: '', closingTime: '' },
+        'Sábado': { enabled: false, openingTime: '', closingTime: '' },
+        'Domingo': { enabled: false, openingTime: '', closingTime: '' }
+      };
+      
+      try {
+        if (park.openingHours && typeof park.openingHours === 'string') {
+          const parsed = JSON.parse(park.openingHours);
+          dailyScheduleFromDB = { ...dailyScheduleFromDB, ...parsed };
+          console.log("✅ Horarios procesados desde BD:", dailyScheduleFromDB);
+        }
+      } catch (error) {
+        console.log("⚠️ Error procesando horarios, usando valores por defecto:", error);
+      }
+
       const formValues = {
         name: park.name || '',
         municipality: park.municipalityText || park.municipality?.name || park.municipality || '',
@@ -130,20 +151,14 @@ const AdminParkEdit: React.FC = () => {
         longitude: park.longitude || '',
         area: park.area || '',
         foundationYear: park.foundationYear || null,
-        dailySchedule: {
-          'Lunes': { enabled: false, openingTime: '', closingTime: '' },
-          'Martes': { enabled: false, openingTime: '', closingTime: '' },
-          'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
-          'Jueves': { enabled: false, openingTime: '', closingTime: '' },
-          'Viernes': { enabled: false, openingTime: '', closingTime: '' },
-          'Sábado': { enabled: false, openingTime: '', closingTime: '' },
-          'Domingo': { enabled: false, openingTime: '', closingTime: '' }
-        },
+        dailySchedule: dailyScheduleFromDB,
         administrator: park.administrator || '',
         contactPhone: park.contactPhone || '',
         contactEmail: park.contactEmail || '',
         certificaciones: park.certificaciones || '',
       };
+      
+      console.log("📝 Valores cargados al formulario:", formValues);
       
       form.reset(formValues);
     }
