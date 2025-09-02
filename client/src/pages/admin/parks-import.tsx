@@ -86,9 +86,7 @@ const ParksImport = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
       
-      console.log('🚀 Enviando solicitud de importación...');
-      console.log('FormData:', formData);
-      console.log('Archivo:', selectedFile);
+      console.log('🚀 Enviando solicitud de importación...', selectedFile?.name);
       
       const response = await fetch('/api/parks/import', {
         method: 'POST',
