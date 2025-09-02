@@ -7,9 +7,23 @@ const app = express();
 // ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
 const HEALTH_RESPONSE = 'HEALTHY';
 
-// Root endpoint - ALWAYS returns health response for deployment
+// Root endpoint - Ultra-fast routing for health checks vs browsers
 app.get('/', (req, res) => {
-  res.status(200).send(HEALTH_RESPONSE);
+  // Ultra-fast browser detection - only check Accept header
+  const acceptHeader = req.get('Accept') || '';
+  
+  if (acceptHeader.includes('text/html')) {
+    // Browser requesting HTML - serve React app
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(503).send('Application not built');
+    }
+  } else {
+    // Health checker - instant response
+    res.status(200).send(HEALTH_RESPONSE);
+  }
 });
 
 // All health check endpoints - instant responses
@@ -49,7 +63,7 @@ app.get('/status', (req, res) => {
   res.status(200).send(HEALTH_RESPONSE);
 });
 
-// Dedicated browser route for React application
+// Dedicated browser route for React application (backup)
 app.get('/app', (req, res) => {
   const indexPath = path.join(process.cwd(), 'public', 'index.html');
   if (fs.existsSync(indexPath)) {
