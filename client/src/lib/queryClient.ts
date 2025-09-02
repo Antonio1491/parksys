@@ -213,7 +213,7 @@ export const getQueryFn: <T>(options: {
       const res = await fetch(url, {
         credentials: "include",
         headers,
-        signal: AbortSignal.timeout(30000) // 30 second timeout
+        signal: AbortSignal.timeout(10000) // 10 second timeout (reduced from 30s)
       });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
@@ -271,11 +271,12 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      staleTime: 300000, // 5 minutes instead of Infinity
+      retry: 3, // Enable retries - 3 attempts instead of none
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
     },
     mutations: {
-      retry: false,
+      retry: 2, // Enable retries for mutations too
     },
   },
 });
