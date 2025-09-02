@@ -157,7 +157,7 @@ const useAdPlacements = (spaceId: number, pageType: string, position: string, en
       // Verificar cache primero
       const cached = cacheManager.get(pageType, position);
       if (cached) {
-        console.log(`🎯 Cache hit for ${pageType}:${position}`);
+        // Cache hit silencioso
         return cached;
       }
 
@@ -169,7 +169,7 @@ const useAdPlacements = (spaceId: number, pageType: string, position: string, en
       
       // Guardar en cache
       cacheManager.set(pageType, position, placements);
-      console.log(`💾 Cached placements for ${pageType}:${position}`, placements.length);
+      // Datos guardados en caché silenciosamente
       
       return placements;
     },
@@ -310,7 +310,7 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
           timestamp: new Date().toISOString()
         })
       });
-      console.log(`📊 Impression tracked: ${placementId} on ${pageType}:${position}`);
+      // Impresión registrada silenciosamente
     } catch (error) {
       console.error('Error tracking impression:', error);
     }
@@ -328,7 +328,7 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
           timestamp: new Date().toISOString()
         })
       });
-      console.log(`🖱️ Click tracked: ${placementId} on ${pageType}:${position}`);
+      // Click registrado silenciosamente
     } catch (error) {
       console.error('Error tracking click:', error);
     }
