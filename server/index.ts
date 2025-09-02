@@ -442,7 +442,7 @@ async function initializeApplication() {
     app.get('/api/sponsors', async (req, res) => {
       try {
         const { pool } = await import("./db");
-        const result = await pool.query('SELECT * FROM sponsors ORDER BY tier DESC, id');
+        const result = await pool.query('SELECT * FROM sponsors ORDER BY contract_value DESC, id');
         res.json(result.rows);
       } catch (error) {
         console.error('Error fetching sponsors:', error);
@@ -459,6 +459,70 @@ async function initializeApplication() {
       } catch (error) {
         console.error('Error fetching events:', error);
         res.status(500).json({ error: 'Error loading events' });
+      }
+    });
+
+    // Individual activity API
+    app.get('/api/activities/:id', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const activityId = req.params.id;
+        const result = await pool.query(`
+          SELECT 
+            a.*, p.name as "parkName",
+            c.name as "categoryName",
+            i.full_name as "instructorName"
+          FROM activities a
+          LEFT JOIN parks p ON a.park_id = p.id
+          LEFT JOIN activity_categories c ON a.category_id = c.id
+          LEFT JOIN instructors i ON a.instructor_id = i.id
+          WHERE a.id = $1
+        `, [activityId]);
+        
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Activity not found' });
+        }
+        
+        res.json(result.rows[0]);
+      } catch (error) {
+        console.error('Error fetching activity:', error);
+        res.status(500).json({ error: 'Error loading activity' });
+      }
+    });
+
+    // Activity images API
+    app.get('/api/activities/:id/images', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const activityId = req.params.id;
+        const result = await pool.query(
+          'SELECT * FROM activity_images WHERE activity_id = $1 ORDER BY id',
+          [activityId]
+        );
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching activity images:', error);
+        res.status(500).json({ error: 'Error loading activity images' });
+      }
+    });
+
+    // Activity registration stats API
+    app.get('/api/activity-registrations/stats/:id', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const activityId = req.params.id;
+        const result = await pool.query(`
+          SELECT 
+            COUNT(*) as total_registrations,
+            COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_registrations,
+            COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_registrations
+          FROM activity_registrations 
+          WHERE activity_id = $1
+        `, [activityId]);
+        res.json(result.rows[0] || { total_registrations: 0, confirmed_registrations: 0, pending_registrations: 0 });
+      } catch (error) {
+        console.error('Error fetching activity registration stats:', error);
+        res.status(500).json({ error: 'Error loading registration stats' });
       }
     });
 
