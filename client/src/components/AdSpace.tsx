@@ -67,14 +67,16 @@ const AdSpace: React.FC<AdSpaceProps> = ({ spaceId, position, pageType, classNam
     ? placementsResponse.data[0] 
     : null;
 
-  // Debug logging
+  // Debug logging (solo cuando hay datos relevantes)
   React.useEffect(() => {
-    console.log(`🎯 AdSpace ${spaceId} (${pageType}/${position}):`, {
-      isLoading,
-      placementsResponse,
-      activePlacement,
-      hasData: placementsResponse?.success && Array.isArray(placementsResponse.data) && placementsResponse.data.length > 0
-    });
+    if (isLoading) {
+      console.log(`⏳ AdSpace ${spaceId} está cargando...`);
+    } else if (placementsResponse?.success && Array.isArray(placementsResponse.data)) {
+      if (placementsResponse.data.length > 0) {
+        console.log(`✅ AdSpace ${spaceId} tiene asignación activa:`, activePlacement);
+      }
+      // Solo registrar cuando no hay datos Y es la primera carga (evita spam de logs)
+    }
   }, [spaceId, pageType, position, isLoading, placementsResponse, activePlacement]);
 
 
@@ -153,16 +155,12 @@ const AdSpace: React.FC<AdSpaceProps> = ({ spaceId, position, pageType, classNam
 
   // Si está cargando o no hay asignación activa, no mostrar nada
   if (isLoading) {
-    console.log(`⏳ AdSpace ${spaceId} está cargando...`);
     return null;
   }
   
   if (!activePlacement) {
-    console.log(`❌ AdSpace ${spaceId} no tiene asignación activa`, { placementsResponse });
     return null;
   }
-  
-  console.log(`✅ AdSpace ${spaceId} renderizando anuncio:`, activePlacement.advertisement.title);
 
   const { advertisement } = activePlacement;
   
