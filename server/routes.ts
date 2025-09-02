@@ -2723,8 +2723,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const parkId = Number(req.params.id);
       
-      // Permitir actualización completa del parque incluyendo municipio
-      const parkData = req.body;
+      // Procesar los datos del parque
+      const parkData = { ...req.body };
+      
+      // Si viene el campo municipality como texto libre, almacenarlo en municipalityText
+      if (parkData.municipality && typeof parkData.municipality === 'string') {
+        // Mapear municipality a municipalityText
+        parkData.municipalityText = parkData.municipality;
+        delete parkData.municipality; // Eliminar el campo municipality que no existe en el schema
+      }
       
       const updatedPark = await storage.updatePark(parkId, parkData);
       

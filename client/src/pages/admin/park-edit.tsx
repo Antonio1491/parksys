@@ -122,7 +122,7 @@ const AdminParkEdit: React.FC = () => {
       
       const formValues = {
         name: park.name || '',
-        municipality: park.municipality?.name || park.municipality || '',
+        municipality: park.municipalityText || park.municipality?.name || park.municipality || '',
         address: park.address || '',
         description: park.description || '',
         postalCode: park.postalCode || '',
