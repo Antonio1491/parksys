@@ -463,7 +463,11 @@ export const processImportFile = async (req: Request, res: Response) => {
     parksData.forEach((parkData, index) => {
       try {
         const validatedPark = insertParkSchema.parse(parkData);
-        validParks.push(validatedPark);
+        
+        // CRÍTICO: Eliminar el campo id si existe para evitar conflictos con auto-generación
+        const { id, ...parkDataWithoutId } = validatedPark as any;
+        
+        validParks.push(parkDataWithoutId);
       } catch (error) {
         if (error instanceof ZodError) {
           const rowNumber = index + 2; // +2 porque el índice empieza en 0 y hay un encabezado
