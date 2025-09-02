@@ -244,26 +244,60 @@ export const processImportFile = async (req: Request, res: Response) => {
   try {
     console.log('🚀 [IMPORT] Iniciando proceso de importación de parques');
     console.log('📁 [IMPORT] Archivo recibido:', req.file ? req.file.filename : 'No hay archivo');
+    console.log('🔍 [IMPORT] Detalles del archivo:', {
+      originalname: req.file?.originalname,
+      filename: req.file?.filename,
+      path: req.file?.path,
+      mimetype: req.file?.mimetype,
+      size: req.file?.size
+    });
     
     if (!req.file) {
       console.log('❌ [IMPORT] No se recibió archivo');
       return res.status(400).json({ message: 'No se ha subido ningún archivo' });
     }
     
-    const filePath = req.file.path;
+    // Verificar que el path existe, si no usar el buffer directamente
+    let filePath = req.file.path;
+    let fileContent: string | Buffer;
+    
+    if (!filePath && req.file.buffer) {
+      console.log('🔄 [IMPORT] Usando buffer del archivo en memoria');
+      fileContent = req.file.buffer.toString('utf8');
+    } else if (!filePath) {
+      console.log('❌ [IMPORT] No se puede acceder al archivo');
+      return res.status(400).json({ message: 'Error al procesar el archivo subido' });
+    } else {
+      console.log('✅ [IMPORT] Usando archivo desde:', filePath);
+    }
     
     // Determinar el tipo de archivo y procesarlo
     let rawData: any[] = [];
-    const fileExtension = path.extname(filePath).toLowerCase();
+    let fileExtension: string;
+    
+    // Obtener extensión del archivo
+    if (filePath) {
+      fileExtension = path.extname(filePath).toLowerCase();
+    } else {
+      // Usar el nombre original si no hay path
+      fileExtension = path.extname(req.file.originalname || '').toLowerCase();
+    }
     
     console.log('🔍 [IMPORT] Procesando archivo:', fileExtension);
     
     if (fileExtension === '.csv') {
       // Procesar archivo CSV
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      console.log('📄 [IMPORT] Contenido CSV (primeras 200 chars):', fileContent.substring(0, 200));
+      let csvContent: string;
       
-      rawData = parse(fileContent, {
+      if (filePath) {
+        csvContent = fs.readFileSync(filePath, 'utf8');
+      } else {
+        csvContent = fileContent as string;
+      }
+      
+      console.log('📄 [IMPORT] Contenido CSV (primeras 200 chars):', csvContent.substring(0, 200));
+      
+      rawData = parse(csvContent, {
         columns: true, // Usar la primera fila como headers
         skip_empty_lines: true,
         delimiter: ',',
@@ -274,7 +308,14 @@ export const processImportFile = async (req: Request, res: Response) => {
     } else if (fileExtension === '.xlsx' || fileExtension === '.xls') {
       // Procesar archivo Excel
       try {
-        const workbook = XLSX.readFile(filePath);
+        let workbook;
+        
+        if (filePath) {
+          workbook = XLSX.readFile(filePath);
+        } else {
+          workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+        }
+        
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         rawData = XLSX.utils.sheet_to_json(worksheet, { raw: true }) as any[];
@@ -282,8 +323,15 @@ export const processImportFile = async (req: Request, res: Response) => {
       } catch (xlsxError) {
         console.error('❌ [IMPORT] Error con XLSX:', xlsxError);
         // Fallback: intentar leer como CSV
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        rawData = parse(fileContent, {
+        let csvContent: string;
+        
+        if (filePath) {
+          csvContent = fs.readFileSync(filePath, 'utf8');
+        } else {
+          csvContent = fileContent as string;
+        }
+        
+        rawData = parse(csvContent, {
           columns: true,
           skip_empty_lines: true,
           delimiter: ','
@@ -409,8 +457,10 @@ export const processImportFile = async (req: Request, res: Response) => {
       })
     );
     
-    // Eliminar archivo temporal
-    fs.unlinkSync(filePath);
+    // Eliminar archivo temporal si existe
+    if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
     
     // Preparar respuesta
     const hasErrors = errors.length > 0 || importErrors.length > 0;
@@ -429,7 +479,7 @@ export const processImportFile = async (req: Request, res: Response) => {
     
   } catch (error) {
     // Si hay algún error en el proceso, eliminar el archivo temporal
-    if (req.file && fs.existsSync(req.file.path)) {
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
     
