@@ -320,6 +320,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registramos las rutas de categorías de activos
   registerAssetCategoriesRoutes(app, apiRouter);
   
+  // ===== RUTAS BÁSICAS DE API PÚBLICAS =====
+  // Estas rutas son las que el frontend necesita para cargar datos iniciales
+  
+  // GET /api/parks - Lista todos los parques (ruta básica)
+  app.get('/api/parks', async (req: Request, res: Response) => {
+    try {
+      console.log('🌐 [API] GET /api/parks requested');
+      const parks = await storage.getParks({ includeDeleted: false });
+      res.json(parks);
+    } catch (error) {
+      console.error('❌ Error getting parks:', error);
+      res.status(500).json({ error: 'Error retrieving parks' });
+    }
+  });
+
+  // GET /api/events - Lista todos los eventos (ruta básica)
+  app.get('/api/events', async (req: Request, res: Response) => {
+    try {
+      console.log('🌐 [API] GET /api/events requested');
+      // Usar consulta directa SQL ya que getEvents() no existe en storage
+      const result = await pool.query('SELECT * FROM events ORDER BY start_date DESC');
+      res.json(result.rows);
+    } catch (error) {
+      console.error('❌ Error getting events:', error);
+      res.status(500).json({ error: 'Error retrieving events' });
+    }
+  });
+
+  // GET /api/sponsors - Lista todos los patrocinadores (ruta básica)
+  app.get('/api/sponsors', async (req: Request, res: Response) => {
+    try {
+      console.log('🌐 [API] GET /api/sponsors requested');
+      // Usar consulta directa SQL ya que getSponsors() no existe en storage
+      const result = await pool.query('SELECT * FROM sponsors ORDER BY name ASC');
+      res.json(result.rows);
+    } catch (error) {
+      console.error('❌ Error getting sponsors:', error);
+      res.status(500).json({ error: 'Error retrieving sponsors' });
+    }
+  });
+
   // Registramos las rutas del módulo de actividades
   registerActivityRoutes(app, apiRouter, isAuthenticated, hasParkAccess);
   
