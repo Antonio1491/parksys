@@ -7,26 +7,9 @@ const app = express();
 // ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
 const HEALTH_RESPONSE = 'HEALTHY';
 
-// Root endpoint - Smart routing for health checks vs browsers
+// Root endpoint - ALWAYS returns health response for deployment
 app.get('/', (req, res) => {
-  const userAgent = req.get('User-Agent') || '';
-  const acceptHeader = req.get('Accept') || '';
-  
-  // Simple but effective browser detection
-  // Real browsers always send Accept: text/html and complex User-Agent
-  const isBrowser = acceptHeader.includes('text/html') && 
-                    userAgent.length > 20 && 
-                    (userAgent.includes('Mozilla') || userAgent.includes('Chrome') || 
-                     userAgent.includes('Safari') || userAgent.includes('Edge') || 
-                     userAgent.includes('Firefox') || userAgent.includes('Opera'));
-  
-  if (isBrowser) {
-    // Redirect browsers to /app endpoint which serves React properly
-    res.redirect(302, '/app');
-  } else {
-    // Health check response for deployment systems - instant
-    res.status(200).send(HEALTH_RESPONSE);
-  }
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 // All health check endpoints - instant responses
@@ -66,6 +49,16 @@ app.get('/status', (req, res) => {
   res.status(200).send(HEALTH_RESPONSE);
 });
 
+// Dedicated browser route for React application
+app.get('/app', (req, res) => {
+  const indexPath = path.join(process.cwd(), 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(503).send('Application not built');
+  }
+});
+
 // ===== IMMEDIATE STATIC FILE SERVING =====
 // Serve static files immediately for favicon and assets
 app.use(express.static(path.join(process.cwd(), 'public')));
@@ -83,21 +76,29 @@ if (isProduction) {
 }
 
 // ===== DEPLOYMENT CONFIGURATION =====
-// Use PORT from environment, fallback to 5000 for Replit, 8080 for Cloud Run
+// Use PORT from environment, fallback to 5000 for Replit
 const PORT = parseInt(process.env.PORT || "5000"); 
 const HOST = "0.0.0.0"; // Required for deployment platforms
 
 console.log('🚀 Starting ParkSys server for deployment...');
+console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔧 PORT: ${PORT}, HOST: ${HOST}`);
+console.log(`💻 Process: ${process.pid}`);
+console.log(`📦 Platform: ${process.platform}`);
+console.log(`⚡ Node version: ${process.version}`);
 
 const server = app.listen(PORT, HOST, () => {
   console.log(`✅ Server listening on ${HOST}:${PORT}`);
   console.log('🏥 Health checks active - instant responses');
-  console.log('📡 Ready for Cloud Run deployment');
+  console.log('📡 Ready for deployment health checks');
+  console.log(`🌐 Application available at: http://${HOST}:${PORT}/app`);
+  console.log(`⚡ Health check at: http://${HOST}:${PORT}/`);
   
   // Start ALL initialization after server is listening
   process.nextTick(() => {
     initializeApplication().catch(error => {
       console.error('❌ Background initialization error:', error);
+      console.error('Stack:', error.stack);
       // Never crash - keep server running for health checks
     });
   });
@@ -287,13 +288,34 @@ async function initializeApplication() {
 // ===== ERROR HANDLING - KEEP SERVER ALIVE =====
 process.on('uncaughtException', (error) => {
   console.error('🚨 Uncaught Exception:', error.message);
+  console.error('Stack:', error.stack);
+  console.error('🔄 Server continues running for health checks');
   // Never exit - keep server alive for health checks
 });
 
 process.on('unhandledRejection', (reason) => {
   console.error('🚨 Unhandled Rejection:', reason);
+  if (reason instanceof Error) {
+    console.error('Stack:', reason.stack);
+  }
+  console.error('🔄 Server continues running for health checks');
   // Never exit - keep server alive for health checks
 });
+
+// Additional error handling for server
+if (server) {
+  server.on('error', (error) => {
+    console.error('🚨 Server Error:', error.message);
+    console.error('Stack:', error.stack);
+  });
+  
+  server.on('clientError', (error, socket) => {
+    console.error('🚨 Client Error:', error.message);
+    if (socket.writable) {
+      socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+    }
+  });
+}
 
 // ===== GRACEFUL SHUTDOWN FOR CLOUD RUN =====
 process.on('SIGTERM', () => {
