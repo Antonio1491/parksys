@@ -4,25 +4,50 @@ import fs from "fs";
 
 const app = express();
 
+// ===== CRITICAL ERROR HANDLING TO PREVENT CRASHES =====
+process.on('uncaughtException', (error) => {
+  console.error('❌ UNCAUGHT EXCEPTION - Server will continue running:', error);
+  console.error('Stack:', error.stack);
+  // Log but don't crash - health checks must continue working
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ UNHANDLED REJECTION - Server will continue running:', reason);
+  console.error('Promise:', promise);
+  // Log but don't crash - health checks must continue working
+});
+
+
 // ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
 const HEALTH_RESPONSE = 'HEALTHY';
 
-// Root endpoint - Ultra-fast routing for health checks vs browsers
+// Root endpoint - Ultra-fast routing for health checks vs browsers  
 app.get('/', (req, res) => {
-  // Ultra-fast browser detection - only check Accept header
-  const acceptHeader = req.get('Accept') || '';
-  
-  if (acceptHeader.includes('text/html')) {
-    // Browser requesting HTML - serve React app
-    const indexPath = path.join(process.cwd(), 'public', 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
+  try {
+    // Ultra-fast browser detection - only check Accept header
+    const acceptHeader = req.get('Accept') || '';
+    
+    if (acceptHeader.includes('text/html')) {
+      // Browser requesting HTML - serve React app
+      const indexPath = path.join(process.cwd(), 'public', 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath, (err) => {
+          if (err) {
+            console.error('❌ Error serving index.html:', err);
+            res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Application Error</h1></body></html>');
+          }
+        });
+      } else {
+        console.error('❌ index.html not found at:', indexPath);
+        res.status(503).send('<!DOCTYPE html><html><head><title>Not Built</title></head><body><h1>Application not built</h1></body></html>');
+      }
     } else {
-      res.status(503).send('Application not built');
+      // Health checker - instant response
+      res.status(200).send(HEALTH_RESPONSE);
     }
-  } else {
-    // Health checker - instant response
-    res.status(200).send(HEALTH_RESPONSE);
+  } catch (error) {
+    console.error('❌ Error in root endpoint:', error);
+    res.status(500).send(HEALTH_RESPONSE); // Fallback to health response
   }
 });
 
@@ -65,28 +90,59 @@ app.get('/status', (req, res) => {
 
 // Dedicated browser route for React application (backup)
 app.get('/app', (req, res) => {
-  const indexPath = path.join(process.cwd(), 'public', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(503).send('Application not built');
+  try {
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          console.error('❌ Error serving /app:', err);
+          res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Application Error</h1></body></html>');
+        }
+      });
+    } else {
+      console.error('❌ index.html not found for /app at:', indexPath);
+      res.status(503).send('<!DOCTYPE html><html><head><title>Not Built</title></head><body><h1>Application not built</h1></body></html>');
+    }
+  } catch (error) {
+    console.error('❌ Error in /app endpoint:', error);
+    res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Server Error</h1></body></html>');
   }
 });
 
-// ===== IMMEDIATE STATIC FILE SERVING =====
+// ===== IMMEDIATE STATIC FILE SERVING WITH ERROR HANDLING =====
 // Serve static files immediately for favicon and assets
-app.use(express.static(path.join(process.cwd(), 'public')));
+try {
+  const publicPath = path.join(process.cwd(), 'public');
+  console.log(`📁 Serving static files from: ${publicPath}`);
+  console.log(`📁 Public directory exists: ${fs.existsSync(publicPath)}`);
+  
+  app.use(express.static(publicPath, {
+    setHeaders: (res, path) => {
+      // Add proper cache headers for static files
+      if (path.endsWith('.ico')) {
+        res.setHeader('Content-Type', 'image/x-icon');
+      }
+    },
+    fallthrough: true // Continue to next middleware if file not found
+  }));
 
-// Additional static routes for uploads
-const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-const uploadsBasePath = isProduction ? 
-  path.join(process.cwd(), 'public/uploads') : 
-  path.join(process.cwd(), 'uploads');
+  // Additional static routes for uploads
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+  const uploadsBasePath = isProduction ? 
+    path.join(process.cwd(), 'public/uploads') : 
+    path.join(process.cwd(), 'uploads');
 
-app.use('/uploads', express.static(uploadsBasePath));
+  console.log(`📁 Uploads path: ${uploadsBasePath}`);
+  console.log(`📁 Uploads directory exists: ${fs.existsSync(uploadsBasePath)}`);
 
-if (isProduction) {
-  app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+  app.use('/uploads', express.static(uploadsBasePath, { fallthrough: true }));
+
+  if (isProduction) {
+    app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads'), { fallthrough: true }));
+  }
+} catch (error) {
+  console.error('❌ Error setting up static file serving:', error);
+  // Continue without crashing
 }
 
 // ===== DEPLOYMENT CONFIGURATION =====
@@ -101,6 +157,7 @@ console.log(`💻 Process: ${process.pid}`);
 console.log(`📦 Platform: ${process.platform}`);
 console.log(`⚡ Node version: ${process.version}`);
 
+// ===== ROBUST SERVER STARTUP =====
 const server = app.listen(PORT, HOST, () => {
   console.log(`✅ Server listening on ${HOST}:${PORT}`);
   console.log('🏥 Health checks active - instant responses');
@@ -116,6 +173,24 @@ const server = app.listen(PORT, HOST, () => {
       // Never crash - keep server running for health checks
     });
   });
+});
+
+// ===== SERVER ERROR HANDLING =====
+server.on('error', (error: any) => {
+  console.error('❌ Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use`);
+    process.exit(1);
+  }
+  // For other errors, log but don't crash
+});
+
+server.on('clientError', (err: any, socket: any) => {
+  console.error('❌ Client error:', err);
+  // Don't crash on client errors
+  if (!socket.destroyed) {
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  }
 });
 
 // ===== APPLICATION INITIALIZATION (BACKGROUND ONLY) =====
@@ -198,7 +273,7 @@ async function initializeApplication() {
       const { registerRoutes } = await import("./routes");
       registerRoutes(app);
       console.log('✅ Main routes registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Main routes skipped:', error.message);
     }
 
@@ -206,7 +281,7 @@ async function initializeApplication() {
       const { registerActivityPaymentRoutes } = await import("./routes/activityPayments");
       registerActivityPaymentRoutes(app);
       console.log('✅ Activity payment routes registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Activity payment routes skipped:', error.message);
     }
 
@@ -214,7 +289,7 @@ async function initializeApplication() {
       const { activityRouter } = await import("./activityRoutes");
       app.use('/activities', activityRouter);
       console.log('✅ Activity router registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Activity router skipped:', error.message);
     }
 
@@ -222,7 +297,7 @@ async function initializeApplication() {
       const { testRouter } = await import("./testRoutes");
       app.use('/test', testRouter);
       console.log('✅ Test router registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Test router skipped:', error.message);
     }
 
@@ -246,7 +321,7 @@ async function initializeApplication() {
       const { createParkEvaluationsTables } = await import("./create-park-evaluations-tables");
       await createParkEvaluationsTables();
       console.log('✅ Park evaluation tables created');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Park evaluation tables skipped:', error.message);
     }
 
@@ -254,7 +329,7 @@ async function initializeApplication() {
       const { registerInstructorInvitationRoutes } = await import("./instructorInvitationRoutes");
       registerInstructorInvitationRoutes(app);
       console.log('✅ Instructor invitation routes registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Instructor invitation routes skipped:', error.message);
     }
 
@@ -262,7 +337,7 @@ async function initializeApplication() {
       const { registerInstructorApplicationRoutes } = await import("./instructorApplicationRoutes");
       registerInstructorApplicationRoutes(app);
       console.log('✅ Instructor application routes registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Instructor application routes skipped:', error.message);
     }
 
@@ -270,7 +345,7 @@ async function initializeApplication() {
       const { registerAuditRoutes } = await import("./audit-routes");
       registerAuditRoutes(app);
       console.log('✅ Audit routes registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Audit routes skipped:', error.message);
     }
 
@@ -278,7 +353,7 @@ async function initializeApplication() {
       const faunaRoutes = await import("./faunaRoutes");
       app.use('/', faunaRoutes.default || faunaRoutes);
       console.log('✅ Fauna routes registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Fauna routes skipped:', error.message);
     }
 
@@ -286,50 +361,35 @@ async function initializeApplication() {
       const evaluacionesRoutes = await import("./evaluaciones-routes");
       app.use('/', evaluacionesRoutes.default || evaluacionesRoutes);
       console.log('✅ Evaluaciones routes registered');
-    } catch (error) {
+    } catch (error: any) {
       console.log('⚠️ Evaluaciones routes skipped:', error.message);
     }
 
     console.log('✅ Background initialization completed');
     console.log('🎯 ParkSys application fully loaded');
+    
+    // ===== UNIVERSAL ERROR MIDDLEWARE (AFTER ALL ROUTES) =====
+    app.use((err: any, req: any, res: any, next: any) => {
+      console.error('❌ Express Error Middleware:', err);
+      console.error('URL:', req.url);
+      console.error('Method:', req.method);
+      
+      // Never crash - always respond
+      if (!res.headersSent) {
+        if (req.get('Accept')?.includes('text/html')) {
+          res.status(500).send('<!DOCTYPE html><html><head><title>Server Error</title></head><body><h1>Server Error</h1><p>Please try again later.</p></body></html>');
+        } else {
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      }
+    });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Background initialization failed:', error);
     // Never crash - server continues for health checks
   }
 }
 
-// ===== ERROR HANDLING - KEEP SERVER ALIVE =====
-process.on('uncaughtException', (error) => {
-  console.error('🚨 Uncaught Exception:', error.message);
-  console.error('Stack:', error.stack);
-  console.error('🔄 Server continues running for health checks');
-  // Never exit - keep server alive for health checks
-});
-
-process.on('unhandledRejection', (reason) => {
-  console.error('🚨 Unhandled Rejection:', reason);
-  if (reason instanceof Error) {
-    console.error('Stack:', reason.stack);
-  }
-  console.error('🔄 Server continues running for health checks');
-  // Never exit - keep server alive for health checks
-});
-
-// Additional error handling for server
-if (server) {
-  server.on('error', (error) => {
-    console.error('🚨 Server Error:', error.message);
-    console.error('Stack:', error.stack);
-  });
-  
-  server.on('clientError', (error, socket) => {
-    console.error('🚨 Client Error:', error.message);
-    if (socket.writable) {
-      socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-    }
-  });
-}
 
 // ===== GRACEFUL SHUTDOWN FOR CLOUD RUN =====
 process.on('SIGTERM', () => {
