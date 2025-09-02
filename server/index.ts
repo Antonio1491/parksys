@@ -2077,7 +2077,7 @@ function startServer() {
   criticalApiRouter.get("/events", async (req: any, res: any) => {
     try {
       const { pool } = await import("./db");
-      const result = await pool.query('SELECT * FROM events ORDER BY event_date DESC LIMIT 50');
+      const result = await pool.query('SELECT * FROM events ORDER BY start_date DESC LIMIT 50');
       console.log(`📅 [CRITICAL] Returning ${result.rows.length} events via critical route`);
       res.json(result.rows);
     } catch (error) {
