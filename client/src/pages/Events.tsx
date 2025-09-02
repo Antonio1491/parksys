@@ -15,18 +15,18 @@ interface Event {
   id: number;
   title: string;
   description: string;
-  startDate: string;
-  endDate: string;
-  startTime?: string;
-  endTime?: string;
+  start_date: string;
+  end_date: string;
+  start_time?: string;
+  end_time?: string;
   location: string;
   capacity: number;
   registeredCount?: number;
-  eventType: string;
+  event_type: string;
   status: 'draft' | 'published' | 'cancelled';
-  featuredImageUrl?: string;
-  organizerName: string;
-  organizerEmail: string;
+  featured_image_url?: string;
+  organizer_name: string;
+  organizer_email: string;
   parks?: Array<{ id: number; name: string; address: string }>;
 }
 
@@ -53,7 +53,7 @@ const Events: React.FC = () => {
   const parks = Array.isArray(parksData?.data) ? parksData.data : Array.isArray(parksData) ? parksData : [];
   
   // Obtener categorías únicas de los eventos
-  const categories = [...new Set(events.map((event: Event) => event.eventType))];
+  const categories = [...new Set(events.map((event: Event) => event.event_type))];
 
   const filteredEvents = events.filter((event: Event) => {
     const parkName = event.parks && event.parks.length > 0 ? event.parks[0].name : event.location;
@@ -62,8 +62,8 @@ const Events: React.FC = () => {
                          event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          parkName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.organizerName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || event.eventType === categoryFilter;
+                         event.organizer_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === 'all' || event.event_type === categoryFilter;
     const matchesPark = parkFilter === 'all' || parkName === parkFilter;
     
     return matchesSearch && matchesCategory && matchesPark;
@@ -269,9 +269,9 @@ const Events: React.FC = () => {
                   <div className="flex flex-col h-80">
                     {/* Imagen que ocupa 2/3 de la altura */}
                     <div className="relative h-2/3 overflow-hidden">
-                      {event.featuredImageUrl ? (
+                      {event.featured_image_url ? (
                         <img 
-                          src={event.featuredImageUrl} 
+                          src={event.featured_image_url} 
                           alt={event.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -286,11 +286,11 @@ const Events: React.FC = () => {
                         <Badge 
                           className="text-xs border shadow-sm font-medium text-white"
                           style={{ 
-                            backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
+                            backgroundColor: eventTypeColors[event.event_type as keyof typeof eventTypeColors] || '#3B82F6',
                             borderColor: 'rgba(255,255,255,0.3)'
                           }}
                         >
-                          {event.eventType}
+                          {event.event_type}
                         </Badge>
                       </div>
 
@@ -322,7 +322,7 @@ const Events: React.FC = () => {
                         <div className="flex items-center text-gray-700">
                           <Calendar className="h-4 w-4 mr-2 text-blue-600" />
                           <span className="text-sm">
-                            {formatDate(event.startDate)}
+                            {formatDate(event.start_date)}
                           </span>
                         </div>
                         <div className="flex items-center text-gray-700">
@@ -341,7 +341,7 @@ const Events: React.FC = () => {
                         )}
                         <div className="text-xs text-gray-500 mt-2">
                           <span className="font-medium">Organiza: </span>
-                          <span className="text-gray-700">{event.organizerName || 'Administración del Parque'}</span>
+                          <span className="text-gray-700">{event.organizer_name || 'Administración del Parque'}</span>
                         </div>
                       </div>
                     </div>
@@ -358,18 +358,18 @@ const Events: React.FC = () => {
                           <Badge 
                             className="text-xs border shadow-sm font-medium text-white"
                             style={{ 
-                              backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
+                              backgroundColor: eventTypeColors[event.event_type as keyof typeof eventTypeColors] || '#3B82F6',
                               borderColor: 'rgba(255,255,255,0.3)'
                             }}
                           >
-                            {event.eventType}
+                            {event.event_type}
                           </Badge>
                         </div>
                         
                         <div className="flex items-center gap-6 text-sm text-gray-500 mb-2">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-1" />
-                            {formatDate(event.startDate)} {event.startTime && `- ${formatTime(event.startTime)}`}
+                            {formatDate(event.start_date)} {event.start_time && `- ${formatTime(event.start_time)}`}
                           </div>
                           <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-1" />
@@ -383,15 +383,15 @@ const Events: React.FC = () => {
                         
                         <div className="text-xs text-gray-500">
                           <span className="font-medium">Organiza: </span>
-                          <span className="text-gray-700">{event.organizerName || 'Administración del Parque'}</span>
+                          <span className="text-gray-700">{event.organizer_name || 'Administración del Parque'}</span>
                         </div>
                       </div>
                       
                       {/* Imagen del evento - 1/4 del espacio */}
                       <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg">
-                        {event.featuredImageUrl ? (
+                        {event.featured_image_url ? (
                           <img 
-                            src={event.featuredImageUrl} 
+                            src={event.featured_image_url} 
                             alt={event.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
