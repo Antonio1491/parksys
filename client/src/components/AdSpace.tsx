@@ -67,17 +67,7 @@ const AdSpace: React.FC<AdSpaceProps> = ({ spaceId, position, pageType, classNam
     ? placementsResponse.data[0] 
     : null;
 
-  // Debug logging (solo cuando hay datos relevantes)
-  React.useEffect(() => {
-    if (isLoading) {
-      console.log(`⏳ AdSpace ${spaceId} está cargando...`);
-    } else if (placementsResponse?.success && Array.isArray(placementsResponse.data)) {
-      if (placementsResponse.data.length > 0) {
-        console.log(`✅ AdSpace ${spaceId} tiene asignación activa:`, activePlacement);
-      }
-      // Solo registrar cuando no hay datos Y es la primera carga (evita spam de logs)
-    }
-  }, [spaceId, pageType, position, isLoading, placementsResponse, activePlacement]);
+  // Debug logging completamente removido para evitar spam en consola
 
 
 
@@ -292,8 +282,7 @@ const AdSpace: React.FC<AdSpaceProps> = ({ spaceId, position, pageType, classNam
 
   const containerStyle = baseStyles[position as keyof typeof baseStyles] || baseStyles.sidebar;
 
-  console.log(`🎨 AdSpace ${spaceId} Container style:`, containerStyle);
-  console.log(`🎨 AdSpace ${spaceId} className adicional:`, className);
+  // Logs removidos para evitar spam en consola
 
   return (
     <div 
