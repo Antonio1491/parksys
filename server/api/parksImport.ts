@@ -406,14 +406,24 @@ export const processImportFile = async (req: Request, res: Response) => {
         if (englishKey) {
           let value = row[key];
           
-          // Convertir números
-          if (['municipalityId', 'foundationYear', 'latitude', 'longitude', 'area'].includes(englishKey)) {
-            value = convertToNumber(value);
+          // Convertir números (pero NO latitude/longitude que deben ser strings)
+          if (['municipalityId', 'foundationYear', 'area'].includes(englishKey)) {
+            const numValue = convertToNumber(value);
+            // Para municipalityId, asignar valor por defecto si es null
+            if (englishKey === 'municipalityId' && numValue === null) {
+              value = 1; // Valor por defecto
+            } else {
+              value = numValue;
+            }
           }
           
-          // Limpiar strings
-          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail'].includes(englishKey)) {
+          // Limpiar y mantener como strings (incluyendo coordenadas)
+          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail', 'latitude', 'longitude'].includes(englishKey)) {
             value = cleanString(value);
+            // Para coordenadas, asegurar que no sean null
+            if ((englishKey === 'latitude' || englishKey === 'longitude') && value === null) {
+              value = '0.0'; // Valor por defecto para coordenadas
+            }
           }
           
           // Convertir 'estacionamiento' a booleano
