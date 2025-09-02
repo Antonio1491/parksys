@@ -818,14 +818,96 @@ export class DatabaseStorage implements IStorage {
 
   async updatePark(id: number, data: any): Promise<any> {
     try {
-      const result = await db.update(parks)
-        .set({
-          ...data,
-          updatedAt: new Date()
-        })
-        .where(eq(parks.id, id))
-        .returning();
-      return result[0] || null;
+      console.log("🔄 Actualizando parque con datos:", data);
+      
+      // Construir la consulta SQL dinámicamente
+      const fields = [];
+      const values = [];
+      let paramIndex = 1;
+      
+      if (data.name !== undefined) {
+        fields.push(`name = $${paramIndex++}`);
+        values.push(data.name);
+      }
+      if (data.municipalityText !== undefined) {
+        fields.push(`municipality_text = $${paramIndex++}`);
+        values.push(data.municipalityText);
+      }
+      if (data.description !== undefined) {
+        fields.push(`description = $${paramIndex++}`);
+        values.push(data.description);
+      }
+      if (data.address !== undefined) {
+        fields.push(`address = $${paramIndex++}`);
+        values.push(data.address);
+      }
+      if (data.postalCode !== undefined) {
+        fields.push(`postal_code = $${paramIndex++}`);
+        values.push(data.postalCode);
+      }
+      if (data.latitude !== undefined) {
+        fields.push(`latitude = $${paramIndex++}`);
+        values.push(data.latitude);
+      }
+      if (data.longitude !== undefined) {
+        fields.push(`longitude = $${paramIndex++}`);
+        values.push(data.longitude);
+      }
+      if (data.area !== undefined) {
+        fields.push(`area = $${paramIndex++}`);
+        values.push(data.area);
+      }
+      if (data.foundationYear !== undefined) {
+        fields.push(`foundation_year = $${paramIndex++}`);
+        values.push(data.foundationYear);
+      }
+      if (data.administrator !== undefined) {
+        fields.push(`administrator = $${paramIndex++}`);
+        values.push(data.administrator);
+      }
+      if (data.contactPhone !== undefined) {
+        fields.push(`contact_phone = $${paramIndex++}`);
+        values.push(data.contactPhone);
+      }
+      if (data.contactEmail !== undefined) {
+        fields.push(`contact_email = $${paramIndex++}`);
+        values.push(data.contactEmail);
+      }
+      if (data.certificaciones !== undefined) {
+        fields.push(`certificaciones = $${paramIndex++}`);
+        values.push(data.certificaciones);
+      }
+      if (data.dailySchedule !== undefined) {
+        fields.push(`opening_hours = $${paramIndex++}`);
+        values.push(JSON.stringify(data.dailySchedule));
+      }
+      
+      // Siempre actualizar updated_at
+      fields.push(`updated_at = NOW()`);
+      values.push(id); // ID para el WHERE
+      
+      if (fields.length === 1) { // Solo tiene updated_at
+        throw new Error("No hay campos para actualizar");
+      }
+      
+      const result = await pool.query(`
+        UPDATE parks 
+        SET ${fields.join(', ')}
+        WHERE id = $${paramIndex}
+        RETURNING 
+          id, name, municipality_id as "municipalityId", municipality_text as "municipalityText",
+          park_type as "parkType", description, address,
+          postal_code as "postalCode", latitude, longitude,
+          area, green_area as "greenArea", foundation_year as "foundationYear",
+          administrator, conservation_status as "conservationStatus",
+          regulation_url as "regulationUrl", opening_hours as "openingHours",
+          contact_email as "contactEmail", contact_phone as "contactPhone",
+          video_url as "videoUrl", certificaciones,
+          is_deleted as "isDeleted", created_at as "createdAt", updated_at as "updatedAt"
+      `, values);
+      
+      console.log("✅ Parque actualizado exitosamente:", result.rows[0]);
+      return result.rows[0] || null;
     } catch (error) {
       console.error("Error al actualizar parque:", error);
       throw error;
