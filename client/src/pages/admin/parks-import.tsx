@@ -182,13 +182,23 @@ const ParksImport = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="file">Archivo de Importación</Label>
-                <Input
-                  id="file"
-                  type="file"
-                  accept=".xlsx,.xls,.csv"
-                  onChange={handleFileChange}
-                  className="cursor-pointer"
-                />
+                <div className="relative">
+                  <input
+                    id="file"
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="flex items-center justify-between w-full px-3 py-2 text-sm border border-input bg-background rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground">
+                    <span className="text-muted-foreground">
+                      {selectedFile ? selectedFile.name : 'Ningún archivo seleccionado'}
+                    </span>
+                    <Button type="button" variant="outline" size="sm" className="pointer-events-none">
+                      Elegir Archivo
+                    </Button>
+                  </div>
+                </div>
                 <p className="text-sm text-gray-500">
                   Formatos aceptados: Excel (.xlsx, .xls) o CSV (.csv)
                 </p>
