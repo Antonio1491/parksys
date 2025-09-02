@@ -2,8 +2,16 @@ import { ExportFormatter } from '../ExportEngine';
 import { ExportOptions, ExportConfig } from '../../../shared/exports/config';
 import { BrandingConfig } from '../../../shared/exports/branding';
 import moment from 'moment';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
-// Placeholder para PDFFormatter - requiere implementación completa con jsPDF
+// Extender el tipo de jsPDF para incluir autoTable
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
+
 export class PDFFormatter implements ExportFormatter {
   format = 'pdf';
   mimeType = 'application/pdf';
@@ -15,54 +23,129 @@ export class PDFFormatter implements ExportFormatter {
     branding: BrandingConfig, 
     options: ExportOptions
   ): Promise<Buffer> {
-    // Por ahora, generar un PDF simple con información básica
-    // En implementación completa, usar jsPDF o similar
-    
     const selectedFields = options.fields || config.fields.map(f => f.key);
     const fieldConfigs = config.fields.filter(f => selectedFields.includes(f.key));
 
-    // Crear contenido básico en texto
-    let content = '';
-    
+    // Crear nuevo documento PDF
+    const doc = new jsPDF({
+      orientation: fieldConfigs.length > 6 ? 'landscape' : 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    let yPosition = 20;
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 20;
+
     // Header
     if (options.template !== 'minimal' && options.branding?.includeHeader !== false) {
-      content += `${branding.organization.name}\n`;
-      content += `${branding.organization.department || ''}\n`;
-      content += `\nReporte: ${config.displayName}\n`;
-      content += `Generado: ${moment().format('DD/MM/YYYY HH:mm')}\n`;
-      content += '\n' + '='.repeat(80) + '\n\n';
+      // Título de la organización
+      if (branding.templates.header.showOrganization) {
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text(branding.organization.name, margin, yPosition);
+        yPosition += 8;
+      }
+
+      // Departamento
+      if (branding.organization.department) {
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text(branding.organization.department, margin, yPosition);
+        yPosition += 8;
+      }
+
+      // Título del reporte
+      if (branding.templates.header.showTitle) {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Reporte: ${config.displayName}`, margin, yPosition);
+        yPosition += 8;
+      }
+
+      // Fecha
+      if (branding.templates.header.showDate) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Generado: ${moment().format('DD/MM/YYYY HH:mm')}`, margin, yPosition);
+        yPosition += 12;
+      }
+
+      // Línea separadora
+      doc.setDrawColor(branding.colors.primary);
+      doc.setLineWidth(0.5);
+      doc.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 10;
     }
 
-    // Tabla de datos simplificada
-    // Headers
-    const headers = fieldConfigs.map(f => f.label).join(' | ');
-    content += headers + '\n';
-    content += '-'.repeat(headers.length) + '\n';
+    // Preparar datos para la tabla
+    const tableColumns = fieldConfigs.map(field => ({
+      header: field.label,
+      dataKey: field.key,
+      width: field.width ? field.width * 2 : 'auto' // Convertir ancho estimado
+    }));
 
-    // Data
-    data.forEach(row => {
-      const values = fieldConfigs.map(field => {
-        const value = this.formatValue(row[field.key], field.type, branding);
-        return value.toString().substring(0, 20); // Truncar para formato tabla
+    const tableData = data.map(row => {
+      const rowData: any = {};
+      fieldConfigs.forEach(field => {
+        const value = row[field.key];
+        rowData[field.key] = this.formatValue(value, field.type, branding);
       });
-      content += values.join(' | ') + '\n';
+      return rowData;
+    });
+
+    // Generar tabla con autoTable
+    doc.autoTable({
+      startY: yPosition,
+      head: [tableColumns.map(col => col.header)],
+      body: tableData.map(row => 
+        tableColumns.map(col => row[col.dataKey])
+      ),
+      styles: {
+        fontSize: 8,
+        cellPadding: 3,
+        textColor: [31, 41, 55], // text color del branding
+        fillColor: [255, 255, 255]
+      },
+      headStyles: {
+        fillColor: this.hexToRgb(branding.colors.tableHeader),
+        textColor: [255, 255, 255],
+        fontSize: 9,
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: this.hexToRgb(branding.colors.tableAlternate)
+      },
+      margin: { left: margin, right: margin },
+      tableWidth: 'auto',
+      columnStyles: {},
     });
 
     // Footer
     if (options.template !== 'minimal' && options.branding?.includeFooter !== false) {
-      content += '\n' + '='.repeat(80) + '\n';
-      content += `Total de registros: ${data.length}\n`;
-      if (branding.organization.website) {
-        content += `${branding.organization.website}\n`;
+      const finalY = (doc as any).lastAutoTable.finalY || yPosition + 100;
+      const footerY = finalY + 15;
+
+      // Total de registros
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Total de registros: ${data.length}`, margin, footerY);
+
+      // Información de contacto
+      if (branding.templates.footer.showContact && branding.organization.website) {
+        doc.text(`Sitio web: ${branding.organization.website}`, margin, footerY + 6);
       }
-      if (branding.templates.footer.disclaimer) {
-        content += `\n${branding.templates.footer.disclaimer}\n`;
+
+      // Disclaimer
+      if (branding.templates.footer.showDisclaimer && branding.templates.footer.disclaimer) {
+        doc.setFontSize(8);
+        doc.text(branding.templates.footer.disclaimer, margin, footerY + 12);
       }
     }
 
-    // Convertir a Buffer (implementación básica)
-    // En producción, usar una librería de PDF real
-    return Buffer.from(content, 'utf-8');
+    // Generar Buffer del PDF
+    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+    return pdfBuffer;
   }
 
   private formatValue(value: any, type: string, branding: BrandingConfig): string {
@@ -92,5 +175,17 @@ export class PDFFormatter implements ExportFormatter {
       default:
         return value?.toString() || '';
     }
+  }
+
+  private hexToRgb(hex: string): [number, number, number] {
+    // Remover el # si está presente
+    hex = hex.replace('#', '');
+    
+    // Convertir hex a RGB
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    return [r, g, b];
   }
 }
