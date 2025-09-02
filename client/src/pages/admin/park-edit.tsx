@@ -50,7 +50,20 @@ const parkSchema = z.object({
   description: z.string().nullable().optional(),
   postalCode: z.string().nullable().optional(),
   latitude: z.string().nullable().optional(),
-  longitude: z.string().nullable().optional()
+  longitude: z.string().nullable().optional(),
+  area: z.string().nullable().optional(),
+  foundationYear: z.coerce.number().nullable().optional(),
+
+  // Horarios individuales por día
+  dailySchedule: z.record(z.string(), z.object({
+    enabled: z.boolean(),
+    openingTime: z.string().nullable().optional(),
+    closingTime: z.string().nullable().optional()
+  })).optional(),
+  administrator: z.string().nullable().optional(),
+  contactPhone: z.string().nullable().optional(),
+  contactEmail: z.string().nullable().optional(),
+  certificaciones: z.string().nullable().optional(),
 });
 
 type ParkFormValues = z.infer<typeof parkSchema>;
@@ -72,6 +85,7 @@ const AdminParkEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [_, setLocation] = useWouterLocation();
   const isEdit = !!id;
+  const [activeTab, setActiveTab] = useState('basic');
   const { toast } = useToast();
   
 
@@ -97,7 +111,24 @@ const AdminParkEdit: React.FC = () => {
       description: '',
       postalCode: '',
       latitude: '',
-      longitude: ''
+      longitude: '',
+      area: '',
+      foundationYear: null,
+
+      // Horarios por defecto por día
+      dailySchedule: {
+        'Lunes': { enabled: false, openingTime: '', closingTime: '' },
+        'Martes': { enabled: false, openingTime: '', closingTime: '' },
+        'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
+        'Jueves': { enabled: false, openingTime: '', closingTime: '' },
+        'Viernes': { enabled: false, openingTime: '', closingTime: '' },
+        'Sábado': { enabled: false, openingTime: '', closingTime: '' },
+        'Domingo': { enabled: false, openingTime: '', closingTime: '' }
+      },
+      administrator: '',
+      contactPhone: '',
+      contactEmail: '',
+      certificaciones: '',
     },
   });
   
@@ -114,7 +145,23 @@ const AdminParkEdit: React.FC = () => {
         description: park.description || '',
         postalCode: park.postalCode || '',
         latitude: park.latitude || '',
-        longitude: park.longitude || ''
+        longitude: park.longitude || '',
+        area: park.area || '',
+        foundationYear: park.foundationYear || undefined,
+        // Parsear horarios existentes o usar valores por defecto
+        dailySchedule: {
+          'Lunes': { enabled: false, openingTime: '', closingTime: '' },
+          'Martes': { enabled: false, openingTime: '', closingTime: '' },
+          'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
+          'Jueves': { enabled: false, openingTime: '', closingTime: '' },
+          'Viernes': { enabled: false, openingTime: '', closingTime: '' },
+          'Sábado': { enabled: false, openingTime: '', closingTime: '' },
+          'Domingo': { enabled: false, openingTime: '', closingTime: '' }
+        },
+        administrator: park.administrator || '',
+        contactPhone: park.contactPhone || '',
+        contactEmail: park.contactEmail || '',
+        certificaciones: park.certificaciones || '',
       };
       
       form.reset(formValues);
@@ -132,7 +179,17 @@ const AdminParkEdit: React.FC = () => {
     const cleanedValues = {
       ...values,
       latitude: values.latitude ? values.latitude.trim().replace(/,$/, '') : undefined,
-      longitude: values.longitude ? values.longitude.trim().replace(/,$/, '') : undefined
+      longitude: values.longitude ? values.longitude.trim().replace(/,$/, '') : undefined,
+      area: values.area || undefined,
+      foundationYear: values.foundationYear || undefined,
+      administrator: values.administrator || undefined,
+      contactPhone: values.contactPhone || undefined,
+      contactEmail: values.contactEmail || undefined,
+      // Convertir horarios individuales por día a JSON para el backend
+      openingHours: values.dailySchedule && Object.values(values.dailySchedule).some(schedule => schedule.enabled)
+        ? JSON.stringify(values.dailySchedule)
+        : undefined,
+      certificaciones: values.certificaciones || undefined
     };
     
     console.log('Valores limpiados para enviar:', cleanedValues);
@@ -205,11 +262,17 @@ const AdminParkEdit: React.FC = () => {
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 park-edit-container">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-1">
+                  <TabsTrigger value="basic">Información Básica</TabsTrigger>
+                </TabsList>
+            
+            <TabsContent value="basic">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isEdit ? 'Editar Parque' : 'Nuevo Parque'}</CardTitle>
+                  <CardTitle>Información Básica</CardTitle>
                   <CardDescription>
-                    {isEdit ? 'Actualiza la información del parque' : 'Ingresa la información para crear un nuevo parque'}
+                    Información general sobre el parque
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -332,6 +395,209 @@ const AdminParkEdit: React.FC = () => {
                     />
                   </div>
                   
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Área */}
+                    <FormField
+                      control={form.control}
+                      name="area"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Área (m²)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Superficie en metros cuadrados" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Año de fundación */}
+                    <FormField
+                      control={form.control}
+                      name="foundationYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Año de fundación</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              placeholder="Año de fundación"
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : null)}
+                              value={field.value === null ? '' : field.value}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+
+                  
+                  {/* Configuración de horarios individuales por día */}
+                  <FormField
+                    control={form.control}
+                    name="dailySchedule"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-medium">Configuración de Horarios</h3>
+                          
+                          {/* Encabezados */}
+                          <div className="grid grid-cols-4 gap-4 pb-2 border-b">
+                            <div className="font-medium text-sm">Día</div>
+                            <div className="font-medium text-sm text-center">Activo</div>
+                            <div className="font-medium text-sm text-center">Apertura</div>
+                            <div className="font-medium text-sm text-center">Cierre</div>
+                          </div>
+
+                          {/* Filas por cada día */}
+                          <div className="space-y-3">
+                            {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day) => (
+                              <div key={day} className="grid grid-cols-4 gap-4 items-center">
+                                {/* Nombre del día */}
+                                <div className="font-medium text-sm">
+                                  {day}
+                                </div>
+
+                                {/* Checkbox de habilitado */}
+                                <div className="flex justify-center">
+                                  <Checkbox
+                                    id={`${day}-enabled`}
+                                    checked={field.value?.[day]?.enabled || false}
+                                    onCheckedChange={(checked) => {
+                                      const currentSchedule = field.value || {};
+                                      const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
+                                      field.onChange({
+                                        ...currentSchedule,
+                                        [day]: {
+                                          ...daySchedule,
+                                          enabled: checked as boolean
+                                        }
+                                      });
+                                    }}
+                                  />
+                                </div>
+
+                                {/* Hora de apertura */}
+                                <div>
+                                  <Input
+                                    type="time"
+                                    value={field.value?.[day]?.openingTime || ''}
+                                    onChange={(e) => {
+                                      const currentSchedule = field.value || {};
+                                      const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
+                                      field.onChange({
+                                        ...currentSchedule,
+                                        [day]: {
+                                          ...daySchedule,
+                                          openingTime: e.target.value
+                                        }
+                                      });
+                                    }}
+                                    disabled={!field.value?.[day]?.enabled}
+                                    className="text-center"
+                                  />
+                                </div>
+
+                                {/* Hora de cierre */}
+                                <div>
+                                  <Input
+                                    type="time"
+                                    value={field.value?.[day]?.closingTime || ''}
+                                    onChange={(e) => {
+                                      const currentSchedule = field.value || {};
+                                      const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
+                                      field.onChange({
+                                        ...currentSchedule,
+                                        [day]: {
+                                          ...daySchedule,
+                                          closingTime: e.target.value
+                                        }
+                                      });
+                                    }}
+                                    disabled={!field.value?.[day]?.enabled}
+                                    className="text-center"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Administrador */}
+                    <FormField
+                      control={form.control}
+                      name="administrator"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Administrador</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nombre del administrador" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Teléfono de contacto */}
+                    <FormField
+                      control={form.control}
+                      name="contactPhone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Teléfono de contacto</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Teléfono de contacto" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  {/* Correo electrónico */}
+                  <FormField
+                    control={form.control}
+                    name="contactEmail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Correo electrónico de contacto</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Correo electrónico" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {/* Certificaciones */}
+                  <FormField
+                    control={form.control}
+                    name="certificaciones"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Certificaciones</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Green Flag Award, ISO 14001, Certificación Ambiental (separadas por comas)" 
+                            className="min-h-[80px]" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-sm text-muted-foreground">
+                          Ingresa las certificaciones del parque separadas por comas. Ejemplo: Green Flag Award 2024, ISO 14001, Bandera Verde
+                        </p>
+                      </FormItem>
+                    )}
+                  />
+
                 </CardContent>
                 <CardFooter className="flex justify-end">
                   <Button 
@@ -343,6 +609,8 @@ const AdminParkEdit: React.FC = () => {
                   </Button>
                 </CardFooter>
               </Card>
+            </TabsContent>
+              </Tabs>
             </form>
           </Form>
         </div>
