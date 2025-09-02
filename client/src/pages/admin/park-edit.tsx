@@ -45,7 +45,7 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 // Define el esquema de validación para el formulario
 const parkSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
-  municipalityId: z.coerce.number().refine(val => val > 0, 'Seleccione un municipio'),
+  municipality: z.string().min(1, 'El municipio es requerido'),
   address: z.string().min(1, 'La dirección es requerida'),
   description: z.string().nullable().optional(),
   postalCode: z.string().nullable().optional(),
@@ -106,7 +106,7 @@ const AdminParkEdit: React.FC = () => {
     resolver: zodResolver(parkSchema),
     defaultValues: {
       name: '',
-      municipalityId: 0,
+      municipality: '',
       address: '',
       description: '',
       postalCode: '',
@@ -140,7 +140,7 @@ const AdminParkEdit: React.FC = () => {
       // Crear un objeto con los valores por defecto en caso de que falten propiedades
       const formValues = {
         name: park.name || '',
-        municipalityId: park.municipalityId || 0,
+        municipality: park.municipality?.name || park.municipality || '',
         address: park.address || '',
         description: park.description || '',
         postalCode: park.postalCode || '',
@@ -295,30 +295,16 @@ const AdminParkEdit: React.FC = () => {
                     {/* Municipio */}
                     <FormField
                       control={form.control}
-                      name="municipalityId"
+                      name="municipality"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-red-600">Municipio *</FormLabel>
-                          <Select 
-                            onValueChange={(value) => field.onChange(parseInt(value))}
-                            value={field.value ? field.value.toString() : ''}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Seleccione un municipio" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {municipalities?.map((municipality: any) => (
-                                <SelectItem 
-                                  key={municipality.id} 
-                                  value={municipality.id.toString()}
-                                >
-                                  {municipality.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ingrese el municipio"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
