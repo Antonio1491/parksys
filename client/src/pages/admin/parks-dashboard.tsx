@@ -17,6 +17,7 @@ import DashboardLayout from "@/components/ui/dashboard-layout";
 import MetricCard from "@/components/ui/metric-card";
 import GraphicCard from "@/components/ui/graphic-card";
 import VerticalBarChart from "@/components/ui/vertical-bar-chart";
+import ParkStarRatingChart from "@/components/ui/park-star-rating-chart";
 import {
   Card,
   CardContent,
@@ -382,7 +383,7 @@ const ParksDashboard = () => {
 
           {/* Columna 4: Calificación + Parque mejor evaluado */}
           <MetricCard
-            title="Calificación Promedio"
+            title="Evaluación Promedio"
             value={data.averageRating ? data.averageRating.toFixed(1) : "N/A"}
             subtitle="Promedio de evaluaciones"
             icon={CheckCircle}
@@ -454,18 +455,14 @@ const ParksDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Columna derecha: Gráfico de Evaluación Promedio por Parque - Usando VerticalBarChart */}
+        {/* Columna derecha: Gráfico de Evaluación Promedio por Parque - Usando ParkStarRatingChart */}
         <GraphicCard
           title="⭐ Evaluación Promedio por Parque"
           description="Nivel de satisfacción promedio de visitantes por parque basado en evaluaciones"
           className="h-full"
         >
-          <VerticalBarChart
-            data={(data.parkEvaluations || []).map((park) => ({
-              label: park.parkName,
-              value: park.averageRating,
-              id: park.parkId
-            }))}
+          <ParkStarRatingChart
+            data={data.parkEvaluations || []}
             emptyStateTitle="No hay evaluaciones disponibles"
             emptyStateDescription="Los datos de evaluación aparecerán aquí una vez que los visitantes evalúen los parques"
             footerText={
@@ -473,8 +470,6 @@ const ParksDashboard = () => {
                 ? `Mostrando todos los ${data.parkEvaluations.length} parques registrados en el sistema`
                 : undefined
             }
-            sortDescending={true}
-            showLabels={true}
           />
         </GraphicCard>
 
