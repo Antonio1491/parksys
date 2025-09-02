@@ -271,7 +271,7 @@ const Events: React.FC = () => {
                     <div className="relative h-2/3 overflow-hidden">
                       {event.featured_image_url ? (
                         <img 
-                          src={event.featured_image_url} 
+                          src={`http://localhost:5000${event.featured_image_url}`} 
                           alt={event.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -391,7 +391,7 @@ const Events: React.FC = () => {
                       <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg">
                         {event.featured_image_url ? (
                           <img 
-                            src={event.featured_image_url} 
+                            src={`http://localhost:5000${event.featured_image_url}`} 
                             alt={event.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
