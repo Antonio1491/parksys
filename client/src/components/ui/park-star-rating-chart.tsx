@@ -91,12 +91,12 @@ const ParkStarRatingChart: React.FC<ParkStarRatingChartProps> = ({
             <div className="flex-1 min-w-0 mr-4">
               <h4 className="text-sm font-medium text-gray-900 truncate">
                 {park.parkName}
+                {park.evaluationCount && (
+                  <span className="text-xs text-gray-500 ml-2 font-normal">
+                    ({park.evaluationCount} evaluación{park.evaluationCount !== 1 ? 'es' : ''})
+                  </span>
+                )}
               </h4>
-              {park.evaluationCount && (
-                <p className="text-xs text-gray-500">
-                  {park.evaluationCount} evaluación{park.evaluationCount !== 1 ? 'es' : ''}
-                </p>
-              )}
             </div>
 
             {/* Stars and rating (right side) */}
