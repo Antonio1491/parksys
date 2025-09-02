@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import multer from 'multer';
-import * as XLSX from 'xlsx';
+import XLSX from 'xlsx';
+import { parse } from 'csv-parse/sync';
 import path from 'path';
 import fs from 'fs';
 import { insertParkSchema } from '@shared/schema';
@@ -251,13 +252,47 @@ export const processImportFile = async (req: Request, res: Response) => {
     
     const filePath = req.file.path;
     
-    // Cargar el workbook
-    const workbook = XLSX.readFile(filePath);
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+    // Determinar el tipo de archivo y procesarlo
+    let rawData: any[] = [];
+    const fileExtension = path.extname(filePath).toLowerCase();
     
-    // Convertir a JSON
-    const rawData = XLSX.utils.sheet_to_json(worksheet, { raw: true }) as any[];
+    console.log('🔍 [IMPORT] Procesando archivo:', fileExtension);
+    
+    if (fileExtension === '.csv') {
+      // Procesar archivo CSV
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      console.log('📄 [IMPORT] Contenido CSV (primeras 200 chars):', fileContent.substring(0, 200));
+      
+      rawData = parse(fileContent, {
+        columns: true, // Usar la primera fila como headers
+        skip_empty_lines: true,
+        delimiter: ',',
+        quote: '"',
+        escape: '"'
+      });
+      console.log('✅ [IMPORT] CSV procesado, filas:', rawData.length);
+    } else if (fileExtension === '.xlsx' || fileExtension === '.xls') {
+      // Procesar archivo Excel
+      try {
+        const workbook = XLSX.readFile(filePath);
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        rawData = XLSX.utils.sheet_to_json(worksheet, { raw: true }) as any[];
+        console.log('✅ [IMPORT] Excel procesado, filas:', rawData.length);
+      } catch (xlsxError) {
+        console.error('❌ [IMPORT] Error con XLSX:', xlsxError);
+        // Fallback: intentar leer como CSV
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        rawData = parse(fileContent, {
+          columns: true,
+          skip_empty_lines: true,
+          delimiter: ','
+        });
+        console.log('🔄 [IMPORT] Fallback CSV exitoso, filas:', rawData.length);
+      }
+    } else {
+      throw new Error(`Tipo de archivo no soportado: ${fileExtension}`);
+    }
     
     if (rawData.length === 0) {
       return res.status(400).json({ message: 'El archivo está vacío o no contiene datos válidos' });
