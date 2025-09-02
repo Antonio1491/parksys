@@ -1333,35 +1333,36 @@ export class DatabaseStorage implements IStorage {
 
   async createPark(parkData: any): Promise<any> {
     try {
-      // CRÍTICO: Asegurar que NO se incluya el campo id
-      const { id, createdAt, updatedAt, ...cleanData } = parkData;
+      console.log('🏗️ [STORAGE] Datos recibidos:', Object.keys(parkData));
       
-      console.log('🏗️ [STORAGE] Datos limpios para inserción:', Object.keys(cleanData));
-      
-      const result = await db.insert(parks).values({
-        name: cleanData.name,
-        municipalityId: cleanData.municipalityId,
-        parkType: cleanData.parkType || 'urbano',
-        description: cleanData.description || '',
-        address: cleanData.address || '',
-        postalCode: cleanData.postalCode || '',
-        latitude: cleanData.latitude || '0',
-        longitude: cleanData.longitude || '0',
-        area: cleanData.area || '0',
-        foundationYear: cleanData.foundationYear || new Date().getFullYear(),
-        administrator: cleanData.administrator || '',
-        conservationStatus: cleanData.conservationStatus || 'Good',
-        regulationUrl: cleanData.regulationUrl || '',
-        openingHours: cleanData.openingHours || '{}',
-        contactEmail: cleanData.contactEmail || '',
-        contactPhone: cleanData.contactPhone || '',
-        certificaciones: cleanData.certificaciones || null,
-        videoUrl: cleanData.videoUrl || '',
+      // ESTRATEGIA NUEVA: Construir objeto completamente limpio sin campos problemáticos
+      const insertData = {
+        name: parkData.name,
+        municipalityId: parkData.municipalityId,
+        parkType: parkData.parkType || 'urbano',
+        description: parkData.description || '',
+        address: parkData.address || '',
+        postalCode: parkData.postalCode || '',
+        latitude: parkData.latitude || '0',
+        longitude: parkData.longitude || '0',
+        area: parkData.area || '0',
+        foundationYear: parkData.foundationYear || new Date().getFullYear(),
+        administrator: parkData.administrator || '',
+        conservationStatus: parkData.conservationStatus || 'Good',
+        regulationUrl: parkData.regulationUrl || '',
+        openingHours: parkData.openingHours || '{}',
+        contactEmail: parkData.contactEmail || '',
+        contactPhone: parkData.contactPhone || '',
+        certificaciones: parkData.certificaciones || null,
+        videoUrl: parkData.videoUrl || '',
         isDeleted: false
-        // NO incluir id, createdAt, updatedAt - se auto-generan
-      }).returning();
+      };
       
-      console.log('✅ [STORAGE] Parque creado con ID:', result[0].id);
+      console.log('✅ [STORAGE] Objeto limpio para inserción:', Object.keys(insertData));
+      
+      const result = await db.insert(parks).values(insertData).returning();
+      
+      console.log('✅ [STORAGE] Parque creado exitosamente con ID:', result[0].id);
       return result[0];
     } catch (error) {
       console.error("Error al crear parque:", error);
