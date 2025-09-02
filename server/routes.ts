@@ -89,15 +89,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server first
   const httpServer = createServer(app);
   
-  // ===== RUTAS ESTÁTICAS CRÍTICAS (PRIMERO) =====
-  // Servir archivos adjuntos desde attached_assets (ALTA PRIORIDAD)
-  console.log("📎 Configurando serving de attached_assets...");
-  app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_assets'), {
-    setHeaders: (res, filepath) => {
-      console.log(`📎 Serving attached asset: ${path.basename(filepath)}`);
-    }
-  }));
-  
   // API routes - all prefixed with /api
   const apiRouter = express.Router();
   
@@ -329,47 +320,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registramos las rutas de categorías de activos
   registerAssetCategoriesRoutes(app, apiRouter);
   
-  // ===== RUTAS BÁSICAS DE API PÚBLICAS =====
-  // Estas rutas son las que el frontend necesita para cargar datos iniciales
-  
-  // GET /api/parks - Lista todos los parques (ruta básica)
-  app.get('/api/parks', async (req: Request, res: Response) => {
-    try {
-      console.log('🌐 [API] GET /api/parks requested');
-      const parks = await storage.getParks({ includeDeleted: false });
-      res.json(parks);
-    } catch (error) {
-      console.error('❌ Error getting parks:', error);
-      res.status(500).json({ error: 'Error retrieving parks' });
-    }
-  });
-
-  // GET /api/events - Lista todos los eventos (ruta básica)
-  app.get('/api/events', async (req: Request, res: Response) => {
-    try {
-      console.log('🌐 [API] GET /api/events requested');
-      // Usar consulta directa SQL ya que getEvents() no existe en storage
-      const result = await pool.query('SELECT * FROM events ORDER BY start_date DESC');
-      res.json(result.rows);
-    } catch (error) {
-      console.error('❌ Error getting events:', error);
-      res.status(500).json({ error: 'Error retrieving events' });
-    }
-  });
-
-  // GET /api/sponsors - Lista todos los patrocinadores (ruta básica)
-  app.get('/api/sponsors', async (req: Request, res: Response) => {
-    try {
-      console.log('🌐 [API] GET /api/sponsors requested');
-      // Usar consulta directa SQL ya que getSponsors() no existe en storage
-      const result = await pool.query('SELECT * FROM sponsors ORDER BY name ASC');
-      res.json(result.rows);
-    } catch (error) {
-      console.error('❌ Error getting sponsors:', error);
-      res.status(500).json({ error: 'Error retrieving sponsors' });
-    }
-  });
-
   // Registramos las rutas del módulo de actividades
   registerActivityRoutes(app, apiRouter, isAuthenticated, hasParkAccess);
   
@@ -2439,8 +2389,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const images = extendedPark?.images || [];
 
       // Use simplified queries for other data that don't require complex joins
-      const activities = await storage.getActivities();
-      const parkActivities = (activities || []).filter((activity: any) => activity.parkId === parkId).slice(0, 20);
+      const activities = await storage.getAllActivities();
+      const parkActivities = activities.filter(activity => activity.parkId === parkId).slice(0, 20);
 
       // Get trees data with statistics for this park
       const treesQuery = await pool.query(
@@ -7351,13 +7301,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(404).json({ error: 'Imagen no encontrada' });
     }
   });
-
-  // Servir archivos estáticos desde attached_assets usando express.static()
-  app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_assets'), {
-    setHeaders: (res, filepath) => {
-      console.log(`📎 Serving attached asset: ${filepath}`);
-    }
-  }));
 
   // Ruta para uploads dinámicos
   app.get('/uploads/*', (req: Request, res: Response) => {

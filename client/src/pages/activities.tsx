@@ -208,7 +208,17 @@ function CarouselActivityCard({ activity, isCenter = false }: { activity: Activi
     <Card className={`group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden border-0 shadow-sm h-full ${isCenter ? 'scale-105 shadow-md' : ''}`}>
       {/* Imagen con contenido superpuesto */}
       <div className={`${isCenter ? 'aspect-[3/2]' : 'aspect-[4/3]'} relative overflow-hidden`}>
-        {activity.imageUrl ? (
+        {activity.images && activity.images.length > 0 ? (
+          <>
+            <img 
+              src={activity.images[0].imageUrl} 
+              alt={activity.images[0].altText || activity.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-black/20"></div>
+          </>
+        ) : activity.imageUrl ? (
           <>
             <img 
               src={activity.imageUrl} 
@@ -253,7 +263,7 @@ function CarouselActivityCard({ activity, isCenter = false }: { activity: Activi
           <div className="flex items-center gap-2 text-gray-700">
             <MapPin className="h-3 w-3 text-green-600 flex-shrink-0" />
             <span className="text-xs truncate">
-              {(parksData as any[]).find((p: any) => p.id === activity.parkId)?.name || 'Parque'}
+              {parksData.find(p => p.id === activity.parkId)?.name || 'Parque'}
             </span>
           </div>
           

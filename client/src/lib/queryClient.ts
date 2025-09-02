@@ -197,8 +197,7 @@ export const getQueryFn: <T>(options: {
     
     // Añadimos encabezados de autenticación
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1754063087518",
+      "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1750522117022",
       "X-User-Id": userId,
       "X-User-Role": userRole
     };
@@ -213,8 +212,8 @@ export const getQueryFn: <T>(options: {
       
       const res = await fetch(url, {
         credentials: "include",
-        headers
-        // Removed timeout to eliminate potential AbortSignal issues
+        headers,
+        signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
@@ -272,12 +271,11 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: 300000, // 5 minutes instead of Infinity
-      retry: 5, // Increase retries during initialization
-      retryDelay: attemptIndex => Math.min(500 * 2 ** attemptIndex, 10000), // Faster retry with exponential backoff
+      staleTime: Infinity,
+      retry: false,
     },
     mutations: {
-      retry: 2, // Enable retries for mutations too
+      retry: false,
     },
   },
 });
