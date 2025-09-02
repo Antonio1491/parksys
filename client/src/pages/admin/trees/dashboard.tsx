@@ -684,64 +684,6 @@ const TreesDashboard: React.FC = () => {
             )}
           </GraphicCard>
         </div>
-
-        {/* Información adicional */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Top parques */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Parques con Más Árboles
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {topParks.map(([park, count], index) => (
-                <div key={park} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{index + 1}</Badge>
-                    <span className="font-medium">{park}</span>
-                  </div>
-                  <Badge variant="outline">{count} árboles</Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Resumen de mantenimientos */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wrench className="h-5 w-5" />
-                Resumen de Mantenimientos
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{totalMaintenances}</div>
-                  <div className="text-sm text-gray-600">Total registrados</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{pendingMaintenances}</div>
-                  <div className="text-sm text-gray-600">Pendientes</div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {Object.entries(urgencyStats).map(([urgency, count]) => (
-                  <div key={urgency} className="flex justify-between items-center">
-                    <span className="capitalize">{urgency}</span>
-                    <Badge 
-                      variant={urgency === 'alta' ? 'destructive' : urgency === 'media' ? 'default' : 'secondary'}
-                    >
-                      {count}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </DashboardLayout>
   );

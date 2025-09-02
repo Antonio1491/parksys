@@ -204,8 +204,10 @@ const OrganizadorPage: React.FC = () => {
   // Calcular parque con más y menos actividades
   const parkWithMostActivities = parkActivityData.length > 0 ? 
     parkActivityData.reduce((max, park) => park.totalActivities > max.totalActivities ? park : max) : null;
-  const parkWithLeastActivities = parkActivityData.length > 0 ? 
-    parkActivityData.filter(p => p.totalActivities > 0).reduce((min, park) => park.totalActivities < min.totalActivities ? park : min) : null;
+  
+  const parksWithActivities = parkActivityData.filter(p => p.totalActivities > 0);
+  const parkWithLeastActivities = parksWithActivities.length > 0 ? 
+    parksWithActivities.reduce((min, park) => park.totalActivities < min.totalActivities ? park : min) : null;
 
   // Calcular instructor con mejor y peor calificación
   const instructorsWithRating = Array.isArray(instructors) ? instructors.filter((i: any) => i.rating && i.rating > 0) : [];
