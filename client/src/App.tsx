@@ -1440,6 +1440,7 @@ function Router() {
 }
 
 function App() {
+  console.error('🚨 APP.TSX SE ESTÁ EJECUTANDO - NUEVO CÓDIGO PARA TESTING CACHÉ - TIMESTAMP:', Date.now());
   return (
     <QueryClientProvider client={queryClient}>
       <ProfileCompletionProvider>

@@ -47,15 +47,15 @@ const AdminDashboard: React.FC = () => {
   
   // Consultas de datos reales
   const { data: parksResponse } = useQuery({ queryKey: ['/api/parks'] });
-  const { data: activities = [] } = useQuery({ queryKey: ['/api/activities'] });
+  const { data: activitiesResponse } = useQuery({ queryKey: ['/api/activities'] });
   const { data: users = [] } = useQuery({ queryKey: ['/api/users'] });
   const { data: employees = [] } = useQuery({ queryKey: ['/api/hr/employees'] });
   const { data: volunteers = [] } = useQuery({ queryKey: ['/api/volunteers'] });
   const { data: concessions = [] } = useQuery({ queryKey: ['/api/active-concessions'] });
 
   // Seguridad de tipos para arrays - corrigiendo acceso a datos de parques
-  const parksArray = Array.isArray(parksResponse) ? parksResponse : [];
-  const activitiesArray = Array.isArray(activities) ? activities : [];
+  const parksArray = parksResponse?.data || [];
+  const activitiesArray = activitiesResponse?.data || [];
   const usersArray = Array.isArray(users) ? users : [];
   const employeesArray = Array.isArray(employees) ? employees : [];
   const volunteersArray = Array.isArray(volunteers) ? volunteers : [];

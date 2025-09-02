@@ -192,9 +192,8 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
   enableAnalytics = true,
   autoRefresh = false
 }) => {
-  const [hasTrackedImpression, setHasTrackedImpression] = useState(false);
-  const [currentAdIndex, setCurrentAdIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  // TEMPORALMENTE DESHABILITADO PARA DEBUGGING
+  return null;
 
   // Obtener mapeo de espacios para esta página/posición
   const { data: spaceMappings, isLoading: mappingLoading } = useSpaceMapping(pageType, position);

@@ -40,21 +40,23 @@ const Home: React.FC = () => {
   }, []);
   
   // Fetch a few featured parks
-  const { data: parksResponse, isLoading } = useQuery<ExtendedPark[]>({
+  const { data: parksResponse, isLoading } = useQuery<{data: ExtendedPark[]}>({
     queryKey: ['/api/parks'],
   });
   
   // Fetch sponsors para la sección de patrocinadores
-  const { data: sponsors = [], isLoading: sponsorsLoading } = useQuery<any[]>({
+  const { data: sponsorsResponse, isLoading: sponsorsLoading } = useQuery<{data: any[]}>({
     queryKey: ['/api/sponsors'],
   });
   
   // Fetch eventos para la sección de eventos
-  const { data: eventsResponse = [], isLoading: eventsLoading } = useQuery<any[]>({
+  const { data: eventsResponse, isLoading: eventsLoading } = useQuery<{data: any[]}>({
     queryKey: ['/api/events'],
   });
   
-  const allParks = parksResponse || [];
+  const allParks = parksResponse?.data || [];
+  const sponsors = sponsorsResponse?.data || [];
+  const events = eventsResponse?.data || [];
   
   // Filtrar parques sin nombre o marcados como eliminados
   const featuredParks = allParks.filter(park => 
@@ -62,8 +64,8 @@ const Home: React.FC = () => {
   );
   
   // Obtener eventos destacados (máximo 3 para la página de inicio)
-  const featuredEvents = (eventsResponse || [])
-    .filter((event: any) => event.featuredImageUrl) // Solo eventos con imagen
+  const featuredEvents = events
+    .filter((event: any) => event.featured_image_url) // Solo eventos con imagen
     .slice(0, 3); // Limitar a 3 eventos
   
   // Función para formatear fechas
@@ -373,15 +375,15 @@ const Home: React.FC = () => {
             </Link>
           </div>
           
-          {/* Banner publicitario */}
-          <div className="w-full my-12">
+          {/* Banner publicitario - TEMPORALMENTE DESHABILITADO PARA DEBUGGING */}
+          {/* <div className="w-full my-12">
             <AdSpace 
               spaceId={14} 
               position="banner" 
               pageType="homepage" 
               className="w-full"
             />
-          </div>
+          </div> */}
         </div>
       </section>
       
@@ -665,7 +667,7 @@ const Home: React.FC = () => {
             ) : sponsors.length > 0 ? (
               // Mostrar patrocinadores reales
               sponsors
-                .filter((sponsor: any) => sponsor.status === 'activo' && sponsor.logo) // Solo activos con logo
+                .filter((sponsor: any) => sponsor.status === 'active' && sponsor.logo) // Solo activos con logo
                 .map((sponsor: any, index: number) => (
                   <div key={sponsor.id || index} className="group">
                     <div 

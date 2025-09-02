@@ -45,11 +45,11 @@ const Parks: React.FC = () => {
   };
   
   // Fetch parks with filters
-  const { data: parksResponse, isLoading } = useQuery<ExtendedPark[]>({
+  const { data: parksResponse, isLoading } = useQuery<{data: ExtendedPark[]}>({
     queryKey: [`/api/parks${buildQueryString()}`],
   });
   
-  const allParks = parksResponse || [];
+  const allParks = parksResponse?.data || [];
   
   // Filtrar parques sin nombre o marcados como eliminados
   const filteredParks = allParks.filter(park => 

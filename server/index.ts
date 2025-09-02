@@ -349,13 +349,24 @@ async function initializeApplication() {
 
     // Static file serving already configured above for immediate availability
 
+    // Register basic API routes first (bypass TypeScript errors)
+    try {
+      const { registerBasicApiRoutes } = await import("./basic-api-routes");
+      registerBasicApiRoutes(app);
+      console.log('✅ Basic API routes registered');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('⚠️ Basic API routes skipped:', errorMessage);
+    }
+
     // Load application routes with error handling
     try {
       const { registerRoutes } = await import("./routes");
       registerRoutes(app);
       console.log('✅ Main routes registered');
-    } catch (error: any) {
-      console.log('⚠️ Main routes skipped:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('⚠️ Main routes skipped:', errorMessage);
     }
 
     try {
