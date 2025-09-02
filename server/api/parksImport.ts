@@ -241,22 +241,15 @@ export const generateImportTemplate = (req: Request, res: Response) => {
 // Procesa el archivo de importación
 export const processImportFile = async (req: Request, res: Response) => {
   try {
+    console.log('🚀 [IMPORT] Iniciando proceso de importación de parques');
+    console.log('📁 [IMPORT] Archivo recibido:', req.file ? req.file.filename : 'No hay archivo');
+    
     if (!req.file) {
+      console.log('❌ [IMPORT] No se recibió archivo');
       return res.status(400).json({ message: 'No se ha subido ningún archivo' });
     }
     
-    if (!req.body.municipalityId) {
-      return res.status(400).json({ message: 'Debe seleccionar un municipio' });
-    }
-    
-    const municipalityId = parseInt(req.body.municipalityId);
     const filePath = req.file.path;
-    
-    // Verificar que el municipio existe
-    const municipality = await storage.getMunicipality(municipalityId);
-    if (!municipality) {
-      return res.status(404).json({ message: 'El municipio seleccionado no existe' });
-    }
     
     // Cargar el workbook
     const workbook = XLSX.readFile(filePath);
@@ -270,21 +263,28 @@ export const processImportFile = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'El archivo está vacío o no contiene datos válidos' });
     }
     
-    // Mapeo de nombres de columnas en español a inglés
+    // Mapeo ACTUALIZADO de nombres de columnas según nueva plantilla
     const fieldMappings: { [key: string]: string } = {
       'nombre': 'name',
-      'tipo_parque': 'parkType',
+      'municipio_id': 'municipalityId',
       'direccion': 'address',
+      'descripcion': 'description',
+      'codigo_postal': 'postalCode',
       'latitud': 'latitude',
       'longitud': 'longitude',
-      'codigo_postal': 'postalCode',
-      'descripcion': 'description',
       'area': 'area',
-      'horario': 'hours',
-      'estacionamiento': 'hasParking',
+      'ano_fundacion': 'foundationYear',
+      'horario_lunes': 'mondayHours',
+      'horario_martes': 'tuesdayHours',
+      'horario_miercoles': 'wednesdayHours',
+      'horario_jueves': 'thursdayHours',
+      'horario_viernes': 'fridayHours',
+      'horario_sabado': 'saturdayHours',
+      'horario_domingo': 'sundayHours',
+      'administrador': 'administrator',
       'telefono_contacto': 'contactPhone',
       'email_contacto': 'contactEmail',
-      'website': 'website'
+      'certificaciones': 'certificaciones'
     };
     
     // Mapear tipos de parque en español a inglés
@@ -299,9 +299,7 @@ export const processImportFile = async (req: Request, res: Response) => {
     
     // Transformar datos
     const parksData = rawData.map((row, index) => {
-      const transformedData: any = {
-        municipalityId: municipalityId
-      };
+      const transformedData: any = {};
       
       // Mapear campos según los nombres en español
       Object.keys(row).forEach(key => {

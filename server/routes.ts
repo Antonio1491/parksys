@@ -2681,38 +2681,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import parks from Excel/CSV - Version robusta con manejo de errores
   apiRouter.post("/parks/import", isAuthenticated, upload.single('file'), async (req: Request, res: Response) => {
     try {
-      console.log("Iniciando proceso de importación de parques");
-      console.log("Body completo:", req.body);
-      console.log("Archivo recibido:", req.file ? req.file.filename : "No hay archivo");
-      
-      const municipalityId = req.body.municipalityId;
-      
-      if (!municipalityId) {
-        console.log("No se encontró municipalityId en el body");
-        return res.status(400).json({
-          success: false,
-          message: "Debe seleccionar un municipio",
-          receivedData: req.body
-        });
-      }
+      console.log("🚀 [ROUTES] Iniciando importación de parques");
+      console.log("📁 [ROUTES] Archivo recibido:", req.file ? req.file.filename : "No hay archivo");
 
       if (!req.file) {
+        console.log("❌ [ROUTES] No se recibió archivo");
         return res.status(400).json({
           success: false,
           message: "Debe seleccionar un archivo para importar"
         });
       }
 
-      console.log("Municipio seleccionado:", municipalityId);
-      console.log("Archivo:", req.file.originalname);
+      console.log("✅ [ROUTES] Archivo:", req.file.originalname);
       
-      res.json({
-        success: true,
-        message: "Archivo recibido correctamente. La funcionalidad de importación está en desarrollo.",
-        parksImported: 0,
-        municipalityId: municipalityId,
-        fileName: req.file.originalname
-      });
+      // Usar la función processImportFile existente  
+      return await processImportFile(req, res);
       
     } catch (error) {
       console.error("Error en importación de parques:", error);

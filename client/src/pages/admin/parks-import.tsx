@@ -8,8 +8,6 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Municipality } from '@shared/schema';
 import { apiRequest } from '@/lib/queryClient';
 
 const ParksImport = () => {
@@ -22,21 +20,7 @@ const ParksImport = () => {
     parksImported?: number;
     errors?: string[];
   } | null>(null);
-  const [selectedMunicipality, setSelectedMunicipality] = useState<string>('');
 
-  // Lista de municipios del Área Metropolitana de Guadalajara
-  const municipalities = [
-    { id: 1, name: 'Guadalajara' },
-    { id: 2, name: 'Zapopan' },
-    { id: 3, name: 'San Pedro Tlaquepaque' },
-    { id: 4, name: 'Tonalá' },
-    { id: 5, name: 'Tlajomulco de Zúñiga' },
-    { id: 6, name: 'El Salto' },
-    { id: 7, name: 'Ixtlahuacán de los Membrillos' },
-    { id: 8, name: 'Juanacatlán' },
-    { id: 9, name: 'Zapotlanejo' }
-  ];
-  const loadingMunicipalities = false;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -94,14 +78,6 @@ const ParksImport = () => {
       return;
     }
 
-    if (!selectedMunicipality) {
-      toast({
-        title: "Error",
-        description: "Debe seleccionar un municipio.",
-        variant: "destructive",
-      });
-      return;
-    }
     
     try {
       setUploading(true);
@@ -109,14 +85,19 @@ const ParksImport = () => {
       
       const formData = new FormData();
       formData.append('file', selectedFile);
-      formData.append('municipalityId', selectedMunicipality);
+      
+      console.log('🚀 Enviando solicitud de importación...');
+      console.log('FormData:', formData);
+      console.log('Archivo:', selectedFile);
       
       const response = await fetch('/api/parks/import', {
         method: 'POST',
         body: formData,
       });
       
+      console.log('📡 Respuesta del servidor:', response.status, response.statusText);
       const result = await response.json();
+      console.log('📋 Resultado:', result);
       
       if (response.ok) {
         setImportResult({
@@ -202,22 +183,6 @@ const ParksImport = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="municipality">Municipio</Label>
-                <Select value={selectedMunicipality} onValueChange={setSelectedMunicipality}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Seleccione un municipio" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {municipalities.map(municipality => (
-                      <SelectItem key={municipality.id} value={municipality.id.toString()}>
-                        {municipality.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
                 <Label htmlFor="file">Archivo de Importación</Label>
                 <Input
                   id="file"
@@ -231,7 +196,7 @@ const ParksImport = () => {
                 </p>
               </div>
 
-              <Button type="submit" disabled={!selectedFile || uploading || !selectedMunicipality} className="w-full">
+              <Button type="submit" disabled={!selectedFile || uploading} className="w-full">
                 {uploading ? (
                   <>
                     <FileUp className="h-4 w-4 mr-2 animate-pulse" />
