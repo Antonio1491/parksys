@@ -9,69 +9,6 @@ import { adMediaFiles } from '../shared/advertising-schema';
 
 const router = Router();
 
-// ===== PLACEMENTS ENDPOINT - CRITICAL FOR FRONTEND =====
-// Endpoint que el frontend está solicitando constantemente
-router.get('/placements', async (req, res) => {
-  try {
-    const { spaceId } = req.query;
-    
-    if (!spaceId) {
-      return res.status(400).json({ error: 'spaceId is required' });
-    }
-
-    console.log(`🎯 Fetching placements for spaceId: ${spaceId}`);
-
-    // Buscar asignaciones activas para el espacio específico
-    const query = `
-      SELECT 
-        sm.*,
-        ads.id as ad_id,
-        ads.title,
-        ads.content,
-        ads.is_active as ad_active,
-        amf.file_url,
-        amf.filename
-      FROM ad_space_mappings sm
-      LEFT JOIN advertisements ads ON sm.advertisement_id = ads.id
-      LEFT JOIN ad_media_files amf ON ads.media_file_id = amf.id
-      WHERE sm.space_id = $1 
-        AND sm.is_active = true
-        AND (ads.is_active IS NULL OR ads.is_active = true)
-      ORDER BY sm.priority DESC, sm.created_at DESC
-      LIMIT 1
-    `;
-
-    const result = await pool.query(query, [spaceId]);
-    
-    if (result.rows.length === 0) {
-      // No hay asignaciones activas para este espacio
-      return res.json({ activePlacement: null });
-    }
-
-    const placement = result.rows[0];
-    console.log(`✅ Found active placement for space ${spaceId}:`, placement.title);
-    
-    res.json({ 
-      activePlacement: {
-        id: placement.id,
-        spaceId: placement.space_id,
-        advertisementId: placement.advertisement_id,
-        title: placement.title,
-        content: placement.content,
-        fileUrl: placement.file_url,
-        filename: placement.filename,
-        priority: placement.priority,
-        isActive: placement.ad_active
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Error fetching placements:', error);
-    // Always return a valid response, never crash
-    res.json({ activePlacement: null, error: 'Failed to fetch placements' });
-  }
-});
-
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

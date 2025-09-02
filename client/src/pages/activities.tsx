@@ -202,7 +202,7 @@ function CarouselActivityCard({ activity, isCenter = false }: { activity: Activi
   const statusColor = statusColors[activity.status as keyof typeof statusColors] || 'bg-gray-500 text-white border-gray-600';
   const statusLabel = statusLabels[activity.status as keyof typeof statusLabels] || 'Sin estado';
   const parksResponse = useQuery({ queryKey: ['/api/parks'] });
-  const parksData = parksResponse.data?.data || [];
+  const parksData = parksResponse.data || [];
   
   return (
     <Card className={`group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden border-0 shadow-sm h-full ${isCenter ? 'scale-105 shadow-md' : ''}`}>

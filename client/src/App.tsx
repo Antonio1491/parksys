@@ -1440,23 +1440,15 @@ function Router() {
 }
 
 function App() {
-  console.error('🚨🚨🚨 CACHE BUSTING - NEW APP VERSION 2025-09-02 - TIMESTAMP:', Date.now());
-  
-  // Force cache busting with random number
-  const cacheBreaker = Math.random();
-  console.error('🔥 CACHE BREAKER VALUE:', cacheBreaker);
-  
   return (
-    <div data-cache-breaker={cacheBreaker}>
-      <QueryClientProvider client={queryClient}>
-        <ProfileCompletionProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </ProfileCompletionProvider>
-      </QueryClientProvider>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <ProfileCompletionProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </ProfileCompletionProvider>
+    </QueryClientProvider>
   );
 }
 
