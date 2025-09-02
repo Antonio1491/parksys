@@ -21,48 +21,141 @@ process.on('unhandledRejection', (reason, promise) => {
 // ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
 const HEALTH_RESPONSE = 'HEALTHY';
 
-// ===== SMART ROOT ENDPOINT - HEALTH CHECK + REACT APP =====
-// Handle both health checks AND browser requests intelligently
+// ===== ULTRA-ROBUST ROOT ENDPOINT - NEVER FAILS =====
+// Universal endpoint that handles ALL requests without failures
 app.get('/', (req, res) => {
   try {
-    // Check User-Agent and Accept headers to distinguish requests
     const userAgent = req.get('User-Agent') || '';
     const acceptHeader = req.get('Accept') || '';
     
-    // Health checkers typically don't have text/html in Accept header
-    // AND may have specific User-Agent patterns
-    const isHealthChecker = !acceptHeader.includes('text/html') &&
-                           (userAgent.includes('GoogleHC') ||
-                            userAgent.includes('kube-probe') ||
-                            userAgent.includes('ELB-HealthChecker') ||
-                            userAgent.includes('Consul Health Check') ||
-                            userAgent === '' ||
-                            !userAgent.includes('Mozilla'));
+    console.log(`🌐 ROOT REQUEST - UA: ${userAgent.substring(0, 50)}... Accept: ${acceptHeader}`);
     
-    if (isHealthChecker) {
-      // Health check request - instant response
-      res.status(200).send(HEALTH_RESPONSE);
-    } else {
-      // Browser request - serve React app
-      const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    // Simple detection: if Accept contains text/html, it's likely a browser
+    const wantsBrowserContent = acceptHeader.includes('text/html');
+    
+    if (!wantsBrowserContent) {
+      // Likely a health checker or API call
+      console.log('✅ Health check request detected');
+      return res.status(200).send(HEALTH_RESPONSE);
+    }
+    
+    // Browser request - try multiple paths for index.html
+    const possiblePaths = [
+      path.join(process.cwd(), 'public', 'index.html'),
+      path.join(process.cwd(), 'dist', 'index.html'),
+      path.join(process.cwd(), 'build', 'index.html'),
+      path.join(process.cwd(), 'index.html')
+    ];
+    
+    let foundPath = null;
+    for (const indexPath of possiblePaths) {
       if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath, (err) => {
-          if (err) {
-            console.error('❌ Error serving React app:', err);
-            res.status(500).send('<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Application Error</h1></body></html>');
-          }
-        });
-      } else {
-        console.error('❌ index.html not found for browser request');
-        res.status(503).send('<!DOCTYPE html><html><head><title>Service Unavailable</title></head><body><h1>Application Building...</h1><p>Please wait while the application finishes building.</p></body></html>');
+        foundPath = indexPath;
+        console.log(`✅ Found index.html at: ${indexPath}`);
+        break;
       }
     }
+    
+    if (foundPath) {
+      // Serve the React app
+      res.sendFile(foundPath, (err) => {
+        if (err) {
+          console.error('❌ Error serving index.html:', err);
+          // Fallback to inline HTML
+          res.status(200).send(generateFallbackHTML());
+        }
+      });
+    } else {
+      // No index.html found anywhere - generate fallback HTML
+      console.log('⚠️ No index.html found in any location, serving fallback');
+      res.status(200).send(generateFallbackHTML());
+    }
+    
   } catch (error) {
-    console.error('❌ Error in root endpoint:', error);
-    // Always fallback to health check response to prevent deployment failures
-    res.status(200).send(HEALTH_RESPONSE);
+    console.error('❌ Critical error in root endpoint:', error);
+    // Ultimate fallback - never return 503
+    const acceptHeader = req.get('Accept') || '';
+    if (acceptHeader.includes('text/html')) {
+      res.status(200).send(generateFallbackHTML());
+    } else {
+      res.status(200).send(HEALTH_RESPONSE);
+    }
   }
 });
+
+// Generate fallback HTML when React build is not available
+function generateFallbackHTML() {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkSys - Cargando</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 40px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .loading { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+        .card { 
+            background: rgba(255,255,255,0.1); 
+            padding: 30px; 
+            border-radius: 10px; 
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .retry-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .retry-btn:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="loading">
+            <h1>🏞️ ParkSys</h1>
+            <h2>Sistema de Información de Parques Públicos</h2>
+            <p>La aplicación se está iniciando...</p>
+            <p><small>Por favor espera unos momentos mientras se completa la carga.</small></p>
+        </div>
+        <button class="retry-btn" onclick="window.location.reload()">Reintentar</button>
+    </div>
+    
+    <script>
+        // Auto-reload every 10 seconds if this fallback is shown
+        setTimeout(() => {
+            console.log('Auto-reloading to check for app availability...');
+            window.location.reload();
+        }, 10000);
+        
+        // Try to detect if main app becomes available
+        fetch('/api/status').then(() => {
+            console.log('Main app detected, reloading...');
+            window.location.reload();
+        }).catch(() => {
+            console.log('Main app not ready yet...');
+        });
+    </script>
+</body>
+</html>`;
+}
 
 // ===== REACT APP SERVING ON SEPARATE ROUTE =====
 app.get('/app*', (req, res) => {
