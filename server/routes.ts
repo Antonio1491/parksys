@@ -89,6 +89,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server first
   const httpServer = createServer(app);
   
+  // ===== RUTAS ESTÁTICAS CRÍTICAS (PRIMERO) =====
+  // Servir archivos adjuntos desde attached_assets (ALTA PRIORIDAD)
+  console.log("📎 Configurando serving de attached_assets...");
+  app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_assets'), {
+    setHeaders: (res, filepath) => {
+      console.log(`📎 Serving attached asset: ${path.basename(filepath)}`);
+    }
+  }));
+  
   // API routes - all prefixed with /api
   const apiRouter = express.Router();
   
@@ -7342,6 +7351,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(404).json({ error: 'Imagen no encontrada' });
     }
   });
+
+  // Servir archivos estáticos desde attached_assets usando express.static()
+  app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_assets'), {
+    setHeaders: (res, filepath) => {
+      console.log(`📎 Serving attached asset: ${filepath}`);
+    }
+  }));
 
   // Ruta para uploads dinámicos
   app.get('/uploads/*', (req: Request, res: Response) => {
