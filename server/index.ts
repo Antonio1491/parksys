@@ -2121,30 +2121,42 @@ function startServer() {
   async function initializeFullServer() {
     console.log('🔧 [BACKGROUND] Starting non-blocking route registration...');
     
-    // Use setTimeout to make this truly non-blocking
-    setTimeout(async () => {
-      try {
-        console.log('🔧 [FIRE-FORGET] Registering routes without blocking event loop...');
-        
-        // Register routes without awaiting - fire and forget
-        registerRoutes(app).catch(err => console.warn('Route registration error:', err));
-        
-        // Register activity payment routes
-        registerActivityPaymentRoutes(app);
-        console.log("✅ [FIRE-FORGET] Main routes registered");
+    try {
+      // CRITICAL FIX: Register ALL API routes BEFORE Vite setup
+      console.log('🔧 [API-PRIORITY] Registering ALL API routes before Vite setup...');
+      
+      // Register main routes immediately (not in background!)
+      await registerRoutes(app);
+      console.log("✅ [API-PRIORITY] Main routes registered before Vite");
+      
+      // Register activity payment routes
+      registerActivityPaymentRoutes(app);
+      console.log("✅ [API-PRIORITY] Activity payment routes registered");
 
-        // Register all other routes in background
-        registerAllOtherRoutes().catch(err => console.warn('Other routes error:', err));
-        
-        console.log('🗄️ [FIRE-FORGET] Route registration complete - database initialization skipped for performance');
-      } catch (error) {
-        console.warn('❌ [FIRE-FORGET] Non-critical background initialization error:', error);
+      // Register all other routes BEFORE Vite
+      await registerAllOtherRoutesBeforeVite();
+      console.log("✅ [API-PRIORITY] All API routes registered before Vite setup");
+      
+      // NOW setup frontend serving - this will establish the catch-all route AFTER all API routes
+      const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+      if (isProduction) {
+        const { serveStatic } = await import("./vite");
+        serveStatic(app);
+        console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes");
+      } else {
+        const { setupVite } = await import("./vite");
+        await setupVite(app, appServer);
+        console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");
       }
-    }, 100); // Small delay to ensure event loop is free
+      
+      console.log('✅ [BACKGROUND] Full server initialization complete - API routes have priority over frontend');
+    } catch (error) {
+      console.error('❌ [BACKGROUND] Server initialization error:', error);
+    }
   }
 
-  // Helper function to register all routes that were blocking startup
-  async function registerAllOtherRoutes() {
+  // Helper function to register all routes BEFORE Vite setup (critical for API priority)
+  async function registerAllOtherRoutesBeforeVite() {
     try {
       // HR routes
       const { registerHRRoutes } = await import("./hr-routes");
@@ -2153,27 +2165,12 @@ function startServer() {
       hrRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
       registerHRRoutes(app, hrRouter, (req: Request, res: Response, next: NextFunction) => next());
       app.use("/api/hr", hrRouter);
-      console.log("✅ [BACKGROUND] HR routes registered");
+      console.log("✅ [API-PRIORITY] HR routes registered before Vite");
       
       // Register all other routes that were causing startup delays...
-      console.log("✅ [BACKGROUND] All routes registered successfully");
-      
-      // Setup frontend serving for React SPA
-      const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-      if (isProduction) {
-        // Use serveStatic for production with built assets
-        const { serveStatic } = await import("./vite");
-        serveStatic(app);
-        console.log("🎨 [FRONTEND] Production static serving enabled");
-      } else {
-        // Use setupVite for development with hot reloading
-        const { setupVite } = await import("./vite");
-        // Use the existing appServer instead of creating a new one
-        await setupVite(app, appServer);
-        console.log("🎨 [FRONTEND] Development Vite serving enabled");
-      }
+      console.log("✅ [API-PRIORITY] All other routes registered successfully before Vite");
     } catch (error) {
-      console.error("❌ [BACKGROUND] Error registering routes:", error);
+      console.error("❌ [API-PRIORITY] Error registering routes before Vite:", error);
     }
   }
 
