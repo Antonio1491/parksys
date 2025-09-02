@@ -197,7 +197,8 @@ export const getQueryFn: <T>(options: {
     
     // Añadimos encabezados de autenticación
     const headers: Record<string, string> = {
-      "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1750522117022",
+      "Content-Type": "application/json",
+      "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1754063087518",
       "X-User-Id": userId,
       "X-User-Role": userRole
     };
@@ -212,8 +213,8 @@ export const getQueryFn: <T>(options: {
       
       const res = await fetch(url, {
         credentials: "include",
-        headers,
-        signal: AbortSignal.timeout(30000) // 30 second timeout for better reliability
+        headers
+        // Removed timeout to eliminate potential AbortSignal issues
       });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
