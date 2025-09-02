@@ -591,7 +591,7 @@ const ParksDashboard = () => {
           icon={Activity}
           backgroundColor="white"
           textColor="#00444f"
-          borderColor="#00444f"
+          borderColor="#14b8a6"
         >
           {data.parkWithMostActivities && (
             <div className="space-y-1">
@@ -613,7 +613,7 @@ const ParksDashboard = () => {
           icon={Trees}
           backgroundColor="white"
           textColor="#00444f"
-          borderColor="#00444f"
+          borderColor="#14b8a6"
         >
           {data.parkWithMostTrees && (
             <div className="space-y-1">
@@ -635,7 +635,7 @@ const ParksDashboard = () => {
           icon={Users}
           backgroundColor="white"
           textColor="#00444f"
-          borderColor="#00444f"
+          borderColor="#14b8a6"
         >
           {data.mostVisitedPark && (
             <div className="space-y-1">
@@ -657,7 +657,7 @@ const ParksDashboard = () => {
           icon={ParkingCircle}
           backgroundColor="white"
           textColor="#00444f"
-          borderColor="#00444f"
+          borderColor="#14b8a6"
         >
           {data.parkWithMostAmenities && (
             <div className="space-y-1">
@@ -679,7 +679,7 @@ const ParksDashboard = () => {
           icon={Calendar}
           backgroundColor="white"
           textColor="#00444f"
-          borderColor="#00444f"
+          borderColor="#14b8a6"
         >
           {data.mostRequestedPark && (
             <div className="space-y-1">
@@ -701,7 +701,7 @@ const ParksDashboard = () => {
           icon={Calendar}
           backgroundColor="white"
           textColor="#00444f"
-          borderColor="#00444f"
+          borderColor="#14b8a6"
         >
           {data.parkWithMostEvents && (
             <div className="space-y-1">
@@ -717,30 +717,8 @@ const ParksDashboard = () => {
 
       </div>
 
-      {/* Tercera fila: Gráfico de Evaluación Promedio por Parque */}
+      {/* Tercera fila: Gráfico de Porcentaje de Área Verde por Parque */}
       <div className="grid gap-6 lg:grid-cols-1">
-        <GraphicCard
-          title="⭐ Evaluación Promedio por Parque"
-          description="Nivel de satisfacción promedio de visitantes por parque basado en evaluaciones"
-          className="h-full"
-        >
-          <ParkStarRatingChart
-            data={data.parkEvaluations || []}
-            emptyStateTitle="No hay evaluaciones disponibles"
-            emptyStateDescription="Los datos de evaluación aparecerán aquí una vez que los visitantes evalúen los parques"
-            footerText={
-              data.parkEvaluations?.length > 0 
-                ? `Mostrando todos los ${data.parkEvaluations.length} parques registrados en el sistema`
-                : undefined
-            }
-          />
-        </GraphicCard>
-      </div>
-
-      {/* Cuarta fila: 2 columnas - Gráfico de Área Verde + Actividades y Árboles */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        
-        {/* Columna izquierda: Gráfico de Porcentaje de Área Verde */}
         <GraphicCard
           title="🌿 Porcentaje de Área Verde por Parque"
           description="Distribución del área verde en cada parque"
@@ -764,7 +742,26 @@ const ParksDashboard = () => {
             formatValue={(value) => `${Math.round(value)}%`}
           />
         </GraphicCard>
-        
+      </div>
+
+      {/* Cuarta fila: Gráfico de Evaluación Promedio por Parque */}
+      <div className="grid gap-6 lg:grid-cols-1">
+        <GraphicCard
+          title="⭐ Evaluación Promedio por Parque"
+          description="Nivel de satisfacción promedio de visitantes por parque basado en evaluaciones"
+          className="h-full"
+        >
+          <ParkStarRatingChart
+            data={data.parkEvaluations || []}
+            emptyStateTitle="No hay evaluaciones disponibles"
+            emptyStateDescription="Los datos de evaluación aparecerán aquí una vez que los visitantes evalúen los parques"
+            footerText={
+              data.parkEvaluations?.length > 0 
+                ? `Mostrando todos los ${data.parkEvaluations.length} parques registrados en el sistema`
+                : undefined
+            }
+          />
+        </GraphicCard>
       </div>
 
 
