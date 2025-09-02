@@ -109,22 +109,60 @@ app.get('/app', (req, res) => {
   }
 });
 
-// ===== IMMEDIATE STATIC FILE SERVING WITH ERROR HANDLING =====
-// Serve static files immediately for favicon and assets
+// ===== ROBUST STATIC FILE SERVING FOR PRODUCTION =====
 try {
   const publicPath = path.join(process.cwd(), 'public');
   console.log(`📁 Serving static files from: ${publicPath}`);
   console.log(`📁 Public directory exists: ${fs.existsSync(publicPath)}`);
   
+  // Check critical files
+  const assetsPath = path.join(publicPath, 'assets');
+  const faviconPath = path.join(publicPath, 'favicon.ico');
+  const logoPath = path.join(publicPath, 'parksys-logo.png');
+  
+  console.log(`📁 Assets directory exists: ${fs.existsSync(assetsPath)}`);
+  console.log(`📁 Favicon exists: ${fs.existsSync(faviconPath)}`);
+  console.log(`📁 Logo exists: ${fs.existsSync(logoPath)}`);
+  
+  // Primary static file serving with robust error handling
   app.use(express.static(publicPath, {
-    setHeaders: (res, path) => {
-      // Add proper cache headers for static files
-      if (path.endsWith('.ico')) {
+    maxAge: '1d', // Cache for 1 day in production
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath, stat) => {
+      // Set correct content types
+      if (filePath.endsWith('.ico')) {
         res.setHeader('Content-Type', 'image/x-icon');
+      } else if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (filePath.endsWith('.png')) {
+        res.setHeader('Content-Type', 'image/png');
       }
+      
+      // CORS headers for assets
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     },
-    fallthrough: true // Continue to next middleware if file not found
+    fallthrough: true
   }));
+
+  // Fallback for missing static files - return 404 instead of crashing
+  app.use('/assets/*', (req, res, next) => {
+    console.log(`⚠️ Missing asset requested: ${req.path}`);
+    res.status(404).send('Asset not found');
+  });
+
+  app.use('/favicon.ico', (req, res, next) => {
+    const faviconPath = path.join(publicPath, 'favicon.ico');
+    if (fs.existsSync(faviconPath)) {
+      res.sendFile(faviconPath);
+    } else {
+      console.log('⚠️ Favicon not found, serving default');
+      res.status(404).send('Favicon not found');
+    }
+  });
 
   // Additional static routes for uploads
   const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
@@ -135,14 +173,23 @@ try {
   console.log(`📁 Uploads path: ${uploadsBasePath}`);
   console.log(`📁 Uploads directory exists: ${fs.existsSync(uploadsBasePath)}`);
 
-  app.use('/uploads', express.static(uploadsBasePath, { fallthrough: true }));
+  app.use('/uploads', express.static(uploadsBasePath, { 
+    fallthrough: true,
+    maxAge: '1h'
+  }));
 
   if (isProduction) {
-    app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads'), { fallthrough: true }));
+    app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads'), { 
+      fallthrough: true,
+      maxAge: '1h'
+    }));
   }
+  
+  console.log('✅ Static file serving configured successfully');
+  
 } catch (error) {
   console.error('❌ Error setting up static file serving:', error);
-  // Continue without crashing
+  // Continue without crashing - server must stay alive
 }
 
 // ===== DEPLOYMENT CONFIGURATION =====
@@ -367,6 +414,37 @@ async function initializeApplication() {
 
     console.log('✅ Background initialization completed');
     console.log('🎯 ParkSys application fully loaded');
+    
+    // ===== CATCH-ALL ROUTES FOR UNHANDLED REQUESTS =====
+    // Handle any remaining unmatched routes to prevent 503 errors
+    app.use('*', (req: any, res: any, next: any) => {
+      console.log(`⚠️ Unhandled route: ${req.method} ${req.originalUrl}`);
+      
+      // If it's a static file request, return 404
+      if (req.originalUrl.includes('/assets/') || 
+          req.originalUrl.includes('.js') || 
+          req.originalUrl.includes('.css') || 
+          req.originalUrl.includes('.ico') || 
+          req.originalUrl.includes('.png') || 
+          req.originalUrl.includes('.jpg') || 
+          req.originalUrl.includes('.svg')) {
+        res.status(404).send('File not found');
+        return;
+      }
+      
+      // For HTML requests, serve the main app
+      if (req.get('Accept')?.includes('text/html')) {
+        const indexPath = path.join(process.cwd(), 'public', 'index.html');
+        if (fs.existsSync(indexPath)) {
+          res.sendFile(indexPath);
+        } else {
+          res.status(503).send('<!DOCTYPE html><html><head><title>Service Unavailable</title></head><body><h1>Service Unavailable</h1><p>Application is starting up...</p></body></html>');
+        }
+      } else {
+        // For API requests, return JSON error
+        res.status(404).json({ error: 'Not Found', path: req.originalUrl });
+      }
+    });
     
     // ===== UNIVERSAL ERROR MIDDLEWARE (AFTER ALL ROUTES) =====
     app.use((err: any, req: any, res: any, next: any) => {
