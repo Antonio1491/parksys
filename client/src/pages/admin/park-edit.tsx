@@ -159,7 +159,7 @@ const AdminParkEdit: React.FC = () => {
       ...values,
       latitude: values.latitude ? values.latitude.trim().replace(/,$/, '') : undefined,
       longitude: values.longitude ? values.longitude.trim().replace(/,$/, '') : undefined,
-      area: values.area || undefined,
+      area: values.area ? values.area.replace(/,/g, '') : undefined,
       foundationYear: values.foundationYear || undefined,
       administrator: values.administrator || undefined,
       contactPhone: values.contactPhone || undefined,
