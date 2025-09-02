@@ -70,54 +70,75 @@ export const generateImportTemplate = (req: Request, res: Response) => {
     // Crear un libro de trabajo nuevo
     const wb = XLSX.utils.book_new();
     
-    // Crear una hoja de datos con encabezados y ejemplos
+    // Crear una hoja de datos con encabezados actualizados según formulario
     const headers = [
       'nombre',
-      'tipo_parque',
+      'municipio_id',
       'direccion',
+      'descripcion',
+      'codigo_postal',
       'latitud',
       'longitud',
-      'codigo_postal',
-      'descripcion',
       'area',
-      'horario',
-      'estacionamiento',
+      'ano_fundacion',
+      'horario_lunes',
+      'horario_martes',
+      'horario_miercoles',
+      'horario_jueves',
+      'horario_viernes',
+      'horario_sabado',
+      'horario_domingo',
+      'administrador',
       'telefono_contacto',
       'email_contacto',
-      'website'
+      'certificaciones'
     ];
     
-    // Datos de ejemplo
+    // Datos de ejemplo actualizados
     const exampleData = [
       {
         nombre: 'Parque Ejemplo',
-        tipo_parque: 'Urbano',
+        municipio_id: '1',
         direccion: 'Av. Ejemplo 123, Col. Centro',
+        descripcion: 'Descripción detallada del parque ejemplo',
+        codigo_postal: '44100',
         latitud: '20.659698',
         longitud: '-103.349609',
-        codigo_postal: '44100',
-        descripcion: 'Descripción detallada del parque ejemplo',
         area: '12000',
-        horario: 'Lunes a Domingo de 6:00 a 22:00',
-        estacionamiento: 'Sí',
+        ano_fundacion: '1995',
+        horario_lunes: '06:00-22:00',
+        horario_martes: '06:00-22:00',
+        horario_miercoles: '06:00-22:00',
+        horario_jueves: '06:00-22:00',
+        horario_viernes: '06:00-22:00',
+        horario_sabado: '08:00-20:00',
+        horario_domingo: '08:00-18:00',
+        administrador: 'María González',
         telefono_contacto: '3331234567',
         email_contacto: 'parque@ejemplo.com',
-        website: 'https://www.parqueejemplo.mx'
+        certificaciones: 'Green Flag Award 2024, ISO 14001'
       },
       {
         nombre: 'Parque Modelo',
-        tipo_parque: 'Lineal',
+        municipio_id: '2',
         direccion: 'Calle Modelo 456, Col. Moderna',
+        descripcion: 'Parque lineal con ciclovía y áreas verdes',
+        codigo_postal: '44190',
         latitud: '20.670000',
         longitud: '-103.350000',
-        codigo_postal: '44190',
-        descripcion: 'Parque lineal con ciclovía y áreas verdes',
         area: '5000',
-        horario: 'Abierto 24 horas',
-        estacionamiento: 'No',
+        ano_fundacion: '2010',
+        horario_lunes: '',
+        horario_martes: '',
+        horario_miercoles: '',
+        horario_jueves: '',
+        horario_viernes: '',
+        horario_sabado: '',
+        horario_domingo: '',
+        administrador: '',
         telefono_contacto: '',
         email_contacto: '',
-        website: ''
+        certificaciones: ''
       }
     ];
     
@@ -127,21 +148,28 @@ export const generateImportTemplate = (req: Request, res: Response) => {
     // Agregar datos de ejemplo
     exampleData.forEach(example => {
       const row = headers.map(header => {
-        // Usar nombres de campo en inglés para mapear a los nombres en español
+        // Mapeo actualizado de campos según formulario
         const fieldMapping: { [key: string]: string } = {
           'nombre': 'name',
-          'tipo_parque': 'parkType',
+          'municipio_id': 'municipalityId',
           'direccion': 'address',
+          'descripcion': 'description',
+          'codigo_postal': 'postalCode',
           'latitud': 'latitude',
           'longitud': 'longitude',
-          'codigo_postal': 'postalCode',
-          'descripcion': 'description',
           'area': 'area',
-          'horario': 'hours',
-          'estacionamiento': 'hasParking',
+          'ano_fundacion': 'foundationYear',
+          'horario_lunes': 'mondayHours',
+          'horario_martes': 'tuesdayHours',
+          'horario_miercoles': 'wednesdayHours',
+          'horario_jueves': 'thursdayHours',
+          'horario_viernes': 'fridayHours',
+          'horario_sabado': 'saturdayHours',
+          'horario_domingo': 'sundayHours',
+          'administrador': 'administrator',
           'telefono_contacto': 'contactPhone',
           'email_contacto': 'contactEmail',
-          'website': 'website'
+          'certificaciones': 'certificaciones'
         };
         
         const fieldName = fieldMapping[header] || header;
@@ -150,35 +178,49 @@ export const generateImportTemplate = (req: Request, res: Response) => {
       ws_data.push(row);
     });
     
-    // Añadir información sobre los tipos de parque válidos
-    const parkTypesInfo = [
+    // Información sobre municipios válidos (AMG)
+    const municipalityInfo = [
       [''],
-      ['Tipos de parque válidos:'],
-      ['Urbano'],
-      ['Lineal'],
-      ['Bosque Urbano'],
-      ['Jardín'],
-      ['Unidad Deportiva'],
-      ['Otro']
+      ['IDs de Municipios (AMG):'],
+      ['1 - Guadalajara'],
+      ['2 - Zapopan'],
+      ['3 - San Pedro Tlaquepaque'],
+      ['4 - Tonalá'],
+      ['5 - Tlajomulco de Zúñiga'],
+      ['6 - El Salto'],
+      ['7 - Ixtlahuacán de los Membrillos'],
+      ['8 - Juanacatlán'],
+      ['9 - Zapotlanejo']
     ];
     
-    // Añadir información sobre los campos obligatorios
+    // Información sobre campos obligatorios
     const requiredFieldsInfo = [
       [''],
       ['Campos obligatorios:'],
       ['nombre'],
-      ['tipo_parque'],
-      ['direccion'],
-      ['latitud'],
-      ['longitud']
+      ['municipio_id'],
+      ['direccion']
+    ];
+    
+    // Información sobre formato de horarios
+    const scheduleInfo = [
+      [''],
+      ['Formato de horarios:'],
+      ['HH:MM-HH:MM (ej: 06:00-22:00)'],
+      ['Vacío si no aplica'],
+      [''],
+      ['Formato certificaciones:'],
+      ['Separadas por comas'],
+      ['Ej: Green Flag Award 2024, ISO 14001']
     ];
     
     // Crear worksheet con los datos
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
     
     // Agregar información adicional en columnas separadas
-    XLSX.utils.sheet_add_aoa(ws, parkTypesInfo, { origin: { r: 0, c: headers.length + 2 } });
+    XLSX.utils.sheet_add_aoa(ws, municipalityInfo, { origin: { r: 0, c: headers.length + 2 } });
     XLSX.utils.sheet_add_aoa(ws, requiredFieldsInfo, { origin: { r: 0, c: headers.length + 4 } });
+    XLSX.utils.sheet_add_aoa(ws, scheduleInfo, { origin: { r: 0, c: headers.length + 6 } });
     
     // Agregar el worksheet al workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Plantilla Parques');
