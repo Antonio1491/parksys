@@ -8,13 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Download, FileSpreadsheet, FileText, File, ChevronDown } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, File, } from 'lucide-react';
 import { useExport } from '@/hooks/use-export';
 import { ExportConfigForm } from './export-config-form';
 import { ExportOptions } from '../../../../shared/exports/config';
