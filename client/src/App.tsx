@@ -1440,16 +1440,23 @@ function Router() {
 }
 
 function App() {
-  console.error('🚨 APP.TSX SE ESTÁ EJECUTANDO - NUEVO CÓDIGO PARA TESTING CACHÉ - TIMESTAMP:', Date.now());
+  console.error('🚨🚨🚨 CACHE BUSTING - NEW APP VERSION 2025-09-02 - TIMESTAMP:', Date.now());
+  
+  // Force cache busting with random number
+  const cacheBreaker = Math.random();
+  console.error('🔥 CACHE BREAKER VALUE:', cacheBreaker);
+  
   return (
-    <QueryClientProvider client={queryClient}>
-      <ProfileCompletionProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ProfileCompletionProvider>
-    </QueryClientProvider>
+    <div data-cache-breaker={cacheBreaker}>
+      <QueryClientProvider client={queryClient}>
+        <ProfileCompletionProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </ProfileCompletionProvider>
+      </QueryClientProvider>
+    </div>
   );
 }
 

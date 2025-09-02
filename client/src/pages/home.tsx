@@ -5,7 +5,7 @@ import { Map, ArrowRight, MapPin, Trees, Users, Calendar, Sparkles, TrendingUp, 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ParkCard from '@/components/ParkCard';
-import AdSpace from '@/components/AdSpace';
+// import AdSpace from '@/components/AdSpace'; // TEMPORALMENTE REMOVIDO PARA TESTING
 import { ExtendedPark } from '@shared/schema';
 const logoImage = "/images/logo-ambu.png";
 
@@ -375,15 +375,7 @@ const Home: React.FC = () => {
             </Link>
           </div>
           
-          {/* Banner publicitario - TEMPORALMENTE DESHABILITADO PARA DEBUGGING */}
-          {/* <div className="w-full my-12">
-            <AdSpace 
-              spaceId={14} 
-              position="banner" 
-              pageType="homepage" 
-              className="w-full"
-            />
-          </div> */}
+          {/* Banner publicitario - COMPLETAMENTE REMOVIDO PARA TESTING */}
         </div>
       </section>
       

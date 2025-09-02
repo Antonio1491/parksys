@@ -8,13 +8,8 @@ interface AdSpaceProps {
 }
 
 const AdSpace: React.FC<AdSpaceProps> = ({ spaceId, position, pageType, className = '' }) => {
-  console.error(`🚨 NUEVO COMPONENTE ADSPACE EJECUTÁNDOSE - spaceId: ${spaceId}, pageType: ${pageType}, position: ${position}`);
-  console.error('Stack trace:', new Error().stack);
-  return (
-    <div className="p-4 bg-red-100 border border-red-500 text-red-700">
-      ⚠️ ADSPACE DESHABILITADO PARA DEBUGGING - ID: {spaceId}
-    </div>
-  );
+  console.error(`🚨🚨🚨 NUEVO ADSPACE COMPONENT EJECUTÁNDOSE - spaceId: ${spaceId}, pageType: ${pageType}, position: ${position} - TIMESTAMP: ${Date.now()}`);
+  return null;
 };
 
 export default AdSpace;
