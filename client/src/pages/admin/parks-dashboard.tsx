@@ -580,6 +580,125 @@ const ParksDashboard = () => {
 
       </div>
 
+      {/* Nueva fila: Métricas adicionales en 6 columnas */}
+      <div className="grid gap-4 lg:grid-cols-6">
+        
+        {/* Actividades */}
+        <MetricCard
+          title="Actividades"
+          value={data.parkWithMostActivities?.totalActivities.toString() || "0"}
+          subtitle="Más activo"
+          icon={Activity}
+        >
+          {data.parkWithMostActivities && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-200 truncate">
+                {data.parkWithMostActivities.parkName}
+              </div>
+              <div className="text-xs text-green-400">
+                {data.parkWithMostActivities.activeActivities} activas
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Árboles */}
+        <MetricCard
+          title="Árboles"
+          value={data.parkWithMostTrees?.totalTrees.toString() || "0"}
+          subtitle="Más arbolado"
+          icon={Trees}
+        >
+          {data.parkWithMostTrees && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-200 truncate">
+                {data.parkWithMostTrees.parkName}
+              </div>
+              <div className="text-xs text-green-400">
+                {data.parkWithMostTrees.healthyTrees} saludables
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Visitantes */}
+        <MetricCard
+          title="Visitantes"
+          value={data.mostVisitedPark?.weeklyVisitors.toString() || "0"}
+          subtitle="Más visitado"
+          icon={Users}
+        >
+          {data.mostVisitedPark && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-200 truncate">
+                {data.mostVisitedPark.parkName}
+              </div>
+              <div className="text-xs text-blue-400">
+                {data.mostVisitedPark.visitRecords} registros
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Amenidades */}
+        <MetricCard
+          title="Amenidades"
+          value={data.parkWithMostAmenities?.amenityCount.toString() || "0"}
+          subtitle="Mejor equipado"
+          icon={ParkingCircle}
+        >
+          {data.parkWithMostAmenities && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-200 truncate">
+                {data.parkWithMostAmenities.parkName}
+              </div>
+              <div className="text-xs text-purple-400">
+                amenidades instaladas
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Reservas */}
+        <MetricCard
+          title="Reservas"
+          value={data.mostRequestedPark?.reservationRequests.toString() || "0"}
+          subtitle="Más solicitado"
+          icon={Calendar}
+        >
+          {data.mostRequestedPark && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-200 truncate">
+                {data.mostRequestedPark.parkName}
+              </div>
+              <div className="text-xs text-orange-400">
+                {data.mostRequestedPark.approvedReservations} aprobadas
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+        {/* Eventos */}
+        <MetricCard
+          title="Eventos"
+          value={data.parkWithMostEvents?.scheduledEvents.toString() || "0"}
+          subtitle="Más eventos"
+          icon={Calendar}
+        >
+          {data.parkWithMostEvents && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-200 truncate">
+                {data.parkWithMostEvents.parkName}
+              </div>
+              <div className="text-xs text-teal-400">
+                {data.parkWithMostEvents.upcomingEvents} próximos
+              </div>
+            </div>
+          )}
+        </MetricCard>
+
+      </div>
+
       {/* Tercera fila: Gráfico de Evaluación Promedio por Parque */}
       <div className="grid gap-6 lg:grid-cols-1">
         <GraphicCard
