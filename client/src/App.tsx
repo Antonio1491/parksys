@@ -272,11 +272,6 @@ function Router() {
           </Suspense>
         </Route>
 
-        <Route path="/admin/parks-dashboard">
-          <Suspense fallback={<div className="p-8 text-center">Cargando dashboard de parques...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/parks-dashboard')))}
-          </Suspense>
-        </Route>
         <Route path="/admin/parks-import" component={AdminParksImport} />
         <Route path="/admin/parks/new" component={AdminParkEdit} />
         <Route path="/admin/parks/:id" component={AdminParkEdit} />
