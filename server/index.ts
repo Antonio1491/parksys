@@ -526,7 +526,200 @@ async function initializeApplication() {
       }
     });
 
-    console.log('✅ Critical API routes registered directly');
+    // All Activities API
+    app.get('/api/activities', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT 
+            a.*, p.name as "parkName",
+            c.name as "categoryName",
+            i.full_name as "instructorName"
+          FROM activities a
+          LEFT JOIN parks p ON a.park_id = p.id
+          LEFT JOIN activity_categories c ON a.category_id = c.id
+          LEFT JOIN instructors i ON a.instructor_id = i.id
+          ORDER BY a.created_at DESC
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+        res.status(500).json({ error: 'Error loading activities' });
+      }
+    });
+
+    // Volunteers API
+    app.get('/api/volunteers', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query('SELECT * FROM volunteers ORDER BY created_at DESC');
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching volunteers:', error);
+        res.status(500).json({ error: 'Error loading volunteers' });
+      }
+    });
+
+    // Public Volunteers API
+    app.get('/api/volunteers/public', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT id, full_name, skills, email, phone, status, created_at 
+          FROM volunteers 
+          WHERE status = 'active'
+          ORDER BY created_at DESC
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching public volunteers:', error);
+        res.status(500).json({ error: 'Error loading public volunteers' });
+      }
+    });
+
+    // Users API
+    app.get('/api/users', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query('SELECT id, email, role, created_at FROM users ORDER BY created_at DESC');
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Error loading users' });
+      }
+    });
+
+    // HR Employees API
+    app.get('/api/hr/employees', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query('SELECT * FROM employees ORDER BY created_at DESC');
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+        res.status(500).json({ error: 'Error loading employees' });
+      }
+    });
+
+    // Active Concessions API
+    app.get('/api/active-concessions', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT * FROM active_concessions 
+          WHERE status = 'active' 
+          ORDER BY contract_start DESC
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching active concessions:', error);
+        res.status(500).json({ error: 'Error loading active concessions' });
+      }
+    });
+
+    // Visitor Counts API
+    app.get('/api/visitor-counts', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT * FROM visitor_counts 
+          ORDER BY visit_date DESC 
+          LIMIT 100
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching visitor counts:', error);
+        res.status(500).json({ error: 'Error loading visitor counts' });
+      }
+    });
+
+    // Tree Species API
+    app.get('/api/tree-species', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const limit = req.query.limit || 1000;
+        const result = await pool.query(`
+          SELECT * FROM tree_species 
+          ORDER BY common_name 
+          LIMIT $1
+        `, [limit]);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching tree species:', error);
+        res.status(500).json({ error: 'Error loading tree species' });
+      }
+    });
+
+    // Park Tree Species API
+    app.get('/api/park-tree-species', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT pts.*, ts.common_name, ts.scientific_name, p.name as park_name
+          FROM park_tree_species pts
+          LEFT JOIN tree_species ts ON pts.species_id = ts.id
+          LEFT JOIN parks p ON pts.park_id = p.id
+          ORDER BY p.name, ts.common_name
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching park tree species:', error);
+        res.status(500).json({ error: 'Error loading park tree species' });
+      }
+    });
+
+    // Reservable Spaces API
+    app.get('/api/reservable-spaces', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT rs.*, p.name as park_name
+          FROM reservable_spaces rs
+          LEFT JOIN parks p ON rs.park_id = p.id
+          WHERE rs.is_active = true
+          ORDER BY rs.name
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching reservable spaces:', error);
+        res.status(500).json({ error: 'Error loading reservable spaces' });
+      }
+    });
+
+    // Feedback API
+    app.get('/api/feedback', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const limit = req.query.limit || 100;
+        const result = await pool.query(`
+          SELECT * FROM feedback 
+          ORDER BY created_at DESC 
+          LIMIT $1
+        `, [limit]);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching feedback:', error);
+        res.status(500).json({ error: 'Error loading feedback' });
+      }
+    });
+
+    // Park Images API
+    app.get('/api/parks/:id/images', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const parkId = req.params.id;
+        const result = await pool.query(
+          'SELECT * FROM park_images WHERE park_id = $1 ORDER BY id',
+          [parkId]
+        );
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching park images:', error);
+        res.status(500).json({ error: 'Error loading park images' });
+      }
+    });
+
+    console.log('✅ All critical API routes registered directly');
 
     // React application route (separate from health checks)
     app.get('/app', (req, res) => {
