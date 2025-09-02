@@ -274,6 +274,12 @@ const Events: React.FC = () => {
                           src={`http://localhost:5000${event.featured_image_url}`} 
                           alt={event.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            console.error('Error loading image:', `http://localhost:5000${event.featured_image_url}`);
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).nextElementSibling?.setAttribute('style', 'display: flex');
+                          }}
+                          onLoad={() => console.log('Image loaded successfully:', `http://localhost:5000${event.featured_image_url}`)}
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
