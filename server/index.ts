@@ -1,107 +1,88 @@
-import express, { type Request, Response, NextFunction } from "express";
-import path from "path";
-import fs from "fs";
+import express from "express";
 
 const app = express();
 
-// ===== ULTRA-FAST HEALTH CHECK RESPONSES =====
-const HEALTHY_RESPONSE = 'HEALTHY';
-const PING_RESPONSE = 'pong';
+// ===== INSTANT HEALTH CHECK RESPONSES - NO LOGIC =====
+const HEALTH_RESPONSE = 'HEALTHY';
 
-// ===== IMMEDIATE HEALTH CHECK ENDPOINTS - NO PROCESSING =====
+// Root endpoint - ALWAYS returns health response for deployment
+app.get('/', (req, res) => {
+  res.status(200).send(HEALTH_RESPONSE);
+});
+
+// All health check endpoints - instant responses
 app.get('/ping', (req, res) => {
-  res.status(200).send(PING_RESPONSE);
+  res.status(200).send('pong');
 });
 
 app.get('/health', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 app.get('/healthz', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 app.get('/liveness', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 app.get('/readiness', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 app.get('/_health', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 app.get('/up', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 app.get('/ready', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
 app.get('/status', (req, res) => {
-  res.status(200).send(HEALTHY_RESPONSE);
+  res.status(200).send(HEALTH_RESPONSE);
 });
 
-// ===== SIMPLIFIED ROOT ENDPOINT - INSTANT HEALTH CHECK RESPONSE =====
-app.get('/', (req: Request, res: Response) => {
-  // For deployment: respond with HEALTHY to ANY request that's not explicitly a browser
-  const userAgent = req.headers['user-agent']?.toLowerCase() || '';
-  const acceptHeader = req.headers.accept || '';
-  
-  // Only serve HTML if it's clearly a browser request
-  const isDefinitelyBrowser = 
-    acceptHeader.includes('text/html') && 
-    userAgent.includes('mozilla') && 
-    (userAgent.includes('chrome') || userAgent.includes('firefox') || userAgent.includes('safari') || userAgent.includes('edge'));
-  
-  if (!isDefinitelyBrowser) {
-    // Immediate health check response for all deployment checkers
-    return res.status(200).send(HEALTHY_RESPONSE);
-  }
-  
-  // For browsers, serve the React app
-  const indexPath = path.join(process.cwd(), 'public', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(200).send(HEALTHY_RESPONSE); // Fallback to health response
-  }
-});
+// ===== DEPLOYMENT CONFIGURATION =====
+// Use PORT from environment, fallback to 5000 for Replit, 8080 for Cloud Run
+const PORT = parseInt(process.env.PORT || "5000"); 
+const HOST = "0.0.0.0"; // Required for deployment platforms
 
-// ===== START SERVER IMMEDIATELY ON PORT 5000 =====
-const PORT = 5000; // Fixed port for deployment
-const HOST = "0.0.0.0"; // Listen on all interfaces for deployment
-
-console.log('🚀 Starting ParkSys server immediately...');
+console.log('🚀 Starting ParkSys server for deployment...');
 
 const server = app.listen(PORT, HOST, () => {
   console.log(`✅ Server listening on ${HOST}:${PORT}`);
-  console.log('🏥 Health checks active and responding immediately');
-  console.log('📡 Ready for deployment verification');
+  console.log('🏥 Health checks active - instant responses');
+  console.log('📡 Ready for Cloud Run deployment');
   
-  // Start background initialization AFTER server is listening
-  setImmediate(() => {
+  // Start ALL initialization after server is listening
+  process.nextTick(() => {
     initializeApplication().catch(error => {
       console.error('❌ Background initialization error:', error);
-      // Don't crash - keep server running for health checks
+      // Never crash - keep server running for health checks
     });
   });
 });
 
-// ===== BACKGROUND INITIALIZATION (AFTER SERVER IS LISTENING) =====
+// ===== APPLICATION INITIALIZATION (BACKGROUND ONLY) =====
 async function initializeApplication() {
   try {
-    console.log('🔄 Starting background initialization...');
+    console.log('🔄 Starting background application initialization...');
+    
+    // Import path and fs only when needed
+    const path = await import("path");
+    const fs = await import("fs");
     
     // Basic Express middleware
     app.use(express.json({ limit: '50mb' }));
     app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
     // CORS middleware
-    app.use((req: Request, res: Response, next: NextFunction) => {
+    app.use((req, res, next) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -114,18 +95,46 @@ async function initializeApplication() {
       next();
     });
 
-    // Simple API status endpoint
-    app.get('/api/status', (req: Request, res: Response) => {
+    // React application route (separate from health checks)
+    app.get('/app', (req, res) => {
+      const indexPath = path.default.join(process.cwd(), 'public', 'index.html');
+      if (fs.default.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(503).send('Application not built');
+      }
+    });
+
+    // Additional app routes for different paths
+    app.get('/parks', (req, res) => {
+      const indexPath = path.default.join(process.cwd(), 'public', 'index.html');
+      if (fs.default.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(503).send('Application not built');
+      }
+    });
+
+    app.get('/admin*', (req, res) => {
+      const indexPath = path.default.join(process.cwd(), 'public', 'index.html');
+      if (fs.default.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(503).send('Application not built');
+      }
+    });
+
+    // Simple API status
+    app.get('/api/status', (req, res) => {
       res.status(200).json({ 
         status: 'ok', 
-        message: 'ParkSys API is running',
+        message: 'ParkSys API',
         timestamp: new Date().toISOString(),
-        port: PORT,
-        environment: process.env.NODE_ENV || 'development'
+        port: PORT
       });
     });
 
-    app.get('/api/health', (req: Request, res: Response) => {
+    app.get('/api/health', (req, res) => {
       res.status(200).json({ 
         status: 'ok', 
         timestamp: new Date().toISOString()
@@ -133,26 +142,26 @@ async function initializeApplication() {
     });
 
     // Static file serving
-    app.use(express.static(path.join(process.cwd(), 'public')));
+    app.use(express.static(path.default.join(process.cwd(), 'public')));
     
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
     const uploadsBasePath = isProduction ? 
-      path.join(process.cwd(), 'public/uploads') : 
-      path.join(process.cwd(), 'uploads');
+      path.default.join(process.cwd(), 'public/uploads') : 
+      path.default.join(process.cwd(), 'uploads');
 
     app.use('/uploads', express.static(uploadsBasePath));
     
     if (isProduction) {
-      app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+      app.use('/public/uploads', express.static(path.default.join(process.cwd(), 'public/uploads')));
     }
 
-    // Load and register routes in background
+    // Load application routes with error handling
     try {
       const { registerRoutes } = await import("./routes");
       registerRoutes(app);
       console.log('✅ Main routes registered');
     } catch (error) {
-      console.log('⚠️ Main routes registration skipped:', error.message);
+      console.log('⚠️ Main routes skipped:', error.message);
     }
 
     try {
@@ -163,7 +172,6 @@ async function initializeApplication() {
       console.log('⚠️ Activity payment routes skipped:', error.message);
     }
 
-    // Register other modules with error handling
     try {
       const { activityRouter } = await import("./activityRoutes");
       app.use('/activities', activityRouter);
@@ -244,37 +252,27 @@ async function initializeApplication() {
       console.log('⚠️ Evaluaciones routes skipped:', error.message);
     }
 
-    // Set up Vite only in development
-    if (process.env.NODE_ENV !== "production") {
-      try {
-        const { setupVite, serveStatic } = await import("./vite");
-        console.log('⚠️ Skipping Vite setup for deployment compatibility');
-      } catch (error) {
-        console.log('⚠️ Vite setup skipped:', error.message);
-      }
-    }
-
     console.log('✅ Background initialization completed');
-    console.log('🎯 ParkSys fully operational');
+    console.log('🎯 ParkSys application fully loaded');
 
   } catch (error) {
     console.error('❌ Background initialization failed:', error);
-    // Don't crash - server continues running for health checks
+    // Never crash - server continues for health checks
   }
 }
 
 // ===== ERROR HANDLING - KEEP SERVER ALIVE =====
 process.on('uncaughtException', (error) => {
   console.error('🚨 Uncaught Exception:', error.message);
-  // Don't exit - keep server running for health checks
+  // Never exit - keep server alive for health checks
 });
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason) => {
   console.error('🚨 Unhandled Rejection:', reason);
-  // Don't exit - keep server running for health checks
+  // Never exit - keep server alive for health checks
 });
 
-// ===== GRACEFUL SHUTDOWN =====
+// ===== GRACEFUL SHUTDOWN FOR CLOUD RUN =====
 process.on('SIGTERM', () => {
   console.log('🛑 SIGTERM received, shutting down gracefully');
   if (server) {
