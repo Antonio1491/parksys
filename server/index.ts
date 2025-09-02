@@ -66,6 +66,22 @@ app.get('/status', (req, res) => {
   res.status(200).send(HEALTH_RESPONSE);
 });
 
+// ===== IMMEDIATE STATIC FILE SERVING =====
+// Serve static files immediately for favicon and assets
+app.use(express.static(path.join(process.cwd(), 'public')));
+
+// Additional static routes for uploads
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+const uploadsBasePath = isProduction ? 
+  path.join(process.cwd(), 'public/uploads') : 
+  path.join(process.cwd(), 'uploads');
+
+app.use('/uploads', express.static(uploadsBasePath));
+
+if (isProduction) {
+  app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+}
+
 // ===== DEPLOYMENT CONFIGURATION =====
 // Use PORT from environment, fallback to 5000 for Replit, 8080 for Cloud Run
 const PORT = parseInt(process.env.PORT || "5000"); 
@@ -160,19 +176,7 @@ async function initializeApplication() {
       });
     });
 
-    // Static file serving
-    app.use(express.static(path.default.join(process.cwd(), 'public')));
-    
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-    const uploadsBasePath = isProduction ? 
-      path.default.join(process.cwd(), 'public/uploads') : 
-      path.default.join(process.cwd(), 'uploads');
-
-    app.use('/uploads', express.static(uploadsBasePath));
-    
-    if (isProduction) {
-      app.use('/public/uploads', express.static(path.default.join(process.cwd(), 'public/uploads')));
-    }
+    // Static file serving already configured above for immediate availability
 
     // Load application routes with error handling
     try {
