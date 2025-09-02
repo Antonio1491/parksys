@@ -719,7 +719,160 @@ async function initializeApplication() {
       }
     });
 
+    // Extended Park Details API
+    app.get('/api/parks/:id/extended', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const parkId = req.params.id;
+        
+        // Get park basic info
+        const parkResult = await pool.query(`
+          SELECT * FROM parks WHERE id = $1
+        `, [parkId]);
+        
+        if (parkResult.rows.length === 0) {
+          return res.status(404).json({ error: 'Park not found' });
+        }
+        
+        const park = parkResult.rows[0];
+        
+        // Get park images
+        const imagesResult = await pool.query(`
+          SELECT * FROM park_images WHERE park_id = $1 ORDER BY id
+        `, [parkId]);
+        
+        // Get park activities
+        const activitiesResult = await pool.query(`
+          SELECT a.*, c.name as "categoryName"
+          FROM activities a
+          LEFT JOIN activity_categories c ON a.category_id = c.id
+          WHERE a.park_id = $1
+          ORDER BY a.start_date DESC
+          LIMIT 10
+        `, [parkId]);
+        
+        // Get park amenities (using correct column names)
+        const amenitiesResult = await pool.query(`
+          SELECT name, category, icon
+          FROM amenities
+          WHERE id IN (
+            SELECT amenity_id FROM park_amenities WHERE park_id = $1
+          )
+        `, [parkId]);
+        
+        res.json({
+          ...park,
+          images: imagesResult.rows,
+          activities: activitiesResult.rows,
+          amenities: amenitiesResult.rows
+        });
+      } catch (error) {
+        console.error('Error fetching extended park details:', error);
+        res.status(500).json({ error: 'Error loading park details' });
+      }
+    });
+
+    // Event Images API
+    app.get('/api/events/:id/images', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const eventId = req.params.id;
+        const result = await pool.query(
+          'SELECT * FROM event_images WHERE event_id = $1 ORDER BY id',
+          [eventId]
+        );
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching event images:', error);
+        res.status(500).json({ error: 'Error loading event images' });
+      }
+    });
+
+    // Individual Event Details API
+    app.get('/api/events/:id', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const eventId = req.params.id;
+        const result = await pool.query(`
+          SELECT * FROM events WHERE id = $1
+        `, [eventId]);
+        
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Event not found' });
+        }
+        
+        res.json(result.rows[0]);
+      } catch (error) {
+        console.error('Error fetching event:', error);
+        res.status(500).json({ error: 'Error loading event' });
+      }
+    });
+
+    // Park by Slug API (for routes like /parque/parque-metropolitano-de-guadalajara-2)
+    app.get('/api/parks/slug/:slug', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const slug = req.params.slug;
+        
+        // Try to extract park ID from slug (assuming format ends with -ID)
+        const slugParts = slug.split('-');
+        const potentialId = slugParts[slugParts.length - 1];
+        
+        let parkResult;
+        if (!isNaN(potentialId)) {
+          // Try by ID first
+          parkResult = await pool.query(`
+            SELECT * FROM parks WHERE id = $1
+          `, [potentialId]);
+        }
+        
+        // If not found by ID, try by name similarity
+        if (!parkResult || parkResult.rows.length === 0) {
+          const searchName = slug.replace(/-/g, ' ').replace(/\d+$/, '').trim();
+          parkResult = await pool.query(`
+            SELECT * FROM parks WHERE LOWER(name) ILIKE $1 LIMIT 1
+          `, [`%${searchName}%`]);
+        }
+        
+        if (parkResult.rows.length === 0) {
+          return res.status(404).json({ error: 'Park not found' });
+        }
+        
+        res.json(parkResult.rows[0]);
+      } catch (error) {
+        console.error('Error fetching park by slug:', error);
+        res.status(500).json({ error: 'Error loading park' });
+      }
+    });
+
+    // Public Instructors API
+    app.get('/public-api/instructors/public', async (req, res) => {
+      try {
+        const { pool } = await import("./db");
+        const result = await pool.query(`
+          SELECT id, full_name, email, phone, specialization, experience, status
+          FROM instructors 
+          WHERE status = 'active'
+          ORDER BY full_name
+        `);
+        res.json(result.rows);
+      } catch (error) {
+        console.error('Error fetching public instructors:', error);
+        res.status(500).json({ error: 'Error loading instructors' });
+      }
+    });
+
     console.log('✅ All critical API routes registered directly');
+
+    // Park pages route (serve React app for park detail pages)
+    app.get('/parque/*', (req, res) => {
+      const indexPath = path.default.join(process.cwd(), 'public', 'index.html');
+      if (fs.default.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(503).send('Application not built');
+      }
+    });
 
     // React application route (separate from health checks)
     app.get('/app', (req, res) => {
