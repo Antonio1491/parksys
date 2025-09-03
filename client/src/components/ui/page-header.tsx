@@ -23,7 +23,7 @@ export const PageHeader = ({
     <div className="flex items-start gap-3">
       {React.cloneElement(icon as React.ReactElement, {className: 'h-6 w-6 text-white mt-1',})}
       <div>
-        <h1 className="text-3xl font-semibold text-white font-poppins">
+        <h1 className="text-4xl font-semibold text-white font-poppins">
           {title}
         </h1>
         {subtitle && (
