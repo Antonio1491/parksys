@@ -227,15 +227,16 @@ export async function createHybridPaymentTables() {
   }
 }
 
+// COMMENTED OUT: Auto-execution was causing server startup failures in production
 // Ejecutar el script si se ejecuta directamente
-if (import.meta.url === `file://${process.argv[1]}`) {
-  createHybridPaymentTables()
-    .then(() => {
-      console.log("Script de creación de tablas de cobro híbrido completado");
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error("Error en script de creación de tablas de cobro híbrido:", error);
-      process.exit(1);
-    });
-}
+// if (import.meta.url === `file://${process.argv[1]}`) {
+//   createHybridPaymentTables()
+//     .then(() => {
+//       console.log("Script de creación de tablas de cobro híbrido completado");
+//       process.exit(0);
+//     })
+//     .catch((error) => {
+//       console.error("Error en script de creación de tablas de cobro híbrido:", error);
+//       process.exit(1);
+//     });
+// }
