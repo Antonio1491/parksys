@@ -387,7 +387,9 @@ const AdminSidebarComplete: React.FC = () => {
     if (location.startsWith('/admin/finance')) return 'finanzas';
     if (location.startsWith('/admin/accounting')) return 'contabilidad';
     if (location.startsWith('/admin/concessions')) return 'concesiones';
-    if (location.startsWith('/admin/communications')) return 'comunicacion';
+    if (location.startsWith('/admin/marketing')) return 'marketing';
+    if (location.startsWith('/admin/advertising')) return 'advertising';
+    if (location.startsWith('/admin/communications')) return 'communications';
     // Rutas del módulo "Configuración y Seguridad"
     if (location.startsWith('/admin/configuracion-seguridad/access/')) return 'control-acceso';
     if (location.startsWith('/admin/configuracion-seguridad/policies')) return 'politicas';
@@ -412,7 +414,9 @@ const AdminSidebarComplete: React.FC = () => {
       'finanzas': ['/admin/finance'],
       'contabilidad': ['/admin/accounting'],
       'concesiones': ['/admin/concessions'],
-      'comunicacion': ['/admin/communications'],
+      'marketing': ['/admin/marketing'],
+      'advertising': ['/admin/advertising'],
+      'communications': ['/admin/communications'],
       'control-acceso': ['/admin/configuracion-seguridad/access/'],
       'auditoria': ['/admin/configuracion-seguridad/audit'],
       'mantenimiento-sistema': ['/admin/configuracion-seguridad/maintenance']
@@ -478,7 +482,7 @@ const AdminSidebarComplete: React.FC = () => {
     }
     
     // Rutas que pertenecen al módulo "Mkt & Comm"
-    if (location.startsWith('/admin/communications')) {
+    if (location.startsWith('/admin/communications') || location.startsWith('/admin/marketing') || location.startsWith('/admin/advertising')) {
       return ['mkt-comm'];
     }
     
@@ -1104,19 +1108,82 @@ const AdminSidebarComplete: React.FC = () => {
             title="Mkt & Comm" 
             icon={<Megaphone className="h-5 w-5" />}
             value="mkt-comm"
-            defaultOpen={location.startsWith('/admin/communications')}
+            defaultOpen={location.startsWith('/admin/communications') || location.startsWith('/admin/marketing') || location.startsWith('/admin/advertising')}
           >
 
-            {/* COMUNICACIÓN */}
+            {/* MARKETING */}
             <CollapsibleSubmenu
-              id="comunicacion"
-              title="Marketing y Comunicación"
-              icon={<MessageSquare className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('comunicacion')}
+              id="marketing"
+              title="Marketing"
+              icon={<Target className="h-4 w-4" />}
+              isExpanded={expandedSubmenus.includes('marketing')}
               onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('comunicacion')}
+              isActive={isSubmenuActive('marketing')}
             >
-              
+              <NavItem 
+                href="/admin/marketing/campaigns" 
+                icon={<Megaphone className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/campaigns')}
+              >
+                Campañas
+              </NavItem>
+              <NavItem 
+                href="/admin/marketing/analytics" 
+                icon={<TrendingUp className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/analytics')}
+              >
+                Análisis
+              </NavItem>
+              <NavItem 
+                href="/admin/marketing/content" 
+                icon={<FileText className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/content')}
+              >
+                Contenido
+              </NavItem>
+            </CollapsibleSubmenu>
+
+            {/* ADVERTISING */}
+            <CollapsibleSubmenu
+              id="advertising"
+              title="Advertising"
+              icon={<Star className="h-4 w-4" />}
+              isExpanded={expandedSubmenus.includes('advertising')}
+              onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('advertising')}
+            >
+              <NavItem 
+                href="/admin/advertising/spaces" 
+                icon={<LayoutGrid className="h-4 w-4" />}
+                active={location.startsWith('/admin/advertising/spaces')}
+              >
+                Espacios
+              </NavItem>
+              <NavItem 
+                href="/admin/advertising/placements" 
+                icon={<MapPin className="h-4 w-4" />}
+                active={location.startsWith('/admin/advertising/placements')}
+              >
+                Colocaciones
+              </NavItem>
+              <NavItem 
+                href="/admin/advertising/analytics" 
+                icon={<BarChart3 className="h-4 w-4" />}
+                active={location.startsWith('/admin/advertising/analytics')}
+              >
+                Métricas
+              </NavItem>
+            </CollapsibleSubmenu>
+
+            {/* COMMUNICATIONS */}
+            <CollapsibleSubmenu
+              id="communications"
+              title="Communications"
+              icon={<MessageSquare className="h-4 w-4" />}
+              isExpanded={expandedSubmenus.includes('communications')}
+              onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('communications')}
+            >
               <NavItem 
                 href="/admin/communications/templates" 
                 icon={<FileText className="h-4 w-4" />}
@@ -1132,25 +1199,11 @@ const AdminSidebarComplete: React.FC = () => {
                 Cola de Emails
               </NavItem>
               <NavItem 
-                href="/admin/communications/campaigns" 
-                icon={<Megaphone className="h-4 w-4" />}
-                active={location.startsWith('/admin/communications/campaigns')}
-              >
-                Campañas
-              </NavItem>
-              <NavItem 
                 href="/admin/communications/bulk" 
                 icon={<Mail className="h-4 w-4" />}
                 active={location.startsWith('/admin/communications/bulk')}
               >
                 Envío Masivo
-              </NavItem>
-              <NavItem 
-                href="/admin/communications/analytics" 
-                icon={<TrendingUp className="h-4 w-4" />}
-                active={location.startsWith('/admin/communications/analytics')}
-              >
-                Análisis
               </NavItem>
             </CollapsibleSubmenu>
           </ModuleNav>
