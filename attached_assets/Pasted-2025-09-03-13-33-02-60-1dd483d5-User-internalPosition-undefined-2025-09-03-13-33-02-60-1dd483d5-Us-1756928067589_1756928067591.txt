@@ -1,0 +1,159 @@
+2025-09-03 13:33:02.60
+1dd483d5
+User
+internalPosition: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+internalQuery: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+where: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+schema: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+table: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+column: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+dataType: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+constraint: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+file: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+line: undefined,
+2025-09-03 13:33:02.60
+1dd483d5
+User
+routine: undefined
+2025-09-03 13:33:02.60
+1dd483d5
+User
+}
+2025-09-03 13:33:12.79
+1dd483d5
+User
+🔄 [HEARTBEAT] Server alive - 2025-09-03T19:33:12.794Z
+2025-09-03 13:33:21.03
+2c45a2bf
+User
+🔄 [HEARTBEAT] Server alive - 2025-09-03T19:33:21.032Z
+2025-09-03 13:33:42.79
+1dd483d5
+User
+🔄 [HEARTBEAT] Server alive - 2025-09-03T19:33:42.798Z
+2025-09-03 13:33:51.04
+2c45a2bf
+User
+🔄 [HEARTBEAT] Server alive - 2025-09-03T19:33:51.040Z
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+❌ Error procesando cola de emails: error: password authentication failed for user 'neondb_owner'
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+at async EmailQueueService.processQueue (file:///home/runner/workspace/dist/index.js:7758:26)
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+at async file:///home/runner/workspace/dist/index.js:7710:13
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+at async Timeout._onTimeout (/home/runner/workspace/node_modules/node-cron/dist/esm/scheduler/runner.js:70:44) {
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+length: 75,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+severity: 'ERROR',
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+code: 'XX000',
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+detail: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+hint: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+position: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+internalPosition: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+internalQuery: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+where: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+schema: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+table: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+column: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+dataType: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+constraint: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+file: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+line: undefined,
+2025-09-03 13:34:01.38
+2c45a2bf
+User
+routine: undefined
+2025-09-03 13:34:01.38
+2c45a2bf
+User
