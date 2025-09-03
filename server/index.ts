@@ -25,6 +25,14 @@ import evaluacionesRoutes from "./evaluaciones-routes";
 
 const app = express();
 
+// 🔍 DEPLOYMENT DEBUG - LOG ANTES DE CUALQUIER MIDDLEWARE
+console.log('🚀 [DEPLOYMENT] Starting server...');
+console.log('🔍 [DEPLOYMENT] NODE_ENV:', process.env.NODE_ENV);
+console.log('🔍 [DEPLOYMENT] REPLIT_DEPLOYMENT:', process.env.REPLIT_DEPLOYMENT);
+console.log('🔍 [DEPLOYMENT] DATABASE_URL available:', !!process.env.DATABASE_URL);
+console.log('🔍 [DEPLOYMENT] All PG vars:', Object.keys(process.env).filter(k => k.startsWith('PG')));
+console.log('🔍 [DEPLOYMENT] All DB vars:', Object.keys(process.env).filter(k => k.includes('DB')));
+
 // ===== CLOUD RUN OPTIMIZED HEALTH CHECKS - ABSOLUTE PRIORITY =====
 // These endpoints must be FIRST to avoid any middleware overhead
 // Pre-computed responses for maximum speed - no string processing during requests
