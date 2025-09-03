@@ -70,16 +70,30 @@ function TreeSpeciesDetail() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
+  // Validar que el ID sea un número válido
+  const numericId = parseInt(id as string, 10);
+  const isValidId = !isNaN(numericId) && id !== undefined;
+
   const { data: species, isLoading, error } = useQuery({
     queryKey: [`/api/tree-species/${id}`],
     queryFn: async () => {
-      const response = await fetch(`/api/tree-species/${id}`);
+      if (!isValidId) {
+        throw new Error('ID de especie inválido');
+      }
+      const response = await fetch(`/api/tree-species/${numericId}`);
       if (!response.ok) {
         throw new Error('Error al cargar los detalles de la especie arbórea');
       }
       return response.json();
     },
+    enabled: isValidId, // Solo ejecutar la query si el ID es válido
   });
+
+  // Redirigir si el ID no es válido
+  if (!isValidId) {
+    setLocation('/admin/trees/catalog');
+    return null;
+  }
 
   if (error) {
     toast({

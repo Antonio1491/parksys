@@ -80,6 +80,16 @@ function EditTreeSpecies() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+
+  // Validar que el ID sea un número válido
+  const numericId = parseInt(id as string, 10);
+  const isValidId = !isNaN(numericId) && id !== undefined;
+
+  // Redirigir si el ID no es válido
+  if (!isValidId) {
+    setLocation('/admin/trees/catalog');
+    return null;
+  }
   const [uploadedPhoto, setUploadedPhoto] = React.useState<string | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
 
@@ -111,18 +121,19 @@ function EditTreeSpecies() {
   const { data: species, isLoading: isLoadingSpecies } = useQuery({
     queryKey: [`/api/tree-species/${id}`],
     queryFn: async () => {
-      const response = await fetch(`/api/tree-species/${id}`);
+      const response = await fetch(`/api/tree-species/${numericId}`);
       if (!response.ok) {
         throw new Error('Error al cargar los detalles de la especie arbórea');
       }
       return response.json();
     },
+    enabled: isValidId, // Solo ejecutar la query si el ID es válido
   });
 
   // Mutation para actualizar la especie arbórea
   const updateTreeSpeciesMutation = useMutation({
     mutationFn: async (data: TreeSpeciesFormValues) => {
-      const response = await fetch(`/api/tree-species/${id}`, {
+      const response = await fetch(`/api/tree-species/${numericId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -139,12 +150,12 @@ function EditTreeSpecies() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tree-species'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/tree-species/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tree-species/${numericId}`] });
       toast({
         title: "Especie actualizada",
         description: "La especie ha sido actualizada exitosamente en el catálogo.",
       });
-      setLocation(`/admin/trees/catalog/${id}`);
+      setLocation(`/admin/trees/catalog/${numericId}`);
     },
     onError: (error: Error) => {
       toast({
