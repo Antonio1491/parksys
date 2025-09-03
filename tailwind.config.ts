@@ -52,6 +52,7 @@ export default {
           "5": "hsl(var(--chart-5))",
         },
         principal: "hsl(var(--principal))",
+        "header-background": "hsl(var(--header-background))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

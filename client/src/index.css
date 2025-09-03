@@ -157,6 +157,7 @@
 
 :root {
   --principal: 73 58% 51%;
+  --header-background: 169 50% 47%;
 }
 
 @layer components {
