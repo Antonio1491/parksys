@@ -70,7 +70,7 @@ const growthRateLabels = {
 
 // Función para mostrar las etiquetas con acentos en la UI
 const getGrowthRateDisplayLabel = (rate: string) => {
-  if (rate === 'Rapido') return 'Rápido';
+  if (rate === 'Rapido') return 'Rapido'; // Fixed: No more accent to prevent Vite crashes
   return rate;
 };
 

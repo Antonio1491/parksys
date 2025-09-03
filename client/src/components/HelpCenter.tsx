@@ -161,7 +161,7 @@ export function HelpCenter({ children }: HelpCenterProps) {
         <Tabs defaultValue="documentation" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="documentation">Documentación</TabsTrigger>
-            <TabsTrigger value="quickstart">Inicio Rápido</TabsTrigger>
+            <TabsTrigger value="quickstart">Inicio Rapido</TabsTrigger>
             <TabsTrigger value="contact">Soporte</TabsTrigger>
           </TabsList>
           
