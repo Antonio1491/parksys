@@ -679,65 +679,6 @@ function Router() {
           </Suspense>
         </Route>
 
-        {/* Rutas para el módulo de marketing/patrocinios */}
-        <Route path="/admin/marketing">
-          <Suspense fallback={<div className="p-8 text-center">Cargando dashboard de marketing...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/dashboard')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/marketing/contracts">
-          <Suspense fallback={<div className="p-8 text-center">Cargando contratos de patrocinio...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/contracts')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/marketing/events">
-          <Suspense fallback={<div className="p-8 text-center">Cargando eventos patrocinados...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/events')))}
-          </Suspense>
-        </Route>
-
-        <Route path="/admin/marketing/assets">
-          <Suspense fallback={<div className="p-8 text-center">Cargando activos promocionales...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/assets')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/marketing/evaluations">
-          <Suspense fallback={<div className="p-8 text-center">Cargando evaluaciones de patrocinio...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/evaluations')))}
-          </Suspense>
-        </Route>
-
-        {/* Rutas para el módulo de publicidad digital */}
-        <Route path="/admin/advertising">
-          <Suspense fallback={<div className="p-8 text-center">Cargando dashboard de publicidad...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/advertising/dashboard')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/advertising/spaces">
-          <Suspense fallback={<div className="p-8 text-center">Cargando espacios publicitarios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/advertising/spaces')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/advertising/advertisements">
-          <Suspense fallback={<div className="p-8 text-center">Cargando gestión de anuncios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/advertising/advertisements')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/advertising/assignments">
-          <Suspense fallback={<div className="p-8 text-center">Cargando asignaciones publicitarias...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/advertising/assignments')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/advertising/campaigns">
-          <Suspense fallback={<div className="p-8 text-center">Cargando campañas publicitarias...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/advertising/campaigns')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/advertising/space-mappings">
-          <Suspense fallback={<div className="p-8 text-center">Cargando mapeo de espacios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/advertising/space-mappings')))}
-          </Suspense>
-        </Route>
 
         {/* Rutas para reset de contraseña */}
         <Route path="/reset-password">
@@ -1210,12 +1151,6 @@ function Router() {
           </Suspense>
         </Route>
 
-        {/* Rutas del módulo de Marketing */}
-        <Route path="/admin/marketing/sponsors">
-          <Suspense fallback={<div className="p-8 text-center">Cargando gestión de patrocinios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/sponsors')))}
-          </Suspense>
-        </Route>
 
         {/* Ruta de redirección para compatibilidad */}
         <Route path="/admin/finance">

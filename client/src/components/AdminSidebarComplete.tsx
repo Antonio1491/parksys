@@ -225,7 +225,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
   return (
     <AccordionItem value={value} className="border-0">
       <AccordionTrigger className={cn("py-2 hover:no-underline [&>svg]:text-white", colors.hoverBg)}>
-        <div className={cn("flex items-center text-sm font-medium", colors.textColor)}>
+        <div className={cn("flex items-center text-sm font-normal font-poppins", colors.textColor)}>
           <div className="mr-2 flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: colors.bgColor }}>
             {iconWithClass}
           </div>
@@ -277,9 +277,10 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
   };
 
   const Wrapper = href ? Link : 'div';
+  const wrapperProps = href ? { to: href } : {};
 
   return (
-    <Wrapper href={href}>
+    <Wrapper {...wrapperProps}>
       <button
         onClick={handleClick}
         className={cn(
@@ -353,8 +354,6 @@ const AdminSidebarComplete: React.FC = () => {
     if (location.startsWith('/admin/finance')) return 'finanzas';
     if (location.startsWith('/admin/accounting')) return 'contabilidad';
     if (location.startsWith('/admin/concessions')) return 'concesiones';
-    if (location.startsWith('/admin/marketing')) return 'marketing';
-    if (location.startsWith('/admin/advertising')) return 'advertising';
     if (location.startsWith('/admin/communications')) return 'comunicacion';
     // Rutas del módulo "Configuración y Seguridad"
     if (location.startsWith('/admin/configuracion-seguridad/access/')) return 'control-acceso';
@@ -380,8 +379,6 @@ const AdminSidebarComplete: React.FC = () => {
       'finanzas': ['/admin/finance'],
       'contabilidad': ['/admin/accounting'],
       'concesiones': ['/admin/concessions'],
-      'marketing': ['/admin/marketing'],
-      'advertising': ['/admin/advertising'],
       'comunicacion': ['/admin/communications'],
       'control-acceso': ['/admin/configuracion-seguridad/access/'],
       'auditoria': ['/admin/configuracion-seguridad/audit'],
@@ -448,7 +445,7 @@ const AdminSidebarComplete: React.FC = () => {
     }
     
     // Rutas que pertenecen al módulo "Mkt & Comm"
-    if (location.startsWith('/admin/marketing') || location.startsWith('/admin/communications') || location.startsWith('/admin/advertising')) {
+    if (location.startsWith('/admin/communications')) {
       return ['mkt-comm'];
     }
     
@@ -1074,109 +1071,25 @@ const AdminSidebarComplete: React.FC = () => {
             title="Mkt & Comm" 
             icon={<Megaphone className="h-5 w-5" />}
             value="mkt-comm"
-            defaultOpen={location.startsWith('/admin/marketing') || location.startsWith('/admin/communications')}
+            defaultOpen={location.startsWith('/admin/communications')}
           >
-            {/* MARKETING */}
-            <CollapsibleSubmenu
-              id="marketing"
-              title="Marketing"
-              icon={<Megaphone className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('marketing')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('marketing')}
-            >
-              <NavItem 
-                href="/admin/marketing/sponsors" 
-                icon={<Building className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/sponsors')}
-              >
-                Patrocinadores
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/contracts" 
-                icon={<FileText className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/contracts')}
-              >
-                Contratos
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/events" 
-                icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/events')}
-              >
-                Eventos
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/assets" 
-                icon={<Image className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/assets')}
-              >
-                Activos
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/evaluations" 
-                icon={<Star className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/evaluations')}
-              >
-                Evaluaciones
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* PUBLICIDAD DIGITAL */}
-            <CollapsibleSubmenu
-              id="advertising"
-              title="Publicidad Digital"
-              icon={<Monitor className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('advertising')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('advertising')}
-            >
-              <NavItem 
-                href="/admin/advertising/spaces" 
-                icon={<LayoutGrid className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/spaces')}
-              >
-                Espacios Publicitarios
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/advertisements" 
-                icon={<Image className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/advertisements')}
-              >
-                Anuncios
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/campaigns" 
-                icon={<Target className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/campaigns')}
-              >
-                Campañas
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/assignments" 
-                icon={<MapPin className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/assignments')}
-              >
-                Asignaciones
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/space-mappings" 
-                icon={<Grid className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/space-mappings')}
-              >
-                Mapeo de Espacios
-              </NavItem>
-            </CollapsibleSubmenu>
 
             {/* COMUNICACIÓN */}
             <CollapsibleSubmenu
               id="comunicacion"
-              title="Comunicación"
+              title="Marketing y Comunicación"
               icon={<MessageSquare className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('comunicacion')}
               onToggle={toggleSubmenu}
               isActive={isSubmenuActive('comunicacion')}
             >
+              <NavItem 
+                href="/admin/communications" 
+                icon={<BarChart3 className="h-4 w-4" />}
+                active={location === '/admin/communications'}
+              >
+                Dashboard Unificado
+              </NavItem>
               <NavItem 
                 href="/admin/communications/templates" 
                 icon={<FileText className="h-4 w-4" />}

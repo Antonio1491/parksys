@@ -85,24 +85,8 @@ export function SidebarSearch() {
     { id: 'accounting-dashboard', title: 'Dashboard Contabilidad', description: 'Panel de contabilidad', href: '/admin/accounting/dashboard', module: 'Contabilidad', icon: <BarChart3 className="h-4 w-4" /> },
     { id: 'concessions-reports', title: 'Reportes de Concesiones', description: 'Informes de concesiones', href: '/admin/concessions/reports', module: 'Concesiones', icon: <FileText className="h-4 w-4" /> },
 
-    // Marketing y Comunicación - Marketing
-    { id: 'marketing-dashboard', title: 'Dashboard Marketing', description: 'Panel de control de marketing', href: '/admin/marketing', module: 'Marketing', icon: <BarChart3 className="h-4 w-4" /> },
-    { id: 'marketing-sponsors', title: 'Patrocinadores', description: 'Gestión de patrocinadores', href: '/admin/marketing/sponsors', module: 'Marketing', icon: <Users className="h-4 w-4" /> },
-    { id: 'marketing-contracts', title: 'Contratos de Marketing', description: 'Gestión de contratos de marketing', href: '/admin/marketing/contracts', module: 'Marketing', icon: <FileText className="h-4 w-4" /> },
-    { id: 'marketing-events', title: 'Eventos de Marketing', description: 'Eventos promocionales', href: '/admin/marketing/events', module: 'Marketing', icon: <Calendar className="h-4 w-4" /> },
-    { id: 'marketing-assets', title: 'Activos Promocionales', description: 'Material promocional', href: '/admin/marketing/assets', module: 'Marketing', icon: <Package className="h-4 w-4" /> },
-    { id: 'marketing-evaluations', title: 'Evaluaciones de Marketing', description: 'Evaluaciones de campañas de marketing', href: '/admin/marketing/evaluations', module: 'Marketing', icon: <FileText className="h-4 w-4" /> },
-
-    // Marketing y Comunicación - Publicidad
-    { id: 'advertising-dashboard', title: 'Dashboard Publicidad', description: 'Panel de control publicitario', href: '/admin/advertising', module: 'Publicidad', icon: <BarChart3 className="h-4 w-4" /> },
-    { id: 'advertising-spaces', title: 'Espacios Publicitarios', description: 'Gestión de espacios publicitarios', href: '/admin/advertising/spaces', module: 'Publicidad', icon: <MapPin className="h-4 w-4" /> },
-    { id: 'advertising-advertisements', title: 'Anuncios', description: 'Gestión de anuncios publicitarios', href: '/admin/advertising/advertisements', module: 'Publicidad', icon: <FileText className="h-4 w-4" /> },
-    { id: 'advertising-campaigns', title: 'Campañas Publicitarias', description: 'Gestión de campañas publicitarias', href: '/admin/advertising/campaigns', module: 'Publicidad', icon: <Calendar className="h-4 w-4" /> },
-    { id: 'advertising-assignments', title: 'Asignaciones Publicitarias', description: 'Asignaciones de espacios publicitarios', href: '/admin/advertising/assignments', module: 'Publicidad', icon: <Settings className="h-4 w-4" /> },
-    { id: 'advertising-space-mappings', title: 'Mapeo de Espacios', description: 'Mapeo de espacios publicitarios', href: '/admin/advertising/space-mappings', module: 'Publicidad', icon: <MapPin className="h-4 w-4" /> },
-
-    // Marketing y Comunicación - Comunicaciones
-    { id: 'communications-dashboard', title: 'Dashboard Comunicaciones', description: 'Panel de control de comunicaciones', href: '/admin/communications', module: 'Comunicaciones', icon: <BarChart3 className="h-4 w-4" /> },
+    // Marketing y Comunicación - Dashboard Unificado
+    { id: 'communications-dashboard', title: 'Marketing y Comunicación', description: 'Panel unificado de comunicaciones, patrocinios y publicidad digital', href: '/admin/communications', module: 'Marketing y Comunicación', icon: <BarChart3 className="h-4 w-4" /> },
     { id: 'communications-templates', title: 'Plantillas de Email', description: 'Plantillas de comunicación', href: '/admin/communications/templates', module: 'Comunicaciones', icon: <FileText className="h-4 w-4" /> },
     { id: 'communications-queue', title: 'Cola de Emails', description: 'Cola de envío de emails', href: '/admin/communications/queue', module: 'Comunicaciones', icon: <Calendar className="h-4 w-4" /> },
     { id: 'communications-campaigns', title: 'Campañas de Email', description: 'Campañas de comunicación', href: '/admin/communications/campaigns', module: 'Comunicaciones', icon: <Calendar className="h-4 w-4" /> },
