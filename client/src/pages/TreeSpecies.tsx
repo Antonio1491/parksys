@@ -65,7 +65,13 @@ const growthRateColors = {
 const growthRateLabels = {
   'Lento': 'Lento',
   'Medio': 'Medio', 
-  'Rapido': 'Rápido'
+  'Rapido': 'Rapido'
+};
+
+// Función para mostrar las etiquetas con acentos en la UI
+const getGrowthRateDisplayLabel = (rate: string) => {
+  if (rate === 'Rapido') return 'Rápido';
+  return rate;
 };
 
 const originColors = {
@@ -112,7 +118,7 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
                 </div>
                 <div className="flex gap-2">
                   <Badge className={growthRateColor}>
-                    {growthRateLabels[species.growthRate as keyof typeof growthRateLabels] || species.growthRate}
+                    {getGrowthRateDisplayLabel(species.growthRate)}
                   </Badge>
                   <Badge className={originColor}>
                     {species.origin}
@@ -221,7 +227,7 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
               <p className="text-sm text-gray-500 italic">{species.scientificName}</p>
             </div>
             <Badge className={growthRateColor}>
-              {growthRateLabels[species.growthRate as keyof typeof growthRateLabels] || species.growthRate}
+              {getGrowthRateDisplayLabel(species.growthRate)}
             </Badge>
           </div>
           
