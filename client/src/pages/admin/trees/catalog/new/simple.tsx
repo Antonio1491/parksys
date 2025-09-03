@@ -269,7 +269,7 @@ function SimpleNewTreeSpecies() {
                       <SelectContent>
                         <SelectItem value="Lento">Lento</SelectItem>
                         <SelectItem value="Medio">Medio</SelectItem>
-                        <SelectItem value="Rapido">Rápido</SelectItem>
+                        <SelectItem value="Rapido">Rapido</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
