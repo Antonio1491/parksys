@@ -507,8 +507,10 @@ const AdminSidebarComplete: React.FC = () => {
 
   return (
     <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40 bg-accent" style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
-      
-      
+      {/* Barra de búsqueda */}
+      <div className="p-0">
+        <SidebarSearch />
+      </div>
       {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-2 w-full">
         <Accordion
@@ -516,12 +518,7 @@ const AdminSidebarComplete: React.FC = () => {
           value={openAccordions}
           onValueChange={setOpenAccordions}
           className="space-y-1"
-        >
-          {/* Barra de búsqueda */}
-          <div className="p-0">
-            <SidebarSearch />
-          </div>
-
+        >          
           {/* 1. GESTIÓN - MENÚ PRINCIPAL CON SUBMENÚS COLAPSABLES */}
           <ModuleNav 
             title="Gestión" 
