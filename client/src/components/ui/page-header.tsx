@@ -27,7 +27,7 @@ export const PageHeader = ({
           {title}
         </h1>
         {subtitle && (
-          <p className="text-base font-light text-white font-poppins mt-1">
+          <p className="text-base font-light text-white font-poppins mt-0">
             {subtitle}
           </p>
         )}
