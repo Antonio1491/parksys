@@ -137,7 +137,17 @@ function TreeSpeciesCatalog() {
   };
 
   const handleViewDetails = (id: number) => {
-    setLocation(`/admin/trees/catalog/${id}`);
+    // Validate that id is a valid number
+    if (typeof id === 'number' && !isNaN(id) && id > 0) {
+      setLocation(`/admin/trees/catalog/${id}`);
+    } else {
+      console.warn('Invalid tree species ID:', id);
+      toast({
+        title: "Error",
+        description: "ID de especie inválido. Por favor, contacta al administrador.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Mutación para importar CSV
