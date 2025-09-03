@@ -293,8 +293,10 @@ function TreeSpeciesCatalog() {
       )
     ].join('\n');
 
-    // Crear y descargar archivo
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Crear y descargar archivo con BOM UTF-8 para acentos correctos
+    const bom = '\uFEFF';
+    const csvWithBom = bom + csvContent;
+    const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.style.display = 'none';
