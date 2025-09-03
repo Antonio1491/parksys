@@ -269,7 +269,7 @@ function TreeSpeciesCatalog() {
         'Jacaranda mimosifolia',
         'Bignoniaceae',
         'Introducido',
-        'Rápido',
+        'Rapido',
         'https://ejemplo.com/jacaranda.jpg',
         'no',
         'Árbol ornamental famoso por su espectacular floración violeta. Originario de Argentina, ampliamente cultivado en México por su belleza.',

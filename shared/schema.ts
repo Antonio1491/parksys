@@ -1377,7 +1377,7 @@ export const treeSpecies = pgTable("tree_species", {
   family: text("family"),
   origin: text("origin"), // Nativo, Introducido, etc.
   climateZone: text("climate_zone"),
-  growthRate: text("growth_rate"), // Lento, Medio, Rápido
+  growthRate: text("growth_rate"), // Lento, Medio, Rapido
   heightMature: decimal("height_mature", { precision: 5, scale: 2 }), // altura máxima en metros
   canopyDiameter: decimal("canopy_diameter", { precision: 5, scale: 2 }), // diámetro de copa en metros
   lifespan: integer("lifespan"), // años aproximados
