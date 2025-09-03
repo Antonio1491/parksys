@@ -344,12 +344,13 @@
     /* Sidebar colors - Parques de México theme */
     --sidebar-background: 190 100% 14%;
     --sidebar-foreground: 20 14.3% 4.1%;
-    --sidebar-primary: 167 100% 33%; /* #00a587 */
+    --sidebar-primary: 169 50% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 167 100% 20%; /* #067f5f */
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 20 5.9% 90%;
     --sidebar-ring: 167 100% 33%;
+    --sidebar-hover: 181 94% 21%;
   }
 
   .dark {

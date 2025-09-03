@@ -161,49 +161,49 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
       'system': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#61B1A0'
       },
       'gestion': {
         iconColor: 'text-white',
         textColor: 'text-white', 
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#513C73'
       },
       'operations': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#B275B0'
       },
       'admin-finance': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#B3C077'
       },
       'mkt-comm': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#1E5AA6'
       },
       'hr': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#198DCE'
       },
       'security': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#90D3EC'
       },
       'public': {
         iconColor: 'text-white',
         textColor: 'text-white',
-        hoverBg: 'hover:bg-[#036668]',
+        hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#1E5AA6'
       }
     };
@@ -211,7 +211,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
     return colorSchemes[moduleValue as keyof typeof colorSchemes] || {
       iconColor: 'text-white',
       textColor: 'text-white',
-      hoverBg: 'hover:bg-[#036668]',
+      hoverBg: 'hover:bg-sidebar-hover',
       bgColor: '#90D3EC'
     };
   };
@@ -284,8 +284,8 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
           className={cn(
             'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
             isActive
-              ? 'bg-[#3DB59F] text-white'
-              : 'bg-transparent text-white hover:bg-[#036668]'
+              ? 'bg-sidebar-primary text-white'
+              : 'bg-transparent text-white hover:bg-sidebar-hover'
           )}
         >
           <div className="flex items-center">
@@ -506,7 +506,7 @@ const AdminSidebarComplete: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40 bg-accent" style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
+    <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40 bg-sidebar" style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
       {/* Barra de búsqueda */}
       <div className="p-0">
         <SidebarSearch />
