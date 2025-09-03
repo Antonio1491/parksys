@@ -3238,7 +3238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const parkId = Number(req.params.id);
       console.log(`DEBUG: Endpoint /parks/${parkId}/amenities llamado - Devolviendo park_amenities`);
       
-      // Usar ROW_NUMBER() para eliminar duplicados reales de la base de datos
+      // Consulta simplificada para evitar duplicados
       const result = await pool.query(`
         SELECT 
           pa.id,
@@ -3253,14 +3253,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           a.name as "amenityName",
           a.icon as "amenityIcon",
           a.custom_icon_url as "customIconUrl"
-        FROM (
-          SELECT DISTINCT ON (pa.park_id, pa.amenity_id)
-            pa.*
-          FROM park_amenities pa
-          WHERE pa.park_id = $1
-          ORDER BY pa.park_id, pa.amenity_id, pa.id DESC
-        ) pa
+        FROM park_amenities pa
         INNER JOIN amenities a ON pa.amenity_id = a.id
+        WHERE pa.park_id = $1
         ORDER BY a.name
       `, [parkId]);
       
