@@ -249,9 +249,9 @@ app.get('/api/status', (req: Request, res: Response) => {
       message: 'ParkSys - Parques de México API',
       timestamp: new Date().toISOString(),
       port: process.env.PORT || 5000,
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env.NODE_ENV || 'production',
       replit: {
-        deployment_id: process.env.REPLIT_DEPLOYMENT_ID || 'development',
+        deployment_id: process.env.REPLIT_DEPLOYMENT_ID || 'prod-default',
         domain: process.env.REPLIT_DOMAIN || 'localhost'
       }
     });
@@ -278,7 +278,7 @@ app.get('/server-status', (req: Request, res: Response) => {
         external: `${Math.round(memory.external / 1024 / 1024)} MB`
       },
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env.NODE_ENV || 'production',
       isReplit: !!process.env.REPLIT_DEPLOYMENT_ID
     });
   } catch (error) {
@@ -389,7 +389,7 @@ app.get('/status', (req: Request, res: Response) => {
             <div class="status">✅ Sistema Funcionando</div>
             <div class="info">
               <p><strong>Estado:</strong> Operativo</p>
-              <p><strong>Servidor:</strong> ${process.env.NODE_ENV || 'development'}</p>
+              <p><strong>Servidor:</strong> ${process.env.NODE_ENV || 'production'}</p>
               <p><strong>Puerto:</strong> ${process.env.PORT || 5000}</p>
               <p><strong>Base de Datos:</strong> PostgreSQL Conectada</p>
             </div>
@@ -658,7 +658,7 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   if (!res.headersSent) {
     res.status(500).json({ 
       error: 'Internal Server Error',
-      message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : error.message
     });
   }
 });
@@ -1565,10 +1565,10 @@ app.post("/api/parks/:parkId/images", imageUpload.single('image'), async (req: R
   }
 });
 
-// ENDPOINT DIRECTO PARA ACTUALIZAR PARQUES - DEVELOPMENT MODE
-app.put("/api/dev/parks/:id", async (req: Request, res: Response) => {
+// ENDPOINT DIRECTO PARA ACTUALIZAR PARQUES
+app.put("/api/parks/:id", async (req: Request, res: Response) => {
   try {
-    console.log("=== DESARROLLO - Actualizando parque directamente ===");
+    console.log("=== Actualizando parque directamente ===");
     console.log("Park ID:", req.params.id);
     console.log("Datos recibidos:", req.body);
     console.log("Campo certificaciones recibido:", req.body.certificaciones);
