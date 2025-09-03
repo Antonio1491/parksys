@@ -682,17 +682,18 @@ router.get('/placements', async (req, res) => {
     
     const params = [];
     
-    if (spaceId) {
+    // Parse spaceId as integer and validate it's a valid number
+    if (spaceId && spaceId !== 'undefined' && !isNaN(parseInt(String(spaceId)))) {
       query += ` AND ads.id = $${params.length + 1}`;
-      params.push(spaceId);
+      params.push(parseInt(String(spaceId)));
     }
     
-    if (pageType) {
+    if (pageType && pageType !== 'undefined') {
       query += ` AND ads.page_type = $${params.length + 1}`;
       params.push(pageType);
     }
     
-    if (position) {
+    if (position && position !== 'undefined') {
       query += ` AND ads.position = $${params.length + 1}`;
       params.push(position);
     }
