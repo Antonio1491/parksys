@@ -1437,8 +1437,8 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
   // Subir icono personalizado para especies de árboles
   apiRouter.post("/tree-species/upload-icon", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      // Verificar que el usuario sea administrador
-      if (req.user?.role !== "admin" && req.user?.role !== "super_admin") {
+      // Verificar que el usuario sea administrador (role_id 1 = admin)
+      if (!req.user || (req.user.roleId !== 1 && req.user.role_id !== 1)) {
         return res.status(403).json({ message: "Solo administradores pueden subir iconos" });
       }
       
@@ -1461,8 +1461,8 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
   // Subir foto principal para especies de árboles
   apiRouter.post("/tree-species/upload-photo", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      // Verificar que el usuario sea administrador
-      if (req.user?.role !== "admin" && req.user?.role !== "super_admin") {
+      // Verificar que el usuario sea administrador (role_id 1 = admin)
+      if (!req.user || (req.user.roleId !== 1 && req.user.role_id !== 1)) {
         return res.status(403).json({ message: "Solo administradores pueden subir fotos" });
       }
       
@@ -1485,8 +1485,8 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
   // Subida masiva de iconos para especies de árboles
   apiRouter.post("/tree-species/bulk-upload-icons", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      // Verificar que el usuario sea administrador
-      if (req.user?.role !== "admin" && req.user?.role !== "super_admin") {
+      // Verificar que el usuario sea administrador (role_id 1 = admin)
+      if (!req.user || (req.user.roleId !== 1 && req.user.role_id !== 1)) {
         return res.status(403).json({ message: "Solo administradores pueden realizar carga masiva" });
       }
 
