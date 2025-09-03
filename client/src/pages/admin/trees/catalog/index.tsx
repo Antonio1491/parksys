@@ -332,7 +332,7 @@ function TreeSpeciesCatalog() {
       let csvText = event.target?.result as string;
       // Corregir encoding UTF-8
       csvText = fixEncoding(csvText);
-      console.log("CSV después de corrección de encoding (preview):", csvText.substring(0, 500));
+      // console.log("CSV después de corrección de encoding (preview):", csvText.substring(0, 500)); // Disabled to prevent Vite issues
       const lines = csvText.split('\n').filter(line => line.trim());
       
       if (lines.length < 2) {
@@ -430,7 +430,7 @@ function TreeSpeciesCatalog() {
       let csvText = event.target?.result as string;
       // Corregir encoding UTF-8
       csvText = fixEncoding(csvText);
-      console.log("CSV después de corrección de encoding (importación):", csvText.substring(0, 500));
+      // console.log("CSV después de corrección de encoding (importación):", csvText.substring(0, 500)); // Disabled to prevent Vite issues
       const lines = csvText.split('\n').filter(line => line.trim());
       const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
       
@@ -457,7 +457,7 @@ function TreeSpeciesCatalog() {
           delete row.isendangered;
         }
         
-        console.log("Parsed row:", row);
+        // console.log("Parsed row:", row); // Disabled to prevent Vite module processing issues
         return row;
       });
 
