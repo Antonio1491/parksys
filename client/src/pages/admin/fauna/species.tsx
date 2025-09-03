@@ -198,7 +198,7 @@ const FaunaSpeciesAdmin: React.FC = () => {
   const handleCreate = (data: any) => {
     console.log('Datos del formulario:', data);
     // Filtrar campos vacíos y enviar solo los que tienen valor
-    const cleanData = {
+    const cleanData: any = {
       commonName: data.commonName,
       scientificName: data.scientificName,
       family: data.family,
@@ -235,7 +235,7 @@ const FaunaSpeciesAdmin: React.FC = () => {
 
   const handleEdit = (speciesData: FaunaSpecies) => {
     setSelectedSpecies(speciesData);
-    form.reset(speciesData);
+    form.reset(speciesData as any);
     setIsEditDialogOpen(true);
   };
 

@@ -3030,6 +3030,7 @@ export const sponsors = pgTable("sponsors", {
   name: varchar("name", { length: 255 }).notNull(),
   category: varchar("category", { length: 50 }).notNull(), // corporativo, local, institucional, ong
   logo: varchar("logo", { length: 500 }),
+  tier: integer("tier").default(1), // nivel de patrocinio 1-10
   
   // Información de contacto
   representative: varchar("representative", { length: 255 }),

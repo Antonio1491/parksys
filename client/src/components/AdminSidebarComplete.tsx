@@ -276,43 +276,76 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
     }
   };
 
-  const Wrapper = href ? Link : 'div';
-  const wrapperProps = href ? { to: href } : {};
-
   return (
-    <Wrapper {...wrapperProps}>
-      <button
-        onClick={handleClick}
-        className={cn(
-          'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
-          isActive
-            ? 'bg-[#3DB59F] text-white'
-            : 'bg-transparent text-white hover:bg-[#036668]'
-        )}
-      >
-        <div className="flex items-center">
-          {icon &&
-            React.cloneElement(icon as React.ReactElement, {
-              className: 'h-4 w-4 text-white',
-            })}
-          <span className="ml-2">{title}</span>
-        </div>
-        {collapsible && (
-          <ChevronRight
-            className={cn(
-              'h-4 w-4 text-white transition-transform',
-              isExpanded && 'rotate-90'
-            )}
-          />
-        )}
-      </button>
+    href ? (
+      <Link to={href}>
+        <button
+          onClick={handleClick}
+          className={cn(
+            'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
+            isActive
+              ? 'bg-[#3DB59F] text-white'
+              : 'bg-transparent text-white hover:bg-[#036668]'
+          )}
+        >
+          <div className="flex items-center">
+            {icon &&
+              React.cloneElement(icon as React.ReactElement, {
+                className: 'h-4 w-4 text-white',
+              })}
+            <span className="ml-2">{title}</span>
+          </div>
+          {collapsible && (
+            <ChevronRight
+              className={cn(
+                'h-4 w-4 text-white transition-transform',
+                isExpanded && 'rotate-90'
+              )}
+            />
+          )}
+        </button>
 
-      {collapsible && isExpanded && (
-        <div className="pl-4 ml-2 space-y-1 mt-2">
-          {children}
-        </div>
-      )}
-    </Wrapper>
+        {collapsible && isExpanded && (
+          <div className="pl-4 ml-2 space-y-1 mt-2">
+            {children}
+          </div>
+        )}
+      </Link>
+    ) : (
+      <div>
+        <button
+          onClick={handleClick}
+          className={cn(
+            'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
+            isActive
+              ? 'bg-[#3DB59F] text-white'
+              : 'bg-transparent text-white hover:bg-[#036668]'
+          )}
+        >
+          <div className="flex items-center">
+            {icon &&
+              React.cloneElement(icon as React.ReactElement, {
+                className: 'h-4 w-4 text-white',
+              })}
+            <span className="ml-2">{title}</span>
+          </div>
+          {collapsible && (
+            <ChevronRight
+              className={cn(
+                'h-4 w-4 text-white transition-transform',
+                isExpanded && 'rotate-90'
+              )}
+            />
+          )}
+        </button>
+
+        {collapsible && isExpanded && (
+          <div className="pl-4 ml-2 space-y-1 mt-2">
+            {children}
+          </div>
+        )}
+      </div>
+    )
   );
 };
 

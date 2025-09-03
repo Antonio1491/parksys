@@ -976,7 +976,6 @@ function TreeSpeciesCatalog() {
                           <TableCell>
                             <div className="flex items-center justify-center h-10 w-10 rounded-full bg-green-50">
                               <TreeSpeciesIcon
-                                name={species.commonName}
                                 iconType={species.iconType || 'system'}
                                 customIconUrl={species.customIconUrl || undefined}
                                 size={32}
