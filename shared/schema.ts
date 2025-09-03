@@ -1344,7 +1344,7 @@ export const parkTypology = pgTable("park_typology", {
 export const parks = pgTable("parks", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  municipalityId: integer("municipality_id"),
+  municipalityId: integer("municipality_id"), // Opcional - para retrocompatibilidad
   municipalityText: text("municipality_text"), // Campo para municipio como texto libre
   parkType: text("park_type").notNull(), // Campo legacy mantenido para retrocompatibilidad
   typologyId: integer("typology_id").references(() => parkTypology.id), // Relación con tipología oficial

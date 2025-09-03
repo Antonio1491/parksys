@@ -302,7 +302,8 @@ export const processImportFile = async (req: Request, res: Response) => {
         skip_empty_lines: true,
         delimiter: ',',
         quote: '"',
-        escape: '"'
+        escape: '"',
+        cast: false // Forzar que todos los valores se mantengan como strings
       });
       console.log('✅ [IMPORT] CSV procesado, filas:', rawData.length);
     } else if (fileExtension === '.xlsx' || fileExtension === '.xls') {
@@ -334,7 +335,8 @@ export const processImportFile = async (req: Request, res: Response) => {
         rawData = parse(csvContent, {
           columns: true,
           skip_empty_lines: true,
-          delimiter: ','
+          delimiter: ',',
+          cast: false // Forzar que todos los valores se mantengan como strings
         });
         console.log('🔄 [IMPORT] Fallback CSV exitoso, filas:', rawData.length);
       }
@@ -406,14 +408,14 @@ export const processImportFile = async (req: Request, res: Response) => {
         if (englishKey) {
           let value = row[key];
           
-          // Convertir números (pero NO latitude/longitude que deben ser strings)
-          if (['foundationYear', 'area'].includes(englishKey)) {
+          // Convertir números específicos
+          if (['foundationYear'].includes(englishKey)) {
             const numValue = convertToNumber(value);
             value = numValue;
           }
           
-          // Limpiar y mantener como strings (incluyendo coordenadas y municipio)
-          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail', 'latitude', 'longitude', 'municipalityText'].includes(englishKey)) {
+          // Limpiar y mantener como strings (incluyendo coordenadas, municipio y área)
+          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail', 'latitude', 'longitude', 'municipalityText', 'area'].includes(englishKey)) {
             value = cleanString(value);
             // Para coordenadas, asegurar que no sean null
             if ((englishKey === 'latitude' || englishKey === 'longitude') && value === null) {
@@ -490,16 +492,6 @@ export const processImportFile = async (req: Request, res: Response) => {
     await Promise.all(
       validParks.map(async (parkData, index) => {
         try {
-          console.log(`🔍 [IMPORT] Datos a insertar para parque ${index + 1}:`, {
-            name: parkData.name,
-            municipalityText: parkData.municipalityText,
-            area: parkData.area,
-            administrator: parkData.administrator,
-            contactPhone: parkData.contactPhone,
-            address: parkData.address,
-            description: parkData.description,
-            allFields: parkData
-          });
           await storage.createPark(parkData);
           createdCount++;
         } catch (error) {
