@@ -50,6 +50,7 @@ interface TreeSpecies {
   ornamentalValue?: string;
   commonUses?: string;
   photoUrl?: string;
+  imageUrl?: string;
   isEndangered: boolean;
   iconType?: string;
   customIconUrl?: string;
@@ -58,7 +59,13 @@ interface TreeSpecies {
 const growthRateColors = {
   'Lento': 'bg-red-100 text-red-800 border-red-200',
   'Medio': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  'Rápido': 'bg-green-100 text-green-800 border-green-200'
+  'Rapido': 'bg-green-100 text-green-800 border-green-200'
+};
+
+const growthRateLabels = {
+  'Lento': 'Lento',
+  'Medio': 'Medio', 
+  'Rapido': 'Rápido'
 };
 
 const originColors = {
@@ -79,17 +86,21 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
           <div className="flex gap-6">
             {/* Imagen */}
             <div className="w-32 h-32 flex-shrink-0">
-              {species.photoUrl ? (
+              {(species.photoUrl || species.imageUrl) ? (
                 <img 
-                  src={species.photoUrl} 
+                  src={species.photoUrl || species.imageUrl} 
                   alt={species.commonName}
                   className="w-full h-full object-cover rounded-lg"
+                  onError={(e) => {
+                    // Si falla la carga, mostrar placeholder
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
                 />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
-                  <Trees className="h-16 w-16 text-white opacity-80" />
-                </div>
-              )}
+              ) : null}
+              <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                <Trees className="h-16 w-16 text-white opacity-80" />
+              </div>
             </div>
             
             {/* Contenido */}
@@ -101,7 +112,7 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
                 </div>
                 <div className="flex gap-2">
                   <Badge className={growthRateColor}>
-                    {species.growthRate}
+                    {growthRateLabels[species.growthRate as keyof typeof growthRateLabels] || species.growthRate}
                   </Badge>
                   <Badge className={originColor}>
                     {species.origin}
@@ -177,9 +188,9 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
         <CardContent className="p-0">
         {/* Imagen */}
         <div className="relative h-48 overflow-hidden">
-          {species.photoUrl ? (
+          {(species.photoUrl || species.imageUrl) ? (
             <img 
-              src={species.photoUrl} 
+              src={species.photoUrl || species.imageUrl} 
               alt={species.commonName}
               className="w-full h-full object-cover"
             />
@@ -210,7 +221,7 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
               <p className="text-sm text-gray-500 italic">{species.scientificName}</p>
             </div>
             <Badge className={growthRateColor}>
-              {species.growthRate}
+              {growthRateLabels[species.growthRate as keyof typeof growthRateLabels] || species.growthRate}
             </Badge>
           </div>
           
@@ -481,7 +492,7 @@ export default function TreeSpecies() {
                       <SelectItem value="all">Todos los ritmos</SelectItem>
                       <SelectItem value="Lento">Lento</SelectItem>
                       <SelectItem value="Medio">Medio</SelectItem>
-                      <SelectItem value="Rápido">Rápido</SelectItem>
+                      <SelectItem value="Rapido">Rápido</SelectItem>
                     </SelectContent>
                   </Select>
                   
