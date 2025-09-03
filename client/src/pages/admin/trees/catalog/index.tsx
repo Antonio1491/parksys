@@ -377,7 +377,8 @@ function TreeSpeciesCatalog() {
             case 'ritmodecrecimiento':
             case 'ritmocrecimiento':
             case 'growthrate':
-              row.growthRate = value;
+              // Normalizar automáticamente "Rápido" para evitar crashes de Vite
+              row.growthRate = value === 'Rápido' ? 'Rapido' : value;
               break;
             case 'amenazada':
             case 'isendangered':
@@ -440,7 +441,14 @@ function TreeSpeciesCatalog() {
         // Mapeo directo desde CSV a objeto
         headers.forEach((header, i) => {
           const value = values[i] || '';
-          row[header.toLowerCase()] = value;
+          const normalizedHeader = header.toLowerCase();
+          
+          // Normalizar automáticamente "Rápido" para evitar crashes de Vite
+          if (normalizedHeader.includes('crecimiento') || normalizedHeader.includes('growthrate')) {
+            row[normalizedHeader] = value === 'Rápido' ? 'Rapido' : value;
+          } else {
+            row[normalizedHeader] = value;
+          }
         });
         
         // Convertir isEndangered a boolean si existe
