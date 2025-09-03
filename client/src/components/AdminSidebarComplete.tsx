@@ -138,7 +138,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
         className={cn(
           "w-full flex items-center justify-start text-sm font-light h-9 px-2 transition-colors duration-200",
           active
-            ? "bg-white text-[#3DB59F]"
+            ? "bg-white text-header-background"
             : "text-[#3DB59F] hover:bg-[#036668] hover:text-[#3DB59F]"
         )}
       >
