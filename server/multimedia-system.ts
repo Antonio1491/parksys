@@ -196,35 +196,43 @@ export function registerMultimediaRoutes(app: any, apiRouter: Router, isAuthenti
   apiRouter.post('/park-images/:id/set-primary', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const imageId = parseInt(req.params.id);
+      console.log(`🔧 Estableciendo imagen ${imageId} como principal`);
       
       // Obtener parkId de la imagen
-      const imageResult = await db.execute(
+      const imageResult = await pool.query(
         'SELECT park_id FROM park_images WHERE id = $1',
         [imageId]
       );
       
-      if (imageResult.length === 0) {
+      if (imageResult.rows.length === 0) {
+        console.log(`❌ Imagen ${imageId} no encontrada`);
         return res.status(404).json({ error: 'Imagen no encontrada' });
       }
       
-      const parkId = imageResult[0].park_id;
+      const parkId = imageResult.rows[0].park_id;
+      console.log(`🔧 Imagen pertenece al parque ${parkId}`);
       
-      // Desmarcar todas las imágenes como principales
-      await db.execute(
+      // Desmarcar todas las imágenes como principales para este parque
+      await pool.query(
         'UPDATE park_images SET is_primary = false WHERE park_id = $1',
         [parkId]
       );
+      console.log(`🔧 Desmarcadas todas las imágenes principales del parque ${parkId}`);
       
       // Marcar esta imagen como principal
-      await db.execute(
-        'UPDATE park_images SET is_primary = true WHERE id = $1',
+      const updateResult = await pool.query(
+        'UPDATE park_images SET is_primary = true WHERE id = $1 RETURNING id, park_id as "parkId", is_primary as "isPrimary"',
         [imageId]
       );
       
-      res.json({ message: 'Imagen establecida como principal' });
+      console.log(`✅ Imagen ${imageId} establecida como principal:`, updateResult.rows[0]);
+      res.json({ 
+        message: 'Imagen establecida como principal',
+        image: updateResult.rows[0]
+      });
       
     } catch (error) {
-      console.error('Error estableciendo imagen principal:', error);
+      console.error('❌ Error estableciendo imagen principal:', error);
       res.status(500).json({ error: 'Error al establecer imagen principal' });
     }
   });
