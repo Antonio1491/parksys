@@ -128,7 +128,7 @@ type CollapsibleSubmenuProps = {
 
 const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleColor }) => {
   const iconWithClass = React.cloneElement(icon as React.ReactElement, {
-    className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-[#3DB59F]')
+    className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-header-background')
   });
 
   return (
@@ -139,7 +139,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
           "w-full flex items-center justify-start text-sm font-light h-9 px-2 transition-colors duration-200",
           active
             ? "bg-white text-header-background"
-            : "text-[#3DB59F] hover:bg-[#036668] hover:text-[#3DB59F]"
+            : "text-header-background hover:bg-[#036668] hover:text-header-background"
         )}
       >
         {iconWithClass}
@@ -506,7 +506,9 @@ const AdminSidebarComplete: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40" style={{ top: '80px', height: 'calc(100vh - 80px)', backgroundColor: '#003D49' }}>
+    <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40 bg-accent" style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
+      
+      
       {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-2 w-full">
         <Accordion
