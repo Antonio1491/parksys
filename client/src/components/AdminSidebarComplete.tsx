@@ -1175,7 +1175,7 @@ const AdminSidebarComplete: React.FC = () => {
 
           {/* 7. CONFIGURACIÓN Y SEGURIDAD */}
           <ModuleNav 
-            title="Configuración y Seguridad" 
+            title="Configuración" 
             icon={<Settings className="h-5 w-5" />}
             value="config-security"
             defaultOpen={location.startsWith('/admin/configuracion-seguridad') || 

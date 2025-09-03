@@ -2882,13 +2882,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all amenities - Restaurado para funcionamiento normal
+  // Get all amenities - Con DISTINCT para evitar duplicados
   apiRouter.get("/amenities", async (_req: Request, res: Response) => {
     try {
       console.log("[AMENITIES] Obteniendo todas las amenidades...");
       
       const result = await pool.query(`
-        SELECT 
+        SELECT DISTINCT
           id,
           name,
           icon,
@@ -2899,7 +2899,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ORDER BY name
       `);
       
-      console.log("[AMENITIES] Amenidades encontradas:", result.rows.length);
+      console.log("[AMENITIES] Amenidades únicas encontradas:", result.rows.length);
       res.json(result.rows);
     } catch (error) {
       console.error("Error al obtener amenidades:", error);
@@ -3232,13 +3232,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get amenities for a specific park - FIXED VERSION
+  // Get amenities for a specific park - FIXED VERSION SIN DUPLICADOS
   apiRouter.get("/parks/:id/amenities", async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
       console.log(`DEBUG: Endpoint /parks/${parkId}/amenities llamado - Devolviendo park_amenities`);
       
-      // Usar la consulta SQL que sabemos que funciona
+      // Usar ROW_NUMBER() para eliminar duplicados reales de la base de datos
       const result = await pool.query(`
         SELECT 
           pa.id,
@@ -3253,12 +3253,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           a.name as "amenityName",
           a.icon as "amenityIcon",
           a.custom_icon_url as "customIconUrl"
-        FROM park_amenities pa
+        FROM (
+          SELECT DISTINCT ON (pa.park_id, pa.amenity_id)
+            pa.*
+          FROM park_amenities pa
+          WHERE pa.park_id = $1
+          ORDER BY pa.park_id, pa.amenity_id, pa.id DESC
+        ) pa
         INNER JOIN amenities a ON pa.amenity_id = a.id
-        WHERE pa.park_id = $1
         ORDER BY a.name
       `, [parkId]);
       
+      console.log(`DEBUG: Amenidades encontradas para parque ${parkId}:`, result.rows.length);
       res.setHeader('Content-Type', 'application/json');
       res.json(result.rows);
     } catch (error) {
@@ -3707,29 +3713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get amenities for a specific park (for activity location selection)
-  apiRouter.get("/parks/:parkId/amenities", async (req: Request, res: Response) => {
-    try {
-      const parkId = Number(req.params.parkId);
-      
-      const result = await pool.query(`
-        SELECT DISTINCT
-          a.id,
-          a.name,
-          a.category,
-          a.icon
-        FROM amenities a
-        INNER JOIN park_amenities pa ON a.id = pa.amenity_id
-        WHERE pa.park_id = $1
-        ORDER BY a.name
-      `, [parkId]);
-      
-      res.json(result.rows);
-    } catch (error) {
-      console.error("Error fetching park amenities:", error);
-      res.status(500).json({ message: "Error fetching park amenities" });
-    }
-  });
+  // Este endpoint fue eliminado para evitar duplicación con /parks/:id/amenities
 
   // Remove an amenity from a park (admin/municipality only)
   apiRouter.delete("/parks/:parkId/amenities/:amenityId", async (req: Request, res: Response) => {
