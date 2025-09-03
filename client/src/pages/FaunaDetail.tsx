@@ -508,7 +508,7 @@ export default function FaunaDetail() {
               </Card>
 
               {/* Publicidad lateral */}
-              <AdSpace placementId={37} />
+              <AdSpace placement="lateral" />
             </div>
           </div>
         </div>
