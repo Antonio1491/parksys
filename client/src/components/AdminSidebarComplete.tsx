@@ -1071,96 +1071,19 @@ const AdminSidebarComplete: React.FC = () => {
             title="Mkt & Comm" 
             icon={<Megaphone className="h-5 w-5" />}
             value="mkt-comm"
-            defaultOpen={location.startsWith('/admin/communications') || location.startsWith('/admin/marketing') || location.startsWith('/admin/advertising')}
+            defaultOpen={location.startsWith('/admin/communications')}
           >
-
-            {/* MARKETING */}
-            <CollapsibleSubmenu
-              id="marketing"
-              title="Marketing"
-              icon={<TrendingUp className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('marketing')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('marketing')}
-            >
-              <NavItem 
-                href="/admin/communications" 
-                icon={<BarChart3 className="h-4 w-4" />}
-                active={location === '/admin/communications'}
-              >
-                Dashboard Unificado
-              </NavItem>
-              <NavItem 
-                href="/admin/communications/campaigns" 
-                icon={<Megaphone className="h-4 w-4" />}
-                active={location.startsWith('/admin/communications/campaigns')}
-              >
-                Campañas
-              </NavItem>
-              <NavItem 
-                href="/admin/communications/analytics" 
-                icon={<TrendingUp className="h-4 w-4" />}
-                active={location.startsWith('/admin/communications/analytics')}
-              >
-                Análisis
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* PUBLICIDAD */}
-            <CollapsibleSubmenu
-              id="publicidad"
-              title="Publicidad"
-              icon={<Monitor className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('publicidad')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('publicidad')}
-            >
-              <NavItem 
-                href="/admin/advertising" 
-                icon={<BarChart3 className="h-4 w-4" />}
-                active={location === '/admin/advertising'}
-              >
-                Dashboard
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/spaces" 
-                icon={<Monitor className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/spaces')}
-              >
-                Espacios Publicitarios
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/ads" 
-                icon={<Image className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/ads')}
-              >
-                Anuncios
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/campaigns" 
-                icon={<Target className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/campaigns')}
-              >
-                Campañas
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/analytics" 
-                icon={<BarChart3 className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/analytics')}
-              >
-                Métricas
-              </NavItem>
-            </CollapsibleSubmenu>
 
             {/* COMUNICACIÓN */}
             <CollapsibleSubmenu
               id="comunicacion"
-              title="Comunicación"
+              title="Marketing y Comunicación"
               icon={<MessageSquare className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('comunicacion')}
               onToggle={toggleSubmenu}
               isActive={isSubmenuActive('comunicacion')}
             >
+              
               <NavItem 
                 href="/admin/communications/templates" 
                 icon={<FileText className="h-4 w-4" />}
@@ -1176,11 +1099,25 @@ const AdminSidebarComplete: React.FC = () => {
                 Cola de Emails
               </NavItem>
               <NavItem 
+                href="/admin/communications/campaigns" 
+                icon={<Megaphone className="h-4 w-4" />}
+                active={location.startsWith('/admin/communications/campaigns')}
+              >
+                Campañas
+              </NavItem>
+              <NavItem 
                 href="/admin/communications/bulk" 
                 icon={<Mail className="h-4 w-4" />}
                 active={location.startsWith('/admin/communications/bulk')}
               >
                 Envío Masivo
+              </NavItem>
+              <NavItem 
+                href="/admin/communications/analytics" 
+                icon={<TrendingUp className="h-4 w-4" />}
+                active={location.startsWith('/admin/communications/analytics')}
+              >
+                Análisis
               </NavItem>
             </CollapsibleSubmenu>
           </ModuleNav>
