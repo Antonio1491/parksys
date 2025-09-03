@@ -490,6 +490,16 @@ export const processImportFile = async (req: Request, res: Response) => {
     await Promise.all(
       validParks.map(async (parkData, index) => {
         try {
+          console.log(`🔍 [IMPORT] Datos a insertar para parque ${index + 1}:`, {
+            name: parkData.name,
+            municipalityText: parkData.municipalityText,
+            area: parkData.area,
+            administrator: parkData.administrator,
+            contactPhone: parkData.contactPhone,
+            address: parkData.address,
+            description: parkData.description,
+            allFields: parkData
+          });
           await storage.createPark(parkData);
           createdCount++;
         } catch (error) {
