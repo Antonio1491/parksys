@@ -461,10 +461,10 @@ function TreeSpeciesCatalog() {
         return row;
       });
 
-      console.log("=== FRONTEND CSV DATA ===");
-      console.log("Parsed data:", data);
-      console.log("Data length:", data.length);
-      console.log("First row:", data[0]);
+      // console.log("=== FRONTEND CSV DATA ==="); // Disabled to prevent Vite issues
+      // console.log("Parsed data:", data); // Disabled to prevent Vite issues  
+      // console.log("Data length:", data.length); // Disabled to prevent Vite issues
+      // console.log("First row:", data[0]); // Disabled to prevent Vite issues
       importMutation.mutate(data);
     };
 
