@@ -334,9 +334,9 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
                   <p className="text-xs mt-1">Agrega amenidades desde la lista de la izquierda</p>
                 </div>
               ) : (
-                parkAmenities.map((amenity) => (
+                parkAmenities.map((amenity, index) => (
                   <div
-                    key={amenity.id}
+                    key={`${amenity.id}-${amenity.amenityId}-${index}`}
                     className="flex items-center gap-3 p-3 border rounded-lg bg-green-50 border-green-200"
                   >
                     <AmenityIcon 

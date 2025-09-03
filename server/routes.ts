@@ -3685,14 +3685,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "amenityId es requerido" });
       }
       
-      // Check if amenity already exists for this park
+      // Check if amenity already exists for this park (REFORZADO)
       const existingCheck = await pool.query(`
         SELECT id FROM park_amenities 
         WHERE park_id = $1 AND amenity_id = $2
       `, [parkId, amenityId]);
       
       if (existingCheck.rows.length > 0) {
-        return res.status(400).json({ message: "Esta amenidad ya está asignada a este parque" });
+        console.log(`⚠️ DUPLICADO DETECTADO: Parque ${parkId}, Amenidad ${amenityId} - Ya existe`);
+        return res.status(400).json({ 
+          message: "Esta amenidad ya está asignada a este parque",
+          existingEntries: existingCheck.rows.length,
+          parkId,
+          amenityId
+        });
       }
       
       // Insert new park amenity
