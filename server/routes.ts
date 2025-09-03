@@ -1022,13 +1022,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error("Error al registrar rutas de integración Concesiones-Finanzas:", error);
   }
   
-  // Crear tablas del sistema de cobro híbrido
+  // Crear tablas del sistema de cobro híbrido - NON-BLOCKING para evitar fallas de deployment
   try {
     const { createHybridPaymentTables } = await import("./create-hybrid-payment-tables");
-    await createHybridPaymentTables();
-    console.log("Tablas del sistema de cobro híbrido creadas correctamente");
+    
+    // Ejecutar en background sin bloquear el startup
+    setImmediate(async () => {
+      try {
+        await createHybridPaymentTables();
+        console.log("Tablas del sistema de cobro híbrido creadas correctamente");
+      } catch (backgroundError) {
+        console.warn("⚠️ [NON-CRITICAL] Error al crear tablas del sistema de cobro híbrido (no bloquea el servidor):", backgroundError);
+      }
+    });
   } catch (error) {
-    console.error("Error al crear tablas del sistema de cobro híbrido:", error);
+    console.warn("⚠️ [NON-CRITICAL] Error al importar createHybridPaymentTables:", error);
   }
   
   // Registramos las rutas del sistema de cobro híbrido

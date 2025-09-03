@@ -1,0 +1,164 @@
+2025-09-03 12:21:30.90
+051484b3
+User
+length: 75,
+2025-09-03 12:21:30.90
+051484b3
+User
+severity: 'ERROR',
+2025-09-03 12:21:30.90
+051484b3
+User
+code: 'XX000',
+2025-09-03 12:21:30.90
+051484b3
+User
+detail: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+hint: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+position: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+internalPosition: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+internalQuery: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+where: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+schema: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+table: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+column: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+dataType: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+constraint: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+file: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+line: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+routine: undefined
+2025-09-03 12:21:30.90
+051484b3
+User
+}
+2025-09-03 12:21:30.90
+051484b3
+User
+Error en script de creación de tablas de cobro híbrido: error: password authentication failed for user 'neondb_owner'
+2025-09-03 12:21:30.90
+051484b3
+User
+at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+2025-09-03 12:21:30.90
+051484b3
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-09-03 12:21:30.90
+051484b3
+User
+at async createHybridPaymentTables (file:///home/runner/workspace/dist/index.js:10642:5) {
+2025-09-03 12:21:30.90
+051484b3
+User
+length: 75,
+2025-09-03 12:21:30.90
+051484b3
+User
+severity: 'ERROR',
+2025-09-03 12:21:30.90
+051484b3
+User
+code: 'XX000',
+2025-09-03 12:21:30.90
+051484b3
+User
+detail: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+hint: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+position: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+internalPosition: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+internalQuery: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+where: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+schema: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+table: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+column: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+dataType: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+constraint: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+file: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+line: undefined,
+2025-09-03 12:21:30.90
+051484b3
+User
+routine: undefined
+2025-09-03 12:21:30.90
+051484b3
+User
+}
+2025-09-03 12:21:35.91
+051484b3
+System
+command finished with error [npm run start]: exit status 1
