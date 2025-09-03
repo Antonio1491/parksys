@@ -140,20 +140,20 @@ const Home: React.FC = () => {
           <div className="max-w-3xl">
             {/* Título principal */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Agencia Metropolitana
-              <span className="block">de Bosques Urbanos</span>
+              Conoce
+              <span className="block">Parques de México</span>
             </h1>
             
             {/* Subtítulo */}
             <p className="text-2xl md:text-3xl text-gray-200 mb-8 leading-relaxed max-w-2xl">
-              Trabajamos por un futuro más verde,<br />
+              Por un futuro más verde,<br />
               árbol por árbol.
             </p>
             
             {/* Badge */}
             <div className="inline-flex items-center bg-black/55 text-white px-8 py-4 rounded-lg text-lg font-semibold mb-6 border border-white/30">
               <MapPin className="mr-3 h-5 w-5" />
-              Zona Metropolitana de Guadalajara
+              México
             </div>
 
             {/* Botones CTA */}
@@ -192,7 +192,7 @@ const Home: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8">
               <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#51a19f', fontWeight: '300' }}>Nuestros</span><br />
-              <span style={{ color: '#19633c' }}>Bosques Urbanos</span>
+              <span style={{ color: '#19633c' }}>Parques Urbanos</span>
             </h2>
             <p className="text-2xl font-bold text-gray-600 max-w-4xl mx-auto leading-relaxed">
               espacios para respirar, convivir y disfrutar

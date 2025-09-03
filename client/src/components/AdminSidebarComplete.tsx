@@ -1115,7 +1115,7 @@ const AdminSidebarComplete: React.FC = () => {
             <CollapsibleSubmenu
               id="marketing"
               title="Marketing"
-              icon={<Target className="h-4 w-4" />}
+              icon={<TrendingUp className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('marketing')}
               onToggle={toggleSubmenu}
               isActive={isSubmenuActive('marketing')}
