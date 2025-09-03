@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarClock, MapPin, Users, DollarSign, TrendingUp, Calendar, BarChart3, Eye } from 'lucide-react';
 import { useLocation } from 'wouter';
-import AdminLayout from '@/components/AdminLayout';
+import DashboardLayout from '@/components/ui/dashboard-layout';
 import { formatDate } from '@/lib/utils';
 
 interface ReservationStats {
@@ -83,13 +83,24 @@ export default function DashboardReservas() {
     }
   });
 
+  const handleExportPDF = () => {
+    // TODO: Implementar exportación PDF del dashboard
+    console.log('Exportando dashboard de reservas a PDF...');
+  };
+
   if (statsLoading || reservationsLoading) {
     return (
-      <AdminLayout>
+      <DashboardLayout
+        icon={BarChart3}
+        title="Dashboard de Reservas"
+        subtitle="Análisis y métricas de reservas de espacios en parques"
+        backgroundColor="#14b8a6"
+        onExportPDF={handleExportPDF}
+      >
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </AdminLayout>
+      </DashboardLayout>
     );
   }
 
@@ -106,27 +117,20 @@ export default function DashboardReservas() {
   };
 
   return (
-    <AdminLayout>
+    <DashboardLayout
+      icon={BarChart3}
+      title="Dashboard de Reservas"
+      subtitle="Análisis y métricas de reservas de espacios en parques"
+      backgroundColor="#14b8a6"
+      onExportPDF={handleExportPDF}
+    >
       <div className="space-y-6">
-        {/* Header con fondo coloreado */}
-        <div 
-          className="py-8 px-4 -mx-4 -mt-6 flex justify-between items-start"
-          style={{ backgroundColor: "#14b8a6" }}
-        >
-          <div className="flex items-center gap-3">
-            <BarChart3 className="w-8 h-8 text-white" />
-            <div>
-              <h1 className="text-3xl font-bold text-white font-poppins">
-                Dashboard de Reservas
-              </h1>
-              <p className="text-base font-normal text-white font-poppins mt-1">
-                Análisis y métricas de reservas de espacios en parques
-              </p>
-            </div>
-          </div>
+        {/* Controles adicionales */}
+        <div className="flex justify-between items-center">
+          <div></div>
           <div className="flex items-center gap-3">
             <Select value={timeFilter} onValueChange={setTimeFilter}>
-              <SelectTrigger className="w-40 bg-white text-gray-900">
+              <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -138,7 +142,7 @@ export default function DashboardReservas() {
             </Select>
             <Button 
               onClick={handleNewReservation}
-              className="bg-white text-gray-900 hover:bg-gray-100"
+              className="bg-primary text-white hover:bg-primary/90"
             >
               <CalendarClock className="h-4 w-4 mr-2" />
               Nueva Reserva
@@ -358,6 +362,6 @@ export default function DashboardReservas() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </DashboardLayout>
   );
 }
