@@ -448,7 +448,7 @@ app.get('/fonts/:filename(*)', (req, res) => {
   
   if (fs.existsSync(fontPath)) {
     const ext = path.extname(filename).toLowerCase();
-    const mimeTypes = {
+    const mimeTypes: Record<string, string> = {
       '.woff': 'font/woff',
       '.woff2': 'font/woff2',
       '.ttf': 'font/truetype',
@@ -711,8 +711,8 @@ app.post("/api/activities", async (req: Request, res: Response) => {
       startTime,
       endTime,
       location,
-      latitude: validLatitude,
-      longitude: validLongitude,
+      latitude: validLatitude ? validLatitude.toString() : null,
+      longitude: validLongitude ? validLongitude.toString() : null,
       instructorId: instructorId || null,
       duration: duration ? Number(duration) : null,
       capacity: capacity ? Number(capacity) : null,
@@ -739,7 +739,7 @@ app.post("/api/activities", async (req: Request, res: Response) => {
     // Insertar en base de datos
     const [result] = await db
       .insert(activities)
-      .values(activityData)
+      .values([activityData])
       .returning();
 
     console.log("✅ ACTIVIDAD CREADA EXITOSAMENTE:", result);
@@ -747,7 +747,8 @@ app.post("/api/activities", async (req: Request, res: Response) => {
     res.status(201).json(result);
   } catch (error) {
     console.error("❌ ERROR CREANDO ACTIVIDAD:", error);
-    res.status(500).json({ message: "Error al crear actividad", error: error.message });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({ message: "Error al crear actividad", error: errorMessage });
   }
 });
 
