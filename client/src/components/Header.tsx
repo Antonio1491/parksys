@@ -444,40 +444,14 @@ const Header: React.FC = () => {
                   </div>
 
                   {/* Menú MKT & Comm */}
-                  <div className="relative group">
-                    <div className="flex flex-col items-center">
-                      <button 
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isMarketingActive ? "#f4f5f7" : "transparent" }}
-                      >
-                        <Megaphone className={`h-4 w-4 ${isMarketingActive ? "text-[#00444f]" : "text-white"}`} />
-                      </button>
+                  <Link href="/admin/communications" className="flex flex-col items-center hover:opacity-80">
+                    <div 
+                      className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                      style={{ backgroundColor: isMarketingActive ? "#f4f5f7" : "transparent" }}
+                    >
+                      <Megaphone className={`h-4 w-4 ${isMarketingActive ? "text-[#00444f]" : "text-white"}`} />
                     </div>
-
-                    {/* Dropdown menu */}
-                    <div className="absolute left-0 top-full mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="py-1">
-                        <Link
-                          href="/admin/marketing"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Marketing
-                        </Link>
-                        <Link
-                          href="/admin/advertising"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Publicidad
-                        </Link>
-                        <Link
-                          href="/admin/communications"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Comunicaciones
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+                  </Link>
 
                   {/* Menú RH */}
                   <Link href="/admin/hr/dashboard" className="flex flex-col items-center hover:opacity-80">

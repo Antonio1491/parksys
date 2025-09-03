@@ -225,7 +225,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
   return (
     <AccordionItem value={value} className="border-0">
       <AccordionTrigger className={cn("py-2 hover:no-underline [&>svg]:text-white", colors.hoverBg)}>
-        <div className={cn("flex items-center text-sm font-normal font-poppins", colors.textColor)}>
+        <div className={cn("flex items-center text-xs font-normal font-poppins", colors.textColor)}>
           <div className="mr-2 flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: colors.bgColor }}>
             {iconWithClass}
           </div>
@@ -284,7 +284,7 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
       <button
         onClick={handleClick}
         className={cn(
-          'w-full flex items-center justify-between p-2 text-sm font-normal rounded-lg transition-colors',
+          'w-full flex items-center justify-between p-2 text-xs font-normal font-poppins rounded-lg transition-colors',
           isActive
             ? 'bg-[#3DB59F] text-white'
             : 'bg-transparent text-white hover:bg-[#036668]'
