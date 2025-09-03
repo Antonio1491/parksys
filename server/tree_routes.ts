@@ -728,9 +728,15 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         )
       ].join('\n');
 
+      // Crear el CSV con BOM UTF-8 usando Buffer para asegurar codificación correcta
+      const bom = Buffer.from('\uFEFF', 'utf8');
+      const csvBuffer = Buffer.from(csvContent, 'utf8');
+      const finalBuffer = Buffer.concat([bom, csvBuffer]);
+
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', 'attachment; filename="especies_mexicanas_plantilla.csv"');
-      res.send('\uFEFF' + csvContent); // BOM para UTF-8
+      res.setHeader('Cache-Control', 'no-cache');
+      res.send(finalBuffer);
     } catch (error) {
       console.error("Error al generar plantilla CSV:", error);
       res.status(500).json({ message: "Error al generar plantilla CSV" });
@@ -1967,12 +1973,15 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         csvContent += rowData.join(',') + '\n';
       });
 
-      // Agregar BOM para UTF-8
-      const csvWithBOM = '\uFEFF' + csvContent;
+      // Crear el CSV con BOM UTF-8 usando Buffer para asegurar codificación correcta
+      const bom = Buffer.from('\uFEFF', 'utf8');
+      const csvBuffer = Buffer.from(csvContent, 'utf8');
+      const finalBuffer = Buffer.concat([bom, csvBuffer]);
 
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', 'attachment; filename="plantilla_arboles.csv"');
-      res.send(csvWithBOM);
+      res.setHeader('Cache-Control', 'no-cache');
+      res.send(finalBuffer);
 
     } catch (error) {
       console.error("Error al generar plantilla CSV:", error);
