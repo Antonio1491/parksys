@@ -69,30 +69,46 @@ app.get('/cloudrun-health', (req, res) => {
 });
 
 app.get('/', (req: Request, res: Response) => {
-  // ULTRA-OPTIMIZED: Check if this is a health check request
-  const acceptHeader = req.headers.accept;
-  const userAgent = req.headers['user-agent'];
-  
-  // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
-  const isHealthCheck = !acceptHeader?.includes('text/html') || 
-    userAgent?.includes('GoogleHC') || 
-    userAgent?.includes('kube-probe') ||
-    userAgent?.includes('ELB-HealthChecker') ||
-    acceptHeader === '*/*';
-  
-  if (isHealthCheck) {
-    // Immediate health check response - no file system operations
-    res.writeHead(200, healthHeaders);
-    res.end(healthResponse);
-    return;
-  }
-  
-  // Serve the React app for browser requests (only when not health check)
-  const indexPath = path.join(process.cwd(), 'public', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(503).send('Application not built. Please run npm run build first.');
+  try {
+    // ULTRA-OPTIMIZED: Check if this is a health check request
+    const acceptHeader = req.headers.accept;
+    const userAgent = req.headers['user-agent'];
+    
+    console.log(`🔍 [ROOT] Request: Accept=${acceptHeader}, UserAgent=${userAgent}`);
+    
+    // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
+    const isHealthCheck = !acceptHeader?.includes('text/html') || 
+      userAgent?.includes('GoogleHC') || 
+      userAgent?.includes('kube-probe') ||
+      userAgent?.includes('ELB-HealthChecker') ||
+      acceptHeader === '*/*';
+    
+    if (isHealthCheck) {
+      console.log(`🏥 [ROOT] Health check detected, returning OK`);
+      // Immediate health check response - no file system operations
+      res.writeHead(200, healthHeaders);
+      res.end(healthResponse);
+      return;
+    }
+    
+    console.log(`🌐 [ROOT] Browser request detected, serving React app`);
+    
+    // Serve the React app for browser requests (only when not health check)
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    console.log(`📁 [ROOT] Looking for index.html at: ${indexPath}`);
+    
+    if (fs.existsSync(indexPath)) {
+      console.log(`✅ [ROOT] index.html found, serving file`);
+      res.sendFile(indexPath);
+    } else {
+      console.log(`❌ [ROOT] index.html not found at ${indexPath}`);
+      console.log(`📂 [ROOT] Current working directory: ${process.cwd()}`);
+      console.log(`📂 [ROOT] Checking if public directory exists: ${fs.existsSync(path.join(process.cwd(), 'public'))}`);
+      res.status(503).send('Application not built. Please run npm run build first.');
+    }
+  } catch (error) {
+    console.error(`🚨 [ROOT] Error in root handler:`, error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
@@ -628,6 +644,23 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(`🌟 Body parseado:`, JSON.stringify(req.body, null, 2));
   }
   next();
+});
+
+// Global error handler middleware - must be LAST middleware
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('🚨 [EXPRESS] Global error handler caught error:');
+  console.error('🚨 [EXPRESS] Error:', error);
+  console.error('🚨 [EXPRESS] Error stack:', error.stack);
+  console.error('🚨 [EXPRESS] Request URL:', req.url);
+  console.error('🚨 [EXPRESS] Request method:', req.method);
+  console.error('🚨 [EXPRESS] Request headers:', req.headers);
+  
+  if (!res.headersSent) {
+    res.status(500).json({ 
+      error: 'Internal Server Error',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+    });
+  }
 });
 
 
@@ -2186,12 +2219,14 @@ function startServer() {
   // Add process safety handlers to prevent unexpected exits
   process.on('uncaughtException', (error) => {
     console.error('🚨 [PROCESS] Uncaught Exception:', error);
+    console.error('🚨 [PROCESS] Error stack:', error.stack);
     console.error('🚨 [PROCESS] Server will continue running...');
     // Don't exit - keep server running for deployment health checks
   });
 
   process.on('unhandledRejection', (reason, promise) => {
     console.error('🚨 [PROCESS] Unhandled Promise Rejection at:', promise, 'reason:', reason);
+    console.error('🚨 [PROCESS] Unhandled rejection details:', JSON.stringify(reason, null, 2));
     console.error('🚨 [PROCESS] Server will continue running...');
     // Don't exit - keep server running for deployment health checks
   });
