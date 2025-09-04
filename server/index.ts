@@ -427,25 +427,11 @@ if (isProductionMode) {
   console.log('📁 [DEV] Skipping public/ static files - Vite will handle assets');
 }
 
-// Configuración dinámica para uploads basada en el entorno
-const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-const uploadsBasePath = isProduction ? 
-  path.join(process.cwd(), 'public/uploads') : 
-  path.join(process.cwd(), 'uploads');
-
-console.log(`📁 Configurando archivos uploads desde: ${uploadsBasePath}`);
-
 // Servir archivos adjuntos desde attached_assets
 app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_assets')));
 
-// CRÍTICO: En producción (Vercel), los archivos deben estar en public/uploads 
-// pero ser servidos como /uploads para mantener compatibilidad con URLs de BD
-app.use('/uploads', express.static(uploadsBasePath));
-
-// En producción, también servir desde public/uploads directamente
-if (isProduction) {
-  app.use('/public/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
-}
+// NOTA: Las rutas /uploads se manejan en server/routes.ts con lógica de múltiples ubicaciones
+console.log('📁 [UPLOADS] Configuración delegada a server/routes.ts para lógica inteligente de rutas');
 
 // RUTAS ESPECÍFICAS PARA VERCEL - Endpoints individuales para archivos estáticos
 // Estas rutas son necesarias porque vercel.json las redirige al servidor Node.js
@@ -463,18 +449,8 @@ app.get('/images/:filename(*)', (req, res) => {
   }
 });
 
-// Servir uploads desde /uploads
-app.get('/uploads/:filename(*)', (req, res) => {
-  const filename = req.params.filename;
-  const uploadPath = path.join(uploadsBasePath, filename);
-  
-  if (fs.existsSync(uploadPath)) {
-    res.sendFile(uploadPath);
-  } else {
-    console.log(`⚠️ Upload no encontrado: ${uploadPath}`);
-    res.status(404).json({ error: 'Upload not found' });
-  }
-});
+// ELIMINADO: Configuración duplicada de /uploads - ahora se maneja en server/routes.ts
+// Las rutas /uploads son manejadas por server/routes.ts con lógica de múltiples ubicaciones
 
 // Servir fuentes desde /fonts
 app.get('/fonts/:filename(*)', (req, res) => {
@@ -515,13 +491,7 @@ app.get('/locales/:lang/:namespace.json', (req, res) => {
   }
 });
 
-// Configuraciones específicas con fallback para development
-if (!isProduction) {
-  // Solo en desarrollo, servir desde la carpeta uploads original
-  app.use('/uploads/advertising', express.static(path.join(process.cwd(), 'uploads/advertising')));
-  app.use('/uploads/spaces', express.static(path.join(process.cwd(), 'uploads/spaces')));
-  app.use('/uploads/documents', express.static(path.join(process.cwd(), 'uploads/documents')));
-}
+// ELIMINADO: Configuraciones específicas conflictivas - delegadas a server/routes.ts
 
 // Endpoint para servir archivos de Object Storage
 app.get('/objects/uploads/:objectId', async (req: Request, res: Response) => {
