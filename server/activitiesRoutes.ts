@@ -317,6 +317,8 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
   // Importar actividades desde CSV
   apiRouter.post("/activities/import", isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log(`🔥 ENDPOINT IMPORT: Iniciando procesamiento`);
+      console.log(`🔥 ENDPOINT IMPORT: Body keys:`, Object.keys(req.body));
       const { activities: csvActivities } = req.body;
       
       if (!Array.isArray(csvActivities) || csvActivities.length === 0) {
@@ -333,6 +335,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
       
       console.log(`🚀 INICIANDO BUCLE: Procesando ${csvActivities.length} actividades`);
       console.log(`🔍 Estructura de primera actividad:`, Object.keys(csvActivities[0]));
+      console.log(`🔧 PUNTO CRÍTICO: A punto de entrar al try del bucle`);
 
       try {
         console.log(`🔥 ENTRANDO AL BUCLE FOR - Length: ${csvActivities.length}`);
@@ -411,12 +414,13 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
             errors.push(errorMessage);
           }
         }
+      } 
       } catch (bucleError) {
         console.error(`🚨 ERROR CRÍTICO EN EL BUCLE:`, bucleError);
-        console.error(`🚨 Stack trace:`, bucleError.stack);
+        console.error(`🚨 Stack trace:`, (bucleError as Error).stack);
         return res.status(500).json({
           message: "Error crítico en el procesamiento del bucle",
-          error: bucleError.message
+          error: (bucleError as Error).message
         });
       }
 
