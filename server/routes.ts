@@ -7368,7 +7368,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== RUTAS DE ARCHIVOS ESTÁTICOS ====================
   console.log("🖼️ Configurando rutas de archivos estáticos...");
 
-  // Ruta para Object Storage - servir archivos públicos
+  // PRIORIDAD MÁXIMA: Ruta para Object Storage - servir archivos públicos
+  // DEBE estar antes de cualquier otro middleware para evitar conflictos
   app.get("/public-objects/:filePath(*)", async (req: Request, res: Response) => {
     const filePath = req.params.filePath;
     console.log(`🔍 [OBJECT-STORAGE] Buscando archivo: ${filePath}`);

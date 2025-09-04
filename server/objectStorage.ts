@@ -95,6 +95,8 @@ export class ObjectStorageService {
         const bucket = objectStorageClient.bucket(bucketName);
         const file = bucket.file(objectName);
 
+        console.log(`🔍 [OBJECT-SEARCH] Parsing - Bucket: ${bucketName}, Object: ${objectName}`);
+
         // Check if file exists
         const [exists] = await file.exists();
         if (exists) {

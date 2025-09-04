@@ -234,6 +234,29 @@ app.put('/api/evaluations/parks/:id', (req, res) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// ==================== OBJECT STORAGE ENDPOINT - MÁXIMA PRIORIDAD ====================
+// ESTE ENDPOINT DEBE ESTAR ANTES QUE CUALQUIER OTRO MIDDLEWARE PARA EVITAR CONFLICTOS
+app.get("/public-objects/:filePath(*)", async (req: express.Request, res: express.Response) => {
+  const filePath = req.params.filePath;
+  console.log(`🔍 [OBJECT-STORAGE-PRIORITY] Buscando archivo: ${filePath}`);
+  
+  try {
+    const { ObjectStorageService } = await import("./objectStorage");
+    const objectStorageService = new ObjectStorageService();
+    const file = await objectStorageService.searchPublicObject(filePath);
+    if (!file) {
+      console.log(`❌ [OBJECT-STORAGE-PRIORITY] Archivo no encontrado: ${filePath}`);
+      return res.status(404).json({ error: "File not found" });
+    }
+    console.log(`✅ [OBJECT-STORAGE-PRIORITY] Archivo encontrado, sirviendo: ${filePath}`);
+    objectStorageService.downloadObject(file, res);
+  } catch (error) {
+    console.error("❌ [OBJECT-STORAGE-PRIORITY] Error searching for public object:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+console.log("✅ [OBJECT-STORAGE-PRIORITY] Endpoint /public-objects/ registrado con máxima prioridad");
+
 // Remove complex health check middleware - let direct endpoints handle all health checks
 
 // Middleware CORS para Replit
