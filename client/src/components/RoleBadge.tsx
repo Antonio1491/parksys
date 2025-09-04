@@ -5,6 +5,8 @@ import {
   Shield, Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import type { DynamicRole } from './DynamicRoleGuard';
 
 // Definición de roles jerárquicos - Sistema integrado
 export interface Role {
@@ -17,19 +19,43 @@ export interface Role {
   icon: React.ComponentType<any>;
 }
 
-// Sistema de 7 roles jerárquicos sincronizado con BD
+// Hook para obtener roles dinámicos de la BD
+const useDynamicRoles = () => {
+  return useQuery<DynamicRole[]>({
+    queryKey: ['/api/roles'],
+    staleTime: 5 * 60 * 1000, // Cache por 5 minutos
+  });
+};
+
+// Mapeo de slugs a iconos para roles dinámicos
+const ROLE_ICONS = {
+  'super-admin': Crown,
+  'admin-general': Star,
+  'coordinador-parques': Gem,
+  'supervisor-operaciones': Zap,
+  'tecnico-especialista': BarChart,
+  'operador-campo': Award,
+  'consultor-auditor': Eye
+} as const;
+
+// Función para obtener icono por slug de rol
+const getRoleIcon = (slug: string) => {
+  return ROLE_ICONS[slug as keyof typeof ROLE_ICONS] || Users;
+};
+
+// Sistema de 7 roles jerárquicos - LEGACY para compatibilidad con componentes existentes
 export const SYSTEM_ROLES: Role[] = [
   {
-    id: '1', // Super Administrador
+    id: '1',
     name: 'super-admin',
     displayName: 'Super Administrador',
     level: 1,
     description: 'Acceso total al sistema',
-    color: 'bg-blue-100 text-blue-800', // Color unificado estilo actual
+    color: 'bg-blue-100 text-blue-800',
     icon: Crown
   },
   {
-    id: '2', // Administrador General
+    id: '2',
     name: 'admin-general',
     displayName: 'Administrador General',
     level: 2,
@@ -38,7 +64,7 @@ export const SYSTEM_ROLES: Role[] = [
     icon: Star
   },
   {
-    id: '3', // Coordinador de Parques
+    id: '3',
     name: 'coordinador-parques',
     displayName: 'Coordinador de Parques',
     level: 3,
@@ -47,7 +73,7 @@ export const SYSTEM_ROLES: Role[] = [
     icon: Gem
   },
   {
-    id: '4', // Supervisor de Operaciones
+    id: '4',
     name: 'supervisor-operaciones',
     displayName: 'Supervisor de Operaciones',
     level: 4,
@@ -56,7 +82,7 @@ export const SYSTEM_ROLES: Role[] = [
     icon: Zap
   },
   {
-    id: '5', // Técnico Especialista
+    id: '5',
     name: 'tecnico-especialista',
     displayName: 'Técnico Especialista',
     level: 5,
@@ -65,7 +91,7 @@ export const SYSTEM_ROLES: Role[] = [
     icon: BarChart
   },
   {
-    id: '6', // Operador de Campo
+    id: '6',
     name: 'operador-campo',
     displayName: 'Operador de Campo',
     level: 6,
@@ -74,7 +100,7 @@ export const SYSTEM_ROLES: Role[] = [
     icon: Award
   },
   {
-    id: '7', // Consultor Auditor
+    id: '7',
     name: 'consultor-auditor',
     displayName: 'Consultor Auditor',
     level: 7,
@@ -85,13 +111,14 @@ export const SYSTEM_ROLES: Role[] = [
 ];
 
 interface RoleBadgeProps {
-  roleId: string;
+  roleId: string | number;
   showLevel?: boolean;
   showIcon?: boolean;
   showText?: boolean;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'outline' | 'secondary';
   className?: string;
+  useDynamic?: boolean; // Flag para usar datos dinámicos de BD
 }
 
 export const RoleBadge: React.FC<RoleBadgeProps> = ({
@@ -101,9 +128,29 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   showText = true,
   size = 'md',
   variant = 'default',
-  className
+  className,
+  useDynamic = true
 }) => {
-  const role = SYSTEM_ROLES.find(r => r.id === roleId || r.id === String(roleId));
+  const { data: dynamicRoles, isLoading } = useDynamic ? useDynamicRoles() : { data: null, isLoading: false };
+  
+  // Usar roles dinámicos si están disponibles, sino fallback a SYSTEM_ROLES
+  const roles = dynamicRoles || SYSTEM_ROLES;
+  const role = roles.find(r => {
+    if (useDynamic && dynamicRoles) {
+      return r.id === Number(roleId) || r.slug === roleId;
+    }
+    return r.id === roleId || r.id === String(roleId);
+  });
+  
+  // Mostrar loading si estamos cargando datos dinámicos
+  if (isLoading && useDynamic) {
+    return (
+      <div className={cn(
+        "animate-pulse bg-gray-200 rounded h-6 w-20",
+        className
+      )}></div>
+    );
+  }
   
   if (!role) {
     return (
@@ -114,14 +161,21 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
     );
   }
 
-  const Icon = role.icon;
+  // Obtener icono dinámicamente
+  const Icon = useDynamic && dynamicRoles 
+    ? getRoleIcon((role as DynamicRole).slug) 
+    : (role as Role).icon;
   
   // Para solo icono (tabla limpia)
   if (!showText) {
+    const colorClass = useDynamic && dynamicRoles 
+      ? 'bg-blue-100 text-blue-800'
+      : (role as Role).color;
+      
     return (
       <div className={cn(
         "inline-flex items-center justify-center rounded",
-        role.color,
+        colorClass,
         size === 'sm' ? 'w-6 h-6' : size === 'lg' ? 'w-10 h-10' : 'w-8 h-8',
         className
       )}>
@@ -142,17 +196,25 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
     lg: 'w-4 h-4'
   };
 
+  const colorClass = useDynamic && dynamicRoles 
+    ? 'bg-blue-100 text-blue-800'
+    : (role as Role).color;
+    
+  const displayName = useDynamic && dynamicRoles 
+    ? (role as DynamicRole).name
+    : (role as Role).displayName;
+
   return (
     <Badge 
       className={cn(
         sizeClasses[size],
-        role.color,
+        colorClass,
         "hover:bg-blue-100 font-medium flex items-center gap-1 transition-colors",
         className
       )}
     >
       {showIcon && <Icon className={iconSizes[size]} />}
-      <span>{role.displayName}</span>
+      <span>{displayName}</span>
       {showLevel && (
         <span className="ml-1 text-xs opacity-80">
           (N{role.level})
@@ -162,8 +224,16 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   );
 };
 
-// Hook para obtener rol por ID
-export const useRole = (roleId: string) => {
+// Hook para obtener rol por ID - ahora con soporte dinámico
+export const useRole = (roleId: string | number, useDynamic = true) => {
+  const { data: dynamicRoles } = useDynamic ? useDynamicRoles() : { data: null };
+  
+  const roles = dynamicRoles || SYSTEM_ROLES;
+  
+  if (useDynamic && dynamicRoles) {
+    return roles.find(r => r.id === Number(roleId) || (r as DynamicRole).slug === roleId);
+  }
+  
   return SYSTEM_ROLES.find(r => r.id === roleId);
 };
 

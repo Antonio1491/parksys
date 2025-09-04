@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { registerActivityPaymentRoutes } from "./routes/activityPayments";
+import { registerRoleRoutes } from "./roleRoutes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import fs from "fs";
@@ -2192,6 +2193,10 @@ function startServer() {
       // Register main routes immediately BEFORE express.static
       await registerRoutes(app);
       console.log("✅ [API-PRIORITY] Main routes registered with priority over static files");
+      
+      // Register role routes
+      registerRoleRoutes(app);
+      console.log("✅ [API-PRIORITY] Role routes registered with priority over static files");
       
       // NOW apply express.static AFTER custom routes to avoid intercepting /uploads/*
       if (process.env.NODE_ENV === 'production') {

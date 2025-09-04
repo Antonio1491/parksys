@@ -1,7 +1,7 @@
 import { db } from './db';
 import { roles, users } from '../shared/schema';
 import { eq, asc } from 'drizzle-orm';
-import type { Role, User } from '../shared/schema';
+import type { Role, User, InsertRole } from '../shared/schema';
 
 export class RoleService {
   
@@ -152,6 +152,117 @@ export class RoleService {
       ...user,
       userRole: role || undefined
     }));
+  }
+
+  // ===== NUEVAS FUNCIONES PARA SISTEMA DINÁMICO =====
+
+  // Crear rol
+  async createRole(roleData: InsertRole): Promise<Role> {
+    const result = await db.insert(roles).values(roleData).returning();
+    return result[0];
+  }
+
+  // Actualizar rol
+  async updateRole(id: number, roleData: Partial<InsertRole>): Promise<Role | null> {
+    const result = await db
+      .update(roles)
+      .set({ ...roleData, updatedAt: new Date() })
+      .where(eq(roles.id, id))
+      .returning();
+    return result[0] || null;
+  }
+
+  // Eliminar rol (solo si no tiene usuarios asignados)
+  async deleteRole(id: number): Promise<boolean> {
+    try {
+      // Verificar que no hay usuarios con este rol
+      const usersWithRole = await db
+        .select()
+        .from(users)
+        .where(eq(users.roleId, id));
+      
+      if (usersWithRole.length > 0) {
+        throw new Error(`No se puede eliminar el rol. Tiene ${usersWithRole.length} usuario(s) asignado(s).`);
+      }
+
+      await db.delete(roles).where(eq(roles.id, id));
+      return true;
+    } catch (error) {
+      console.error('Error eliminando rol:', error);
+      return false;
+    }
+  }
+
+  // Verificar permisos de módulo específico
+  async hasModulePermission(
+    userId: number, 
+    module: string, 
+    permission: 'read' | 'write' | 'admin'
+  ): Promise<boolean> {
+    const result = await db
+      .select({ permissions: roles.permissions })
+      .from(users)
+      .innerJoin(roles, eq(users.roleId, roles.id))
+      .where(eq(users.id, userId));
+    
+    if (!result[0]) return false;
+    
+    const permissions = result[0].permissions as Record<string, any>;
+    
+    // Super Admin tiene todos los permisos
+    if (permissions.all === true) return true;
+    
+    // Verificar permiso específico del módulo
+    const modulePermissions = permissions[module];
+    if (!modulePermissions || !Array.isArray(modulePermissions)) return false;
+    
+    return modulePermissions.includes(permission);
+  }
+
+  // Obtener permisos completos de un usuario
+  async getUserPermissions(userId: number): Promise<Record<string, string[]> | null> {
+    const result = await db
+      .select({ 
+        permissions: roles.permissions,
+        roleLevel: roles.level,
+        roleName: roles.name
+      })
+      .from(users)
+      .innerJoin(roles, eq(users.roleId, roles.id))
+      .where(eq(users.id, userId));
+    
+    if (!result[0]) return null;
+    
+    const permissions = result[0].permissions as Record<string, any>;
+    
+    // Si es super admin, generar permisos completos
+    if (permissions.all === true) {
+      return {
+        'Configuración': ['read', 'write', 'admin'],
+        'Gestión': ['read', 'write', 'admin'],
+        'Operaciones': ['read', 'write', 'admin'],
+        'Finanzas': ['read', 'write', 'admin'],
+        'Marketing': ['read', 'write', 'admin'],
+        'RH': ['read', 'write', 'admin'],
+        'Seguridad': ['read', 'write', 'admin']
+      };
+    }
+
+    return permissions as Record<string, string[]>;
+  }
+
+  // Actualizar permisos de rol
+  async updateRolePermissions(roleId: number, permissions: Record<string, any>): Promise<boolean> {
+    try {
+      await db
+        .update(roles)
+        .set({ permissions, updatedAt: new Date() })
+        .where(eq(roles.id, roleId));
+      return true;
+    } catch (error) {
+      console.error('Error actualizando permisos:', error);
+      return false;
+    }
   }
 }
 
