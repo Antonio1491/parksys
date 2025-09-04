@@ -525,11 +525,30 @@ export const processImportFile = async (req: Request, res: Response) => {
       delete park.municipalityText;
     });
 
+    // VALIDACIÓN DE DUPLICADOS: Obtener parques existentes
+    const existingParks = await storage.getAllParks();
+    console.log(`🔍 [IMPORT] Parques existentes en BD: ${existingParks.length}`);
+    
+    // Filtrar parques duplicados por nombre (case-insensitive)
+    const filteredParks = parksData.filter(parkData => {
+      const existingPark = existingParks.find(existing => 
+        existing.name.toLowerCase().trim() === parkData.name?.toLowerCase().trim()
+      );
+      
+      if (existingPark) {
+        console.log(`⚠️ [IMPORT] Parque duplicado omitido: "${parkData.name}" (ya existe con ID ${existingPark.id})`);
+        return false;
+      }
+      return true;
+    });
+    
+    console.log(`🔄 [IMPORT] Parques después de filtrar duplicados: ${filteredParks.length} de ${parksData.length}`);
+
     // Validar y filtrar parques válidos
     const validParks: any[] = [];
     const errors: string[] = [];
     
-    parksData.forEach((parkData, index) => {
+    filteredParks.forEach((parkData, index) => {
       try {
         const validatedPark = insertParkSchema.parse(parkData);
         
