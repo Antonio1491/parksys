@@ -330,6 +330,9 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
       
       let imported = 0;
       let errors: string[] = [];
+      
+      console.log(`🚀 INICIANDO BUCLE: Procesando ${csvActivities.length} actividades`);
+      console.log(`🔍 Estructura de primera actividad:`, Object.keys(csvActivities[0]));
 
       for (let i = 0; i < csvActivities.length; i++) {
         const activityData = csvActivities[i];
