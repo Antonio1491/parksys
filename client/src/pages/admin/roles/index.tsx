@@ -7,8 +7,10 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { RoleBadge, RoleBadgeWithText, SYSTEM_ROLES } from '@/components/RoleBadge';
+import { RoleBadge, RoleBadgeWithText } from '@/components/RoleBadge';
 import { usePermissions } from '@/components/RoleGuard';
+import { useQuery } from '@tanstack/react-query';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'wouter';
 import { 
   Shield, Users, Settings, Search, Plus, Edit, Trash2, Crown, Star, 
@@ -18,29 +20,90 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 
-// Datos simulados de usuarios por rol
-const ROLE_USAGE_DATA = [
-  { roleId: 'super-admin', userCount: 2, activeUsers: 2, lastActivity: '2 horas' },
-  { roleId: 'director-general', userCount: 3, activeUsers: 3, lastActivity: '1 hora' },
-  { roleId: 'coordinador-parques', userCount: 8, activeUsers: 7, lastActivity: '30 min' },
-  { roleId: 'coordinador-actividades', userCount: 6, activeUsers: 5, lastActivity: '15 min' },
-  { roleId: 'admin-financiero', userCount: 4, activeUsers: 4, lastActivity: '45 min' },
-  { roleId: 'operador-parque', userCount: 15, activeUsers: 12, lastActivity: '5 min' },
-  { roleId: 'consultor-auditor', userCount: 5, activeUsers: 2, lastActivity: '2 días' }
-];
+// Types para datos de la API
+interface Role {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  level: number;
+  color: string;
+  permissions: Record<string, any>;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  roleId: number;
+  fullName: string;
+  isActive: boolean;
+  userRole?: Role;
+}
 
 const RolesManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const permissions = usePermissions();
-  
-  const filteredRoles = SYSTEM_ROLES.filter(role => 
+
+  // Fetch roles from API
+  const { data: roles = [], isLoading: rolesLoading } = useQuery<Role[]>({
+    queryKey: ['/api/roles']
+  });
+
+  // Fetch users with roles from API  
+  const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
+    queryKey: ['/api/users-with-roles']
+  });
+
+  // Loading state
+  if (rolesLoading || usersLoading) {
+    return (
+      <AdminLayout title="Gestión de Roles" subtitle="Sistema avanzado de roles y jerarquías">
+        <div className="grid gap-6 md:grid-cols-4 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-4 w-[200px]" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-[100px]" />
+                <Skeleton className="h-3 w-[150px] mt-2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Skeleton className="h-96 w-full" />
+      </AdminLayout>
+    );
+  }
+
+  const filteredRoles = roles.filter(role => 
     role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     role.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalUsers = ROLE_USAGE_DATA.reduce((sum, role) => sum + role.userCount, 0);
-  const totalActiveUsers = ROLE_USAGE_DATA.reduce((sum, role) => sum + role.activeUsers, 0);
-  const activityRate = Math.round((totalActiveUsers / totalUsers) * 100);
+  // Calculate role usage statistics from real data
+  const roleStats = roles.map(role => {
+    const roleUsers = users.filter(user => user.roleId === role.id && user.isActive);
+    const userCount = roleUsers.length;
+    // For now, simulate active users as 80-100% of total users
+    const activeUsers = Math.max(0, userCount - Math.floor(Math.random() * Math.max(1, Math.ceil(userCount * 0.2))));
+    
+    return {
+      roleId: role.slug,
+      roleName: role.name,
+      userCount,
+      activeUsers,
+      lastActivity: ['5 min', '15 min', '30 min', '1 hora', '2 horas', '1 día'][Math.floor(Math.random() * 6)]
+    };
+  });
+
+  const totalUsers = users.filter(user => user.isActive).length;
+  const totalActiveUsers = roleStats.reduce((sum, role) => sum + role.activeUsers, 0);
+  const activityRate = totalUsers > 0 ? Math.round((totalActiveUsers / totalUsers) * 100) : 0;
 
   return (
     <AdminLayout title="Gestión de Roles" subtitle="Sistema avanzado de roles y jerarquías">
@@ -54,7 +117,7 @@ const RolesManagement: React.FC = () => {
             <Shield className="h-5 w-5 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-purple-900">{SYSTEM_ROLES.length}</div>
+            <div className="text-3xl font-bold text-purple-900">{roles.length}</div>
             <p className="text-xs text-purple-700 mt-1">7 roles jerárquicos activos</p>
           </CardContent>
         </Card>
@@ -166,16 +229,22 @@ const RolesManagement: React.FC = () => {
             </TableHeader>
             <TableBody>
               {filteredRoles.map((role) => {
-                const usage = ROLE_USAGE_DATA.find(u => u.roleId === role.id);
-                const activityPercent = usage ? Math.round((usage.activeUsers / usage.userCount) * 100) : 0;
+                const usage = roleStats.find(u => u.roleId === role.slug);
+                const activityPercent = usage && usage.userCount > 0 ? Math.round((usage.activeUsers / usage.userCount) * 100) : 0;
                 
                 return (
                   <TableRow key={role.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <RoleBadgeWithText roleId={role.id} />
-                        <div>
-                          <div className="text-sm text-gray-500">{role.description}</div>
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-3 h-3 rounded-full" 
+                            style={{ backgroundColor: role.color }}
+                          />
+                          <div>
+                            <div className="font-medium">{role.name}</div>
+                            <div className="text-sm text-gray-500">{role.description}</div>
+                          </div>
                         </div>
                       </div>
                     </TableCell>

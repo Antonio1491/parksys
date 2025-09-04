@@ -18,6 +18,17 @@ export function registerRoleRoutes(app: Express) {
     }
   });
 
+  // Obtener estadísticas de roles y usuarios
+  app.get("/api/role-stats", async (req, res) => {
+    try {
+      const stats = await roleService.getRoleUsageStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error obteniendo estadísticas de roles:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // Obtener rol por ID
   app.get("/api/roles/:id", async (req, res) => {
     try {
