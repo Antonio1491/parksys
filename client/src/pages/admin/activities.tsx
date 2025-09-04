@@ -430,7 +430,10 @@ const AdminActivities = () => {
             const value = values[i];
             
             // Map CSV headers to database fields
-            switch (header.toLowerCase()) {
+            const normalizedHeader = header.toLowerCase().trim();
+            console.log(`🔍 Mapeando header: "${header}" -> "${normalizedHeader}" = "${value}"`);
+            
+            switch (normalizedHeader) {
               case 'título':
                 activityData.title = value;
                 break;
@@ -438,23 +441,31 @@ const AdminActivities = () => {
                 activityData.description = value;
                 break;
               case 'parque':
+                console.log(`🏞️ Buscando parque: "${value}"`);
+                console.log(`🏞️ Parques disponibles:`, parksData?.map(p => p.name) || []);
                 const park = parksData?.find((p: any) => 
-                  p.name.toLowerCase() === value.toLowerCase()
+                  p.name.toLowerCase().trim() === value.toLowerCase().trim()
                 );
                 if (park) {
+                  console.log(`✅ Parque encontrado: ${park.name} (ID: ${park.id})`);
                   activityData.parkId = park.id;
                 } else if (value) {
-                  throw new Error(`Parque no encontrado: ${value}`);
+                  console.log(`❌ Parque NO encontrado: "${value}"`);
+                  throw new Error(`Parque no encontrado: "${value}". Parques disponibles: ${parksData?.map(p => p.name).join(', ') || 'ninguno'}`);
                 }
                 break;
               case 'categoría':
+                console.log(`🎨 Buscando categoría: "${value}"`);
+                console.log(`🎨 Categorías disponibles:`, categoriesData?.map(c => c.name) || []);
                 const category = categoriesData?.find((c: any) => 
-                  c.name.toLowerCase() === value.toLowerCase()
+                  c.name.toLowerCase().trim() === value.toLowerCase().trim()
                 );
                 if (category) {
+                  console.log(`✅ Categoría encontrada: ${category.name} (ID: ${category.id})`);
                   activityData.categoryId = category.id;
                 } else if (value) {
-                  throw new Error(`Categoría no encontrada: ${value}`);
+                  console.log(`❌ Categoría NO encontrada: "${value}"`);
+                  throw new Error(`Categoría no encontrada: "${value}". Categorías disponibles: ${categoriesData?.map(c => c.name).join(', ') || 'ninguna'}`);
                 }
                 break;
               case 'fechainicio':
@@ -488,7 +499,10 @@ const AdminActivities = () => {
                 activityData.price = value ? parseFloat(value) : 0;
                 break;
               case 'esgratis':
-                activityData.isFree = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value === '1';
+              case 'esgratuita':
+                console.log(`💰 Procesando campo gratis: "${value}"`);
+                activityData.isFree = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value.toLowerCase() === 'true' || value === '1';
+                console.log(`💰 Es gratis: ${activityData.isFree}`);
                 break;
               case 'materiales':
                 activityData.materials = value || '';
