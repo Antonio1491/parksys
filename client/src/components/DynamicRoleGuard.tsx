@@ -1,6 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+// Tipos para permisos de múltiples roles
+interface UserPermissionsResponse {
+  permissions?: Record<string, string[]>;
+  combinedPermissions?: Record<string, string[]>;
+  metadata?: {
+    hasMultipleRoles?: boolean;
+    primaryRole?: any;
+  };
+  role?: {
+    level: number;
+    slug: string;
+    name: string;
+  };
+  roles?: Array<{
+    level: number;
+    slug: string;
+    name: string;
+  }>;
+  primaryRole?: {
+    level: number;
+    slug: string;
+    name: string;
+  };
+}
+
 // Tipos para el sistema dinámico
 export interface DynamicRole {
   id: number;
@@ -129,25 +154,34 @@ export const DynamicRoleGuard: React.FC<DynamicRoleGuardProps> = ({
 // Hook mejorado para verificar permisos con datos dinámicos (ACTUALIZADO para múltiples roles)
 export const useDynamicPermissions = (userId: number = 1) => {
   const { data: roles } = useDynamicRoles();
-  const { data: userPermissions } = useUserComprehensivePermissions(userId);
+  
+  // Obtener permisos comprehensivos del usuario (múltiples roles)
+  const { data: userPermissions } = useQuery<UserPermissionsResponse>({
+    queryKey: ['/api/users/permissions', userId],
+    enabled: !!userId
+  });
 
   const hasPermission = (module: SystemModule, permission: PermissionType): boolean => {
+    if (!userPermissions) return false;
+    
     // Para múltiples roles, usar combinedPermissions
-    const permissions = userPermissions?.combinedPermissions || userPermissions?.permissions || {};
+    const permissions = userPermissions.combinedPermissions || userPermissions.permissions || {};
     
     // Si tiene permisos totales
-    if (permissions.all === true) return true;
+    if ((permissions as any).all === true) return true;
     
     const modulePermissions = permissions[module];
     return modulePermissions ? modulePermissions.includes(permission) : false;
   };
 
   const hasModuleAccess = (module: SystemModule): boolean => {
+    if (!userPermissions) return false;
+    
     // Para múltiples roles, usar combinedPermissions
-    const permissions = userPermissions?.combinedPermissions || userPermissions?.permissions || {};
+    const permissions = userPermissions.combinedPermissions || userPermissions.permissions || {};
     
     // Si tiene permisos totales
-    if (permissions.all === true) return true;
+    if ((permissions as any).all === true) return true;
     
     const modulePermissions = permissions[module];
     return modulePermissions && modulePermissions.length > 0;
@@ -161,8 +195,8 @@ export const useDynamicPermissions = (userId: number = 1) => {
     if (!userPermissions) return null;
     
     // Para múltiples roles, devolver el nivel más alto (menor número)
-    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length > 0) {
-      return Math.min(...userPermissions.roles.map(role => role.level));
+    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length) {
+      return Math.min(...userPermissions.roles.map((role: any) => role.level));
     }
     
     // Para rol único, devolver el nivel del rol
@@ -173,7 +207,7 @@ export const useDynamicPermissions = (userId: number = 1) => {
     if (!userPermissions) return [];
     
     // Para múltiples roles
-    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length > 0) {
+    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length) {
       return userPermissions.roles;
     }
     

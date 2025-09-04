@@ -27,9 +27,9 @@ interface Role {
   id: number;
   name: string;
   slug: string;
-  description: string;
+  description?: string;
   level: number;
-  color: string;
+  color?: string;
   permissions: Record<string, any>;
   isActive: boolean;
   createdAt: string;
@@ -321,7 +321,7 @@ const RolesManagement: React.FC = () => {
 
   const filteredRoles = roles.filter(role => 
     role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    role.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (role.description || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate role usage statistics from real data - ACTUALIZADO para múltiples roles
@@ -426,7 +426,7 @@ const RolesManagement: React.FC = () => {
               {permissions.hasMultipleRoles ? (
                 <MultiRoleBadge userId={1} showOnlyPrimary={true} size="sm" />
               ) : (
-                <RoleBadge roleId={permissions.userRole?.id || permissions.userRole} size="sm" useDynamic={true} />
+                <RoleBadge roleId={typeof permissions.userRole === 'object' && permissions.userRole?.id ? permissions.userRole.id : 1} size="sm" useDynamic={true} />
               )}
             </div>
             <p className="text-xs text-orange-700 mt-1">
@@ -546,7 +546,7 @@ const RolesManagement: React.FC = () => {
                           />
                           <div>
                             <div className="font-medium">{role.name}</div>
-                            <div className="text-sm text-gray-500">{role.description}</div>
+                            <div className="text-sm text-gray-500">{role.description || 'Sin descripción'}</div>
                           </div>
                         </div>
                       </div>
@@ -598,7 +598,7 @@ const RolesManagement: React.FC = () => {
                               </div>
                               <div>
                                 <Label className="text-sm font-medium">Descripción</Label>
-                                <p className="text-sm text-gray-600">{role.description || 'Sin descripción'}</p>
+                                <p className="text-sm text-gray-600">{role.description || 'Sin descripción disponible'}</p>
                               </div>
                               <div>
                                 <Label className="text-sm font-medium">Nivel Jerárquico</Label>
@@ -650,7 +650,7 @@ const RolesManagement: React.FC = () => {
                               <div className="space-y-4">
                                 <div>
                                   <Label className="text-sm font-medium">Descripción</Label>
-                                  <Input defaultValue={role.description} />
+                                  <Input defaultValue={role.description || ''} />
                                 </div>
                                 <div>
                                   <Label className="text-sm font-medium">Estado</Label>
