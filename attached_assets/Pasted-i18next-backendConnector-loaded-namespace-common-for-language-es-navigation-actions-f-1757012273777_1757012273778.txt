@@ -1,0 +1,80 @@
+i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+Console.js:61 i18next: languageChanged es
+Console.js:61 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+Console.js:61 ⚠️ No space mapping found for parks:footer
+Mt.forEach.n.<computed> @ Console.js:61
+AdSpaceIntelligent @ AdSpaceIntelligent.tsx:376
+renderWithHooks @ chunk-SKRUXVEK.js?v=a5b62361:11548
+updateFunctionComponent @ chunk-SKRUXVEK.js?v=a5b62361:14582
+beginWork @ chunk-SKRUXVEK.js?v=a5b62361:15924
+beginWork$1 @ chunk-SKRUXVEK.js?v=a5b62361:19753
+performUnitOfWork @ chunk-SKRUXVEK.js?v=a5b62361:19198
+workLoopSync @ chunk-SKRUXVEK.js?v=a5b62361:19137
+renderRootSync @ chunk-SKRUXVEK.js?v=a5b62361:19116
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18874
+flushSyncCallbacks @ chunk-SKRUXVEK.js?v=a5b62361:9119
+(anonymous) @ chunk-SKRUXVEK.js?v=a5b62361:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=a5b62361:552
+flush @ @tanstack_react-query.js?v=a5b62361:576
+batch @ @tanstack_react-query.js?v=a5b62361:594
+dispatch_fn @ @tanstack_react-query.js?v=a5b62361:1007
+onError @ @tanstack_react-query.js?v=a5b62361:872
+reject @ @tanstack_react-query.js?v=a5b62361:471
+(anonymous) @ @tanstack_react-query.js?v=a5b62361:514
+Promise.catch
+run @ @tanstack_react-query.js?v=a5b62361:504
+start @ @tanstack_react-query.js?v=a5b62361:542
+fetch @ @tanstack_react-query.js?v=a5b62361:937
+executeFetch_fn @ @tanstack_react-query.js?v=a5b62361:2244
+onSubscribe @ @tanstack_react-query.js?v=a5b62361:1948
+subscribe @ @tanstack_react-query.js?v=a5b62361:24
+(anonymous) @ @tanstack_react-query.js?v=a5b62361:3093
+subscribeToStore @ chunk-SKRUXVEK.js?v=a5b62361:11984
+commitHookEffectListMount @ chunk-SKRUXVEK.js?v=a5b62361:16915
+commitPassiveMountOnFiber @ chunk-SKRUXVEK.js?v=a5b62361:18156
+commitPassiveMountEffects_complete @ chunk-SKRUXVEK.js?v=a5b62361:18129
+commitPassiveMountEffects_begin @ chunk-SKRUXVEK.js?v=a5b62361:18119
+commitPassiveMountEffects @ chunk-SKRUXVEK.js?v=a5b62361:18109
+flushPassiveEffectsImpl @ chunk-SKRUXVEK.js?v=a5b62361:19490
+flushPassiveEffects @ chunk-SKRUXVEK.js?v=a5b62361:19447
+commitRootImpl @ chunk-SKRUXVEK.js?v=a5b62361:19416
+commitRoot @ chunk-SKRUXVEK.js?v=a5b62361:19277
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18895
+flushSyncCallbacks @ chunk-SKRUXVEK.js?v=a5b62361:9119
+(anonymous) @ chunk-SKRUXVEK.js?v=a5b62361:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=a5b62361:552
+flush @ @tanstack_react-query.js?v=a5b62361:576
+batch @ @tanstack_react-query.js?v=a5b62361:594
+dispatch_fn @ @tanstack_react-query.js?v=a5b62361:1007
+setData @ @tanstack_react-query.js?v=a5b62361:705
+onSuccess @ @tanstack_react-query.js?v=a5b62361:908
+resolve @ @tanstack_react-query.js?v=a5b62361:462
+Promise.then
+run @ @tanstack_react-query.js?v=a5b62361:504
+start @ @tanstack_react-query.js?v=a5b62361:542
+fetch @ @tanstack_react-query.js?v=a5b62361:937
+executeFetch_fn @ @tanstack_react-query.js?v=a5b62361:2244
+onSubscribe @ @tanstack_react-query.js?v=a5b62361:1948
+subscribe @ @tanstack_react-query.js?v=a5b62361:24
+(anonymous) @ @tanstack_react-query.js?v=a5b62361:3093
+subscribeToStore @ chunk-SKRUXVEK.js?v=a5b62361:11984
+commitHookEffectListMount @ chunk-SKRUXVEK.js?v=a5b62361:16915
+commitPassiveMountOnFiber @ chunk-SKRUXVEK.js?v=a5b62361:18156
+commitPassiveMountEffects_complete @ chunk-SKRUXVEK.js?v=a5b62361:18129
+commitPassiveMountEffects_begin @ chunk-SKRUXVEK.js?v=a5b62361:18119
+commitPassiveMountEffects @ chunk-SKRUXVEK.js?v=a5b62361:18109
+flushPassiveEffectsImpl @ chunk-SKRUXVEK.js?v=a5b62361:19490
+flushPassiveEffects @ chunk-SKRUXVEK.js?v=a5b62361:19447
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18868
+flushSyncCallbacks @ chunk-SKRUXVEK.js?v=a5b62361:9119
+commitRootImpl @ chunk-SKRUXVEK.js?v=a5b62361:19432
+commitRoot @ chunk-SKRUXVEK.js?v=a5b62361:19277
+finishConcurrentRender @ chunk-SKRUXVEK.js?v=a5b62361:18805
+performConcurrentWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18718
+workLoop @ chunk-SKRUXVEK.js?v=a5b62361:197
+flushWork @ chunk-SKRUXVEK.js?v=a5b62361:176
+performWorkUntilDeadline @ chunk-SKRUXVEK.js?v=a5b62361:384Understand this warning
+Console.js:61 🌐 [QUERY] GET /api/parks/99/extended
+Console.js:61 🌐 [SAFE API] GET /api/parks/99/evaluation-stats
