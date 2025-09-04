@@ -592,7 +592,22 @@ const AdminActivities = () => {
           return activityData;
         });
 
-        importMutation.mutate(csvData);
+        // Transform data types before sending to backend
+        const transformedData = csvData.map(activity => ({
+          ...activity,
+          // Convert string dates to Date objects
+          startDate: activity.startDate ? new Date(activity.startDate) : null,
+          endDate: activity.endDate ? new Date(activity.endDate) : null,
+          // Convert numbers to strings where expected
+          latitude: activity.latitude ? String(activity.latitude) : null,
+          longitude: activity.longitude ? String(activity.longitude) : null,
+          price: activity.price !== undefined ? String(activity.price) : '0',
+          // Add default status if missing, ensure lowercase
+          status: activity.status ? String(activity.status).toLowerCase() : 'programada'
+        }));
+
+        console.log('🔧 Datos transformados antes de enviar:', transformedData[0]);
+        importMutation.mutate(transformedData);
 
       } catch (error: any) {
         toast({
