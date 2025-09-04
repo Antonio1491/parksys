@@ -96,7 +96,7 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
   // Filtrar voluntarios disponibles (excluir los ya asignados)
   const assignedIds = assignedVolunteers.map(v => v.id);
   const availableVolunteers = allVolunteers.filter(volunteer => 
-    !assignedIds.includes(volunteer.id) && volunteer.status === 'active'
+    !assignedIds.includes(volunteer.id) && volunteer.status === 'activo'
   );
 
   // Aplicar filtros a voluntarios disponibles
