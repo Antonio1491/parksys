@@ -2660,7 +2660,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🚀 Recibiendo petición de creación de parque:', req.body);
       
-      const parkData = insertParkSchema.parse(req.body);
+      // Add default parkType if missing
+      const dataToValidate = {
+        ...req.body,
+        parkType: req.body.parkType || 'urbano' // Default value for required field
+      };
+      
+      const parkData = insertParkSchema.parse(dataToValidate);
       console.log('✅ Datos del parque validados:', parkData);
       
       // Crear el parque en la base de datos
@@ -2672,9 +2678,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('❌ Error creando parque:', error);
       
-      if (error?.name === 'ZodError') {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        console.error('🚨 Error de validación Zod:', validationError.message);
         return res.status(400).json({ 
-          message: "Datos de entrada inválidos",
+          message: "Datos de entrada inválidos: " + validationError.message,
           details: error.issues 
         });
       }
