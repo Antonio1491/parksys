@@ -248,6 +248,130 @@ export function registerObjectStorageRoutes(app: any, apiRouter: Router, isAuthe
   });
 
   // =============================================
+  // TREE SPECIES IMAGES - OBJECT STORAGE
+  // =============================================
+
+  // Upload tree species photo to Object Storage
+  apiRouter.post('/tree-species/:speciesId/photo/upload-os', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const speciesId = parseInt(req.params.speciesId);
+      console.log(`🚀 [OBJECT STORAGE] Iniciando upload de foto para especie de árbol ${speciesId}`);
+      
+      // Generate unique filename for Object Storage
+      const timestamp = Date.now();
+      const randomId = Math.floor(Math.random() * 1000000);
+      const imageId = randomUUID();
+      const filename = `tree-photo-${timestamp}-${randomId}-${imageId}`;
+      
+      // Get upload URL from Object Storage
+      const uploadUrl = await objectStorage.getObjectEntityUploadURL();
+      
+      console.log(`📤 [OBJECT STORAGE] URL de upload generada para especie de árbol ${speciesId}`);
+      
+      res.json({
+        uploadUrl,
+        imageId,
+        filename,
+        speciesId
+      });
+      
+    } catch (error) {
+      console.error('❌ [OBJECT STORAGE] Error generando URL de upload para especie:', error);
+      res.status(500).json({ error: 'Error generando URL de upload' });
+    }
+  });
+
+  // Confirm tree species photo upload
+  apiRouter.post('/tree-species/:speciesId/photo/confirm-os', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const speciesId = parseInt(req.params.speciesId);
+      const { imageId, filename, uploadUrl } = req.body;
+      
+      console.log(`✅ [OBJECT STORAGE] Confirmando upload de foto para especie de árbol ${speciesId}`);
+      
+      // Normalize the object path for storage
+      const normalizedPath = objectStorage.normalizeObjectEntityPath(uploadUrl);
+      
+      // Set ACL policy for public access (since these are species photos for public catalog)
+      const finalImageUrl = await objectStorage.trySetObjectEntityAclPolicy(normalizedPath, {
+        visibility: 'public',
+        owner: req.user?.id || 'system'
+      });
+      
+      console.log(`📸 [OBJECT STORAGE] Foto de especie ${speciesId} disponible en: ${finalImageUrl}`);
+      
+      res.json({
+        photoUrl: finalImageUrl,
+        success: true
+      });
+      
+    } catch (error) {
+      console.error('❌ [OBJECT STORAGE] Error confirmando upload de foto de especie:', error);
+      res.status(500).json({ error: 'Error confirmando upload de foto: ' + (error as Error).message });
+    }
+  });
+
+  // Upload tree species icon to Object Storage
+  apiRouter.post('/tree-species/:speciesId/icon/upload-os', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const speciesId = parseInt(req.params.speciesId);
+      console.log(`🚀 [OBJECT STORAGE] Iniciando upload de icono para especie de árbol ${speciesId}`);
+      
+      // Generate unique filename for Object Storage
+      const timestamp = Date.now();
+      const randomId = Math.floor(Math.random() * 1000000);
+      const imageId = randomUUID();
+      const filename = `tree-icon-${timestamp}-${randomId}-${imageId}`;
+      
+      // Get upload URL from Object Storage
+      const uploadUrl = await objectStorage.getObjectEntityUploadURL();
+      
+      console.log(`📤 [OBJECT STORAGE] URL de upload generada para icono de especie ${speciesId}`);
+      
+      res.json({
+        uploadUrl,
+        imageId,
+        filename,
+        speciesId
+      });
+      
+    } catch (error) {
+      console.error('❌ [OBJECT STORAGE] Error generando URL de upload para icono:', error);
+      res.status(500).json({ error: 'Error generando URL de upload' });
+    }
+  });
+
+  // Confirm tree species icon upload
+  apiRouter.post('/tree-species/:speciesId/icon/confirm-os', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const speciesId = parseInt(req.params.speciesId);
+      const { imageId, filename, uploadUrl } = req.body;
+      
+      console.log(`✅ [OBJECT STORAGE] Confirmando upload de icono para especie de árbol ${speciesId}`);
+      
+      // Normalize the object path for storage
+      const normalizedPath = objectStorage.normalizeObjectEntityPath(uploadUrl);
+      
+      // Set ACL policy for public access
+      const finalImageUrl = await objectStorage.trySetObjectEntityAclPolicy(normalizedPath, {
+        visibility: 'public',
+        owner: req.user?.id || 'system'
+      });
+      
+      console.log(`🔧 [OBJECT STORAGE] Icono de especie ${speciesId} disponible en: ${finalImageUrl}`);
+      
+      res.json({
+        iconUrl: finalImageUrl,
+        success: true
+      });
+      
+    } catch (error) {
+      console.error('❌ [OBJECT STORAGE] Error confirmando upload de icono de especie:', error);
+      res.status(500).json({ error: 'Error confirmando upload de icono: ' + (error as Error).message });
+    }
+  });
+
+  // =============================================
   // GENERIC OBJECT STORAGE UTILITIES
   // =============================================
 

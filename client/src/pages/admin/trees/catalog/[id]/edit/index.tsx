@@ -38,6 +38,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TreePine, ArrowLeft, Save, Leaf, Upload, Image, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { uploadTreeSpeciesPhotoOS } from '@/utils/objectStorageUpload';
 
 // Definir el esquema de validación para el formulario
 const treeSpeciesSchema = z.object({
@@ -224,27 +225,16 @@ function EditTreeSpecies() {
     setIsUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('photo', file);
+      // Usar Object Storage para el upload
+      const photoUrl = await uploadTreeSpeciesPhotoOS(species.id, file);
 
-      const response = await fetch('/api/tree-species/upload-photo', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al subir la foto');
-      }
-
-      const result = await response.json();
-      
       // Actualizar el campo imageUrl del formulario con la URL de la foto subida
-      form.setValue('imageUrl', result.photoUrl);
-      setUploadedPhoto(result.photoUrl);
+      form.setValue('imageUrl', photoUrl);
+      setUploadedPhoto(photoUrl);
 
       toast({
         title: "Foto subida exitosamente",
-        description: "La foto se ha guardado y se usará como imagen de la especie.",
+        description: "La foto se ha guardado en Object Storage y se usará como imagen de la especie.",
       });
     } catch (error) {
       toast({

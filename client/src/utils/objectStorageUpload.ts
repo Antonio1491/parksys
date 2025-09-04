@@ -289,6 +289,146 @@ export async function uploadGenericFileOS(
 }
 
 /**
+ * Upload de fotos de especies de árboles usando Object Storage
+ */
+export async function uploadTreeSpeciesPhotoOS(
+  speciesId: number,
+  file: File
+): Promise<string> {
+  try {
+    console.log(`🚀 [FRONTEND] Iniciando upload OS para especie de árbol ${speciesId}`);
+    
+    // 1. Obtener URL de upload
+    const uploadResponse = await fetch(`/api/tree-species/${speciesId}/photo/upload-os`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include'
+    });
+    
+    if (!uploadResponse.ok) {
+      throw new Error(`Error obteniendo URL de upload: ${uploadResponse.statusText}`);
+    }
+    
+    const uploadData: UploadResponse = await uploadResponse.json();
+    console.log(`📤 [FRONTEND] URL de upload obtenida para especie:`, uploadData);
+    
+    // 2. Subir archivo a Object Storage
+    const fileUpload = await fetch(uploadData.uploadUrl, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      }
+    });
+    
+    if (!fileUpload.ok) {
+      throw new Error(`Error subiendo archivo: ${fileUpload.statusText}`);
+    }
+    
+    console.log(`✅ [FRONTEND] Foto de especie subida exitosamente a Object Storage`);
+    
+    // 3. Confirmar upload
+    const confirmResponse = await fetch(`/api/tree-species/${speciesId}/photo/confirm-os`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        imageId: uploadData.imageId,
+        filename: uploadData.filename,
+        uploadUrl: uploadData.uploadUrl
+      })
+    });
+    
+    if (!confirmResponse.ok) {
+      throw new Error(`Error confirmando upload: ${confirmResponse.statusText}`);
+    }
+    
+    const confirmData = await confirmResponse.json();
+    console.log(`💾 [FRONTEND] Upload de foto de especie confirmado:`, confirmData);
+    
+    return confirmData.photoUrl;
+    
+  } catch (error) {
+    console.error('❌ [FRONTEND] Error en upload de foto de especie:', error);
+    throw error;
+  }
+}
+
+/**
+ * Upload de iconos de especies de árboles usando Object Storage
+ */
+export async function uploadTreeSpeciesIconOS(
+  speciesId: number,
+  file: File
+): Promise<string> {
+  try {
+    console.log(`🚀 [FRONTEND] Iniciando upload OS para icono de especie ${speciesId}`);
+    
+    // 1. Obtener URL de upload
+    const uploadResponse = await fetch(`/api/tree-species/${speciesId}/icon/upload-os`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include'
+    });
+    
+    if (!uploadResponse.ok) {
+      throw new Error(`Error obteniendo URL de upload: ${uploadResponse.statusText}`);
+    }
+    
+    const uploadData: UploadResponse = await uploadResponse.json();
+    console.log(`📤 [FRONTEND] URL de upload obtenida para icono:`, uploadData);
+    
+    // 2. Subir archivo a Object Storage
+    const fileUpload = await fetch(uploadData.uploadUrl, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      }
+    });
+    
+    if (!fileUpload.ok) {
+      throw new Error(`Error subiendo archivo: ${fileUpload.statusText}`);
+    }
+    
+    console.log(`✅ [FRONTEND] Icono de especie subido exitosamente a Object Storage`);
+    
+    // 3. Confirmar upload
+    const confirmResponse = await fetch(`/api/tree-species/${speciesId}/icon/confirm-os`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        imageId: uploadData.imageId,
+        filename: uploadData.filename,
+        uploadUrl: uploadData.uploadUrl
+      })
+    });
+    
+    if (!confirmResponse.ok) {
+      throw new Error(`Error confirmando upload: ${confirmResponse.statusText}`);
+    }
+    
+    const confirmData = await confirmResponse.json();
+    console.log(`💾 [FRONTEND] Upload de icono de especie confirmado:`, confirmData);
+    
+    return confirmData.iconUrl;
+    
+  } catch (error) {
+    console.error('❌ [FRONTEND] Error en upload de icono de especie:', error);
+    throw error;
+  }
+}
+
+/**
  * Verificar health check de Object Storage
  */
 export async function checkObjectStorageHealth(): Promise<boolean> {
