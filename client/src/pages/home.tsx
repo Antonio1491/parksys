@@ -122,6 +122,9 @@ const Home: React.FC = () => {
   
   return (
     <main className="flex-1">
+      <div style={{background: 'red', color: 'white', padding: '10px', fontSize: '20px'}}>
+        🔥 PRUEBA - {Date.now()} - SI VES ESTO, ESTÁ FUNCIONANDO
+      </div>
       {/* 🌟 HERO SECTION - Inspirado en bosquesamg.mx */}
       <section className="relative min-h-screen bg-black overflow-hidden">
         {/* Imagen de fondo */}
@@ -140,7 +143,7 @@ const Home: React.FC = () => {
           <div className="max-w-3xl">
             {/* Título principal */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Conoce
+              Conoce los
               <span className="block">Parques de México</span>
             </h1>
             
@@ -485,7 +488,7 @@ const Home: React.FC = () => {
               <span style={{ color: '#19633c' }}>Agencia Metropolitana<br />de Bosques Urbanos</span>
             </h2>
             <p className="text-xl font-bold text-gray-700 max-w-4xl mx-auto leading-relaxed">
-              Somos un organismo público descentralizado que gestiona y conserva los parques del Área<br />
+              Somos un Organismo Público Descentralizado que gestiona y conserva los parques del Área<br />
               Metropolitana de Guadalajara con el objetivo de garantizar el derecho humano a un ambiente sano.
             </p>
           </div>

@@ -1,7 +1,11 @@
+import React from 'react';
+import { Search, X, Grid, List } from 'lucide-react';
+
 interface ToolbarProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
+  placeholder?: string;
   filters?: React.ReactNode;
   sortSelector?: React.ReactNode;
   orderSelector?: React.ReactNode;
@@ -13,6 +17,7 @@ export const Toolbar = ({
   searchQuery,
   onSearchChange,
   onClearSearch,
+  placeholder = 'Buscar...',
   filters,
   sortSelector,
   orderSelector,
@@ -29,7 +34,7 @@ export const Toolbar = ({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar..."
+              placeholder={placeholder}
               className="w-full font-poppins font-medium text-sm pl-10 pr-10 py-2 border border-gray-300 rounded-lg"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}

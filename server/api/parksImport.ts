@@ -375,7 +375,16 @@ export const processImportFile = async (req: Request, res: Response) => {
     // Función para convertir strings a números cuando sea necesario
     const convertToNumber = (value: any): number | null => {
       if (value === null || value === undefined || value === '') return null;
-      const num = Number(value);
+      
+      // Limpiar el valor: remover comas, espacios y otros caracteres no numéricos excepto punto y guión
+      const cleanValue = String(value)
+        .replace(/,/g, '')  // Remover comas (separadores de miles)
+        .replace(/\s/g, '') // Remover espacios
+        .trim();
+      
+      if (cleanValue === '') return null;
+      
+      const num = Number(cleanValue);
       return isNaN(num) ? null : num;
     };
 
@@ -384,6 +393,13 @@ export const processImportFile = async (req: Request, res: Response) => {
       if (value === null || value === undefined) return null;
       const str = String(value).trim();
       return str === '' ? null : str;
+    };
+
+    // Función para limpiar strings requeridos (no permite null)
+    const cleanRequiredString = (value: any): string => {
+      if (value === null || value === undefined) return '';
+      const str = String(value).trim();
+      return str === '' ? 'Sin especificar' : str;
     };
     
     // Mapear tipos de parque en español a inglés
@@ -408,14 +424,19 @@ export const processImportFile = async (req: Request, res: Response) => {
         if (englishKey) {
           let value = row[key];
           
-          // Convertir números específicos
-          if (['foundationYear'].includes(englishKey)) {
+          // Convertir números específicos (incluyendo area)
+          if (['foundationYear', 'area'].includes(englishKey)) {
             const numValue = convertToNumber(value);
             value = numValue;
           }
           
-          // Limpiar y mantener como strings (incluyendo coordenadas, municipio y área)
-          if (['name', 'address', 'description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail', 'latitude', 'longitude', 'municipalityText', 'area'].includes(englishKey)) {
+          // Limpiar campos requeridos (name, address)
+          if (['name', 'address'].includes(englishKey)) {
+            value = cleanRequiredString(value);
+          }
+          
+          // Limpiar y mantener como strings opcionales (excluyendo area, name, address que ya se procesaron)
+          if (['description', 'postalCode', 'administrator', 'contactPhone', 'contactEmail', 'latitude', 'longitude', 'municipalityText'].includes(englishKey)) {
             value = cleanString(value);
             // Para coordenadas, asegurar que no sean null
             if ((englishKey === 'latitude' || englishKey === 'longitude') && value === null) {
