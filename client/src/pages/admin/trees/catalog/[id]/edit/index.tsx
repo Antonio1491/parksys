@@ -487,7 +487,7 @@ function EditTreeSpecies() {
                               />
                               <p className="text-sm text-green-600 mt-2 flex items-center">
                                 <Image className="h-4 w-4 mr-1" />
-                                Esta imagen se usará como icono en las amenidades
+                                Esta imagen se usará como icono en las especies de árboles
                               </p>
                             </div>
                           )}
