@@ -2660,11 +2660,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🚀 Recibiendo petición de creación de parque:', req.body);
       
-      // Add default parkType if missing
+      // Map frontend field names to database schema fields
       const dataToValidate = {
-        ...req.body,
-        parkType: req.body.parkType || 'urbano' // Default value for required field
+        name: req.body.name,
+        municipalityText: req.body.municipality || req.body.municipalityText, // Map municipality -> municipalityText
+        parkType: req.body.parkType || 'urbano', // Default value for required field
+        description: req.body.description,
+        address: req.body.address,
+        postalCode: req.body.postalCode,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude?.trim(), // Remove any whitespace
+        area: req.body.area,
+        foundationYear: req.body.foundationYear,
+        administrator: req.body.administrator,
+        contactPhone: req.body.contactPhone,
+        contactEmail: req.body.contactEmail,
+        certificaciones: req.body.certificaciones,
+        // Skip dailySchedule as it's not in the database schema
       };
+      
+      console.log('🔧 Datos mapeados para validación:', dataToValidate);
       
       const parkData = insertParkSchema.parse(dataToValidate);
       console.log('✅ Datos del parque validados:', parkData);
@@ -2681,6 +2696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         console.error('🚨 Error de validación Zod:', validationError.message);
+        console.error('🔍 Issues detallados:', error.issues);
         return res.status(400).json({ 
           message: "Datos de entrada inválidos: " + validationError.message,
           details: error.issues 
