@@ -543,58 +543,26 @@ const AdminParksContent = () => {
               Importar
             </Button>,
             <Button variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 mr-2" />
               Nuevo Parque
             </Button>,
           ]}
         />
-        
-        {/* View mode toggle and actions */}
-        <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-600">
-            {filteredParks.length} parques encontrados
-          </div>
-          <div className="flex items-center space-x-2">
-            {/* View toggle buttons first */}
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className={viewMode === 'grid' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
-            >
-              <Grid className="h-4 w-4 mr-2" />
-              Fichas
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-              className={viewMode === 'list' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
-            >
-              <List className="h-4 w-4 mr-2" />
-              Lista
-            </Button>
-          </div>
-        </div>
-        
-        {/* ===== ATENCIÓN: USUARIO ESPECÍFICAMENTE PIDIÓ SIN FILTROS ===== */}
-        {/* ===== SOLO BARRA DE BÚSQUEDA - NO AGREGAR SELECT O FILTROS ===== */}
+                  
+        {/* BARRA DE BÚSQUEDA Y TOGGLE VIEW */}
         <div 
-          className="bg-white p-6 rounded-lg border shadow-sm"
+          className="bg-white p-2 rounded-xl border shadow-sm"
           data-no-filters="true"
           id="search-section-no-filters"
         >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Buscar Parques</h3>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative flex-1 max-w-md">
+          <div className="space-y-0">
+            <div className="flex items-center justify-between w-full px-2 py-2">
+              <div className="relative flex-1 max-w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Buscar parques por nombre o dirección..."
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Buscar parques..."
+                  className="w-full font-poppins font-medium text-sm pl-10 pr-10 py-2 border border-gray-300 rounded-lg"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -608,8 +576,21 @@ const AdminParksContent = () => {
                   </button>
                 )}
               </div>
-              <div className="text-sm text-gray-500 font-medium">
-                {filteredParks.length} parque{filteredParks.length !== 1 ? 's' : ''} encontrado{filteredParks.length !== 1 ? 's' : ''}
+              <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </div>

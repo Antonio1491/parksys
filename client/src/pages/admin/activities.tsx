@@ -469,10 +469,26 @@ const AdminActivities = () => {
                 }
                 break;
               case 'fechainicio':
-                activityData.startDate = value || null;
+                // Convertir "16/09/25" a "2025-09-16" formato ISO
+                if (value) {
+                  const [day, month, year] = value.split('/');
+                  const fullYear = year.length === 2 ? `20${year}` : year;
+                  activityData.startDate = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`).toISOString();
+                  console.log(`📅 Fecha inicio convertida: "${value}" -> "${activityData.startDate}"`);
+                } else {
+                  activityData.startDate = null;
+                }
                 break;
               case 'fechafin':
-                activityData.endDate = value || null;
+                // Convertir "16/09/25" a "2025-09-16" formato ISO
+                if (value) {
+                  const [day, month, year] = value.split('/');
+                  const fullYear = year.length === 2 ? `20${year}` : year;
+                  activityData.endDate = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`).toISOString();
+                  console.log(`📅 Fecha fin convertida: "${value}" -> "${activityData.endDate}"`);
+                } else {
+                  activityData.endDate = null;
+                }
                 break;
               case 'horainicio':
                 activityData.startTime = value || null;
@@ -517,10 +533,26 @@ const AdminActivities = () => {
                 activityData.recurringDays = value ? value.split(';').filter(d => d.trim()) : [];
                 break;
               case 'mercadoobjetivo':
-                activityData.targetMarket = value ? value.split(';').filter(t => t.trim()) : [];
+                if (value && value.trim()) {
+                  // Si contiene ';' dividir, sino crear array con un elemento
+                  activityData.targetMarket = value.includes(';') 
+                    ? value.split(';').filter(t => t.trim()) 
+                    : [value.trim()];
+                  console.log(`🎯 Mercado objetivo: ${JSON.stringify(activityData.targetMarket)}`);
+                } else {
+                  activityData.targetMarket = [];
+                }
                 break;
               case 'necesidadesespeciales':
-                activityData.specialNeeds = value ? value.split(';').filter(n => n.trim()) : [];
+                if (value && value.trim()) {
+                  // Si contiene ';' dividir, sino crear array con un elemento
+                  activityData.specialNeeds = value.includes(';') 
+                    ? value.split(';').filter(n => n.trim()) 
+                    : [value.trim()];
+                  console.log(`♿ Necesidades especiales: ${JSON.stringify(activityData.specialNeeds)}`);
+                } else {
+                  activityData.specialNeeds = [];
+                }
                 break;
               case 'permiteregistropúblico':
                 activityData.allowsPublicRegistration = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value === '1';

@@ -20,7 +20,7 @@ export const PageHeader = ({
     style={{ backgroundColor }}
   >
     {/* Sección izquierda: ícono + título + subtítulo */}
-    <div className="flex items-start gap-2">
+    <div className="flex items-start gap-2 mt-5">
       {React.cloneElement(icon as React.ReactElement, {className: 'h-8 w-8 text-white mt-1',})}
       <div>
         <h1 className="text-3xl font-semibold text-white font-poppins">
@@ -35,7 +35,7 @@ export const PageHeader = ({
     </div>
 
     {/* Sección derecha: botones */}
-    <div className="flex gap-2">
+    <div className="flex gap-2 mt-8">
       {actions.slice(0, 3).map((action, index) => (
         <div key={index}>{action}</div>
       ))}

@@ -136,14 +136,14 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
       <Button
         variant="ghost"
         className={cn(
-          "w-full flex items-center justify-start text-sm font-light h-9 px-2 transition-colors duration-200",
+          "w-full flex items-center justify-start rounded-full text-sm font-light h-9 px-4 transition-colors duration-200",
           active
-            ? "bg-white text-header-background"
-            : "text-sidebar-primary hover:bg-[#036668] hover:text-header-background"
+            ? "bg-white text-sidebar-primary hover:bg-white hover:text-header-background"
+            : "text-sidebar-primary hover:bg-sidebar-hover hover:text-header-background"
         )}
       >
         {iconWithClass}
-        <span className="ml-0">{children}</span>
+        <span className="ml-1">{children}</span>
       </Button>
     </Link>
   );
@@ -232,7 +232,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
           {title}
         </div>
       </AccordionTrigger>
-      <AccordionContent className="pl-2 pb-0">
+      <AccordionContent className="pl-4 pb-0">
         <div className="flex flex-col gap-1 pt-1">
           {React.Children.map(children, (child) => {
             if (React.isValidElement(child)) {
@@ -318,8 +318,8 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
           className={cn(
             'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
             isActive
-              ? 'bg-[#3DB59F] text-white'
-              : 'bg-transparent text-white hover:bg-[#036668]'
+              ? 'bg-header-background text-white'
+              : 'bg-transparent text-white hover:bg-sidebar-hover'
           )}
         >
           <div className="flex items-center">
@@ -512,7 +512,7 @@ const AdminSidebarComplete: React.FC = () => {
         <SidebarSearch />
       </div>
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-2 w-full">
+      <ScrollArea className="flex-1 px-3 py-2">
         <Accordion
           type="multiple"
           value={openAccordions}
