@@ -419,8 +419,13 @@ app.get('/status', (req: Request, res: Response) => {
   }
 });
 
-// Servir archivos estáticos del directorio public ANTES de otras rutas
-app.use(express.static(path.join(process.cwd(), 'public')));
+// Servir archivos estáticos del directorio public ANTES de otras rutas (solo en producción)
+if (isProductionMode) {
+  app.use(express.static(path.join(process.cwd(), 'public')));
+  console.log('📁 [PROD] Static files from public/ enabled');
+} else {
+  console.log('📁 [DEV] Skipping public/ static files - Vite will handle assets');
+}
 
 // Configuración dinámica para uploads basada en el entorno
 const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
@@ -2086,9 +2091,13 @@ function startServer() {
   // Health checks must be available immediately for deployment
   console.log("🏥 [DEPLOYMENT] Skipping all heavy initialization - health checks priority");
 
-  // CRITICAL: Setup static file serving immediately for the app to work
-  app.use(express.static(path.join(process.cwd(), 'public')));
-  console.log("🗂️ [IMMEDIATE] Static files configured");
+  // CRITICAL: Setup static file serving immediately for the app to work (production only)
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    app.use(express.static(path.join(process.cwd(), 'public')));
+    console.log("🗂️ [IMMEDIATE] Static files configured");
+  } else {
+    console.log("🗂️ [IMMEDIATE] Skipping static files in development - Vite will handle");
+  }
 
   // CRITICAL: Register essential API routes BEFORE Vite setup to prevent route conflicts
   app.use(express.json({ limit: '50mb' }));
