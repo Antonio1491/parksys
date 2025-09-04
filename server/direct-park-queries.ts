@@ -8,6 +8,7 @@ export async function getParksDirectly(filters?: any) {
     let queryStr = `
       SELECT DISTINCT
         p.id, p.name, p.municipality_id as "municipalityId", 
+        p.municipality_text as "municipalityText",
         p.park_type as "parkType", p.description, p.address, 
         p.postal_code as "postalCode", p.latitude, p.longitude, 
         p.area, p.foundation_year as "foundationYear",
@@ -268,6 +269,7 @@ export async function getParkByIdDirectly(parkId: number) {
       const parkResult = await pool.query(`
         SELECT 
           id, name, municipality_id as "municipalityId", 
+          municipality_text as "municipalityText",
           park_type as "parkType", description, address, 
           postal_code as "postalCode", latitude, longitude, 
           area, green_area as "greenArea", foundation_year as "foundationYear",
