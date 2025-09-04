@@ -306,7 +306,7 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
         </button>
 
         {collapsible && isExpanded && (
-          <div className="pl-4 ml-2 space-y-1 mt-2">
+          <div className="pl-2 ml-2 space-y-1 mt-2">
             {children}
           </div>
         )}
@@ -340,7 +340,7 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
         </button>
 
         {collapsible && isExpanded && (
-          <div className="pl-4 ml-2 space-y-1 mt-2">
+          <div className="pl-2 ml-2 space-y-1 mt-2">
             {children}
           </div>
         )}
@@ -1400,12 +1400,12 @@ const AdminSidebarComplete: React.FC = () => {
         </Accordion>
       </ScrollArea>
       {/* Footer con logo de ParkSys */}
-      <div className="p-8 border-t border-teal-600" style={{ backgroundColor: '#003D49' }}>
+      <div className="p-8 border-t border-header-background" style={{ backgroundColor: '#003D49' }}>
         <div className="flex flex-col items-center justify-center gap-4">
           <img 
             src={parksysLogo} 
             alt="ParkSys - Sistema de parques" 
-            className="h-15 w-auto opacity-80 hover:opacity-100 transition-opacity pl-[5px] pr-[5px]"
+            className="h-14 w-auto max-w-64 opacity-80 hover:opacity-100 transition-opacity pl-[5px] pr-[5px]"
           />
           <a 
             href="https://parquesdemexico.org/"

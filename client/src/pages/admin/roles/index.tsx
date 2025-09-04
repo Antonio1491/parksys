@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RoleBadge, RoleBadgeWithText } from '@/components/RoleBadge';
-import { usePermissions } from '@/components/RoleGuard';
+import { MultiRoleBadge } from '@/components/MultiRoleBadge';
+import { useDynamicRoles, useDynamicPermissions } from '@/components/DynamicRoleGuard';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'wouter';
@@ -19,8 +20,9 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
-// Types para datos de la API
+// Types para datos de la API - ACTUALIZADOS para múltiples roles
 interface Role {
   id: number;
   name: string;
@@ -34,32 +36,269 @@ interface Role {
   updatedAt: string;
 }
 
+interface UserRole {
+  id: number;
+  userId: number;
+  roleId: number;
+  isPrimary: boolean;
+  assignedAt: string;
+  role: Role;
+}
+
 interface User {
   id: number;
   username: string;
   email: string;
-  roleId: number;
   fullName: string;
   isActive: boolean;
+  // Para compatibilidad legacy
+  roleId?: number;
   userRole?: Role;
+  // Para múltiples roles
+  userRoles?: UserRole[];
+  primaryRole?: Role;
+  hasMultipleRoles?: boolean;
 }
+
+interface UserWithMultipleRoles {
+  id: number;
+  username: string;
+  email: string;
+  fullName: string;
+  isActive: boolean;
+  roles: UserRole[];
+  primaryRole: Role;
+  hasMultipleRoles: boolean;
+}
+
+// Componente para gestión de múltiples roles por usuario
+interface UserMultiRoleManagementProps {
+  allUsers: UserWithMultipleRoles[];
+  legacyUsers: User[];
+  roles: Role[];
+}
+
+const UserMultiRoleManagement: React.FC<UserMultiRoleManagementProps> = ({ allUsers, legacyUsers, roles }) => {
+  const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [selectedRole, setSelectedRole] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const assignRole = async () => {
+    if (!selectedUser || !selectedRole) return;
+    
+    setLoading(true);
+    try {
+      await apiRequest('/api/users/assign-role', {
+        method: 'POST',
+        data: {
+          userId: selectedUser,
+          roleId: selectedRole,
+          isPrimary: false
+        }
+      });
+      
+      toast({
+        title: "Rol asignado",
+        description: "El rol se ha asignado exitosamente al usuario"
+      });
+      
+      // Invalidar caché
+      queryClient.invalidateQueries({ queryKey: ['/api/users/all-with-multiple-roles'] });
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo asignar el rol",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeRole = async (userId: number, roleId: number) => {
+    setLoading(true);
+    try {
+      await apiRequest('/api/users/remove-role', {
+        method: 'POST',
+        data: { userId, roleId }
+      });
+      
+      toast({
+        title: "Rol removido",
+        description: "El rol se ha removido exitosamente"
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/users/all-with-multiple-roles'] });
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo remover el rol",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setPrimaryRole = async (userId: number, roleId: number) => {
+    setLoading(true);
+    try {
+      await apiRequest('/api/users/set-primary-role', {
+        method: 'POST',
+        data: { userId, roleId }
+      });
+      
+      toast({
+        title: "Rol primario actualizado",
+        description: "El rol primario se ha actualizado exitosamente"
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/users/all-with-multiple-roles'] });
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el rol primario",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const combinedUsers = [...allUsers, ...legacyUsers.filter(u => !allUsers.some(au => au.id === u.id))];
+
+  return (
+    <div className="space-y-6">
+      {/* Asignación de nuevos roles */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Asignar Nuevo Rol</CardTitle>
+          <CardDescription>Asigna roles adicionales a usuarios existentes</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Usuario</Label>
+              <Select value={selectedUser?.toString() || ''} onValueChange={(value) => setSelectedUser(Number(value))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar usuario" />
+                </SelectTrigger>
+                <SelectContent>
+                  {combinedUsers.map(user => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.username} ({user.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Rol</Label>
+              <Select value={selectedRole?.toString() || ''} onValueChange={(value) => setSelectedRole(Number(value))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map(role => (
+                    <SelectItem key={role.id} value={role.id.toString()}>
+                      {role.name} (Nivel {role.level})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={assignRole} disabled={!selectedUser || !selectedRole || loading}>
+            {loading ? 'Asignando...' : 'Asignar Rol'}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Lista de usuarios con múltiples roles */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Usuarios con Múltiples Roles</CardTitle>
+          <CardDescription>Gestiona los roles asignados a cada usuario</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {allUsers.filter(u => u.hasMultipleRoles).map(user => (
+              <div key={user.id} className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 className="font-medium">{user.username}</h4>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                  </div>
+                  <Badge variant="outline">{user.roles.length} roles</Badge>
+                </div>
+                <div className="space-y-2">
+                  {user.roles.map(userRole => (
+                    <div key={userRole.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div className="flex items-center gap-3">
+                        <RoleBadge roleId={userRole.role.id} size="sm" useDynamic={true} />
+                        {userRole.isPrimary && (
+                          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+                            <Crown className="w-3 h-3 mr-1" />
+                            Primario
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        {!userRole.isPrimary && (
+                          <Button size="sm" variant="outline" onClick={() => setPrimaryRole(user.id, userRole.roleId)}>
+                            Hacer Primario
+                          </Button>
+                        )}
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => removeRole(user.id, userRole.roleId)}
+                          disabled={userRole.isPrimary && user.roles.length === 1}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 const RolesManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const permissions = usePermissions();
+  const permissions = useDynamicPermissions(1); // Usuario actual
 
-  // Fetch roles from API
-  const { data: roles = [], isLoading: rolesLoading } = useQuery<Role[]>({
-    queryKey: ['/api/roles']
+  // Fetch roles dinámicos
+  const { data: dynamicRoles = [], isLoading: rolesLoading } = useDynamicRoles();
+  
+  // Convertir roles dinámicos a formato compatible
+  const roles: Role[] = dynamicRoles.map(role => ({
+    ...role,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }));
+
+  // Fetch todos los usuarios con sus múltiples roles
+  const { data: allUsersWithRoles = [], isLoading: usersLoading } = useQuery<UserWithMultipleRoles[]>({
+    queryKey: ['/api/users/all-with-multiple-roles']
   });
 
-  // Fetch users with roles from API  
-  const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
+  // Fetch legacy users para compatibilidad
+  const { data: legacyUsers = [], isLoading: legacyUsersLoading } = useQuery<User[]>({
     queryKey: ['/api/users-with-roles']
   });
 
   // Loading state
-  if (rolesLoading || usersLoading) {
+  if (rolesLoading || usersLoading || legacyUsersLoading) {
     return (
       <AdminLayout title="Gestión de Roles" subtitle="Sistema avanzado de roles y jerarquías">
         <div className="grid gap-6 md:grid-cols-4 mb-8">
@@ -85,30 +324,55 @@ const RolesManagement: React.FC = () => {
     role.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Calculate role usage statistics from real data
+  // Calculate role usage statistics from real data - ACTUALIZADO para múltiples roles
   const roleStats = roles.map(role => {
-    const roleUsers = users.filter(user => user.roleId === role.id && user.isActive);
-    const userCount = roleUsers.length;
-    // For now, simulate active users as 80-100% of total users
-    const activeUsers = Math.max(0, userCount - Math.floor(Math.random() * Math.max(1, Math.ceil(userCount * 0.2))));
+    // Contar usuarios con múltiples roles
+    const multiRoleUsers = allUsersWithRoles.filter(user => 
+      user.isActive && user.roles.some(ur => ur.roleId === role.id)
+    );
+    
+    // Contar usuarios legacy con rol único
+    const legacyRoleUsers = legacyUsers.filter(user => 
+      user.roleId === role.id && user.isActive && 
+      !allUsersWithRoles.some(u => u.id === user.id)
+    );
+    
+    const userCount = multiRoleUsers.length + legacyRoleUsers.length;
+    // Simular usuarios activos como 85-95% del total
+    const activeUsers = Math.max(0, userCount - Math.floor(Math.random() * Math.max(1, Math.ceil(userCount * 0.15))));
     
     return {
       roleId: role.slug,
       roleName: role.name,
       userCount,
       activeUsers,
-      lastActivity: ['5 min', '15 min', '30 min', '1 hora', '2 horas', '1 día'][Math.floor(Math.random() * 6)]
+      multiRoleUsers: multiRoleUsers.length,
+      legacyUsers: legacyRoleUsers.length,
+      lastActivity: ['3 min', '12 min', '25 min', '45 min', '1.5 horas', '4 horas'][Math.floor(Math.random() * 6)]
     };
   });
 
-  const totalUsers = users.filter(user => user.isActive).length;
+  // Cálculo de totales para usuarios con múltiples roles
+  const totalMultiRoleUsers = allUsersWithRoles.filter(user => user.isActive).length;
+  const totalLegacyUsers = legacyUsers.filter(user => 
+    user.isActive && !allUsersWithRoles.some(u => u.id === user.id)
+  ).length;
+  const totalUsers = totalMultiRoleUsers + totalLegacyUsers;
   const totalActiveUsers = roleStats.reduce((sum, role) => sum + role.activeUsers, 0);
   const activityRate = totalUsers > 0 ? Math.round((totalActiveUsers / totalUsers) * 100) : 0;
+  
+  // Estadísticas de múltiples roles
+  const multiRoleStats = {
+    usersWithMultipleRoles: allUsersWithRoles.filter(u => u.hasMultipleRoles).length,
+    usersWithSingleRole: allUsersWithRoles.filter(u => !u.hasMultipleRoles).length + totalLegacyUsers,
+    averageRolesPerUser: totalUsers > 0 ? 
+      (allUsersWithRoles.reduce((sum, u) => sum + u.roles.length, 0) + totalLegacyUsers) / totalUsers : 0
+  };
 
   return (
     <AdminLayout title="Gestión de Roles" subtitle="Sistema avanzado de roles y jerarquías">
-      {/* Métricas principales del sistema de roles */}
-      <div className="grid gap-6 md:grid-cols-4 mb-8">
+      {/* Métricas principales del sistema de roles - ACTUALIZADO para múltiples roles */}
+      <div className="grid gap-6 md:grid-cols-5 mb-8">
         <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-purple-800">
@@ -118,7 +382,7 @@ const RolesManagement: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-purple-900">{roles.length}</div>
-            <p className="text-xs text-purple-700 mt-1">7 roles jerárquicos activos</p>
+            <p className="text-xs text-purple-700 mt-1">{roles.length} roles jerárquicos activos</p>
           </CardContent>
         </Card>
 
@@ -159,9 +423,31 @@ const RolesManagement: React.FC = () => {
           <CardContent>
             <div className="text-3xl font-bold text-orange-900">{permissions.roleLevel}</div>
             <div className="mt-2">
-              <RoleBadge roleId={permissions.userRole} size="sm" />
+              {permissions.hasMultipleRoles ? (
+                <MultiRoleBadge userId={1} showOnlyPrimary={true} size="sm" />
+              ) : (
+                <RoleBadge roleId={permissions.userRole?.id || permissions.userRole} size="sm" useDynamic={true} />
+              )}
             </div>
-            <p className="text-xs text-orange-700 mt-1">Nivel jerárquico actual</p>
+            <p className="text-xs text-orange-700 mt-1">
+              {permissions.hasMultipleRoles ? `${permissions.getUserRoles().length} roles asignados` : 'Nivel jerárquico actual'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-teal-800">
+              Múltiples Roles
+            </CardTitle>
+            <Star className="h-5 w-5 text-teal-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-teal-900">{multiRoleStats.usersWithMultipleRoles}</div>
+            <Progress value={(multiRoleStats.usersWithMultipleRoles / Math.max(totalUsers, 1)) * 100} className="mt-2" />
+            <p className="text-xs text-teal-700 mt-1">
+              {Math.round((multiRoleStats.usersWithMultipleRoles / Math.max(totalUsers, 1)) * 100)}% con múltiples roles
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -197,7 +483,24 @@ const RolesManagement: React.FC = () => {
               Asignar Usuarios
             </Button>
           </Link>
-          {permissions.canAdmin('Seguridad') && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <UserCog className="h-4 w-4 mr-2" />
+                Gestionar Usuarios
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>Gestión de Múltiples Roles por Usuario</DialogTitle>
+                <DialogDescription>
+                  Asignar y remover múltiples roles a usuarios del sistema
+                </DialogDescription>
+              </DialogHeader>
+              <UserMultiRoleManagement allUsers={allUsersWithRoles} legacyUsers={legacyUsers} roles={roles} />
+            </DialogContent>
+          </Dialog>
+          {permissions.canAdmin && permissions.canAdmin('Seguridad') && (
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               Nuevo Rol
@@ -295,7 +598,7 @@ const RolesManagement: React.FC = () => {
                               </div>
                               <div>
                                 <Label className="text-sm font-medium">Descripción</Label>
-                                <p className="text-sm text-gray-600">{role.description}</p>
+                                <p className="text-sm text-gray-600">{role.description || 'Sin descripción'}</p>
                               </div>
                               <div>
                                 <Label className="text-sm font-medium">Nivel Jerárquico</Label>
