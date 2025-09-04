@@ -48,7 +48,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
           p.name as "parkName"
         FROM volunteers v
         LEFT JOIN parks p ON v.preferred_park_id = p.id
-        WHERE v.status = 'active'
+        WHERE v.status = 'activo'
         ORDER BY v.created_at DESC
       `);
       
@@ -164,7 +164,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
             previous_experience,
             'module' as source
           FROM volunteers 
-          WHERE status = 'active'
+          WHERE status = 'activo'
           ORDER BY id DESC`
         );
         

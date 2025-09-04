@@ -1,0 +1,24 @@
+🌐 [QUERY] GET /api/parks
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/sponsors
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/events
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413Understand this warning
+index-BhF-TSlG.js:789 i18next::backendConnector: loaded namespace common for language es Object
+index-BhF-TSlG.js:789 i18next: languageChanged es
+index-BhF-TSlG.js:789 i18next: initialized Object
+index-BhF-TSlG.js:1234 Respuesta del servidor: Object
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/activities
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/users
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/hr/employees
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/volunteers
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/active-concessions
+/api/users:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+index-BhF-TSlG.js:49 Query failed for: /api/users Error: Authentication required
+    at index-BhF-TSlG.js:49:46367
+(anonymous) @ index-BhF-TSlG.js:49Understand this error
+index-BhF-TSlG.js:833 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-BhF-TSlG.js:833Understand this warning
+index-DDK2Knoy.js:4 Headers detectados: (17) ['fullName', 'email', 'phone', 'age', 'gender', 'address', 'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelation', 'preferredParkId', 'previousExperience', 'availableDays', 'availableHours', 'interestAreas', 'skills', 'legalConsent', 'status']
+index-DDK2Knoy.js:4 Voluntarios procesados: (22) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+index-BhF-TSlG.js:49 🌐 [API REQUEST] POST /api/volunteers/import
+index-BhF-TSlG.js:49 🌐 [QUERY] GET /api/volunteers
