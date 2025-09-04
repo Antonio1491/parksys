@@ -3466,11 +3466,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await pool.query('DELETE FROM park_images WHERE park_id = $1', [numParkId]);
           await pool.query('DELETE FROM documents WHERE park_id = $1', [numParkId]);
           await pool.query('DELETE FROM activities WHERE park_id = $1', [numParkId]);
+          // Delete tree maintenances first (depends on tree_id)
+          await pool.query('DELETE FROM tree_maintenances WHERE tree_id IN (SELECT id FROM trees WHERE park_id = $1)', [numParkId]);
           await pool.query('DELETE FROM trees WHERE park_id = $1', [numParkId]);
-          await pool.query('DELETE FROM tree_maintenances WHERE park_id = $1', [numParkId]);
           await pool.query('DELETE FROM assets WHERE park_id = $1', [numParkId]);
           await pool.query('DELETE FROM incidents WHERE park_id = $1', [numParkId]);
-          await pool.query('DELETE FROM evaluations WHERE park_id = $1', [numParkId]);
           await pool.query('DELETE FROM event_parks WHERE park_id = $1', [numParkId]);
           
           // Finally delete the park itself
