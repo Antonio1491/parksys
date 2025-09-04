@@ -493,7 +493,7 @@ export const processImportFile = async (req: Request, res: Response) => {
     for (const municipalityName of uniqueMunicipalities) {
       try {
         // Intentar encontrar municipio existente
-        const existingMunicipalities = await storage.getAllMunicipalities();
+        const existingMunicipalities = await storage.getMunicipalities();
         const existingMunicipality = existingMunicipalities.find(
           m => m.name.toLowerCase() === municipalityName.toLowerCase()
         );
@@ -502,13 +502,8 @@ export const processImportFile = async (req: Request, res: Response) => {
           municipalityMap.set(municipalityName, existingMunicipality.id);
           console.log(`✅ [IMPORT] Municipio existente mapeado: ${municipalityName} → ID ${existingMunicipality.id}`);
         } else {
-          // Crear nuevo municipio
-          const newMunicipality = await storage.createMunicipality({
-            name: municipalityName,
-            state: 'Por definir' // Valor por defecto
-          });
-          municipalityMap.set(municipalityName, newMunicipality.id);
-          console.log(`🆕 [IMPORT] Nuevo municipio creado: ${municipalityName} → ID ${newMunicipality.id}`);
+          // Por ahora, no crear municipios automáticamente - dejar como null
+          console.log(`⚠️ [IMPORT] Municipio no encontrado: ${municipalityName} (municipalityId será null)`);
         }
       } catch (error) {
         console.error(`❌ [IMPORT] Error procesando municipio ${municipalityName}:`, error);
@@ -526,7 +521,7 @@ export const processImportFile = async (req: Request, res: Response) => {
     });
 
     // VALIDACIÓN DE DUPLICADOS: Obtener parques existentes
-    const existingParks = await storage.getAllParks();
+    const existingParks = await storage.getParks();
     console.log(`🔍 [IMPORT] Parques existentes en BD: ${existingParks.length}`);
     
     // Filtrar parques duplicados por nombre (case-insensitive)
