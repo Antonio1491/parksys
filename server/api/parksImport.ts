@@ -477,47 +477,15 @@ export const processImportFile = async (req: Request, res: Response) => {
       return transformedData;
     });
     
-    // NUEVA SECCIÓN: Crear municipios automáticamente y mapear a IDs
-    const municipalityMap = new Map<string, number>();
+    // SIMPLIFICADO: Mantener municipio como texto libre
+    console.log('🏙️ [IMPORT] Manteniendo municipios como texto libre en municipalityText');
     
-    // Recopilar todos los municipios únicos del CSV
-    const uniqueMunicipalities = [...new Set(
-      parksData
-        .map(park => park.municipalityText)
-        .filter(text => text && text.trim() !== '')
-    )];
-    
-    console.log('🏙️ [IMPORT] Municipios únicos encontrados:', uniqueMunicipalities);
-    
-    // Crear o buscar municipios en la BD
-    for (const municipalityName of uniqueMunicipalities) {
-      try {
-        // Intentar encontrar municipio existente
-        const existingMunicipalities = await storage.getMunicipalities();
-        const existingMunicipality = existingMunicipalities.find(
-          m => m.name.toLowerCase() === municipalityName.toLowerCase()
-        );
-        
-        if (existingMunicipality) {
-          municipalityMap.set(municipalityName, existingMunicipality.id);
-          console.log(`✅ [IMPORT] Municipio existente mapeado: ${municipalityName} → ID ${existingMunicipality.id}`);
-        } else {
-          // Por ahora, no crear municipios automáticamente - dejar como null
-          console.log(`⚠️ [IMPORT] Municipio no encontrado: ${municipalityName} (municipalityId será null)`);
-        }
-      } catch (error) {
-        console.error(`❌ [IMPORT] Error procesando municipio ${municipalityName}:`, error);
-      }
-    }
-    
-    // Convertir municipalityText a municipalityId en todos los parques
+    // Limpiar y procesar municipalityText (mantenerlo como está, no convertir a ID)
     parksData.forEach(park => {
-      if (park.municipalityText && municipalityMap.has(park.municipalityText)) {
-        park.municipalityId = municipalityMap.get(park.municipalityText);
-        console.log(`🔄 [IMPORT] Mapeado: "${park.municipalityText}" → ID ${park.municipalityId}`);
+      if (park.municipalityText) {
+        park.municipalityText = park.municipalityText.trim();
+        console.log(`📝 [IMPORT] Municipio texto: "${park.municipalityText}"`);
       }
-      // Eliminar el campo temporal
-      delete park.municipalityText;
     });
 
     // VALIDACIÓN DE DUPLICADOS: Obtener parques existentes
