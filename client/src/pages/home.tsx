@@ -146,8 +146,8 @@ const Home: React.FC = () => {
             
             {/* Subtítulo */}
             <p className="text-2xl md:text-3xl text-gray-200 mb-8 leading-relaxed max-w-2xl">
-              Por un futuro más verde,<br />
-              árbol por árbol.
+              Conectando a México a través<br />
+              de sus grandes parques.
             </p>
             
             {/* Badge */}
@@ -368,20 +368,10 @@ const Home: React.FC = () => {
             <Link href="/parks">
               <Button size="lg" className="bg-[#19633c] hover:bg-[#145530] text-white font-bold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 Encuentra tu parque favorito
-                <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </Link>
           </div>
-          
-          {/* Banner publicitario */}
-          <div className="w-full my-12">
-            <AdSpace 
-              spaceId={14} 
-              position="banner" 
-              pageType="homepage" 
-              className="w-full"
-            />
-          </div>
+
         </div>
       </section>
       
