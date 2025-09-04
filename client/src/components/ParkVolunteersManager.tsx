@@ -78,9 +78,10 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
   });
 
   // Consulta para obtener todos los voluntarios disponibles
-  const { data: allVolunteers = [] } = useQuery<Volunteer[]>({
+  const { data: allVolunteers = [], isLoading: allVolunteersLoading, error: allVolunteersError } = useQuery<Volunteer[]>({
     queryKey: ['/api/volunteers'],
     queryFn: async () => {
+      console.log('🔍 FRONTEND: Cargando TODOS los voluntarios disponibles');
       const response = await fetch('/api/volunteers', {
         headers: {
           'Authorization': 'Bearer direct-token-1750522117022',
@@ -88,8 +89,13 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
           'X-User-Role': 'super_admin'
         }
       });
-      if (!response.ok) throw new Error('Error cargando voluntarios disponibles');
-      return response.json();
+      if (!response.ok) {
+        console.error('❌ FRONTEND: Error en respuesta de /api/volunteers:', response.status, response.statusText);
+        throw new Error(`Error cargando voluntarios disponibles: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('✅ FRONTEND: Todos los voluntarios cargados:', data.length, data);
+      return data;
     }
   });
 
@@ -98,6 +104,13 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
   const availableVolunteers = allVolunteers.filter(volunteer => 
     !assignedIds.includes(volunteer.id) && (volunteer.status === 'active' || volunteer.status === 'activo')
   );
+
+  // Debug logs
+  console.log('🔍 DEBUG: allVolunteers:', allVolunteers.length);
+  console.log('🔍 DEBUG: assignedIds:', assignedIds);
+  console.log('🔍 DEBUG: availableVolunteers:', availableVolunteers.length);
+  console.log('🔍 DEBUG: allVolunteersLoading:', allVolunteersLoading);
+  console.log('🔍 DEBUG: allVolunteersError:', allVolunteersError);
 
   // Aplicar filtros a voluntarios disponibles
   const filteredAvailableVolunteers = availableVolunteers.filter(volunteer => {
