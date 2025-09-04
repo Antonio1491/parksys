@@ -73,7 +73,7 @@ import { uploadAdvertising, handleAdvertisingUpload } from "./api/advertising-up
 import { 
   insertCommentSchema, insertIncidentSchema, 
   insertActivitySchema, insertDocumentSchema, insertParkImageSchema,
-  insertParkAmenitySchema, ExtendedPark, Park, Municipality, Amenity, Activity
+  insertParkAmenitySchema, insertVolunteerSchema, ExtendedPark, Park, Municipality, Amenity, Activity
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
