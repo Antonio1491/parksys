@@ -29,8 +29,8 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     const errors = [];
     
     for (let i = 0; i < activities.length; i++) {
+      let activityData = activities[i];
       try {
-        const activityData = activities[i];
         
         // Validar datos requeridos
         if (!activityData.title || !activityData.description) {
@@ -79,7 +79,7 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
         const newActivity = await (storage as any).createActivity(validatedData);
         importedActivities.push(newActivity);
         
-        console.log(`✅ Actividad importada: ${validatedData.title}`);
+        console.log(`✅ Actividad importada: ${(validatedData as any).title}`);
         
       } catch (error) {
         console.error(`❌ Error importando actividad en fila ${i + 2}:`, error);
@@ -89,8 +89,9 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
           console.error(`🚨 Error de validación Zod:`, validationError.message);
           errors.push(`Fila ${i + 2}: ${validationError.message}`);
         } else {
-          console.error(`🚨 Error general:`, error.message);
-          errors.push(`Fila ${i + 2}: ${error.message || 'Error desconocido'}`);
+          const errorMsg = (error as Error).message || 'Error desconocido';
+          console.error(`🚨 Error general:`, errorMsg);
+          errors.push(`Fila ${i + 2}: ${errorMsg}`);
         }
       }
     }
@@ -111,7 +112,7 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     res.status(500).json({ 
       success: false,
       message: "Error interno al importar actividades",
-      error: error.message 
+      error: (error as Error).message 
     });
   }
 });
@@ -332,7 +333,7 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
       // Procesar arrays JSON si existen
       if (activity.targetMarket) {
         try {
-          activity.targetMarket = JSON.parse(activity.targetMarket);
+          activity.targetMarket = JSON.parse(activity.targetMarket as string);
         } catch (e) {
           activity.targetMarket = [];
         }
@@ -342,7 +343,7 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
       
       if (activity.specialNeeds) {
         try {
-          activity.specialNeeds = JSON.parse(activity.specialNeeds);
+          activity.specialNeeds = JSON.parse(activity.specialNeeds as string);
         } catch (e) {
           activity.specialNeeds = [];
         }
@@ -352,7 +353,7 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
       
       if (activity.recurringDays) {
         try {
-          activity.recurringDays = JSON.parse(activity.recurringDays);
+          activity.recurringDays = JSON.parse(activity.recurringDays as string);
         } catch (e) {
           activity.recurringDays = [];
         }
