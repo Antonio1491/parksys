@@ -1464,6 +1464,16 @@ export class DatabaseStorage implements IStorage {
   async createPark(parkData: any): Promise<any> {
     try {
       console.log('🏗️ [STORAGE] Datos recibidos:', Object.keys(parkData));
+      console.log('🔍 [STORAGE] Área recibida:', parkData.area, typeof parkData.area);
+      
+      // Función para limpiar números (remover comas)
+      const cleanNumber = (value: any): string => {
+        if (value === null || value === undefined || value === '') return '0';
+        const cleaned = String(value).replace(/,/g, '').trim();
+        const result = cleaned === '' ? '0' : cleaned;
+        console.log('🧹 [STORAGE] Número limpiado:', value, '->', result);
+        return result;
+      };
       
       // ESTRATEGIA NUEVA: Construir objeto completamente limpio sin campos problemáticos
       const insertData = {
@@ -1475,7 +1485,7 @@ export class DatabaseStorage implements IStorage {
         postalCode: parkData.postalCode || '',
         latitude: parkData.latitude || '0',
         longitude: parkData.longitude || '0',
-        area: parkData.area || '0',
+        area: cleanNumber(parkData.area),
         foundationYear: parkData.foundationYear || new Date().getFullYear(),
         administrator: parkData.administrator || '',
         conservationStatus: parkData.conservationStatus || 'Good',

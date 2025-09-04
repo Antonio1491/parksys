@@ -259,7 +259,7 @@ export const processImportFile = async (req: Request, res: Response) => {
     
     // Verificar que el path existe, si no usar el buffer directamente
     let filePath = req.file.path;
-    let fileContent: string | Buffer;
+    let fileContent: string = '';
     
     if (!filePath && req.file.buffer) {
       console.log('🔄 [IMPORT] Usando buffer del archivo en memoria');
@@ -269,6 +269,8 @@ export const processImportFile = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Error al procesar el archivo subido' });
     } else {
       console.log('✅ [IMPORT] Usando archivo desde:', filePath);
+      // Inicializar fileContent cuando usamos filePath
+      fileContent = fs.readFileSync(filePath, 'utf8');
     }
     
     // Determinar el tipo de archivo y procesarlo
