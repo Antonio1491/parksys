@@ -137,9 +137,11 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   const roles = dynamicRoles || SYSTEM_ROLES;
   const role = roles.find(r => {
     if (useDynamic && dynamicRoles) {
-      return r.id === Number(roleId) || r.slug === roleId;
+      const dynamicRole = r as DynamicRole;
+      return dynamicRole.id === Number(roleId) || dynamicRole.slug === roleId;
     }
-    return r.id === roleId || r.id === String(roleId);
+    const staticRole = r as Role;
+    return staticRole.id === roleId || staticRole.id === String(roleId);
   });
   
   // Mostrar loading si estamos cargando datos dinámicos

@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { roleService } from "./roleService";
+import type { InsertUserRole } from "../shared/schema";
 import { roleSeeder } from "./roleSeeder";
 import { insertRoleSchema, insertUserSchema } from "../shared/schema";
 import { z } from "zod";
@@ -291,5 +292,194 @@ export function registerRoleRoutes(app: Express) {
     }
   });
 
-  console.log("✅ Rutas del sistema de roles registradas correctamente");
+  // ===== NUEVAS RUTAS PARA MÚLTIPLES ROLES POR USUARIO =====
+
+  // Obtener todos los roles de un usuario
+  app.get("/api/users/:userId/roles", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "ID de usuario inválido" });
+      }
+
+      const includeInactive = req.query.includeInactive === 'true';
+      const userRoles = await roleService.getUserRoles(userId, includeInactive);
+      
+      res.json(userRoles);
+    } catch (error) {
+      console.error("Error obteniendo roles del usuario:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Asignar rol a usuario
+  app.post("/api/users/:userId/roles", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { roleId, isPrimary, assignedBy } = req.body;
+
+      if (isNaN(userId) || !roleId) {
+        return res.status(400).json({ error: "Datos inválidos: userId y roleId son requeridos" });
+      }
+
+      // Verificar que el rol existe
+      const role = await roleService.getRoleById(roleId);
+      if (!role) {
+        return res.status(404).json({ error: "Rol no encontrado" });
+      }
+
+      const newUserRole = await roleService.assignRoleToUser(
+        userId, 
+        roleId, 
+        assignedBy, 
+        isPrimary || false
+      );
+      
+      res.status(201).json({
+        success: true,
+        message: "Rol asignado exitosamente",
+        userRole: newUserRole
+      });
+    } catch (error) {
+      console.error("Error asignando rol al usuario:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Remover rol específico de usuario
+  app.delete("/api/users/:userId/roles/:roleId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const roleId = parseInt(req.params.roleId);
+
+      if (isNaN(userId) || isNaN(roleId)) {
+        return res.status(400).json({ error: "IDs inválidos" });
+      }
+
+      const success = await roleService.removeRoleFromUser(userId, roleId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Asignación de rol no encontrada" });
+      }
+
+      res.json({ success: true, message: "Rol removido exitosamente" });
+    } catch (error) {
+      console.error("Error removiendo rol del usuario:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Establecer rol primario para usuario
+  app.put("/api/users/:userId/primary-role", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { roleId } = req.body;
+
+      if (isNaN(userId) || !roleId) {
+        return res.status(400).json({ error: "Datos inválidos: userId y roleId son requeridos" });
+      }
+
+      const success = await roleService.setPrimaryRole(userId, roleId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "No se pudo establecer el rol como primario" });
+      }
+
+      res.json({ success: true, message: "Rol primario establecido exitosamente" });
+    } catch (error) {
+      console.error("Error estableciendo rol primario:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Obtener rol primario del usuario
+  app.get("/api/users/:userId/primary-role", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "ID de usuario inválido" });
+      }
+
+      const primaryRole = await roleService.getPrimaryRole(userId);
+      
+      if (!primaryRole) {
+        return res.status(404).json({ error: "Usuario no tiene rol primario definido" });
+      }
+
+      res.json(primaryRole);
+    } catch (error) {
+      console.error("Error obteniendo rol primario:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Verificar si usuario tiene múltiples roles
+  app.get("/api/users/:userId/has-multiple-roles", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "ID de usuario inválido" });
+      }
+
+      const hasMultiple = await roleService.hasMultipleRoles(userId);
+      
+      res.json({ hasMultipleRoles: hasMultiple });
+    } catch (error) {
+      console.error("Error verificando múltiples roles:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Obtener permisos completos del usuario (actualizado para múltiples roles)
+  app.get("/api/users/:id/comprehensive-permissions", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "ID de usuario inválido" });
+      }
+
+      const permissions = await roleService.getUserPermissions(id);
+      res.json(permissions);
+    } catch (error) {
+      console.error("Error obteniendo permisos completos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Asignación masiva de roles (para administradores)
+  app.post("/api/users/:userId/roles/bulk", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { roleIds, assignedBy } = req.body;
+
+      if (isNaN(userId) || !Array.isArray(roleIds) || roleIds.length === 0) {
+        return res.status(400).json({ error: "Datos inválidos: userId y roleIds (array) son requeridos" });
+      }
+
+      const results = [];
+      
+      for (let i = 0; i < roleIds.length; i++) {
+        const roleId = roleIds[i];
+        const isPrimary = i === 0; // El primer rol será el primario
+        
+        try {
+          const newUserRole = await roleService.assignRoleToUser(userId, roleId, assignedBy, isPrimary);
+          results.push({ success: true, roleId, userRole: newUserRole });
+        } catch (error) {
+          results.push({ success: false, roleId, error: error.message });
+        }
+      }
+
+      res.json({
+        success: true,
+        message: `Asignación masiva completada`,
+        results
+      });
+    } catch (error) {
+      console.error("Error en asignación masiva de roles:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  console.log("✅ Rutas del sistema de roles (incluye múltiples roles) registradas correctamente");
 }

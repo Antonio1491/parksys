@@ -1,9 +1,133 @@
 import { db } from './db';
-import { roles, users } from '../shared/schema';
-import { eq, asc } from 'drizzle-orm';
-import type { Role, User, InsertRole } from '../shared/schema';
+import { roles, users, userRoles } from '../shared/schema';
+import { eq, asc, and, inArray } from 'drizzle-orm';
+import type { Role, User, InsertRole, UserRole, InsertUserRole } from '../shared/schema';
 
 export class RoleService {
+  
+  // ===== MÉTODOS PARA MÚLTIPLES ROLES =====
+  
+  // Obtener todos los roles de un usuario
+  async getUserRoles(userId: number, includeInactive = false): Promise<(UserRole & { role: Role })[]> {
+    const query = db
+      .select({
+        id: userRoles.id,
+        userId: userRoles.userId,
+        roleId: userRoles.roleId,
+        isPrimary: userRoles.isPrimary,
+        assignedBy: userRoles.assignedBy,
+        assignedAt: userRoles.assignedAt,
+        expiresAt: userRoles.expiresAt,
+        isActive: userRoles.isActive,
+        createdAt: userRoles.createdAt,
+        updatedAt: userRoles.updatedAt,
+        role: roles
+      })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(eq(userRoles.userId, userId));
+      
+    if (!includeInactive) {
+      query.where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.isActive, true),
+        eq(roles.isActive, true)
+      ));
+    }
+    
+    return await query.orderBy(asc(roles.level));
+  }
+  
+  // Asignar rol a usuario
+  async assignRoleToUser(userId: number, roleId: number, assignedBy?: number, isPrimary = false): Promise<UserRole> {
+    // Si es rol primario, quitar la marca de otros roles
+    if (isPrimary) {
+      await db
+        .update(userRoles)
+        .set({ isPrimary: false, updatedAt: new Date() })
+        .where(eq(userRoles.userId, userId));
+    }
+    
+    const [newUserRole] = await db
+      .insert(userRoles)
+      .values({
+        userId,
+        roleId,
+        isPrimary,
+        assignedBy,
+        assignedAt: new Date(),
+        isActive: true
+      })
+      .returning();
+      
+    return newUserRole;
+  }
+  
+  // Remover rol de usuario
+  async removeRoleFromUser(userId: number, roleId: number): Promise<boolean> {
+    const result = await db
+      .delete(userRoles)
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.roleId, roleId)
+      ))
+      .returning();
+      
+    return result.length > 0;
+  }
+  
+  // Establecer rol como primario
+  async setPrimaryRole(userId: number, roleId: number): Promise<boolean> {
+    // Primero quitar la marca primaria de todos los roles
+    await db
+      .update(userRoles)
+      .set({ isPrimary: false, updatedAt: new Date() })
+      .where(eq(userRoles.userId, userId));
+    
+    // Luego establecer el rol específico como primario
+    const result = await db
+      .update(userRoles)
+      .set({ isPrimary: true, updatedAt: new Date() })
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.roleId, roleId)
+      ))
+      .returning();
+      
+    return result.length > 0;
+  }
+  
+  // Obtener rol primario del usuario
+  async getPrimaryRole(userId: number): Promise<Role | null> {
+    const result = await db
+      .select({ role: roles })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.isPrimary, true),
+        eq(userRoles.isActive, true),
+        eq(roles.isActive, true)
+      ))
+      .limit(1);
+      
+    return result[0]?.role || null;
+  }
+  
+  // Verificar si un usuario tiene múltiples roles
+  async hasMultipleRoles(userId: number): Promise<boolean> {
+    const result = await db
+      .select({ count: userRoles.id })
+      .from(userRoles)
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.isActive, true)
+      ));
+      
+    return result.length > 1;
+  }
+  
+  // ===== MÉTODOS ACTUALIZADOS PARA COMPATIBILIDAD =====
   
   // Obtener todos los roles ordenados por nivel jerárquico
   async getAllRoles(): Promise<Role[]> {
@@ -22,31 +146,69 @@ export class RoleService {
     return result[0] || null;
   }
 
-  // Verificar si un usuario tiene un nivel de rol específico o superior
+  // Verificar si un usuario tiene un nivel de rol específico o superior (ACTUALIZADO para múltiples roles)
   async hasRoleLevel(userId: number, requiredLevel: number): Promise<boolean> {
-    const result = await db
+    // Primero intentar con múltiples roles
+    const multiRoleResult = await db
+      .select({ level: roles.level })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.isActive, true),
+        eq(roles.isActive, true)
+      ))
+      .orderBy(asc(roles.level)); // Ordenar por nivel, el más bajo (más autoridad) primero
+    
+    if (multiRoleResult.length > 0) {
+      // Si tiene múltiples roles, verificar si alguno cumple el nivel requerido
+      return multiRoleResult.some(r => r.level <= requiredLevel);
+    }
+    
+    // Fallback: usar el sistema legacy de rol único
+    const legacyResult = await db
       .select({ level: roles.level })
       .from(users)
       .innerJoin(roles, eq(users.roleId, roles.id))
       .where(eq(users.id, userId));
     
-    if (!result[0]) return false;
+    if (!legacyResult[0]) return false;
     
     // Niveles más bajos tienen mayor autoridad (1 = Super Admin, 7 = Consultor)
-    return result[0].level <= requiredLevel;
+    return legacyResult[0].level <= requiredLevel;
   }
 
-  // Verificar si un usuario tiene una permiso específico
+  // Verificar si un usuario tiene un permiso específico (ACTUALIZADO para múltiples roles)
   async hasPermission(userId: number, permission: string): Promise<boolean> {
-    const result = await db
+    // Primero intentar con múltiples roles
+    const multiRoleResult = await db
+      .select({ permissions: roles.permissions, level: roles.level })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.isActive, true),
+        eq(roles.isActive, true)
+      ));
+    
+    if (multiRoleResult.length > 0) {
+      // Combinar permisos de todos los roles activos
+      return this.checkCombinedPermissions(multiRoleResult.map(r => ({
+        permissions: r.permissions as Record<string, any>,
+        level: r.level
+      })), permission);
+    }
+    
+    // Fallback: usar el sistema legacy de rol único
+    const legacyResult = await db
       .select({ permissions: roles.permissions })
       .from(users)
       .innerJoin(roles, eq(users.roleId, roles.id))
       .where(eq(users.id, userId));
     
-    if (!result[0]) return false;
+    if (!legacyResult[0]) return false;
     
-    const permissions = result[0].permissions as Record<string, any>;
+    const permissions = legacyResult[0].permissions as Record<string, any>;
     
     // Super Admin tiene todos los permisos
     if (permissions.all === true) return true;
@@ -71,6 +233,73 @@ export class RoleService {
     }
     
     return current === true;
+  }
+  
+  // Método privado para combinar permisos de múltiples roles
+  private checkCombinedPermissions(rolePermissions: Array<{ permissions: Record<string, any>, level: number }>, permission: string): boolean {
+    // Si algún rol tiene permisos totales, conceder acceso
+    if (rolePermissions.some(rp => rp.permissions.all === true)) {
+      return true;
+    }
+    
+    // Verificar si algún rol tiene el permiso específico
+    for (const rolePermission of rolePermissions) {
+      if (this.checkPermissionInObject(rolePermission.permissions, permission)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  // Método privado para combinar permisos de múltiples roles
+  private combineMultiplePermissions(permissionsArray: Record<string, any>[]): Record<string, any> {
+    const combined: Record<string, any> = {};
+    
+    for (const permissions of permissionsArray) {
+      // Si algún rol tiene acceso total, el resultado final lo tendrá
+      if (permissions.all === true) {
+        return { all: true };
+      }
+      
+      // Combinar permisos específicos
+      this.mergePermissions(combined, permissions);
+    }
+    
+    return combined;
+  }
+  
+  // Método privado para fusionar permisos recursivamente
+  private mergePermissions(target: Record<string, any>, source: Record<string, any>): void {
+    for (const [key, value] of Object.entries(source)) {
+      if (key === 'all' && value === true) {
+        target[key] = true;
+        return;
+      }
+      
+      if (typeof value === 'boolean') {
+        // Si el valor es boolean, usar OR lógico (más permisivo gana)
+        target[key] = target[key] === true || value === true;
+      } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        // Si es objeto (no array), recursivamente combinar
+        if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
+          target[key] = {};
+        }
+        this.mergePermissions(target[key], value);
+      } else if (Array.isArray(value)) {
+        // Si es array, combinar arrays eliminando duplicados
+        if (!target[key]) {
+          target[key] = [...value];
+        } else if (Array.isArray(target[key])) {
+          target[key] = [...new Set([...target[key], ...value])];
+        } else {
+          target[key] = [...value];
+        }
+      } else {
+        // Para otros tipos, tomar el valor
+        target[key] = value;
+      }
+    }
   }
 
   // Obtener estadísticas de usuarios por rol
@@ -193,21 +422,50 @@ export class RoleService {
     }
   }
 
-  // Verificar permisos de módulo específico
+  // Verificar permisos de módulo específico (ACTUALIZADO para múltiples roles)
   async hasModulePermission(
     userId: number, 
     module: string, 
     permission: 'read' | 'write' | 'admin'
   ): Promise<boolean> {
-    const result = await db
+    // Primero intentar con múltiples roles
+    const multiRoleResult = await db
+      .select({ permissions: roles.permissions })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.isActive, true),
+        eq(roles.isActive, true)
+      ));
+    
+    if (multiRoleResult.length > 0) {
+      // Verificar si alguno de los roles tiene el permiso del módulo
+      for (const roleResult of multiRoleResult) {
+        const permissions = roleResult.permissions as Record<string, any>;
+        
+        // Super Admin tiene todos los permisos
+        if (permissions.all === true) return true;
+        
+        // Verificar permiso específico del módulo
+        const modulePermissions = permissions[module];
+        if (modulePermissions && Array.isArray(modulePermissions) && modulePermissions.includes(permission)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // Fallback: sistema legacy
+    const legacyResult = await db
       .select({ permissions: roles.permissions })
       .from(users)
       .innerJoin(roles, eq(users.roleId, roles.id))
       .where(eq(users.id, userId));
     
-    if (!result[0]) return false;
+    if (!legacyResult[0]) return false;
     
-    const permissions = result[0].permissions as Record<string, any>;
+    const permissions = legacyResult[0].permissions as Record<string, any>;
     
     // Super Admin tiene todos los permisos
     if (permissions.all === true) return true;
@@ -219,36 +477,103 @@ export class RoleService {
     return modulePermissions.includes(permission);
   }
 
-  // Obtener permisos completos de un usuario
-  async getUserPermissions(userId: number): Promise<Record<string, string[]> | null> {
-    const result = await db
+  // Obtener permisos completos de un usuario (ACTUALIZADO para múltiples roles)
+  async getUserPermissions(userId: number): Promise<Record<string, any>> {
+    // Primero intentar con múltiples roles
+    const multiRoleResult = await db
       .select({ 
         permissions: roles.permissions,
-        roleLevel: roles.level,
-        roleName: roles.name
+        level: roles.level,
+        roleName: roles.name,
+        roleSlug: roles.slug,
+        isPrimary: userRoles.isPrimary
+      })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.isActive, true),
+        eq(roles.isActive, true)
+      ))
+      .orderBy(asc(roles.level));
+    
+    if (multiRoleResult.length > 0) {
+      // Usuario tiene múltiples roles - combinar permisos
+      const combinedPermissions = this.combineMultiplePermissions(
+        multiRoleResult.map(r => r.permissions as Record<string, any>)
+      );
+      
+      const primaryRole = multiRoleResult.find(r => r.isPrimary) || multiRoleResult[0];
+      
+      return {
+        userId,
+        roles: multiRoleResult.map(r => ({
+          name: r.roleName,
+          slug: r.roleSlug,
+          level: r.level,
+          isPrimary: r.isPrimary,
+          permissions: r.permissions
+        })),
+        primaryRole: {
+          name: primaryRole.roleName,
+          slug: primaryRole.roleSlug,
+          level: primaryRole.level
+        },
+        combinedPermissions,
+        // Metadata adicional
+        metadata: {
+          source: 'multiple_roles',
+          roleCount: multiRoleResult.length,
+          hasMultipleRoles: multiRoleResult.length > 1,
+          timestamp: new Date().toISOString()
+        }
+      };
+    }
+    
+    // Fallback: sistema legacy de rol único
+    const legacyResult = await db
+      .select({ 
+        permissions: roles.permissions,
+        level: roles.level,
+        roleName: roles.name,
+        roleSlug: roles.slug 
       })
       .from(users)
       .innerJoin(roles, eq(users.roleId, roles.id))
       .where(eq(users.id, userId));
     
-    if (!result[0]) return null;
-    
-    const permissions = result[0].permissions as Record<string, any>;
-    
-    // Si es super admin, generar permisos completos
-    if (permissions.all === true) {
-      return {
-        'Configuración': ['read', 'write', 'admin'],
-        'Gestión': ['read', 'write', 'admin'],
-        'Operaciones': ['read', 'write', 'admin'],
-        'Finanzas': ['read', 'write', 'admin'],
-        'Marketing': ['read', 'write', 'admin'],
-        'RH': ['read', 'write', 'admin'],
-        'Seguridad': ['read', 'write', 'admin']
-      };
+    if (!legacyResult[0]) {
+      return { userId, permissions: {}, metadata: { source: 'none' } };
     }
-
-    return permissions as Record<string, string[]>;
+    
+    const permissions = legacyResult[0].permissions as Record<string, any>;
+    
+    // Si es super admin, expandir permisos
+    const expandedPermissions = permissions.all === true ? {
+      'Configuración': ['read', 'write', 'admin'],
+      'Gestión': ['read', 'write', 'admin'],
+      'Operaciones': ['read', 'write', 'admin'],
+      'Finanzas': ['read', 'write', 'admin'],
+      'Marketing': ['read', 'write', 'admin'],
+      'RH': ['read', 'write', 'admin'],
+      'Seguridad': ['read', 'write', 'admin']
+    } : permissions;
+    
+    return {
+      userId,
+      role: {
+        name: legacyResult[0].roleName,
+        slug: legacyResult[0].roleSlug,
+        level: legacyResult[0].level
+      },
+      permissions: expandedPermissions,
+      // Metadata adicional para debugging
+      metadata: {
+        source: 'single_role_legacy',
+        hasMultipleRoles: false,
+        timestamp: new Date().toISOString()
+      }
+    };
   }
 
   // Actualizar permisos de rol

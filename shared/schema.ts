@@ -460,6 +460,24 @@ export const users = pgTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+// ===== TABLA INTERMEDIA PARA MÚLTIPLES ROLES POR USUARIO =====
+// Tabla user_roles - Relación many-to-many entre usuarios y roles
+export const userRoles = pgTable("user_roles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  roleId: integer("role_id").notNull().references(() => roles.id, { onDelete: 'cascade' }),
+  isPrimary: boolean("is_primary").default(false), // Indica si es el rol principal del usuario
+  assignedBy: integer("assigned_by").references(() => users.id), // Usuario que asignó el rol
+  assignedAt: timestamp("assigned_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at"), // Opcional: roles temporales
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
+export type UserRole = typeof userRoles.$inferSelect;
+export type InsertUserRole = typeof userRoles.$inferInsert;
+
 export const insertUserSchema = createInsertSchema(users).omit({ 
   id: true,
   createdAt: true,
@@ -467,7 +485,8 @@ export const insertUserSchema = createInsertSchema(users).omit({
 });
 
 export const rolesRelations = relations(roles, ({ many }) => ({
-  users: many(users),
+  users: many(users), // Relación legacy - mantener para compatibilidad
+  userRoles: many(userRoles), // Nueva relación many-to-many
 }));
 
 // Elementos adicionales necesarios para el funcionamiento del sistema
@@ -1027,6 +1046,23 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   userRole: one(roles, {
     fields: [users.roleId],
     references: [roles.id],
+  }), // Relación legacy - mantener para compatibilidad
+  userRoles: many(userRoles), // Nueva relación many-to-many
+}));
+
+// Relaciones para la tabla intermedia user_roles
+export const userRolesRelations = relations(userRoles, ({ one }) => ({
+  user: one(users, {
+    fields: [userRoles.userId],
+    references: [users.id],
+  }),
+  role: one(roles, {
+    fields: [userRoles.roleId],
+    references: [roles.id],
+  }),
+  assignedByUser: one(users, {
+    fields: [userRoles.assignedBy],
+    references: [users.id],
   })
 }));
 

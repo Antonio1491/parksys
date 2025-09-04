@@ -90,7 +90,7 @@ export const DynamicRoleGuard: React.FC<DynamicRoleGuardProps> = ({
 
   // Mostrar loading mientras se cargan los datos
   if (rolesLoading || permissionsLoading || (requiredModule && modulePermissionLoading)) {
-    return <div className=\"animate-pulse bg-gray-200 rounded h-4 w-16\"></div>;
+    return <div className="animate-pulse bg-gray-200 rounded h-4 w-16"></div>;
   }
 
   // Si no se pudieron cargar los datos, denegar acceso
@@ -126,31 +126,72 @@ export const DynamicRoleGuard: React.FC<DynamicRoleGuardProps> = ({
   return <>{children}</>;
 };
 
-// Hook mejorado para verificar permisos con datos dinámicos
+// Hook mejorado para verificar permisos con datos dinámicos (ACTUALIZADO para múltiples roles)
 export const useDynamicPermissions = (userId: number = 1) => {
   const { data: roles } = useDynamicRoles();
-  const { data: userPermissions } = useUserPermissions(userId);
+  const { data: userPermissions } = useUserComprehensivePermissions(userId);
 
   const hasPermission = (module: SystemModule, permission: PermissionType): boolean => {
-    if (!userPermissions?.permissions) return false;
+    // Para múltiples roles, usar combinedPermissions
+    const permissions = userPermissions?.combinedPermissions || userPermissions?.permissions || {};
     
-    const modulePermissions = userPermissions.permissions[module];
+    // Si tiene permisos totales
+    if (permissions.all === true) return true;
+    
+    const modulePermissions = permissions[module];
     return modulePermissions ? modulePermissions.includes(permission) : false;
   };
 
   const hasModuleAccess = (module: SystemModule): boolean => {
-    if (!userPermissions?.permissions) return false;
+    // Para múltiples roles, usar combinedPermissions
+    const permissions = userPermissions?.combinedPermissions || userPermissions?.permissions || {};
     
-    const modulePermissions = userPermissions.permissions[module];
-    return modulePermissions ? modulePermissions.length > 0 : false;
+    // Si tiene permisos totales
+    if (permissions.all === true) return true;
+    
+    const modulePermissions = permissions[module];
+    return modulePermissions && modulePermissions.length > 0;
   };
 
   const canRead = (module: SystemModule) => hasPermission(module, 'read');
   const canWrite = (module: SystemModule) => hasPermission(module, 'write');
   const canAdmin = (module: SystemModule) => hasPermission(module, 'admin');
 
-  // Obtener información del rol del usuario
-  const userRole = roles?.find(r => r.level === 1); // Por ahora Super Admin para desarrollo
+  const getUserRoleLevel = (): number | null => {
+    if (!userPermissions) return null;
+    
+    // Para múltiples roles, devolver el nivel más alto (menor número)
+    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length > 0) {
+      return Math.min(...userPermissions.roles.map(role => role.level));
+    }
+    
+    // Para rol único, devolver el nivel del rol
+    return userPermissions.role?.level || null;
+  };
+
+  const getUserRoles = () => {
+    if (!userPermissions) return [];
+    
+    // Para múltiples roles
+    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length > 0) {
+      return userPermissions.roles;
+    }
+    
+    // Para rol único
+    return userPermissions.role ? [userPermissions.role] : [];
+  };
+
+  const getPrimaryRole = () => {
+    if (!userPermissions) return null;
+    
+    // Para múltiples roles, devolver el rol primario
+    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.primaryRole) {
+      return userPermissions.primaryRole;
+    }
+    
+    // Para rol único
+    return userPermissions.role || null;
+  };
 
   return {
     hasPermission,
@@ -158,8 +199,14 @@ export const useDynamicPermissions = (userId: number = 1) => {
     canRead,
     canWrite,
     canAdmin,
-    userRole,
-    roleLevel: userRole?.level || 0,
+    getUserRoleLevel,
+    getUserRoles,
+    getPrimaryRole,
+    hasMultipleRoles: userPermissions?.metadata?.hasMultipleRoles || false,
+    userRole: getPrimaryRole(), // Compatibilidad con código existente
+    roleLevel: getUserRoleLevel() || 0,
+    roles,
+    userPermissions,
     isLoading: !roles || !userPermissions
   };
 };
