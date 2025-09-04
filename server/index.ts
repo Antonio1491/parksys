@@ -88,11 +88,14 @@ if (isProductionMode) {
       console.log(`🔍 [ROOT] Request: Accept=${acceptHeader}, UserAgent=${userAgent}`);
       
       // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
-      const isHealthCheck = !acceptHeader?.includes('text/html') || 
+      // FIXED: Only detect actual health checks, not browser requests
+      const isHealthCheck = (
         userAgent?.includes('GoogleHC') || 
         userAgent?.includes('kube-probe') ||
         userAgent?.includes('ELB-HealthChecker') ||
-        acceptHeader === '*/*';
+        userAgent?.includes('curl') ||
+        userAgent?.includes('wget')
+      ) && !acceptHeader?.includes('text/html');
       
       if (isHealthCheck) {
         console.log(`🏥 [ROOT] Health check detected, returning OK`);
@@ -105,7 +108,7 @@ if (isProductionMode) {
       console.log(`🌐 [ROOT] Browser request detected, serving React app`);
       
       // Serve the React app for browser requests (only when not health check)
-      const indexPath = path.join(process.cwd(), 'public', 'index.html');
+      const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
       console.log(`📁 [ROOT] Looking for index.html at: ${indexPath}`);
       
       if (fs.existsSync(indexPath)) {
@@ -114,7 +117,8 @@ if (isProductionMode) {
       } else {
         console.log(`❌ [ROOT] index.html not found at ${indexPath}`);
         console.log(`📂 [ROOT] Current working directory: ${process.cwd()}`);
-        console.log(`📂 [ROOT] Checking if public directory exists: ${fs.existsSync(path.join(process.cwd(), 'public'))}`);
+        console.log(`📂 [ROOT] Checking if dist/public directory exists: ${fs.existsSync(path.join(process.cwd(), 'dist', 'public'))}`);
+        console.log(`📂 [ROOT] Available files in dist/public:`, fs.existsSync(path.join(process.cwd(), 'dist', 'public')) ? fs.readdirSync(path.join(process.cwd(), 'dist', 'public')) : 'directory does not exist');
         res.status(503).send('Application not built. Please run npm run build first.');
       }
     } catch (error) {
