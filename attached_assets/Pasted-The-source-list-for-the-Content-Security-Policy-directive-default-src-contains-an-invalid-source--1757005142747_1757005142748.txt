@@ -1,0 +1,644 @@
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+14The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+14The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+ParkSys:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+ParkSys:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+ParkSys:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+stallwart.build.js:1 stallwart: failed ping 1
+_app-ed957290dfbc6b7b.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-ed957290dfbc6b7b.js:38 [LaunchDarkly] LaunchDarkly client initialized
+_app-ed957290dfbc6b7b.js:1 Uncaught (in promise) TypeError: i.enterprise.execute is not a function
+    at _app-ed957290dfbc6b7b.js:1:43079Understand this error
+ParkSys:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+9Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+5Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+5Unrecognized feature: 'battery'.Understand this warning
+5Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+5Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+5Unrecognized feature: 'layout-animations'.Understand this warning
+5Unrecognized feature: 'legacy-image-formats'.Understand this warning
+5Unrecognized feature: 'navigation-override'.Understand this warning
+5Unrecognized feature: 'oversized-images'.Understand this warning
+5Unrecognized feature: 'publickey-credentials'.Understand this warning
+5Unrecognized feature: 'speaker-selection'.Understand this warning
+5Unrecognized feature: 'unoptimized-images'.Understand this warning
+5Unrecognized feature: 'unsized-media'.Understand this warning
+framework-d12711ff36e2d472.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-d12711ff36e2d472.js:1Understand this warning
+5Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+5Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+eruda.js:2 🌐 [QUERY] GET /api/parks
+eruda.js:2 🌐 [QUERY] GET /api/sponsors
+eruda.js:2 🌐 [QUERY] GET /api/events
+eruda.js:2 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+Mt.forEach.n.<computed> @ eruda.js:2Understand this warning
+eruda.js:2 i18next::backendConnector: loaded namespace common for language es [object Object]
+eruda.js:2 i18next: languageChanged es
+eruda.js:2 i18next: initialized [object Object]
+eruda.js:2 Respuesta del servidor: [object Object]
+eruda.js:2 🌐 [QUERY] GET /api/activities
+eruda.js:2 🌐 [QUERY] GET /api/users
+eruda.js:2 🌐 [QUERY] GET /api/hr/employees
+eruda.js:2 🌐 [QUERY] GET /api/volunteers
+eruda.js:2 🌐 [QUERY] GET /api/active-concessions
+profile-1756839040343-466559270.png:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+eruda.js:2 i18next::backendConnector: loaded namespace parks for language es [object Object]
+eruda.js:2 🌐 [QUERY] GET /api/parks
+profile-1756839040343-466559270.png:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+eruda.js:2 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+eruda.js:2 i18next::backendConnector: loaded namespace common for language es Object
+eruda.js:2 i18next: languageChanged es
+eruda.js:2 i18next: initialized Object
+profile-1756839040343-466559270.png:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+eruda.js:2 🚀 Enviando solicitud de importación... Parques Final.csv
+eruda.js:2 📡 Respuesta del servidor: 200 OK
+eruda.js:2 📋 Resultado: Object
+eruda.js:2 [vite] server connection lost. Polling for restart...
+workspace_iframe.html?initialPath=%2F&id=%3Ardm%3A:151  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/ 404 (Not Found)
+(anonymous) @ workspace_iframe.html?initialPath=%2F&id=%3Ardm%3A:151Understand this error
+  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/ 404 (Not Found)
+(anonymous) @ workspace_iframe.htm…2F&id=%3Ardm%3A:151Understand this error
+  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/ 404 (Not Found)
+(anonymous) @ workspace_iframe.htm…2F&id=%3Ardm%3A:151Understand this error
+9Refused to load the script '<URL>' because it violates the following Content Security Policy directive: "default-src 'none'". Note that 'script-src-elem' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+(index):1 Refused to execute inline event handler because it violates the following Content Security Policy directive: "default-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. Note also that 'script-src' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+(index):1 Refused to execute inline event handler because it violates the following Content Security Policy directive: "default-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. Note also that 'script-src' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+(index):1 Refused to execute inline event handler because it violates the following Content Security Policy directive: "default-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. Note also that 'script-src' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+Console.js:61 🌐 [QUERY] GET /api/parks
+Console.js:61 🌐 [QUERY] GET /api/sponsors
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+Mt.forEach.n.<computed> @ Console.js:61
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+google.maps.Load @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+Console.js:61 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+Console.js:61 i18next: languageChanged es
+Console.js:61 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+Console.js:61 🌐 [QUERY] GET /api/parks
+Console.js:61 🌐 [QUERY] GET /api/sponsors
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+Mt.forEach.n.<computed> @ Console.js:61
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+google.maps.Load @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+Console.js:61 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+Console.js:61 i18next: languageChanged es
+Console.js:61 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+Console.js:61 Respuesta del servidor: {user: {…}, token: 'direct-token-1757005074658'}
+Console.js:61 🌐 [QUERY] GET /api/activities
+Console.js:61 🌐 [QUERY] GET /api/users
+Console.js:61 🌐 [QUERY] GET /api/hr/employees
+Console.js:61 🌐 [QUERY] GET /api/volunteers
+Console.js:61 🌐 [QUERY] GET /api/active-concessions
+profile-1756839040343-466559270.png:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/profiles/profile-1756839040343-466559270.png 404 (Not Found)
+Image
+resolveLoadingStatus @ @radix-ui_react-avatar.js?v=a5b62361:90
+(anonymous) @ @radix-ui_react-avatar.js?v=a5b62361:108
+commitHookEffectListMount @ chunk-SKRUXVEK.js?v=a5b62361:16915
+commitLayoutEffectOnFiber @ chunk-SKRUXVEK.js?v=a5b62361:17002
+commitLayoutMountEffects_complete @ chunk-SKRUXVEK.js?v=a5b62361:17980
+commitLayoutEffects_begin @ chunk-SKRUXVEK.js?v=a5b62361:17969
+commitLayoutEffects @ chunk-SKRUXVEK.js?v=a5b62361:17920
+commitRootImpl @ chunk-SKRUXVEK.js?v=a5b62361:19353
+commitRoot @ chunk-SKRUXVEK.js?v=a5b62361:19277
+finishConcurrentRender @ chunk-SKRUXVEK.js?v=a5b62361:18805
+performConcurrentWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18718
+workLoop @ chunk-SKRUXVEK.js?v=a5b62361:197
+flushWork @ chunk-SKRUXVEK.js?v=a5b62361:176
+performWorkUntilDeadline @ chunk-SKRUXVEK.js?v=a5b62361:384Understand this error
+Console.js:61 🌐 [QUERY] GET /api/actividades-fotos
+Console.js:61 🌐 [QUERY] GET /api/activity-categories
+profile-1756839040343-466559270.png:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/profiles/profile-1756839040343-466559270.png 404 (Not Found)
+Image
+resolveLoadingStatus @ @radix-ui_react-avatar.js?v=a5b62361:90
+(anonymous) @ @radix-ui_react-avatar.js?v=a5b62361:108
+commitHookEffectListMount @ chunk-SKRUXVEK.js?v=a5b62361:16915
+commitLayoutEffectOnFiber @ chunk-SKRUXVEK.js?v=a5b62361:17002
+commitLayoutMountEffects_complete @ chunk-SKRUXVEK.js?v=a5b62361:17980
+commitLayoutEffects_begin @ chunk-SKRUXVEK.js?v=a5b62361:17969
+commitLayoutEffects @ chunk-SKRUXVEK.js?v=a5b62361:17920
+commitRootImpl @ chunk-SKRUXVEK.js?v=a5b62361:19353
+commitRoot @ chunk-SKRUXVEK.js?v=a5b62361:19277
+finishConcurrentRender @ chunk-SKRUXVEK.js?v=a5b62361:18805
+performConcurrentWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18718
+workLoop @ chunk-SKRUXVEK.js?v=a5b62361:197
+flushWork @ chunk-SKRUXVEK.js?v=a5b62361:176
+performWorkUntilDeadline @ chunk-SKRUXVEK.js?v=a5b62361:384Understand this error
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ chunk-PZOYHTW2.js?v=a5b62361:339
+commitHookEffectListMount @ chunk-SKRUXVEK.js?v=a5b62361:16915
+commitPassiveMountOnFiber @ chunk-SKRUXVEK.js?v=a5b62361:18156
+commitPassiveMountEffects_complete @ chunk-SKRUXVEK.js?v=a5b62361:18129
+commitPassiveMountEffects_begin @ chunk-SKRUXVEK.js?v=a5b62361:18119
+commitPassiveMountEffects @ chunk-SKRUXVEK.js?v=a5b62361:18109
+flushPassiveEffectsImpl @ chunk-SKRUXVEK.js?v=a5b62361:19490
+flushPassiveEffects @ chunk-SKRUXVEK.js?v=a5b62361:19447
+commitRootImpl @ chunk-SKRUXVEK.js?v=a5b62361:19416
+commitRoot @ chunk-SKRUXVEK.js?v=a5b62361:19277
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18895
+flushSyncCallbacks @ chunk-SKRUXVEK.js?v=a5b62361:9119
+(anonymous) @ chunk-SKRUXVEK.js?v=a5b62361:18627Understand this warning
+Console.js:61 🚀 INICIANDO IMPORTACIÓN CSV
+Console.js:61 📁 Archivo seleccionado: Parques Final.csv 9913 bytes
+Console.js:61 📄 Contenido del archivo CSV (primeros 500 caracteres): nombre,municipio_id,direccion,descripcion,codigo_postal,latitud,longitud,area,ano_fundacion,horario_lunes,horario_martes,horario_miercoles,horario_jueves,horario_viernes,horario_sabado,horario_domingo,administrador,telefono_contacto,email_contacto,certificaciones,,,,,,,
+Parque Ecológico Explora,León,"Blvd. Francisco Villa 202, Col. La Martinica","Parque interactivo orientado a la ciencia y la tecnología, con museos, exposiciones, áreas verdes y actividades educativas. Destaca por su Museo de Ci
+Console.js:61 📋 Headers encontrados: (27) ['nombre', 'municipio_id', 'direccion', 'descripcion', 'codigo_postal', 'latitud', 'longitud', 'area', 'ano_fundacion', 'horario_lunes', 'horario_martes', 'horario_miercoles', 'horario_jueves', 'horario_viernes', 'horario_sabado', 'horario_domingo', 'administrador', 'telefono_contacto', 'email_contacto', 'certificaciones', '', '', '', '', '', '', '']
+Console.js:61 📊 Total de columnas en header: 27
+Console.js:61 📝 Procesando fila 2: 27 valores: (27) ['Parque Ecológico Explora', 'León', 'Blvd. Francisco Villa 202, Col. La Martinica', 'Parque interactivo orientado a la ciencia y la tec… con lagos, zonas de picnic y eventos familiares.', '37500', '21.1215', '-101.682', '160,000', '1994', '', '', '', '', '', '', '', 'Claudia Méndez Ortega', '(55) 1234 5678', 'contacto@parqueecologicoexplora.mx', 'Ninguna', '', '', 'IDs de Municipios (AMG):', '', 'Campos obligatorios:', '', 'Formato de horarios:']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Ecológico Explora', 'León', 'Blvd. Francisco Villa 202, Col. La Martinica', 'Parque interactivo orientado a la ciencia y la tec… con lagos, zonas de picnic y eventos familiares.', '37500', '21.1215', '-101.682', '160,000', '1994', '', '', '', '', '', '', '', 'Claudia Méndez Ortega', '(55) 1234 5678', 'contacto@parqueecologicoexplora.mx', 'Ninguna', '', '', 'IDs de Municipios (AMG):', '', 'Campos obligatorios:', '', 'Formato de horarios:']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Ecológico Explora"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "León"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Blvd. Francisco Villa 202, Col. La Martinica"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Parque interactivo orientado a la ciencia y la tecnología, con museos, exposiciones, áreas verdes y actividades educativas. Destaca por su Museo de Ciencias Explora y espacios recreativos con lagos, zonas de picnic y eventos familiares."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "37500"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "21.1215"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-101.682"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "160,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1994"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Claudia Méndez Ortega"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(55) 1234 5678"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parqueecologicoexplora.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "IDs de Municipios (AMG):"
+Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "Campos obligatorios:"
+Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "Formato de horarios:"
+Console.js:61 📝 Procesando fila 3: 27 valores: (27) ['Parque Fundidora', 'Monterrey', 'Av. Fundidora S/N, Obrera', 'Antigua siderúrgica transformada en parque urbano …mblemáticos de reconversión industrial en México.', '64010', '25.675', '-100.286', '1,420,000', '1988', '', '', '', '', '', '', '', 'Jorge Luis Ramírez Torres', '(81) 2345 6789', 'contacto@parquefundidora.mx', 'Green Flag Award', '', '', '1 - Guadalajara', '', 'nombre', '', 'HH:MM-HH:MM (ej: 06:00-22:00)']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Fundidora', 'Monterrey', 'Av. Fundidora S/N, Obrera', 'Antigua siderúrgica transformada en parque urbano …mblemáticos de reconversión industrial en México.', '64010', '25.675', '-100.286', '1,420,000', '1988', '', '', '', '', '', '', '', 'Jorge Luis Ramírez Torres', '(81) 2345 6789', 'contacto@parquefundidora.mx', 'Green Flag Award', '', '', '1 - Guadalajara', '', 'nombre', '', 'HH:MM-HH:MM (ej: 06:00-22:00)']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Fundidora"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Monterrey"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Fundidora S/N, Obrera"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Antigua siderúrgica transformada en parque urbano y cultural. Alberga museos (Horno3, Museo del Acero), centros de convenciones, explanadas para conciertos, lagos y ciclovías. Es uno de los ejemplos más emblemáticos de reconversión industrial en México."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "64010"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.675"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-100.286"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "1,420,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1988"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Jorge Luis Ramírez Torres"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(81) 2345 6789"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquefundidora.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Green Flag Award"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "1 - Guadalajara"
+Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "nombre"
+Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "HH:MM-HH:MM (ej: 06:00-22:00)"
+Console.js:61 📝 Procesando fila 4: 27 valores: (27) ['Bosque de Chapultepec', 'Ciudad de México', 'Av. Reforma s/n, Miguel Hidalgo', 'Considerado el pulmón más grande de la Ciudad de M…arques urbanos más importantes de América Latina.', '11580', '19.4204', '-99.1819', '6,860,000', '1530', '', '', '', '', '', '', '', 'Mariana Salazar Quintana', '(33) 3456 7890', 'contacto@bosquedechapultepec.mx', 'Ninguna', '', '', '2 - Zapopan', '', 'municipio_id', '', 'Vacío si no aplica']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Bosque de Chapultepec', 'Ciudad de México', 'Av. Reforma s/n, Miguel Hidalgo', 'Considerado el pulmón más grande de la Ciudad de M…arques urbanos más importantes de América Latina.', '11580', '19.4204', '-99.1819', '6,860,000', '1530', '', '', '', '', '', '', '', 'Mariana Salazar Quintana', '(33) 3456 7890', 'contacto@bosquedechapultepec.mx', 'Ninguna', '', '', '2 - Zapopan', '', 'municipio_id', '', 'Vacío si no aplica']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Bosque de Chapultepec"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Ciudad de México"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Reforma s/n, Miguel Hidalgo"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Considerado el pulmón más grande de la Ciudad de México con más de 680 ha divididas en secciones. Contiene museos de relevancia nacional (Museo Nacional de Antropología, Castillo de Chapultepec), zoológico, lagos, espacios deportivos y culturales. Es uno de los parques urbanos más importantes de América Latina."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "11580"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.4204"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-99.1819"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "6,860,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1530"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Mariana Salazar Quintana"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(33) 3456 7890"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@bosquedechapultepec.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "2 - Zapopan"
+Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "municipio_id"
+Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "Vacío si no aplica"
+Console.js:61 📝 Procesando fila 5: 27 valores: (27) ['Parque Tangamanga I', 'San Luis Potosí', 'Av. Salvador Nava Martínez', 'Uno de los parques urbanos más grandes de México c…rde y recreativo de la ciudad de San Luis Potosí.', '78294', '22.144', '-101.019', '4,200,000', '1983', '', '', '', '', '', '', '', 'Fernando Álvarez Domínguez', '(444) 456 7891', 'contacto@parquetangamangai.mx', 'Ninguna', '', '', '3 - San Pedro Tlaquepaque', '', 'direccion', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Tangamanga I', 'San Luis Potosí', 'Av. Salvador Nava Martínez', 'Uno de los parques urbanos más grandes de México c…rde y recreativo de la ciudad de San Luis Potosí.', '78294', '22.144', '-101.019', '4,200,000', '1983', '', '', '', '', '', '', '', 'Fernando Álvarez Domínguez', '(444) 456 7891', 'contacto@parquetangamangai.mx', 'Ninguna', '', '', '3 - San Pedro Tlaquepaque', '', 'direccion', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Tangamanga I"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "San Luis Potosí"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Salvador Nava Martínez"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Uno de los parques urbanos más grandes de México con unas 420 ha. Cuenta con lagos, jardines, zoológico, canchas deportivas, museos, teatros y áreas recreativas. Es el principal espacio verde y recreativo de la ciudad de San Luis Potosí."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "78294"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "22.144"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-101.019"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "4,200,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1983"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Fernando Álvarez Domínguez"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(444) 456 7891"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquetangamangai.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "3 - San Pedro Tlaquepaque"
+Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "direccion"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 6: 27 valores: (27) ['Parque Metropolitano de Guadalajara', 'Guadalajara', 'Av. Independencia 7, Zapopan', 'Área natural protegida de más de 113 ha, ubicada e…n zoológico infantil y programas de conservación.', '45138', '20.7167', '-103.45', '1,130,000', '1997', '', '', '', '', '', '', '', 'Patricia Gómez Aranda', '(33) 5678 9012', 'contacto@parquemetropolitano.mx', 'Green Flag Award', '', '', '4 - Tonalá', '', '', '', 'Formato certificaciones:']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Metropolitano de Guadalajara', 'Guadalajara', 'Av. Independencia 7, Zapopan', 'Área natural protegida de más de 113 ha, ubicada e…n zoológico infantil y programas de conservación.', '45138', '20.7167', '-103.45', '1,130,000', '1997', '', '', '', '', '', '', '', 'Patricia Gómez Aranda', '(33) 5678 9012', 'contacto@parquemetropolitano.mx', 'Green Flag Award', '', '', '4 - Tonalá', '', '', '', 'Formato certificaciones:']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Metropolitano de Guadalajara"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Guadalajara"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Independencia 7, Zapopan"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Área natural protegida de más de 113 ha, ubicada en Zapopan. Alberga humedales, aves migratorias y vegetación local. Es muy visitado para correr, andar en bici y actividades familiares. Tiene también un zoológico infantil y programas de conservación."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "45138"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.7167"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-103.45"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "1,130,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1997"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Patricia Gómez Aranda"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(33) 5678 9012"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquemetropolitano.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Green Flag Award"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "4 - Tonalá"
+3Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "Formato certificaciones:"
+Console.js:61 📝 Procesando fila 7: 27 valores: (27) ['Parque Bicentenario', 'Ciudad de México', 'Av. 5 de Mayo 290, Refinería 18 de Marzo', 'Ubicado en Azcapotzalco, fue inaugurado en 2010 en…peración ambiental más importantes de la capital.', '11250', '19.478', '-99.198', '550,000', '2010', '', '', '', '', '', '', '', 'Alejandro Hernández Velasco', '(55) 6789 0123', 'contacto@parquebicentenario.mx', 'Ninguna', '', '', '5 - Tlajomulco de Zúñiga', '', '', '', 'Separadas por comas']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Bicentenario', 'Ciudad de México', 'Av. 5 de Mayo 290, Refinería 18 de Marzo', 'Ubicado en Azcapotzalco, fue inaugurado en 2010 en…peración ambiental más importantes de la capital.', '11250', '19.478', '-99.198', '550,000', '2010', '', '', '', '', '', '', '', 'Alejandro Hernández Velasco', '(55) 6789 0123', 'contacto@parquebicentenario.mx', 'Ninguna', '', '', '5 - Tlajomulco de Zúñiga', '', '', '', 'Separadas por comas']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Bicentenario"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Ciudad de México"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. 5 de Mayo 290, Refinería 18 de Marzo"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Ubicado en Azcapotzalco, fue inaugurado en 2010 en terrenos de la antigua Refinería 18 de Marzo. Con más de 55 ha, incluye jardines temáticos, áreas deportivas, foros culturales, lagos y un orquideario. Es uno de los proyectos de recuperación ambiental más importantes de la capital."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "11250"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.478"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-99.198"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "550,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2010"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Alejandro Hernández Velasco"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(55) 6789 0123"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquebicentenario.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "5 - Tlajomulco de Zúñiga"
+3Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "Separadas por comas"
+Console.js:61 📝 Procesando fila 8: 27 valores: (27) ['Parque La Mexicana', 'Santa Fe, CDMX', 'Lomas de Santa Fe', 'Parque contemporáneo de 30 ha, inaugurado en 2017.…vo Chapultepec" de la zona poniente de la ciudad.', '5348', '19.36', '-99.28', '280,000', '2017', '', '', '', '', '', '', '', 'Sofía Ruiz Calderón', '(55) 7890 1234', 'contacto@parquelamexicana.mx', 'Green Flag Award', '', '', '6 - El Salto', '', '', '', 'Ej: Green Flag Award 2024, ISO 14001']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque La Mexicana', 'Santa Fe, CDMX', 'Lomas de Santa Fe', 'Parque contemporáneo de 30 ha, inaugurado en 2017.…vo Chapultepec" de la zona poniente de la ciudad.', '5348', '19.36', '-99.28', '280,000', '2017', '', '', '', '', '', '', '', 'Sofía Ruiz Calderón', '(55) 7890 1234', 'contacto@parquelamexicana.mx', 'Green Flag Award', '', '', '6 - El Salto', '', '', '', 'Ej: Green Flag Award 2024, ISO 14001']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque La Mexicana"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Santa Fe, CDMX"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Lomas de Santa Fe"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Parque contemporáneo de 30 ha, inaugurado en 2017. Diseñado con estándares modernos, tiene lagos artificiales, ciclovías, skatepark, áreas para perros, restaurantes y zonas verdes. Es considerado el "nuevo Chapultepec" de la zona poniente de la ciudad."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "5348"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.36"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-99.28"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "280,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2017"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Sofía Ruiz Calderón"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(55) 7890 1234"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquelamexicana.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Green Flag Award"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "6 - El Salto"
+3Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "Ej: Green Flag Award 2024, ISO 14001"
+Console.js:61 📝 Procesando fila 9: 27 valores: (27) ['Parque Rufino Tamayo', 'San Pedro Garza García', 'Av. Fundadores 123', 'Parque de 8 ha junto al Museo Rufino Tamayo y el A…recreativa en el corredor de Paseo de la Reforma.', '66220', '25.65', '-100.36', '80,000', '2017', '', '', '', '', '', '', '', 'Víctor Manuel Estrada Pineda', '(656) 890 1235', 'contacto@parquerufinotamayo.mx', 'Green Flag Award', '', '', '7 - Ixtlahuacán de los Membrillos', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Rufino Tamayo', 'San Pedro Garza García', 'Av. Fundadores 123', 'Parque de 8 ha junto al Museo Rufino Tamayo y el A…recreativa en el corredor de Paseo de la Reforma.', '66220', '25.65', '-100.36', '80,000', '2017', '', '', '', '', '', '', '', 'Víctor Manuel Estrada Pineda', '(656) 890 1235', 'contacto@parquerufinotamayo.mx', 'Green Flag Award', '', '', '7 - Ixtlahuacán de los Membrillos', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Rufino Tamayo"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "San Pedro Garza García"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Fundadores 123"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Parque de 8 ha junto al Museo Rufino Tamayo y el Auditorio Nacional. Espacio urbano de diseño moderno con jardines, áreas de descanso y esculturas. Funciona como antesala cultural y recreativa en el corredor de Paseo de la Reforma."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "66220"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.65"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-100.36"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "80,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2017"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Víctor Manuel Estrada Pineda"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(656) 890 1235"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquerufinotamayo.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Green Flag Award"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "7 - Ixtlahuacán de los Membrillos"
+4Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 10: 27 valores: (27) ['Parque Central Ciudad Juárez', 'Ciudad Juárez', 'Av. Prolongación Paseo de Montejo', 'Parque emblemático de la ciudad fronteriza, con la…ncia familiar y sede de ferias y eventos locales.', '97100', '20.99', '-89.63', '250,000', '2023', '', '', '', '', '', '', '', 'Gabriela López Márquez', '(472) 901 2345', 'contacto@parquecentral.mx', 'Ninguna', '', '', '8 - Juanacatlán', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Central Ciudad Juárez', 'Ciudad Juárez', 'Av. Prolongación Paseo de Montejo', 'Parque emblemático de la ciudad fronteriza, con la…ncia familiar y sede de ferias y eventos locales.', '97100', '20.99', '-89.63', '250,000', '2023', '', '', '', '', '', '', '', 'Gabriela López Márquez', '(472) 901 2345', 'contacto@parquecentral.mx', 'Ninguna', '', '', '8 - Juanacatlán', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Central Ciudad Juárez"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Ciudad Juárez"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Prolongación Paseo de Montejo"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Parque emblemático de la ciudad fronteriza, con lagos, zoológico, museos, áreas deportivas y culturales. Es un centro de convivencia familiar y sede de ferias y eventos locales."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "97100"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.99"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-89.63"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "250,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2023"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Gabriela López Márquez"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(472) 901 2345"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquecentral.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "8 - Juanacatlán"
+4Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 11: 27 valores: (27) ['Parque Guanajuato Bicentenario', 'Silao', 'Circuito Metropolitano', 'Inaugurado en 2010 para conmemorar el Bicentenario…s mecánicos, jardines y espacios para conciertos.', '97000', '21.02', '-89.65', '820,000', '2014', '', '', '', '', '', '', '', 'Héctor Sánchez Villalobos', '(81) 0123 4567', 'contacto@pgb.mx', 'Ninguna', '', '', '9 - Zapotlanejo', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Guanajuato Bicentenario', 'Silao', 'Circuito Metropolitano', 'Inaugurado en 2010 para conmemorar el Bicentenario…s mecánicos, jardines y espacios para conciertos.', '97000', '21.02', '-89.65', '820,000', '2014', '', '', '', '', '', '', '', 'Héctor Sánchez Villalobos', '(81) 0123 4567', 'contacto@pgb.mx', 'Ninguna', '', '', '9 - Zapotlanejo', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Guanajuato Bicentenario"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Silao"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Circuito Metropolitano"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Inaugurado en 2010 para conmemorar el Bicentenario de la Independencia y el Centenario de la Revolución. Alberga pabellones culturales, museos, áreas de exposiciones, juegos mecánicos, jardines y espacios para conciertos."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "97000"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "21.02"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-89.65"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "820,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2014"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Héctor Sánchez Villalobos"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(81) 0123 4567"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@pgb.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+2Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔍 Mapeando header: "" -> "" = "9 - Zapotlanejo"
+4Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 12: 27 valores: (27) ['Parque el Capitán', 'San Pedro Garza García', 'Av. Fuentes del Valle, Fuentes del Valle, 66220 San Pedro Garza García, N.L.', 'Parque ecológico y recreativo en las faldas de la … parte de proyectos de áreas verdes en San Pedro.', '97302', '25.66521872', '-100.360811', '150,000', '2023', '', '', '', '', '', '', '', 'Isabel Fernández Castaño', '(81) 2345 6780', 'contacto@parqueelcapitan.mx', 'Green Flag Award', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque el Capitán', 'San Pedro Garza García', 'Av. Fuentes del Valle, Fuentes del Valle, 66220 San Pedro Garza García, N.L.', 'Parque ecológico y recreativo en las faldas de la … parte de proyectos de áreas verdes en San Pedro.', '97302', '25.66521872', '-100.360811', '150,000', '2023', '', '', '', '', '', '', '', 'Isabel Fernández Castaño', '(81) 2345 6780', 'contacto@parqueelcapitan.mx', 'Green Flag Award', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque el Capitán"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "San Pedro Garza García"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Fuentes del Valle, Fuentes del Valle, 66220 San Pedro Garza García, N.L."
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Parque ecológico y recreativo en las faldas de la Sierra Madre Oriental. Espacio de conservación con senderos, juegos infantiles y áreas verdes para el esparcimiento local. Aún en desarrollo como parte de proyectos de áreas verdes en San Pedro."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "97302"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.66521872"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-100.360811"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "150,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2023"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Isabel Fernández Castaño"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(81) 2345 6780"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parqueelcapitan.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Green Flag Award"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 13: 27 valores: (27) ['Parque Metropolitano de León', 'León', 'Av. Tecnológico y Av. Ejército Nacional', 'Reserva ecológica de 337 ha con lago, humedales y …s, además de programas de conservación ambiental.', '32310', '31.72', '-106.43', '1,000,000', '1980', '', '', '', '', '', '', '', 'Ricardo Torres Aguilar', '(477) 345 6789', 'contacto@parquemetro.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Metropolitano de León', 'León', 'Av. Tecnológico y Av. Ejército Nacional', 'Reserva ecológica de 337 ha con lago, humedales y …s, además de programas de conservación ambiental.', '32310', '31.72', '-106.43', '1,000,000', '1980', '', '', '', '', '', '', '', 'Ricardo Torres Aguilar', '(477) 345 6789', 'contacto@parquemetro.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Metropolitano de León"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "León"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Tecnológico y Av. Ejército Nacional"
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Reserva ecológica de 337 ha con lago, humedales y vida silvestre. Es sede del Festival Internacional del Globo. Ofrece senderos, ciclovías, miradores y actividades deportivas, además de programas de conservación ambiental."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "32310"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "31.72"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-106.43"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "1,000,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1980"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Ricardo Torres Aguilar"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(477) 345 6789"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquemetro.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 14: 27 valores: (27) ['Gran Parque La Plancha', 'Mérida', 'C. 43 429, Centro, 97000 Mérida, Yuc.', 'Proyecto inaugurado en 2023 sobre antiguos patios …no de Mérida y un ejemplo de reconversión urbana.', '77600', '20.97844437', '-89.61172739', '220,000', '2023', '', '', '', '', '', '', '', 'Daniela Navarro Esquivel', '(999) 456 7890', 'contacto@parqulaplancha.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Gran Parque La Plancha', 'Mérida', 'C. 43 429, Centro, 97000 Mérida, Yuc.', 'Proyecto inaugurado en 2023 sobre antiguos patios …no de Mérida y un ejemplo de reconversión urbana.', '77600', '20.97844437', '-89.61172739', '220,000', '2023', '', '', '', '', '', '', '', 'Daniela Navarro Esquivel', '(999) 456 7890', 'contacto@parqulaplancha.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Gran Parque La Plancha"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Mérida"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "C. 43 429, Centro, 97000 Mérida, Yuc."
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Proyecto inaugurado en 2023 sobre antiguos patios ferroviarios. Con 22 ha, incluye un lago artificial, mercado gastronómico, museos, áreas deportivas, anfiteatro y zonas de convivencia. Es hoy el parque urbano más moderno de Mérida y un ejemplo de reconversión urbana."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "77600"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.97844437"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-89.61172739"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "220,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2023"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Daniela Navarro Esquivel"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(999) 456 7890"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parqulaplancha.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 15: 27 valores: (27) ['Bosque Los Colomos', 'Guadalajara', 'El Chaco 3200, Colonia Providencia, Guadalajara.', 'Es uno de los pulmones más importantes de Guadalaj…ristas que buscan naturaleza dentro de la ciudad.', '', '', '', '920,000', '1893', '', '', '', '', '', '', '', 'Claudia Méndez Ortega', '(55) 1234 5679', 'contacto@bosquecolomos.mx', 'Green Flag Award', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Bosque Los Colomos', 'Guadalajara', 'El Chaco 3200, Colonia Providencia, Guadalajara.', 'Es uno de los pulmones más importantes de Guadalaj…ristas que buscan naturaleza dentro de la ciudad.', '', '', '', '920,000', '1893', '', '', '', '', '', '', '', 'Claudia Méndez Ortega', '(55) 1234 5679', 'contacto@bosquecolomos.mx', 'Green Flag Award', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Bosque Los Colomos"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Guadalajara"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "El Chaco 3200, Colonia Providencia, Guadalajara."
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Es uno de los pulmones más importantes de Guadalajara, con alrededor de 92 hectáreas. Su origen está vinculado al abastecimiento de agua en el siglo XIX, y hoy es un espacio recreativo, deportivo y cultural. Destaca por su Jardín Japonés, lago artificial, áreas de trote, juegos infantiles, caballerizas y zonas arboladas de pino y eucalipto. Es muy visitado por familias, deportistas y turistas que buscan naturaleza dentro de la ciudad."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = ""
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = ""
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = ""
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "920,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1893"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Claudia Méndez Ortega"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(55) 1234 5679"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@bosquecolomos.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Green Flag Award"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 16: 27 valores: (27) ['Parque Las Ribieras', 'Culiacán', 'Situado en los malecones a orillas de los ríos Hum…a y Culiacán, en el distrito Tres Ríos, Culiacán.', 'Ubicado a lo largo de los malecones de los ríos Hu…to ciudadano con el entorno natural de la ciudad.', '', '', '', '121,000', '2007', '', '', '', '', '', '', '', 'Jorge Luis Ramírez Torres', '(81) 2345 6790', 'contacto@parquelasribieras.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Las Ribieras', 'Culiacán', 'Situado en los malecones a orillas de los ríos Hum…a y Culiacán, en el distrito Tres Ríos, Culiacán.', 'Ubicado a lo largo de los malecones de los ríos Hu…to ciudadano con el entorno natural de la ciudad.', '', '', '', '121,000', '2007', '', '', '', '', '', '', '', 'Jorge Luis Ramírez Torres', '(81) 2345 6790', 'contacto@parquelasribieras.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Las Ribieras"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Culiacán"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Situado en los malecones a orillas de los ríos Humaya, Tamazula y Culiacán, en el distrito Tres Ríos, Culiacán."
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Ubicado a lo largo de los malecones de los ríos Humaya, Tamazula y Culiacán, este parque lineal de más de 120 hectáreas conecta a la ciudad con sus ríos. Tiene áreas para caminar, andar en bicicleta y espacios de convivencia familiar. Alberga esculturas, foros culturales, juegos infantiles y espacios para ferias y exposiciones. Es considerado un ejemplo de recuperación urbana que fomenta el contacto ciudadano con el entorno natural de la ciudad."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = ""
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = ""
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = ""
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "121,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2007"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Jorge Luis Ramírez Torres"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(81) 2345 6790"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@parquelasribieras.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 17: 27 valores: (27) ['Jardín Botánico de Culiacán', 'Culiacán', 'Av. Las Américas 2131, Col. Burócratas, Culiacán.', 'Fundado en 1986, ocupa 10 hectáreas y combina cole… con recorridos guiados, talleres y exposiciones.', '', '24.82376', '-107.384967', '100,000', '1986', '', '', '', '', '', '', '', 'Mariana Salazar Quintana', '(33) 3456 7891', 'contacto@jardinbotanicoculiacan.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Jardín Botánico de Culiacán', 'Culiacán', 'Av. Las Américas 2131, Col. Burócratas, Culiacán.', 'Fundado en 1986, ocupa 10 hectáreas y combina cole… con recorridos guiados, talleres y exposiciones.', '', '24.82376', '-107.384967', '100,000', '1986', '', '', '', '', '', '', '', 'Mariana Salazar Quintana', '(33) 3456 7891', 'contacto@jardinbotanicoculiacan.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Jardín Botánico de Culiacán"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Culiacán"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Av. Las Américas 2131, Col. Burócratas, Culiacán."
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Fundado en 1986, ocupa 10 hectáreas y combina colecciones botánicas con arte contemporáneo en espacios abiertos. Alberga más de 1,000 especies vegetales, muchas de ellas tropicales y exóticas, además de instalaciones de artistas reconocidos a nivel mundial. Es un referente de educación ambiental, conservación y turismo cultural, con recorridos guiados, talleres y exposiciones."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = ""
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "24.82376"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-107.384967"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "100,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "1986"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Mariana Salazar Quintana"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(33) 3456 7891"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@jardinbotanicoculiacan.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 18: 27 valores: (27) ['Parque Flor del Bosque', 'Puebla', 'Amozoc, Puebla (Ex-Hacienda Flor del Bosque).', 'Es una reserva ecológica de más de 600 hectáreas, …sidad en Puebla y un lugar de recreación natural.', '', '19.0211', '-98.1011', '614,000', '2012', '', '', '', '', '', '', '', 'Fernando Álvarez Domínguez', '(444) 456 7892', 'contacto@flordelbosque.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Flor del Bosque', 'Puebla', 'Amozoc, Puebla (Ex-Hacienda Flor del Bosque).', 'Es una reserva ecológica de más de 600 hectáreas, …sidad en Puebla y un lugar de recreación natural.', '', '19.0211', '-98.1011', '614,000', '2012', '', '', '', '', '', '', '', 'Fernando Álvarez Domínguez', '(444) 456 7892', 'contacto@flordelbosque.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Flor del Bosque"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Puebla"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Amozoc, Puebla (Ex-Hacienda Flor del Bosque)."
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Es una reserva ecológica de más de 600 hectáreas, con ecosistemas de bosque de encino y zonas de reforestación. Es hogar de venados cola blanca, coyotes, aves rapaces y reptiles. El parque ofrece senderos de interpretación ambiental, cabañas, espacios para campismo y actividades educativas. Es uno de los sitios clave para la conservación de biodiversidad en Puebla y un lugar de recreación natural."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = ""
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.0211"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-98.1011"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "614,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2012"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Fernando Álvarez Domínguez"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(444) 456 7892"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@flordelbosque.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 19: 27 valores: (27) ['Parque Cultural Higalguense', 'Pachuca', 'Blvd. Felipe Ángeles S/N, Zona Plateada,  Pachuca de Soto, Hgo.', 'Es un espacio moderno de más de 26 hectáreas diseñ…eguro para actividades comunitarias y festivales.', '42083', '20.09493696', '-98.77239353', '260,000', '2025', '', '', '', '', '', '', '', 'Patricia Gómez Aranda', '(33) 5678 9013', 'contacto@pch.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['Parque Cultural Higalguense', 'Pachuca', 'Blvd. Felipe Ángeles S/N, Zona Plateada,  Pachuca de Soto, Hgo.', 'Es un espacio moderno de más de 26 hectáreas diseñ…eguro para actividades comunitarias y festivales.', '42083', '20.09493696', '-98.77239353', '260,000', '2025', '', '', '', '', '', '', '', 'Patricia Gómez Aranda', '(33) 5678 9013', 'contacto@pch.mx', 'Ninguna', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = "Parque Cultural Higalguense"
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = "Pachuca"
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = "Blvd. Felipe Ángeles S/N, Zona Plateada,  Pachuca de Soto, Hgo."
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = "Es un espacio moderno de más de 26 hectáreas diseñado como punto de encuentro cultural y recreativo. Inaugurado en 2025, integra áreas verdes, explanadas, ciclovías, canchas deportivas y escenarios para conciertos y eventos artísticos. Su objetivo es ser un polo de desarrollo cultural y social en Pachuca, ofreciendo a la población un sitio amplio y seguro para actividades comunitarias y festivales."
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = "42083"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.09493696"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-98.77239353"
+Console.js:61 🔍 Mapeando header: "area" -> "area" = "260,000"
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = "2025"
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = "Patricia Gómez Aranda"
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = "(33) 5678 9013"
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = "contacto@pch.mx"
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = "Ninguna"
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 📝 Procesando fila 20: 27 valores: (27) ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Console.js:61 ✅ Valores ajustados (27): (27) ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "nombre" -> "nombre" = ""
+Console.js:61 🔍 Mapeando header: "municipio_id" -> "municipio_id" = ""
+Console.js:61 🔍 Mapeando header: "direccion" -> "direccion" = ""
+Console.js:61 🔍 Mapeando header: "descripcion" -> "descripcion" = ""
+Console.js:61 🔍 Mapeando header: "codigo_postal" -> "codigo_postal" = ""
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = ""
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = ""
+Console.js:61 🔍 Mapeando header: "area" -> "area" = ""
+Console.js:61 🔍 Mapeando header: "ano_fundacion" -> "ano_fundacion" = ""
+Console.js:61 🔍 Mapeando header: "horario_lunes" -> "horario_lunes" = ""
+Console.js:61 🔍 Mapeando header: "horario_martes" -> "horario_martes" = ""
+Console.js:61 🔍 Mapeando header: "horario_miercoles" -> "horario_miercoles" = ""
+Console.js:61 🔍 Mapeando header: "horario_jueves" -> "horario_jueves" = ""
+Console.js:61 🔍 Mapeando header: "horario_viernes" -> "horario_viernes" = ""
+Console.js:61 🔍 Mapeando header: "horario_sabado" -> "horario_sabado" = ""
+Console.js:61 🔍 Mapeando header: "horario_domingo" -> "horario_domingo" = ""
+Console.js:61 🔍 Mapeando header: "administrador" -> "administrador" = ""
+Console.js:61 🔍 Mapeando header: "telefono_contacto" -> "telefono_contacto" = ""
+Console.js:61 🔍 Mapeando header: "email_contacto" -> "email_contacto" = ""
+Console.js:61 🔍 Mapeando header: "certificaciones" -> "certificaciones" = ""
+7Console.js:61 🔍 Mapeando header: "" -> "" = ""
+Console.js:61 🔧 Datos transformados antes de enviar: {latitude: '21.1215', longitude: '-101.682', startDate: null, endDate: null, price: '0', …}
+Console.js:61 🌐 [API REQUEST] POST /api/activities/import
+Console.js:61 🌐 [QUERY] GET /api/activities

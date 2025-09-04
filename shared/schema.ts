@@ -1472,6 +1472,12 @@ export const insertParkSchema = createInsertSchema(parks).omit({
   id: true,
   createdAt: true,
   updatedAt: true
+}).extend({
+  // Corregir campos numeric para aceptar tanto string como number
+  area: z.coerce.number().nullable().optional(),
+  greenArea: z.coerce.number().nullable().optional(),
+  foundationYear: z.coerce.number().nullable().optional(),
+  capacity: z.coerce.number().nullable().optional(),
 });
 
 // Categorías de eventos (diferente de actividades)
