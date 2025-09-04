@@ -76,49 +76,55 @@ app.get('/cloudrun-health', (req, res) => {
   res.end(healthResponse);
 });
 
-app.get('/', (req: Request, res: Response) => {
-  try {
-    // ULTRA-OPTIMIZED: Check if this is a health check request
-    const acceptHeader = req.headers.accept;
-    const userAgent = req.headers['user-agent'];
-    
-    console.log(`🔍 [ROOT] Request: Accept=${acceptHeader}, UserAgent=${userAgent}`);
-    
-    // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
-    const isHealthCheck = !acceptHeader?.includes('text/html') || 
-      userAgent?.includes('GoogleHC') || 
-      userAgent?.includes('kube-probe') ||
-      userAgent?.includes('ELB-HealthChecker') ||
-      acceptHeader === '*/*';
-    
-    if (isHealthCheck) {
-      console.log(`🏥 [ROOT] Health check detected, returning OK`);
-      // Immediate health check response - no file system operations
-      res.writeHead(200, healthHeaders);
-      res.end(healthResponse);
-      return;
+// Only handle root route in PRODUCTION - let Vite handle it in development
+const isProductionMode = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+if (isProductionMode) {
+  app.get('/', (req: Request, res: Response) => {
+    try {
+      // ULTRA-OPTIMIZED: Check if this is a health check request
+      const acceptHeader = req.headers.accept;
+      const userAgent = req.headers['user-agent'];
+      
+      console.log(`🔍 [ROOT] Request: Accept=${acceptHeader}, UserAgent=${userAgent}`);
+      
+      // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
+      const isHealthCheck = !acceptHeader?.includes('text/html') || 
+        userAgent?.includes('GoogleHC') || 
+        userAgent?.includes('kube-probe') ||
+        userAgent?.includes('ELB-HealthChecker') ||
+        acceptHeader === '*/*';
+      
+      if (isHealthCheck) {
+        console.log(`🏥 [ROOT] Health check detected, returning OK`);
+        // Immediate health check response - no file system operations
+        res.writeHead(200, healthHeaders);
+        res.end(healthResponse);
+        return;
+      }
+      
+      console.log(`🌐 [ROOT] Browser request detected, serving React app`);
+      
+      // Serve the React app for browser requests (only when not health check)
+      const indexPath = path.join(process.cwd(), 'public', 'index.html');
+      console.log(`📁 [ROOT] Looking for index.html at: ${indexPath}`);
+      
+      if (fs.existsSync(indexPath)) {
+        console.log(`✅ [ROOT] index.html found, serving file`);
+        res.sendFile(indexPath);
+      } else {
+        console.log(`❌ [ROOT] index.html not found at ${indexPath}`);
+        console.log(`📂 [ROOT] Current working directory: ${process.cwd()}`);
+        console.log(`📂 [ROOT] Checking if public directory exists: ${fs.existsSync(path.join(process.cwd(), 'public'))}`);
+        res.status(503).send('Application not built. Please run npm run build first.');
+      }
+    } catch (error) {
+      console.error(`🚨 [ROOT] Error in root handler:`, error);
+      res.status(500).send('Internal Server Error');
     }
-    
-    console.log(`🌐 [ROOT] Browser request detected, serving React app`);
-    
-    // Serve the React app for browser requests (only when not health check)
-    const indexPath = path.join(process.cwd(), 'public', 'index.html');
-    console.log(`📁 [ROOT] Looking for index.html at: ${indexPath}`);
-    
-    if (fs.existsSync(indexPath)) {
-      console.log(`✅ [ROOT] index.html found, serving file`);
-      res.sendFile(indexPath);
-    } else {
-      console.log(`❌ [ROOT] index.html not found at ${indexPath}`);
-      console.log(`📂 [ROOT] Current working directory: ${process.cwd()}`);
-      console.log(`📂 [ROOT] Checking if public directory exists: ${fs.existsSync(path.join(process.cwd(), 'public'))}`);
-      res.status(503).send('Application not built. Please run npm run build first.');
-    }
-  } catch (error) {
-    console.error(`🚨 [ROOT] Error in root handler:`, error);
-    res.status(500).send('Internal Server Error');
-  }
-});
+  });
+} else {
+  console.log(`🚀 [DEV] Skipping root handler - Vite will handle '/' route in development`);
+}
 
 app.get('/health', (req: Request, res: Response) => {
   res.writeHead(200, healthHeaders);
