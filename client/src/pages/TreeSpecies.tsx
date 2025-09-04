@@ -93,20 +93,26 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
             {/* Imagen */}
             <div className="w-32 h-32 flex-shrink-0">
               {(species.photoUrl || species.imageUrl) ? (
-                <img 
-                  src={species.photoUrl || species.imageUrl} 
-                  alt={species.commonName}
-                  className="w-full h-full object-cover rounded-lg"
-                  onError={(e) => {
-                    // Si falla la carga, mostrar placeholder
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                  }}
-                />
-              ) : null}
-              <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
-                <Trees className="h-16 w-16 text-white opacity-80" />
-              </div>
+                <>
+                  <img 
+                    src={species.photoUrl || species.imageUrl} 
+                    alt={species.commonName}
+                    className="w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      // Si falla la carga, mostrar placeholder
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                  <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center hidden">
+                    <Trees className="h-16 w-16 text-white opacity-80" />
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                  <Trees className="h-16 w-16 text-white opacity-80" />
+                </div>
+              )}
             </div>
             
             {/* Contenido */}
@@ -195,11 +201,21 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
         {/* Imagen */}
         <div className="relative h-48 overflow-hidden">
           {(species.photoUrl || species.imageUrl) ? (
-            <img 
-              src={species.photoUrl || species.imageUrl} 
-              alt={species.commonName}
-              className="w-full h-full object-cover"
-            />
+            <>
+              <img 
+                src={species.photoUrl || species.imageUrl} 
+                alt={species.commonName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Si falla la carga, mostrar placeholder
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center hidden">
+                <Trees className="h-16 w-16 text-white opacity-80" />
+              </div>
+            </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
               <Trees className="h-16 w-16 text-white opacity-80" />
