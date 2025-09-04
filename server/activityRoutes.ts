@@ -10,6 +10,90 @@ import { sql } from 'drizzle-orm';
 // Crear un router para las actividades
 const activityRouter = Router();
 
+// Endpoint para importar actividades desde CSV
+activityRouter.post("/activities/import", isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const { activities } = req.body;
+    
+    if (!Array.isArray(activities) || activities.length === 0) {
+      return res.status(400).json({ 
+        message: "Se requiere un array de actividades para importar",
+        success: false 
+      });
+    }
+
+    console.log(`📥 Iniciando importación de ${activities.length} actividades`);
+    
+    const importedActivities = [];
+    const errors = [];
+    
+    for (let i = 0; i < activities.length; i++) {
+      try {
+        const activityData = activities[i];
+        
+        // Validar datos requeridos
+        if (!activityData.título || !activityData.descripción) {
+          errors.push(`Fila ${i + 2}: Título y descripción son requeridos`);
+          continue;
+        }
+        
+        // Mapear campos del CSV a formato de base de datos
+        const mappedActivity = {
+          title: activityData.título,
+          description: activityData.descripción,
+          startDate: activityData.fechaInicio || new Date().toISOString(),
+          endDate: activityData.fechaFin || new Date().toISOString(),
+          location: activityData.ubicación || '',
+          capacity: parseInt(activityData.capacidad) || 20,
+          price: parseFloat(activityData.precio) || 0,
+          isFree: activityData.esGratuita === 'true' || activityData.precio === '0',
+          parkId: parseInt(activityData.parqueId) || null,
+          categoryId: parseInt(activityData.categoríaId) || null,
+          instructorId: parseInt(activityData.instructorId) || null,
+          status: activityData.estado || 'Activa'
+        };
+        
+        // Validar esquema usando Zod
+        const validatedData = insertActivitySchema.parse(mappedActivity);
+        
+        // Crear actividad en la base de datos
+        const newActivity = await storage.createActivity(validatedData);
+        importedActivities.push(newActivity);
+        
+        console.log(`✅ Actividad importada: ${validatedData.title}`);
+        
+      } catch (error) {
+        console.error(`❌ Error importando actividad en fila ${i + 2}:`, error);
+        if (error instanceof ZodError) {
+          const validationError = fromZodError(error);
+          errors.push(`Fila ${i + 2}: ${validationError.message}`);
+        } else {
+          errors.push(`Fila ${i + 2}: ${error.message || 'Error desconocido'}`);
+        }
+      }
+    }
+    
+    console.log(`📊 Importación completada: ${importedActivities.length} exitosas, ${errors.length} errores`);
+    
+    res.json({
+      success: true,
+      message: `Importación completada: ${importedActivities.length} actividades importadas`,
+      imported: importedActivities.length,
+      errors: errors.length,
+      errorDetails: errors,
+      activities: importedActivities
+    });
+    
+  } catch (error) {
+    console.error("❌ Error general en importación de actividades:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Error interno al importar actividades",
+      error: error.message 
+    });
+  }
+});
+
 // Obtener todas las actividades
 activityRouter.get("/activities", async (_req: Request, res: Response) => {
   try {

@@ -73,11 +73,11 @@ const AdminActivities = () => {
     enabled: viewMode === 'cards',
   });
 
-  const { data: parksData } = useQuery({
+  const { data: parksData = [] } = useQuery({
     queryKey: ['/api/parks'],
   });
 
-  const { data: categoriesData } = useQuery({
+  const { data: categoriesData = [] } = useQuery({
     queryKey: ['/api/activity-categories'],
   });
 
@@ -326,7 +326,7 @@ const AdminActivities = () => {
     mutationFn: async (csvData: any[]) => {
       return await apiRequest('/api/activities/import', {
         method: 'POST',
-        body: JSON.stringify({ activities: csvData }),
+        data: { activities: csvData },
         headers: {
           'Content-Type': 'application/json',
         },
