@@ -362,21 +362,39 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
 
           // Parse and validate the activity data using Zod schema
           console.log(`🔧 Intentando validar actividad "${activityData.title}" con datos:`, JSON.stringify(activityData, null, 2));
+          // Convert dates from string to Date objects
+          let parsedStartDate: Date | null = null;
+          let parsedEndDate: Date | null = null;
+          
+          if (activityData.startDate) {
+            parsedStartDate = new Date(activityData.startDate);
+            if (isNaN(parsedStartDate.getTime())) {
+              throw new Error(`Fecha de inicio inválida: ${activityData.startDate}`);
+            }
+          }
+          
+          if (activityData.endDate) {
+            parsedEndDate = new Date(activityData.endDate);
+            if (isNaN(parsedEndDate.getTime())) {
+              throw new Error(`Fecha de fin inválida: ${activityData.endDate}`);
+            }
+          }
+          
           const validatedActivity = insertActivitySchema.parse({
             title: activityData.title.trim(),
             description: activityData.description || '',
             parkId: parseInt(activityData.parkId),
             categoryId: parseInt(activityData.categoryId),
-            startDate: activityData.startDate || null,
-            endDate: activityData.endDate || null,
+            startDate: parsedStartDate,
+            endDate: parsedEndDate,
             startTime: activityData.startTime || null,
             endTime: activityData.endTime || null,
             location: activityData.location || null,
-            latitude: activityData.latitude ? parseFloat(activityData.latitude) : null,
-            longitude: activityData.longitude ? parseFloat(activityData.longitude) : null,
+            latitude: activityData.latitude ? String(activityData.latitude) : null,
+            longitude: activityData.longitude ? String(activityData.longitude) : null,
             capacity: activityData.capacity ? parseInt(activityData.capacity) : null,
             duration: activityData.duration ? parseInt(activityData.duration) : null,
-            price: activityData.price ? parseFloat(activityData.price) : 0,
+            price: activityData.price ? String(activityData.price) : '0',
             isFree: activityData.isFree === true || activityData.isFree === 'true',
             materials: activityData.materials || '',
             requirements: activityData.requirements || '',
@@ -391,6 +409,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
             requiresApproval: activityData.requiresApproval === true || activityData.requiresApproval === 'true',
             ageRestrictions: activityData.ageRestrictions || '',
             healthRequirements: activityData.healthRequirements || '',
+            status: activityData.status ? String(activityData.status).toLowerCase() : 'programada',
             // Nota: createdAt y updatedAt se agregan automáticamente
           });
           console.log(`✅ Validación Zod exitosa para "${activityData.title}"`);
