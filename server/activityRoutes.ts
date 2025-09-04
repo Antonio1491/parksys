@@ -64,10 +64,13 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
         
       } catch (error) {
         console.error(`❌ Error importando actividad en fila ${i + 2}:`, error);
+        console.error(`🔍 Datos que causaron el error:`, JSON.stringify(activityData, null, 2));
         if (error instanceof ZodError) {
           const validationError = fromZodError(error);
+          console.error(`🚨 Error de validación Zod:`, validationError.message);
           errors.push(`Fila ${i + 2}: ${validationError.message}`);
         } else {
+          console.error(`🚨 Error general:`, error.message);
           errors.push(`Fila ${i + 2}: ${error.message || 'Error desconocido'}`);
         }
       }
