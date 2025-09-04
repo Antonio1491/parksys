@@ -139,7 +139,7 @@ const Home: React.FC = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-screen flex items-center">
           <div className="max-w-3xl">
             {/* Título principal */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-Guttery font-bold text-white mb-6 leading-tight">
               Conoce los
               <span className="block">Parques de México</span>
             </h1>
