@@ -73,7 +73,7 @@ import { uploadAdvertising, handleAdvertisingUpload } from "./api/advertising-up
 import { 
   insertCommentSchema, insertIncidentSchema, 
   insertActivitySchema, insertDocumentSchema, insertParkImageSchema,
-  insertParkAmenitySchema, insertVolunteerSchema, ExtendedPark, Park, Municipality, Amenity, Activity
+  insertParkAmenitySchema, insertVolunteerSchema, ExtendedPark, Park, Municipality, Amenity, Activity, volunteers
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
@@ -5127,8 +5127,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Validar con Zod schema
           const validatedData = insertVolunteerSchema.parse(volunteerData);
           
-          // Crear voluntario usando storage
-          const result = await storage.createVolunteer(validatedData);
+          // Crear voluntario usando Drizzle directamente
+          const result = await db.insert(volunteers).values(validatedData).returning();
           importedCount++;
           
           console.log(`✅ Voluntario ${i + 1} creado exitosamente: ${result.id}`);
