@@ -82,9 +82,9 @@ const ParkDetail: React.FC = () => {
     return format(new Date(date), "EEEE, d 'de' MMMM 'de' yyyy • h:mm a", { locale: es });
   };
   
-  // Get images
-  const mainImage = park.primaryImage || (park.images && park.images.length > 0 ? park.images[0].imageUrl : '');
-  const additionalImages = park.images?.filter(img => !img.isPrimary).map(img => img.imageUrl) || [];
+  // Get images - Fixed logic to properly display all park images
+  const mainImage = park.images && park.images.length > 0 ? park.images[0].imageUrl : '';
+  const additionalImages = park.images && park.images.length > 1 ? park.images.slice(1).map(img => img.imageUrl) : [];
 
   return (
     <div className="bg-gray-50 min-h-screen">
