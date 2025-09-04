@@ -754,6 +754,66 @@ const RolesManagement: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Acciones rápidas */}
+      <div className="grid gap-6 md:grid-cols-3 mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Grid className="h-5 w-5 mr-2 text-purple-500" />
+              Matriz de Permisos
+            </CardTitle>
+            <CardDescription>
+              Configura permisos granulares por módulo y rol
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/admin/permissions/matrix">
+              <Button className="w-full">
+                Abrir Matriz
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <UserCog className="h-5 w-5 mr-2 text-blue-500" />
+              Asignación de Usuarios
+            </CardTitle>
+            <CardDescription>
+              Gestiona asignaciones masivas de roles
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/admin/role-assignments">
+              <Button className="w-full">
+                Gestionar Usuarios
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Activity className="h-5 w-5 mr-2 text-green-500" />
+              Auditoría de Roles
+            </CardTitle>
+            <CardDescription>
+              Revisa logs de actividad y cambios
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/admin/configuracion-seguridad/audit/role-audits">
+              <Button className="w-full">
+                Ver Auditoría
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
     </AdminLayout>
   );
 };
