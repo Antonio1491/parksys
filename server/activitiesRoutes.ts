@@ -349,6 +349,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
           }
 
           // Parse and validate the activity data using Zod schema
+          console.log(`🔧 Intentando validar actividad "${activityData.title}" con datos:`, JSON.stringify(activityData, null, 2));
           const validatedActivity = insertActivitySchema.parse({
             title: activityData.title.trim(),
             description: activityData.description || '',
@@ -378,9 +379,9 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
             requiresApproval: activityData.requiresApproval === true || activityData.requiresApproval === 'true',
             ageRestrictions: activityData.ageRestrictions || '',
             healthRequirements: activityData.healthRequirements || '',
-            createdAt: new Date(),
-            updatedAt: new Date()
+            // Nota: createdAt y updatedAt se agregan automáticamente
           });
+          console.log(`✅ Validación Zod exitosa para "${activityData.title}"`);
 
           // Insert the activity using storage layer
           await storage.createActivity(validatedActivity);
