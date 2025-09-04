@@ -1,0 +1,52 @@
+i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-QkYrPQ9h.js:789 i18next: languageChanged es
+index-QkYrPQ9h.js:789 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+index-QkYrPQ9h.js:49 🌐 [QUERY] GET /api/volunteers
+index-QkYrPQ9h.js:49 🌐 [QUERY] GET /api/parks
+index-QkYrPQ9h.js:833 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-QkYrPQ9h.js:833
+hj @ index-QkYrPQ9h.js:41
+fh @ index-QkYrPQ9h.js:41
+Gte @ index-QkYrPQ9h.js:41
+Yc @ index-QkYrPQ9h.js:41
+TO @ index-QkYrPQ9h.js:41
+Sc @ index-QkYrPQ9h.js:39
+Md @ index-QkYrPQ9h.js:41
+L8 @ index-QkYrPQ9h.js:38
+B_ @ index-QkYrPQ9h.js:38
+YC @ index-QkYrPQ9h.js:38
+Oee @ index-QkYrPQ9h.js:38Understand this warning
+index-D-UKFCSX.js:4 Headers detectados: (17) ['fullName', 'email', 'phone', 'age', 'gender', 'address', 'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelation', 'preferredParkId', 'previousExperience', 'availableDays', 'availableHours', 'interestAreas', 'skills', 'legalConsent', 'status']
+index-D-UKFCSX.js:4 Voluntarios procesados: (22) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+index-QkYrPQ9h.js:49 🌐 [API REQUEST] POST /api/volunteers/import
+index-QkYrPQ9h.js:49  POST https://parksys-demo.replit.app/api/volunteers/import 400 (Bad Request)
+tn @ index-QkYrPQ9h.js:49
+we @ index-D-UKFCSX.js:4
+await in we
+fee @ index-QkYrPQ9h.js:38
+pee @ index-QkYrPQ9h.js:38
+gee @ index-QkYrPQ9h.js:38
+tO @ index-QkYrPQ9h.js:38
+fF @ index-QkYrPQ9h.js:38
+(anonymous) @ index-QkYrPQ9h.js:38
+wP @ index-QkYrPQ9h.js:41
+L8 @ index-QkYrPQ9h.js:38
+B_ @ index-QkYrPQ9h.js:38
+YC @ index-QkYrPQ9h.js:38
+Oee @ index-QkYrPQ9h.js:38Understand this error
+index-D-UKFCSX.js:4 Error importing volunteers: Error: 400: {"success":false,"error":"Se requiere un array de voluntarios en req.body.volunteers"}
+    at tn (index-QkYrPQ9h.js:49:45436)
+    at async we (index-D-UKFCSX.js:4:1930)
+we @ index-D-UKFCSX.js:4
+await in we
+fee @ index-QkYrPQ9h.js:38
+pee @ index-QkYrPQ9h.js:38
+gee @ index-QkYrPQ9h.js:38
+tO @ index-QkYrPQ9h.js:38
+fF @ index-QkYrPQ9h.js:38
+(anonymous) @ index-QkYrPQ9h.js:38
+wP @ index-QkYrPQ9h.js:41
+L8 @ index-QkYrPQ9h.js:38
+B_ @ index-QkYrPQ9h.js:38
+YC @ index-QkYrPQ9h.js:38
+Oee @ index-QkYrPQ9h.js:38Understand this error

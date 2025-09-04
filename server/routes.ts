@@ -5101,8 +5101,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/volunteers/import", async (req: Request, res: Response) => {
     try {
       console.log("📥 POST /api/volunteers/import - Iniciando importación de voluntarios");
+      console.log("📊 req.body keys:", Object.keys(req.body || {}));
+      console.log("📊 req.body.volunteers type:", typeof req.body.volunteers);
+      console.log("📊 req.body.volunteers exists:", !!req.body.volunteers);
+      console.log("📊 req.body.volunteers is array:", Array.isArray(req.body.volunteers));
       
       if (!req.body.volunteers || !Array.isArray(req.body.volunteers)) {
+        console.log("❌ Error: No se encontró array de voluntarios en req.body");
+        console.log("📊 Contenido completo de req.body:", JSON.stringify(req.body, null, 2));
         return res.status(400).json({ 
           success: false, 
           error: "Se requiere un array de voluntarios en req.body.volunteers" 
