@@ -30,6 +30,7 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     
     for (let i = 0; i < activities.length; i++) {
       let activityData = activities[i];
+      console.log(`\n🔄 [${i+1}/${activities.length}] Procesando: "${activityData.title}"`);
       try {
         
         // Validar datos requeridos
@@ -73,10 +74,14 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
         };
         
         // Validar esquema usando Zod
+        console.log(`🔧 Intentando validar con Zod...`);
         const validatedData = insertActivitySchema.parse(mappedActivity);
+        console.log(`✅ Validación Zod exitosa`);
         
         // Crear actividad en la base de datos
+        console.log(`🗄️ Insertando en base de datos...`);
         const newActivity = await (storage as any).createActivity(validatedData);
+        console.log(`✅ Actividad creada en BD con ID:`, newActivity?.id);
         importedActivities.push(newActivity);
         
         console.log(`✅ Actividad importada: ${(validatedData as any).title}`);
