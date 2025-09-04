@@ -3429,6 +3429,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk delete parks
+  apiRouter.post("/parks/bulk-delete", async (req: Request, res: Response) => {
+    try {
+      const { parkIds } = req.body;
+      
+      if (!parkIds || !Array.isArray(parkIds) || parkIds.length === 0) {
+        return res.status(400).json({ error: "Se requiere un array de IDs de parques" });
+      }
+
+      console.log(`🗑️ [BULK DELETE] Iniciando eliminación de ${parkIds.length} parques:`, parkIds);
+      
+      const deletedParks = [];
+      const errors = [];
+      
+      // Process each park deletion
+      for (const parkId of parkIds) {
+        try {
+          const numParkId = Number(parkId);
+          if (isNaN(numParkId)) {
+            errors.push({ parkId, error: "ID de parque inválido" });
+            continue;
+          }
+          
+          // Get park name for logging
+          const parkResult = await pool.query('SELECT name FROM parks WHERE id = $1', [numParkId]);
+          const parkName = parkResult.rows[0]?.name || `Parque ${numParkId}`;
+          
+          console.log(`🗑️ [BULK DELETE] Eliminando parque: ${parkName} (ID: ${numParkId})`);
+          
+          // Delete park and all related data in transaction
+          await pool.query('BEGIN');
+          
+          // Delete in order of dependencies
+          await pool.query('DELETE FROM park_amenities WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM park_images WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM documents WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM activities WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM trees WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM tree_maintenances WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM assets WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM incidents WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM evaluations WHERE park_id = $1', [numParkId]);
+          await pool.query('DELETE FROM event_parks WHERE park_id = $1', [numParkId]);
+          
+          // Finally delete the park itself
+          const deleteResult = await pool.query('DELETE FROM parks WHERE id = $1 RETURNING name', [numParkId]);
+          
+          if (deleteResult.rows.length > 0) {
+            await pool.query('COMMIT');
+            deletedParks.push({ id: numParkId, name: deleteResult.rows[0].name });
+            console.log(`✅ [BULK DELETE] Parque eliminado exitosamente: ${deleteResult.rows[0].name}`);
+          } else {
+            await pool.query('ROLLBACK');
+            errors.push({ parkId: numParkId, error: "Parque no encontrado" });
+          }
+        } catch (error) {
+          await pool.query('ROLLBACK');
+          console.error(`❌ [BULK DELETE] Error eliminando parque ${parkId}:`, error);
+          errors.push({ parkId, error: error.message || "Error desconocido" });
+        }
+      }
+      
+      console.log(`🏁 [BULK DELETE] Proceso completado. Eliminados: ${deletedParks.length}, Errores: ${errors.length}`);
+      
+      // Return results
+      if (deletedParks.length > 0 && errors.length === 0) {
+        res.json({
+          success: true,
+          message: `Se eliminaron ${deletedParks.length} parque${deletedParks.length > 1 ? 's' : ''} exitosamente`,
+          deletedParks,
+          errors: []
+        });
+      } else if (deletedParks.length > 0 && errors.length > 0) {
+        res.status(207).json({ // 207 Multi-Status
+          success: true,
+          message: `Se eliminaron ${deletedParks.length} parques, ${errors.length} con errores`,
+          deletedParks,
+          errors
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: "No se pudo eliminar ningún parque",
+          deletedParks: [],
+          errors
+        });
+      }
+    } catch (error) {
+      console.error('❌ [BULK DELETE] Error general:', error);
+      res.status(500).json({ 
+        success: false,
+        error: "Error interno del servidor al eliminar parques"
+      });
+    }
+  });
+
   // Add an amenity to a park (admin/municipality only)
   app.post("/api/parks/:id/amenities", async (req: Request, res: Response) => {
     try {

@@ -10,8 +10,9 @@ import { PageHeader } from "@/components/ui/page-header";
 // El usuario específicamente NO quiere filtros en esta página
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload } from "lucide-react";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 import { ExportButton } from "@/components/ui/export-button";
@@ -98,6 +99,11 @@ const AdminParksContent = () => {
   const [parkDependencies, setParkDependencies] = useState<ParkDependencies | null>(null);
   const [loadingDependencies, setLoadingDependencies] = useState(false);
   
+  // Bulk delete states
+  const [selectedParks, setSelectedParks] = useState<Set<number>>(new Set());
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [bulkDeleteDependencies, setBulkDeleteDependencies] = useState<{[key: number]: ParkDependencies} | null>(null);
+  
   // Pagination and view states
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -140,6 +146,36 @@ const AdminParksContent = () => {
       setLoadingDependencies(false);
     }
   };
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (parkIds: number[]) => {
+      await apiRequest('/api/parks/bulk-delete', {
+        method: 'POST',
+        data: { parkIds },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
+      toast({
+        title: "Parques eliminados",
+        description: `Se eliminaron ${selectedParks.size} parques exitosamente.`,
+      });
+      setShowBulkDeleteDialog(false);
+      setSelectedParks(new Set());
+      setBulkDeleteDependencies(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "No se pudieron eliminar los parques seleccionados.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -287,10 +323,15 @@ const AdminParksContent = () => {
           <Card key={park.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900">{park.name}</h3>
+                <div className="flex items-center space-x-3 flex-1">
+                  <Checkbox
+                    checked={selectedParks.has(park.id)}
+                    onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900">{park.name}</h3>
                       {isParkCertified(park) && (
                         <Badge 
                           variant="secondary" 
@@ -301,23 +342,24 @@ const AdminParksContent = () => {
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center space-x-6 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        <span className="max-w-xs truncate">{park.address}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Package className="h-4 w-4 mr-1" />
-                        <span>
-                          {park.area
-                            ? `${(park.area / 10000).toLocaleString(undefined, {
-                                minimumFractionDigits: 1,
-                                maximumFractionDigits: 1,
-                              })} ha`
-                            : 'N/A'}
-                        </span>
-                      </div>
+                  </div>
+                  <div className="flex items-center space-x-6 text-sm text-gray-600">
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      <span className="max-w-xs truncate">{park.address}</span>
                     </div>
+                    <div className="flex items-center">
+                      <Package className="h-4 w-4 mr-1" />
+                      <span>
+                        {park.area
+                          ? `${(park.area / 10000).toLocaleString(undefined, {
+                              minimumFractionDigits: 1,
+                              maximumFractionDigits: 1,
+                            })} ha`
+                          : 'N/A'}
+                      </span>
+                    </div>
+                  </div>
                   </div>
                   {park.description && (
                     <p className="mt-2 text-sm text-gray-600 line-clamp-2">{park.description}</p>
@@ -373,17 +415,24 @@ const AdminParksContent = () => {
           <Card key={park.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{park.name}</CardTitle>
-                  {isParkCertified(park) && (
-                    <Badge 
-                      variant="secondary" 
-                      className="mt-2 bg-green-100 text-green-800 border-green-200"
-                    >
-                      <Award className="h-3 w-3 mr-1" />
-                      Certificado
-                    </Badge>
-                  )}
+                <div className="flex items-start space-x-2 flex-1">
+                  <Checkbox
+                    checked={selectedParks.has(park.id)}
+                    onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">{park.name}</CardTitle>
+                    {isParkCertified(park) && (
+                      <Badge 
+                        variant="secondary" 
+                        className="mt-2 bg-green-100 text-green-800 border-green-200"
+                      >
+                        <Award className="h-3 w-3 mr-1" />
+                        Certificado
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -471,6 +520,58 @@ const AdminParksContent = () => {
     deleteMutation.mutate(parkToDelete.id);
   };
 
+  // Bulk selection handlers
+  const handleSelectPark = (parkId: number, checked: boolean) => {
+    const newSelected = new Set(selectedParks);
+    if (checked) {
+      newSelected.add(parkId);
+    } else {
+      newSelected.delete(parkId);
+    }
+    setSelectedParks(newSelected);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allParkIds = new Set(currentParks.map(park => park.id));
+      setSelectedParks(allParkIds);
+    } else {
+      setSelectedParks(new Set());
+    }
+  };
+
+  const handleBulkDeleteClick = async () => {
+    if (selectedParks.size === 0) return;
+    setShowBulkDeleteDialog(true);
+    
+    // Fetch dependencies for all selected parks
+    setLoadingDependencies(true);
+    const dependencies: {[key: number]: ParkDependencies} = {};
+    
+    for (const parkId of Array.from(selectedParks)) {
+      try {
+        const response = await fetch(`/api/parks/${parkId}/dependencies`);
+        if (response.ok) {
+          dependencies[parkId] = await response.json();
+        }
+      } catch (error) {
+        console.error(`Error fetching dependencies for park ${parkId}:`, error);
+      }
+    }
+    
+    setBulkDeleteDependencies(dependencies);
+    setLoadingDependencies(false);
+  };
+
+  const handleBulkDeleteConfirm = () => {
+    const parkIds = Array.from(selectedParks);
+    bulkDeleteMutation.mutate(parkIds);
+  };
+
+  // Check if all current page parks are selected
+  const isAllSelected = currentParks.length > 0 && currentParks.every(park => selectedParks.has(park.id));
+  const isIndeterminate = currentParks.some(park => selectedParks.has(park.id)) && !isAllSelected;
+
   // Handle manual refresh
   const handleRefresh = async () => {
     await refetchParks();
@@ -548,7 +649,7 @@ const AdminParksContent = () => {
           ]}
         />
                   
-        {/* BARRA DE BÚSQUEDA Y TOGGLE VIEW */}
+        {/* BARRA DE BÚSQUEDA Y CONTROLES */}
         <div 
           className="bg-white p-2 rounded-xl border shadow-sm"
           data-no-filters="true"
@@ -575,6 +676,25 @@ const AdminParksContent = () => {
                   </button>
                 )}
               </div>
+              
+              {/* Bulk Actions */}
+              {selectedParks.size > 0 && (
+                <div className="flex items-center space-x-2 mr-4">
+                  <span className="text-sm text-gray-600">
+                    {selectedParks.size} seleccionado{selectedParks.size > 1 ? 's' : ''}
+                  </span>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleBulkDeleteClick}
+                    disabled={bulkDeleteMutation.isPending}
+                  >
+                    <Trash className="h-4 w-4 mr-1" />
+                    Eliminar
+                  </Button>
+                </div>
+              )}
+              
               <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'outline'}
@@ -592,6 +712,20 @@ const AdminParksContent = () => {
                 </Button>
               </div>
             </div>
+            
+            {/* Select All Checkbox */}
+            {currentParks.length > 0 && (
+              <div className="flex items-center px-2 py-2 border-t">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={handleSelectAll}
+                  className="mr-2"
+                />
+                <span className="text-sm text-gray-600">
+                  Seleccionar todos en esta página ({currentParks.length})
+                </span>
+              </div>
+            )}
           </div>
         </div>
         {/* ===== FIN SECCIÓN BÚSQUEDA SIN FILTROS ===== */}
@@ -614,6 +748,60 @@ const AdminParksContent = () => {
           </>
         )}
       </div>
+
+      {/* Bulk Delete confirmation dialog */}
+      <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar {selectedParks.size} parque{selectedParks.size > 1 ? 's' : ''}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará permanentemente los parques seleccionados y todos sus datos asociados.
+              {loadingDependencies && (
+                <div className="mt-4 text-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mx-auto"></div>
+                  <p className="mt-2 text-sm">Analizando dependencias...</p>
+                </div>
+              )}
+              {bulkDeleteDependencies && Object.keys(bulkDeleteDependencies).length > 0 && (
+                <div className="mt-4 p-4 bg-yellow-50 rounded-md max-h-60 overflow-y-auto">
+                  <h4 className="font-medium text-yellow-800 mb-2">Dependencias que serán eliminadas:</h4>
+                  <div className="space-y-2 text-sm text-yellow-700">
+                    {Object.entries(bulkDeleteDependencies).map(([parkId, deps]) => {
+                      const park = parks.find(p => p.id.toString() === parkId);
+                      const totalDeps = deps.total || 0;
+                      return totalDeps > 0 ? (
+                        <div key={parkId} className="border-l-2 border-yellow-300 pl-2">
+                          <div className="font-medium">{park?.name || `Parque ${parkId}`} ({totalDeps} registros):</div>
+                          <div className="ml-2 text-xs">
+                            {deps.trees > 0 && <span className="mr-2">🌳 {deps.trees} árboles</span>}
+                            {deps.activities > 0 && <span className="mr-2">🏃 {deps.activities} actividades</span>}
+                            {deps.amenities > 0 && <span className="mr-2">🛠️ {deps.amenities} amenidades</span>}
+                            {deps.assets > 0 && <span className="mr-2">📦 {deps.assets} activos</span>}
+                            {deps.images > 0 && <span className="mr-2">📸 {deps.images} imágenes</span>}
+                            {deps.documents > 0 && <span className="mr-2">📄 {deps.documents} documentos</span>}
+                            {deps.evaluations > 0 && <span className="mr-2">⭐ {deps.evaluations} evaluaciones</span>}
+                            {deps.incidents > 0 && <span className="mr-2">⚠️ {deps.incidents} incidencias</span>}
+                          </div>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDeleteConfirm}
+              disabled={bulkDeleteMutation.isPending || loadingDependencies}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {bulkDeleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
