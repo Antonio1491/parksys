@@ -28,6 +28,12 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     const importedActivities = [];
     const errors = [];
     
+    console.log(`🚀 PUNTO CRÍTICO: A punto de iniciar bucle`);
+    console.log(`🔍 Array activities es válido:`, Array.isArray(activities));
+    console.log(`🔍 Longitud del array:`, activities.length);
+    console.log(`🔍 Tipo de activities:`, typeof activities);
+    console.log(`🔍 Primer elemento existe:`, !!activities[0]);
+    
     for (let i = 0; i < activities.length; i++) {
       let activityData = activities[i];
       console.log(`\n🔄 [${i+1}/${activities.length}] Procesando: "${activityData.title}"`);
