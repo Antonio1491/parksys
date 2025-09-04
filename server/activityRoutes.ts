@@ -25,8 +25,11 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     console.log(`📥 Iniciando importación de ${activities.length} actividades`);
     console.log(`🔍 Primera actividad de ejemplo:`, JSON.stringify(activities[0], null, 2));
     
+    console.log(`🔥 CHECKPOINT 1: Después de mostrar ejemplo`);
     const importedActivities = [];
+    console.log(`🔥 CHECKPOINT 2: Arrays inicializados`);
     const errors = [];
+    console.log(`🔥 CHECKPOINT 3: Variables creadas correctamente`);
     
     console.log(`🚀 PUNTO CRÍTICO: A punto de iniciar bucle`);
     console.log(`🔍 Array activities es válido:`, Array.isArray(activities));
