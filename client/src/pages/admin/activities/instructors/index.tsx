@@ -43,7 +43,9 @@ import {
   Users,
   UserCheck,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  Upload,
+  FileSpreadsheet
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -59,6 +61,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { apiRequest } from '@/lib/queryClient';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import Papa from 'papaparse';
 
 interface Instructor {
   id: number;
@@ -104,6 +107,13 @@ export default function InstructorsManagementPage() {
   // Estados para eliminación masiva
   const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
   const [deleteInstructorId, setDeleteInstructorId] = useState<number | null>(null);
+  
+  // Estados para importación CSV
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvData, setCsvData] = useState<any[]>([]);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [isProcessingCsv, setIsProcessingCsv] = useState(false);
 
   // Obtener lista de instructores
   const { data: instructors = [], isLoading, isError, refetch } = useQuery({
@@ -168,6 +178,90 @@ export default function InstructorsManagementPage() {
       setDeleteAllDialogOpen(false);
     },
   });
+
+  // Mutación para importar instructores desde CSV
+  const importInstructorsMutation = useMutation({
+    mutationFn: async (instructorsData: any[]) => {
+      return await apiRequest('/api/instructors/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ instructors: instructorsData }),
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Importación completada",
+        description: data.message || "Instructores importados correctamente",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/instructors'] });
+      setShowImportDialog(false);
+      setCsvFile(null);
+      setCsvData([]);
+      setImportPreview([]);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error en importación",
+        description: error.message || "Error al importar instructores",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Funciones para manejo de CSV
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === 'text/csv') {
+      setCsvFile(file);
+      setIsProcessingCsv(true);
+      
+      Papa.parse(file, {
+        header: true,
+        complete: (results) => {
+          console.log('CSV procesado:', results.data);
+          setCsvData(results.data as any[]);
+          setImportPreview((results.data as any[]).slice(0, 5)); // Mostrar primeras 5 filas
+          setIsProcessingCsv(false);
+        },
+        error: (error) => {
+          console.error('Error al procesar CSV:', error);
+          toast({
+            title: "Error",
+            description: "Error al procesar el archivo CSV",
+            variant: "destructive",
+          });
+          setIsProcessingCsv(false);
+        }
+      });
+    } else {
+      toast({
+        title: "Archivo inválido",
+        description: "Por favor selecciona un archivo CSV válido",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImportConfirm = () => {
+    if (csvData.length > 0) {
+      importInstructorsMutation.mutate(csvData);
+    }
+  };
+
+  const downloadTemplate = () => {
+    const csvContent = `data:text/csv;charset=utf-8,fullName,firstName,lastName,email,phone,age,gender,address,specialties,certifications,experienceYears,availableDays,availableHours,bio,qualifications,education,hourlyRate,status
+"María García López","María","García López","maria.garcia@email.com","5551234567",32,"femenino","Av. Reforma 123, CDMX","Yoga,Pilates,Meditación","Certificación Internacional de Yoga,Instructor de Pilates Certificado",5,"lunes,miércoles,viernes","09:00-17:00","Instructora especializada en bienestar y relajación con más de 5 años de experiencia.","Licenciatura en Educación Física","Universidad Nacional",350,"active"`;
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "plantilla_instructores.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Obtener especialidades únicas para el filtro
   const uniqueSpecialties = Array.from(
@@ -441,6 +535,10 @@ export default function InstructorsManagementPage() {
               <Button onClick={() => setLocation('/admin/activities/instructors/new')} className="bg-[#00a587] hover:bg-[#067f5f]">
                 <Plus className="mr-2 h-4 w-4" />
                 Nuevo Instructor
+              </Button>
+              <Button onClick={() => setShowImportDialog(true)} variant="outline" className="border-[#00a587] text-[#00a587] hover:bg-[#00a587]/10">
+                <Upload className="mr-2 h-4 w-4" />
+                Importar CSV
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -877,6 +975,114 @@ export default function InstructorsManagementPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Diálogo de importación CSV */}
+      <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <FileSpreadsheet className="h-6 w-6 text-[#00a587]" />
+              <span>Importar Instructores desde CSV</span>
+            </DialogTitle>
+            <DialogDescription>
+              Carga un archivo CSV para importar múltiples instructores de forma masiva
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* Botón para descargar plantilla */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2">📋 Plantilla CSV</h4>
+              <p className="text-sm text-blue-700 mb-3">
+                Para garantizar una importación exitosa, descarga y usa nuestra plantilla CSV oficial
+              </p>
+              <Button onClick={downloadTemplate} variant="outline" size="sm" className="border-blue-500 text-blue-600 hover:bg-blue-50">
+                <Download className="mr-2 h-4 w-4" />
+                Descargar Plantilla
+              </Button>
+            </div>
+
+            {/* Selector de archivo */}
+            <div className="space-y-3">
+              <h4 className="font-medium">Seleccionar archivo CSV</h4>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-500
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-[#00a587] file:text-white
+                          hover:file:bg-[#067f5f]"
+              />
+              {isProcessingCsv && (
+                <div className="flex items-center text-sm text-gray-600">
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Procesando archivo CSV...
+                </div>
+              )}
+            </div>
+
+            {/* Vista previa de datos */}
+            {importPreview.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Vista previa (primeras 5 filas)</h4>
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="overflow-x-auto max-h-64">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left">Nombre</th>
+                          <th className="px-3 py-2 text-left">Email</th>
+                          <th className="px-3 py-2 text-left">Especialidades</th>
+                          <th className="px-3 py-2 text-left">Experiencia</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importPreview.map((row, index) => (
+                          <tr key={index} className="border-t">
+                            <td className="px-3 py-2">{row.fullName || `${row.firstName} ${row.lastName}`}</td>
+                            <td className="px-3 py-2">{row.email}</td>
+                            <td className="px-3 py-2">{row.specialties}</td>
+                            <td className="px-3 py-2">{row.experienceYears} años</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-600">
+                  Se procesarán {csvData.length} instructores en total
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setShowImportDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleImportConfirm}
+              disabled={csvData.length === 0 || importInstructorsMutation.isPending}
+              className="bg-[#00a587] hover:bg-[#067f5f]"
+            >
+              {importInstructorsMutation.isPending ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Importando...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Importar Instructores
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

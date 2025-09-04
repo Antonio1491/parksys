@@ -310,6 +310,119 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
     }
   });
 
+  // Importar instructores desde CSV
+  apiRouter.post('/instructors/import', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { instructors: instructorsData } = req.body;
+
+      if (!instructorsData || !Array.isArray(instructorsData)) {
+        return res.status(400).json({ 
+          message: 'Se requiere un array de instructores válido' 
+        });
+      }
+
+      console.log(`🔍 Procesando importación de ${instructorsData.length} instructores...`);
+
+      const results = [];
+      const errors = [];
+
+      for (const [index, instructorData] of instructorsData.entries()) {
+        try {
+          // Procesar campos especiales
+          const processedData = {
+            ...instructorData,
+            // Construir fullName si no existe
+            fullName: instructorData.fullName || `${instructorData.firstName || ''} ${instructorData.lastName || ''}`.trim(),
+            
+            // Convertir números
+            age: instructorData.age ? parseInt(instructorData.age) : undefined,
+            experienceYears: instructorData.experienceYears ? parseInt(instructorData.experienceYears) : 0,
+            hourlyRate: instructorData.hourlyRate ? parseFloat(instructorData.hourlyRate) : 0,
+            
+            // Procesar arrays (specialties, certifications, availableDays)
+            specialties: Array.isArray(instructorData.specialties) 
+              ? instructorData.specialties 
+              : (instructorData.specialties ? instructorData.specialties.split(',').map(s => s.trim()) : []),
+            
+            certifications: Array.isArray(instructorData.certifications)
+              ? instructorData.certifications
+              : (instructorData.certifications ? instructorData.certifications.split(',').map(s => s.trim()) : []),
+            
+            availableDays: Array.isArray(instructorData.availableDays)
+              ? instructorData.availableDays
+              : (instructorData.availableDays ? instructorData.availableDays.split(',').map(s => s.trim()) : []),
+            
+            // Establecer valores por defecto
+            status: instructorData.status || 'active',
+            rating: 0,
+            activitiesCount: 0,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+
+          // Validar datos
+          const validationResult = insertInstructorSchema.safeParse(processedData);
+          
+          if (!validationResult.success) {
+            errors.push({
+              row: index + 1,
+              email: instructorData.email,
+              errors: validationResult.error.format()
+            });
+            continue;
+          }
+
+          // Verificar si el email ya existe
+          const existingInstructor = await db
+            .select({ id: instructors.id })
+            .from(instructors)
+            .where(eq(instructors.email, validationResult.data.email))
+            .limit(1);
+
+          if (existingInstructor.length > 0) {
+            errors.push({
+              row: index + 1,
+              email: instructorData.email,
+              error: 'El email ya existe'
+            });
+            continue;
+          }
+
+          // Insertar instructor
+          const [newInstructor] = await db
+            .insert(instructors)
+            .values(validationResult.data)
+            .returning();
+
+          results.push(newInstructor);
+
+        } catch (error) {
+          errors.push({
+            row: index + 1,
+            email: instructorData.email,
+            error: error instanceof Error ? error.message : 'Error desconocido'
+          });
+        }
+      }
+
+      console.log(`✅ Importación completada: ${results.length} exitosos, ${errors.length} errores`);
+
+      res.json({
+        message: `Importación completada: ${results.length} instructores creados, ${errors.length} errores`,
+        successful: results.length,
+        errors: errors.length,
+        errorDetails: errors
+      });
+
+    } catch (error) {
+      console.error('Error en importación de instructores:', error);
+      res.status(500).json({ 
+        message: 'Error al procesar la importación',
+        error: error instanceof Error ? error.message : 'Error desconocido'
+      });
+    }
+  });
+
   // Crear nuevo instructor
   apiRouter.post('/instructors', upload.fields([
     { name: 'profileImage', maxCount: 1 },
