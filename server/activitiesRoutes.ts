@@ -125,7 +125,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
   apiRouter.get("/parks/:id/activities", async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
-      const activities = await storage.getParkActivities(parkId);
+      const activities = await (storage as any).getParkActivities(parkId);
       res.json(activities);
     } catch (error) {
       console.error("Error al obtener actividades del parque:", error);
@@ -178,7 +178,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
       console.log("Datos procesados para crear actividad:", activityData);
       
       const data = insertActivitySchema.parse(activityData);
-      const result = await storage.createActivity(data);
+      const result = await (storage as any).createActivity(data);
       
       res.status(201).json(result);
     } catch (error) {
@@ -203,7 +203,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
       console.log("🎯 INICIO DEL PROCESO DE ACTUALIZACIÓN - ID:", activityId);
       
       // Verificar si la actividad existe
-      const existingActivity = await storage.getActivity(activityId);
+      const existingActivity = await (storage as any).getActivity(activityId);
       if (!existingActivity) {
         console.log("❌ ACTIVIDAD NO ENCONTRADA - ID:", activityId);
         return res.status(404).json({ message: "Actividad no encontrada" });
@@ -268,7 +268,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
       });
       
       try {
-        const result = await storage.updateActivity(activityId, activityData);
+        const result = await (storage as any).updateActivity(activityId, activityData);
         console.log("🎉 Resultado de updateActivity:", result);
         res.json(result);
       } catch (storageError) {
@@ -295,13 +295,13 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
       console.log("Eliminando actividad con ID:", activityId);
       
       // Verificar si la actividad existe
-      const existingActivity = await storage.getActivity(activityId);
+      const existingActivity = await (storage as any).getActivity(activityId);
       if (!existingActivity) {
         return res.status(404).json({ message: "Actividad no encontrada" });
       }
       
       // Eliminar la actividad
-      const result = await storage.deleteActivity(activityId);
+      const result = await (storage as any).deleteActivity(activityId);
       
       if (result) {
         res.status(200).json({ success: true, message: "Actividad eliminada correctamente" });
@@ -390,7 +390,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
           console.log(`✅ Validación Zod exitosa para "${activityData.title}"`);
 
           // Insert the activity using storage layer
-          await storage.createActivity(validatedActivity);
+          await (storage as any).createActivity(validatedActivity);
           imported++;
           
           console.log(`✓ Actividad importada: "${validatedActivity.title}"`);

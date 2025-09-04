@@ -1,0 +1,1220 @@
+The service worker navigation preload request was cancelled before 'preloadResponse' settled. If you intend to use 'preloadResponse', use waitUntil() or respondWith() to wait for the promise to settle.Understand this error
+76The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+76The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+76The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+ParkSys:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+ParkSys:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+ParkSys:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+_app-8a34a6428039682b.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-8a34a6428039682b.js:38 [LaunchDarkly] LaunchDarkly client initialized
+ParkSys:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+27Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'battery'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+framework-5a9569bb6cecd467.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uD @ framework-5a9569bb6cecd467.js:1
+uI @ framework-5a9569bb6cecd467.js:1
+uM @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this warning
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Afetch%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A25316c34&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=252bfde5-73a8-49b3-be5e-e079f781df3a:1  Failed to load resource: net::ERR_CONNECTION_CLOSEDUnderstand this error
+stallwart.build.js:1 stallwart: failed ping 1
+_app-8a34a6428039682b.js:38 task queue exceeded allotted deadline by 52ms
+(anonymous) @ _app-8a34a6428039682b.js:38
+_process @ 7b975a49.e94d2349c588dbed.js:3
+(anonymous) @ 7b975a49.e94d2349c588dbed.js:3
+n @ _app-8a34a6428039682b.js:38Understand this warning
+_app-8a34a6428039682b.js:38 task queue exceeded allotted deadline by 26ms
+(anonymous) @ _app-8a34a6428039682b.js:38
+_process @ 7b975a49.e94d2349c588dbed.js:3
+(anonymous) @ 7b975a49.e94d2349c588dbed.js:3
+n @ _app-8a34a6428039682b.js:38Understand this warning
+_app-8a34a6428039682b.js:38 task queue exceeded allotted deadline by 37ms
+(anonymous) @ _app-8a34a6428039682b.js:38
+_process @ 7b975a49.e94d2349c588dbed.js:3
+(anonymous) @ 7b975a49.e94d2349c588dbed.js:3
+n @ _app-8a34a6428039682b.js:38Understand this warning
+_app-8a34a6428039682b.js:38 task queue exceeded allotted deadline by 58ms
+(anonymous) @ _app-8a34a6428039682b.js:38
+_process @ 6344.65af94e8aa6ace02.js:15
+(anonymous) @ 6344.65af94e8aa6ace02.js:15
+n @ _app-8a34a6428039682b.js:38Understand this warning
+4233-a7cee931f0cb3ac3.js:1 WebSocket is already in CLOSING or CLOSED state.
+send @ 4233-a7cee931f0cb3ac3.js:1
+k @ 4233-a7cee931f0cb3ac3.js:1
+send @ 4233-a7cee931f0cb3ac3.js:1
+(anonymous) @ 4233-a7cee931f0cb3ac3.js:1
+L @ 4233-a7cee931f0cb3ac3.js:1
+n @ _app-8a34a6428039682b.js:38
+(anonymous) @ 268-d9c18482c7e317a4.js:1
+oM @ framework-5a9569bb6cecd467.js:1
+oD @ framework-5a9569bb6cecd467.js:1
+uB @ framework-5a9569bb6cecd467.js:1
+u_ @ framework-5a9569bb6cecd467.js:1
+r6 @ framework-5a9569bb6cecd467.js:1
+(anonymous) @ framework-5a9569bb6cecd467.js:1
+uO @ framework-5a9569bb6cecd467.js:1
+uS @ framework-5a9569bb6cecd467.js:1
+C @ framework-5a9569bb6cecd467.js:1
+z @ framework-5a9569bb6cecd467.js:1Understand this error
+stallwart.build.js:1 stallwart: failed ping 1
+stallwart.build.js:1 stallwart: failed ping 2
+stallwart.build.js:1 stallwart: failed ping 3
+stallwart.build.js:1 stallwart: failed ping 4
+stallwart.build.js:1 stallwart: failed ping 5
+stallwart.build.js:1 stallwart: session stalled
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'battery'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin&id=%3Ar2a0%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Talleres de pintura o escultura para fomentar creatividad y expresión artística."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Fundidora"
+Console.js:61 🏞️ Buscando parque: "Parque Fundidora"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Fundidora (ID: 29)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Arte y Cultura"
+Console.js:61 🎨 Buscando categoría: "Arte y Cultura"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Arte y Cultura (ID: 1)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "16/09/25"
+Console.js:61 📅 Fecha inicio convertida: "16/09/25" -> "2025-09-16T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "16/09/25"
+Console.js:61 📅 Fecha fin convertida: "16/09/25" -> "2025-09-16T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Pabellón Creativo"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.6735"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–100.2833"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "100"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "90"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "150"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Caballetes, pinceles, pinturas acrílicas, arcilla, mesas de trabajo"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Edad mínima ocho años, inscripción previa, uso obligatorio de mandil y materiales básicos"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Niños"
+Console.js:61 🎯 Mercado objetivo: ["Niños"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 4: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Clases de música o presentaciones en vivo"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Clases de música o presentaciones en vivo con artistas locales invitados."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Bosque de Chapultepec"
+Console.js:61 🏞️ Buscando parque: "Bosque de Chapultepec"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Bosque de Chapultepec (ID: 33)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Arte y Cultura"
+Console.js:61 🎨 Buscando categoría: "Arte y Cultura"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Arte y Cultura (ID: 1)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "17/09/25"
+Console.js:61 📅 Fecha inicio convertida: "17/09/25" -> "2025-09-17T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "17/09/25"
+Console.js:61 📅 Fecha fin convertida: "17/09/25" -> "2025-09-17T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Foro Cultural"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.4131"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–99.1978"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "20"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "60"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Micrófonos, guitarras, teclados, bocinas profesionales, tarima pequeña"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Participación abierta, registro en línea, traer instrumento propio si se desea"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adolescentes"
+Console.js:61 🎯 Mercado objetivo: ["Adolescentes"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 5: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Teatro comunitario en el parque"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Teatro comunitario en el parque con actores amateurs y obras clásicas."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Tangamanga I"
+Console.js:61 🏞️ Buscando parque: "Parque Tangamanga I"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Tangamanga I (ID: 31)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Arte y Cultura"
+Console.js:61 🎨 Buscando categoría: "Arte y Cultura"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Arte y Cultura (ID: 1)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "18/09/25"
+Console.js:61 📅 Fecha inicio convertida: "18/09/25" -> "2025-09-18T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "18/09/25"
+Console.js:61 📅 Fecha fin convertida: "18/09/25" -> "2025-09-18T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "9:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "11:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Escenario del Lago"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "22.254158"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "−100.93519"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "45"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "75"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "100"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Telón, focos teatrales, vestuario básico, micrófonos de diadema"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Registro anticipado, asistencia mínima de diez personas, respeto a turnos de actuación"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos Mayores"
+Console.js:61 🎯 Mercado objetivo: ["Adultos Mayores"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 6: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Exhibiciones de fotografía y arte urbano"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Exhibiciones de fotografía y arte urbano abiertas al público general."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Metropolitano"
+Console.js:61 🏞️ Buscando parque: "Parque Metropolitano"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Metropolitano (ID: 35)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Arte y Cultura"
+Console.js:61 🎨 Buscando categoría: "Arte y Cultura"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Arte y Cultura (ID: 1)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "19/09/25"
+Console.js:61 📅 Fecha inicio convertida: "19/09/25" -> "2025-09-19T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "19/09/25"
+Console.js:61 📅 Fecha fin convertida: "19/09/25" -> "2025-09-19T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "10:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "12:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Galería al Aire Libre"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "21.1706149"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–101.6952881"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "40"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "105"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "120"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Paneles móviles, impresoras fotográficas, caballetes de exhibición, luces LED"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Inscripción gratuita, máximo tres fotografías por participante, material de exhibición propio"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 7: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Cuenta cuentos y actividades literarias para niños"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Cuenta cuentos y actividades literarias para niños en espacios de lectura."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Bicentenario"
+Console.js:61 🏞️ Buscando parque: "Parque Bicentenario"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Bicentenario (ID: 30)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Arte y Cultura"
+Console.js:61 🎨 Buscando categoría: "Arte y Cultura"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Arte y Cultura (ID: 1)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "20/09/25"
+Console.js:61 📅 Fecha inicio convertida: "20/09/25" -> "2025-09-20T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "20/09/25"
+Console.js:61 📅 Fecha fin convertida: "20/09/25" -> "2025-09-20T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "11:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "14:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Rincón de la Lectura"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.4194815"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–99.1894558"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "40"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "50"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Alfombra de lectura, cojines, libros infantiles, micrófono inalámbrico"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Actividad dirigida a niños de tres a diez años, acompañados por adulto"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Preescolar"
+Console.js:61 🎯 Mercado objetivo: ["Preescolar"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 8: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Caminatas guiadas de observación de aves"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Caminatas guiadas de observación de aves con expertos en biodiversidad local."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque La Mexicana"
+Console.js:61 🏞️ Buscando parque: "Parque La Mexicana"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque La Mexicana (ID: 32)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Naturaleza y Ciencia"
+Console.js:61 🎨 Buscando categoría: "Naturaleza y Ciencia"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Naturaleza y Ciencia (ID: 2)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "21/09/25"
+Console.js:61 📅 Fecha inicio convertida: "21/09/25" -> "2025-09-21T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "21/09/25"
+Console.js:61 📅 Fecha fin convertida: "21/09/25" -> "2025-09-21T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "12:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "15:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Sendero Ecológico"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.4285"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–99.1277"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "150"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "140"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "180"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Binoculares, guías de aves, chalecos identificadores, libreta de campo"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Reservación previa, cupo máximo veinte personas, traer ropa cómoda y gorra"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Sí"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos Mayores"
+Console.js:61 🎯 Mercado objetivo: ["Adultos Mayores"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 9: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Talleres de jardinería y compostaje"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Talleres de jardinería y compostaje para aprender técnicas de cultivo sustentable."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Rufino Tamayo"
+Console.js:61 🏞️ Buscando parque: "Parque Rufino Tamayo"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Rufino Tamayo (ID: 34)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Naturaleza y Ciencia"
+Console.js:61 🎨 Buscando categoría: "Naturaleza y Ciencia"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Naturaleza y Ciencia (ID: 2)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "22/09/25"
+Console.js:61 📅 Fecha inicio convertida: "22/09/25" -> "2025-09-22T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "22/09/25"
+Console.js:61 📅 Fecha fin convertida: "22/09/25" -> "2025-09-22T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "13:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "17:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Huerto Educativo"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.6446"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–100.3297"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "200"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "80"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Macetas, tierra, semillas, composta, guantes de jardinería"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Actividad familiar, cupo limitado a quince personas, traer guantes de jardinería"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 10: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Sesiones de meditación y mindfulness"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Sesiones de meditación y mindfulness en espacios tranquilos rodeados de naturaleza."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Central Ciudad Juárez"
+Console.js:61 🏞️ Buscando parque: "Parque Central Ciudad Juárez"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Central Ciudad Juárez (ID: 24)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Naturaleza y Ciencia"
+Console.js:61 🎨 Buscando categoría: "Naturaleza y Ciencia"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Naturaleza y Ciencia (ID: 2)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "23/09/25"
+Console.js:61 📅 Fecha inicio convertida: "23/09/25" -> "2025-09-23T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "23/09/25"
+Console.js:61 📅 Fecha fin convertida: "23/09/25" -> "2025-09-23T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "14:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "18:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Jardín Zen"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "31.68725735"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-106.4263812"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "26"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "55"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "50"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Tapetes, incienso, difusores de aroma, cojines de meditación"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Edad mínima doce años, ropa cómoda, silencio absoluto durante la práctica"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 11: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Senderismo en rutas señalizadas"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Picnic comunitario con juegos tradicionales que fomentan convivencia y amistad."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Guanajuato Bicentenario"
+Console.js:61 🏞️ Buscando parque: "Parque Guanajuato Bicentenario"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Guanajuato Bicentenario (ID: 28)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Naturaleza y Ciencia"
+Console.js:61 🎨 Buscando categoría: "Naturaleza y Ciencia"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Naturaleza y Ciencia (ID: 2)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "24/09/25"
+Console.js:61 📅 Fecha inicio convertida: "24/09/25" -> "2025-09-24T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "24/09/25"
+Console.js:61 📅 Fecha fin convertida: "24/09/25" -> "2025-09-24T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Prado Familiar"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.95725904"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-101.3591301"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "45"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "120"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Manteles, canastas, juegos tradicionales, pelotas inflables"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Acceso libre, traer alimentos sin envases de vidrio, respeto a áreas verdes"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Niños"
+Console.js:61 🎯 Mercado objetivo: ["Niños"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 12: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Picnic comunitario con juegos tradicionales"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Senderismo en rutas señalizadas que promueven la actividad física y el contacto natural."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque el Capitán"
+Console.js:61 🏞️ Buscando parque: "Parque el Capitán"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque el Capitán (ID: 27)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Naturaleza y Ciencia"
+Console.js:61 🎨 Buscando categoría: "Naturaleza y Ciencia"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Naturaleza y Ciencia (ID: 2)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "25/09/25"
+Console.js:61 📅 Fecha inicio convertida: "25/09/25" -> "2025-09-25T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "25/09/25"
+Console.js:61 📅 Fecha fin convertida: "25/09/25" -> "2025-09-25T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Ruta del Bosque"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.66714758"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-100.3652901"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "30"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "90"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "90"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Señalización, mapas, bastones de senderismo, bebederos portátiles"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Actividad abierta, llevar calzado cómodo, no salirse de rutas marcadas"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adolescentes"
+Console.js:61 🎯 Mercado objetivo: ["Adolescentes"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 13: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Circuito de ejercicio al aire libre (outdoor gym)"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Circuito de ejercicio al aire libre con máquinas y estaciones de entrenamiento."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Metropolitano de León"
+Console.js:61 🏞️ Buscando parque: "Parque Metropolitano de León"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Metropolitano de León (ID: 40)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Naturaleza y Ciencia"
+Console.js:61 🎨 Buscando categoría: "Naturaleza y Ciencia"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Naturaleza y Ciencia (ID: 2)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "26/09/25"
+Console.js:61 📅 Fecha inicio convertida: "26/09/25" -> "2025-09-26T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "26/09/25"
+Console.js:61 📅 Fecha fin convertida: "26/09/25" -> "2025-09-26T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Zona Fitness"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "21.17378232"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-101.685708"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "100"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "45"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Barras paralelas, bicicletas estáticas, escaladoras, señalética de rutinas"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Uso obligatorio de toalla y agua personal, cupo máximo veinte usuarios por sesión"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 14: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Clases de yoga al aire libre"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Clases de yoga al aire libre para relajarse, estirar y fortalecer el cuerpo."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Gran Parque La Plancha"
+Console.js:61 🏞️ Buscando parque: "Gran Parque La Plancha"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Gran Parque La Plancha (ID: 22)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "27/09/25"
+Console.js:61 📅 Fecha inicio convertida: "27/09/25" -> "2025-09-27T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "27/09/25"
+Console.js:61 📅 Fecha fin convertida: "27/09/25" -> "2025-09-27T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "9:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "11:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Terraza del Sol"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.97845435"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-89.61173802"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "20"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "60"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "70"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Tapetes de yoga, bocinas portátiles, velas decorativas, instructivo visual"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Reservar con anticipación, llevar tapete personal, ropa cómoda y ligera"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Sí"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos Mayores"
+Console.js:61 🎯 Mercado objetivo: ["Adultos Mayores"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 15: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Torneos de fútbol rápido"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Torneos de fútbol rápido organizados con equipos locales en canchas del parque."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Ecológico Explora"
+Console.js:61 🏞️ Buscando parque: "Parque Ecológico Explora"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Ecológico Explora (ID: 21)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "28/09/25"
+Console.js:61 📅 Fecha inicio convertida: "28/09/25" -> "2025-09-28T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "28/09/25"
+Console.js:61 📅 Fecha fin convertida: "28/09/25" -> "2025-09-28T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "10:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "12:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Cancha Multiusos"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "21.11"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–101.6592"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "45"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "70"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "120"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Balones de fútbol, conos, redes portátiles, silbatos"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Participación a partir de doce años, equipo deportivo adecuado, máximo diez equipos"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adolescentes"
+Console.js:61 🎯 Mercado objetivo: ["Adolescentes"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 16: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Carreras y caminatas recreativas"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Carreras y caminatas recreativas para todas las edades en senderos señalizados."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Fundidora"
+Console.js:61 🏞️ Buscando parque: "Parque Fundidora"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Fundidora (ID: 29)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "29/09/25"
+Console.js:61 📅 Fecha inicio convertida: "29/09/25" -> "2025-09-29T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "29/09/25"
+Console.js:61 📅 Fecha fin convertida: "29/09/25" -> "2025-09-29T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "11:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "14:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Pista Perimetral"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.6735"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–100.2833"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "40"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "90"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Chalecos numerados, cronómetros, señalética de pista, carpas de hidratación"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Acceso libre, niños acompañados por adultos, hidratación personal recomendada"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 17: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Clases de zumba o baile fitness"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Clases de zumba o baile fitness con música animada y ambiente energético."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Bosque de Chapultepec"
+Console.js:61 🏞️ Buscando parque: "Bosque de Chapultepec"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Bosque de Chapultepec (ID: 33)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "30/09/25"
+Console.js:61 📅 Fecha inicio convertida: "30/09/25" -> "2025-09-30T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "30/09/25"
+Console.js:61 📅 Fecha fin convertida: "30/09/25" -> "2025-09-30T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "12:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "15:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Plaza del Movimiento"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.4131"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–99.1978"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "40"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "50"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "130"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Bocinas, tarima móvil, ropa deportiva, botellas de agua"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Cupo máximo cincuenta personas, inscripción gratuita, traer ropa deportiva ligera"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 18: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "CrossFit o entrenamiento funcional"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "CrossFit o entrenamiento funcional en áreas abiertas con estaciones dinámicas."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Tangamanga I"
+Console.js:61 🏞️ Buscando parque: "Parque Tangamanga I"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Tangamanga I (ID: 31)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "01/10/25"
+Console.js:61 📅 Fecha inicio convertida: "01/10/25" -> "2025-10-01T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "01/10/25"
+Console.js:61 📅 Fecha fin convertida: "01/10/25" -> "2025-10-01T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "13:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "17:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Área de Desafío"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "22.254158"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "−100.93519"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "150"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "80"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "150"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Cajas pliométricas, cuerdas de batalla, llantas recicladas, pesas rusas"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Inscripción con cuota simbólica, uso obligatorio de calzado adecuado y guantes"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 19: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Renta de bicicletas o patines"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Renta de bicicletas o patines para recorrer ciclovías y zonas seguras."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Metropolitano"
+Console.js:61 🏞️ Buscando parque: "Parque Metropolitano"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Metropolitano (ID: 35)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "02/10/25"
+Console.js:61 📅 Fecha inicio convertida: "02/10/25" -> "2025-10-02T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "02/10/25"
+Console.js:61 📅 Fecha fin convertida: "02/10/25" -> "2025-10-02T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "14:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "18:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Estación de Rodadas"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "21.1706149"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–101.6952881"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "200"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "55"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Bicicletas, patines, cascos, chalecos reflectantes"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Edad mínima diez años, equipo de protección personal obligatorio, uso de casco"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Niños"
+Console.js:61 🎯 Mercado objetivo: ["Niños"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 20: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Rallys de aventura con pruebas físicas y mentales"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Rallys de aventura con pruebas físicas y mentales para jóvenes equipos."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Bicentenario"
+Console.js:61 🏞️ Buscando parque: "Parque Bicentenario"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Bicentenario (ID: 30)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "03/10/25"
+Console.js:61 📅 Fecha inicio convertida: "03/10/25" -> "2025-10-03T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "03/10/25"
+Console.js:61 📅 Fecha fin convertida: "03/10/25" -> "2025-10-03T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Circuito Aventura"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.4194815"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–99.1894558"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "26"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "120"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "170"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Cuerdas, obstáculos inflables, brújulas, cronómetros"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Participación en equipos de tres a cinco personas, inscripción previa obligatoria"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Sí"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adolescentes"
+Console.js:61 🎯 Mercado objetivo: ["Adolescentes"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 21: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Campamentos de verano con actividades recreativas"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Campamentos de verano con actividades recreativas, deportivas y educativas integradas."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque La Mexicana"
+Console.js:61 🏞️ Buscando parque: "Parque La Mexicana"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque La Mexicana (ID: 32)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Deportes y Recreación"
+Console.js:61 🎨 Buscando categoría: "Deportes y Recreación"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Deportes y Recreación (ID: 3)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "04/10/25"
+Console.js:61 📅 Fecha inicio convertida: "04/10/25" -> "2025-10-04T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "04/10/25"
+Console.js:61 📅 Fecha fin convertida: "04/10/25" -> "2025-10-04T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Zona de Campamento"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "19.4285"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–99.1277"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "45"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "150"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Tiendas de campaña, colchonetas, linternas, fogateros"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Dirigido a niños y jóvenes de siete a quince años, autorización de padres"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Niños"
+Console.js:61 🎯 Mercado objetivo: ["Niños"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 22: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Mercados verdes o de productores locales"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Mercados verdes o de productores locales con alimentos frescos y artesanales."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Rufino Tamayo"
+Console.js:61 🏞️ Buscando parque: "Parque Rufino Tamayo"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Rufino Tamayo (ID: 34)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Comunidad"
+Console.js:61 🎨 Buscando categoría: "Comunidad"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Comunidad (ID: 4)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "05/10/25"
+Console.js:61 📅 Fecha inicio convertida: "05/10/25" -> "2025-10-05T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "05/10/25"
+Console.js:61 📅 Fecha fin convertida: "05/10/25" -> "2025-10-05T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "8:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "9:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Plaza de los Sabores"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.6446"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "–100.3297"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "30"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "120"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "180"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Carpas modulares, mesas de exhibición, refrigeradores, manteles"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Participación libre, traer bolsas reutilizables, respetar normas de higiene y limpieza"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 23: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Ferias de adopción de mascotas"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Ferias de adopción de mascotas con stands informativos y voluntarios activos."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Central Ciudad Juárez"
+Console.js:61 🏞️ Buscando parque: "Parque Central Ciudad Juárez"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Central Ciudad Juárez (ID: 24)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Comunidad"
+Console.js:61 🎨 Buscando categoría: "Comunidad"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Comunidad (ID: 4)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "06/10/25"
+Console.js:61 📅 Fecha inicio convertida: "06/10/25" -> "2025-10-06T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "06/10/25"
+Console.js:61 📅 Fecha fin convertida: "06/10/25" -> "2025-10-06T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "9:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "11:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Jardín de los Animales"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "31.68725735"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-106.4263812"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "100"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "70"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Jaulas portátiles, bebederos, lonas, mesas informativas"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Adopción sujeta a requisitos legales, identificación oficial, compromiso de cuidado animal"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "No"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 24: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Talleres de manualidades para familias"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Talleres de manualidades para familias donde se crean objetos decorativos."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Guanajuato Bicentenario"
+Console.js:61 🏞️ Buscando parque: "Parque Guanajuato Bicentenario"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Guanajuato Bicentenario (ID: 28)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Comunidad"
+Console.js:61 🎨 Buscando categoría: "Comunidad"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Comunidad (ID: 4)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "07/10/25"
+Console.js:61 📅 Fecha inicio convertida: "07/10/25" -> "2025-10-07T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "07/10/25"
+Console.js:61 📅 Fecha fin convertida: "07/10/25" -> "2025-10-07T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "10:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "12:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Casa de la Comunidad"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.95725904"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-101.3591301"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "20"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "60"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "50"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Cartulinas, pinturas, pegamento, tijeras"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Acceso libre, niños acompañados por adultos, materiales incluidos en la actividad"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Preescolar"
+Console.js:61 🎯 Mercado objetivo: ["Preescolar"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 25: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Juegos de mesa gigantes (ajedrez, jenga, dominó)"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Juegos de mesa gigantes como ajedrez, jenga y dominó comunitario."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque el Capitán"
+Console.js:61 🏞️ Buscando parque: "Parque el Capitán"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque el Capitán (ID: 27)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Comunidad"
+Console.js:61 🎨 Buscando categoría: "Comunidad"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Comunidad (ID: 4)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "08/10/25"
+Console.js:61 📅 Fecha inicio convertida: "08/10/25" -> "2025-10-08T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "08/10/25"
+Console.js:61 📅 Fecha fin convertida: "08/10/25" -> "2025-10-08T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "11:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "14:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Patio Lúdico"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "25.66714758"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-100.3652901"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "45"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "40"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Ajedrez gigante, bloques de jenga gigante, fichas de dominó gigante, tapetes"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Edad mínima seis años, participación libre, máximo veinte jugadores por turno"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Niños"
+Console.js:61 🎯 Mercado objetivo: ["Niños"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 26: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Festivales gastronómicos"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Festivales gastronómicos con puestos variados de cocina internacional y regional."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Parque Metropolitano de León"
+Console.js:61 🏞️ Buscando parque: "Parque Metropolitano de León"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Parque Metropolitano de León (ID: 40)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Eventos de Temporada"
+Console.js:61 🎨 Buscando categoría: "Eventos de Temporada"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Eventos de Temporada (ID: 5)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "09/10/25"
+Console.js:61 📅 Fecha inicio convertida: "09/10/25" -> "2025-10-09T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "09/10/25"
+Console.js:61 📅 Fecha fin convertida: "09/10/25" -> "2025-10-09T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "12:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "15:30"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Corredor Gastronómico"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "21.17378232"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-101.685708"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "40"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "180"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "200"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "No"
+Console.js:61 💰 Procesando campo gratis: "No"
+Console.js:61 💰 Es gratis: false
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Carpas gastronómicas, mesas altas, parrillas portátiles, extintores"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Inscripción anticipada, cupo limitado, cumplimiento de normas de seguridad alimentaria"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adultos"
+Console.js:61 🎯 Mercado objetivo: ["Adultos"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 27: 28 valores: Array(28)
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Competencias de cometas/papalotes"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Competencias de cometas o papalotes que llenan el cielo de colores."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Gran Parque La Plancha"
+Console.js:61 🏞️ Buscando parque: "Gran Parque La Plancha"
+Console.js:61 🏞️ Parques disponibles: Array(14)
+Console.js:61 ✅ Parque encontrado: Gran Parque La Plancha (ID: 22)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Eventos de Temporada"
+Console.js:61 🎨 Buscando categoría: "Eventos de Temporada"
+Console.js:61 🎨 Categorías disponibles: Array(5)
+Console.js:61 ✅ Categoría encontrada: Eventos de Temporada (ID: 5)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "10/10/25"
+Console.js:61 📅 Fecha inicio convertida: "10/10/25" -> "2025-10-10T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "10/10/25"
+Console.js:61 📅 Fecha fin convertida: "10/10/25" -> "2025-10-10T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "13:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "17:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Colina del Viento"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.97845435"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-89.61173802"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "40"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "90"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Cometas, cuerdas resistentes, estacas, silbatos de coordinación"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Actividad gratuita, cupo limitado, cometa propia o adquirir en módulo oficial"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adolescentes"
+Console.js:61 🎯 Mercado objetivo: ["Adolescentes"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 🌐 [API REQUEST] POST /api/activities/import
+Console.js:61 🌐 [QUERY] GET /api/activities
