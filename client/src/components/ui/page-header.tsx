@@ -16,8 +16,7 @@ export const PageHeader = ({
   backgroundColor = 'bg-header-background',
 }: PageHeaderProps) => (
   <div
-    className="mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between"
-    style={{ backgroundColor }}
+    className={`mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between ${backgroundColor}`}
   >
     {/* Sección izquierda: ícono + título + subtítulo */}
     <div className="flex items-start gap-2 mt-5">

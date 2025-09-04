@@ -333,12 +333,15 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
 
       for (let i = 0; i < csvActivities.length; i++) {
         const activityData = csvActivities[i];
+        console.log(`\n🔄 Procesando actividad ${i + 1}/${csvActivities.length}: "${activityData.title}"`);
         
         try {
           // Validate required fields
+          console.log(`🔍 Validando campos requeridos para "${activityData.title}"`);
           if (!activityData.title || activityData.title.trim() === '') {
             throw new Error(`Fila ${i + 2}: El título es requerido`);
           }
+          console.log(`✅ Título válido: "${activityData.title}"`);;
           
           if (!activityData.parkId || activityData.parkId === '') {
             throw new Error(`Fila ${i + 2}: El parque es requerido`);
