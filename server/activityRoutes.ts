@@ -33,32 +33,50 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
         const activityData = activities[i];
         
         // Validar datos requeridos
-        if (!activityData.título || !activityData.descripción) {
+        if (!activityData.title || !activityData.description) {
           errors.push(`Fila ${i + 2}: Título y descripción son requeridos`);
           continue;
         }
         
-        // Mapear campos del CSV a formato de base de datos
+        // Mapear campos correctos del frontend
         const mappedActivity = {
-          title: activityData.título,
-          description: activityData.descripción,
-          startDate: activityData.fechaInicio || new Date().toISOString(),
-          endDate: activityData.fechaFin || new Date().toISOString(),
-          location: activityData.ubicación || '',
-          capacity: parseInt(activityData.capacidad) || 20,
-          price: parseFloat(activityData.precio) || 0,
-          isFree: activityData.esGratuita === 'true' || activityData.precio === '0',
-          parkId: parseInt(activityData.parqueId) || null,
-          categoryId: parseInt(activityData.categoríaId) || null,
+          title: activityData.title,
+          description: activityData.description,
+          startDate: activityData.startDate || new Date().toISOString(),
+          endDate: activityData.endDate || new Date().toISOString(),
+          startTime: activityData.startTime || null,
+          endTime: activityData.endTime || null,
+          location: activityData.location || '',
+          latitude: activityData.latitude ? parseFloat(activityData.latitude) : null,
+          longitude: activityData.longitude ? parseFloat(activityData.longitude) : null,
+          capacity: parseInt(activityData.capacity) || 20,
+          duration: parseInt(activityData.duration) || null,
+          price: parseFloat(activityData.price) || 0,
+          isFree: activityData.isFree === true || activityData.isFree === 'true',
+          materials: activityData.materials || '',
+          requirements: activityData.requirements || '',
+          isRecurring: activityData.isRecurring === true || activityData.isRecurring === 'true',
+          recurringDays: Array.isArray(activityData.recurringDays) ? activityData.recurringDays : [],
+          targetMarket: Array.isArray(activityData.targetMarket) ? activityData.targetMarket : [],
+          specialNeeds: Array.isArray(activityData.specialNeeds) ? activityData.specialNeeds : [],
+          allowsPublicRegistration: activityData.allowsPublicRegistration === true || activityData.allowsPublicRegistration === 'true',
+          maxRegistrations: activityData.maxRegistrations ? parseInt(activityData.maxRegistrations) : null,
+          registrationDeadline: activityData.registrationDeadline || null,
+          registrationInstructions: activityData.registrationInstructions || '',
+          requiresApproval: activityData.requiresApproval === true || activityData.requiresApproval === 'true',
+          ageRestrictions: activityData.ageRestrictions || '',
+          healthRequirements: activityData.healthRequirements || '',
+          parkId: parseInt(activityData.parkId) || null,
+          categoryId: parseInt(activityData.categoryId) || null,
           instructorId: parseInt(activityData.instructorId) || null,
-          status: activityData.estado || 'Activa'
+          status: 'Activa'
         };
         
         // Validar esquema usando Zod
         const validatedData = insertActivitySchema.parse(mappedActivity);
         
         // Crear actividad en la base de datos
-        const newActivity = await storage.createActivity(validatedData);
+        const newActivity = await (storage as any).createActivity(validatedData);
         importedActivities.push(newActivity);
         
         console.log(`✅ Actividad importada: ${validatedData.title}`);
