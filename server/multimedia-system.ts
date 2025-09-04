@@ -22,8 +22,8 @@ import { pool } from './db';
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = file.fieldname === 'document' 
-      ? 'public/uploads/park-documents' 
-      : 'public/uploads/park-images';
+      ? 'uploads/park-documents' 
+      : 'uploads/park-images';
     
     // Asegurar que el directorio existe
     if (!fs.existsSync(uploadPath)) {
@@ -188,7 +188,8 @@ export function registerMultimediaRoutes(app: any, apiRouter: Router, isAuthenti
       
     } catch (error) {
       console.error('❌ Error subiendo imagen:', error);
-      res.status(400).json({ error: 'Error al subir la imagen: ' + error.message });
+      const message = error instanceof Error ? error.message : 'Error desconocido';
+      res.status(400).json({ error: 'Error al subir la imagen: ' + message });
     }
   });
 
@@ -349,7 +350,7 @@ export function registerMultimediaRoutes(app: any, apiRouter: Router, isAuthenti
         category: category || 'general'
       });
       
-      const result = await db.execute(insertQuery, [
+      const result = await pool.query(insertQuery, [
         parkId,
         title,
         filePath,
@@ -360,10 +361,10 @@ export function registerMultimediaRoutes(app: any, apiRouter: Router, isAuthenti
         category || 'general'
       ]);
       
-      console.log('Resultado de inserción:', result);
+      console.log('Resultado de inserción:', result.rows);
       
-      console.log(`Nuevo documento creado para parque ${parkId}:`, result[0]);
-      res.status(201).json(result[0]);
+      console.log(`Nuevo documento creado para parque ${parkId}:`, result.rows[0]);
+      res.status(201).json(result.rows[0]);
       
     } catch (error) {
       console.error('Error subiendo documento:', error);
