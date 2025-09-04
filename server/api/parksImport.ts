@@ -354,6 +354,7 @@ export const processImportFile = async (req: Request, res: Response) => {
     const fieldMappings: { [key: string]: string } = {
       'nombre': 'name',
       'municipio': 'municipalityText',
+      'municipio_id': 'municipalityText',  // ✅ Agregar mapeo para municipio_id
       'direccion': 'address',
       'descripcion': 'description',
       'codigo_postal': 'postalCode',
@@ -476,6 +477,54 @@ export const processImportFile = async (req: Request, res: Response) => {
       return transformedData;
     });
     
+    // NUEVA SECCIÓN: Crear municipios automáticamente y mapear a IDs
+    const municipalityMap = new Map<string, number>();
+    
+    // Recopilar todos los municipios únicos del CSV
+    const uniqueMunicipalities = [...new Set(
+      parksData
+        .map(park => park.municipalityText)
+        .filter(text => text && text.trim() !== '')
+    )];
+    
+    console.log('🏙️ [IMPORT] Municipios únicos encontrados:', uniqueMunicipalities);
+    
+    // Crear o buscar municipios en la BD
+    for (const municipalityName of uniqueMunicipalities) {
+      try {
+        // Intentar encontrar municipio existente
+        const existingMunicipalities = await storage.getAllMunicipalities();
+        const existingMunicipality = existingMunicipalities.find(
+          m => m.name.toLowerCase() === municipalityName.toLowerCase()
+        );
+        
+        if (existingMunicipality) {
+          municipalityMap.set(municipalityName, existingMunicipality.id);
+          console.log(`✅ [IMPORT] Municipio existente mapeado: ${municipalityName} → ID ${existingMunicipality.id}`);
+        } else {
+          // Crear nuevo municipio
+          const newMunicipality = await storage.createMunicipality({
+            name: municipalityName,
+            state: 'Por definir' // Valor por defecto
+          });
+          municipalityMap.set(municipalityName, newMunicipality.id);
+          console.log(`🆕 [IMPORT] Nuevo municipio creado: ${municipalityName} → ID ${newMunicipality.id}`);
+        }
+      } catch (error) {
+        console.error(`❌ [IMPORT] Error procesando municipio ${municipalityName}:`, error);
+      }
+    }
+    
+    // Convertir municipalityText a municipalityId en todos los parques
+    parksData.forEach(park => {
+      if (park.municipalityText && municipalityMap.has(park.municipalityText)) {
+        park.municipalityId = municipalityMap.get(park.municipalityText);
+        console.log(`🔄 [IMPORT] Mapeado: "${park.municipalityText}" → ID ${park.municipalityId}`);
+      }
+      // Eliminar el campo temporal
+      delete park.municipalityText;
+    });
+
     // Validar y filtrar parques válidos
     const validParks: any[] = [];
     const errors: string[] = [];
