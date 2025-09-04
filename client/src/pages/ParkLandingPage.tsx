@@ -506,7 +506,7 @@ function ParkLandingPage() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-center gap-2 text-white/90 text-lg mb-4">
               <MapPin className="h-5 w-5" />
-              <span>{park.municipality?.name || 'Guadalajara'}, {park.municipality?.state || 'Jalisco'}</span>
+              <span>{park.municipalityText || ''}</span>
             </div>
           </div>
         </div>
@@ -1299,7 +1299,7 @@ function ParkLandingPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Municipio</p>
-                      <p className="font-medium">{park.municipality?.name}, {park.municipality?.state}</p>
+                      <p className="font-medium">{park.municipalityText || ''}</p>
                     </div>
                   </div>
 

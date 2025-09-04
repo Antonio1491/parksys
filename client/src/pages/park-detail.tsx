@@ -104,7 +104,7 @@ const ParkDetail: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold font-heading">{park.name}</h1>
             <p className="text-gray-600">
-              {park.municipality?.name || ''}, {park.municipality?.state || ''}
+              {park.municipalityText || ''}
             </p>
           </div>
           <div className="mt-2 md:mt-0">
