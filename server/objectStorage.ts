@@ -76,21 +76,39 @@ export class ObjectStorageService {
 
   // Search for a public object from the search paths.
   async searchPublicObject(filePath: string): Promise<File | null> {
-    for (const searchPath of this.getPublicObjectSearchPaths()) {
+    // Get configured search paths
+    const searchPaths = this.getPublicObjectSearchPaths();
+    
+    // Add direct bucket path for legacy park images
+    const bucketId = "replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2";
+    const allSearchPaths = [...searchPaths, `/${bucketId}`];
+    
+    console.log(`🔍 [OBJECT-SEARCH] Buscando '${filePath}' en paths: ${allSearchPaths.join(', ')}`);
+    
+    for (const searchPath of allSearchPaths) {
       const fullPath = `${searchPath}/${filePath}`;
+      console.log(`🔍 [OBJECT-SEARCH] Probando path: ${fullPath}`);
 
-      // Full path format: /<bucket_name>/<object_name>
-      const { bucketName, objectName } = parseObjectPath(fullPath);
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
+      try {
+        // Full path format: /<bucket_name>/<object_name>
+        const { bucketName, objectName } = parseObjectPath(fullPath);
+        const bucket = objectStorageClient.bucket(bucketName);
+        const file = bucket.file(objectName);
 
-      // Check if file exists
-      const [exists] = await file.exists();
-      if (exists) {
-        return file;
+        // Check if file exists
+        const [exists] = await file.exists();
+        if (exists) {
+          console.log(`✅ [OBJECT-SEARCH] Archivo encontrado en: ${fullPath}`);
+          return file;
+        }
+        console.log(`❌ [OBJECT-SEARCH] No encontrado en: ${fullPath}`);
+      } catch (error) {
+        console.log(`❌ [OBJECT-SEARCH] Error en path ${fullPath}:`, error);
+        continue;
       }
     }
 
+    console.log(`❌ [OBJECT-SEARCH] Archivo '${filePath}' no encontrado en ningún path`);
     return null;
   }
 

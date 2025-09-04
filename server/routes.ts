@@ -7371,15 +7371,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ruta para Object Storage - servir archivos públicos
   app.get("/public-objects/:filePath(*)", async (req: Request, res: Response) => {
     const filePath = req.params.filePath;
+    console.log(`🔍 [OBJECT-STORAGE] Buscando archivo: ${filePath}`);
     const objectStorageService = new ObjectStorageService();
     try {
       const file = await objectStorageService.searchPublicObject(filePath);
       if (!file) {
+        console.log(`❌ [OBJECT-STORAGE] Archivo no encontrado: ${filePath}`);
         return res.status(404).json({ error: "File not found" });
       }
+      console.log(`✅ [OBJECT-STORAGE] Archivo encontrado, sirviendo: ${filePath}`);
       objectStorageService.downloadObject(file, res);
     } catch (error) {
-      console.error("Error searching for public object:", error);
+      console.error("❌ [OBJECT-STORAGE] Error searching for public object:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   });
