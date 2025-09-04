@@ -26,6 +26,7 @@ interface Park {
   parkType: string;
   municipalityId: number;
   municipality?: { name: string };
+  municipalityText?: string; // ✅ Campo para municipio como texto libre
   certificaciones?: string;
   createdAt: string;
   updatedAt: string;
@@ -348,6 +349,12 @@ const AdminParksContent = () => {
                       <MapPin className="h-4 w-4 mr-1" />
                       <span className="max-w-xs truncate">{park.address}</span>
                     </div>
+                    {park.municipalityText && (
+                      <div className="flex items-center">
+                        <Map className="h-4 w-4 mr-1" />
+                        <span className="font-medium text-emerald-700">{park.municipalityText}</span>
+                      </div>
+                    )}
                     <div className="flex items-center">
                       <Package className="h-4 w-4 mr-1" />
                       <span>
@@ -443,6 +450,13 @@ const AdminParksContent = () => {
                   <MapPin className="h-4 w-4 mr-2" />
                   <span className="truncate">{park.address}</span>
                 </div>
+                
+                {park.municipalityText && (
+                  <div className="flex items-center text-sm text-emerald-700 font-medium">
+                    <Map className="h-4 w-4 mr-2" />
+                    <span>{park.municipalityText}</span>
+                  </div>
+                )}
                 
                 <div className="flex items-center text-sm text-gray-600">
                   <Package className="h-4 w-4 mr-2" />
