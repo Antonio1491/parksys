@@ -7384,20 +7384,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ruta para uploads dinámicos
   app.get('/uploads/*', (req: Request, res: Response) => {
     const filePath = req.path.replace('/uploads/', '');
-    const fullPath = path.join(process.cwd(), 'uploads', filePath);
     
-    if (fs.existsSync(fullPath)) {
-      res.sendFile(fullPath);
-    } else {
-      // Intentar en public/uploads
-      const publicPath = path.join(process.cwd(), 'public', 'uploads', filePath);
-      if (fs.existsSync(publicPath)) {
-        res.sendFile(publicPath);
-      } else {
-        console.log(`❌ Archivo no encontrado: ${fullPath} ni ${publicPath}`);
-        res.status(404).json({ error: 'Archivo no encontrado' });
+    // Lista de rutas a probar en orden de prioridad
+    const possiblePaths = [
+      path.join(process.cwd(), 'uploads', filePath),           // Desarrollo
+      path.join(process.cwd(), 'public', 'uploads', filePath), // Desarrollo alt
+      path.join(process.cwd(), 'dist', 'public', 'uploads', filePath), // Producción Vercel
+    ];
+    
+    console.log(`🔍 [UPLOADS] Buscando archivo: ${req.path}`);
+    
+    for (const testPath of possiblePaths) {
+      console.log(`🔍 [UPLOADS] Probando ruta: ${testPath}`);
+      
+      if (fs.existsSync(testPath)) {
+        console.log(`✅ [UPLOADS] Archivo encontrado en: ${testPath}`);
+        return res.sendFile(testPath);
       }
     }
+    
+    console.log(`❌ [UPLOADS] Archivo no encontrado en ninguna ruta:`);
+    possiblePaths.forEach(p => console.log(`   - ${p}`));
+    res.status(404).json({ error: 'Archivo no encontrado' });
   });
 
   // Ruta para fuentes
