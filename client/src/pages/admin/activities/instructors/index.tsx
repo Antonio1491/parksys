@@ -251,16 +251,24 @@ export default function InstructorsManagementPage() {
   };
 
   const downloadTemplate = () => {
-    const csvContent = `data:text/csv;charset=utf-8,fullName,firstName,lastName,email,phone,age,gender,address,specialties,certifications,experienceYears,availableDays,availableHours,bio,qualifications,education,hourlyRate,status
-"María García López","María","García López","maria.garcia@email.com","5551234567",32,"femenino","Av. Reforma 123, CDMX","Yoga,Pilates,Meditación","Certificación Internacional de Yoga,Instructor de Pilates Certificado",5,"lunes,miércoles,viernes","09:00-17:00","Instructora especializada en bienestar y relajación con más de 5 años de experiencia.","Licenciatura en Educación Física","Universidad Nacional",350,"active"`;
+    // Datos de la plantilla sin acentos para evitar problemas de codificación
+    const csvContent = `fullName,firstName,lastName,email,phone,age,gender,address,specialties,certifications,experienceYears,availableDays,availableHours,bio,qualifications,education,hourlyRate,status
+Maria Garcia Lopez,Maria,Garcia Lopez,maria.garcia@email.com,5551234567,32,femenino,Av. Reforma 123 CDMX,Yoga;Pilates;Meditacion,Certificacion Internacional de Yoga;Instructor de Pilates Certificado,5,lunes;miercoles;viernes,09:00-17:00,Instructora especializada en bienestar y relajacion con mas de 5 anos de experiencia.,Licenciatura en Educacion Fisica,Universidad Nacional,350,active
+Carlos Rodriguez Perez,Carlos,Rodriguez Perez,carlos.rodriguez@email.com,5552345678,28,masculino,Col. Roma Norte 456,Futbol;Basquetbol;Atletismo,Entrenador Deportivo Nivel 1;Primeros Auxilios,3,martes;jueves;sabado,08:00-16:00,Entrenador deportivo con pasion por desarrollar habilidades atleticas en jovenes y adultos.,Licenciatura en Ciencias del Deporte,Instituto Politecnico Nacional,280,active
+Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femenino,Col. Condesa 789,Danza;Teatro;Musica,Maestra en Artes Escenicas;Certificacion en Danza Contemporanea,8,lunes;martes;miercoles;jueves,10:00-18:00,Artista multidisciplinaria con experiencia en ensenanza de artes escenicas para todas las edades.,Maestria en Artes Escenicas,Universidad de las Artes,400,active`;
     
-    const encodedUri = encodeURI(csvContent);
+    // Crear un Blob con codificación UTF-8 con BOM para Excel
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.setAttribute("href", url);
     link.setAttribute("download", "plantilla_instructores.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   // Obtener especialidades únicas para el filtro
