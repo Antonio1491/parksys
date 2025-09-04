@@ -77,7 +77,7 @@ app.get('/cloudrun-health', (req, res) => {
 });
 
 // Only handle root route in PRODUCTION - let Vite handle it in development
-const isProductionMode = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+const isProductionMode = process.env.NODE_ENV === 'production';
 if (isProductionMode) {
   app.get('/', (req: Request, res: Response) => {
     try {
@@ -433,8 +433,7 @@ app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_as
 // NOTA: Las rutas /uploads se manejan en server/routes.ts con lógica de múltiples ubicaciones
 console.log('📁 [UPLOADS] Configuración delegada a server/routes.ts para lógica inteligente de rutas');
 
-// RUTAS ESPECÍFICAS PARA VERCEL - Endpoints individuales para archivos estáticos
-// Estas rutas son necesarias porque vercel.json las redirige al servidor Node.js
+// RUTAS PARA ARCHIVOS ESTÁTICOS - Endpoints para servir archivos
 
 // Servir imágenes desde /images
 app.get('/images/:filename(*)', (req, res) => {
@@ -2062,7 +2061,7 @@ function startServer() {
   console.log("🏥 [DEPLOYMENT] Skipping all heavy initialization - health checks priority");
 
   // CRITICAL: Setup static file serving immediately for the app to work (production only)
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+  if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(process.cwd(), 'public')));
     console.log("🗂️ [IMMEDIATE] Static files configured");
   } else {
@@ -2173,7 +2172,7 @@ function startServer() {
       console.log("✅ [API-PRIORITY] All API routes registered before Vite setup");
       
       // NOW setup frontend serving - this will establish the catch-all route AFTER all API routes
-      const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+      const isProduction = process.env.NODE_ENV === 'production';
       if (isProduction) {
         const { serveStatic } = await import("./vite");
         serveStatic(app);

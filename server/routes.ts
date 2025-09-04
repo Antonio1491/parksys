@@ -7387,12 +7387,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Lista de rutas a probar en orden de prioridad
     const possiblePaths = [
-      path.join(process.cwd(), 'dist', 'public', 'uploads', filePath),  // PRODUCCIÓN PRIMERO - Replit deployment
-      path.join(process.cwd(), 'public', 'uploads', filePath),          // Desarrollo/preview
-      path.join(process.cwd(), 'uploads', filePath),                    // Desarrollo legacy
-      path.join('/tmp', 'uploads', filePath),                          // Vercel serverless tmp
-      path.join('/vercel', 'path0', 'uploads', filePath),              // Vercel deployment path
-      path.join('/vercel', 'path0', 'dist', 'public', 'uploads', filePath), // Vercel dist path
+      path.join(process.cwd(), 'dist', 'public', 'uploads', filePath),  // Producción Replit 
+      path.join(process.cwd(), 'public', 'uploads', filePath),          // Desarrollo
+      path.join(process.cwd(), 'uploads', filePath),                    // Legacy
     ];
     
     console.log(`🔍 [UPLOADS] Buscando archivo: ${req.path}`);
