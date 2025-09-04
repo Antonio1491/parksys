@@ -139,14 +139,14 @@ const AdminActivities = () => {
         'materiales',
         'requisitos',
         'esRecurrente',
-        'díasRecurrentes',
+        'diasRecurrentes',
         'mercadoObjetivo',
         'necesidadesEspeciales',
-        'permiteRegistroPúblico',
-        'máximoRegistros',
-        'fechaLímiteRegistro',
+        'permiteRegistroPublico',
+        'maxRegistros',
+        'fechaLimiteRegistro',
         'instruccionesRegistro',
-        'requiereAprobación',
+        'requiereAprobacion',
         'restriccionesEdad',
         'requisitosSalud'
       ];
@@ -244,44 +244,44 @@ const AdminActivities = () => {
         'materiales',
         'requisitos',
         'esRecurrente',
-        'díasRecurrentes',
+        'diasRecurrentes',
         'mercadoObjetivo',
         'necesidadesEspeciales',
-        'permiteRegistroPúblico',
-        'máximoRegistros',
-        'fechaLímiteRegistro',
+        'permiteRegistroPublico',
+        'maxRegistros',
+        'fechaLimiteRegistro',
         'instruccionesRegistro',
-        'requiereAprobación',
+        'requiereAprobacion',
         'restriccionesEdad',
         'requisitosSalud'
       ];
 
       // Add example row with proper Spanish format
       const exampleRow = [
-        'Ejemplo: Yoga en el Parque',
-        'Clase de yoga matutina para todas las edades',
+        'Cine al aire libre',
+        'Cine al aire libre con películas familiares proyectadas en pantallas gigantes.',
         'Parque Central',
-        'Bienestar',
-        '2024-03-15',
-        '2024-06-15',
-        '08:00',
-        '09:30',
-        'Área de césped principal',
-        '20.123456',
-        '-103.654321',
+        'Deportivo',
+        '15/09/25',
+        '15/09/25',
+        '8:00',
+        '9:30',
+        'Explanada Verde',
+        '21.11',
+        '',
         '30',
-        '90',
-        '50',
-        'No',
-        'Mat de yoga, toalla',
-        'Ropa cómoda, agua',
-        'Sí',
-        'lunes;miércoles;viernes',
-        'adultos;jóvenes',
+        '120',
+        '0',
+        'Si',
+        'Pantalla inflable proyector de alta potencia sistema de sonido portátil sillas plegables',
+        'Asistir con manta o silla portátil permitido ingreso con snacks personales',
+        'Si',
+        'lunes,miércoles,viernes',
+        'Adultos',
         'principiantes',
-        'Sí',
+        'Si',
         '25',
-        '2024-03-10',
+        '10/03/24',
         'Contactar por email para registro',
         'No',
         '16+',
@@ -530,6 +530,7 @@ const AdminActivities = () => {
                 activityData.isRecurring = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value === '1';
                 break;
               case 'díasrecurrentes':
+              case 'diasrecurrentes':
                 activityData.recurringDays = value ? value.split(';').filter(d => d.trim()) : [];
                 break;
               case 'mercadoobjetivo':
@@ -555,18 +556,22 @@ const AdminActivities = () => {
                 }
                 break;
               case 'permiteregistropúblico':
+              case 'permiteregistropublico':
                 activityData.allowsPublicRegistration = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value === '1';
                 break;
               case 'máximoregistros':
+              case 'maxregistros':
                 activityData.maxRegistrations = value ? parseInt(value) : null;
                 break;
               case 'fechalímiteregistro':
+              case 'fechalimiteregistro':
                 activityData.registrationDeadline = value || null;
                 break;
               case 'instruccionesregistro':
                 activityData.registrationInstructions = value || '';
                 break;
               case 'requiereaprobación':
+              case 'requiereaprobacion':
                 activityData.requiresApproval = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value === '1';
                 break;
               case 'restriccionesedad':

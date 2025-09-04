@@ -23,25 +23,13 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     }
 
     console.log(`📥 Iniciando importación de ${activities.length} actividades`);
-    console.log(`💀 ANTES DE JSON.STRINGIFY - Todo funcionando OK`);
     console.log(`🔍 Primera actividad de ejemplo:`, JSON.stringify(activities[0], null, 2));
-    console.log(`💀 DESPUÉS DE JSON.STRINGIFY - Si ves esto, el JSON no es el problema`);
     
-    console.log(`🔥 CHECKPOINT 1: Después de mostrar ejemplo`);
     const importedActivities = [];
-    console.log(`🔥 CHECKPOINT 2: Arrays inicializados`);
     const errors = [];
-    console.log(`🔥 CHECKPOINT 3: Variables creadas correctamente`);
-    
-    console.log(`🚀 PUNTO CRÍTICO: A punto de iniciar bucle`);
-    console.log(`🔍 Array activities es válido:`, Array.isArray(activities));
-    console.log(`🔍 Longitud del array:`, activities.length);
-    console.log(`🔍 Tipo de activities:`, typeof activities);
-    console.log(`🔍 Primer elemento existe:`, !!activities[0]);
     
     for (let i = 0; i < activities.length; i++) {
       let activityData = activities[i];
-      console.log(`\n🔄 [${i+1}/${activities.length}] Procesando: "${activityData.title}"`);
       try {
         
         // Validar datos requeridos
@@ -85,14 +73,10 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
         };
         
         // Validar esquema usando Zod
-        console.log(`🔧 Intentando validar con Zod...`);
         const validatedData = insertActivitySchema.parse(mappedActivity);
-        console.log(`✅ Validación Zod exitosa`);
         
         // Crear actividad en la base de datos
-        console.log(`🗄️ Insertando en base de datos...`);
         const newActivity = await (storage as any).createActivity(validatedData);
-        console.log(`✅ Actividad creada en BD con ID:`, newActivity?.id);
         importedActivities.push(newActivity);
         
         console.log(`✅ Actividad importada: ${(validatedData as any).title}`);
