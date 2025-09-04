@@ -1353,8 +1353,8 @@ export const parks = pgTable("parks", {
   postalCode: text("postal_code"),
   latitude: text("latitude").notNull(),
   longitude: text("longitude").notNull(),
-  area: text("area"), // Superficie total
-  greenArea: text("green_area"), // Área permeable
+  area: numeric("area"), // Superficie total
+  greenArea: numeric("green_area"), // Área permeable
   foundationYear: integer("foundation_year"),
   administrator: text("administrator"),
   conservationStatus: text("conservation_status"),
