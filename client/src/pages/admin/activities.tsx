@@ -595,15 +595,16 @@ const AdminActivities = () => {
         // Transform data types before sending to backend
         const transformedData = csvData.map(activity => ({
           ...activity,
-          // Convert string dates to Date objects
+          // Keep dates as Date objects (not ISO strings)
           startDate: activity.startDate ? new Date(activity.startDate) : null,
           endDate: activity.endDate ? new Date(activity.endDate) : null,
-          // Convert numbers to strings where expected
-          latitude: activity.latitude ? String(activity.latitude) : null,
-          longitude: activity.longitude ? String(activity.longitude) : null,
-          price: activity.price !== undefined ? String(activity.price) : '0',
-          // Add default status if missing, ensure lowercase
-          status: activity.status ? String(activity.status).toLowerCase() : 'programada'
+          // Convert coordinates to strings as expected by schema
+          latitude: activity.latitude !== null && activity.latitude !== undefined ? String(activity.latitude) : null,
+          longitude: activity.longitude !== null && activity.longitude !== undefined ? String(activity.longitude) : null,
+          // Convert price to string as expected by schema
+          price: activity.price !== undefined && activity.price !== null ? String(activity.price) : "0",
+          // Ensure status is lowercase enum value
+          status: 'programada' // Always use lowercase default status
         }));
 
         console.log('🔧 Datos transformados antes de enviar:', transformedData[0]);

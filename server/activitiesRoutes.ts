@@ -360,57 +360,51 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
             throw new Error(`Fila ${i + 2}: La categoría es requerida`);
           }
 
-          // Parse and validate the activity data using Zod schema
-          console.log(`🔧 Intentando validar actividad "${activityData.title}" con datos:`, JSON.stringify(activityData, null, 2));
-          // Convert dates from string to Date objects
-          let parsedStartDate: Date | null = null;
-          let parsedEndDate: Date | null = null;
-          
-          if (activityData.startDate) {
-            parsedStartDate = new Date(activityData.startDate);
-            if (isNaN(parsedStartDate.getTime())) {
-              throw new Error(`Fecha de inicio inválida: ${activityData.startDate}`);
+          // Parse registration deadline if provided
+          let parsedRegistrationDeadline = null;
+          if (activityData.registrationDeadline && activityData.registrationDeadline.trim() !== '') {
+            // Handle DD/MM/YY format like "10/03/24"
+            const [day, month, year] = activityData.registrationDeadline.split('/');
+            const fullYear = year.length === 2 ? `20${year}` : year;
+            parsedRegistrationDeadline = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+            
+            if (isNaN(parsedRegistrationDeadline.getTime())) {
+              parsedRegistrationDeadline = null;
             }
           }
-          
-          if (activityData.endDate) {
-            parsedEndDate = new Date(activityData.endDate);
-            if (isNaN(parsedEndDate.getTime())) {
-              throw new Error(`Fecha de fin inválida: ${activityData.endDate}`);
-            }
-          }
+
+          console.log(`🔧 Intentando validar actividad "${activityData.title}"`);
           
           const validatedActivity = insertActivitySchema.parse({
-            title: activityData.title.trim(),
+            title: activityData.title?.trim() || '',
             description: activityData.description || '',
             parkId: parseInt(activityData.parkId),
             categoryId: parseInt(activityData.categoryId),
-            startDate: parsedStartDate,
-            endDate: parsedEndDate,
+            startDate: activityData.startDate,
+            endDate: activityData.endDate,
             startTime: activityData.startTime || null,
             endTime: activityData.endTime || null,
             location: activityData.location || null,
-            latitude: activityData.latitude ? String(activityData.latitude) : null,
-            longitude: activityData.longitude ? String(activityData.longitude) : null,
+            latitude: activityData.latitude,
+            longitude: activityData.longitude,
             capacity: activityData.capacity ? parseInt(activityData.capacity) : null,
             duration: activityData.duration ? parseInt(activityData.duration) : null,
-            price: activityData.price ? String(activityData.price) : '0',
-            isFree: activityData.isFree === true || activityData.isFree === 'true',
+            price: activityData.price || '0',
+            isFree: Boolean(activityData.isFree),
             materials: activityData.materials || '',
             requirements: activityData.requirements || '',
-            isRecurring: activityData.isRecurring === true || activityData.isRecurring === 'true',
+            isRecurring: Boolean(activityData.isRecurring),
             recurringDays: Array.isArray(activityData.recurringDays) ? activityData.recurringDays : [],
             targetMarket: Array.isArray(activityData.targetMarket) ? activityData.targetMarket : [],
             specialNeeds: Array.isArray(activityData.specialNeeds) ? activityData.specialNeeds : [],
-            registrationEnabled: activityData.registrationEnabled === true || activityData.registrationEnabled === 'true',
+            registrationEnabled: Boolean(activityData.registrationEnabled),
             maxRegistrations: activityData.maxRegistrations ? parseInt(activityData.maxRegistrations) : null,
-            registrationDeadline: activityData.registrationDeadline || null,
+            registrationDeadline: parsedRegistrationDeadline,
             registrationInstructions: activityData.registrationInstructions || '',
-            requiresApproval: activityData.requiresApproval === true || activityData.requiresApproval === 'true',
+            requiresApproval: Boolean(activityData.requiresApproval),
             ageRestrictions: activityData.ageRestrictions || '',
             healthRequirements: activityData.healthRequirements || '',
-            status: activityData.status ? String(activityData.status).toLowerCase() : 'programada',
-            // Nota: createdAt y updatedAt se agregan automáticamente
+            status: 'programada',
           });
           console.log(`✅ Validación Zod exitosa para "${activityData.title}"`);
 
