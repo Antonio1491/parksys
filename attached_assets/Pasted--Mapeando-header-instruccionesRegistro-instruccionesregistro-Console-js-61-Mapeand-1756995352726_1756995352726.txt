@@ -1,0 +1,46 @@
+🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 📝 Procesando fila 27: 28 valores: (28) ['Competencias de cometas/papalotes', 'Competencias de cometas o papalotes que llenan el cielo de colores.', 'Gran Parque La Plancha', 'Eventos de Temporada', '10/10/25', '10/10/25', '13:00', '17:00', 'Colina del Viento', '20.97845435', '-89.61173802', '40', '90', '0', 'Si', 'Cometas, cuerdas resistentes, estacas, silbatos de coordinación', 'Actividad gratuita, cupo limitado, cometa propia o adquirir en módulo oficial', 'Si', '', 'Adolescentes', '', '', '', '', '', '', '', '']
+Console.js:61 🔍 Mapeando header: "título" -> "título" = "Competencias de cometas/papalotes"
+Console.js:61 🔍 Mapeando header: "descripción" -> "descripción" = "Competencias de cometas o papalotes que llenan el cielo de colores."
+Console.js:61 🔍 Mapeando header: "parque" -> "parque" = "Gran Parque La Plancha"
+Console.js:61 🏞️ Buscando parque: "Gran Parque La Plancha"
+Console.js:61 🏞️ Parques disponibles: (14) ['Bosque de Chapultepec', 'Gran Parque La Plancha', 'Parque Bicentenario', 'Parque Central Ciudad Juárez', 'Parque Ecológico Explora', 'Parque Fundidora', 'Parque Guanajuato Bicentenario', 'Parque La Mexicana', 'Parque Metropolitano', 'Parque Metropolitano de León', 'Parque Rufino Tamayo', 'Parque Tangamanga I', 'Parque Valle Condesa', 'Parque el Capitán']
+Console.js:61 ✅ Parque encontrado: Gran Parque La Plancha (ID: 22)
+Console.js:61 🔍 Mapeando header: "categoría" -> "categoría" = "Eventos de Temporada"
+Console.js:61 🎨 Buscando categoría: "Eventos de Temporada"
+Console.js:61 🎨 Categorías disponibles: (5) ['Arte y Cultura', 'Naturaleza y Ciencia', 'Deportes y Recreación', 'Comunidad', 'Eventos de Temporada']
+Console.js:61 ✅ Categoría encontrada: Eventos de Temporada (ID: 5)
+Console.js:61 🔍 Mapeando header: "fechaInicio" -> "fechainicio" = "10/10/25"
+Console.js:61 📅 Fecha inicio convertida: "10/10/25" -> "2025-10-10T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "fechaFin" -> "fechafin" = "10/10/25"
+Console.js:61 📅 Fecha fin convertida: "10/10/25" -> "2025-10-10T00:00:00.000Z"
+Console.js:61 🔍 Mapeando header: "horaInicio" -> "horainicio" = "13:00"
+Console.js:61 🔍 Mapeando header: "horaFin" -> "horafin" = "17:00"
+Console.js:61 🔍 Mapeando header: "ubicación" -> "ubicación" = "Colina del Viento"
+Console.js:61 🔍 Mapeando header: "latitud" -> "latitud" = "20.97845435"
+Console.js:61 🔍 Mapeando header: "longitud" -> "longitud" = "-89.61173802"
+Console.js:61 🔍 Mapeando header: "capacidad" -> "capacidad" = "40"
+Console.js:61 🔍 Mapeando header: "duración" -> "duración" = "90"
+Console.js:61 🔍 Mapeando header: "precio" -> "precio" = "0"
+Console.js:61 🔍 Mapeando header: "esGratis" -> "esgratis" = "Si"
+Console.js:61 💰 Procesando campo gratis: "Si"
+Console.js:61 💰 Es gratis: true
+Console.js:61 🔍 Mapeando header: "materiales" -> "materiales" = "Cometas, cuerdas resistentes, estacas, silbatos de coordinación"
+Console.js:61 🔍 Mapeando header: "requisitos" -> "requisitos" = "Actividad gratuita, cupo limitado, cometa propia o adquirir en módulo oficial"
+Console.js:61 🔍 Mapeando header: "esRecurrente" -> "esrecurrente" = "Si"
+Console.js:61 🔍 Mapeando header: "díasRecurrentes" -> "díasrecurrentes" = ""
+Console.js:61 🔍 Mapeando header: "mercadoObjetivo" -> "mercadoobjetivo" = "Adolescentes"
+Console.js:61 🎯 Mercado objetivo: ["Adolescentes"]
+Console.js:61 🔍 Mapeando header: "necesidadesEspeciales" -> "necesidadesespeciales" = ""
+Console.js:61 🔍 Mapeando header: "permiteRegistroPúblico" -> "permiteregistropúblico" = ""
+Console.js:61 🔍 Mapeando header: "máximoRegistros" -> "máximoregistros" = ""
+Console.js:61 🔍 Mapeando header: "fechaLímiteRegistro" -> "fechalímiteregistro" = ""
+Console.js:61 🔍 Mapeando header: "instruccionesRegistro" -> "instruccionesregistro" = ""
+Console.js:61 🔍 Mapeando header: "requiereAprobación" -> "requiereaprobación" = ""
+Console.js:61 🔍 Mapeando header: "restriccionesEdad" -> "restriccionesedad" = ""
+Console.js:61 🔍 Mapeando header: "requisitosSalud" -> "requisitossalud" = ""
+Console.js:61 🌐 [API REQUEST] POST /api/activities/import
+Console.js:61 🌐 [QUERY] GET /api/activities

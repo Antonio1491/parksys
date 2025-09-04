@@ -23,6 +23,7 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     }
 
     console.log(`📥 Iniciando importación de ${activities.length} actividades`);
+    console.log(`🔍 Primera actividad de ejemplo:`, JSON.stringify(activities[0], null, 2));
     
     const importedActivities = [];
     const errors = [];
