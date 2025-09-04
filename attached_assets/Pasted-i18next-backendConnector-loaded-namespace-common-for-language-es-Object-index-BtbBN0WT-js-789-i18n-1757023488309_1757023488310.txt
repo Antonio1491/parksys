@@ -1,0 +1,31 @@
+i18next::backendConnector: loaded namespace common for language es Object
+index-BtbBN0WT.js:789 i18next: languageChanged es
+index-BtbBN0WT.js:789 i18next: initialized Object
+index-BtbBN0WT.js:1234 Respuesta del servidor: Object
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/activities
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/users
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/hr/employees
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/volunteers
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/active-concessions
+/api/users:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+index-BtbBN0WT.js:49 Query failed for: /api/users Error: Authentication required
+    at index-BtbBN0WT.js:49:46367
+(anonymous) @ index-BtbBN0WT.js:49Understand this error
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/actividades-fotos
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/activity-categories
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/instructors
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/activities/53
+index-BtbBN0WT.js:38 The specified value "1:00:00 p.m." does not conform to the required format.  The format is "HH:mm", "HH:mm:ss" or "HH:mm:ss.SSS" where HH is 00-23, mm is 00-59, ss is 00-59, and SSS is 000-999.
+set @ index-BtbBN0WT.js:38Understand this warning
+index-BtbBN0WT.js:38 The specified value "1:00:00 p.m." does not conform to the required format.  The format is "HH:mm", "HH:mm:ss" or "HH:mm:ss.SSS" where HH is 00-23, mm is 00-59, ss is 00-59, and SSS is 000-999.
+fN @ index-BtbBN0WT.js:38Understand this warning
+5The specified value "5:00:00 p.m." does not conform to the required format.  The format is "HH:mm", "HH:mm:ss" or "HH:mm:ss.SSS" where HH is 00-23, mm is 00-59, ss is 00-59, and SSS is 000-999.Understand this warning
+index-BtbBN0WT.js:38 The specified value "1:00:00 p.m." does not conform to the required format.  The format is "HH:mm", "HH:mm:ss" or "HH:mm:ss.SSS" where HH is 00-23, mm is 00-59, ss is 00-59, and SSS is 000-999.
+set @ index-BtbBN0WT.js:38Understand this warning
+editar-BrUENYNh.js:1 Enviando datos de edición: Object
+editar-BrUENYNh.js:1 🔍 STATUS ESPECÍFICO enviado: Object
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/activities/53
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/activities
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/actividades-fotos
+index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/activities
+2index-BtbBN0WT.js:49 🌐 [QUERY] GET /api/activities/53/images

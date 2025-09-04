@@ -5030,6 +5030,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Import activities from CSV (bulk import)
+  apiRouter.post("/activities/import", async (req: Request, res: Response) => {
+    try {
+      console.log("📥 POST /api/activities/import - Iniciando importación de actividades");
+      
+      if (!req.body.activities || !Array.isArray(req.body.activities)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Se requiere un array de actividades en req.body.activities" 
+        });
+      }
+
+      const activitiesData = req.body.activities;
+      console.log(`📊 Procesando ${activitiesData.length} actividades para importar`);
+
+      let importedCount = 0;
+      let errors = [];
+
+      for (let i = 0; i < activitiesData.length; i++) {
+        try {
+          const activityData = activitiesData[i];
+          console.log(`🔧 Procesando actividad ${i + 1}:`, activityData.title);
+
+          // Validar con Zod schema
+          const validatedData = insertActivitySchema.parse(activityData);
+          
+          // Crear actividad usando storage
+          const result = await storage.createActivity(validatedData);
+          importedCount++;
+          
+          console.log(`✅ Actividad ${i + 1} creada exitosamente: ${result.id}`);
+          
+        } catch (error) {
+          console.error(`❌ Error procesando actividad ${i + 1}:`, error);
+          errors.push({
+            index: i + 1,
+            title: activitiesData[i]?.title || 'Sin título',
+            error: error instanceof ZodError 
+              ? `Validación: ${error.issues.map(issue => issue.message).join(', ')}`
+              : (error as Error).message
+          });
+        }
+      }
+
+      console.log(`✅ Importación completada: ${importedCount} actividades importadas`);
+      console.log(`❌ Errores encontrados: ${errors.length}`);
+
+      // La invalidación del cache se maneja en el frontend después de recibir la respuesta exitosa
+
+      res.json({
+        success: true,
+        message: `Importación completada: ${importedCount} actividades importadas exitosamente`,
+        imported: importedCount,
+        errors: errors,
+        processed: activitiesData.length
+      });
+
+    } catch (error) {
+      console.error('❌ Error general en importación de actividades:', error);
+      res.status(500).json({
+        success: false,
+        error: "Error interno del servidor durante la importación",
+        message: (error as Error).message
+      });
+    }
+  });
+
   // Add an activity to a park (admin/municipality only)
   apiRouter.post("/parks/:id/activities", isAuthenticated, hasParkAccess, async (req: Request, res: Response) => {
     try {

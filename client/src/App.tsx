@@ -23,7 +23,6 @@ import AdminUsers from "@/pages/admin/users";
 import AdminActivities from "@/pages/admin/activities";
 import AdminAmenities from "@/pages/admin/amenities";
 import AdminSettings from "@/pages/admin/settings";
-import RolesManagement from "@/pages/admin/roles/index";
 import AdminPayments from "@/pages/admin/payments";
 import AdminLogin from "@/pages/admin/login";
 import AdminInstructorInvitations from "@/pages/admin/instructor-invitations";
@@ -417,7 +416,6 @@ function Router() {
           </Suspense>
         </Route>
         <Route path="/admin/settings" component={AdminSettings} />
-        <Route path="/admin/roles" component={RolesManagement} />
         <Route path="/admin/permissions">
           <Suspense fallback={<div className="p-8 text-center">Cargando permisos...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/permissions')))}
@@ -1339,19 +1337,9 @@ function Router() {
         </Route>
 
         {/* COMPATIBILIDAD: Rutas antigas con redirección */}
-        <Route path="/admin/roles">
-          <Suspense fallback={<div className="p-8 text-center">Cargando gestión de roles...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/roles')))}
-          </Suspense>
-        </Route>
         <Route path="/admin/permissions/matrix">
           <Suspense fallback={<div className="p-8 text-center">Cargando matriz de permisos...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/permissions/matrix')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/role-assignments">
-          <Suspense fallback={<div className="p-8 text-center">Cargando asignación de usuarios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/role-assignments')))}
           </Suspense>
         </Route>
         <Route path="/admin/configuracion-seguridad/audit/role-audits">
