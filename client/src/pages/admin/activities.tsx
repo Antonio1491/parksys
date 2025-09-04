@@ -365,20 +365,59 @@ const AdminActivities = () => {
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
+        console.log('📄 Contenido del archivo CSV (primeros 500 caracteres):', text.substring(0, 500));
+        
         const lines = text.split('\n').filter(line => line.trim());
         
         if (lines.length < 2) {
           throw new Error('El archivo debe contener al menos una fila de datos además del encabezado.');
         }
 
-        const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+        // Función para parsear líneas CSV correctamente (maneja comillas y comas dentro de valores)
+        const parseCSVLine = (line: string): string[] => {
+          const result = [];
+          let currentField = '';
+          let inQuotes = false;
+          
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+              if (inQuotes && line[i + 1] === '"') {
+                currentField += '"';
+                i++; // Saltar la siguiente comilla
+              } else {
+                inQuotes = !inQuotes;
+              }
+            } else if (char === ',' && !inQuotes) {
+              result.push(currentField.trim());
+              currentField = '';
+            } else {
+              currentField += char;
+            }
+          }
+          
+          result.push(currentField.trim());
+          return result;
+        };
+
+        const headers = parseCSVLine(lines[0]);
+        console.log('📋 Headers encontrados:', headers);
+        console.log('📊 Total de columnas en header:', headers.length);
+        
         const dataRows = lines.slice(1);
 
         const csvData = dataRows.map((row, index) => {
-          const values = row.split(',').map(v => v.replace(/"/g, '').trim());
+          const values = parseCSVLine(row);
+          console.log(`📝 Procesando fila ${index + 2}: ${values.length} valores:`, values);
           
           if (values.length !== headers.length) {
-            throw new Error(`Fila ${index + 2}: número incorrecto de columnas.`);
+            throw new Error(
+              `Fila ${index + 2}: número incorrecto de columnas.\n` +
+              `Se esperaban ${headers.length} columnas, se encontraron ${values.length}.\n` +
+              `Headers: [${headers.join(', ')}]\n` +
+              `Valores: [${values.join(', ')}]`
+            );
           }
 
           const activityData: any = {};
