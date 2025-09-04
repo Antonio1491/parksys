@@ -452,63 +452,6 @@ const RolesManagement: React.FC = () => {
         </Card>
       </div>
 
-      {/* Herramientas y acciones */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar roles..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-80"
-            />
-          </div>
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filtros
-          </Button>
-        </div>
-        
-        <div className="flex gap-2">
-          <Link href="/admin/permissions/matrix">
-            <Button variant="outline">
-              <Grid className="h-4 w-4 mr-2" />
-              Matriz de Permisos
-            </Button>
-          </Link>
-          <Link href="/admin/role-assignments">
-            <Button variant="outline">
-              <UserCog className="h-4 w-4 mr-2" />
-              Asignar Usuarios
-            </Button>
-          </Link>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <UserCog className="h-4 w-4 mr-2" />
-                Gestionar Usuarios
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl">
-              <DialogHeader>
-                <DialogTitle>Gestión de Múltiples Roles por Usuario</DialogTitle>
-                <DialogDescription>
-                  Asignar y remover múltiples roles a usuarios del sistema
-                </DialogDescription>
-              </DialogHeader>
-              <UserMultiRoleManagement allUsers={allUsersWithRoles} legacyUsers={legacyUsers} roles={roles} />
-            </DialogContent>
-          </Dialog>
-          {permissions.canAdmin && permissions.canAdmin('Seguridad') && (
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Rol
-            </Button>
-          )}
-        </div>
-      </div>
-
       {/* Tabla de roles jerárquicos */}
       <Card>
         <CardHeader>
@@ -754,66 +697,6 @@ const RolesManagement: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Acciones rápidas */}
-      <div className="grid gap-6 md:grid-cols-3 mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Grid className="h-5 w-5 mr-2 text-purple-500" />
-              Matriz de Permisos
-            </CardTitle>
-            <CardDescription>
-              Configura permisos granulares por módulo y rol
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/admin/permissions/matrix">
-              <Button className="w-full">
-                Abrir Matriz
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <UserCog className="h-5 w-5 mr-2 text-blue-500" />
-              Asignación de Usuarios
-            </CardTitle>
-            <CardDescription>
-              Gestiona asignaciones masivas de roles
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/admin/role-assignments">
-              <Button className="w-full">
-                Gestionar Usuarios
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Activity className="h-5 w-5 mr-2 text-green-500" />
-              Auditoría de Roles
-            </CardTitle>
-            <CardDescription>
-              Revisa logs de actividad y cambios
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/admin/configuracion-seguridad/audit/role-audits">
-              <Button className="w-full">
-                Ver Auditoría
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
     </AdminLayout>
   );
 };

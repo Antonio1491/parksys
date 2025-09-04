@@ -28,7 +28,7 @@ import {
   TrendingUp,
   Settings
 } from 'lucide-react';
-const logoPath = "/images/landing-logo.jpg";
+const logoPath = "/images/logo-pdm.png";
 
 const Landing = () => {
   const { t } = useTranslation('common');
