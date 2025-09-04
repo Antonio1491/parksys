@@ -352,7 +352,10 @@ const AdminActivities = () => {
 
   // Handle CSV import
   const handleImportCSV = () => {
+    console.log('🚀 INICIANDO IMPORTACIÓN CSV');
+    
     if (!importFile) {
+      console.log('❌ No hay archivo seleccionado');
       toast({
         title: "Error",
         description: "Por favor selecciona un archivo CSV.",
@@ -360,6 +363,8 @@ const AdminActivities = () => {
       });
       return;
     }
+    
+    console.log('📁 Archivo seleccionado:', importFile.name, importFile.size, 'bytes');
 
     const reader = new FileReader();
     reader.onload = (e) => {
