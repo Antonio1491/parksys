@@ -122,8 +122,20 @@ const Home: React.FC = () => {
   
   return (
     <main className="flex-1">
-      <div style={{background: 'red', color: 'white', padding: '10px', fontSize: '20px'}}>
-        🔥 PRUEBA - {Date.now()} - SI VES ESTO, ESTÁ FUNCIONANDO
+      <div style={{
+        background: 'red', 
+        color: 'white', 
+        padding: '20px', 
+        fontSize: '30px',
+        textAlign: 'center',
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        zIndex: '9999',
+        border: '5px solid yellow'
+      }}>
+        🚨 CAMBIO FORZADO - {new Date().toLocaleTimeString()} - ¡SI VES ESTO, HMR FUNCIONA! 🚨
       </div>
       {/* 🌟 HERO SECTION - Inspirado en bosquesamg.mx */}
       <section className="relative min-h-screen bg-black overflow-hidden">
