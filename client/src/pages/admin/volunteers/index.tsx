@@ -383,10 +383,7 @@ export default function VolunteersPage() {
 
       const response = await apiRequest('/api/volunteers/import', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ volunteers }),
+        data: { volunteers },
       });
 
       if (response.success) {

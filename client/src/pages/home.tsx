@@ -143,7 +143,7 @@ const Home: React.FC = () => {
               Conoce los
             </h1>
             <h1 className="text-5xl md:text-6xl lg:text-6xl font-poppins font-bold text-white mb-6 leading-tight">
-            <span className="block text-">PARQUES</span> DE MÉXICO
+            <span className="block text-header-background">PARQUES</span> DE MÉXICO
             </h1>
             
             {/* Subtítulo */}
