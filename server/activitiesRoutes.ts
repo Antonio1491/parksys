@@ -375,13 +375,17 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
 
           console.log(`🔧 Intentando validar actividad "${activityData.title}"`);
           
+          // Convert string dates to Date objects for Zod validation
+          const startDate = activityData.startDate ? new Date(activityData.startDate) : new Date();
+          const endDate = activityData.endDate ? new Date(activityData.endDate) : new Date();
+
           const validatedActivity = insertActivitySchema.parse({
             title: activityData.title?.trim() || '',
             description: activityData.description || '',
             parkId: parseInt(activityData.parkId),
             categoryId: parseInt(activityData.categoryId),
-            startDate: activityData.startDate,
-            endDate: activityData.endDate,
+            startDate: startDate,
+            endDate: endDate,
             startTime: activityData.startTime || null,
             endTime: activityData.endTime || null,
             location: activityData.location || null,
