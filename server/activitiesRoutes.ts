@@ -325,7 +325,8 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
         });
       }
 
-      console.log(`=== IMPORTANDO ${csvActivities.length} ACTIVIDADES DESDE CSV ===`);
+      console.log(`📥 Iniciando importación de ${csvActivities.length} actividades`);
+      console.log(`🔍 Primera actividad de ejemplo:`, JSON.stringify(csvActivities[0], null, 2));
       
       let imported = 0;
       let errors: string[] = [];
@@ -388,9 +389,17 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
           console.log(`✓ Actividad importada: "${validatedActivity.title}"`);
           
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : `Error desconocido en fila ${i + 2}`;
-          errors.push(errorMessage);
-          console.error(`✗ Error en fila ${i + 2}:`, errorMessage);
+          console.error(`❌ Error importando actividad en fila ${i + 2}:`, error);
+          console.error(`🔍 Datos que causaron el error:`, JSON.stringify(activityData, null, 2));
+          if (error instanceof ZodError) {
+            const validationError = fromZodError(error);
+            console.error(`🚨 Error de validación Zod:`, validationError.message);
+            errors.push(`Fila ${i + 2}: ${validationError.message}`);
+          } else {
+            const errorMessage = error instanceof Error ? error.message : `Error desconocido en fila ${i + 2}`;
+            console.error(`🚨 Error general:`, errorMessage);
+            errors.push(errorMessage);
+          }
         }
       }
 
@@ -410,7 +419,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
         errors: errors.length > 0 ? errors.slice(0, 5) : undefined
       };
 
-      console.log(`✓ Importación CSV completada: ${imported}/${csvActivities.length} actividades`);
+      console.log(`📊 Importación completada: ${imported} exitosas, ${errors.length} errores`);
       res.status(200).json(response);
       
     } catch (error) {
