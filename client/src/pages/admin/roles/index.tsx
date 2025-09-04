@@ -779,25 +779,6 @@ const RolesManagement: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <UserCog className="h-5 w-5 mr-2 text-blue-500" />
-              Asignación de Usuarios
-            </CardTitle>
-            <CardDescription>
-              Gestiona asignaciones masivas de roles
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/admin/role-assignments">
-              <Button className="w-full">
-                Gestionar Usuarios
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
               <Activity className="h-5 w-5 mr-2 text-green-500" />
               Auditoría de Roles
             </CardTitle>
