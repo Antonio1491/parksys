@@ -1,0 +1,269 @@
+i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-hwNSLi41.js:789 i18next: languageChanged es
+index-hwNSLi41.js:789 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+index-hwNSLi41.js:49 🌐 [QUERY] GET /api/parks/99/extended
+index-hwNSLi41.js:49 🌐 [SAFE API] GET /api/parks/99/evaluation-stats
+park-img-1757010088319-318559.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757010088319-318559.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error
+park-img-1757009958293-730064.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757009958293-730064.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error
+park-img-1757010106534-326582.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757010106534-326582.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error
+park-img-1757009968914-620718.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757009968914-620718.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error
+park-img-1757009450383-273545.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757009450383-273545.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error
+park-img-1757009491674-447851.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757009491674-447851.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error
+park-img-1757010098700-77715.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757010098700-77715.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error
+park-img-1757010079299-873353.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-img-1757010079299-873353.jpg 404 (Not Found)
+Image
+CO @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+az @ index-hwNSLi41.js:41
+Ute @ index-hwNSLi41.js:41
+Zte @ index-hwNSLi41.js:41
+Bc @ index-hwNSLi41.js:41
+AO @ index-hwNSLi41.js:41
+gc @ index-hwNSLi41.js:39
+(anonymous) @ index-hwNSLi41.js:41
+setTimeout
+Hne @ index-hwNSLi41.js:49
+o @ index-hwNSLi41.js:49
+batch @ index-hwNSLi41.js:49
+Co @ index-hwNSLi41.js:49
+setData @ index-hwNSLi41.js:49
+onSuccess @ index-hwNSLi41.js:49
+f @ index-hwNSLi41.js:49
+Promise.then
+y @ index-hwNSLi41.js:49
+start @ index-hwNSLi41.js:49
+fetch @ index-hwNSLi41.js:49
+ap @ index-hwNSLi41.js:49
+onSubscribe @ index-hwNSLi41.js:49
+subscribe @ index-hwNSLi41.js:49
+(anonymous) @ index-hwNSLi41.js:49
+PF @ index-hwNSLi41.js:39
+uj @ index-hwNSLi41.js:41
+dh @ index-hwNSLi41.js:41
+(anonymous) @ index-hwNSLi41.js:41
+C @ index-hwNSLi41.js:26
+$ @ index-hwNSLi41.js:26Understand this error

@@ -442,10 +442,13 @@ app.get('/status', (req: Request, res: Response) => {
   }
 });
 
-// Servir archivos estáticos del directorio public ANTES de otras rutas (solo en producción)
+// NOTA: Las rutas personalizadas se registran en initializeFullServer() ANTES de express.static
+// para evitar que express.static intercepte /uploads/* antes del endpoint personalizado
+
+// Servir archivos estáticos del directorio public (DESPUÉS de rutas personalizadas)
 if (isProductionMode) {
-  app.use(express.static(path.join(process.cwd(), 'public')));
-  console.log('📁 [PROD] Static files from public/ enabled');
+  // express.static se aplicará DESPUÉS de que se registren las rutas personalizadas en initializeFullServer()
+  console.log('📁 [PROD] Static files will be enabled after custom routes');
 } else {
   console.log('📁 [DEV] Skipping public/ static files - Vite will handle assets');
 }
@@ -2179,12 +2182,18 @@ function startServer() {
     console.log('🔧 [BACKGROUND] Starting non-blocking route registration...');
     
     try {
-      // CRITICAL FIX: Register ALL API routes BEFORE Vite setup
-      console.log('🔧 [API-PRIORITY] Registering ALL API routes before Vite setup...');
+      // CRITICAL FIX: Register ALL API routes BEFORE express.static and Vite setup
+      console.log('🔧 [API-PRIORITY] Registering ALL API routes before static middlewares...');
       
-      // Register main routes immediately (not in background!)
+      // Register main routes immediately BEFORE express.static
       await registerRoutes(app);
-      console.log("✅ [API-PRIORITY] Main routes registered before Vite");
+      console.log("✅ [API-PRIORITY] Main routes registered with priority over static files");
+      
+      // NOW apply express.static AFTER custom routes to avoid intercepting /uploads/*
+      if (process.env.NODE_ENV === 'production') {
+        app.use(express.static(path.join(process.cwd(), 'public')));
+        console.log('📁 [PROD] Static files from public/ enabled AFTER custom routes');
+      }
       
       // Register activity payment routes
       registerActivityPaymentRoutes(app);

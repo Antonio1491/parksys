@@ -7419,7 +7419,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (fs.existsSync(testPath)) {
         console.log(`✅ [UPLOADS] Archivo encontrado en: ${testPath}`);
-        return res.sendFile(testPath);
+        return res.sendFile(testPath, (err) => {
+          if (err) {
+            console.error(`❌ [UPLOADS] Error enviando archivo: ${err.message}`);
+            console.error(`❌ [UPLOADS] Stack: ${err.stack}`);
+            res.status(500).json({ error: 'Error interno del servidor' });
+          } else {
+            console.log(`✅ [UPLOADS] Archivo enviado exitosamente: ${testPath}`);
+          }
+        });
       }
     }
     
