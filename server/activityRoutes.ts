@@ -23,7 +23,9 @@ activityRouter.post("/activities/import", isAuthenticated, async (req: Request, 
     }
 
     console.log(`📥 Iniciando importación de ${activities.length} actividades`);
+    console.log(`💀 ANTES DE JSON.STRINGIFY - Todo funcionando OK`);
     console.log(`🔍 Primera actividad de ejemplo:`, JSON.stringify(activities[0], null, 2));
+    console.log(`💀 DESPUÉS DE JSON.STRINGIFY - Si ves esto, el JSON no es el problema`);
     
     console.log(`🔥 CHECKPOINT 1: Después de mostrar ejemplo`);
     const importedActivities = [];
