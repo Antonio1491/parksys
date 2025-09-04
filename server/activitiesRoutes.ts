@@ -334,7 +334,10 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
       console.log(`🚀 INICIANDO BUCLE: Procesando ${csvActivities.length} actividades`);
       console.log(`🔍 Estructura de primera actividad:`, Object.keys(csvActivities[0]));
 
-      for (let i = 0; i < csvActivities.length; i++) {
+      try {
+        console.log(`🔥 ENTRANDO AL BUCLE FOR - Length: ${csvActivities.length}`);
+        
+        for (let i = 0; i < csvActivities.length; i++) {
         const activityData = csvActivities[i];
         console.log(`\n🔄 Procesando actividad ${i + 1}/${csvActivities.length}: "${activityData.title}"`);
         
@@ -408,6 +411,13 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
             errors.push(errorMessage);
           }
         }
+      } catch (bucleError) {
+        console.error(`🚨 ERROR CRÍTICO EN EL BUCLE:`, bucleError);
+        console.error(`🚨 Stack trace:`, bucleError.stack);
+        return res.status(500).json({
+          message: "Error crítico en el procesamiento del bucle",
+          error: bucleError.message
+        });
       }
 
       if (errors.length > 0 && imported === 0) {
