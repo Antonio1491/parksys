@@ -41,7 +41,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 const AdminActivities = () => {
   const [, setLocation] = useLocation();
@@ -339,7 +339,8 @@ const AdminActivities = () => {
       });
       setShowImportDialog(false);
       setImportFile(null);
-      refetch();
+      // Invalidate cache to force refresh of activities list
+      queryClient.invalidateQueries({ queryKey: ['/api/activities'] });
     },
     onError: (error: any) => {
       toast({

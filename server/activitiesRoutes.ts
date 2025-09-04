@@ -96,29 +96,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
     }
   });
 
-  // Obtener todas las actividades
-  apiRouter.get("/activities", async (_req: Request, res: Response) => {
-    try {
-      // Usar consulta SQL directa para incluir categorías y parques
-      const result = await db.execute(
-        sql`SELECT a.id, a.park_id as "parkId", a.title, a.description, 
-                 a.start_date as "startDate", a.end_date as "endDate", 
-                 a.category, a.location, a.capacity, a.price, a.is_free as "isFree", 
-                 a.category_id as "categoryId", a.created_at as "createdAt",
-                 p.name as "parkName",
-                 ac.name as "categoryName"
-             FROM activities a
-             LEFT JOIN parks p ON a.park_id = p.id
-             LEFT JOIN activity_categories ac ON a.category_id = ac.id
-             ORDER BY a.start_date DESC`
-      );
-      
-      res.json(result.rows);
-    } catch (error) {
-      console.error("Error al obtener actividades:", error);
-      res.status(500).json({ message: "Error al obtener actividades" });
-    }
-  });
+  // Endpoint duplicado eliminado - se usa el de activityRoutes.ts
 
 
   // Obtener actividades para un parque específico
