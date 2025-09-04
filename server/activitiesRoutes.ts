@@ -412,7 +412,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
           await (storage as any).createActivity(validatedActivity);
           imported++;
           
-          console.log(`✓ Actividad importada: "${validatedActivity.title}"`);
+          console.log(`✓ Actividad importada: "${activityData.title}"`);
           
         } catch (error) {
           console.error(`❌ Error importando actividad en fila ${i + 2}:`, error);
