@@ -135,7 +135,22 @@ const Home: React.FC = () => {
         zIndex: '9999',
         border: '5px solid yellow'
       }}>
-        🚨 CAMBIO FORZADO - {new Date().toLocaleTimeString()} - ¡SI VES ESTO, HMR FUNCIONA! 🚨
+        🚨 NUEVO CAMBIO EXTREMO - {new Date().toLocaleTimeString()} - ¡ESTO DEBERÍA SER VISIBLE! 🚨
+      </div>
+      {/* CAMBIO COMPLETO DE PÁGINA PARA DEBUGGING */}
+      <div style={{
+        background: 'blue',
+        color: 'white', 
+        fontSize: '50px',
+        textAlign: 'center',
+        padding: '100px',
+        margin: '50px'
+      }}>
+        🔵 PÁGINA DE INICIO COMPLETAMENTE MODIFICADA 🔵
+        <br />
+        Hora actual: {new Date().toLocaleString()}
+        <br />
+        Si ves esto, el problema está resuelto
       </div>
       {/* 🌟 HERO SECTION - Inspirado en bosquesamg.mx */}
       <section className="relative min-h-screen bg-black overflow-hidden">
