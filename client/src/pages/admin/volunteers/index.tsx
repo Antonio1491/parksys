@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Search, Edit, Eye, Users, MapPin, Calendar, Award, Clock, Download, Upload, ChevronLeft, ChevronRight, FileText, Filter, Trash2 } from "lucide-react";
 
@@ -51,6 +51,11 @@ export default function VolunteersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  
+  // Estados para importación CSV
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   
   const itemsPerPage = 10;
 
@@ -170,22 +175,245 @@ export default function VolunteersPage() {
     });
   };
 
-  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  // Descargar plantilla CSV para voluntarios
+  const downloadTemplate = () => {
+    try {
+      // Crear plantilla con todos los campos del formulario de voluntarios
+      const templateData = [
+        {
+          'fullName': 'Juan Pérez García',
+          'email': 'juan.perez@email.com', 
+          'phone': '5551234567',
+          'age': '25',
+          'gender': 'masculino',
+          'address': 'Av. Principal 123, Col. Centro',
+          'emergencyContactName': 'María García',
+          'emergencyContactPhone': '5559876543',
+          'emergencyContactRelation': 'madre',
+          'preferredParkId': '1',
+          'previousExperience': 'Experiencia en reforestación y actividades comunitarias',
+          'availableDays': 'lunes,miércoles,viernes',
+          'availableHours': 'mañana',
+          'interestAreas': 'reforestación,educación ambiental',
+          'skills': 'Comunicación, trabajo en equipo, jardinería',
+          'legalConsent': 'true',
+          'status': 'active'
+        },
+        {
+          'fullName': 'Ana López Martínez',
+          'email': 'ana.lopez@email.com',
+          'phone': '5555678901',
+          'age': '32',
+          'gender': 'femenino', 
+          'address': 'Calle Flores 456, Col. Jardines',
+          'emergencyContactName': 'Carlos López',
+          'emergencyContactPhone': '5554321098',
+          'emergencyContactRelation': 'esposo',
+          'preferredParkId': '2',
+          'previousExperience': 'Voluntariado en refugio de animales',
+          'availableDays': 'sábado,domingo',
+          'availableHours': 'tarde',
+          'interestAreas': 'cuidado animal,limpieza',
+          'skills': 'Paciencia, organización, primeros auxilios',
+          'legalConsent': 'true',
+          'status': 'active'
+        }
+      ];
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const csv = e.target?.result as string;
-      const lines = csv.split('\n');
-      const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
-      
-      toast({
-        title: "Importación en desarrollo",
-        description: `Se detectaron ${lines.length - 1} registros en el archivo CSV`,
+      // Convertir a CSV con BOM para UTF-8
+      const headers = Object.keys(templateData[0]);
+      const csvRows = [
+        headers.join(','),
+        ...templateData.map(row => 
+          headers.map(header => `"${(row as any)[header] || ''}"`).join(',')
+        )
+      ];
+
+      const csvContent = csvRows.join('\n');
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvContent], { 
+        type: 'text/csv;charset=utf-8;' 
       });
-    };
-    reader.readAsText(file);
+      
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'plantilla_voluntarios.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Plantilla descargada",
+        description: "La plantilla CSV se ha descargado correctamente.",
+      });
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      toast({
+        title: "Error",
+        description: "Hubo un problema al descargar la plantilla.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setIsImportDialogOpen(true);
+    }
+    // Reset input
+    event.target.value = '';
+  };
+
+  const handleImportCSV = async () => {
+    if (!selectedFile) return;
+
+    setIsImporting(true);
+    try {
+      const text = await selectedFile.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        throw new Error('El archivo debe contener al menos una fila de datos además del encabezado');
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      console.log('Headers detectados:', headers);
+
+      const volunteers = lines.slice(1).map((line, index) => {
+        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+        const volunteer: any = {};
+
+        headers.forEach((header, i) => {
+          const value = values[i] || '';
+          
+          // Mapear campos según el esquema
+          switch (header.toLowerCase()) {
+            case 'fullname':
+            case 'full_name':
+            case 'nombre_completo':
+              volunteer.fullName = value;
+              break;
+            case 'email':
+            case 'correo':
+              volunteer.email = value;
+              break;
+            case 'phone':
+            case 'telefono':
+            case 'teléfono':
+              volunteer.phone = value;
+              break;
+            case 'age':
+            case 'edad':
+              volunteer.age = value ? parseInt(value) : null;
+              break;
+            case 'gender':
+            case 'genero':
+            case 'género':
+              volunteer.gender = value;
+              break;
+            case 'address':
+            case 'direccion':
+            case 'dirección':
+              volunteer.address = value;
+              break;
+            case 'emergencycontactname':
+            case 'emergency_contact_name':
+            case 'contacto_emergencia':
+              volunteer.emergencyContactName = value;
+              break;
+            case 'emergencycontactphone':
+            case 'emergency_contact_phone':
+            case 'telefono_emergencia':
+              volunteer.emergencyContactPhone = value;
+              break;
+            case 'emergencycontactrelation':
+            case 'emergency_contact_relation':
+            case 'relacion_emergencia':
+              volunteer.emergencyContactRelation = value;
+              break;
+            case 'preferredparkid':
+            case 'preferred_park_id':
+            case 'parque_preferido':
+              volunteer.preferredParkId = value ? parseInt(value) : null;
+              break;
+            case 'previousexperience':
+            case 'previous_experience':
+            case 'experiencia_previa':
+              volunteer.previousExperience = value;
+              break;
+            case 'availabledays':
+            case 'available_days':
+            case 'dias_disponibles':
+              volunteer.availableDays = value ? value.split(',').map(d => d.trim()) : [];
+              break;
+            case 'availablehours':
+            case 'available_hours':
+            case 'horas_disponibles':
+              volunteer.availableHours = value;
+              break;
+            case 'interestareas':
+            case 'interest_areas':
+            case 'areas_interes':
+              volunteer.interestAreas = value ? value.split(',').map(a => a.trim()) : [];
+              break;
+            case 'skills':
+            case 'habilidades':
+              volunteer.skills = value;
+              break;
+            case 'legalconsent':
+            case 'legal_consent':
+            case 'consentimiento_legal':
+              volunteer.legalConsent = value.toLowerCase() === 'true' || value.toLowerCase() === 'sí' || value === '1';
+              break;
+            case 'status':
+            case 'estado':
+              volunteer.status = value || 'active';
+              break;
+          }
+        });
+
+        return volunteer;
+      });
+
+      console.log('Voluntarios procesados:', volunteers);
+
+      const response = await apiRequest('/api/volunteers/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ volunteers }),
+      });
+
+      if (response.success) {
+        toast({
+          title: "Importación exitosa",
+          description: `Se importaron ${response.imported} voluntarios de ${response.processed} registros`,
+        });
+        
+        // Invalidar cache para actualizar la lista
+        queryClient.invalidateQueries({ queryKey: ['/api/volunteers'] });
+        
+        setIsImportDialogOpen(false);
+        setSelectedFile(null);
+      } else {
+        throw new Error(response.error || 'Error en la importación');
+      }
+
+    } catch (error) {
+      console.error('Error importing volunteers:', error);
+      toast({
+        title: "Error en la importación",
+        description: error instanceof Error ? error.message : "Error desconocido",
+        variant: "destructive"
+      });
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   const handleViewDetails = (volunteer: Volunteer) => {
@@ -399,6 +627,14 @@ export default function VolunteersPage() {
               </Button>
               <Button 
                 variant="outline"
+                onClick={downloadTemplate}
+                className="flex items-center gap-2 border-green-600 text-green-600 hover:bg-green-50"
+              >
+                <FileText className="h-4 w-4" />
+                Descargar Plantilla CSV
+              </Button>
+              <Button 
+                variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 className="flex items-center gap-2"
               >
@@ -410,7 +646,7 @@ export default function VolunteersPage() {
                 type="file"
                 accept=".csv"
                 style={{ display: 'none' }}
-                onChange={handleFileImport}
+                onChange={handleFileSelect}
               />
             </div>
           </CardContent>
@@ -811,6 +1047,46 @@ export default function VolunteersPage() {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de importación CSV */}
+        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Importar Voluntarios desde CSV</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Seleccionaste: <strong>{selectedFile?.name}</strong>
+                </p>
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-xs text-blue-800">
+                    <strong>Formato requerido:</strong> Usa la plantilla CSV descargable que incluye todos los campos del formulario "Nuevo Voluntario" con soporte completo para caracteres acentuados.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsImportDialogOpen(false);
+                  setSelectedFile(null);
+                }}
+                disabled={isImporting}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleImportCSV}
+                disabled={isImporting || !selectedFile}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isImporting ? "Importando..." : "Importar Voluntarios"}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

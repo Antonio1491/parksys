@@ -5097,6 +5097,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Import volunteers from CSV (bulk import)
+  apiRouter.post("/volunteers/import", async (req: Request, res: Response) => {
+    try {
+      console.log("📥 POST /api/volunteers/import - Iniciando importación de voluntarios");
+      
+      if (!req.body.volunteers || !Array.isArray(req.body.volunteers)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Se requiere un array de voluntarios en req.body.volunteers" 
+        });
+      }
+
+      const volunteersData = req.body.volunteers;
+      console.log(`📊 Procesando ${volunteersData.length} voluntarios para importar`);
+
+      let importedCount = 0;
+      let errors = [];
+
+      for (let i = 0; i < volunteersData.length; i++) {
+        try {
+          const volunteerData = volunteersData[i];
+          console.log(`🔧 Procesando voluntario ${i + 1}:`, volunteerData.fullName || volunteerData.full_name);
+
+          // Validar con Zod schema
+          const validatedData = insertVolunteerSchema.parse(volunteerData);
+          
+          // Crear voluntario usando storage
+          const result = await storage.createVolunteer(validatedData);
+          importedCount++;
+          
+          console.log(`✅ Voluntario ${i + 1} creado exitosamente: ${result.id}`);
+          
+        } catch (error) {
+          console.error(`❌ Error procesando voluntario ${i + 1}:`, error);
+          errors.push({
+            index: i + 1,
+            name: volunteersData[i]?.fullName || volunteersData[i]?.full_name || 'Sin nombre',
+            error: error instanceof ZodError 
+              ? `Validación: ${error.issues.map(issue => issue.message).join(', ')}`
+              : (error as Error).message
+          });
+        }
+      }
+
+      console.log(`✅ Importación completada: ${importedCount} voluntarios importados`);
+      console.log(`❌ Errores encontrados: ${errors.length}`);
+
+      res.json({
+        success: true,
+        message: `Importación completada: ${importedCount} voluntarios importados exitosamente`,
+        imported: importedCount,
+        errors: errors,
+        processed: volunteersData.length
+      });
+
+    } catch (error) {
+      console.error('❌ Error general en importación de voluntarios:', error);
+      res.status(500).json({
+        success: false,
+        error: "Error interno del servidor durante la importación",
+        message: (error as Error).message
+      });
+    }
+  });
+
   // Add an activity to a park (admin/municipality only)
   apiRouter.post("/parks/:id/activities", isAuthenticated, hasParkAccess, async (req: Request, res: Response) => {
     try {
