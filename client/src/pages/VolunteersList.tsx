@@ -95,7 +95,7 @@ export default function VolunteersList() {
     
     const matchesPark = parkFilter === 'all' || volunteer.preferredParkId?.toString() === parkFilter;
     
-    return matchesSearch && matchesPark && volunteer.status === 'active';
+    return matchesSearch && matchesPark && volunteer.status === 'activo';
   });
 
   // Lógica de "Ver más"
