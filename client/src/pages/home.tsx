@@ -142,8 +142,8 @@ const Home: React.FC = () => {
             <h1 className="text-5xl md:text-6xl lg:text-6xl font-guttery regular font-thin text-white mb-6 leading-tight">
               Conoce los
             </h1>
-            <h1 className="text-5xl md:text-6xl lg:text-6xl font-poppins font-bold text-white mb-6 leading-tight">
-            <span className="btext-header-background">PARQUES</span> DE MÉXICO
+            <h1 className="text-5xl md:text-6xl lg:text-6xl font-poppins font-black text-white mb-6 leading-tight">
+            <span className="text-header-background">PARQUES</span> DE MÉXICO
             </h1>
             
             {/* Subtítulo */}
