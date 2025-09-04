@@ -754,10 +754,6 @@ const RolesManagement: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Acciones rápidas */}
-      <div className="grid gap-6 md:grid-cols-3 mt-8">
-      </div>
     </AdminLayout>
   );
 };
