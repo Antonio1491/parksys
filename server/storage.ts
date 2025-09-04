@@ -1479,6 +1479,7 @@ export class DatabaseStorage implements IStorage {
       const insertData = {
         name: parkData.name,
         municipalityId: parkData.municipalityId,
+        municipalityText: parkData.municipalityText,
         parkType: parkData.parkType || 'urbano',
         description: parkData.description || '',
         address: parkData.address || '',
