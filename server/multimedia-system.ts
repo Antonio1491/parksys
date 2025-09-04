@@ -157,6 +157,21 @@ export function registerMultimediaRoutes(app: any, apiRouter: Router, isAuthenti
         filePath = req.file.path;
         finalImageUrl = `/uploads/park-images/${req.file.filename}`;
         console.log('📁 Archivo subido:', finalImageUrl);
+        
+        // CRÍTICO: Copiar también a public/uploads para producción (como hacen árboles y fauna)
+        const publicDestination = `public/uploads/park-images/${req.file.filename}`;
+        try {
+          // Asegurar que el directorio público existe
+          const publicDir = 'public/uploads/park-images';
+          if (!fs.existsSync(publicDir)) {
+            fs.mkdirSync(publicDir, { recursive: true });
+          }
+          // Copiar archivo a ubicación pública
+          fs.copyFileSync(req.file.path, publicDestination);
+          console.log(`📁 [PRODUCTION] File copied to: ${publicDestination}`);
+        } catch (copyError) {
+          console.error('❌ Error copying to public directory:', copyError);
+        }
       } else {
         console.log('🔗 URL proporcionada:', finalImageUrl);
       }
