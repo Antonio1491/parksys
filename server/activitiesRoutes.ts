@@ -402,7 +402,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
             recurringDays: Array.isArray(activityData.recurringDays) ? activityData.recurringDays : [],
             targetMarket: Array.isArray(activityData.targetMarket) ? activityData.targetMarket : [],
             specialNeeds: Array.isArray(activityData.specialNeeds) ? activityData.specialNeeds : [],
-            allowsPublicRegistration: activityData.allowsPublicRegistration === true || activityData.allowsPublicRegistration === 'true',
+            registrationEnabled: activityData.registrationEnabled === true || activityData.registrationEnabled === 'true',
             maxRegistrations: activityData.maxRegistrations ? parseInt(activityData.maxRegistrations) : null,
             registrationDeadline: activityData.registrationDeadline || null,
             registrationInstructions: activityData.registrationInstructions || '',

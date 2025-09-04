@@ -563,7 +563,7 @@ const AdminActivities = () => {
                 break;
               case 'permiteregistropúblico':
               case 'permiteregistropublico':
-                activityData.allowsPublicRegistration = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value === '1';
+                activityData.registrationEnabled = value.toLowerCase() === 'sí' || value.toLowerCase() === 'si' || value === '1';
                 break;
               case 'máximoregistros':
               case 'maxregistros':
