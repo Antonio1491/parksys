@@ -1508,7 +1508,7 @@ console.log("📊 Rutas del módulo de evaluaciones registradas correctamente");
 
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = 'public/uploads/park-images';
+    const uploadPath = 'uploads/park-images';
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
