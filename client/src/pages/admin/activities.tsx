@@ -416,18 +416,24 @@ const AdminActivities = () => {
           const values = parseCSVLine(row);
           console.log(`📝 Procesando fila ${index + 2}: ${values.length} valores:`, values);
           
-          if (values.length !== headers.length) {
-            throw new Error(
-              `Fila ${index + 2}: número incorrecto de columnas.\n` +
-              `Se esperaban ${headers.length} columnas, se encontraron ${values.length}.\n` +
-              `Headers: [${headers.join(', ')}]\n` +
-              `Valores: [${values.join(', ')}]`
-            );
+          // Ajustar el número de columnas: rellenar con vacíos o recortar
+          const adjustedValues = [...values];
+          
+          // Si tiene menos columnas, rellenar con strings vacíos
+          while (adjustedValues.length < headers.length) {
+            adjustedValues.push('');
           }
+          
+          // Si tiene más columnas, recortar al número de headers
+          if (adjustedValues.length > headers.length) {
+            adjustedValues.splice(headers.length);
+          }
+          
+          console.log(`✅ Valores ajustados (${adjustedValues.length}):`, adjustedValues);
 
           const activityData: any = {};
           headers.forEach((header, i) => {
-            const value = values[i];
+            const value = adjustedValues[i];
             
             // Map CSV headers to database fields
             const normalizedHeader = header.toLowerCase().trim();
