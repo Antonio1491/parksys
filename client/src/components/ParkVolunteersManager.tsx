@@ -124,6 +124,12 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
     return matchesSearch && matchesStatus;
   });
 
+  // Debug del filtro adicional
+  console.log('🔍 DEBUG: searchTerm:', searchTerm);
+  console.log('🔍 DEBUG: statusFilter:', statusFilter);
+  console.log('🔍 DEBUG: filteredAvailableVolunteers:', filteredAvailableVolunteers.length);
+  console.log('🔍 DEBUG: primer voluntario ejemplo:', filteredAvailableVolunteers[0]);
+
   // Mutación para asignar voluntario al parque
   const assignVolunteerMutation = useMutation({
     mutationFn: async (volunteerId: number) => {
@@ -214,6 +220,8 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
     });
   };
 
+  console.log('🎯 RENDERIZANDO ParkVolunteersManager con:', filteredAvailableVolunteers.length, 'voluntarios');
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* COLUMNA IZQUIERDA: Voluntarios Disponibles */}
