@@ -59,12 +59,13 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     if (!firebaseUid && process.env.NODE_ENV === 'development') {
       console.log('🛠️ [AUTH] Modo desarrollo - usando usuario fijo');
       req.user = {
-        id: 4,
-        username: 'Luis',
-        role: 'admin',
+        id: 1,
+        username: 'Luis Romahn',
+        role: 'super-admin',
         isActive: true,
         roleId: 1,
-        firebaseUid: 'dev-user'
+        firebaseUid: 'AgDictDqdqUOo9hKUYlXPT3t5Bv1',
+        uid: 'AgDictDqdqUOo9hKUYlXPT3t5Bv1'
       };
       return next();
     }

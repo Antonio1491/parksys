@@ -7629,9 +7629,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint para el conteo de notificaciones no leídas
   app.get('/api/notifications/count', isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const userFirebaseUid = (req as any).user?.uid;
+      const userFirebaseUid = (req as any).user?.firebaseUid || (req as any).user?.uid;
       
       if (!userFirebaseUid) {
+        console.log('❌ [NOTIFICATIONS] No se encontró firebaseUid en el usuario:', req.user);
         return res.status(401).json({ error: 'Usuario no autenticado' });
       }
 
