@@ -14,6 +14,7 @@ import { useDynamicRoles, useDynamicPermissions } from '@/components/DynamicRole
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageHeader } from "@/components/ui/page-header";
+import MetricCard from "@/components/ui/metric-card";
 import { Link } from 'wouter';
 import { 
   Shield, Users, Settings, Search, Plus, Edit, Trash2, Crown, Star, 
@@ -374,14 +375,12 @@ const RolesManagement: React.FC = () => {
 
   return (
     <AdminLayout title="Gestión de Roles" subtitle="Sistema avanzado de roles y jerarquías">
-      {/* Header con título */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Gestión de Roles</h1>
-          <p className="text-gray-600 mt-2">Sistema avanzado de roles y jerarquías</p>
-        </div>
-        <div className="flex gap-3">
-          <div className="relative">
+      <PageHeader
+        title="Gestión de Roles"
+        subtitle="Sistema avanzado de roles y jerarquías"
+        icon={<UserCog />}
+        actions={[
+          <div key="search" className="relative">
             <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
             <Input
               placeholder="Buscar roles..."
@@ -389,97 +388,98 @@ const RolesManagement: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 w-64"
             />
-          </div>
-          {permissions.canWrite('Seguridad') && (
+          </div>,
+          permissions.canWrite('Seguridad') && (
             <Button 
+              key="create"
               onClick={() => setShowCreateModal(true)}
-              className="bg-purple-600 hover:bg-purple-700"
+              variant="default"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="h-4 w-4 mr-2" />
               Crear Rol
             </Button>
-          )}
-        </div>
-      </div>
+          )
+        ].filter(Boolean)}
+      />
       {/* Métricas principales del sistema de roles - ACTUALIZADO para múltiples roles */}
       <div className="grid gap-6 md:grid-cols-5 mb-8">
-        <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-800">
-              Total de Roles
-            </CardTitle>
-            <Shield className="h-5 w-5 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-900">{roles.length}</div>
-            <p className="text-xs text-purple-700 mt-1">{roles.length} roles jerárquicos activos</p>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Total de Roles"
+          value={roles.length}
+          subtitle={`${roles.length} roles jerárquicos activos`}
+          icon={Shield}
+          iconColor="#7c3aed"
+          backgroundColor="#faf5ff"
+          textColor="#581c87"
+          titleColor="#7c3aed"
+          subtitleColor="#8b5cf6"
+          borderColor="#c4b5fd"
+        />
 
-        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800">
-              Usuarios Totales
-            </CardTitle>
-            <Users className="h-5 w-5 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-900">{totalUsers}</div>
-            <p className="text-xs text-blue-700 mt-1">Asignados a roles activos</p>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Usuarios Totales"
+          value={totalUsers}
+          subtitle={`${totalActiveUsers} usuarios activos`}
+          icon={Users}
+          iconColor="#0ea5e9"
+          backgroundColor="#f0f9ff"
+          textColor="#0c4a6e"
+          titleColor="#0ea5e9"
+          subtitleColor="#0284c7"
+          borderColor="#7dd3fc"
+        />
 
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">
-              Actividad
-            </CardTitle>
-            <Activity className="h-5 w-5 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-900">{activityRate}%</div>
-            <Progress value={activityRate} className="mt-2" />
-            <p className="text-xs text-green-700 mt-1">{totalActiveUsers} usuarios activos</p>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Actividad"
+          value={`${activityRate}%`}
+          subtitle={`${totalActiveUsers} usuarios activos`}
+          icon={Activity}
+          iconColor="#10b981"
+          backgroundColor="#f0fdf4"
+          textColor="#065f46"
+          titleColor="#10b981"
+          subtitleColor="#059669"
+          borderColor="#86efac"
+        >
+          <Progress value={activityRate} className="mt-2" />
+        </MetricCard>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-800">
-              Mi Nivel
-            </CardTitle>
-            <Crown className="h-5 w-5 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-orange-900">{permissions.roleLevel}</div>
-            <div className="mt-2">
-              {permissions.hasMultipleRoles ? (
-                <MultiRoleBadge userId={1} showOnlyPrimary={true} size="sm" />
-              ) : (
-                <RoleBadge roleId={typeof permissions.userRole === 'object' && permissions.userRole?.slug ? permissions.userRole.slug : 'super-admin'} size="sm" useDynamic={true} />
-              )}
-            </div>
-            <p className="text-xs text-orange-700 mt-1">
-              {permissions.hasMultipleRoles ? `${permissions.getUserRoles().length} roles asignados` : 'Nivel jerárquico actual'}
-            </p>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Mi Nivel"
+          value={permissions.roleLevel}
+          subtitle={permissions.hasMultipleRoles ? `${permissions.getUserRoles().length} roles asignados` : 'Nivel jerárquico actual'}
+          icon={Crown}
+          iconColor="#f59e0b"
+          backgroundColor="#fffbeb"
+          textColor="#92400e"
+          titleColor="#f59e0b"
+          subtitleColor="#d97706"
+          borderColor="#fde68a"
+        >
+          <div className="mt-2">
+            {permissions.hasMultipleRoles ? (
+              <MultiRoleBadge userId={1} showOnlyPrimary={true} size="sm" />
+            ) : (
+              <RoleBadge roleId={typeof permissions.userRole === 'object' && permissions.userRole?.slug ? permissions.userRole.slug : 'super-admin'} size="sm" useDynamic={true} />
+            )}
+          </div>
+        </MetricCard>
 
-        <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-teal-800">
-              Múltiples Roles
-            </CardTitle>
-            <Star className="h-5 w-5 text-teal-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-teal-900">{multiRoleStats.usersWithMultipleRoles}</div>
-            <Progress value={(multiRoleStats.usersWithMultipleRoles / Math.max(totalUsers, 1)) * 100} className="mt-2" />
-            <p className="text-xs text-teal-700 mt-1">
-              {Math.round((multiRoleStats.usersWithMultipleRoles / Math.max(totalUsers, 1)) * 100)}% con múltiples roles
-            </p>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Múltiples Roles"
+          value={multiRoleStats.usersWithMultipleRoles}
+          subtitle={`${Math.round((multiRoleStats.usersWithMultipleRoles / Math.max(totalUsers, 1)) * 100)}% con múltiples roles`}
+          icon={Star}
+          iconColor="#06b6d4"
+          backgroundColor="#f0fdfa"
+          textColor="#0f766e"
+          titleColor="#06b6d4"
+          subtitleColor="#0891b2"
+          borderColor="#67e8f9"
+        >
+          <Progress value={(multiRoleStats.usersWithMultipleRoles / Math.max(totalUsers, 1)) * 100} className="mt-2" />
+        </MetricCard>
       </div>
 
       {/* Modal de creación de roles */}
