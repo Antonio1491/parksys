@@ -1,0 +1,44 @@
+i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-CdhC1lKU.js:789 i18next: languageChanged es
+index-CdhC1lKU.js:789 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-CdhC1lKU.js:49 🌐 [QUERY] GET /api/instructors/20
+index-CdhC1lKU.js:49 🌐 [QUERY] GET /api/public/instructors/20/evaluation-stats
+index-CdhC1lKU.js:49 🌐 [QUERY] GET /api/public/instructors/20/evaluations
+profileImage-1757031597744-601122721.jpg:1  GET https://parksys-demo.replit.app/uploads/instructors/profileImage-1757031597744-601122721.jpg 404 (Not Found)
+Image
+EO @ index-CdhC1lKU.js:41
+sz @ index-CdhC1lKU.js:41
+sz @ index-CdhC1lKU.js:41
+Vte @ index-CdhC1lKU.js:41
+Gte @ index-CdhC1lKU.js:41
+Yc @ index-CdhC1lKU.js:41
+TO @ index-CdhC1lKU.js:41
+Sc @ index-CdhC1lKU.js:39
+(anonymous) @ index-CdhC1lKU.js:41
+setTimeout
+Wne @ index-CdhC1lKU.js:49
+o @ index-CdhC1lKU.js:49
+batch @ index-CdhC1lKU.js:49
+Po @ index-CdhC1lKU.js:49
+setData @ index-CdhC1lKU.js:49
+onSuccess @ index-CdhC1lKU.js:49
+f @ index-CdhC1lKU.js:49
+Promise.then
+y @ index-CdhC1lKU.js:49
+start @ index-CdhC1lKU.js:49
+fetch @ index-CdhC1lKU.js:49
+op @ index-CdhC1lKU.js:49
+onSubscribe @ index-CdhC1lKU.js:49
+subscribe @ index-CdhC1lKU.js:49
+(anonymous) @ index-CdhC1lKU.js:49
+AF @ index-CdhC1lKU.js:39
+hj @ index-CdhC1lKU.js:41
+fh @ index-CdhC1lKU.js:41
+(anonymous) @ index-CdhC1lKU.js:41
+C @ index-CdhC1lKU.js:26
+$ @ index-CdhC1lKU.js:26Understand this error

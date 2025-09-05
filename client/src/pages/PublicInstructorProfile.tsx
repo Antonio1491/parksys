@@ -107,8 +107,9 @@ function PublicInstructorProfile() {
             {instructor.profileImageUrl ? (
               <img 
                 src={
-                  import.meta.env.DEV 
-                    ? `http://localhost:5000${instructor.profileImageUrl}` 
+                  // En Replit development, usar URL completa del backend
+                  window.location.hostname.includes('replit.') || import.meta.env.DEV
+                    ? `${window.location.protocol}//${window.location.host}${instructor.profileImageUrl}` 
                     : instructor.profileImageUrl
                 } 
                 alt={instructor.fullName}
