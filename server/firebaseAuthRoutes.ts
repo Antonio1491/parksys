@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from './db';
-import { users, pendingUsers, userRoles } from '../shared/schema';
+import { users, pendingUsers } from '../shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { linkExistingUserWithFirebase, isExistingUser, getUserByFirebaseUid, migrateKnownUsers, getMigrationInstructions } from './firebaseUserSync';
 
@@ -22,14 +22,10 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
       if (approvedUser) {
         console.log(`✅ [AUTH-STATUS] Usuario aprobado encontrado: ${approvedUser.email}`);
         
-        // Obtener roles del usuario
-        const userRolesList = await db.select()
-          .from(userRoles)
-          .where(eq(userRoles.userId, approvedUser.id));
-
+        // Usar el roleId directamente de la tabla users
         const userWithRoles = {
           ...approvedUser,
-          roles: userRolesList
+          roles: [{ roleId: approvedUser.roleId }] // Formato compatible
         };
 
         return res.json({
