@@ -210,6 +210,7 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
         username: pendingUser.displayName || pendingUser.email,
         email: pendingUser.email,
         fullName: pendingUser.displayName || '',
+        password: null, // Los usuarios de Firebase no necesitan contraseña local
         roleId: assignedRoleId,
         isActive: true,
         needsPasswordReset: false,

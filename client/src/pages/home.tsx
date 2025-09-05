@@ -205,7 +205,7 @@ const Home: React.FC = () => {
                     {/* Tarjeta anterior (parcial izquierda) */}
                     {featuredParks.length > 1 && (
                       <div className="w-[15vw] h-full opacity-100 mr-14">
-                        <div className="relative h-full w-full rounded-md overflow-hidden">
+                        <div className="relative h-full w-full rounded-xl overflow-hidden">
                           <div 
                             className="absolute inset-0 bg-cover bg-center"
                             style={{
@@ -224,7 +224,7 @@ const Home: React.FC = () => {
 
                     {/* Tarjeta central (principal) */}
                     <div className="w-[70vw] h-full scale-105 z-20 mx-2">
-                      <div className="relative h-full w-full rounded-3xl overflow-hidden shadow-2xl group">
+                      <div className="relative h-full w-full rounded-xl overflow-hidden group">
                         {/* Imagen de fondo */}
                         <div 
                           className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
