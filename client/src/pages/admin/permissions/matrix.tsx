@@ -21,21 +21,36 @@ const PermissionsMatrix: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<string>('all');
   const [permissions, setPermissions] = useState<Record<string, Record<string, string[]>>>({});
   const [hasChanges, setHasChanges] = useState(false);
-  const { modules, moduleMap } = useAdaptiveModules();
+  const { modules, moduleMap, subModuleMap, flatModules } = useAdaptiveModules();
   const { user } = useAuth();
   const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.id || 1);
 
-  // Cargar permisos desde localStorage al iniciar
+  // Cargar permisos desde localStorage al iniciar y configurar Super Admin por defecto
   useEffect(() => {
     const savedPermissions = localStorage.getItem('rolePermissions');
+    let loadedPermissions = {};
+    
     if (savedPermissions) {
       try {
-        setPermissions(JSON.parse(savedPermissions));
+        loadedPermissions = JSON.parse(savedPermissions);
       } catch (error) {
         console.error('Error al cargar permisos:', error);
       }
     }
-  }, []);
+
+    // Asegurar que Super Admin tenga todos los permisos por defecto
+    const superAdminDefaults = {};
+    flatModules.forEach(moduleId => {
+      superAdminDefaults[moduleId] = ['read', 'create', 'update', 'delete', 'admin'];
+    });
+
+    const finalPermissions = {
+      ...loadedPermissions,
+      'super-admin': superAdminDefaults
+    };
+
+    setPermissions(finalPermissions);
+  }, [flatModules]);
 
   // Guardar cambios en localStorage automáticamente
   useEffect(() => {
@@ -102,9 +117,9 @@ const PermissionsMatrix: React.FC = () => {
 
   const getPermissionCount = (roleId: string): number => {
     let count = 0;
-    Object.keys(moduleMap).forEach(module => {
-      if ((permissions[roleId] as any)?.[module]) {
-        count += (permissions[roleId] as any)[module].length;
+    flatModules.forEach(moduleId => {
+      if ((permissions[roleId] as any)?.[moduleId]) {
+        count += (permissions[roleId] as any)[moduleId].length;
       }
     });
     return count;
@@ -129,7 +144,7 @@ const PermissionsMatrix: React.FC = () => {
   };
 
   const filteredRoles = selectedRole === 'all' ? SYSTEM_ROLES : SYSTEM_ROLES.filter(r => r.id === selectedRole);
-  const filteredModules = selectedModule === 'all' ? Object.keys(moduleMap) : [selectedModule];
+  const filteredModules = selectedModule === 'all' ? flatModules : [selectedModule];
 
   return (
     <AdminLayout title="Matriz de Permisos" subtitle="Configuración granular de permisos por rol y módulo">
@@ -161,9 +176,9 @@ const PermissionsMatrix: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los módulos</SelectItem>
-                {Object.keys(moduleMap).map(moduleId => (
+                {flatModules.map(moduleId => (
                   <SelectItem key={moduleId} value={moduleId}>
-                    {moduleMap[moduleId].name}
+                    {subModuleMap[moduleId]?.name || moduleId}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -258,7 +273,7 @@ const PermissionsMatrix: React.FC = () => {
                   <th className="text-left p-3 border-b font-semibold">Rol</th>
                   {filteredModules.map(moduleId => (
                     <th key={moduleId} className="text-center p-3 border-b font-semibold min-w-32">
-                      {moduleMap[moduleId]?.name || moduleId}
+                      {subModuleMap[moduleId]?.name || moduleId}
                     </th>
                   ))}
                   <th className="text-center p-3 border-b font-semibold">Total</th>
@@ -283,7 +298,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.id, module, 'read')}
                               onCheckedChange={(checked) => updatePermission(role.id, module, 'read', !!checked)}
-                              disabled={role.id === 'super-admin'}
+                              disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">R</span>
                           </div>
@@ -293,7 +308,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.id, module, 'write')}
                               onCheckedChange={(checked) => updatePermission(role.id, module, 'write', !!checked)}
-                              disabled={role.id === 'super-admin'}
+                              disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">W</span>
                           </div>
@@ -303,7 +318,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.id, module, 'admin')}
                               onCheckedChange={(checked) => updatePermission(role.id, module, 'admin', !!checked)}
-                              disabled={role.id === 'super-admin'}
+                              disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">A</span>
                           </div>

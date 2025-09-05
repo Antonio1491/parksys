@@ -41,22 +41,58 @@ export const CRUD_ACTIONS: ModuleAction[] = [
   { id: 'admin', name: 'Administrar', icon: 'Settings', description: 'Control total del módulo' }
 ];
 
-// Configuración estática mejorada basada en AdminSidebarComplete.tsx
+// Configuración dinámica basada en CollapsibleSubmenu de AdminSidebarComplete.tsx
+const SYSTEM_SUBMENU_CONFIG: SubModule[] = [
+  // GESTIÓN
+  { id: 'parques', name: 'Parques', icon: 'MapPin', path: '/admin/parks', actions: CRUD_ACTIONS },
+  { id: 'actividades', name: 'Actividades', icon: 'Calendar', path: '/admin/activities', actions: CRUD_ACTIONS },
+  { id: 'amenidades', name: 'Amenidades', icon: 'Package', path: '/admin/amenities', actions: CRUD_ACTIONS },
+  { id: 'arbolado', name: 'Arbolado', icon: 'TreePine', path: '/admin/trees', actions: CRUD_ACTIONS },
+  { id: 'fauna', name: 'Fauna', icon: 'Heart', path: '/admin/fauna', actions: CRUD_ACTIONS },
+  { id: 'visitantes', name: 'Visitantes', icon: 'Users', path: '/admin/visitors', actions: CRUD_ACTIONS },
+  { id: 'eventos', name: 'Eventos', icon: 'CalendarDays', path: '/admin/events', actions: CRUD_ACTIONS },
+  { id: 'reservas', name: 'Reservas', icon: 'CalendarClock', path: '/admin/space-reservations', actions: CRUD_ACTIONS },
+  { id: 'evaluaciones', name: 'Evaluaciones', icon: 'Star', path: '/admin/evaluaciones', actions: CRUD_ACTIONS },
+  
+  // OPERACIONES Y MANTENIMIENTO
+  { id: 'activos', name: 'Activos', icon: 'Package', path: '/admin/assets', actions: CRUD_ACTIONS },
+  { id: 'incidencias', name: 'Incidencias', icon: 'AlertTriangle', path: '/admin/incidents', actions: CRUD_ACTIONS },
+  { id: 'voluntarios', name: 'Voluntarios', icon: 'HandHeart', path: '/admin/volunteers', actions: CRUD_ACTIONS },
+  
+  // FINANZAS 
+  { id: 'finanzas', name: 'Finanzas', icon: 'DollarSign', path: '/admin/finance', actions: CRUD_ACTIONS },
+  { id: 'contabilidad', name: 'Contabilidad', icon: 'Calculator', path: '/admin/accounting', actions: CRUD_ACTIONS },
+  { id: 'concesiones', name: 'Concesiones', icon: 'Store', path: '/admin/concessions', actions: CRUD_ACTIONS },
+  
+  // MARKETING Y COMUNICACIONES
+  { id: 'marketing', name: 'Marketing', icon: 'Megaphone', path: '/admin/communications/marketing', actions: CRUD_ACTIONS },
+  { id: 'advertising', name: 'Publicidad', icon: 'Image', path: '/admin/communications/advertising', actions: CRUD_ACTIONS },
+  { id: 'communications', name: 'Comunicaciones', icon: 'Mail', path: '/admin/communications', actions: CRUD_ACTIONS },
+  
+  // RECURSOS HUMANOS
+  { id: 'empleados', name: 'Empleados', icon: 'Users', path: '/admin/hr/employees', actions: CRUD_ACTIONS },
+  { id: 'nomina', name: 'Nómina', icon: 'CreditCard', path: '/admin/hr/payroll', actions: CRUD_ACTIONS },
+  { id: 'vacaciones', name: 'Vacaciones', icon: 'Calendar', path: '/admin/hr/vacations', actions: CRUD_ACTIONS },
+  
+  // CONFIGURACIÓN Y SEGURIDAD
+  { id: 'control-acceso', name: 'Control Acceso', icon: 'Shield', path: '/admin/configuracion-seguridad/access', actions: CRUD_ACTIONS },
+  { id: 'politicas', name: 'Políticas', icon: 'FileText', path: '/admin/configuracion-seguridad/policies', actions: CRUD_ACTIONS },
+  { id: 'notificaciones', name: 'Notificaciones', icon: 'Bell', path: '/admin/configuracion-seguridad/notifications', actions: CRUD_ACTIONS },
+  { id: 'auditoria', name: 'Auditoría', icon: 'History', path: '/admin/configuracion-seguridad/audit', actions: CRUD_ACTIONS },
+  { id: 'mantenimiento-sistema', name: 'Mantenimiento', icon: 'Settings', path: '/admin/configuracion-seguridad/maintenance', actions: CRUD_ACTIONS },
+  { id: 'exportaciones', name: 'Exportaciones', icon: 'Download', path: '/admin/configuracion-seguridad/exports', actions: CRUD_ACTIONS },
+];
+
+// Configuración agrupada por módulos principales
 const SYSTEM_MODULES_CONFIG: SystemModule[] = [
   {
-    id: 'sistema',
-    name: 'Sistema',
+    id: 'dashboard',
+    name: 'Dashboard',
     icon: 'Home',
     color: '#61B1A0',
-    description: 'Panel de control y configuración general',
+    description: 'Panel de control principal',
     subModules: [
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        icon: 'BarChart3',
-        path: '/admin',
-        actions: CRUD_ACTIONS.filter(a => ['read'].includes(a.id))
-      }
+      { id: 'dashboard', name: 'Dashboard', icon: 'BarChart3', path: '/admin', actions: CRUD_ACTIONS.filter(a => ['read'].includes(a.id)) }
     ]
   },
   {
@@ -260,22 +296,20 @@ const SYSTEM_MODULES_CONFIG: SystemModule[] = [
  */
 export const useAdaptiveModules = (): AdaptiveModulesStructure => {
   const adaptiveStructure = useMemo(() => {
-    // Crear mapa plano de módulos formato 'módulo.submódulo'
+    // Crear mapa directo de submódulos granulares
     const flatModules: string[] = [];
     const moduleMap: Record<string, SystemModule> = {};
     const subModuleMap: Record<string, SubModule> = {};
 
+    // Procesar submódulos directamente desde la configuración real
+    SYSTEM_SUBMENU_CONFIG.forEach(subModule => {
+      flatModules.push(subModule.id);
+      subModuleMap[subModule.id] = subModule;
+    });
+
+    // Mantener compatibilidad con módulos agrupados
     SYSTEM_MODULES_CONFIG.forEach(module => {
       moduleMap[module.id] = module;
-      
-      module.subModules.forEach(subModule => {
-        const fullId = `${module.id}.${subModule.id}`;
-        flatModules.push(fullId);
-        subModuleMap[fullId] = {
-          ...subModule,
-          id: fullId // Actualizamos el ID para incluir el módulo padre
-        };
-      });
     });
 
     return {

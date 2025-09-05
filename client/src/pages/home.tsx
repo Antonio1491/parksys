@@ -182,7 +182,7 @@ const Home: React.FC = () => {
               <span style={{ color: '#00444f' }}>Favorito</span>
             </h2>
             <p className="text-2xl font-bold text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              espacios para respirar, convivir y disfrutar
+              Navega a través de los parques más emblemáticos, pertenecientes al Sistema de Parques de México 
             </p>
           </div>
           
