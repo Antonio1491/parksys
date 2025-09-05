@@ -2198,15 +2198,18 @@ function startServer() {
       registerRoleRoutes(app);
       console.log("✅ [API-PRIORITY] Role routes registered with priority over static files");
       
-      // NOW apply express.static AFTER custom routes to avoid intercepting /uploads/*
-      // FORCE STATIC FILES CONFIGURATION - Critical for image serving
-      app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-      app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+      // 🔧 PRODUCTION FIX: Express.static BEFORE custom routes in production for reliable serving
       if (process.env.NODE_ENV === 'production') {
+        // In production, prioritize express.static for better performance
+        app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+        app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
         app.use(express.static(path.join(process.cwd(), 'public')));
-        console.log('📁 [PROD] Static files from public/ and uploads/ enabled AFTER custom routes');
+        console.log('📁 [PROD] Express.static /uploads enabled BEFORE custom routes for production');
       } else {
-        console.log('📁 [DEV] Static uploads/ files enabled');
+        // In development, custom routes handle uploads for debugging
+        app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+        app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+        console.log('📁 [DEV] Static uploads/ files enabled AFTER custom routes for debugging');
       }
       
       // Register activity payment routes
@@ -2242,6 +2245,12 @@ function startServer() {
         
         console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes with SPA routing");
       } else {
+        // 🔧 DEV FIX: Add temporary root route before Vite setup
+        app.get('/', (req: Request, res: Response, next: NextFunction) => {
+          console.log('🏠 [DEV] Root route accessed - delegating to Vite');
+          next();
+        });
+        
         const { setupVite } = await import("./vite");
         await setupVite(app, appServer);
         console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");

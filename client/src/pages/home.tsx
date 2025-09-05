@@ -181,8 +181,9 @@ const Home: React.FC = () => {
               <span style={{ color: '#14b8a6' }}>Parque </span>
               <span style={{ color: '#00444f' }}>Favorito</span>
             </h2>
-            <p className="text-xl font-poppins font-regular text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Navega a través de los parques más emblemáticos, pertenecientes al Sistema de Parques de México 
+            <p className="text-xl font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
+              Navega a través de los parques más emblemáticos,<br /> 
+              pertenecientes al Sistema de Parques de México 
             </p>
           </div>
           
@@ -193,7 +194,7 @@ const Home: React.FC = () => {
                 // Loading skeleton
                 <div className="flex w-full h-full items-center justify-center">
                   <div className="w-[70vw] h-full">
-                    <Card className="animate-pulse rounded-3xl overflow-hidden shadow-xl h-full w-full">
+                    <Card className="animate-pulse rounded-4xl overflow-hidden h-full w-full">
                       <div className="h-full bg-gradient-to-br from-gray-200 to-gray-300"></div>
                     </Card>
                   </div>
