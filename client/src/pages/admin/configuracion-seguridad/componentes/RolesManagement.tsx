@@ -22,7 +22,6 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-import { SYSTEM_ROLES } from '@/components/RoleBadge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -116,19 +115,15 @@ export default function RolesManagement() {
     createRoleMutation.mutate(roleData);
   };
 
-  // Datos simulados de estadísticas de roles
-  const roleStats: RoleStats[] = [
-    { roleId: '1', userCount: 2, activeUsers: 2 },
-    { roleId: '2', userCount: 3, activeUsers: 3 },
-    { roleId: '3', userCount: 8, activeUsers: 7 },
-    { roleId: '4', userCount: 5, activeUsers: 4 },
-    { roleId: '5', userCount: 3, activeUsers: 3 },
-    { roleId: '6', userCount: 15, activeUsers: 12 },
-    { roleId: '7', userCount: 2, activeUsers: 1 },
-  ];
+  // Consultar estadísticas de roles desde la API
+  const { data: roleStats = [] } = useQuery<RoleStats[]>({
+    queryKey: ['/api/role-stats'],
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000 // 5 minutos
+  });
 
-  // Usar roles de la API si están disponibles, sino usar SYSTEM_ROLES como fallback
-  const allRoles = apiRoles || SYSTEM_ROLES;
+  // Usar roles de la API - datos exclusivamente de la base de datos
+  const allRoles = apiRoles || [];
   
   // Filtrar roles
   const filteredRoles = allRoles.filter((role: any) => 
@@ -145,17 +140,9 @@ export default function RolesManagement() {
     return 'border-green-200 bg-green-50';
   };
 
-  const getRoleDescription = (roleId: string) => {
-    const descriptions: Record<string, string> = {
-      '1': 'Control total del sistema. Acceso a todas las funcionalidades y configuraciones críticas.',
-      '2': 'Supervisión ejecutiva con acceso a reportes estratégicos y decisiones de alto nivel.',
-      '3': 'Gestión operativa de parques, mantenimiento y coordinación de equipos de campo.',
-      '4': 'Planificación y gestión de actividades recreativas, eventos y programas comunitarios.',
-      '5': 'Administración financiera, presupuestos, contabilidad y reportes fiscales.',
-      '6': 'Operación diaria de parques específicos, mantenimiento básico y atención ciudadana.',
-      '7': 'Acceso de solo lectura para auditorías, consultoría y análisis de datos.'
-    };
-    return descriptions[roleId] || 'Descripción no disponible';
+  const getRoleDescription = (role: any) => {
+    // Usar descripción de la base de datos si está disponible
+    return role.description || `Rol ${role.name} - Nivel ${role.level}`;
   };
 
   return (
@@ -299,7 +286,7 @@ export default function RolesManagement() {
                 <p className="text-sm text-muted-foreground">Administrativos</p>
                 <p className="text-2xl font-bold">
                   {roleStats.filter(r => {
-                    const role = SYSTEM_ROLES.find(role => role.id === r.roleId);
+                    const role = allRoles.find((role: any) => role.id.toString() === r.roleId);
                     return (role?.level || 0) <= 2;
                   }).reduce((acc, r) => acc + r.userCount, 0)}
                 </p>
@@ -316,7 +303,7 @@ export default function RolesManagement() {
                 <p className="text-sm text-muted-foreground">Coordinadores</p>
                 <p className="text-2xl font-bold">
                   {roleStats.filter(r => {
-                    const role = SYSTEM_ROLES.find(role => role.id === r.roleId);
+                    const role = allRoles.find((role: any) => role.id.toString() === r.roleId);
                     const level = role?.level || 0;
                     return level > 2 && level <= 4;
                   }).reduce((acc, r) => acc + r.userCount, 0)}
@@ -334,7 +321,7 @@ export default function RolesManagement() {
                 <p className="text-sm text-muted-foreground">Operativos</p>
                 <p className="text-2xl font-bold">
                   {roleStats.filter(r => {
-                    const role = SYSTEM_ROLES.find(role => role.id === r.roleId);
+                    const role = allRoles.find((role: any) => role.id.toString() === r.roleId);
                     return (role?.level || 0) > 4;
                   }).reduce((acc, r) => acc + r.userCount, 0)}
                 </p>

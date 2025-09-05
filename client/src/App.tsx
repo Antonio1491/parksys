@@ -1178,7 +1178,7 @@ function Router() {
         {/* Control de Acceso */}
         <Route path="/admin/configuracion-seguridad/access/roles">
           <Suspense fallback={<div className="p-8 text-center">Cargando gestión de roles...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/roles')))}
+            {React.createElement(React.lazy(() => import('@/pages/admin/roles/index')))}
           </Suspense>
         </Route>
         <Route path="/admin/configuracion-seguridad/access/permissions">

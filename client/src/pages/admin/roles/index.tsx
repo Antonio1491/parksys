@@ -390,7 +390,7 @@ const RolesManagement: React.FC = () => {
               className="pl-9 w-64"
             />
           </div>
-          {permissions.canWrite('roles') && (
+          {permissions.canWrite('Seguridad') && (
             <Button 
               onClick={() => setShowCreateModal(true)}
               className="bg-purple-600 hover:bg-purple-700"
@@ -456,7 +456,7 @@ const RolesManagement: React.FC = () => {
               {permissions.hasMultipleRoles ? (
                 <MultiRoleBadge userId={1} showOnlyPrimary={true} size="sm" />
               ) : (
-                <RoleBadge roleId={typeof permissions.userRole === 'object' && permissions.userRole?.id ? permissions.userRole.id : 1} size="sm" useDynamic={true} />
+                <RoleBadge roleId={typeof permissions.userRole === 'object' && permissions.userRole?.slug ? permissions.userRole.slug : 'super-admin'} size="sm" useDynamic={true} />
               )}
             </div>
             <p className="text-xs text-orange-700 mt-1">
