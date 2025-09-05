@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useLocation } from 'wouter';
 import { Loader2, User, Mail, Lock, UserPlus, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import logoPath from "@assets/Parksys smart Management 2_1755620540116.png";
 
@@ -31,8 +32,19 @@ export function FirebaseLoginForm() {
     loading, 
     error, 
     userStatus,
-    user
+    user,
+    isAuthenticated
   } = useFirebaseAuth();
+
+  const [, setLocation] = useLocation();
+
+  // Redirección automática cuando el usuario está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('✅ Usuario autenticado, redirigiendo al dashboard...');
+      setLocation('/admin');
+    }
+  }, [isAuthenticated, setLocation]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
