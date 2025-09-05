@@ -175,7 +175,7 @@ const Home: React.FC = () => {
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-poppins font-black text-gray-900 mb-8">
+            <h2 className="text-2xl md:text-6xl font-poppins font-black text-gray-900 mb-8">
               <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
               <span style={{ color: '#00444f' }}>Tu </span>
               <span style={{ color: '#14b8a6' }}>Parque </span>
@@ -188,7 +188,7 @@ const Home: React.FC = () => {
           </div>
           
           {/* Carousel de pantalla completa */}
-          <div className="relative mb-12 h-[520px] w-max left-1/2 transform -translate-x-1/2">
+          <div className="relative mb-12 h-[520px] w-screen left-1/2 transform -translate-x-1/2">
             <div className="flex items-center h-full w-full overflow-hidden">
               {isLoading ? (
                 // Loading skeleton
@@ -212,18 +212,13 @@ const Home: React.FC = () => {
                               backgroundImage: `url(${featuredParks[(currentIndex - 1 + featuredParks.length) % featuredParks.length]?.primaryImage || featuredParks[(currentIndex - 1 + featuredParks.length) % featuredParks.length]?.mainImageUrl || 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'})`
                             }}
                           />
-                          <div className="absolute inset-0 bg-black/40" />
-                          <div className="absolute inset-0 flex items-end p-4">
-                            <h3 className="text-white font-semibold text-lg truncate">
-                              {featuredParks[(currentIndex - 1 + featuredParks.length) % featuredParks.length]?.name}
-                            </h3>
-                          </div>
+                          
                         </div>
                       </div>
                     )}
 
                     {/* Tarjeta central (principal) */}
-                    <div className="w-[70vw] h-full scale-105 z-20 mx-2">
+                    <div className="w-[70vw] h-full z-20 mx-2">
                       <div className="relative h-full w-full rounded-xl overflow-hidden group">
                         {/* Imagen de fondo */}
                         <div 
@@ -282,12 +277,7 @@ const Home: React.FC = () => {
                               backgroundImage: `url(${featuredParks[(currentIndex + 1) % featuredParks.length]?.primaryImage || featuredParks[(currentIndex + 1) % featuredParks.length]?.mainImageUrl || 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'})`
                             }}
                           />
-                          <div className="absolute inset-0 bg-black/40" />
-                          <div className="absolute inset-0 flex items-end p-4">
-                            <h3 className="text-white font-semibold text-lg truncate">
-                              {featuredParks[(currentIndex + 1) % featuredParks.length]?.name}
-                            </h3>
-                          </div>
+                        
                         </div>
                       </div>
                     )}

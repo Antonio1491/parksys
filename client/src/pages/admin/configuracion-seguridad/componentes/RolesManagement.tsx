@@ -42,7 +42,6 @@ const createRoleSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre no puede exceder 100 caracteres'),
   slug: z.string().min(1, 'El slug es requerido').max(100, 'El slug no puede exceder 100 caracteres').regex(/^[a-z0-9-]+$/, 'El slug solo puede contener letras minúsculas, números y guiones'),
   description: z.string().optional(),
-  level: z.number().min(1, 'El nivel debe ser al menos 1').max(10, 'El nivel no puede ser mayor a 10'),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'El color debe ser un código hexadecimal válido (ej: #1e40af)'),
   permissions: z.record(z.array(z.string())).default({}),
   isActive: z.boolean().default(true)
@@ -77,7 +76,6 @@ export default function RolesManagement() {
       name: '',
       slug: '',
       description: '',
-      level: 5,
       color: '#6366f1',
       permissions: {},
       isActive: true
@@ -110,7 +108,12 @@ export default function RolesManagement() {
   });
 
   const handleCreateRole = (data: CreateRoleFormData) => {
-    createRoleMutation.mutate(data);
+    // Asignar automáticamente nivel 3 (otros roles) por defecto
+    const roleData = {
+      ...data,
+      level: 3
+    };
+    createRoleMutation.mutate(roleData);
   };
 
   // Datos simulados de estadísticas de roles
@@ -236,31 +239,7 @@ export default function RolesManagement() {
                         )}
                       />
                       
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="level"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nivel (1-10)</FormLabel>
-                              <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Seleccionar nivel" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {Array.from({ length: 10 }, (_, i) => i + 1).map((level) => (
-                                    <SelectItem key={level} value={level.toString()}>
-                                      Nivel {level} {level <= 2 ? '(Admin)' : level <= 4 ? '(Coord.)' : '(Oper.)'}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <div className="grid grid-cols-1 gap-4">
                         
                         <FormField
                           control={form.control}
