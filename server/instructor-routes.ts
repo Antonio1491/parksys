@@ -313,9 +313,11 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
   // Importar instructores desde CSV
   apiRouter.post('/instructors/import', isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log('🔍 [IMPORT-DEBUG] Datos recibidos en body:', JSON.stringify(req.body, null, 2));
       const { instructors: instructorsData } = req.body;
 
       if (!instructorsData || !Array.isArray(instructorsData)) {
+        console.log('❌ [IMPORT-ERROR] instructorsData no es un array válido:', instructorsData);
         return res.status(400).json({ 
           message: 'Se requiere un array de instructores válido' 
         });
@@ -361,9 +363,11 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
           };
 
           // Validar datos
+          console.log(`🔍 [IMPORT-DEBUG] Procesando instructor ${index + 1}:`, JSON.stringify(processedData, null, 2));
           const validationResult = insertInstructorSchema.safeParse(processedData);
           
           if (!validationResult.success) {
+            console.log(`❌ [IMPORT-ERROR] Error de validación en fila ${index + 1}:`, validationResult.error.issues);
             errors.push({
               row: index + 1,
               email: instructorData.email,
