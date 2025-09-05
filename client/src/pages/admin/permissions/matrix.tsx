@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RoleBadge, RoleBadgeWithText, SYSTEM_ROLES } from '@/components/RoleBadge';
+import { RoleBadge, RoleBadgeWithText } from '@/components/RoleBadge';
 import { useAdaptiveModules } from "@/hooks/useAdaptiveModules";
 import { useAdaptivePermissions } from "@/hooks/useAdaptivePermissions";
 import { Link } from 'wouter';
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
 
 const PermissionsMatrix: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string>('all');
@@ -24,6 +25,12 @@ const PermissionsMatrix: React.FC = () => {
   const { modules, moduleMap, subModuleMap, flatModules } = useAdaptiveModules();
   const { user } = useAuth();
   const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.id || 1);
+  
+  // Debug: Verificar usuario actual
+  useEffect(() => {
+    console.log('🔍 [PERMISOS DEBUG] Usuario actual:', user);
+    console.log('🔍 [PERMISOS DEBUG] Rol del usuario:', user?.role);
+  }, [user]);
 
   // Cargar permisos desde localStorage al iniciar y configurar Super Admin por defecto
   useEffect(() => {
@@ -143,7 +150,13 @@ const PermissionsMatrix: React.FC = () => {
     });
   };
 
-  const filteredRoles = selectedRole === 'all' ? SYSTEM_ROLES : SYSTEM_ROLES.filter(r => r.id === selectedRole);
+  // Usar roles dinámicos de la BD en lugar de hardcodeados
+  const { data: dynamicRoles = [] } = useQuery<any[]>({
+    queryKey: ['/api/roles'],
+    staleTime: 5 * 60 * 1000,
+  });
+  
+  const filteredRoles = selectedRole === 'all' ? dynamicRoles : dynamicRoles.filter(r => r.id.toString() === selectedRole);
   const filteredModules = selectedModule === 'all' ? flatModules : [selectedModule];
 
   return (
@@ -284,21 +297,21 @@ const PermissionsMatrix: React.FC = () => {
                   <tr key={role.id} className="hover:bg-gray-50">
                     <td className="p-3 border-b">
                       <div className="flex items-center gap-3">
-                        <RoleBadgeWithText roleId={role.id} />
+                        <RoleBadgeWithText roleId={role.slug} />
                         <div className="text-xs text-gray-500">
                           Nivel {role.level}
                         </div>
                       </div>
                     </td>
                     {filteredModules.map(module => (
-                      <td key={`${role.id}-${module}`} className="p-3 border-b text-center">
+                      <td key={`${role.slug}-${module}`} className="p-3 border-b text-center">
                         <div className="flex flex-col gap-2">
                           {/* Read Permission */}
                           <div className="flex items-center justify-center gap-1">
                             <Checkbox
-                              checked={hasPermission(role.id, module, 'read')}
-                              onCheckedChange={(checked) => updatePermission(role.id, module, 'read', !!checked)}
-                              disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}
+                              checked={hasPermission(role.slug, module, 'read')}
+                              onCheckedChange={(checked) => updatePermission(role.slug, module, 'read', !!checked)}
+                              disabled={role.slug === 'super-admin' && user?.role !== 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">R</span>
                           </div>
@@ -306,9 +319,9 @@ const PermissionsMatrix: React.FC = () => {
                           {/* Write Permission */}
                           <div className="flex items-center justify-center gap-1">
                             <Checkbox
-                              checked={hasPermission(role.id, module, 'write')}
-                              onCheckedChange={(checked) => updatePermission(role.id, module, 'write', !!checked)}
-                              disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}
+                              checked={hasPermission(role.slug, module, 'write')}
+                              onCheckedChange={(checked) => updatePermission(role.slug, module, 'write', !!checked)}
+                              disabled={role.slug === 'super-admin' && user?.role !== 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">W</span>
                           </div>
@@ -316,9 +329,9 @@ const PermissionsMatrix: React.FC = () => {
                           {/* Admin Permission */}
                           <div className="flex items-center justify-center gap-1">
                             <Checkbox
-                              checked={hasPermission(role.id, module, 'admin')}
-                              onCheckedChange={(checked) => updatePermission(role.id, module, 'admin', !!checked)}
-                              disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}
+                              checked={hasPermission(role.slug, module, 'admin')}
+                              onCheckedChange={(checked) => updatePermission(role.slug, module, 'admin', !!checked)}
+                              disabled={role.slug === 'super-admin' && user?.role !== 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">A</span>
                           </div>
@@ -327,7 +340,7 @@ const PermissionsMatrix: React.FC = () => {
                     ))}
                     <td className="p-3 border-b text-center">
                       <Badge variant="outline" className="font-mono">
-                        {getPermissionCount(role.id)}
+                        {getPermissionCount(role.slug)}
                       </Badge>
                     </td>
                   </tr>
