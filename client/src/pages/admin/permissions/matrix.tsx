@@ -1,10 +1,10 @@
 import React from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import PermissionsMatrix from '@/components/ui/permissions-matrix';
-import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 
 const MatrixPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user } = useUnifiedAuth();
 
   return (
     <AdminLayout>

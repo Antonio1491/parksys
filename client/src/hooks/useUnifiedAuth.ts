@@ -1,0 +1,177 @@
+import { useState, useEffect, useMemo } from 'react';
+import { useFirebaseAuth } from './useFirebaseAuth';
+import { useAuth } from './useAuth';
+
+// Tipos unificados para el sistema de autenticación
+export interface UnifiedUser {
+  // Datos de Firebase
+  firebaseUid?: string;
+  email?: string;
+  displayName?: string;
+  
+  // Datos locales del sistema
+  id?: number;
+  username?: string;
+  fullName?: string;
+  role?: string;
+  roleId?: number;
+  
+  // Campos adicionales
+  profileImage?: string;
+  phone?: string;
+  department?: string;
+  [key: string]: any;
+}
+
+export interface UnifiedAuthState {
+  user: UnifiedUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  
+  // Métodos de autenticación
+  login: (email: string, password: string) => Promise<any>;
+  register: (email: string, password: string, displayName: string) => Promise<any>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  
+  // Verificaciones de permisos
+  hasRole: (role: string) => boolean;
+  hasPermission: (moduleId: string, action: 'create' | 'read' | 'update' | 'delete' | 'admin') => boolean;
+  isAdmin: () => boolean;
+  isSuperAdmin: () => boolean;
+}
+
+/**
+ * Hook unificado que combina Firebase Authentication con el sistema de roles local.
+ * Proporciona una interfaz consistente para toda la aplicación.
+ */
+export function useUnifiedAuth(): UnifiedAuthState {
+  const firebaseAuth = useFirebaseAuth();
+  const localAuth = useAuth();
+  
+  // Estado unificado del usuario
+  const unifiedUser = useMemo((): UnifiedUser | null => {
+    // Priorizar datos de Firebase si el usuario está autenticado y aprobado
+    if (firebaseAuth.isAuthenticated && firebaseAuth.userStatus.localUser) {
+      const localUser = firebaseAuth.userStatus.localUser;
+      const firebaseUser = firebaseAuth.user;
+      
+      return {
+        // Datos de Firebase
+        firebaseUid: firebaseUser?.uid,
+        email: firebaseUser?.email || localUser.email,
+        displayName: firebaseUser?.displayName || localUser.fullName,
+        
+        // Datos locales del sistema ParkSys
+        id: localUser.id,
+        username: localUser.username,
+        fullName: localUser.fullName || firebaseUser?.displayName,
+        role: localUser.role,
+        roleId: localUser.roleId,
+        profileImage: localUser.profileImage,
+        phone: localUser.phone,
+        department: localUser.department,
+        
+        // Campos adicionales del usuario local
+        ...localUser
+      };
+    }
+    
+    // Fallback al sistema local si Firebase no está disponible pero hay usuario local
+    if (localAuth.user) {
+      return {
+        id: localAuth.user.id,
+        username: localAuth.user.username,
+        email: localAuth.user.email,
+        fullName: localAuth.user.fullName,
+        role: localAuth.user.role,
+        roleId: localAuth.user.roleId,
+        ...localAuth.user
+      };
+    }
+    
+    return null;
+  }, [firebaseAuth.user, firebaseAuth.userStatus.localUser, localAuth.user]);
+
+  // Estado de autenticación
+  const isAuthenticated = firebaseAuth.isAuthenticated || localAuth.isAuthenticated;
+  const isLoading = firebaseAuth.loading || localAuth.isLoading;
+  const error = firebaseAuth.error;
+
+  // Métodos de autenticación (delegados a Firebase)
+  const login = firebaseAuth.login;
+  const register = firebaseAuth.register;
+  const logout = async () => {
+    await firebaseAuth.logout();
+    localAuth.logout();
+  };
+  const resetPassword = firebaseAuth.resetPassword;
+
+  // Métodos de verificación de permisos
+  const hasRole = (role: string): boolean => {
+    return unifiedUser?.role === role;
+  };
+
+  const hasPermission = (moduleId: string, action: 'create' | 'read' | 'update' | 'delete' | 'admin'): boolean => {
+    // Super Admin tiene todos los permisos
+    if (unifiedUser?.role === 'super-admin') return true;
+    
+    // Admin General tiene permisos administrativos
+    if (unifiedUser?.role === 'admin' && ['read', 'create', 'update', 'admin'].includes(action)) return true;
+    
+    // Aquí se puede expandir la lógica según el sistema de permisos específico
+    // Por ahora, delegamos a la lógica existente de useAdaptivePermissions
+    
+    return false;
+  };
+
+  const isAdmin = (): boolean => {
+    return unifiedUser?.role === 'admin' || unifiedUser?.role === 'super-admin';
+  };
+
+  const isSuperAdmin = (): boolean => {
+    return unifiedUser?.role === 'super-admin';
+  };
+
+  // Log para debugging (solo en desarrollo)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 [UNIFIED AUTH] Estado:', {
+        isAuthenticated,
+        isLoading,
+        user: unifiedUser,
+        firebaseStatus: {
+          authenticated: firebaseAuth.isAuthenticated,
+          loading: firebaseAuth.loading,
+          approved: firebaseAuth.userStatus.isApproved
+        },
+        localStatus: {
+          authenticated: localAuth.isAuthenticated,
+          loading: localAuth.isLoading
+        }
+      });
+    }
+  }, [isAuthenticated, isLoading, unifiedUser, firebaseAuth, localAuth]);
+
+  return {
+    user: unifiedUser,
+    isAuthenticated,
+    isLoading,
+    error,
+    
+    // Métodos
+    login,
+    register,
+    logout,
+    resetPassword,
+    
+    // Verificaciones
+    hasRole,
+    hasPermission,
+    isAdmin,
+    isSuperAdmin
+  };
+}
+
+export default useUnifiedAuth;

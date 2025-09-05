@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AdminSidebarComplete from './AdminSidebarComplete';
 import Header from './Header';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { FirebaseLoginForm } from './FirebaseLoginForm';
 
 interface AdminLayoutProps {
@@ -12,10 +12,10 @@ interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ title, subtitle, children }) => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { isAuthenticated, loading } = useFirebaseAuth();
+  const { isAuthenticated, isLoading } = useUnifiedAuth();
 
   // Mostrar spinner mientras se verifica la autenticación
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

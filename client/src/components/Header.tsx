@@ -19,7 +19,7 @@ import GlobalSearch from "@/components/GlobalSearch";
 import { HelpCenter } from "@/components/HelpCenter";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileImage from "@/components/UserProfileImage";
-import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
+import { useUnifiedAuth } from "@/hooks/useUnifiedAuth";
 import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
@@ -40,7 +40,7 @@ const Header: React.FC = () => {
   const [usersMenuOpen, setUsersMenuOpen] = useState(false);
   const [gestionMenuOpen, setGestionMenuOpen] = useState(false);
 
-  const { user, logout } = useFirebaseAuth();
+  const { user, isAuthenticated, logout } = useUnifiedAuth();
   const isAdmin = location.startsWith("/admin");
 
   const handleLogout = async () => {
@@ -511,19 +511,17 @@ const Header: React.FC = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center gap-2 focus:outline-none">
                       <UserProfileImage
-                        userId={(user as any)?.id || 0}
-                        role={(user as any)?.role || "user"}
-                        name={(user as any)?.fullName || (user as any)?.username || "Usuario"}
+                        userId={user?.id || 0}
+                        role={user?.role || "user"}
+                        name={user?.fullName || user?.username || user?.displayName || "Usuario"}
                         size="sm"
                       />
                       <div className="flex flex-col text-left">
                         <span className="text-sm font-medium text-gray-800">
-                          {(user as any)?.firstName && (user as any)?.lastName
-                            ? `${(user as any).firstName} ${(user as any).lastName}`
-                            : (user as any)?.fullName || (user as any)?.username || "Usuario"}
+                          {user?.fullName || user?.displayName || user?.username || "Usuario"}
                         </span>
                         <span className="text-xs text-gray-600">
-                          {(user as any)?.role || "usuario"}
+                          {user?.role || "usuario"}
                         </span>
                       </div>
                     </DropdownMenuTrigger>

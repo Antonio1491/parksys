@@ -2,7 +2,7 @@ import React from 'react';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 
 interface NotificationBellProps {
   className?: string;
@@ -13,7 +13,7 @@ interface NotificationCount {
 }
 
 export const NotificationBell: React.FC<NotificationBellProps> = ({ className = "" }) => {
-  const { user } = useFirebaseAuth();
+  const { user } = useUnifiedAuth();
 
   // Query para obtener el conteo de notificaciones no leídas
   const { data: notificationData, isLoading } = useQuery<NotificationCount>({
