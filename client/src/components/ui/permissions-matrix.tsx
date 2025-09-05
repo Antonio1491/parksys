@@ -83,30 +83,31 @@ export function PermissionsMatrix({
 
   // Cargar matriz de permisos desde API
   const { data: apiPermissions, isLoading } = useQuery({
-    queryKey: ['/api/permissions/matrix'],
+    queryKey: ['/api/roles/permissions'],
     refetchOnWindowFocus: false,
   });
 
   // Mutation para guardar cambios
   const saveMutation = useMutation({
     mutationFn: (newPermissions: typeof permissions) => {
-      return apiRequest('/api/permissions/matrix', {
-        method: 'PUT',
-        data: newPermissions,
+      return apiRequest('/api/roles/permissions/save-matrix', {
+        method: 'POST',
+        data: { rolePermissions: newPermissions },
       });
     },
     onSuccess: () => {
       setHasChanges(false);
       toast({
-        title: "Permisos guardados",
-        description: "Los cambios en la matriz de permisos se han guardado exitosamente",
+        title: "Permisos actualizados",
+        description: "Los cambios se guardaron correctamente en la base de datos",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/permissions/matrix'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/roles/permissions'] });
     },
     onError: (error: any) => {
+      console.error('Error al guardar permisos:', error);
       toast({
         title: "Error al guardar",
-        description: error.message || "No se pudieron guardar los permisos",
+        description: error.message || "Error de conexión con el servidor. Verifica que la ruta existe.",
         variant: "destructive",
       });
     }
