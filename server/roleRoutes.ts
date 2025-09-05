@@ -31,25 +31,7 @@ export function registerRoleRoutes(app: Express) {
     }
   });
 
-  // Obtener rol por ID
-  app.get("/api/roles/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "ID de rol inválido" });
-      }
-
-      const role = await roleService.getRoleById(id);
-      if (!role) {
-        return res.status(404).json({ error: "Rol no encontrado" });
-      }
-
-      res.json(role);
-    } catch (error) {
-      console.error("Error obteniendo rol:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
+  // MOVIDO AL FINAL - Los endpoints con parámetros van al final
 
   // ===== RUTAS DE USUARIOS CON ROLES =====
   
@@ -253,14 +235,14 @@ export function registerRoleRoutes(app: Express) {
         return res.status(400).json({ error: "Parámetros inválidos" });
       }
 
-      if (!['read', 'write', 'admin'].includes(permission)) {
-        return res.status(400).json({ error: "Permiso inválido. Debe ser: read, write, admin" });
+      if (!['create', 'read', 'update', 'delete', 'admin'].includes(permission)) {
+        return res.status(400).json({ error: "Permiso inválido. Debe ser: create, read, update, delete, admin" });
       }
 
       const hasPermission = await roleService.hasModulePermission(
         userId, 
         module, 
-        permission as 'read' | 'write' | 'admin'
+        permission as 'create' | 'read' | 'update' | 'delete' | 'admin'
       );
       
       res.json({ hasPermission });
@@ -477,6 +459,28 @@ export function registerRoleRoutes(app: Express) {
       });
     } catch (error) {
       console.error("Error en asignación masiva de roles:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // ===== ENDPOINTS CON PARÁMETROS AL FINAL =====
+  
+  // Obtener rol por ID (DEBE estar al final)
+  app.get("/api/roles/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "ID de rol inválido" });
+      }
+
+      const role = await roleService.getRoleById(id);
+      if (!role) {
+        return res.status(404).json({ error: "Rol no encontrado" });
+      }
+
+      res.json(role);
+    } catch (error) {
+      console.error("Error obteniendo rol:", error);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });

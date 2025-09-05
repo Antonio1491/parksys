@@ -79,6 +79,7 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { getParkByIdDirectly } from "./direct-park-queries";
 import { registerRoleRoutes } from "./roleRoutes";
+import { registerHybridRoleRoutes } from "./hybridRoleRoutes";
 import feedbackRouter from "./feedback-routes";
 import { registerEventCategoriesRoutes } from "./event-categories-routes";
 import { seedEventCategories } from "./seed-event-categories";
@@ -988,7 +989,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registramos las rutas del módulo de usuarios
   registerUserRoutes(app, apiRouter);
 
-  // Registramos las rutas del sistema de roles
+  // Registramos los endpoints híbridos PRIMERO (rutas específicas antes de genéricas)
+  registerHybridRoleRoutes(app);
+  
+  // Registramos las rutas del sistema de roles (rutas genéricas al final)
   registerRoleRoutes(app);
 
   // Registramos las rutas de evaluaciones de instructores

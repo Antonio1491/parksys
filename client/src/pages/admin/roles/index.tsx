@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RoleBadge, RoleBadgeWithText } from '@/components/RoleBadge';
 import { MultiRoleBadge } from '@/components/MultiRoleBadge';
+import { RoleCreationModal } from '@/components/roles/RoleCreationModal';
 import { useDynamicRoles, useDynamicPermissions } from '@/components/DynamicRoleGuard';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -276,6 +277,7 @@ const UserMultiRoleManagement: React.FC<UserMultiRoleManagementProps> = ({ allUs
 
 const RolesManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const permissions = useDynamicPermissions(1); // Usuario actual
 
   // Fetch roles dinámicos
@@ -373,13 +375,32 @@ const RolesManagement: React.FC = () => {
   return (
     <AdminLayout title="Gestión de Roles" subtitle="Sistema avanzado de roles y jerarquías">
       {/* Header con título */}
-      <PageHeader
-        title="Gestión de Roles"
-        subtitle="Sistema avanzado de roles y jerarquías"
-        icon={<UserCog className="h-6 w-6 text-white" />}
-        actions={[
-        ]}Si 
-      />
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Gestión de Roles</h1>
+          <p className="text-gray-600 mt-2">Sistema avanzado de roles y jerarquías</p>
+        </div>
+        <div className="flex gap-3">
+          <div className="relative">
+            <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+            <Input
+              placeholder="Buscar roles..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 w-64"
+            />
+          </div>
+          {permissions.canWrite('roles') && (
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Crear Rol
+            </Button>
+          )}
+        </div>
+      </div>
       {/* Métricas principales del sistema de roles - ACTUALIZADO para múltiples roles */}
       <div className="grid gap-6 md:grid-cols-5 mb-8">
         <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
@@ -460,6 +481,12 @@ const RolesManagement: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de creación de roles */}
+      <RoleCreationModal 
+        open={showCreateModal} 
+        onOpenChange={setShowCreateModal} 
+      />
 
       {/* Tabla de roles jerárquicos */}
       <Card>

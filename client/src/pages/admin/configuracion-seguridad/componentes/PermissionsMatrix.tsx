@@ -22,18 +22,26 @@ import {
   Info,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  Trash2,
+  Edit
 } from 'lucide-react';
 import { SYSTEM_ROLES } from '@/components/RoleBadge';
-import { SYSTEM_MODULES, DEFAULT_ROLE_PERMISSIONS, type SystemModule, type PermissionType } from '@/components/RoleGuard';
+import { useAdaptiveModules, CRUD_ACTIONS, validatePermissionHierarchy } from '@/hooks/useAdaptiveModules';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 
+// Tipos híbridos para el sistema CRUD granular
+type CRUDAction = 'create' | 'read' | 'update' | 'delete' | 'admin';
+type RolePermissions = Record<string, Record<string, CRUDAction[]>>; // { roleId: { 'gestion.parques': ['read', 'create'] } }
+
 export default function PermissionsMatrix() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [permissions, setPermissions] = useState(DEFAULT_ROLE_PERMISSIONS);
+  const { flatModules, modules, subModuleMap } = useAdaptiveModules();
+  const [permissions, setPermissions] = useState<RolePermissions>({});
   const [hasChanges, setHasChanges] = useState(false);
 
   // Fetch permissions from API
@@ -74,76 +82,77 @@ export default function PermissionsMatrix() {
     }
   }, [apiPermissions, hasChanges]);
 
-  const getPermissionIcon = (permission: PermissionType) => {
-    switch (permission) {
+  const getPermissionIcon = (action: CRUDAction) => {
+    switch (action) {
       case 'read': return <Eye className="h-3 w-3" />;
-      case 'write': return <Edit3 className="h-3 w-3" />;
+      case 'create': return <Plus className="h-3 w-3" />;
+      case 'update': return <Edit className="h-3 w-3" />;
+      case 'delete': return <Trash2 className="h-3 w-3" />;
       case 'admin': return <Settings className="h-3 w-3" />;
     }
   };
 
-  const getPermissionColor = (permission: PermissionType) => {
-    switch (permission) {
+  const getPermissionColor = (action: CRUDAction) => {
+    switch (action) {
       case 'read': return 'text-blue-600 bg-blue-50';
-      case 'write': return 'text-orange-600 bg-orange-50';
-      case 'admin': return 'text-red-600 bg-red-50';
+      case 'create': return 'text-green-600 bg-green-50';
+      case 'update': return 'text-orange-600 bg-orange-50';
+      case 'delete': return 'text-red-600 bg-red-50';
+      case 'admin': return 'text-purple-600 bg-purple-50';
     }
   };
 
-  const getPermissionName = (permission: PermissionType) => {
-    switch (permission) {
-      case 'read': return 'Lectura';
-      case 'write': return 'Escritura';
+  const getPermissionName = (action: CRUDAction) => {
+    switch (action) {
+      case 'read': return 'Ver';
+      case 'create': return 'Crear';
+      case 'update': return 'Editar';
+      case 'delete': return 'Eliminar';
       case 'admin': return 'Admin';
     }
   };
 
-  const hasPermission = (roleId: string, module: SystemModule, permission: PermissionType): boolean => {
-    return permissions[roleId]?.[module]?.includes(permission) || false;
+  const hasPermission = (roleId: string, moduleId: string, action: CRUDAction): boolean => {
+    return permissions[roleId]?.[moduleId]?.includes(action) || false;
   };
 
-  const togglePermission = (roleId: string, module: SystemModule, permission: PermissionType) => {
+  const togglePermission = (roleId: string, moduleId: string, action: CRUDAction) => {
     setPermissions(prev => {
       const newPermissions = { ...prev };
       if (!newPermissions[roleId]) {
-        newPermissions[roleId] = {} as Record<SystemModule, PermissionType[]>;
+        newPermissions[roleId] = {};
       }
-      if (!newPermissions[roleId][module]) {
-        newPermissions[roleId][module] = [];
+      if (!newPermissions[roleId][moduleId]) {
+        newPermissions[roleId][moduleId] = [];
       }
 
-      const currentPermissions = [...newPermissions[roleId][module]];
-      const hasCurrentPermission = currentPermissions.includes(permission);
+      const currentActions = [...newPermissions[roleId][moduleId]];
+      const hasCurrentAction = currentActions.includes(action);
 
-      if (hasCurrentPermission) {
-        // Remover el permiso
-        newPermissions[roleId][module] = currentPermissions.filter(p => p !== permission);
+      if (hasCurrentAction) {
+        // Remover la acción y aplicar jerarquía descendente
+        newPermissions[roleId][moduleId] = currentActions.filter(a => a !== action);
         
-        // Si se remueve admin, también remover write
-        if (permission === 'admin') {
-          newPermissions[roleId][module] = newPermissions[roleId][module].filter(p => p !== 'write');
+        // Si se remueve admin, remover todas las demás
+        if (action === 'admin') {
+          newPermissions[roleId][moduleId] = [];
         }
-        // Si se remueve write, también remover admin
-        if (permission === 'write') {
-          newPermissions[roleId][module] = newPermissions[roleId][module].filter(p => p !== 'admin');
+        // Si se remueve delete, también remover admin
+        if (action === 'delete') {
+          newPermissions[roleId][moduleId] = newPermissions[roleId][moduleId].filter(a => a !== 'admin');
+        }
+        // Si se remueve update, también remover delete y admin
+        if (action === 'update') {
+          newPermissions[roleId][moduleId] = newPermissions[roleId][moduleId].filter(a => !['delete', 'admin'].includes(a));
+        }
+        // Si se remueve create, también remover update, delete y admin
+        if (action === 'create') {
+          newPermissions[roleId][moduleId] = newPermissions[roleId][moduleId].filter(a => !['update', 'delete', 'admin'].includes(a));
         }
       } else {
-        // Agregar el permiso
-        newPermissions[roleId][module] = [...currentPermissions, permission];
-        
-        // Si se agrega write, también agregar read
-        if (permission === 'write' && !currentPermissions.includes('read')) {
-          newPermissions[roleId][module].push('read');
-        }
-        // Si se agrega admin, también agregar read y write
-        if (permission === 'admin') {
-          if (!currentPermissions.includes('read')) {
-            newPermissions[roleId][module].push('read');
-          }
-          if (!currentPermissions.includes('write')) {
-            newPermissions[roleId][module].push('write');
-          }
-        }
+        // Agregar la acción y aplicar jerarquía ascendente usando helper
+        const newActionsSet = new Set([...currentActions, action]);
+        newPermissions[roleId][moduleId] = validatePermissionHierarchy(Array.from(newActionsSet));
       }
 
       setHasChanges(true);
@@ -160,7 +169,7 @@ export default function PermissionsMatrix() {
         description: "Se han restaurado los permisos desde el servidor",
       });
     } else {
-      setPermissions(DEFAULT_ROLE_PERMISSIONS);
+      setPermissions({});
       setHasChanges(false);
       toast({
         title: "Permisos restablecidos",
@@ -173,30 +182,30 @@ export default function PermissionsMatrix() {
     saveMutation.mutate(permissions);
   };
 
-  const getModuleStats = (module: SystemModule) => {
+  const getModuleStats = (moduleId: string) => {
     const roles = Object.keys(permissions);
     const withAccess = roles.filter(roleId => 
-      permissions[roleId][module] && permissions[roleId][module].length > 0
+      permissions[roleId][moduleId] && permissions[roleId][moduleId].length > 0
     ).length;
     
     return {
       total: roles.length,
       withAccess,
-      percentage: Math.round((withAccess / roles.length) * 100)
+      percentage: roles.length > 0 ? Math.round((withAccess / roles.length) * 100) : 0
     };
   };
 
   const getRoleStats = (roleId: string) => {
     const modulePermissions = permissions[roleId] || {};
-    const totalModules = SYSTEM_MODULES.length;
-    const accessibleModules = SYSTEM_MODULES.filter(module => 
-      modulePermissions[module] && modulePermissions[module].length > 0
+    const totalModules = flatModules.length;
+    const accessibleModules = flatModules.filter(moduleId => 
+      modulePermissions[moduleId] && modulePermissions[moduleId].length > 0
     ).length;
     
     return {
       total: totalModules,
       accessible: accessibleModules,
-      percentage: Math.round((accessibleModules / totalModules) * 100)
+      percentage: totalModules > 0 ? Math.round((accessibleModules / totalModules) * 100) : 0
     };
   };
 
