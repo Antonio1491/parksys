@@ -528,11 +528,13 @@ const Header: React.FC = () => {
 
                     <DropdownMenuContent 
                       align="end" 
-                      className="w-56 z-[60] mt-2 mr-2"
-                      sideOffset={8}
-                      alignOffset={-8}
+                      side="bottom"
+                      className="w-56 z-[60]"
+                      sideOffset={12}
+                      alignOffset={-20}
                       avoidCollisions={true}
-                      collisionPadding={16}
+                      collisionPadding={20}
+                      collisionBoundary={typeof window !== 'undefined' ? document.body : undefined}
                     >
                       <DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
                       <DropdownMenuSeparator />
