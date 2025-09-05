@@ -103,6 +103,9 @@ export function useFirebaseAuth() {
         }
       }
       
+      // ✅ IMPORTANTE: Resetear loading a false después del login exitoso
+      setAuthState(prev => ({ ...prev, loading: false }));
+      
       return result.user;
     } catch (error: any) {
       const errorMessage = getFirebaseErrorMessage(error.code);
@@ -162,6 +165,9 @@ export function useFirebaseAuth() {
           });
         }
 
+        // ✅ IMPORTANTE: Resetear loading a false después del registro exitoso
+        setAuthState(prev => ({ ...prev, loading: false }));
+        
         return result.user;
         
       } catch (firebaseError: any) {
