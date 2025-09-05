@@ -4,6 +4,7 @@ import type { InsertUserRole } from "../shared/schema";
 import { roleSeeder } from "./roleSeeder";
 import { insertRoleSchema, insertUserSchema } from "../shared/schema";
 import { z } from "zod";
+import { isAuthenticated } from './middleware/auth';
 
 export function registerRoleRoutes(app: Express) {
   

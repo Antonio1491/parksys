@@ -1,8 +1,9 @@
 import express from 'express';
 import { db } from './db';
-import { users, pendingUsers } from '../shared/schema';
+import { users, pendingUsers, roles } from '../shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { linkExistingUserWithFirebase, isExistingUser, getUserByFirebaseUid, migrateKnownUsers, getMigrationInstructions } from './firebaseUserSync';
+import { isAuthenticated } from './middleware/auth';
 
 export function registerFirebaseAuthRoutes(app: express.Express) {
   console.log('🔥 [FIREBASE-AUTH] Registrando rutas de autenticación Firebase...');
@@ -142,8 +143,8 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
     }
   });
 
-  // Obtener usuarios pendientes (solo para super admins)
-  app.get('/api/auth/pending-users', async (req, res) => {
+  // Obtener usuarios pendientes (solo para Admin General o superior)
+  app.get('/api/auth/pending-users', isAuthenticated, async (req, res) => {
     try {
       console.log('📋 [PENDING-USERS] Obteniendo usuarios pendientes...');
 
@@ -162,13 +163,37 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
     }
   });
 
-  // Aprobar usuario (solo para super admins)
-  app.post('/api/auth/approve-user/:requestId', async (req, res) => {
+  // Aprobar usuario (solo para Admin General o superior)
+  app.post('/api/auth/approve-user/:requestId', isAuthenticated, async (req, res) => {
     try {
       const { requestId } = req.params;
       const { approvedBy, assignedRoleId = 2 } = req.body; // Role 2 = empleado por defecto
       
       console.log(`✅ [APPROVE-USER] Aprobando solicitud: ${requestId}`);
+
+      // 🔒 RESTRICCIÓN: Verificar que el usuario que aprueba tenga permisos suficientes
+      const approverUser = req.user;
+      if (!approverUser) {
+        return res.status(401).json({ error: 'Usuario no autenticado' });
+      }
+
+      // 🔒 RESTRICCIÓN: Admin General (nivel 2) NO puede asignar Super Admin (role_id = 1)
+      if (assignedRoleId === 1 && approverUser.roleId !== 1) {
+        console.log(`🚫 [APPROVE-USER] Admin General no puede asignar Super Admin. Usuario: ${approverUser.email}`);
+        return res.status(403).json({ 
+          error: 'Solo el Super Administrador puede asignar roles de Super Administrador' 
+        });
+      }
+
+      // 🔒 RESTRICCIÓN: Verificar que el rol a asignar existe y está activo
+      const [roleToAssign] = await db.select()
+        .from(roles)
+        .where(eq(roles.id, assignedRoleId))
+        .limit(1);
+
+      if (!roleToAssign || !roleToAssign.isActive) {
+        return res.status(400).json({ error: 'Rol inválido o inactivo' });
+      }
 
       // 1. Obtener solicitud pendiente
       const [pendingUser] = await db.select()
@@ -227,8 +252,8 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
     }
   });
 
-  // Rechazar usuario (solo para super admins)
-  app.post('/api/auth/reject-user/:requestId', async (req, res) => {
+  // Rechazar usuario (solo para Admin General o superior) 
+  app.post('/api/auth/reject-user/:requestId', isAuthenticated, async (req, res) => {
     try {
       const { requestId } = req.params;
       const { rejectedBy, rejectionReason } = req.body;
