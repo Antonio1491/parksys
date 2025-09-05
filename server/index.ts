@@ -2216,6 +2216,11 @@ function startServer() {
       registerActivityPaymentRoutes(app);
       console.log("✅ [API-PRIORITY] Activity payment routes registered");
 
+      // Register Firebase auth routes
+      const { registerFirebaseAuthRoutes } = await import("./firebaseAuthRoutes");
+      registerFirebaseAuthRoutes(app);
+      console.log("✅ [API-PRIORITY] Firebase auth routes registered");
+
       // Register all other routes BEFORE Vite
       await registerAllOtherRoutesBeforeVite();
       console.log("✅ [API-PRIORITY] All API routes registered before Vite setup");

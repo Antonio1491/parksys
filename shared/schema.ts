@@ -437,7 +437,7 @@ export const insertRoleSchema = createInsertSchema(roles).omit({
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password"),
   email: text("email").notNull(),
   roleId: integer("role_id").references(() => roles.id), // Referencia a roles
   fullName: text("full_name").notNull(),
@@ -447,6 +447,9 @@ export const users = pgTable("users", {
   birthDate: date("birth_date"),
   bio: text("bio"),
   profileImageUrl: text("profile_image_url"),
+  // Firebase Integration
+  firebaseUid: text("firebase_uid").unique(),
+  needsPasswordReset: boolean("needs_password_reset").default(false),
   // Nuevos campos de alta prioridad
   notificationPreferences: jsonb("notification_preferences").$type<Record<string, any>>().default({}),
   isActive: boolean("is_active").default(true),
@@ -482,6 +485,30 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true
+});
+
+// Tabla para usuarios pendientes de aprobación
+export const pendingUsers = pgTable("pending_users", {
+  id: serial("id").primaryKey(),
+  firebaseUid: text("firebase_uid").notNull().unique(),
+  email: text("email").notNull(),
+  displayName: text("display_name"),
+  requestedAt: timestamp("requested_at").defaultNow(),
+  approvedBy: integer("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  rejectedAt: timestamp("rejected_at"),
+  rejectionReason: text("rejection_reason"),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  requestedRole: text("requested_role").default("employee"), // Usuario puede solicitar un rol específico
+  additionalInfo: jsonb("additional_info").$type<Record<string, any>>().default({}),
+});
+
+export type PendingUser = typeof pendingUsers.$inferSelect;
+export type InsertPendingUser = typeof pendingUsers.$inferInsert;
+
+export const insertPendingUserSchema = createInsertSchema(pendingUsers).omit({
+  id: true,
+  requestedAt: true
 });
 
 export const rolesRelations = relations(roles, ({ many }) => ({

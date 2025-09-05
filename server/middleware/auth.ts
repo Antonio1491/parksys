@@ -1,4 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
+import admin from 'firebase-admin';
+import { db } from '../db';
+import { users, userRoles } from '../../shared/schema';
+import { eq } from 'drizzle-orm';
+
+// Configurar Firebase Admin SDK si no está configurado
+if (!admin.apps.length) {
+  const projectId = process.env.VITE_FIREBASE_PROJECT_ID;
+  
+  if (projectId) {
+    try {
+      admin.initializeApp({
+        credential: admin.credential.applicationDefault(),
+        projectId: projectId
+      });
+      console.log('🔥 [AUTH-MIDDLEWARE] Firebase Admin SDK inicializado');
+    } catch (error) {
+      console.warn('⚠️ [AUTH-MIDDLEWARE] Error inicializando Firebase Admin:', error);
+    }
+  }
+}
 
 // Tipo extendido para incluir el usuario en la petición
 declare global {
@@ -9,17 +30,91 @@ declare global {
   }
 }
 
-// Middleware simplificado para desarrollo
-export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  // Siempre permitir acceso en desarrollo
-  req.user = {
-    id: 4,
-    username: 'Luis',
-    role: 'admin',
-    isActive: true,
-    roleId: 1
-  };
-  next();
+// Middleware de autenticación con Firebase
+export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    let firebaseUid: string | null = null;
+
+    // 1. Verificar token de Firebase
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const idToken = authHeader.substring(7);
+      
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        firebaseUid = decodedToken.uid;
+        console.log(`🔐 [AUTH] Token Firebase verificado: ${firebaseUid}`);
+      } catch (error) {
+        console.error('❌ [AUTH] Error verificando token Firebase:', error);
+      }
+    }
+
+    // 2. Verificar localStorage token (para compatibilidad con sistema existente)
+    if (!firebaseUid && req.headers['x-firebase-uid']) {
+      firebaseUid = req.headers['x-firebase-uid'] as string;
+      console.log(`🔗 [AUTH] Using Firebase UID from header: ${firebaseUid}`);
+    }
+
+    // 3. MODO DESARROLLO: permitir acceso con usuario fijo si no hay Firebase configurado
+    if (!firebaseUid && process.env.NODE_ENV === 'development') {
+      console.log('🛠️ [AUTH] Modo desarrollo - usando usuario fijo');
+      req.user = {
+        id: 4,
+        username: 'Luis',
+        role: 'admin',
+        isActive: true,
+        roleId: 1,
+        firebaseUid: 'dev-user'
+      };
+      return next();
+    }
+
+    // 4. Si no hay Firebase UID, denegar acceso
+    if (!firebaseUid) {
+      return res.status(401).json({ message: 'Token de autenticación requerido' });
+    }
+
+    // 5. Buscar usuario en base de datos local por Firebase UID
+    const [localUser] = await db.select()
+      .from(users)
+      .where(eq(users.firebaseUid, firebaseUid))
+      .limit(1);
+
+    if (!localUser) {
+      console.log(`❌ [AUTH] Usuario no encontrado para Firebase UID: ${firebaseUid}`);
+      return res.status(401).json({ message: 'Usuario no autorizado en el sistema' });
+    }
+
+    if (!localUser.isActive) {
+      console.log(`❌ [AUTH] Usuario inactivo: ${localUser.email}`);
+      return res.status(401).json({ message: 'Cuenta desactivada' });
+    }
+
+    // 6. Obtener roles del usuario
+    const userRolesList = await db.select()
+      .from(userRoles)
+      .where(eq(userRoles.userId, localUser.id));
+
+    // 7. Configurar objeto usuario en request
+    req.user = {
+      id: localUser.id,
+      firebaseUid: localUser.firebaseUid,
+      username: localUser.username,
+      email: localUser.email,
+      fullName: localUser.fullName,
+      roleId: localUser.roleId,
+      isActive: localUser.isActive,
+      roles: userRolesList,
+      needsPasswordReset: localUser.needsPasswordReset
+    };
+
+    console.log(`✅ [AUTH] Usuario autenticado: ${localUser.email}`);
+    next();
+
+  } catch (error) {
+    console.error('💥 [AUTH] Error en middleware de autenticación:', error);
+    res.status(500).json({ message: 'Error interno de autenticación' });
+  }
 };
 
 // Middleware para verificar si el usuario tiene acceso a un municipio específico

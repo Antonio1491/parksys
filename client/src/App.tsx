@@ -25,6 +25,7 @@ import AdminAmenities from "@/pages/admin/amenities";
 import AdminSettings from "@/pages/admin/settings";
 import AdminPayments from "@/pages/admin/payments";
 import AdminLogin from "@/pages/admin/login";
+import PendingUsersPage from "@/pages/admin/pending-users";
 import AdminInstructorInvitations from "@/pages/admin/instructor-invitations";
 import InstructorRegistration from "@/pages/public/instructor-registration";
 import ActivityDetailPage from "@/pages/activity-detail";
@@ -404,6 +405,11 @@ function Router() {
         <Route path="/admin/users">
           <Suspense fallback={<div className="p-8 text-center">Cargando gestión de usuarios...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/users')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/pending-users">
+          <Suspense fallback={<div className="p-8 text-center">Cargando usuarios pendientes...</div>}>
+            <PendingUsersPage />
           </Suspense>
         </Route>
 
