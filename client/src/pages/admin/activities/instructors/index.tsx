@@ -184,10 +184,7 @@ export default function InstructorsManagementPage() {
     mutationFn: async (instructorsData: any[]) => {
       return await apiRequest('/api/instructors/import', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ instructors: instructorsData }),
+        data: { instructors: instructorsData },
       });
     },
     onSuccess: (data) => {

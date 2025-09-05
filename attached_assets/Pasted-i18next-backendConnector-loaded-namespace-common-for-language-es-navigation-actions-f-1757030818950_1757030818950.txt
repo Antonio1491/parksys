@@ -1,0 +1,34 @@
+i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+Console.js:61 i18next: languageChanged es
+Console.js:61 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+Console.js:61 🌐 [QUERY] GET /api/instructors
+Console.js:61 CSV procesado: (20) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+Console.js:61 🌐 [API REQUEST] POST /api/instructors/import
+injected.js:253  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/instructors/import 400 (Bad Request)
+window.fetch @ Network.js:219
+apply @ injected.js:253
+apiRequest @ queryClient.ts:129
+mutationFn @ index.tsx:185
+fn @ @tanstack_react-query.js?v=a5b62361:1203
+run @ @tanstack_react-query.js?v=a5b62361:500
+start @ @tanstack_react-query.js?v=a5b62361:542
+execute @ @tanstack_react-query.js?v=a5b62361:1239
+await in execute
+mutate @ @tanstack_react-query.js?v=a5b62361:2655
+(anonymous) @ @tanstack_react-query.js?v=a5b62361:3371
+handleImportConfirm @ index.tsx:249
+callCallback2 @ chunk-SKRUXVEK.js?v=a5b62361:3674
+invokeGuardedCallbackDev @ chunk-SKRUXVEK.js?v=a5b62361:3699
+invokeGuardedCallback @ chunk-SKRUXVEK.js?v=a5b62361:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-SKRUXVEK.js?v=a5b62361:3736
+executeDispatch @ chunk-SKRUXVEK.js?v=a5b62361:7014
+processDispatchQueueItemsInOrder @ chunk-SKRUXVEK.js?v=a5b62361:7034
+processDispatchQueue @ chunk-SKRUXVEK.js?v=a5b62361:7043
+dispatchEventsForPlugins @ chunk-SKRUXVEK.js?v=a5b62361:7051
+(anonymous) @ chunk-SKRUXVEK.js?v=a5b62361:7174
+batchedUpdates$1 @ chunk-SKRUXVEK.js?v=a5b62361:18913
+batchedUpdates @ chunk-SKRUXVEK.js?v=a5b62361:3579
+dispatchEventForPluginEventSystem @ chunk-SKRUXVEK.js?v=a5b62361:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-SKRUXVEK.js?v=a5b62361:5478
+dispatchEvent @ chunk-SKRUXVEK.js?v=a5b62361:5472
+dispatchDiscreteEvent @ chunk-SKRUXVEK.js?v=a5b62361:5449Understand this error
