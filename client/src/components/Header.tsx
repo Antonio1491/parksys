@@ -29,7 +29,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 const logoImage = "/images/logo-ambu.png";
-const agencyLogo = "/images/logo-ambu.png";
+const agencyLogo = "/images/logo-pdm-new.png";
 
 const Header: React.FC = () => {
   const [location] = useLocation();
