@@ -60,6 +60,9 @@ export default function RolesManagement() {
 
   // Verificar si el usuario puede crear roles (solo super-admin y admin)
   const canCreateRoles = user?.role === 'super-admin' || user?.role === 'admin';
+  
+  // Debug: log para verificar el estado del usuario
+  console.log('🔍 [ROLES] Estado del usuario:', { user, canCreateRoles });
 
   // Obtener roles reales desde la API
   const { data: apiRoles, isLoading: loadingRoles } = useQuery({
@@ -167,14 +170,17 @@ export default function RolesManagement() {
                 className="pl-10"
               />
             </div>
-            {canCreateRoles && (
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-green-600 hover:bg-green-700">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Crear Rol
-                  </Button>
-                </DialogTrigger>
+            {/* Botón siempre visible para debug - luego aplicaremos la condición */}
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={!canCreateRoles}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Crear Rol {!canCreateRoles && '(Sin permisos)'}
+                </Button>
+              </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
                     <DialogTitle>Crear Nuevo Rol</DialogTitle>
@@ -295,7 +301,6 @@ export default function RolesManagement() {
                   </Form>
                 </DialogContent>
               </Dialog>
-            )}
             
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Settings className="h-4 w-4 mr-2" />
