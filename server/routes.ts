@@ -7626,6 +7626,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para el conteo de notificaciones no leídas
+  app.get('/api/notifications/count', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userFirebaseUid = (req as any).user?.uid;
+      
+      if (!userFirebaseUid) {
+        return res.status(401).json({ error: 'Usuario no autenticado' });
+      }
+
+      // Buscar el usuario en la base de datos
+      const [user] = await db
+        .select({ id: schema.users.id })
+        .from(schema.users)
+        .where(eq(schema.users.firebaseUid, userFirebaseUid));
+
+      if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+
+      // Contar notificaciones no leídas de incidencias para este usuario
+      const [countResult] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(schema.incidentNotifications)
+        .where(
+          sql`${schema.incidentNotifications.userId} = ${user.id} AND ${schema.incidentNotifications.isRead} = false`
+        );
+
+      const unreadCount = Number(countResult?.count || 0);
+
+      res.json({ unreadCount });
+    } catch (error) {
+      console.error('Error obteniendo conteo de notificaciones:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
   console.log("✅ Rutas de archivos estáticos configuradas");
 
   // Inicializar categorías de eventos en segundo plano

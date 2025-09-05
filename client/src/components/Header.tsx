@@ -20,6 +20,7 @@ import { HelpCenter } from "@/components/HelpCenter";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileImage from "@/components/UserProfileImage";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
+import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -489,6 +490,9 @@ const Header: React.FC = () => {
                       <HelpCircle className="h-6 w-8 text-gray-700" />
                     </Button>
                   </HelpCenter>
+
+                  {/* Botón de notificaciones */}
+                  <NotificationBell />
 
                   {/* Botón para acceder a la página pública */}
                   <Link href="/">
