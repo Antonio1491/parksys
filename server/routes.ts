@@ -7640,38 +7640,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const [user] = await db
         .select({ 
           id: schema.users.id,
-          role: schema.users.role 
+          roleId: schema.users.roleId,
+          roleSlug: schema.roles.slug
         })
         .from(schema.users)
+        .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
         .where(eq(schema.users.firebaseUid, userFirebaseUid));
 
       if (!user) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
 
+      console.log(`📊 [NOTIFICATIONS] Usuario encontrado: ID=${user.id}, RoleId=${user.roleId}, RoleSlug=${user.roleSlug}`);
+
       let totalUnreadCount = 0;
       let breakdown: any = {};
 
-      // 1. Contar notificaciones no leídas de incidencias para este usuario
-      try {
-        const [incidentCountResult] = await db
-          .select({ count: sql<number>`count(*)` })
-          .from(schema.incidentNotifications)
-          .where(
-            sql`${schema.incidentNotifications.userId} = ${user.id} AND ${schema.incidentNotifications.isRead} = false`
-          );
-
-        const incidentCount = Number(incidentCountResult?.count || 0);
-        totalUnreadCount += incidentCount;
-        breakdown.incidents = incidentCount;
-      } catch (error) {
-        console.error('Error contando notificaciones de incidencias:', error);
-        breakdown.incidents = 0;
-      }
-
+      // Simplificado: Solo contar usuarios pendientes por ahora
+      breakdown.incidents = 0; // Temporalmente deshabilitado
+      
       // 2. ✅ NUEVO: Contar usuarios pendientes de aprobación 
       // Solo para Super Administrador y Administrador General
-      if (user.role === 'super-admin' || user.role === 'admin') {
+      if (user.roleSlug === 'super-admin' || user.roleSlug === 'admin') {
         try {
           const [pendingUsersCount] = await db
             .select({ count: sql<number>`count(*)` })
@@ -7681,13 +7671,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const pendingCount = Number(pendingUsersCount?.count || 0);
           totalUnreadCount += pendingCount;
           breakdown.pendingUsers = pendingCount;
+          
+          console.log(`📈 [NOTIFICATIONS] Usuarios pendientes encontrados: ${pendingCount}`);
         } catch (error) {
           console.error('Error contando usuarios pendientes:', error);
           breakdown.pendingUsers = 0;
         }
       } else {
         breakdown.pendingUsers = 0;
+        console.log(`🚫 [NOTIFICATIONS] Usuario sin permisos para ver usuarios pendientes: RoleSlug=${user.roleSlug}`);
       }
+
+      console.log(`📊 [NOTIFICATIONS] Respuesta final: unreadCount=${totalUnreadCount}, breakdown=`, breakdown);
 
       // TODO: Agregar otros tipos de notificaciones aquí
       // - Notificaciones de actividades pendientes

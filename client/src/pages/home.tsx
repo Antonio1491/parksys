@@ -188,14 +188,13 @@ const Home: React.FC = () => {
           </div>
           
           {/* Carousel de pantalla completa */}
-          <div className="relative mb-12 h-[550px] w-max left-1/2 transform -translate-x-1/2">
+          <div className="relative mb-12 h-[520px] w-max left-1/2 transform -translate-x-1/2">
             <div className="flex items-center h-full w-full overflow-hidden">
               {isLoading ? (
                 // Loading skeleton
                 <div className="flex w-full h-full items-center justify-center">
-                  <div className="w-[70vw] h-full">
+                  <div className="w-[50vw] h-full">
                     <Card className="animate-pulse rounded-4xl overflow-hidden h-full w-full">
-                      <div className="h-full bg-gradient-to-br from-gray-200 to-gray-300"></div>
                     </Card>
                   </div>
                 </div>
@@ -205,8 +204,8 @@ const Home: React.FC = () => {
                   <div className="flex items-center justify-center h-full w-full px-8">
                     {/* Tarjeta anterior (parcial izquierda) */}
                     {featuredParks.length > 1 && (
-                      <div className="w-[15vw] h-[90%] opacity-70 scale-95 mr-4">
-                        <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-lg">
+                      <div className="w-[15vw] h-full opacity-100 mr-14">
+                        <div className="relative h-full w-full rounded-l overflow-hidden">
                           <div 
                             className="absolute inset-0 bg-cover bg-center"
                             style={{
