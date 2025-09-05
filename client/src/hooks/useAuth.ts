@@ -40,8 +40,8 @@ export function useAuth() {
   // Asegurar que el campo 'role' está presente basado en roleId
   if (user && !user.role && user.roleId) {
     const roleMap: Record<number, string> = {
-      1: 'admin',
-      8: 'super-admin'
+      1: 'super-admin', // ✅ CORREGIDO: roleId 1 = Super Administrador
+      2: 'admin'        // ✅ CORREGIDO: roleId 2 = Administrador General
     };
     user.role = roleMap[user.roleId] || 'unknown';
   }

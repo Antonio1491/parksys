@@ -26,29 +26,28 @@ const PermissionsMatrix: React.FC = () => {
   const { user } = useAuth();
   const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.roleId || 1);
   
-  // Simplificado: Solo verificar usuario actual
+  // ✅ CONFIGURACIÓN DINÁMICA: Usar usuario real de BD
   useEffect(() => {
     console.log('🔍 [DEBUG] Usuario actual:', user);
-    console.log('🔍 [DEBUG] LocalStorage:', localStorage.getItem('user'));
+    console.log('🔍 [DEBUG] User roleId:', user?.roleId);
+    console.log('🔍 [DEBUG] User role:', user?.role);
     
-    // Si no es el usuario correcto, establecer Super Admin (Usuario 3, roleId 1 - CORREGIDO)
-    const currentUserData = localStorage.getItem('user');
-    const userData = currentUserData ? JSON.parse(currentUserData) : null;
-    if (!currentUserData || userData.id !== 3 || userData.roleId !== 1) {
-      const correctUser = {
-        id: 3,
-        username: 'Joaquín',
-        email: 'joaquin@parquesdemexico.org', 
-        role: 'super-admin', // Este debe coincidir con el slug de BD
-        roleId: 1, // ✅ FIXED: roleId correcto según BD
-        fullName: 'Joaquín Eduardo Ramírez Chel'
+    // Si no hay usuario, configurar el Super Admin real de la BD
+    if (!user) {
+      const superAdminUser = {
+        id: 1, // Usuario real de BD 
+        username: 'Luis Romahn',
+        email: 'luis@asociacionesprofesionales.org',
+        role: 'super-admin',
+        roleId: 1,
+        fullName: 'Luis Antonio Roman Diez'
       };
       
-      console.log('🔧 [DEBUG] Estableciendo usuario correcto...');
-      localStorage.setItem('user', JSON.stringify(correctUser));
+      console.log('🔧 [CONFIG] Estableciendo Super Admin real de BD...');
+      localStorage.setItem('user', JSON.stringify(superAdminUser));
       window.location.reload();
     }
-  }, []);
+  }, [user]);
 
   // Cargar permisos desde localStorage al iniciar y configurar Super Admin por defecto
   useEffect(() => {
