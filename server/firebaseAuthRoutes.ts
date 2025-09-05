@@ -2,7 +2,7 @@ import express from 'express';
 import { db } from './db';
 import { users, pendingUsers, userRoles } from '../shared/schema';
 import { eq, and } from 'drizzle-orm';
-import { linkExistingUserWithFirebase, isExistingUser, getUserByFirebaseUid, migrateKnownUsers } from './firebaseUserSync';
+import { linkExistingUserWithFirebase, isExistingUser, getUserByFirebaseUid, migrateKnownUsers, getMigrationInstructions } from './firebaseUserSync';
 
 export function registerFirebaseAuthRoutes(app: express.Express) {
   console.log('🔥 [FIREBASE-AUTH] Registrando rutas de autenticación Firebase...');
@@ -269,22 +269,56 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
     }
   });
 
-  // Endpoint para ejecutar migración simplificada (solo para super admins)
+  // Endpoint para ejecutar migración REAL (solo para super admins)
   app.post('/api/auth/migrate-users', async (req, res) => {
     try {
-      console.log('🚀 [MIGRATION] Ejecutando migración simplificada...');
+      console.log('🚀 [REAL-MIGRATION] Ejecutando migración REAL de usuarios a Firebase...');
       
       const migrationResult = await migrateKnownUsers();
       
+      if (migrationResult.alreadyMigrated) {
+        return res.json({
+          success: true,
+          message: 'Todos los usuarios ya están migrados a Firebase',
+          usersToMigrate: 0,
+          alreadyMigrated: true
+        });
+      }
+      
       res.json({
         success: true,
-        message: 'Migración simplificada ejecutada exitosamente',
-        usersToMigrate: migrationResult.usersToMigrate,
-        users: migrationResult.users
+        message: `Migración real completada: ${migrationResult.migratedCount} usuarios migrados`,
+        migratedCount: migrationResult.migratedCount,
+        errorCount: migrationResult.errorCount,
+        migratedUsers: migrationResult.migratedUsers,
+        errors: migrationResult.errors
+      });
+      
+    } catch (error: any) {
+      console.error('❌ [REAL-MIGRATION] Error en migración real:', error);
+      res.status(500).json({ 
+        error: 'Error interno del servidor',
+        details: error?.message || 'Error desconocido'
+      });
+    }
+  });
+
+  // Endpoint para obtener instrucciones de migración (respaldo)
+  app.get('/api/auth/migration-instructions', async (req, res) => {
+    try {
+      console.log('📋 [INSTRUCTIONS] Obteniendo instrucciones...');
+      
+      const instructions = await getMigrationInstructions();
+      
+      res.json({
+        success: true,
+        message: 'Instrucciones de migración obtenidas',
+        usersToMigrate: instructions.usersToMigrate,
+        users: instructions.users
       });
       
     } catch (error) {
-      console.error('❌ [MIGRATION] Error en migración simplificada:', error);
+      console.error('❌ [INSTRUCTIONS] Error obteniendo instrucciones:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
