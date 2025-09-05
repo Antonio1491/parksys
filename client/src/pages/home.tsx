@@ -177,7 +177,7 @@ const Home: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8">
               <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
-              <span style={{ color: '#19633c' }}>Tu >Parque</span> Favorito
+              <span style={{ color: '#19633c' }}>Tu Parque Favorito</span>
             </h2>
             <p className="text-2xl font-bold text-gray-600 max-w-4xl mx-auto leading-relaxed">
               espacios para respirar, convivir y disfrutar

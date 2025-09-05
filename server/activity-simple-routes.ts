@@ -51,11 +51,31 @@ router.post("/:activityId/image", upload.single('image'), async (req: Request, r
       return res.status(400).json({ error: "No se proporcionó archivo de imagen" });
     }
     
+    console.log(`🔄 [ACTIVITY-IMG] Procesando imagen para actividad ${activityId}: ${req.file.filename}`);
+    
     // Verificar que la actividad existe
     const activity = await db.select().from(activities).where(eq(activities.id, activityId)).limit(1);
     if (activity.length === 0) {
       return res.status(404).json({ error: "Actividad no encontrada" });
     }
+    
+    // VERIFICAR que el archivo se guardó físicamente 
+    const fullPath = path.join(process.cwd(), 'uploads', 'activity-images', req.file.filename);
+    if (!fs.existsSync(fullPath)) {
+      console.error(`❌ [ACTIVITY-IMG] Archivo no encontrado después de multer: ${fullPath}`);
+      return res.status(500).json({ error: "Error al guardar archivo físicamente" });
+    }
+    
+    console.log(`✅ [ACTIVITY-IMG] Archivo físico verificado: ${fullPath}`);
+    
+    // COPIA DE SEGURIDAD: También copiar a public/uploads/activity-images/
+    const publicPath = path.join(process.cwd(), 'public', 'uploads', 'activity-images');
+    if (!fs.existsSync(publicPath)) {
+      fs.mkdirSync(publicPath, { recursive: true });
+    }
+    const publicFullPath = path.join(publicPath, req.file.filename);
+    fs.copyFileSync(fullPath, publicFullPath);
+    console.log(`✅ [ACTIVITY-IMG] Copia de seguridad creada: ${publicFullPath}`);
     
     // Actualizar directamente el campo image_url de la actividad (SISTEMA SIMPLE)
     const imageUrl = `/uploads/activity-images/${req.file.filename}`;
@@ -66,16 +86,22 @@ router.post("/:activityId/image", upload.single('image'), async (req: Request, r
       .where(eq(activities.id, activityId))
       .returning();
     
-    console.log(`✅ Imagen actualizada para actividad ${activityId}: ${imageUrl}`);
+    console.log(`✅ [ACTIVITY-IMG] DB actualizada - Actividad ${activityId}: ${imageUrl}`);
     
     res.json({
       success: true,
       activity: updatedActivity[0],
-      imageUrl
+      imageUrl,
+      fileInfo: {
+        filename: req.file.filename,
+        size: req.file.size,
+        path: fullPath,
+        verified: true
+      }
     });
     
   } catch (error) {
-    console.error("Error al subir imagen de actividad:", error);
+    console.error("❌ [ACTIVITY-IMG] Error al subir imagen de actividad:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
