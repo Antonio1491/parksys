@@ -297,8 +297,8 @@ const Home: React.FC = () => {
 
                     {/* Tarjeta siguiente (parcial derecha) */}
                     {featuredParks.length > 1 && (
-                      <div className="w-[15vw] h-[90%] opacity-70 scale-95 ml-4">
-                        <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-lg">
+                      <div className="w-[15vw] h-full opacity-100 ml-4">
+                        <div className="relative h-full w-full rounded-2xl overflow-hidden">
                           <div 
                             className="absolute inset-0 bg-cover bg-center"
                             style={{

@@ -56,10 +56,16 @@ interface ActiveUser {
   username: string;
   fullName: string;
   email: string;
-  role: string;
+  profileImageUrl?: string;
   isActive: boolean;
   createdAt: string;
   lastLogin?: string;
+  userRole: {
+    id: number;
+    name: string;
+    slug: string;
+    color: string;
+  };
 }
 
 export default function AccessUsersPage() {
@@ -86,8 +92,8 @@ export default function AccessUsersPage() {
 
   // Obtener usuarios activos
   const { data: activeUsers, isLoading: loadingActive } = useQuery({
-    queryKey: ['/api/users'],
-    queryFn: () => apiRequest('/api/users')
+    queryKey: ['/api/users-with-roles'],
+    queryFn: () => apiRequest('/api/users-with-roles')
   });
 
   // Obtener roles disponibles para asignación
@@ -112,7 +118,7 @@ export default function AccessUsersPage() {
         description: 'El usuario ha sido aprobado exitosamente y puede acceder al sistema.'
       });
       queryClient.invalidateQueries({ queryKey: ['/api/auth/pending-users'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users-with-roles'] });
       setSelectedUser(null);
     },
     onError: (error: any) => {
@@ -314,7 +320,19 @@ export default function AccessUsersPage() {
                         <TableRow key={user.id}>
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              {user.profileImageUrl ? (
+                                <img 
+                                  src={user.profileImageUrl} 
+                                  alt={user.fullName}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                    target.nextElementSibling?.classList.remove('hidden');
+                                  }}
+                                />
+                              ) : null}
+                              <div className={`w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ${user.profileImageUrl ? 'hidden' : ''}`}>
                                 <User className="h-4 w-4 text-blue-600" />
                               </div>
                               <div>
@@ -330,8 +348,12 @@ export default function AccessUsersPage() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="capitalize">
-                              {user.role}
+                            <Badge 
+                              variant="outline" 
+                              className="capitalize"
+                              style={{ backgroundColor: `${user.userRole.color}15`, borderColor: user.userRole.color, color: user.userRole.color }}
+                            >
+                              {user.userRole.name}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -357,7 +379,7 @@ export default function AccessUsersPage() {
                               <Button size="sm" variant="outline">
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              {user.role !== 'super-admin' && (
+                              {user.userRole.slug !== 'super-admin' && (
                                 <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
