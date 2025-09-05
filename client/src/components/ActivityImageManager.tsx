@@ -371,7 +371,12 @@ const ActivityImageManager: React.FC<ActivityImageManagerProps> = ({
                 <div key={image.id} className="relative group">
                   <div className="relative aspect-video border rounded-lg overflow-hidden">
                     <img
-                      src={image.imageUrl}
+                      src={
+                        // En Replit development, usar URL completa del backend
+                        window.location.hostname.includes('replit.') || import.meta.env.DEV
+                          ? `${window.location.protocol}//${window.location.host}${image.imageUrl}` 
+                          : image.imageUrl
+                      }
                       alt={image.caption || 'Imagen de actividad'}
                       className="w-full h-full object-cover"
                     />
