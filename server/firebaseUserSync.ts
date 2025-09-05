@@ -35,16 +35,34 @@ export async function linkExistingUserWithFirebase(email: string, firebaseUid: s
       }
     }
     
+    // Lista de administradores autorizados para acceso inmediato
+    const authorizedAdmins = [
+      'admin@sistema.com',
+      'luis@asociacionesprofesionales.org', 
+      'joaquin@parquesdemexico.org'
+    ];
+    
+    const isAuthorizedAdmin = authorizedAdmins.includes(email.toLowerCase());
+    
+    if (isAuthorizedAdmin) {
+      console.log(`👑 [ADMIN-SYNC] Vinculando administrador autorizado: ${email}`);
+    }
+
     // Vincular Firebase UID al usuario existente
     const [updatedUser] = await db.update(users)
       .set({
         firebaseUid: firebaseUid,
+        isActive: true, // Asegurar que esté activo (especialmente para admins)
         updatedAt: new Date()
       })
       .where(eq(users.id, existingUser.id))
       .returning();
     
-    console.log(`✅ [SYNC] Usuario vinculado exitosamente: ${email} -> ${firebaseUid}`);
+    if (isAuthorizedAdmin) {
+      console.log(`👑 ✅ [ADMIN-SYNC] Administrador vinculado y activado: ${email} -> ${firebaseUid}`);
+    } else {
+      console.log(`✅ [SYNC] Usuario vinculado exitosamente: ${email} -> ${firebaseUid}`);
+    }
     return updatedUser;
     
   } catch (error) {

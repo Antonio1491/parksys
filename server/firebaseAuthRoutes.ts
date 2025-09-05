@@ -323,6 +323,54 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
     }
   });
 
+  // Endpoint para autorizar administradores inmediatamente (SUPER ADMIN ONLY)
+  app.post('/api/auth/authorize-admins', async (req, res) => {
+    try {
+      console.log('🚀 [ADMIN-AUTH] Autorizando administradores inmediatamente...');
+      
+      const adminEmails = [
+        'admin@sistema.com',
+        'luis@asociacionesprofesionales.org', 
+        'joaquin@parquesdemexico.org'
+      ];
+      
+      const authorizedUsers = [];
+      
+      for (const email of adminEmails) {
+        // Actualizar usuario para permitir acceso inmediato
+        const [updatedUser] = await db.update(users)
+          .set({ 
+            isActive: true,
+            updatedAt: new Date()
+          })
+          .where(eq(users.email, email))
+          .returning();
+          
+        if (updatedUser) {
+          console.log(`✅ [ADMIN-AUTH] Usuario autorizado: ${email}`);
+          authorizedUsers.push({
+            email: updatedUser.email,
+            fullName: updatedUser.fullName,
+            id: updatedUser.id
+          });
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: `${authorizedUsers.length} administradores autorizados para acceso inmediato`,
+        authorizedUsers
+      });
+      
+    } catch (error: any) {
+      console.error('❌ [ADMIN-AUTH] Error autorizando administradores:', error);
+      res.status(500).json({ 
+        error: 'Error interno del servidor',
+        details: error?.message || 'Error desconocido'
+      });
+    }
+  });
+
   // Endpoint para probar vinculación manual (útil para debugging)
   app.post('/api/auth/link-user', async (req, res) => {
     try {
