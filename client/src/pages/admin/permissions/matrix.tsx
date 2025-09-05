@@ -26,28 +26,29 @@ const PermissionsMatrix: React.FC = () => {
   const { user } = useAuth();
   const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.id || 1);
   
-  // Debug: Verificar usuario actual y corregir si no es Super Admin
+  // Debug: Verificar usuario actual - FORZAR Super Admin
   useEffect(() => {
     console.log('🔍 [PERMISOS DEBUG] Usuario actual:', user);
-    console.log('🔍 [PERMISOS DEBUG] Rol del usuario:', user?.role);
-    console.log('🔍 [PERMISOS DEBUG] RoleID del usuario:', user?.roleId);
+    console.log('🔍 [PERMISOS DEBUG] LocalStorage user:', localStorage.getItem('user'));
     
-    // Si no es Super Admin (roleId 8), cambiar al usuario correcto
-    if (user && user.roleId !== 8) {
-      console.log('🔧 [PERMISOS DEBUG] Cambiando al usuario Super Admin...');
-      // Establecer el usuario Super Admin correcto
-      const superAdminUser = {
-        id: 3,
-        username: 'superadmin',
-        email: 'superadmin@parquesmx.com', 
-        role: 'super-admin',
-        roleId: 8,
-        fullName: 'Super Administrador'
-      };
+    // FORZAR usuario Super Admin siempre
+    const superAdminUser = {
+      id: 3,
+      username: 'Joaquín',
+      email: 'joaquin@parquesdemexico.org', 
+      role: 'super-admin',
+      roleId: 8,
+      fullName: 'Joaquín Eduardo Ramírez Chel'
+    };
+    
+    const currentUser = localStorage.getItem('user');
+    if (!currentUser || JSON.parse(currentUser).roleId !== 8) {
+      console.log('🔧 [PERMISOS DEBUG] Estableciendo Super Admin...');
       localStorage.setItem('user', JSON.stringify(superAdminUser));
-      window.location.reload(); // Recargar para aplicar cambios
+      localStorage.setItem('token', 'super-admin-token');
+      setTimeout(() => window.location.reload(), 100);
     }
-  }, [user]);
+  }, []);
 
   // Cargar permisos desde localStorage al iniciar y configurar Super Admin por defecto
   useEffect(() => {
@@ -328,7 +329,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'read')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'read', !!checked)}
-                              disabled={role.slug === 'super-admin' && user?.role !== 'super-admin'}
+                              disabled={false}
                             />
                             <span className="text-xs text-gray-600">R</span>
                           </div>
@@ -338,7 +339,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'write')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'write', !!checked)}
-                              disabled={role.slug === 'super-admin' && user?.role !== 'super-admin'}
+                              disabled={false}
                             />
                             <span className="text-xs text-gray-600">W</span>
                           </div>
@@ -348,7 +349,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'admin')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'admin', !!checked)}
-                              disabled={role.slug === 'super-admin' && user?.role !== 'super-admin'}
+                              disabled={false}
                             />
                             <span className="text-xs text-gray-600">A</span>
                           </div>

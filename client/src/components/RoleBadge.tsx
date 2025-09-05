@@ -155,10 +155,24 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   }
   
   if (!role) {
+    // Fallback especial para slugs conocidos
+    const fallbackNames: Record<string, string> = {
+      'super-admin': 'Super Administrador',
+      'admin-general': 'Administrador General',
+      'coordinador-parques': 'Coordinador de Parques',
+      'supervisor-operaciones': 'Supervisor de Operaciones',
+      'tecnico-especialista': 'Técnico Especialista',
+      'operador-campo': 'Operador de Campo',
+      'consultor-auditor': 'Consultor Auditor'
+    };
+    
+    const fallbackName = fallbackNames[roleId] || 'Rol desconocido';
+    const FallbackIcon = getRoleIcon(roleId);
+    
     return (
       <Badge variant="outline" className={cn("bg-gray-100 text-gray-800 hover:bg-gray-100", className)}>
-        <Users className={cn("mr-1", size === 'sm' ? "w-3 h-3" : "w-4 h-4")} />
-        {showText && "Rol desconocido"}
+        <FallbackIcon className={cn("mr-1", size === 'sm' ? "w-3 h-3" : "w-4 h-4")} />
+        {showText && fallbackName}
       </Badge>
     );
   }
@@ -263,12 +277,26 @@ export const RoleBadgeWithText: React.FC<{
   const role = SYSTEM_ROLES.find(r => r.id === roleId);
   
   if (!role) {
+    // Fallback especial para slugs conocidos
+    const fallbackNames: Record<string, string> = {
+      'super-admin': 'Super Administrador',
+      'admin-general': 'Administrador General',
+      'coordinador-parques': 'Coordinador de Parques',
+      'supervisor-operaciones': 'Supervisor de Operaciones',
+      'tecnico-especialista': 'Técnico Especialista',
+      'operador-campo': 'Operador de Campo',
+      'consultor-auditor': 'Consultor Auditor'
+    };
+    
+    const fallbackName = fallbackNames[roleId] || 'Rol desconocido';
+    const FallbackIcon = getRoleIcon(roleId);
+    
     return (
       <div className={cn("flex items-center gap-2", className)}>
         <Badge variant="outline" className="text-gray-500">
-          <Users className="w-3 h-3" />
+          <FallbackIcon className="w-3 h-3" />
         </Badge>
-        <span className="text-sm text-gray-500">Rol desconocido</span>
+        <span className="text-sm text-gray-500">{fallbackName}</span>
       </div>
     );
   }
