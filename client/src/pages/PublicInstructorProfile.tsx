@@ -106,7 +106,11 @@ function PublicInstructorProfile() {
           <div className="flex items-center gap-4">
             {instructor.profileImageUrl ? (
               <img 
-                src={instructor.profileImageUrl} 
+                src={
+                  import.meta.env.DEV 
+                    ? `http://localhost:5000${instructor.profileImageUrl}` 
+                    : instructor.profileImageUrl
+                } 
                 alt={instructor.fullName}
                 className="w-16 h-16 rounded-full object-cover"
                 onError={(e) => {
