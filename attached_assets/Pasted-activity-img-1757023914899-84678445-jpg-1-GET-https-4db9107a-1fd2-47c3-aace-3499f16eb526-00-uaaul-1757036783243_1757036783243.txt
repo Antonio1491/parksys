@@ -1,0 +1,87 @@
+activity-img-1757023914899-84678445.jpg:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/activity-images/activity-img-1757023914899-84678445.jpg 404 (Not Found)
+Image
+commitMount @ chunk-SKRUXVEK.js?v=a5b62361:8412
+commitLayoutEffectOnFiber @ chunk-SKRUXVEK.js?v=a5b62361:17102
+commitLayoutMountEffects_complete @ chunk-SKRUXVEK.js?v=a5b62361:17980
+commitLayoutEffects_begin @ chunk-SKRUXVEK.js?v=a5b62361:17969
+commitLayoutEffects @ chunk-SKRUXVEK.js?v=a5b62361:17920
+commitRootImpl @ chunk-SKRUXVEK.js?v=a5b62361:19353
+commitRoot @ chunk-SKRUXVEK.js?v=a5b62361:19277
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18895
+flushSyncCallbacks @ chunk-SKRUXVEK.js?v=a5b62361:9119
+(anonymous) @ chunk-SKRUXVEK.js?v=a5b62361:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=a5b62361:552
+flush @ @tanstack_react-query.js?v=a5b62361:576
+batch @ @tanstack_react-query.js?v=a5b62361:594
+dispatch_fn @ @tanstack_react-query.js?v=a5b62361:1007
+setData @ @tanstack_react-query.js?v=a5b62361:705
+onSuccess @ @tanstack_react-query.js?v=a5b62361:908
+resolve @ @tanstack_react-query.js?v=a5b62361:462
+Promise.then
+run @ @tanstack_react-query.js?v=a5b62361:504
+start @ @tanstack_react-query.js?v=a5b62361:542
+fetch @ @tanstack_react-query.js?v=a5b62361:937
+executeFetch_fn @ @tanstack_react-query.js?v=a5b62361:2244
+onSubscribe @ @tanstack_react-query.js?v=a5b62361:1948
+subscribe @ @tanstack_react-query.js?v=a5b62361:24
+(anonymous) @ @tanstack_react-query.js?v=a5b62361:3093
+subscribeToStore @ chunk-SKRUXVEK.js?v=a5b62361:11984
+commitHookEffectListMount @ chunk-SKRUXVEK.js?v=a5b62361:16915
+commitPassiveMountOnFiber @ chunk-SKRUXVEK.js?v=a5b62361:18156
+commitPassiveMountEffects_complete @ chunk-SKRUXVEK.js?v=a5b62361:18129
+commitPassiveMountEffects_begin @ chunk-SKRUXVEK.js?v=a5b62361:18119
+commitPassiveMountEffects @ chunk-SKRUXVEK.js?v=a5b62361:18109
+flushPassiveEffectsImpl @ chunk-SKRUXVEK.js?v=a5b62361:19490
+flushPassiveEffects @ chunk-SKRUXVEK.js?v=a5b62361:19447
+commitRootImpl @ chunk-SKRUXVEK.js?v=a5b62361:19416
+commitRoot @ chunk-SKRUXVEK.js?v=a5b62361:19277
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js?v=a5b62361:18895
+flushSyncCallbacks @ chunk-SKRUXVEK.js?v=a5b62361:9119
+(anonymous) @ chunk-SKRUXVEK.js?v=a5b62361:18627Understand this error
+activity-img-1757023914899-84678445.jpg:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/activity-images/activity-img-1757023914899-84678445.jpg 404 (Not Found)
+Image
+commitMount @ chunk-SKRUXVEK.js:8412
+commitLayoutEffectOnFiber @ chunk-SKRUXVEK.js:17102
+commitLayoutMountEffects_complete @ chunk-SKRUXVEK.js:17980
+commitLayoutEffects_begin @ chunk-SKRUXVEK.js:17969
+commitLayoutEffects @ chunk-SKRUXVEK.js:17920
+commitRootImpl @ chunk-SKRUXVEK.js:19353
+commitRoot @ chunk-SKRUXVEK.js:19277
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js:18895
+flushSyncCallbacks @ chunk-SKRUXVEK.js:9119
+(anonymous) @ chunk-SKRUXVEK.js:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js:552
+flush @ @tanstack_react-query.js:576
+batch @ @tanstack_react-query.js:594
+dispatch_fn @ @tanstack_react-query.js:1007
+setData @ @tanstack_react-query.js:705
+onSuccess @ @tanstack_react-query.js:908
+resolve @ @tanstack_react-query.js:462
+Promise.then
+run @ @tanstack_react-query.js:504
+start @ @tanstack_react-query.js:542
+fetch @ @tanstack_react-query.js:937
+executeFetch_fn @ @tanstack_react-query.js:2244
+onSubscribe @ @tanstack_react-query.js:1948
+subscribe @ @tanstack_react-query.js:24
+(anonymous) @ @tanstack_react-query.js:3093
+subscribeToStore @ chunk-SKRUXVEK.js:11984
+commitHookEffectListMount @ chunk-SKRUXVEK.js:16915
+commitPassiveMountOnFiber @ chunk-SKRUXVEK.js:18156
+commitPassiveMountEffects_complete @ chunk-SKRUXVEK.js:18129
+commitPassiveMountEffects_begin @ chunk-SKRUXVEK.js:18119
+commitPassiveMountEffects @ chunk-SKRUXVEK.js:18109
+flushPassiveEffectsImpl @ chunk-SKRUXVEK.js:19490
+flushPassiveEffects @ chunk-SKRUXVEK.js:19447
+commitRootImpl @ chunk-SKRUXVEK.js:19416
+commitRoot @ chunk-SKRUXVEK.js:19277
+performSyncWorkOnRoot @ chunk-SKRUXVEK.js:18895
+flushSyncCallbacks @ chunk-SKRUXVEK.js:9119
+(anonymous) @ chunk-SKRUXVEK.js:18627Understand this error
+Console.js:61 🌐 [QUERY] GET /api/activities
+Console.js:61 🌐 [QUERY] GET /api/activities/53/images
+Console.js:61 🌐 [API REQUEST] DELETE /api/activities/53/images/7
+Console.js:61 🌐 [QUERY] GET /api/activities/53/images
+Console.js:61 🌐 [QUERY] GET /api/activities/53/images
