@@ -2199,9 +2199,14 @@ function startServer() {
       console.log("✅ [API-PRIORITY] Role routes registered with priority over static files");
       
       // NOW apply express.static AFTER custom routes to avoid intercepting /uploads/*
+      // FORCE STATIC FILES CONFIGURATION - Critical for image serving
+      app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+      app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
       if (process.env.NODE_ENV === 'production') {
         app.use(express.static(path.join(process.cwd(), 'public')));
-        console.log('📁 [PROD] Static files from public/ enabled AFTER custom routes');
+        console.log('📁 [PROD] Static files from public/ and uploads/ enabled AFTER custom routes');
+      } else {
+        console.log('📁 [DEV] Static uploads/ files enabled');
       }
       
       // Register activity payment routes
