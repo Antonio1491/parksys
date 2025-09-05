@@ -389,17 +389,15 @@ const RolesManagement: React.FC = () => {
               className="pl-9 w-64"
             />
           </div>,
-          permissions.canWrite('Seguridad') && (
-            <Button 
-              key="create"
-              onClick={() => setShowCreateModal(true)}
-              variant="default"
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Crear Rol
-            </Button>
-          )
+          <Button 
+            key="create"
+            onClick={() => setShowCreateModal(true)}
+            variant="default"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Crear Rol
+          </Button>
         ].filter(Boolean)}
       />
       {/* Métricas principales del sistema de roles - ACTUALIZADO para múltiples roles */}
