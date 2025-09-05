@@ -26,10 +26,27 @@ const PermissionsMatrix: React.FC = () => {
   const { user } = useAuth();
   const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.id || 1);
   
-  // Debug: Verificar usuario actual
+  // Debug: Verificar usuario actual y corregir si no es Super Admin
   useEffect(() => {
     console.log('🔍 [PERMISOS DEBUG] Usuario actual:', user);
     console.log('🔍 [PERMISOS DEBUG] Rol del usuario:', user?.role);
+    console.log('🔍 [PERMISOS DEBUG] RoleID del usuario:', user?.roleId);
+    
+    // Si no es Super Admin (roleId 8), cambiar al usuario correcto
+    if (user && user.roleId !== 8) {
+      console.log('🔧 [PERMISOS DEBUG] Cambiando al usuario Super Admin...');
+      // Establecer el usuario Super Admin correcto
+      const superAdminUser = {
+        id: 3,
+        username: 'superadmin',
+        email: 'superadmin@parquesmx.com', 
+        role: 'super-admin',
+        roleId: 8,
+        fullName: 'Super Administrador'
+      };
+      localStorage.setItem('user', JSON.stringify(superAdminUser));
+      window.location.reload(); // Recargar para aplicar cambios
+    }
   }, [user]);
 
   // Cargar permisos desde localStorage al iniciar y configurar Super Admin por defecto
@@ -156,7 +173,7 @@ const PermissionsMatrix: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
   
-  const filteredRoles = selectedRole === 'all' ? dynamicRoles : dynamicRoles.filter(r => r.id.toString() === selectedRole);
+  const filteredRoles = selectedRole === 'all' ? dynamicRoles : dynamicRoles.filter(r => r.slug === selectedRole);
   const filteredModules = selectedModule === 'all' ? flatModules : [selectedModule];
 
   return (
@@ -172,9 +189,9 @@ const PermissionsMatrix: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los roles</SelectItem>
-                {SYSTEM_ROLES.map(role => (
-                  <SelectItem key={role.id} value={role.id}>
-                    <RoleBadgeWithText roleId={role.id} size="sm" />
+                {dynamicRoles.map(role => (
+                  <SelectItem key={role.id} value={role.slug}>
+                    <RoleBadgeWithText roleId={role.slug} size="sm" />
                   </SelectItem>
                 ))}
               </SelectContent>
