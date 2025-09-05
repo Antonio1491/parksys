@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import AdminLayout from '@/components/AdminLayout';
-import ActivityImageManager from '@/components/ActivityImageManager';
+import ActivityImageManagerSimple from '@/components/ActivityImageManagerSimple';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Image } from 'lucide-react';
@@ -99,7 +99,13 @@ const ActivityImagesPage: React.FC = () => {
         </div>
 
         {/* Gestor de imágenes */}
-        <ActivityImageManager activityId={activityId} />
+        <ActivityImageManagerSimple 
+          activityId={activityId} 
+          currentImageUrl={activity?.imageUrl || null}
+          onImageUpdated={(imageUrl) => {
+            console.log('Imagen actualizada:', imageUrl);
+          }}
+        />
       </div>
     </AdminLayout>
   );

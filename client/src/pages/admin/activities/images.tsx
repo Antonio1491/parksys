@@ -6,7 +6,7 @@ import { ArrowLeft, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/components/AdminLayout';
-import ActivityImageManager from '@/components/ActivityImageManager';
+import ActivityImageManagerSimple from '@/components/ActivityImageManagerSimple';
 
 const ActivityImagesPage: React.FC = () => {
   const params = useParams();
@@ -146,10 +146,11 @@ const ActivityImagesPage: React.FC = () => {
         {/* Gestor de imágenes */}
         <Card>
           <CardContent className="p-6">
-            <ActivityImageManager
+            <ActivityImageManagerSimple
               activityId={activityId}
-              onImageUploaded={(image) => {
-                console.log('Nueva imagen subida:', image);
+              currentImageUrl={activity?.imageUrl || null}
+              onImageUpdated={(imageUrl) => {
+                console.log('Imagen actualizada:', imageUrl);
               }}
             />
           </CardContent>

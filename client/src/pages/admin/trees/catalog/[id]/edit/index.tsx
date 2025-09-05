@@ -38,7 +38,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TreePine, ArrowLeft, Save, Leaf, Upload, Image, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { uploadTreeSpeciesPhotoOS } from '@/utils/objectStorageUpload';
 
 // Definir el esquema de validación para el formulario
 const treeSpeciesSchema = z.object({
@@ -225,12 +224,13 @@ function EditTreeSpecies() {
     setIsUploading(true);
 
     try {
-      // Usar Object Storage para el upload
-      const photoUrl = await uploadTreeSpeciesPhotoOS(species.id, file);
-
-      // Actualizar el campo imageUrl del formulario con la URL de la foto subida
-      form.setValue('imageUrl', photoUrl);
-      setUploadedPhoto(photoUrl);
+      // TODO: Implementar sistema simple para Trees (pendiente)
+      console.warn('Upload de imágenes para Trees temporalmente deshabilitado');
+      
+      // Placeholder por ahora
+      // const photoUrl = await uploadTreePhoto(species.id, file);
+      // form.setValue('imageUrl', photoUrl);
+      // setUploadedPhoto(photoUrl);
 
       toast({
         title: "Foto subida exitosamente",

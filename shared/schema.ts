@@ -606,6 +606,8 @@ export const activities = pgTable("activities", {
   healthRequirements: text("health_requirements"),
   // Estado de la actividad
   status: activityStatusEnum("status").default("programada"),
+  // Imagen simple (estandarizado como otros módulos)
+  imageUrl: text("image_url"),
 });
 
 // Tabla de imágenes de actividades
