@@ -24,14 +24,14 @@ const PermissionsMatrix: React.FC = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const { modules, moduleMap, subModuleMap, flatModules } = useAdaptiveModules();
   const { user } = useAuth();
-  const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.id || 1);
+  const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.roleId || 1);
   
   // Simplificado: Solo verificar usuario actual
   useEffect(() => {
     console.log('🔍 [DEBUG] Usuario actual:', user);
     console.log('🔍 [DEBUG] LocalStorage:', localStorage.getItem('user'));
     
-    // Si no es el usuario correcto, establecer Super Admin (Usuario 3, roleId 8)
+    // Si no es el usuario correcto, establecer Super Admin (Usuario 3, roleId 1 - CORREGIDO)
     const currentUserData = localStorage.getItem('user');
     if (!currentUserData || JSON.parse(currentUserData).id !== 3) {
       const correctUser = {
@@ -39,7 +39,7 @@ const PermissionsMatrix: React.FC = () => {
         username: 'Joaquín',
         email: 'joaquin@parquesdemexico.org', 
         role: 'super-admin', // Este debe coincidir con el slug de BD
-        roleId: 8,
+        roleId: 1, // ✅ FIXED: roleId correcto según BD
         fullName: 'Joaquín Eduardo Ramírez Chel'
       };
       

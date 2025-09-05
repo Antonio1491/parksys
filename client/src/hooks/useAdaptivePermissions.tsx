@@ -38,6 +38,11 @@ export const useAdaptivePermissions = (roleId?: number | string): AdaptivePermis
   // Funciones memoizadas para verificación de permisos
   const permissionUtils = useMemo(() => {
     const hasPermission = (moduleId: string, action: 'create' | 'read' | 'update' | 'delete' | 'admin'): boolean => {
+      // ✅ CRITICAL FIX: Verificar si tiene permisos totales (Super Admin)
+      if (rolePermissions && typeof rolePermissions === 'object' && (rolePermissions as any).all === true) {
+        return true; // Super Admin tiene TODOS los permisos
+      }
+      
       const modulePermissions = permissions[moduleId] || [];
       
       // Admin permission grants all access
@@ -58,6 +63,11 @@ export const useAdaptivePermissions = (roleId?: number | string): AdaptivePermis
     };
 
     const hasAnyPermission = (moduleId: string): boolean => {
+      // ✅ CRITICAL FIX: Super Admin tiene permisos en todos los módulos
+      if (rolePermissions && typeof rolePermissions === 'object' && (rolePermissions as any).all === true) {
+        return true; // Super Admin tiene acceso a TODOS los módulos
+      }
+      
       const modulePermissions = permissions[moduleId] || [];
       return modulePermissions.length > 0;
     };

@@ -2222,7 +2222,25 @@ function startServer() {
       if (isProduction) {
         const { serveStatic } = await import("./vite");
         serveStatic(app);
-        console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes");
+        
+        // ✅ CRITICAL FIX: SPA catch-all for production mode
+        app.get('*', (req: Request, res: Response) => {
+          try {
+            const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
+            if (fs.existsSync(indexPath)) {
+              console.log(`📁 [SPA] Serving index.html for route: ${req.path}`);
+              res.sendFile(indexPath);
+            } else {
+              console.log(`❌ [SPA] index.html not found for route: ${req.path}`);
+              res.status(404).send('Application not built. Please run npm run build first.');
+            }
+          } catch (error) {
+            console.error(`🚫 [SPA] Error serving ${req.path}:`, error);
+            res.status(500).send('Server error');
+          }
+        });
+        
+        console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes with SPA routing");
       } else {
         const { setupVite } = await import("./vite");
         await setupVite(app, appServer);
