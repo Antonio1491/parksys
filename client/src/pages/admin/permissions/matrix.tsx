@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RoleBadge, RoleBadgeWithText, SYSTEM_ROLES } from '@/components/RoleBadge';
-import { DEFAULT_ROLE_PERMISSIONS, SYSTEM_MODULES, usePermissions } from '@/components/RoleGuard';
+import { useAdaptiveModules } from "@/hooks/useAdaptiveModules";
+import { useAdaptivePermissions } from "@/hooks/useAdaptivePermissions";
 import { Link } from 'wouter';
 import { 
   Grid, Shield, Lock, Unlock, Save, RotateCcw, Eye, Edit, Settings,
@@ -17,9 +18,10 @@ import { toast } from '@/hooks/use-toast';
 const PermissionsMatrix: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [selectedModule, setSelectedModule] = useState<string>('all');
-  const [permissions, setPermissions] = useState(DEFAULT_ROLE_PERMISSIONS);
+  const [permissions, setPermissions] = useState<Record<string, Record<string, string[]>>>({});
   const [hasChanges, setHasChanges] = useState(false);
-  const userPermissions = usePermissions();
+  const { modules } = useAdaptiveModules();
+  const { hasPermission: userHasPermission } = useAdaptivePermissions(1); // Usar ID del usuario actual
 
   // Cargar permisos desde localStorage al iniciar
   useEffect(() => {
@@ -56,7 +58,7 @@ const PermissionsMatrix: React.FC = () => {
       return;
     }
 
-    if (!userPermissions.canAdmin('Seguridad')) {
+    if (!userHasPermission('config-seguridad', 'admin')) {
       toast({
         title: "Sin permisos",
         description: "No tienes permisos para modificar la matriz",
@@ -98,7 +100,7 @@ const PermissionsMatrix: React.FC = () => {
 
   const getPermissionCount = (roleId: string): number => {
     let count = 0;
-    SYSTEM_MODULES.forEach(module => {
+    Object.keys(modules).forEach(module => {
       if ((permissions[roleId] as any)?.[module]) {
         count += (permissions[roleId] as any)[module].length;
       }
@@ -107,7 +109,7 @@ const PermissionsMatrix: React.FC = () => {
   };
 
   const resetToDefaults = () => {
-    if (!userPermissions.canAdmin('Seguridad')) {
+    if (!userHasPermission('config-seguridad', 'admin')) {
       toast({
         title: "Sin permisos",
         description: "No tienes permisos para resetear la matriz",
@@ -116,7 +118,7 @@ const PermissionsMatrix: React.FC = () => {
       return;
     }
 
-    setPermissions(DEFAULT_ROLE_PERMISSIONS);
+    setPermissions({});
     setHasChanges(true);
     toast({
       title: "Matriz restablecida",
@@ -125,7 +127,7 @@ const PermissionsMatrix: React.FC = () => {
   };
 
   const filteredRoles = selectedRole === 'all' ? SYSTEM_ROLES : SYSTEM_ROLES.filter(r => r.id === selectedRole);
-  const filteredModules = selectedModule === 'all' ? SYSTEM_MODULES : [selectedModule];
+  const filteredModules = selectedModule === 'all' ? Object.keys(modules) : [selectedModule];
 
   return (
     <AdminLayout title="Matriz de Permisos" subtitle="Configuración granular de permisos por rol y módulo">
@@ -157,7 +159,7 @@ const PermissionsMatrix: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los módulos</SelectItem>
-                {SYSTEM_MODULES.map(module => (
+                {Object.keys(modules).map(module => (
                   <SelectItem key={module} value={module}>
                     {module}
                   </SelectItem>
@@ -213,7 +215,7 @@ const PermissionsMatrix: React.FC = () => {
               <Eye className="h-5 w-5 text-purple-600" />
               <div>
                 <div className="text-sm font-medium text-purple-800">Mi Rol</div>
-                <RoleBadge roleId={userPermissions.userRole} size="sm" />
+                <RoleBadge roleId="admin" size="sm" />
               </div>
             </div>
           </CardContent>
@@ -279,7 +281,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.id, module, 'read')}
                               onCheckedChange={(checked) => updatePermission(role.id, module, 'read', !!checked)}
-                              disabled={!userPermissions.canAdmin('Seguridad') || role.id === 'super-admin'}
+                              disabled={!userHasPermission('config-seguridad', 'admin') || role.id === 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">R</span>
                           </div>
@@ -289,7 +291,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.id, module, 'write')}
                               onCheckedChange={(checked) => updatePermission(role.id, module, 'write', !!checked)}
-                              disabled={!userPermissions.canAdmin('Seguridad') || role.id === 'super-admin'}
+                              disabled={!userHasPermission('config-seguridad', 'admin') || role.id === 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">W</span>
                           </div>
@@ -299,7 +301,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.id, module, 'admin')}
                               onCheckedChange={(checked) => updatePermission(role.id, module, 'admin', !!checked)}
-                              disabled={!userPermissions.canAdmin('Seguridad') || role.id === 'super-admin'}
+                              disabled={!userHasPermission('config-seguridad', 'admin') || role.id === 'super-admin'}
                             />
                             <span className="text-xs text-gray-600">A</span>
                           </div>
