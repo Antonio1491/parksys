@@ -329,7 +329,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'read')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'read', !!checked)}
-                              disabled={user?.roleId !== 8}
+                              disabled={!userHasPermission('config-seguridad', 'admin')}
                             />
                             <span className="text-xs text-gray-600">R</span>
                           </div>
@@ -339,7 +339,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'write')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'write', !!checked)}
-                              disabled={user?.roleId !== 8}
+                              disabled={!userHasPermission('config-seguridad', 'admin')}
                             />
                             <span className="text-xs text-gray-600">W</span>
                           </div>
@@ -349,7 +349,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'admin')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'admin', !!checked)}
-                              disabled={user?.roleId !== 8}
+                              disabled={!userHasPermission('config-seguridad', 'admin')}
                             />
                             <span className="text-xs text-gray-600">A</span>
                           </div>

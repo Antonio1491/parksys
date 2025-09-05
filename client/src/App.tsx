@@ -505,26 +505,8 @@ function Router() {
           {() => { setLocation('/admin/activities/instructors'); return null; }}
         </Route>
         
-        {/* Demostración Integración HR-Finanzas */}
-        <Route path="/admin/hr-finance-demo">
-          <Suspense fallback={<div className="p-8 text-center">Cargando demostración HR-Finanzas...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/hr-finance-demo')))}
-          </Suspense>
-        </Route>
 
-        {/* Demostración Integración Concesiones-Finanzas */}
-        <Route path="/admin/concessions-finance-demo">
-          <Suspense fallback={<div className="p-8 text-center">Cargando demostración Concesiones-Finanzas...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/concessions-finance-demo')))}
-          </Suspense>
-        </Route>
 
-        {/* Demostración Integraciones Múltiples */}
-        <Route path="/admin/multi-finance-demo">
-          <Suspense fallback={<div className="p-8 text-center">Cargando demostración de integraciones múltiples...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/multi-finance-demo')))}
-          </Suspense>
-        </Route>
 
         {/* Rutas para el módulo de eventos AMBU */}
         <Route path="/admin/eventos-ambu">

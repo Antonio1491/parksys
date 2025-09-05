@@ -6,6 +6,9 @@ ParkSys is a comprehensive municipal parks management system designed to streaml
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+**2025-09-05:** Sistema de permisos múltiples roles completamente funcional - Resolved critical useAdaptivePermissions hook bug, fixed hardcoded permission checks, implemented proper Super Administrator functionality, cleaned obsolete files and routes. All permission validation now works through unified userHasPermission hook with {"all": true} recognition for Super Admin role.
+
 ## System Architecture
 The application uses a client-server architecture with a modern full-stack.
 **UI/UX Decisions**: Emphasizes a consistent design language with `Card` patterns, standardized iconography, corporate color palettes (e.g., green, blue, orange, purple, teal), and responsive layouts. Design principles include visual-first approaches, intuitive navigation, and clear separation of content. The Admin UI has been standardized with consistent layouts and all sidebar modules have been integrated into the main content flow for improved accessibility and visual coherence.
