@@ -318,6 +318,10 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/organizador/catalogo/detalle')))}
           </Suspense>
         </Route>
+        <Route path="/admin/activities" component={() => {
+          setLocation('/admin/activities/management');
+          return null;
+        }} />
         <Route path="/admin/activities/management" component={AdminActivities} />
 
         <Route path="/admin/activities/categories">
