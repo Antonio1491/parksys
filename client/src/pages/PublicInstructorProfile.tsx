@@ -109,6 +109,13 @@ function PublicInstructorProfile() {
                 src={instructor.profileImageUrl} 
                 alt={instructor.fullName}
                 className="w-16 h-16 rounded-full object-cover"
+                onError={(e) => {
+                  console.error('Error loading instructor image:', instructor.profileImageUrl);
+                  console.error('Full error:', e);
+                }}
+                onLoad={() => {
+                  console.log('✅ Instructor image loaded successfully:', instructor.profileImageUrl);
+                }}
               />
             ) : (
               <div className="w-16 h-16 bg-purple-200 rounded-full flex items-center justify-center">
