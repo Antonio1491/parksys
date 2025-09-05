@@ -26,14 +26,18 @@ const PermissionsMatrix: React.FC = () => {
   const { user } = useAuth();
   const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.roleId || 1);
   
-  // ✅ CONFIGURACIÓN DINÁMICA: Usar usuario real de BD
+  // ✅ TIPOS SEGUROS: Garantizar que user tiene la estructura correcta
+  const currentUser = user as { id?: number; roleId?: number; role?: string; username?: string; email?: string; fullName?: string; } | null;
+  
+  // ✅ CONFIGURACIÓN ESTABLE: Una sola vez sin recargas
   useEffect(() => {
-    console.log('🔍 [DEBUG] Usuario actual:', user);
-    console.log('🔍 [DEBUG] User roleId:', user?.roleId);
-    console.log('🔍 [DEBUG] User role:', user?.role);
+    console.log('🔍 [DEBUG] Usuario actual:', currentUser);
+    console.log('🔍 [DEBUG] User roleId:', currentUser?.roleId);
+    console.log('🔍 [DEBUG] User role:', currentUser?.role);
     
-    // Si no hay usuario, configurar el Super Admin real de la BD
-    if (!user) {
+    // Configurar Super Admin solo si localStorage está vacío (una sola vez)
+    const currentUserData = localStorage.getItem('user');
+    if (!currentUserData) {
       const superAdminUser = {
         id: 1, // Usuario real de BD 
         username: 'Luis Romahn',
@@ -43,11 +47,11 @@ const PermissionsMatrix: React.FC = () => {
         fullName: 'Luis Antonio Roman Diez'
       };
       
-      console.log('🔧 [CONFIG] Estableciendo Super Admin real de BD...');
+      console.log('🔧 [CONFIG] Estableciendo Super Admin real de BD (una sola vez)...');
       localStorage.setItem('user', JSON.stringify(superAdminUser));
-      window.location.reload();
+      // ✅ CRÍTICO: NO window.location.reload() - evita bucle infinito
     }
-  }, [user]);
+  }, []); // ✅ CRÍTICO: Array vacío - ejecuta solo una vez
 
   // Cargar permisos desde localStorage al iniciar y configurar Super Admin por defecto
   useEffect(() => {
@@ -136,7 +140,8 @@ const PermissionsMatrix: React.FC = () => {
   };
 
   const hasPermission = (roleId: string, module: string, permissionType: 'read' | 'write' | 'admin'): boolean => {
-    return (permissions[roleId] as any)?.[module]?.includes(permissionType) || false;
+    const rolePermissions = permissions[roleId] as Record<string, string[]> | undefined;
+    return rolePermissions?.[module]?.includes(permissionType) || false;
   };
 
   const getPermissionCount = (roleId: string): number => {
@@ -262,7 +267,7 @@ const PermissionsMatrix: React.FC = () => {
               <Eye className="h-5 w-5 text-purple-600" />
               <div>
                 <div className="text-sm font-medium text-purple-800">Mi Rol</div>
-                <RoleBadge roleId={user?.role || "admin"} size="sm" />
+                <RoleBadge roleId={currentUser?.role || "admin"} size="sm" />
               </div>
             </div>
           </CardContent>

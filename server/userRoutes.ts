@@ -254,6 +254,13 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
   apiRouter.get('/users/:id', isAdmin, async (req: Request, res: Response) => {
     try {
       const userId = Number(req.params.id);
+      
+      // ✅ VALIDACIÓN: Evitar errores de "NaN"
+      if (isNaN(userId) || userId <= 0) {
+        console.error('❌ [USER-ROUTES] ID de usuario inválido:', req.params.id);
+        return res.status(400).json({ message: 'ID de usuario inválido' });
+      }
+      
       const user = await storage.getUser(userId);
       
       if (!user) {
