@@ -67,7 +67,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
         id: localUser.id,
         username: localUser.username,
         fullName: localUser.fullName || firebaseUser?.displayName,
-        role: localUser.role,
+        role: localUser.role || getRoleSlug(localUser.roleId),
         roleId: localUser.roleId,
         profileImage: localUser.profileImage,
         phone: localUser.phone,
@@ -172,6 +172,21 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isAdmin,
     isSuperAdmin
   };
+}
+
+// Función auxiliar para mapear roleId a slug del rol
+function getRoleSlug(roleId: number | undefined): string {
+  const roleMap: Record<number, string> = {
+    1: 'super-admin',      // Super Administrador
+    2: 'admin',            // Administrador General  
+    3: 'coordinador',      // Coordinador
+    4: 'gerente',          // Gerente
+    5: 'supervisor',       // Supervisor
+    6: 'empleado',         // Empleado
+    7: 'invitado'          // Invitado
+  };
+  
+  return roleMap[roleId || 0] || 'usuario';
 }
 
 export default useUnifiedAuth;

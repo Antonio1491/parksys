@@ -513,12 +513,12 @@ const Header: React.FC = () => {
                       <UserProfileImage
                         userId={user?.id || 0}
                         role={user?.role || "user"}
-                        name={user?.fullName || user?.username || user?.displayName || "Usuario"}
+                        name={user?.username || user?.fullName || user?.displayName || "Usuario"}
                         size="sm"
                       />
                       <div className="flex flex-col text-left">
                         <span className="text-sm font-medium text-gray-800">
-                          {user?.fullName || user?.displayName || user?.username || "Usuario"}
+                          {user?.username || user?.fullName || user?.displayName || "Usuario"}
                         </span>
                         <span className="text-xs text-gray-600">
                           {user?.role || "usuario"}
