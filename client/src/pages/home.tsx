@@ -259,29 +259,6 @@ const Home: React.FC = () => {
                             
                             {/* Resumen del parque */}
                             <div className="bg-black/40 backdrop-blur-sm rounded-xl p-3 mb-4 inline-block">
-                              {(() => {
-                                const summary = generateParkSummary(featuredParks[currentIndex]);
-                                return (
-                                  <div className="flex flex-col space-y-1 text-white">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-sm font-semibold">Actividades:</span>
-                                      <span className="text-base font-bold ml-4">{summary.activitiesCount}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-sm font-semibold">Amenidades:</span>
-                                      <span className="text-base font-bold ml-4">{summary.amenitiesCount}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-sm font-semibold">Superficie:</span>
-                                      <span className="text-sm font-bold ml-4">{summary.area}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-sm font-semibold">Tipo:</span>
-                                      <span className="text-sm font-bold ml-4">{summary.parkType}</span>
-                                    </div>
-                                  </div>
-                                );
-                              })()}
                             </div>
                             
                             <Link href={`/parque/${featuredParks[currentIndex]?.name.toLowerCase().replace(/\s+/g, '-')}-${featuredParks[currentIndex]?.id}`}>
