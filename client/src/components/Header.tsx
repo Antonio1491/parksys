@@ -526,7 +526,14 @@ const Header: React.FC = () => {
                       </div>
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="w-56 z-[60] mt-2 mr-2"
+                      sideOffset={8}
+                      alignOffset={-8}
+                      avoidCollisions={true}
+                      collisionPadding={16}
+                    >
                       <DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
