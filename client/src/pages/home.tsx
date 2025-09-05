@@ -188,7 +188,7 @@ const Home: React.FC = () => {
           </div>
           
           {/* Carousel de pantalla completa */}
-          <div className="relative mb-12 h-[500px] w-screen left-1/2 transform -translate-x-1/2">
+          <div className="relative mb-12 h-[550px] w-screen left-1/2 transform -translate-x-1/2">
             <div className="flex items-center h-full w-full overflow-hidden">
               {isLoading ? (
                 // Loading skeleton

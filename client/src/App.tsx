@@ -28,6 +28,7 @@ import AdminLogin from "@/pages/admin/login";
 import PendingUsersPage from "@/pages/admin/pending-users";
 import AdminInstructorInvitations from "@/pages/admin/instructor-invitations";
 import InstructorRegistration from "@/pages/public/instructor-registration";
+import AccessUsersPage from "@/pages/admin/configuracion-seguridad/access/users";
 import ActivityDetailPage from "@/pages/activity-detail";
 import TestAccess from "@/pages/test-access";
 import AdminVolunteers from "@/pages/admin/volunteers";
@@ -1187,9 +1188,7 @@ function Router() {
         </Route>
         {/* RUTA ELIMINADA: /assignments duplicaba funcionalidad de /users */}
         <Route path="/admin/configuracion-seguridad/access/users">
-          <Suspense fallback={<div className="p-8 text-center">Cargando gestión de usuarios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/users')))}
-          </Suspense>
+          <AccessUsersPage />
         </Route>
 
         {/* Políticas */}

@@ -7635,9 +7635,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: 'Usuario no autenticado' });
       }
 
-      // Buscar el usuario en la base de datos
+      // Buscar el usuario en la base de datos con su rol
       const [user] = await db
-        .select({ id: schema.users.id })
+        .select({ 
+          id: schema.users.id,
+          role: schema.users.role 
+        })
         .from(schema.users)
         .where(eq(schema.users.firebaseUid, userFirebaseUid));
 
@@ -7645,17 +7648,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
 
-      // Contar notificaciones no leídas de incidencias para este usuario
-      const [countResult] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(schema.incidentNotifications)
-        .where(
-          sql`${schema.incidentNotifications.userId} = ${user.id} AND ${schema.incidentNotifications.isRead} = false`
-        );
+      let totalUnreadCount = 0;
+      let breakdown: any = {};
 
-      const unreadCount = Number(countResult?.count || 0);
+      // 1. Contar notificaciones no leídas de incidencias para este usuario
+      try {
+        const [incidentCountResult] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(schema.incidentNotifications)
+          .where(
+            sql`${schema.incidentNotifications.userId} = ${user.id} AND ${schema.incidentNotifications.isRead} = false`
+          );
 
-      res.json({ unreadCount });
+        const incidentCount = Number(incidentCountResult?.count || 0);
+        totalUnreadCount += incidentCount;
+        breakdown.incidents = incidentCount;
+      } catch (error) {
+        console.error('Error contando notificaciones de incidencias:', error);
+        breakdown.incidents = 0;
+      }
+
+      // 2. ✅ NUEVO: Contar usuarios pendientes de aprobación 
+      // Solo para Super Administrador y Administrador General
+      if (user.role === 'super-admin' || user.role === 'admin') {
+        try {
+          const [pendingUsersCount] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(schema.pendingUsers)
+            .where(eq(schema.pendingUsers.status, 'pending'));
+
+          const pendingCount = Number(pendingUsersCount?.count || 0);
+          totalUnreadCount += pendingCount;
+          breakdown.pendingUsers = pendingCount;
+        } catch (error) {
+          console.error('Error contando usuarios pendientes:', error);
+          breakdown.pendingUsers = 0;
+        }
+      } else {
+        breakdown.pendingUsers = 0;
+      }
+
+      // TODO: Agregar otros tipos de notificaciones aquí
+      // - Notificaciones de actividades pendientes
+      // - Notificaciones de mantenimiento
+      // - Notificaciones de eventos
+
+      res.json({ 
+        unreadCount: totalUnreadCount,
+        breakdown
+      });
     } catch (error) {
       console.error('Error obteniendo conteo de notificaciones:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
