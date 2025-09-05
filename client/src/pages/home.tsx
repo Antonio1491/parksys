@@ -205,7 +205,7 @@ const Home: React.FC = () => {
                     {/* Tarjeta anterior (parcial izquierda) */}
                     {featuredParks.length > 1 && (
                       <div className="w-[15vw] h-full opacity-100 mr-14">
-                        <div className="relative h-full w-full rounded-l overflow-hidden">
+                        <div className="relative h-full w-full rounded-md overflow-hidden">
                           <div 
                             className="absolute inset-0 bg-cover bg-center"
                             style={{
