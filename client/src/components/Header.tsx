@@ -29,7 +29,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 const logoImage = "/images/logo-ambu.png";
-const agencyLogo = "/images/logo-pdm-new.png";
+const agencyLogo = "/images/logo-pdm.png";
 
 const Header: React.FC = () => {
   const [location] = useLocation();
@@ -138,7 +138,7 @@ const Header: React.FC = () => {
                       <img
                         src={agencyLogo}
                         alt="Agencia de Bosques Urbanos"
-                        className="h-12 w-auto"
+                        className="h-16 w-auto"
                       />
                     </div>
                   </Link>
