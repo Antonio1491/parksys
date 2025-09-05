@@ -26,27 +26,26 @@ const PermissionsMatrix: React.FC = () => {
   const { user } = useAuth();
   const { hasPermission: userHasPermission } = useAdaptivePermissions(user?.id || 1);
   
-  // Debug: Verificar usuario actual - FORZAR Super Admin
+  // Simplificado: Solo verificar usuario actual
   useEffect(() => {
-    console.log('🔍 [PERMISOS DEBUG] Usuario actual:', user);
-    console.log('🔍 [PERMISOS DEBUG] LocalStorage user:', localStorage.getItem('user'));
+    console.log('🔍 [DEBUG] Usuario actual:', user);
+    console.log('🔍 [DEBUG] LocalStorage:', localStorage.getItem('user'));
     
-    // FORZAR usuario Super Admin siempre
-    const superAdminUser = {
-      id: 3,
-      username: 'Joaquín',
-      email: 'joaquin@parquesdemexico.org', 
-      role: 'super-admin',
-      roleId: 8,
-      fullName: 'Joaquín Eduardo Ramírez Chel'
-    };
-    
-    const currentUser = localStorage.getItem('user');
-    if (!currentUser || JSON.parse(currentUser).roleId !== 8) {
-      console.log('🔧 [PERMISOS DEBUG] Estableciendo Super Admin...');
-      localStorage.setItem('user', JSON.stringify(superAdminUser));
-      localStorage.setItem('token', 'super-admin-token');
-      setTimeout(() => window.location.reload(), 100);
+    // Si no es el usuario correcto, establecer Super Admin (Usuario 3, roleId 8)
+    const currentUserData = localStorage.getItem('user');
+    if (!currentUserData || JSON.parse(currentUserData).id !== 3) {
+      const correctUser = {
+        id: 3,
+        username: 'Joaquín',
+        email: 'joaquin@parquesdemexico.org', 
+        role: 'super-admin', // Este debe coincidir con el slug de BD
+        roleId: 8,
+        fullName: 'Joaquín Eduardo Ramírez Chel'
+      };
+      
+      console.log('🔧 [DEBUG] Estableciendo usuario correcto...');
+      localStorage.setItem('user', JSON.stringify(correctUser));
+      window.location.reload();
     }
   }, []);
 
@@ -329,7 +328,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'read')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'read', !!checked)}
-                              disabled={false}
+                              disabled={user?.roleId !== 8}
                             />
                             <span className="text-xs text-gray-600">R</span>
                           </div>
@@ -339,7 +338,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'write')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'write', !!checked)}
-                              disabled={false}
+                              disabled={user?.roleId !== 8}
                             />
                             <span className="text-xs text-gray-600">W</span>
                           </div>
@@ -349,7 +348,7 @@ const PermissionsMatrix: React.FC = () => {
                             <Checkbox
                               checked={hasPermission(role.slug, module, 'admin')}
                               onCheckedChange={(checked) => updatePermission(role.slug, module, 'admin', !!checked)}
-                              disabled={false}
+                              disabled={user?.roleId !== 8}
                             />
                             <span className="text-xs text-gray-600">A</span>
                           </div>

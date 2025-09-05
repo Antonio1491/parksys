@@ -155,15 +155,10 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   }
   
   if (!role) {
-    // Fallback especial para slugs conocidos
+    // Solo los 2 roles activos en BD  
     const fallbackNames: Record<string, string> = {
       'super-admin': 'Super Administrador',
-      'admin-general': 'Administrador General',
-      'coordinador-parques': 'Coordinador de Parques',
-      'supervisor-operaciones': 'Supervisor de Operaciones',
-      'tecnico-especialista': 'Técnico Especialista',
-      'operador-campo': 'Operador de Campo',
-      'consultor-auditor': 'Consultor Auditor'
+      'admin': 'Administrador General'
     };
     
     const fallbackName = fallbackNames[roleId] || 'Rol desconocido';
@@ -277,15 +272,10 @@ export const RoleBadgeWithText: React.FC<{
   const role = SYSTEM_ROLES.find(r => r.id === roleId);
   
   if (!role) {
-    // Fallback especial para slugs conocidos
+    // Solo los 2 roles activos en BD  
     const fallbackNames: Record<string, string> = {
       'super-admin': 'Super Administrador',
-      'admin-general': 'Administrador General',
-      'coordinador-parques': 'Coordinador de Parques',
-      'supervisor-operaciones': 'Supervisor de Operaciones',
-      'tecnico-especialista': 'Técnico Especialista',
-      'operador-campo': 'Operador de Campo',
-      'consultor-auditor': 'Consultor Auditor'
+      'admin': 'Administrador General'
     };
     
     const fallbackName = fallbackNames[roleId] || 'Rol desconocido';

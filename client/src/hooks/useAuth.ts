@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 // Definición de la estructura de usuario
-interface User {
+export interface User {
   id: number;
   username: string;
   email: string;
   role: string;
-  roleId?: number;
+  roleId: number;
   fullName?: string;
+  [key: string]: any; // Para compatibilidad con otros campos
 }
 
 export function useAuth() {
@@ -33,8 +34,17 @@ export function useAuth() {
     enabled: false, // Desactivamos la consulta automática ya que usamos localStorage
   });
   
-  // Determinar el usuario final (priorizar localStorage)
+  // Determinar el usuario final (priorizar localStorage y agregar el campo role basado en roleId)
   const user = localUser || apiUser;
+  
+  // Asegurar que el campo 'role' está presente basado en roleId
+  if (user && !user.role && user.roleId) {
+    const roleMap: Record<number, string> = {
+      1: 'admin',
+      8: 'super-admin'
+    };
+    user.role = roleMap[user.roleId] || 'unknown';
+  }
   
   // Determinar si el usuario está autenticado
   const isAuthenticated = !!user;
