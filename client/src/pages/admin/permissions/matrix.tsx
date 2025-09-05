@@ -33,7 +33,8 @@ const PermissionsMatrix: React.FC = () => {
     
     // Si no es el usuario correcto, establecer Super Admin (Usuario 3, roleId 1 - CORREGIDO)
     const currentUserData = localStorage.getItem('user');
-    if (!currentUserData || JSON.parse(currentUserData).id !== 3) {
+    const userData = currentUserData ? JSON.parse(currentUserData) : null;
+    if (!currentUserData || userData.id !== 3 || userData.roleId !== 1) {
       const correctUser = {
         id: 3,
         username: 'Joaquín',

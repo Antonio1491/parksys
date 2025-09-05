@@ -81,7 +81,7 @@ export const useAdaptivePermissions = (roleId?: number | string): AdaptivePermis
       hasAnyPermission,
       getModulePermissions
     };
-  }, [permissions]);
+  }, [permissions, rolePermissions]); // ✅ CRITICAL FIX: Añadir rolePermissions a dependencias
 
   return {
     permissions,
