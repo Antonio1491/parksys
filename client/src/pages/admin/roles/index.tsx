@@ -12,6 +12,7 @@ import { MultiRoleBadge } from '@/components/MultiRoleBadge';
 import { useDynamicRoles, useDynamicPermissions } from '@/components/DynamicRoleGuard';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PageHeader } from "@/components/ui/page-header";
 import { Link } from 'wouter';
 import { 
   Shield, Users, Settings, Search, Plus, Edit, Trash2, Crown, Star, 
@@ -371,6 +372,14 @@ const RolesManagement: React.FC = () => {
 
   return (
     <AdminLayout title="Gestión de Roles" subtitle="Sistema avanzado de roles y jerarquías">
+      {/* Header con título */}
+      <PageHeader
+        title="Gestión de Roles"
+        subtitle="Sistema avanzado de roles y jerarquías"
+        icon={<UserCog className="h-6 w-6 text-white" />}
+        actions={[
+        ]}
+      />
       {/* Métricas principales del sistema de roles - ACTUALIZADO para múltiples roles */}
       <div className="grid gap-6 md:grid-cols-5 mb-8">
         <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">

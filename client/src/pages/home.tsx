@@ -147,9 +147,9 @@ const Home: React.FC = () => {
             </h1>
             
             {/* Subtítulo */}
-            <p className="text-2xl md:text-3xl text-gray-200 mb-8 leading-relaxed max-w-2xl">
-              Conectando a México a través<br />
-              de sus grandes parques.
+            <p className="text-2xl md:text-3xl font-poppins font-semibold text-gray-200 mb-8 leading-relaxed max-w-2xl">
+              Conectando a México a través de sus<br />
+              grandes parques.
             </p>
             
             {/* Badge */}
