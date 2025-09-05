@@ -475,7 +475,8 @@ export default function RolesManagement() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          );
+        })
         )}
       </div>
 

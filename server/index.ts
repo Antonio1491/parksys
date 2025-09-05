@@ -23,6 +23,7 @@ import { registerAuditRoutes } from "./audit-routes";
 import { ObjectStorageService } from "./objectStorage";
 import faunaRoutes from "./faunaRoutes";
 import evaluacionesRoutes from "./evaluaciones-routes";
+import { registerTestRoleCreationRoutes } from "./testRoleCreation";
 
 const app = express();
 
@@ -2220,6 +2221,10 @@ function startServer() {
       const { registerFirebaseAuthRoutes } = await import("./firebaseAuthRoutes");
       registerFirebaseAuthRoutes(app);
       console.log("✅ [API-PRIORITY] Firebase auth routes registered");
+
+      // Register test role creation routes
+      registerTestRoleCreationRoutes(app);
+      console.log("✅ [TEST] Test role creation routes registered");
 
       // Register all other routes BEFORE Vite
       await registerAllOtherRoutesBeforeVite();
