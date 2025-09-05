@@ -89,14 +89,10 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
       if (existingUserVinculado) {
         console.log(`🔗 [AUTO-LINK] Usuario existente vinculado automáticamente: ${email}`);
         
-        // Obtener roles del usuario
-        const userRolesList = await db.select()
-          .from(userRoles)
-          .where(eq(userRoles.userId, existingUserVinculado.id));
-
+        // El usuario ya tiene roleId, no necesitamos tabla separada
         const userWithRoles = {
           ...existingUserVinculado,
-          roles: userRolesList
+          roles: [{ roleId: existingUserVinculado.roleId }] // Formato compatible
         };
 
         return res.json({
@@ -221,13 +217,7 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
         updatedAt: new Date()
       }).returning();
 
-      // 3. Asignar rol en tabla user_roles
-      await db.insert(userRoles).values({
-        userId: newUser.id,
-        roleId: assignedRoleId,
-        assignedBy: approvedBy,
-        assignedAt: new Date()
-      });
+      // 3. El rol ya fue asignado al crear el usuario (línea 213), no necesitamos tabla separada
 
       // 4. Actualizar estado de solicitud
       await db.update(pendingUsers)
