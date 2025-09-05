@@ -1,0 +1,272 @@
+i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-CdhC1lKU.js:789 i18next: languageChanged es
+index-CdhC1lKU.js:789 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+park-manage-5_LdIKOG.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 0, documents: 0, imagesLoading: true, documentsLoading: true, …}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando imágenes para parque 90
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando documentos para parque 90
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando videos para parque 90
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Imágenes cargadas: [{…}]
+park-manage-5_LdIKOG.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: true, …}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Videos cargados: []
+park-manage-5_LdIKOG.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: true, …}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Documentos cargados: []
+park-manage-5_LdIKOG.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 0, amenitiesLoading: true, amenitiesError: null, availableCount: 0}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades disponibles...
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades disponibles cargadas: (36) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 0, amenitiesLoading: true, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: []
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 0, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+amenity-icon-42.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-42.png 404 (Not Found)Understand this error
+amenity-icon-71.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-71.png 404 (Not Found)Understand this error
+amenity-icon-40.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-40.png 404 (Not Found)Understand this error
+amenity-icon-74.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-74.png 404 (Not Found)Understand this error
+amenity-icon-62.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-62.png 404 (Not Found)Understand this error
+amenity-icon-36.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-36.png 404 (Not Found)Understand this error
+amenity-icon-44.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-44.png 404 (Not Found)Understand this error
+amenity-icon-54.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-54.png 404 (Not Found)Understand this error
+amenity-icon-65.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-65.png 404 (Not Found)Understand this error
+amenity-icon-60.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-60.png 404 (Not Found)Understand this error
+amenity-icon-50.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-50.png 404 (Not Found)Understand this error
+amenity-icon-73.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-73.png 404 (Not Found)Understand this error
+amenity-icon-69.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-69.png 404 (Not Found)Understand this error
+amenity-icon-38.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-38.png 404 (Not Found)Understand this error
+amenity-icon-45.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-45.png 404 (Not Found)Understand this error
+amenity-icon-61.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-61.png 404 (Not Found)Understand this error
+amenity-icon-46.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-46.png 404 (Not Found)Understand this error
+amenity-icon-41.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-41.png 404 (Not Found)Understand this error
+amenity-icon-68.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-68.png 404 (Not Found)Understand this error
+amenity-icon-75.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-75.png 404 (Not Found)Understand this error
+amenity-icon-51.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-51.png 404 (Not Found)Understand this error
+amenity-icon-57.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-57.png 404 (Not Found)Understand this error
+amenity-icon-39.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-39.png 404 (Not Found)Understand this error
+amenity-icon-43.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-43.png 404 (Not Found)Understand this error
+amenity-icon-53.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-53.png 404 (Not Found)Understand this error
+amenity-icon-49.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-49.png 404 (Not Found)Understand this error
+amenity-icon-58.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-58.png 404 (Not Found)Understand this error
+amenity-icon-72.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-72.png 404 (Not Found)Understand this error
+amenity-icon-67.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-67.png 404 (Not Found)Understand this error
+amenity-icon-59.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-59.png 404 (Not Found)Understand this error
+amenity-icon-52.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-52.png 404 (Not Found)Understand this error
+amenity-icon-48.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-48.png 404 (Not Found)Understand this error
+amenity-icon-70.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-70.png 404 (Not Found)Understand this error
+amenity-icon-56.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-56.png 404 (Not Found)Understand this error
+amenity-icon-66.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-66.png 404 (Not Found)Understand this error
+amenity-icon-55.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-55.png 404 (Not Found)Understand this error
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 0, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+amenity-icon-40.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-40.png 404 (Not Found)Understand this error
+amenity-icon-60.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-60.png 404 (Not Found)Understand this error
+amenity-icon-41.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-41.png 404 (Not Found)Understand this error
+amenity-icon-57.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-57.png 404 (Not Found)Understand this error
+amenity-icon-65.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-65.png 404 (Not Found)Understand this error
+amenity-icon-54.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-54.png 404 (Not Found)Understand this error
+amenity-icon-45.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-45.png 404 (Not Found)Understand this error
+amenity-icon-46.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-46.png 404 (Not Found)Understand this error
+amenity-icon-69.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-69.png 404 (Not Found)Understand this error
+amenity-icon-70.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-70.png 404 (Not Found)Understand this error
+amenity-icon-71.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-71.png 404 (Not Found)Understand this error
+amenity-icon-42.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-42.png 404 (Not Found)Understand this error
+amenity-icon-62.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-62.png 404 (Not Found)Understand this error
+amenity-icon-74.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-74.png 404 (Not Found)Understand this error
+amenity-icon-55.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-55.png 404 (Not Found)Understand this error
+amenity-icon-61.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-61.png 404 (Not Found)Understand this error
+amenity-icon-51.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-51.png 404 (Not Found)Understand this error
+amenity-icon-72.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-72.png 404 (Not Found)Understand this error
+amenity-icon-43.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-43.png 404 (Not Found)Understand this error
+amenity-icon-36.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-36.png 404 (Not Found)Understand this error
+amenity-icon-56.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-56.png 404 (Not Found)Understand this error
+amenity-icon-50.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-50.png 404 (Not Found)Understand this error
+amenity-icon-38.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-38.png 404 (Not Found)Understand this error
+amenity-icon-49.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-49.png 404 (Not Found)Understand this error
+amenity-icon-58.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-58.png 404 (Not Found)Understand this error
+amenity-icon-52.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-52.png 404 (Not Found)Understand this error
+amenity-icon-39.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-39.png 404 (Not Found)Understand this error
+amenity-icon-73.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-73.png 404 (Not Found)Understand this error
+amenity-icon-59.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-59.png 404 (Not Found)Understand this error
+amenity-icon-53.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-53.png 404 (Not Found)Understand this error
+amenity-icon-44.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-44.png 404 (Not Found)Understand this error
+amenity-icon-48.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-48.png 404 (Not Found)Understand this error
+amenity-icon-68.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-68.png 404 (Not Found)Understand this error
+amenity-icon-66.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-66.png 404 (Not Found)Understand this error
+amenity-icon-75.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-75.png 404 (Not Found)Understand this error
+amenity-icon-67.png:1  GET https://parksys-demo.replit.app/uploads/amenity-icon-67.png 404 (Not Found)Understand this error
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 0, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 0, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: [{…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 1, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 1, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 1, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (2) [{…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 2, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 2, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 2, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (3) [{…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 3, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 3, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 3, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (4) [{…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 4, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 4, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 4, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (5) [{…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 5, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 5, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 5, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 6, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 6, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 6, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (7) [{…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 7, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 7, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 7, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 7, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (8) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 8, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 8, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 8, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 8, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (9) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 9, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 9, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 9, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (10) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 10, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 10, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 10, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 10, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (11) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 11, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 11, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 11, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 11, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (12) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 12, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 12, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 12, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 12, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (13) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 13, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 13, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 13, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 13, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (14) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 14, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 14, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 14, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 14, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (15) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 15, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 15, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 15, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 15, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (16) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 16, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 16, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 16, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 16, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (17) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 17, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 17, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 17, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 17, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (18) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 18, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 18, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 18, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 18, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (19) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 19, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 19, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 19, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 19, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (20) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 20, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 20, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 20, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 20, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (21) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 21, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 21, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 21, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 21, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 21, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 21, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (22) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 22, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 22, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 22, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 22, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (23) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 23, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 23, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 23, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 23, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (24) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 24, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 24, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 24, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 24, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (25) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 25, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 25, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 25, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 25, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (26) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 26, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 26, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 26, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 26, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (27) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 27, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 27, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 27, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 27, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (28) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 28, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 28, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 28, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 28, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (29) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 29, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 29, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 29, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando amenidades para parque 90
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 29, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Amenidades cargadas: (30) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 30, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 30, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 30, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 AMENITIES MANAGER - Renderizando con: {parkId: 90, amenitiesCount: 30, amenitiesLoading: false, amenitiesError: null, availableCount: 36}
+park-manage-5_LdIKOG.js:1 🔍 FRONTEND: Cargando voluntarios asignados para parque 90
+park-manage-5_LdIKOG.js:1 ✅ FRONTEND: Voluntarios asignados cargados: []
