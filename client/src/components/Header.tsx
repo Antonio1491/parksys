@@ -19,7 +19,7 @@ import GlobalSearch from "@/components/GlobalSearch";
 import { HelpCenter } from "@/components/HelpCenter";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileImage from "@/components/UserProfileImage";
-import { useAuth } from "@/hooks/useAuth";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -39,7 +39,7 @@ const Header: React.FC = () => {
   const [usersMenuOpen, setUsersMenuOpen] = useState(false);
   const [gestionMenuOpen, setGestionMenuOpen] = useState(false);
 
-  const { user, logout } = useAuth();
+  const { user, logout } = useFirebaseAuth();
   const isAdmin = location.startsWith("/admin");
 
   const handleLogout = async () => {
