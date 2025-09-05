@@ -2,6 +2,7 @@ import express from 'express';
 import { db } from './db';
 import { users, pendingUsers, userRoles } from '../shared/schema';
 import { eq, and } from 'drizzle-orm';
+import { linkExistingUserWithFirebase, isExistingUser, getUserByFirebaseUid, migrateKnownUsers } from './firebaseUserSync';
 
 export function registerFirebaseAuthRoutes(app: express.Express) {
   console.log('🔥 [FIREBASE-AUTH] Registrando rutas de autenticación Firebase...');
@@ -85,7 +86,32 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
       const { firebaseUid, email, displayName } = req.body;
       console.log(`📝 [AUTH-REQUEST] Nueva solicitud de: ${email}`);
 
-      // Verificar si ya existe solicitud
+      // 🔗 FUNCIONALIDAD DE VINCULACIÓN: Verificar si es usuario existente
+      const existingUserVinculado = await linkExistingUserWithFirebase(email, firebaseUid);
+      
+      if (existingUserVinculado) {
+        console.log(`🔗 [AUTO-LINK] Usuario existente vinculado automáticamente: ${email}`);
+        
+        // Obtener roles del usuario
+        const userRolesList = await db.select()
+          .from(userRoles)
+          .where(eq(userRoles.userId, existingUserVinculado.id));
+
+        const userWithRoles = {
+          ...existingUserVinculado,
+          roles: userRolesList
+        };
+
+        return res.json({
+          success: true,
+          isExistingUser: true,
+          autoLinked: true,
+          message: '¡Cuenta existente vinculada automáticamente!',
+          localUser: userWithRoles
+        });
+      }
+
+      // Verificar si ya existe solicitud pendiente
       const [existingRequest] = await db.select()
         .from(pendingUsers)
         .where(eq(pendingUsers.firebaseUid, firebaseUid))
@@ -96,7 +122,7 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
         return res.status(400).json({ error: 'Ya existe una solicitud para este usuario' });
       }
 
-      // Crear nueva solicitud
+      // Crear nueva solicitud para usuarios realmente nuevos
       const [newRequest] = await db.insert(pendingUsers).values({
         firebaseUid,
         email,
@@ -109,7 +135,8 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
 
       res.json({ 
         success: true, 
-        message: 'Solicitud enviada correctamente',
+        isExistingUser: false,
+        message: 'Solicitud enviada correctamente - requiere aprobación del administrador',
         requestId: newRequest.id 
       });
 
@@ -238,6 +265,53 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
 
     } catch (error) {
       console.error('❌ [REJECT-USER] Error rechazando usuario:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Endpoint para ejecutar migración simplificada (solo para super admins)
+  app.post('/api/auth/migrate-users', async (req, res) => {
+    try {
+      console.log('🚀 [MIGRATION] Ejecutando migración simplificada...');
+      
+      const migrationResult = await migrateKnownUsers();
+      
+      res.json({
+        success: true,
+        message: 'Migración simplificada ejecutada exitosamente',
+        usersToMigrate: migrationResult.usersToMigrate,
+        users: migrationResult.users
+      });
+      
+    } catch (error) {
+      console.error('❌ [MIGRATION] Error en migración simplificada:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Endpoint para probar vinculación manual (útil para debugging)
+  app.post('/api/auth/link-user', async (req, res) => {
+    try {
+      const { email, firebaseUid } = req.body;
+      
+      if (!email || !firebaseUid) {
+        return res.status(400).json({ error: 'Email y Firebase UID son requeridos' });
+      }
+      
+      const linkedUser = await linkExistingUserWithFirebase(email, firebaseUid);
+      
+      if (linkedUser) {
+        res.json({
+          success: true,
+          message: 'Usuario vinculado exitosamente',
+          user: linkedUser
+        });
+      } else {
+        res.status(404).json({ error: 'Usuario no encontrado o ya vinculado' });
+      }
+      
+    } catch (error) {
+      console.error('❌ [LINK-USER] Error vinculando usuario:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
