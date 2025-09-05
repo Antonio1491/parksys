@@ -378,7 +378,7 @@ const RolesManagement: React.FC = () => {
         subtitle="Sistema avanzado de roles y jerarquías"
         icon={<UserCog className="h-6 w-6 text-white" />}
         actions={[
-        ]}
+        ]}Si 
       />
       {/* Métricas principales del sistema de roles - ACTUALIZADO para múltiples roles */}
       <div className="grid gap-6 md:grid-cols-5 mb-8">

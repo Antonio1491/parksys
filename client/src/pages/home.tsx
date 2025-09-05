@@ -155,40 +155,29 @@ const Home: React.FC = () => {
             {/* Botones CTA */}
             <div className="flex flex-col gap-4 mb-12 items-start">
               <Link href="/parks">
-                <Button size="lg" className="bg-[#aaaf4f] hover:bg-[#9ca047] text-white font-semibold px-8 py-4 text-lg rounded-lg transition-all duration-300 hover:scale-105 shadow-xl">
+                <Button size="lg" className="bg-[#a8bd7d] hover:bg-[#a8bd7d] text-white font-poppins font-semibold px-6 py-4 text-md rounded-xl transition-all duration-300 hover:scale-105 shadow-xl">
                   <Map className="mr-3 h-5 w-5" />
-                  Nuestros parques
+                  NUESTROS PARQUES
                 </Button>
               </Link>
               <Link href="/activities">
-                <Button size="lg" className="bg-white border-2 border-white text-[#aaaf4f] hover:bg-gray-50 hover:text-[#9ca047] font-semibold px-8 py-4 text-lg rounded-lg transition-all duration-300 hover:scale-105 shadow-lg">
+                <Button size="lg" className="bg-white border-2 border-white text-[#14b8a6] hover:bg-gray-50 hover:text-primary font-poppins font-semibold px-6 py-4 text-md rounded-xl transition-all duration-300 hover:scale-105 shadow-lg">
                   <Calendar className="mr-3 h-5 w-5" />
-                  Actividades
+                  ACTIVIDADES
                 </Button>
               </Link>
             </div>
-            
-
-
-          </div>
-        </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
           </div>
         </div>
       </section>
       
-
       {/* 🎯 FEATURED PARKS SECTION RENOVADO */}
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#51a19f', fontWeight: '300' }}>Nuestros</span><br />
-              <span style={{ color: '#19633c' }}>Parques Urbanos</span>
+              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
+              <span style={{ color: '#19633c' }}>Tu >Parque</span> Favorito
             </h2>
             <p className="text-2xl font-bold text-gray-600 max-w-4xl mx-auto leading-relaxed">
               espacios para respirar, convivir y disfrutar
