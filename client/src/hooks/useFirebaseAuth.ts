@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User as FirebaseUser, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
+import { User as FirebaseUser, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -73,6 +73,36 @@ export function useFirebaseAuth() {
     try {
       setAuthState(prev => ({ ...prev, loading: true, error: null }));
       const result = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Lista de administradores autorizados
+      const authorizedAdmins = [
+        'admin@sistema.com',
+        'luis@asociacionesprofesionales.org', 
+        'joaquin@parquesdemexico.org'
+      ];
+      
+      const isAuthorizedAdmin = authorizedAdmins.includes(email.toLowerCase());
+      
+      // Si es un administrador autorizado, intentar vinculación automática
+      if (isAuthorizedAdmin && result.user) {
+        try {
+          await apiRequest('/api/auth/link-user', {
+            method: 'POST',
+            data: {
+              email: result.user.email,
+              firebaseUid: result.user.uid
+            },
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          console.log('✅ Vinculación automática exitosa para admin:', email);
+        } catch (linkError) {
+          console.log('ℹ️ Vinculación automática para admin:', linkError);
+          // No lanzar error, continuar con el login normal
+        }
+      }
+      
       return result.user;
     } catch (error: any) {
       const errorMessage = getFirebaseErrorMessage(error.code);
@@ -85,28 +115,68 @@ export function useFirebaseAuth() {
     try {
       setAuthState(prev => ({ ...prev, loading: true, error: null }));
       
-      // 1. Crear usuario en Firebase
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      // Lista de administradores autorizados
+      const authorizedAdmins = [
+        'admin@sistema.com',
+        'luis@asociacionesprofesionales.org', 
+        'joaquin@parquesdemexico.org'
+      ];
       
-      // 2. Actualizar el perfil con el nombre
-      await result.user.updateProfile({ displayName });
+      const isAuthorizedAdmin = authorizedAdmins.includes(email.toLowerCase());
       
-      // 3. Crear registro en pending_users
-      await apiRequest('/api/auth/request-approval', {
-        method: 'POST',
-        body: JSON.stringify({
-          firebaseUid: result.user.uid,
-          email: result.user.email,
-          displayName: displayName
-        }),
-        headers: {
-          'Content-Type': 'application/json'
+      try {
+        // 1. Intentar crear usuario en Firebase
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // 2. Actualizar el perfil con el nombre
+        await updateProfile(result.user, { displayName });
+        
+        if (isAuthorizedAdmin) {
+          // Para administradores autorizados, intentar vinculación directa
+          try {
+            await apiRequest('/api/auth/link-user', {
+              method: 'POST',
+              data: {
+                email: result.user.email,
+                firebaseUid: result.user.uid
+              },
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+          } catch (linkError) {
+            console.log('Error en vinculación automática:', linkError);
+          }
+        } else {
+          // 3. Para usuarios normales, crear registro en pending_users
+          await apiRequest('/api/auth/request-approval', {
+            method: 'POST',
+            data: {
+              firebaseUid: result.user.uid,
+              email: result.user.email,
+              displayName: displayName
+            },
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
         }
-      });
 
-      return result.user;
+        return result.user;
+        
+      } catch (firebaseError: any) {
+        // Si el email ya existe en Firebase, intentar login automático para admins
+        if (firebaseError.code === 'auth/email-already-in-use' && isAuthorizedAdmin) {
+          setAuthState(prev => ({ ...prev, error: 'Este email ya tiene una cuenta. Usa "Iniciar Sesión" con tu contraseña.', loading: false }));
+          throw new Error('Este email ya tiene una cuenta. Usa "Iniciar Sesión" con tu contraseña.');
+        }
+        
+        // Para otros errores, propagar el error original
+        throw firebaseError;
+      }
+      
     } catch (error: any) {
-      const errorMessage = getFirebaseErrorMessage(error.code);
+      const errorMessage = getFirebaseErrorMessage(error.code) || error.message;
       setAuthState(prev => ({ ...prev, error: errorMessage, loading: false }));
       throw new Error(errorMessage);
     }
