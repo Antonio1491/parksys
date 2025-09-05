@@ -90,9 +90,19 @@ export function PermissionsMatrix({
   // Mutation para guardar cambios
   const saveMutation = useMutation({
     mutationFn: (newPermissions: typeof permissions) => {
+      // Convertir slugs de roles a IDs numéricos
+      const rolePermissionsWithIds: Record<string, Record<string, string[]>> = {};
+      
+      Object.entries(newPermissions).forEach(([roleSlug, modulePermissions]) => {
+        const role = (roles as Role[]).find((r: Role) => r.slug === roleSlug);
+        if (role?.id) {
+          rolePermissionsWithIds[role.id.toString()] = modulePermissions;
+        }
+      });
+
       return apiRequest('/api/roles/permissions/save-matrix', {
         method: 'POST',
-        data: { rolePermissions: newPermissions },
+        data: { rolePermissions: rolePermissionsWithIds },
       });
     },
     onSuccess: () => {
