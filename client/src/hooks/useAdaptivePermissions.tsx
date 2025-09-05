@@ -22,9 +22,9 @@ export const useAdaptivePermissions = (roleId?: number | string): AdaptivePermis
   const { flatModules } = useAdaptiveModules();
   const [permissions, setPermissions] = useState<Record<string, string[]>>({});
   
-  // Query para obtener permisos del rol
+  // Query para obtener permisos del rol específico
   const { data: rolePermissions, isLoading, error } = useQuery({
-    queryKey: ['/api/roles/permissions', roleId],
+    queryKey: [`/api/roles/${roleId}/permissions`],
     enabled: !!roleId,
   });
 
