@@ -32,6 +32,39 @@ export function registerRoleRoutes(app: Express) {
     }
   });
 
+  // Crear nuevo rol (solo super-admin y admin)
+  app.post("/api/roles", isAuthenticated, async (req, res) => {
+    try {
+      // Verificar permisos - solo super-admin y admin pueden crear roles
+      const userRole = req.user?.role;
+      if (userRole !== 'super-admin' && userRole !== 'admin') {
+        return res.status(403).json({ 
+          error: 'No tienes permisos para crear roles. Solo Super Administradores y Administradores Generales pueden crear roles.' 
+        });
+      }
+
+      // Validar datos de entrada
+      const roleData = insertRoleSchema.parse(req.body);
+      
+      // Crear el rol
+      const newRole = await roleService.createRole(roleData);
+      
+      console.log(`✅ [ROLES] Rol creado exitosamente: ${newRole.name} por usuario ${req.user?.email}`);
+      
+      res.status(201).json(newRole);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: 'Datos inválidos', 
+          details: error.errors 
+        });
+      }
+      
+      console.error("Error creando rol:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // MOVIDO AL FINAL - Los endpoints con parámetros van al final
 
   // ===== RUTAS DE USUARIOS CON ROLES =====

@@ -297,7 +297,7 @@ const Home: React.FC = () => {
 
                     {/* Tarjeta siguiente (parcial derecha) */}
                     {featuredParks.length > 1 && (
-                      <div className="w-[15vw] h-full opacity-100 ml-4">
+                      <div className="w-[15vw] h-full opacity-100 ml-14">
                         <div className="relative h-full w-full rounded-2xl overflow-hidden">
                           <div 
                             className="absolute inset-0 bg-cover bg-center"
@@ -353,7 +353,7 @@ const Home: React.FC = () => {
           
           <div className="text-center mb-12">
             <Link href="/parks">
-              <Button size="lg" className="bg-[#19633c] hover:bg-[#145530] text-white font-bold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
+              <Button size="lg" className="bg-[#a8bd7d] hover:bg-[#a8bd7d] text-white font-bold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 Encuentra tu parque favorito
               </Button>
             </Link>

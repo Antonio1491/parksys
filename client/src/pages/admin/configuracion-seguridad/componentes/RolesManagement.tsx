@@ -4,6 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Users, 
   Crown, 
@@ -19,6 +23,13 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { SYSTEM_ROLES } from '@/components/RoleBadge';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 
 interface RoleStats {
   roleId: string;
@@ -26,9 +37,78 @@ interface RoleStats {
   activeUsers: number;
 }
 
+// Schema para validar el formulario de crear rol
+const createRoleSchema = z.object({
+  name: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre no puede exceder 100 caracteres'),
+  slug: z.string().min(1, 'El slug es requerido').max(100, 'El slug no puede exceder 100 caracteres').regex(/^[a-z0-9-]+$/, 'El slug solo puede contener letras minúsculas, números y guiones'),
+  description: z.string().optional(),
+  level: z.number().min(1, 'El nivel debe ser al menos 1').max(10, 'El nivel no puede ser mayor a 10'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'El color debe ser un código hexadecimal válido (ej: #1e40af)'),
+  permissions: z.record(z.array(z.string())).default({}),
+  isActive: z.boolean().default(true)
+});
+
+type CreateRoleFormData = z.infer<typeof createRoleSchema>;
+
 export default function RolesManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { user } = useUnifiedAuth();
+
+  // Verificar si el usuario puede crear roles (solo super-admin y admin)
+  const canCreateRoles = user?.role === 'super-admin' || user?.role === 'admin';
+
+  // Obtener roles reales desde la API
+  const { data: apiRoles, isLoading: loadingRoles } = useQuery({
+    queryKey: ['/api/roles'],
+    queryFn: () => apiRequest('/api/roles')
+  });
+
+  // Form para crear rol
+  const form = useForm<CreateRoleFormData>({
+    resolver: zodResolver(createRoleSchema),
+    defaultValues: {
+      name: '',
+      slug: '',
+      description: '',
+      level: 5,
+      color: '#6366f1',
+      permissions: {},
+      isActive: true
+    }
+  });
+
+  // Mutación para crear rol
+  const createRoleMutation = useMutation({
+    mutationFn: (roleData: CreateRoleFormData) => 
+      apiRequest('/api/roles', {
+        method: 'POST',
+        data: roleData
+      }),
+    onSuccess: () => {
+      toast({
+        title: '✅ Rol creado',
+        description: 'El nuevo rol ha sido creado exitosamente.'
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/roles'] });
+      setIsCreateDialogOpen(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: '❌ Error al crear rol',
+        description: error.message || 'No se pudo crear el rol',
+        variant: 'destructive'
+      });
+    }
+  });
+
+  const handleCreateRole = (data: CreateRoleFormData) => {
+    createRoleMutation.mutate(data);
+  };
 
   // Datos simulados de estadísticas de roles
   const roleStats: RoleStats[] = [
@@ -41,9 +121,12 @@ export default function RolesManagement() {
     { roleId: '7', userCount: 2, activeUsers: 1 },
   ];
 
+  // Usar roles de la API si están disponibles, sino usar SYSTEM_ROLES como fallback
+  const allRoles = apiRoles || SYSTEM_ROLES;
+  
   // Filtrar roles
-  const filteredRoles = SYSTEM_ROLES.filter(role => 
-    searchTerm === '' || role.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRoles = allRoles.filter((role: any) => 
+    searchTerm === '' || (role.name || role.displayName)?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getRoleStats = (roleId: string) => {
@@ -84,6 +167,136 @@ export default function RolesManagement() {
                 className="pl-10"
               />
             </div>
+            {canCreateRoles && (
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-green-600 hover:bg-green-700">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Crear Rol
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Crear Nuevo Rol</DialogTitle>
+                    <DialogDescription>
+                      Crea un nuevo rol para el sistema. Solo Super Administradores y Administradores Generales pueden crear roles.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleCreateRole)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nombre del Rol</FormLabel>
+                            <FormControl>
+                              <Input placeholder="ej: Coordinador de Actividades" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="slug"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Slug (Identificador)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="ej: coordinador-actividades" {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              Solo letras minúsculas, números y guiones
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Descripción</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="Descripción del rol y sus responsabilidades..." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="level"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nivel (1-10)</FormLabel>
+                              <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Seleccionar nivel" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {Array.from({ length: 10 }, (_, i) => i + 1).map((level) => (
+                                    <SelectItem key={level} value={level.toString()}>
+                                      Nivel {level} {level <= 2 ? '(Admin)' : level <= 4 ? '(Coord.)' : '(Oper.)'}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="color"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Color</FormLabel>
+                              <FormControl>
+                                <div className="flex gap-2">
+                                  <Input type="color" {...field} className="w-12 h-10 p-1" />
+                                  <Input {...field} placeholder="#6366f1" className="flex-1" />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <div className="flex justify-end gap-2 pt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsCreateDialogOpen(false)}
+                          disabled={createRoleMutation.isPending}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="bg-green-600 hover:bg-green-700"
+                          disabled={createRoleMutation.isPending}
+                        >
+                          {createRoleMutation.isPending ? 'Creando...' : 'Crear Rol'}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+            )}
+            
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Settings className="h-4 w-4 mr-2" />
               Configurar Permisos
@@ -149,29 +362,36 @@ export default function RolesManagement() {
 
       {/* Lista de roles */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredRoles.map((role) => {
-          const stats = getRoleStats(role.id);
-          const RoleIcon = role.icon;
+        {loadingRoles ? (
+          <div className="col-span-full flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          filteredRoles.map((role: any) => {
+            const stats = getRoleStats(role.id);
+            const RoleIcon = role.icon || Shield; // Fallback icon para roles de API
+            const roleName = role.name || role.displayName;
+            const roleLevel = role.level;
           
           return (
-            <Card key={role.id} className={`${getRoleColor(role.level)} border-2`}>
+            <Card key={role.id} className={`${getRoleColor(roleLevel)} border-2`}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`p-3 rounded-full ${
-                      role.level <= 2 ? 'bg-red-100' :
-                      role.level <= 4 ? 'bg-orange-100' : 'bg-green-100'
+                      roleLevel <= 2 ? 'bg-red-100' :
+                      roleLevel <= 4 ? 'bg-orange-100' : 'bg-green-100'
                     }`}>
                       <RoleIcon className={`h-6 w-6 ${
-                        role.level <= 2 ? 'text-red-700' :
-                        role.level <= 4 ? 'text-orange-700' : 'text-green-700'
+                        roleLevel <= 2 ? 'text-red-700' :
+                        roleLevel <= 4 ? 'text-orange-700' : 'text-green-700'
                       }`} />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">{role.displayName}</CardTitle>
+                      <CardTitle className="text-lg">{roleName}</CardTitle>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-xs">
-                          Nivel {role.level}
+                          Nivel {roleLevel}
                         </Badge>
                         <Badge 
                           className={`text-xs ${
@@ -223,7 +443,7 @@ export default function RolesManagement() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>Acceso administrativo</span>
-                    {role.level <= 2 ? (
+                    {roleLevel <= 2 ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
                       <div className="w-4 h-4 rounded-full bg-gray-300"></div>
@@ -232,7 +452,7 @@ export default function RolesManagement() {
                   
                   <div className="flex items-center justify-between text-sm">
                     <span>Gestión de usuarios</span>
-                    {role.level <= 3 ? (
+                    {roleLevel <= 3 ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
                       <div className="w-4 h-4 rounded-full bg-gray-300"></div>
@@ -241,7 +461,7 @@ export default function RolesManagement() {
                   
                   <div className="flex items-center justify-between text-sm">
                     <span>Operación de campo</span>
-                    {role.level >= 4 ? (
+                    {roleLevel >= 4 ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
                       <div className="w-4 h-4 rounded-full bg-gray-300"></div>
@@ -250,8 +470,8 @@ export default function RolesManagement() {
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
+          ))}
+        )}
       </div>
 
       {/* Información adicional */}

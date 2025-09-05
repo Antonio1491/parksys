@@ -576,6 +576,20 @@ export class RoleService {
     };
   }
 
+  // Crear nuevo rol (método actualizado)
+  async createRole(roleData: any): Promise<Role> {
+    const [newRole] = await db
+      .insert(roles)
+      .values({
+        ...roleData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    
+    return newRole;
+  }
+
   // Actualizar permisos de rol
   async updateRolePermissions(roleId: number, permissions: Record<string, any>): Promise<boolean> {
     try {
