@@ -196,6 +196,25 @@ function EditTreeSpecies() {
     }
   }, [species, form]);
 
+  // Función para subir foto de especie de árbol
+  const uploadTreePhoto = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('photo', file);
+
+    const response = await fetch('/api/tree-species/upload-photo', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al subir la foto');
+    }
+
+    const result = await response.json();
+    return result.photoUrl;
+  };
+
   // Manejar la subida de foto
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -224,19 +243,17 @@ function EditTreeSpecies() {
     setIsUploading(true);
 
     try {
-      // TODO: Implementar sistema simple para Trees (pendiente)
-      console.warn('Upload de imágenes para Trees temporalmente deshabilitado');
-      
-      // Placeholder por ahora
-      // const photoUrl = await uploadTreePhoto(species.id, file);
-      // form.setValue('imageUrl', photoUrl);
-      // setUploadedPhoto(photoUrl);
+      console.log('🌳 Subiendo foto de especie de árbol...');
+      const photoUrl = await uploadTreePhoto(file);
+      form.setValue('imageUrl', photoUrl);
+      setUploadedPhoto(photoUrl);
 
       toast({
         title: "Foto subida exitosamente",
-        description: "La foto se ha guardado en Object Storage y se usará como imagen de la especie.",
+        description: "La foto se ha guardado y se usará como imagen de la especie.",
       });
     } catch (error) {
+      console.error('Error uploading tree photo:', error);
       toast({
         title: "Error",
         description: "No se pudo subir la foto. Inténtalo de nuevo.",
