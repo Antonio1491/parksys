@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, UserCheck, Grid, Shield } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 // Importar componentes existentes
 // Import eliminado - utilizamos la gestión de usuarios unificada
 import RolesManagement from './componentes/RolesManagement';
-import PermissionsMatrix from './componentes/PermissionsMatrix';
+import PermissionsMatrix from '@/components/ui/permissions-matrix';
 
 export default function ControlDeAcceso() {
   const [activeSubTab, setActiveSubTab] = useState("usuarios");
+  const { user } = useAuth();
 
   return (
     <div className="space-y-6">
@@ -76,7 +78,11 @@ export default function ControlDeAcceso() {
         </TabsContent>
 
         <TabsContent value="permisos">
-          <PermissionsMatrix />
+          <PermissionsMatrix 
+            compact={true}
+            currentUser={user as { id?: number; roleId?: number; role?: string; } | undefined}
+            editable={true}
+          />
         </TabsContent>
       </Tabs>
     </div>
