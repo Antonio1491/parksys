@@ -3,7 +3,7 @@ import { roles } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import type { InsertRole } from '../shared/schema';
 
-// Definición de roles del sistema sincronizada con RoleBadge.tsx
+// ✅ Solo los 2 roles realmente necesarios (coinciden con BD actual)
 const SYSTEM_ROLES = [
   {
     name: 'Super Administrador',
@@ -17,9 +17,9 @@ const SYSTEM_ROLES = [
   },
   {
     name: 'Administrador General',
-    slug: 'admin-general',
+    slug: 'admin', // ✅ Corregido para coincidir con BD (era 'admin-general')
     description: 'Administrador general del sistema',
-    level: 2,
+    level: 1, // ✅ Mismo nivel que Super Admin
     color: '#1e40af',
     permissions: {
       'Configuración': ['read', 'write'],
@@ -29,86 +29,6 @@ const SYSTEM_ROLES = [
       'Marketing': ['read', 'write', 'admin'],
       'RH': ['read', 'write', 'admin'],
       'Seguridad': ['read', 'write']
-    }
-  },
-  {
-    name: 'Coordinador de Parques',
-    slug: 'coordinador-parques',
-    description: 'Coordinador de parques urbanos',
-    level: 3,
-    color: '#1e40af',
-    permissions: {
-      'Configuración': ['read'],
-      'Gestión': ['read', 'write', 'admin'],
-      'Operaciones': ['read', 'write', 'admin'],
-      'Finanzas': ['read'],
-      'Marketing': ['read', 'write'],
-      'RH': ['read'],
-      'Seguridad': ['read']
-    }
-  },
-  {
-    name: 'Supervisor de Operaciones',
-    slug: 'supervisor-operaciones',
-    description: 'Supervisor de operaciones de campo',
-    level: 4,
-    color: '#1e40af',
-    permissions: {
-      'Configuración': ['read'],
-      'Gestión': ['read', 'write'],
-      'Operaciones': ['read', 'write'],
-      'Finanzas': ['read'],
-      'Marketing': ['read', 'write', 'admin'],
-      'RH': ['read'],
-      'Seguridad': ['read']
-    }
-  },
-  {
-    name: 'Técnico Especialista',
-    slug: 'tecnico-especialista',
-    description: 'Técnico especialista en áreas',
-    level: 5,
-    color: '#1e40af',
-    permissions: {
-      'Configuración': ['read'],
-      'Gestión': ['read'],
-      'Operaciones': ['read'],
-      'Finanzas': ['read', 'write', 'admin'],
-      'Marketing': ['read'],
-      'RH': ['read', 'write'],
-      'Seguridad': ['read']
-    }
-  },
-  {
-    name: 'Operador de Campo',
-    slug: 'operador-campo',
-    description: 'Operador de campo',
-    level: 6,
-    color: '#1e40af',
-    permissions: {
-      'Configuración': [],
-      'Gestión': ['read'],
-      'Operaciones': ['read', 'write'],
-      'Finanzas': [],
-      'Marketing': ['read'],
-      'RH': [],
-      'Seguridad': []
-    }
-  },
-  {
-    name: 'Consultor Auditor',
-    slug: 'consultor-auditor',
-    description: 'Consultor auditor externo',
-    level: 7,
-    color: '#1e40af',
-    permissions: {
-      'Configuración': ['read'],
-      'Gestión': ['read'],
-      'Operaciones': ['read'],
-      'Finanzas': ['read'],
-      'Marketing': ['read'],
-      'RH': ['read'],
-      'Seguridad': ['read']
     }
   }
 ];
