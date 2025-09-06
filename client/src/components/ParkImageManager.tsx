@@ -49,28 +49,85 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
     queryKey: [`/api/parks/${parkId}/images`],
   });
 
-  // Upload new image mutation
+  // Object Storage upload workflow
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const uploadMutation = useMutation({
-    mutationFn: async (imageData: { imageUrl: string; caption?: string; isPrimary: boolean }) => {
-      const response = await apiRequest(`/api/parks/${parkId}/images`, {
-        method: "POST",
-        data: imageData
-      });
-      return response.json();
+    mutationFn: async (formData: { file?: File; imageUrl?: string; caption?: string; isPrimary: boolean }) => {
+      setIsUploading(true);
+      
+      if (formData.file) {
+        console.log('📤 [OBJECT STORAGE] Iniciando upload de archivo para parque:', parkId);
+        
+        // Paso 1: Obtener upload URL
+        const uploadResponse = await apiRequest(`/api/parks/${parkId}/images/upload-os`, {
+          method: "POST"
+        });
+        const uploadData = await uploadResponse.json();
+        console.log('📤 [OBJECT STORAGE] Upload URL obtenida:', uploadData);
+        
+        // Paso 2: Subir archivo a Object Storage
+        const uploadToStorage = await fetch(uploadData.uploadUrl, {
+          method: 'PUT',
+          body: formData.file,
+          headers: {
+            'Content-Type': formData.file.type,
+          }
+        });
+        
+        if (!uploadToStorage.ok) {
+          throw new Error('Error subiendo archivo a Object Storage');
+        }
+        
+        console.log('📤 [OBJECT STORAGE] Archivo subido exitosamente');
+        
+        // Paso 3: Confirmar upload en base de datos
+        const confirmResponse = await apiRequest(`/api/parks/${parkId}/images/confirm-os`, {
+          method: "POST",
+          data: {
+            imageId: uploadData.imageId,
+            filename: uploadData.filename,
+            caption: formData.caption || '',
+            isPrimary: formData.isPrimary,
+            uploadUrl: uploadData.uploadUrl
+          }
+        });
+        
+        console.log('✅ [OBJECT STORAGE] Upload confirmado');
+        return confirmResponse.json();
+        
+      } else if (formData.imageUrl) {
+        // Fallback para URLs directas (Object Storage migrado)
+        const response = await apiRequest(`/api/parks/${parkId}/images`, {
+          method: "POST",
+          data: {
+            imageUrl: formData.imageUrl,
+            caption: formData.caption,
+            isPrimary: formData.isPrimary
+          }
+        });
+        return response.json();
+      }
+      
+      throw new Error('Se requiere archivo o URL de imagen');
     },
     onSuccess: () => {
       toast({
         title: "Imagen subida",
-        description: "La imagen se ha agregado correctamente al parque.",
+        description: "La imagen se ha agregado correctamente al parque y persistirá en deployments.",
       });
       setIsUploadDialogOpen(false);
       setNewImageUrl("");
       setNewImageCaption("");
+      setSelectedFile(null);
+      setIsUploading(false);
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
     },
     onError: (error) => {
-      console.error("Error uploading image:", error);
+      console.error("❌ [OBJECT STORAGE] Error uploading image:", error);
+      setIsUploading(false);
       toast({
         title: "Error",
         description: "No se pudo subir la imagen. Por favor intente nuevamente.",
@@ -137,16 +194,40 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
   // Handler for upload form submission
   const handleUploadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newImageUrl.trim()) return;
 
     // Check if this is the first image, set isPrimary to true if so
     const isPrimary = images.length === 0;
 
-    uploadMutation.mutate({
-      imageUrl: newImageUrl.trim(),
-      caption: newImageCaption.trim() || undefined,
-      isPrimary,
-    });
+    if (selectedFile) {
+      // Upload with file (Object Storage)
+      uploadMutation.mutate({
+        file: selectedFile,
+        caption: newImageCaption.trim() || undefined,
+        isPrimary,
+      });
+    } else if (newImageUrl.trim()) {
+      // Upload with URL (legacy/Object Storage URL)
+      uploadMutation.mutate({
+        imageUrl: newImageUrl.trim(),
+        caption: newImageCaption.trim() || undefined,
+        isPrimary,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Por favor seleccione un archivo o ingrese una URL de imagen.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      console.log('📁 [OBJECT STORAGE] Archivo seleccionado:', file.name, file.size);
+      setSelectedFile(file);
+      setNewImageUrl(""); // Clear URL when file is selected
+    }
   };
 
   // Open delete confirmation dialog
@@ -270,31 +351,58 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
           <DialogHeader>
             <DialogTitle>Agregar nueva imagen</DialogTitle>
             <DialogDescription>
-              Proporcione una URL de imagen y una descripción opcional para agregarla al parque.
+              Seleccione un archivo de imagen o proporcione una URL. Las imágenes se guardarán permanentemente y persistirán en deployments.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUploadSubmit}>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="image-url">URL de la imagen *</Label>
+                <Label htmlFor="image-file">📎 Subir archivo de imagen (Recomendado)</Label>
+                <Input
+                  id="image-file"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  disabled={isUploading}
+                  className="cursor-pointer"
+                />
+                {selectedFile && (
+                  <p className="text-xs text-green-600 flex items-center">
+                    <Check className="h-3 w-3 mr-1" />
+                    Archivo seleccionado: {selectedFile.name} ({Math.round(selectedFile.size / 1024)}KB)
+                  </p>
+                )}
+              </div>
+              
+              <div className="text-center text-gray-400 text-sm">
+                - O -
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="image-url">🔗 URL de imagen</Label>
                 <Input
                   id="image-url"
                   placeholder="https://ejemplo.com/imagen.jpg"
                   value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  required
+                  onChange={(e) => {
+                    setNewImageUrl(e.target.value);
+                    if (e.target.value) setSelectedFile(null);
+                  }}
+                  disabled={isUploading || !!selectedFile}
                 />
                 <p className="text-xs text-gray-500">
-                  Debe ser una URL directa a una imagen (jpg, png, etc.)
+                  URL directa a imagen (jpg, png, webp, etc.)
                 </p>
               </div>
+              
               <div className="grid gap-2">
-                <Label htmlFor="image-caption">Descripción (opcional)</Label>
+                <Label htmlFor="image-caption">📝 Descripción (opcional)</Label>
                 <Input
                   id="image-caption"
                   placeholder="Vista panorámica del parque"
                   value={newImageCaption}
                   onChange={(e) => setNewImageCaption(e.target.value)}
+                  disabled={isUploading}
                 />
               </div>
             </div>
@@ -302,15 +410,29 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setIsUploadDialogOpen(false)}
+                onClick={() => {
+                  setIsUploadDialogOpen(false);
+                  setSelectedFile(null);
+                  setNewImageUrl("");
+                  setNewImageCaption("");
+                }}
+                disabled={isUploading}
               >
                 Cancelar
               </Button>
               <Button 
                 type="submit" 
-                disabled={uploadMutation.isPending || !newImageUrl.trim()}
+                disabled={isUploading || (!selectedFile && !newImageUrl.trim())}
+                className="min-w-[120px]"
               >
-                {uploadMutation.isPending ? "Subiendo..." : "Subir imagen"}
+                {isUploading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
+                    Subiendo...
+                  </>
+                ) : (
+                  "Subir imagen"
+                )}
               </Button>
             </DialogFooter>
           </form>
