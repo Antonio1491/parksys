@@ -74,7 +74,7 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
           try {
             // Sistema híbrido: enviar archivo directamente al servidor con fetch + auth headers
             const formData = new FormData();
-            formData.append('imageFile', file);
+            formData.append('imageFile', file);  // DEBE coincidir con backend
             formData.append('caption', uploadData.caption || `Imagen ${i + 1}`);
             formData.append('isPrimary', String(isFirstImage));
             
