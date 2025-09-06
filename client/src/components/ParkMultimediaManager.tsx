@@ -197,18 +197,62 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const uploadImageMutation = useMutation({
     mutationFn: async (data: FormData | { imageUrl: string; caption: string; isPrimary: boolean }) => {
       if (data instanceof FormData) {
-        const response = await fetch(`/api/parks/${parkId}/images`, {
+        // 🚀 OBJECT STORAGE: Subida directa persistente
+        console.log('🚀 [OS] Usando Object Storage para subida persistente');
+        
+        // 1. Obtener URL de upload de Object Storage
+        const uploadResponse = await fetch(`/api/parks/${parkId}/images/upload-os`, {
           method: 'POST',
           headers: {
             'Authorization': 'Bearer direct-token-1750522117022',
             'X-User-Id': '1',
-            'X-User-Role': 'super_admin'
+            'X-User-Role': 'super_admin',
+            'Content-Type': 'application/json'
           },
-          body: data
+          body: JSON.stringify({})
         });
-        if (!response.ok) throw new Error('Error subiendo imagen');
-        return response.json();
+        if (!uploadResponse.ok) {
+          throw new Error('Error obteniendo URL de upload de Object Storage');
+        }
+        const uploadData = await uploadResponse.json();
+        console.log('📤 [OS] URL de upload obtenida:', uploadData);
+        
+        // 2. Subir archivo directamente a Object Storage
+        const file = data.get('imageFile') as File;
+        console.log('📤 [OS] Subiendo archivo a Object Storage...');
+        const uploadToStorageResponse = await fetch(uploadData.uploadUrl, {
+          method: 'PUT',
+          body: file,
+        });
+        if (!uploadToStorageResponse.ok) {
+          throw new Error('Error subiendo a Object Storage');
+        }
+        console.log('✅ [OS] Archivo subido a Object Storage exitosamente');
+        
+        // 3. Confirmar upload y guardar en base de datos
+        const confirmResponse = await fetch(`/api/parks/${parkId}/images/confirm-os`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer direct-token-1750522117022',
+            'X-User-Id': '1',
+            'X-User-Role': 'super_admin',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            imageId: uploadData.imageId,
+            filename: uploadData.filename,
+            caption: data.get('caption') || '',
+            isPrimary: data.get('isPrimary') === 'true',
+            uploadUrl: uploadData.uploadUrl
+          })
+        });
+        if (!confirmResponse.ok) {
+          throw new Error('Error confirmando upload en base de datos');
+        }
+        console.log('✅ [OS] Upload confirmado y guardado en BD');
+        return confirmResponse.json();
       } else {
+        // URLs siguen usando el sistema original
         const response = await apiRequest(`/api/parks/${parkId}/images`, {
           method: 'POST',
           data
@@ -216,10 +260,14 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         return response.json();
       }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      const isObjectStorage = result.imageUrl?.startsWith('/objects/');
       toast({
         title: "Imagen subida",
-        description: "La imagen se ha agregado exitosamente al parque.",
+        description: isObjectStorage 
+          ? "Imagen guardada en Object Storage persistente. ¡Será inmune a deployments!" 
+          : "La imagen se ha agregado exitosamente al parque.",
+        className: isObjectStorage ? "bg-green-50 border-green-200" : ""
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
