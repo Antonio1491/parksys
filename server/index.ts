@@ -1504,22 +1504,30 @@ app.use('/api/visitors', visitorsDashboardRoutes);
 app.use(evaluacionesRoutes);
 console.log("📊 Rutas del módulo de evaluaciones registradas correctamente");
 
-// MIDDLEWARE DE COMPATIBILIDAD - IMÁGENES EXISTENTES
-// Sirve imágenes legacy de filesystem como fallback para Object Storage
-app.get("/public-objects/park-images/:filename", express.static('uploads'), (req: Request, res: Response) => {
+// MIDDLEWARE DE COMPATIBILIDAD - IMÁGENES LEGACY
+// Intercepta requests a imágenes legacy y las sirve desde filesystem si existen
+app.get("/uploads/park-images/:filename", (req: Request, res: Response) => {
   const filename = req.params.filename;
   const legacyPath = path.join(__dirname, '..', 'uploads', 'park-images', filename);
   
-  console.log('🔄 [COMPATIBILITY] Buscando imagen legacy:', legacyPath);
+  console.log('🔄 [LEGACY] Buscando imagen legacy:', legacyPath);
   
   // Check if file exists in legacy filesystem location
   if (fs.existsSync(legacyPath)) {
-    console.log('✅ [COMPATIBILITY] Imagen encontrada en filesystem legacy');
+    console.log('✅ [LEGACY] Imagen encontrada y servida desde filesystem');
     return res.sendFile(legacyPath);
   } else {
-    console.log('❌ [COMPATIBILITY] Imagen no encontrada en filesystem legacy');
-    return res.status(404).json({ error: 'Imagen no encontrada' });
+    console.log('❌ [LEGACY] Imagen no encontrada en filesystem:', filename);
+    return res.status(404).json({ error: 'Imagen legacy no encontrada' });
   }
+});
+
+// Middleware adicional para Object Storage paths (nuevas imágenes)
+app.get("/public-objects/park-images/:filename", (req: Request, res: Response) => {
+  const filename = req.params.filename;
+  console.log('🔄 [OBJECT-STORAGE] Request para imagen en Object Storage:', filename);
+  // Aquí el Object Storage middleware debería manejar esto
+  return res.status(404).json({ error: 'Imagen de Object Storage no implementada aún' });
 });
 
 // MIGRACIÓN A OBJECT STORAGE - PARK IMAGES
