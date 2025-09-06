@@ -4150,7 +4150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const fileBuffer = fs.readFileSync(req.file.path);
           
           // USAR CLIENTE DIRECTO - NO HAY MÁS ERRORES
-          const { Storage } = await import('@google-cloud/storage');
+          const { Storage } = require('@google-cloud/storage');
           
           const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
           
