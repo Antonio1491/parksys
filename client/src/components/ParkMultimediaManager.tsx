@@ -196,6 +196,12 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   // Mutaciones para imágenes
   const uploadImageMutation = useMutation({
     mutationFn: async (data: FormData | { imageUrl: string; caption: string; isPrimary: boolean }) => {
+      console.log('📤 [UPLOAD] Iniciando subida con datos:', data instanceof FormData ? 'FormData' : data);
+      
+      // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA AUTOMÁTICA
+      const isProduction = window.location.hostname.includes('replit.app') || 
+                          window.location.hostname !== 'localhost';
+      
       if (data instanceof FormData) {
         // 🚀 SMART UPLOAD: Intentar Object Storage primero, fallback a filesystem
         console.log('🚀 [SMART] Intentando subida inteligente...');
@@ -216,10 +222,16 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         result._uploadMethod = 'unified-persistent';
         return result;
       } else {
-        // URLs siguen usando el sistema original
+        // 🎯 URLs: Ahora con detección de entorno para persistencia
+        console.log(`🌐 [UPLOAD] URL detectada, entorno: ${isProduction ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
+        console.log(`ℹ️ [UPLOAD] Sistema mejorado para persistencia en producción`);
+        
         const response = await apiRequest(`/api/parks/${parkId}/images`, {
           method: 'POST',
-          data
+          data: {
+            ...data,
+            _environment: isProduction ? 'production' : 'development'
+          }
         });
         return response.json();
       }

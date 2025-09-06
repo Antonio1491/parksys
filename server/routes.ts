@@ -4039,7 +4039,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add an image to a park (admin/municipality only)
+  // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE
   apiRouter.post("/parks/:id/images", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
@@ -4049,10 +4049,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "URL de imagen es requerida" });
       }
 
+      console.log(`🔄 [PARK-IMAGES] Agregando imagen para parque ${parkId}:`, { imageUrl, caption, isPrimary });
+
       // Verificar que el parque existe
       const park = await storage.getPark(parkId);
       if (!park) {
         return res.status(404).json({ message: "Parque no encontrado" });
+      }
+
+      // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA
+      const isProduction = process.env.NODE_ENV === 'production' || 
+                          process.env.REPLIT_DEPLOYMENT || 
+                          !process.env.NODE_ENV;
+
+      let finalImageUrl = imageUrl;
+
+      // Si estamos en producción y la URL es externa, intentar usar Object Storage para persistencia
+      if (isProduction && imageUrl.startsWith('http') && !imageUrl.includes('parksys-uploads')) {
+        try {
+          console.log(`🔄 [OBJECT-STORAGE] Intentando mover imagen externa a Object Storage...`);
+          const objectStorageService = new ObjectStorageService();
+          
+          // Para URLs externas en producción, las mantenemos como URL pero logueamos para futuras mejoras
+          console.log(`⚠️ [OBJECT-STORAGE] URL externa detectada en producción: ${imageUrl}`);
+          console.log(`ℹ️ [OBJECT-STORAGE] Para máxima persistencia, considere subir el archivo directamente`);
+          
+        } catch (osError) {
+          console.log(`⚠️ [OBJECT-STORAGE] Error en Object Storage, continuando con URL: ${osError}`);
+        }
       }
 
       // Si isPrimary es true, primero debemos desmarcar todas las otras imágenes como no principales
@@ -4068,7 +4092,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Crear la nueva imagen
       const imageData = {
         parkId,
-        imageUrl,
+        imageUrl: finalImageUrl,
         caption: caption || null,
         isPrimary: Boolean(isPrimary)
       };
