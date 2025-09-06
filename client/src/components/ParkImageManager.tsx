@@ -178,16 +178,31 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
       });
       setIsDeleteDialogOpen(false);
       setSelectedImage(null);
+      // Force cache refresh
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Error deleting image:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar la imagen. Por favor intente nuevamente.",
-        variant: "destructive",
-      });
+      
+      // Even if there's a 404 error, refresh the cache to sync with database
+      if (error?.response?.status === 404 || error?.status === 404) {
+        console.log('🔄 Imagen ya eliminada, sincronizando cache...');
+        setIsDeleteDialogOpen(false);
+        setSelectedImage(null);
+        queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
+        toast({
+          title: "Sincronizado",
+          description: "La imagen ya había sido eliminada. Lista actualizada.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "No se pudo eliminar la imagen. Por favor intente nuevamente.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
