@@ -316,6 +316,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const setPrimaryImageMutation = useMutation({
     mutationFn: async (imageId: number) => {
+      console.log(`⭐ [PRIMARY] Estableciendo imagen ${imageId} como principal`);
       const response = await apiRequest(`/api/park-images/${imageId}/set-primary`, {
         method: 'POST',
         data: {}
@@ -323,20 +324,29 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       if (!response.ok) {
         throw new Error('Error al establecer imagen principal');
       }
-      return response.json();
+      const result = await response.json();
+      console.log(`✅ [PRIMARY] Imagen principal actualizada:`, result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast({
-        title: "Imagen principal actualizada",
-        description: "Se ha establecido la nueva imagen principal del parque.",
+        title: "⭐ Imagen principal actualizada",
+        description: "¡Nueva imagen principal establecida exitosamente!",
+        className: "bg-yellow-50 border-yellow-200 text-yellow-800"
       });
+      // Invalidar y refrescar queries múltiples
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
+      
+      // Forzar refetch inmediato para actualizar UI
+      queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/images`] });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('❌ [PRIMARY] Error:', error);
       toast({
         title: "Error",
-        description: "No se pudo establecer la imagen principal.",
+        description: "No se pudo establecer como imagen principal.",
         variant: "destructive",
       });
     },
@@ -496,6 +506,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       });
     },
   });
+
 
   const setFeaturedVideoMutation = useMutation({
     mutationFn: async (videoId: number) => {
