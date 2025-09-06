@@ -4182,6 +4182,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error removing image" });
     }
   });
+
+  // ARREGLAR: Establecer imagen principal (la ruta que el frontend espera)
+  apiRouter.post('/park-images/:id/set-primary', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const imageId = parseInt(req.params.id);
+      console.log(`🔧 [FIX] Estableciendo imagen ${imageId} como principal`);
+      
+      // Obtener la imagen para verificar que existe y obtener el parkId
+      const image = await storage.getParkImage(imageId);
+      if (!image) {
+        console.log(`❌ [FIX] Imagen ${imageId} no encontrada`);
+        return res.status(404).json({ error: 'Imagen no encontrada' });
+      }
+      
+      const parkId = image.parkId;
+      console.log(`🔧 [FIX] Imagen pertenece al parque ${parkId}`);
+      
+      // Desmarcar todas las imágenes como principales para este parque
+      const parkImages = await storage.getParkImages(parkId);
+      for (const parkImage of parkImages) {
+        if (parkImage.isPrimary) {
+          await storage.updateParkImage(parkImage.id, { isPrimary: false });
+        }
+      }
+      console.log(`🔧 [FIX] Desmarcadas todas las imágenes principales del parque ${parkId}`);
+      
+      // Marcar esta imagen como principal
+      const updatedImage = await storage.updateParkImage(imageId, { isPrimary: true });
+      
+      console.log(`✅ [FIX] Imagen ${imageId} establecida como principal:`, updatedImage);
+      res.json({ 
+        message: 'Imagen establecida como principal',
+        image: updatedImage
+      });
+      
+    } catch (error) {
+      console.error('❌ [FIX] Error estableciendo imagen principal:', error);
+      res.status(500).json({ error: 'Error al establecer imagen principal' });
+    }
+  });
   
   // Set an image as primary for a park (admin/municipality only)
   apiRouter.put("/parks/:parkId/images/:imageId/set-primary", isAuthenticated, async (req: Request, res: Response) => {
