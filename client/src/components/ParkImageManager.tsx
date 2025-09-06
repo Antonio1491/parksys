@@ -63,7 +63,7 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
       const results = [];
       
       if (uploadData.files && uploadData.files.length > 0) {
-        console.log(`📤 [MULTI-UPLOAD] Iniciando upload de ${uploadData.files.length} archivos para parque:`, parkId);
+        console.log(`📤 [HÍBRIDO] Iniciando upload de ${uploadData.files.length} archivos para parque:`, parkId);
         
         for (let i = 0; i < uploadData.files.length; i++) {
           const file = uploadData.files[i];
@@ -72,43 +72,28 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
           setUploadProgress(`Subiendo imagen ${i + 1} de ${uploadData.files.length}: ${file.name}`);
           
           try {
-            // Paso 1: Obtener upload URL
-            const uploadResponse = await apiRequest(`/api/parks/${parkId}/images/upload-os`, {
-              method: "POST"
-            });
-            const uploadUrlData = await uploadResponse.json();
+            // Sistema híbrido: enviar archivo directamente al servidor
+            const formData = new FormData();
+            formData.append('imageFile', file);
+            formData.append('caption', uploadData.caption || `Imagen ${i + 1}`);
+            formData.append('isPrimary', String(isFirstImage));
             
-            // Paso 2: Subir archivo a Object Storage
-            const uploadToStorage = await fetch(uploadUrlData.uploadUrl, {
-              method: 'PUT',
-              body: file,
-              headers: {
-                'Content-Type': file.type,
-              }
+            const response = await fetch(`/api/parks/${parkId}/images`, {
+              method: 'POST',
+              body: formData,
             });
             
-            if (!uploadToStorage.ok) {
-              throw new Error(`Error subiendo ${file.name} a Object Storage`);
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || `Error subiendo ${file.name}`);
             }
             
-            // Paso 3: Confirmar upload en base de datos
-            const confirmResponse = await apiRequest(`/api/parks/${parkId}/images/confirm-os`, {
-              method: "POST",
-              data: {
-                imageId: uploadUrlData.imageId,
-                filename: uploadUrlData.filename,
-                caption: uploadData.caption || `Imagen ${i + 1}`,
-                isPrimary: isFirstImage,
-                uploadUrl: uploadUrlData.uploadUrl
-              }
-            });
-            
-            const result = await confirmResponse.json();
+            const result = await response.json();
             results.push(result);
-            console.log(`✅ [MULTI-UPLOAD] Imagen ${i + 1}/${uploadData.files.length} completada:`, file.name);
+            console.log(`✅ [HÍBRIDO] Imagen ${i + 1}/${uploadData.files.length} completada:`, file.name);
             
           } catch (error) {
-            console.error(`❌ [MULTI-UPLOAD] Error en archivo ${file.name}:`, error);
+            console.error(`❌ [HÍBRIDO] Error en archivo ${file.name}:`, error);
             throw new Error(`Error subiendo ${file.name}: ${error}`);
           }
         }

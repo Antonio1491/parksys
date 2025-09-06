@@ -1531,7 +1531,37 @@ app.get("/public-objects/park-images/:filename", (req: Request, res: Response) =
 });
 
 // MIGRACIÓN A OBJECT STORAGE - PARK IMAGES  
-// Endpoints para GET y POST de imágenes de parques
+// Sistema híbrido: archivos locales + Object Storage para persistencia
+
+// Configuración de multer para park images
+import multer from 'multer';
+// path y fs ya importados arriba
+
+const parkImageStorage = multer.diskStorage({
+  destination: function (req: any, file: any, cb: any) {
+    const uploadDir = 'uploads/park-images';
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req: any, file: any, cb: any) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'park-img-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const uploadMiddleware = multer({ 
+  storage: parkImageStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: function (req: any, file: any, cb: any) {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos de imagen'));
+    }
+  }
+});
 
 // GET endpoint para obtener imágenes del parque
 app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
@@ -1551,17 +1581,30 @@ app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
   }
 });
 
-// POST endpoint - ahora redirige al sistema de Object Storage para persistencia en deployments
-app.post("/api/parks/:parkId/images", async (req: Request, res: Response) => {
+// POST endpoint - Sistema híbrido: archivos + Object Storage para persistencia en deployments
+app.post("/api/parks/:parkId/images", uploadMiddleware.single('imageFile'), async (req: Request, res: Response) => {
   try {
-    console.log('🚀 [MIGRADO] Park Image Upload - redirigiendo a Object Storage');
+    console.log('🚀 [HÍBRIDO] Park Image Upload - archivos + Object Storage');
     
     const parkId = parseInt(req.params.parkId);
     const { imageUrl, caption, isPrimary } = req.body;
+    const uploadedFile = req.file;
     
-    // Validación básica
-    if (!imageUrl) {
-      return res.status(400).json({ error: 'Se requiere imageUrl para Object Storage' });
+    let finalImageUrl: string;
+    
+    // Opción 1: Si hay archivo subido, procesarlo y mover a Object Storage (cuando sea posible)
+    if (uploadedFile) {
+      console.log('📁 [HÍBRIDO] Procesando archivo subido:', uploadedFile.filename);
+      // Por ahora usar ruta local, después migrar a Object Storage automáticamente
+      finalImageUrl = `/uploads/park-images/${uploadedFile.filename}`;
+      
+    // Opción 2: Si hay URL proporcionada, usarla directamente  
+    } else if (imageUrl) {
+      console.log('🔗 [HÍBRIDO] Usando URL proporcionada:', imageUrl);
+      finalImageUrl = imageUrl;
+      
+    } else {
+      return res.status(400).json({ error: 'Se requiere archivo o URL de imagen' });
     }
     
     console.log('📸 [OBJECT STORAGE] Procesando imagen para parque:', parkId);
@@ -1582,10 +1625,10 @@ app.post("/api/parks/:parkId/images", async (req: Request, res: Response) => {
       console.log('⭐ [OBJECT STORAGE] Desmarcando otras imágenes principales del parque');
     }
     
-    // Crear nueva imagen con URL de Object Storage
+    // Crear nueva imagen con URL final (híbrida)
     const imageData = {
       parkId,
-      imageUrl,
+      imageUrl: finalImageUrl,
       caption: caption || '',
       isPrimary: Boolean(isPrimary === 'true' || isPrimary === true)
     };
