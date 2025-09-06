@@ -22,10 +22,10 @@ import { pool } from './db';
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // CRÍTICO: Guardar directamente en public/uploads como hacen los árboles que funcionan
+    // SISTEMA UNIFICADO: Guardar en uploads/ para persistencia garantizada
     const uploadPath = file.fieldname === 'document' 
-      ? 'public/uploads/documents' 
-      : 'public/uploads/park-images';
+      ? 'uploads/documents' 
+      : 'uploads/park-images';
     
     // Asegurar que el directorio existe
     if (!fs.existsSync(uploadPath)) {
@@ -37,7 +37,7 @@ const storage = multer.diskStorage({
     const timestamp = Date.now();
     const randomId = Math.floor(Math.random() * 1000000);
     const extension = path.extname(file.originalname);
-    const baseName = file.fieldname === 'document' ? 'park-doc' : 'park-img';
+    const baseName = file.fieldname === 'document' ? 'park-doc' : 'park-images';
     cb(null, `${baseName}-${timestamp}-${randomId}${extension}`);
   }
 });
@@ -158,37 +158,7 @@ export function registerMultimediaRoutes(app: any, apiRouter: Router, isAuthenti
       if (req.file) {
         filePath = req.file.path;
         finalImageUrl = `/uploads/park-images/${req.file.filename}`;
-        console.log('📁 [PRODUCTION] Archivo guardado directamente en public/uploads:', finalImageUrl);
-        
-        // TAMBIÉN copiar a uploads/ para compatibilidad con desarrollo
-        const developmentDestination = `uploads/park-images/${req.file.filename}`;
-        try {
-          // Asegurar que el directorio de desarrollo existe
-          const devDir = 'uploads/park-images';
-          if (!fs.existsSync(devDir)) {
-            fs.mkdirSync(devDir, { recursive: true });
-          }
-          // Copiar archivo a ubicación de desarrollo
-          fs.copyFileSync(req.file.path, developmentDestination);
-          console.log(`📁 [DEVELOPMENT] File copied to: ${developmentDestination}`);
-        } catch (copyError) {
-          console.error('❌ Error copying to development directory:', copyError);
-        }
-
-        // CRÍTICO: También copiar a dist/public/uploads para producción inmediata
-        const productionDestination = `dist/public/uploads/park-images/${req.file.filename}`;
-        try {
-          // Asegurar que el directorio de producción existe
-          const prodDir = 'dist/public/uploads/park-images';
-          if (!fs.existsSync(prodDir)) {
-            fs.mkdirSync(prodDir, { recursive: true });
-          }
-          // Copiar archivo a ubicación de producción
-          fs.copyFileSync(req.file.path, productionDestination);
-          console.log(`📁 [PRODUCTION] File copied to: ${productionDestination}`);
-        } catch (copyError) {
-          console.error('❌ Error copying to production directory:', copyError);
-        }
+        console.log('🚀 [UNIFIED STORAGE] Archivo guardado en carpeta persistente:', finalImageUrl);
       } else {
         console.log('🔗 URL proporcionada:', finalImageUrl);
       }
