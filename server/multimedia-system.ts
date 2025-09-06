@@ -12,6 +12,7 @@ import path from 'path';
 import fs from 'fs';
 import { db } from './db';
 import { eq, and, desc } from 'drizzle-orm';
+import { isAuthenticated } from './middleware/auth';
 import pkg from 'pg';
 const { Pool } = pkg;
 
