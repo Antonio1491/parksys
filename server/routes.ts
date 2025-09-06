@@ -103,16 +103,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const parkImageUpload = multer({
     storage: multer.diskStorage({
       destination: function (req, file, cb) {
-        const isProduction = process.env.NODE_ENV === 'production' || 
-                            process.env.REPLIT_DEPLOYMENT || 
-                            !process.env.NODE_ENV;
-        // En producción usaremos Object Storage, pero mantenemos filesystem como respaldo
-        const uploadsDir = isProduction ? 'uploads/park-images/' : 'uploads/park-images/';
-        // Crear directorio si no existe
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
+        // Usar directorio temporal para procesamiento antes de Object Storage
+        const tempDir = '/tmp/park-images/';
+        if (!fs.existsSync(tempDir)) {
+          fs.mkdirSync(tempDir, { recursive: true });
         }
-        cb(null, uploadsDir);
+        cb(null, tempDir);
       },
       filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -4094,25 +4090,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // 📁 FORMDATA: Archivo subido
         console.log(`📁 [PARK-IMAGES] Procesando archivo subido: ${req.file.filename}`);
         
-        if (isProduction) {
-          try {
-            console.log(`🚀 [OBJECT-STORAGE] Moviendo a Object Storage para persistencia...`);
-            const objectStorageService = new ObjectStorageService();
-            
-            // TODO: Implementar subida a Object Storage aquí
-            // Por ahora usamos filesystem con logging mejorado
-            imageUrl = `/uploads/park-images/${req.file.filename}`;
-            console.log(`✅ [PARK-IMAGES] Archivo guardado temporalmente: ${imageUrl}`);
-            console.log(`⚠️ [PARK-IMAGES] TODO: Migrar a Object Storage para persistencia total`);
-            
-          } catch (osError) {
-            console.log(`⚠️ [OBJECT-STORAGE] Error, usando filesystem: ${osError}`);
-            imageUrl = `/uploads/park-images/${req.file.filename}`;
-          }
-        } else {
-          // Desarrollo: usar filesystem directamente
+        try {
+          console.log(`🚀 [OBJECT-STORAGE] Integrando con Object Storage para persistencia total...`);
+          const objectStorageService = new ObjectStorageService();
+          
+          // Leer el archivo del filesystem temporal
+          const fileBuffer = fs.readFileSync(req.file.path);
+          
+          // Generar nombre único para Object Storage
+          const objectKey = `public/park-images/${req.file.filename}`;
+          const privateObjectDir = objectStorageService.getPrivateObjectDir();
+          const fullObjectPath = `${privateObjectDir}/park-images/${req.file.filename}`;
+          
+          // Subir a Object Storage usando el servicio existente
+          console.log(`📤 [OBJECT-STORAGE] Subiendo ${req.file.filename} a Object Storage...`);
+          
+          // Para archivos de parque, usamos el directorio público para que sean accesibles
+          const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
+          const objectName = `public/park-images/${req.file.filename}`;
+          const bucket = objectStorageService.objectStorageClient.bucket(bucketName);
+          const file = bucket.file(objectName);
+          
+          await file.save(fileBuffer, {
+            metadata: {
+              contentType: req.file.mimetype,
+              cacheControl: 'public, max-age=3600'
+            }
+          });
+          
+          // URL pública de Object Storage
+          imageUrl = `/public-objects/park-images/${req.file.filename}`;
+          console.log(`✅ [OBJECT-STORAGE] Imagen subida exitosamente: ${imageUrl}`);
+          
+          // Limpiar archivo temporal
+          fs.unlinkSync(req.file.path);
+          console.log(`🧹 [CLEANUP] Archivo temporal eliminado`);
+          
+        } catch (osError) {
+          console.log(`⚠️ [OBJECT-STORAGE] Error, usando filesystem de respaldo: ${osError}`);
           imageUrl = `/uploads/park-images/${req.file.filename}`;
-          console.log(`✅ [PARK-IMAGES] Desarrollo - archivo guardado: ${imageUrl}`);
         }
         
       } else if (req.body.imageUrl) {
