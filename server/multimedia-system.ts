@@ -240,24 +240,8 @@ export function registerMultimediaRoutes(app: any, apiRouter: Router, isAuthenti
     }
   });
 
-  // Eliminar imagen
-  apiRouter.delete('/park-images/:id', isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const imageId = parseInt(req.params.id);
-      console.log('Eliminando imagen con ID:', imageId);
-      
-      // Eliminar registro de base de datos usando pool
-      const result = await pool.query('DELETE FROM park_images WHERE id = $1', [imageId]);
-      
-      console.log('Resultado de eliminación:', result);
-      console.log(`Imagen ${imageId} eliminada exitosamente`);
-      res.status(204).send();
-      
-    } catch (error) {
-      console.error('Error eliminando imagen:', error);
-      res.status(500).json({ error: 'Error al eliminar la imagen' });
-    }
-  });
+  // Eliminar imagen - REMOVIDO PARA EVITAR DUPLICACIÓN
+  // El endpoint DELETE está en routes.ts línea 4141
 
   // =============================================
   // GESTIÓN DE DOCUMENTOS DE PARQUES
