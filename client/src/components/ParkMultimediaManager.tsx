@@ -481,7 +481,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const handleImageSubmit = () => {
     if (newImageFile) {
       const formData = new FormData();
-      formData.append('image', newImageFile);
+      formData.append('imageFile', newImageFile);  // DEBE coincidir con backend
       formData.append('caption', newImageCaption);
       formData.append('isPrimary', isPrimaryImage.toString());
       uploadImageMutation.mutate(formData);
