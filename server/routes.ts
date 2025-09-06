@@ -4091,24 +4091,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`📁 [PARK-IMAGES] Procesando archivo subido: ${req.file.filename}`);
         
         try {
-          console.log(`🚀 [OBJECT-STORAGE] Integrando con Object Storage para persistencia total...`);
-          const objectStorageService = new ObjectStorageService();
+          console.log(`🚀 [OBJECT-STORAGE] Guardando en Object Storage para persistencia TOTAL...`);
           
           // Leer el archivo del filesystem temporal
           const fileBuffer = fs.readFileSync(req.file.path);
           
-          // Generar nombre único para Object Storage
-          const objectKey = `public/park-images/${req.file.filename}`;
-          const privateObjectDir = objectStorageService.getPrivateObjectDir();
-          const fullObjectPath = `${privateObjectDir}/park-images/${req.file.filename}`;
+          // USAR CLIENTE DIRECTO - NO HAY MÁS ERRORES
+          const { Storage } = require('@google-cloud/storage');
           
-          // Subir a Object Storage usando el servicio existente
-          console.log(`📤 [OBJECT-STORAGE] Subiendo ${req.file.filename} a Object Storage...`);
+          const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
           
-          // Para archivos de parque, usamos el directorio público para que sean accesibles
+          // Cliente directo de Object Storage
+          const objectStorageClient = new Storage({
+            credentials: {
+              audience: "replit",
+              subject_token_type: "access_token",
+              token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+              type: "external_account",
+              credential_source: {
+                url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+                format: {
+                  type: "json",
+                  subject_token_field_name: "access_token",
+                },
+              },
+              universe_domain: "googleapis.com",
+            },
+            projectId: "",
+          });
+          
+          // Subir a Object Storage directamente
+          console.log(`📤 [OBJECT-STORAGE] Subiendo ${req.file.filename} a bucket...`);
+          
           const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
           const objectName = `public/park-images/${req.file.filename}`;
-          const bucket = objectStorageService.objectStorageClient.bucket(bucketName);
+          const bucket = objectStorageClient.bucket(bucketName);
           const file = bucket.file(objectName);
           
           await file.save(fileBuffer, {
@@ -4120,14 +4137,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // URL pública de Object Storage
           imageUrl = `/public-objects/park-images/${req.file.filename}`;
-          console.log(`✅ [OBJECT-STORAGE] Imagen subida exitosamente: ${imageUrl}`);
+          console.log(`✅ [OBJECT-STORAGE] ÉXITO TOTAL - Imagen subida: ${imageUrl}`);
           
           // Limpiar archivo temporal
           fs.unlinkSync(req.file.path);
           console.log(`🧹 [CLEANUP] Archivo temporal eliminado`);
           
         } catch (osError) {
-          console.log(`⚠️ [OBJECT-STORAGE] Error, usando filesystem de respaldo: ${osError}`);
+          console.error(`❌ [OBJECT-STORAGE] ERROR CRÍTICO:`, osError);
           imageUrl = `/uploads/park-images/${req.file.filename}`;
         }
         
