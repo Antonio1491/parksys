@@ -1537,35 +1537,11 @@ app.get("/public-objects/park-images/:filename", (req: Request, res: Response) =
 import multer from 'multer';
 // path y fs ya importados arriba
 
-// 🚀 DEPLOYMENT-READY: Sistema híbrido que garantiza persistencia automática
-const parkImageStorage = multer.diskStorage({
-  destination: function (req: any, file: any, cb: any) {
-    const uploadDir = 'public/uploads/park-images';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    console.log('🚀 [DEPLOYMENT-READY] Imagen guardada - sistema automático de persistencia');
-    cb(null, uploadDir);
-  },
-  filename: function (req: any, file: any, cb: any) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const filename = 'park-img-' + uniqueSuffix + path.extname(file.originalname);
-    console.log(`✅ [DEPLOYMENT-READY] Archivo preparado: ${filename} - persistencia garantizada`);
-    cb(null, filename);
-  }
-});
+// 🚀 SISTEMA UNIFICADO: Migrado a UnifiedStorageService para persistencia garantizada
+import { unifiedStorage } from './UnifiedStorageService';
 
-const uploadMiddleware = multer({ 
-  storage: parkImageStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: function (req: any, file: any, cb: any) {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Solo se permiten archivos de imagen'));
-    }
-  }
-});
+// ✅ NUEVO: Usar sistema unificado para parques
+const uploadMiddleware = unifiedStorage.getMulterConfig('park-images');
 
 // GET endpoint para obtener imágenes del parque
 app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
