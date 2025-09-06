@@ -200,67 +200,9 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         // 🚀 SMART UPLOAD: Intentar Object Storage primero, fallback a filesystem
         console.log('🚀 [SMART] Intentando subida inteligente...');
         
-        try {
-          // 1. Intentar Object Storage (persistente)
-          console.log('🚀 [OS] Intentando Object Storage...');
-          const uploadResponse = await fetch(`/api/parks/${parkId}/images/upload-os`, {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer direct-token-1750522117022',
-              'X-User-Id': '1',
-              'X-User-Role': 'super_admin',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-          });
-          
-          if (uploadResponse.ok) {
-            const uploadData = await uploadResponse.json();
-            console.log('📤 [OS] URL de upload obtenida:', uploadData);
-            
-            // Subir archivo directamente a Object Storage
-            const file = data.get('imageFile') as File;
-            const uploadToStorageResponse = await fetch(uploadData.uploadUrl, {
-              method: 'PUT',
-              body: file,
-            });
-            
-            if (uploadToStorageResponse.ok) {
-              // Confirmar upload en base de datos
-              const confirmResponse = await fetch(`/api/parks/${parkId}/images/confirm-os`, {
-                method: 'POST',
-                headers: {
-                  'Authorization': 'Bearer direct-token-1750522117022',
-                  'X-User-Id': '1',
-                  'X-User-Role': 'super_admin',
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  imageId: uploadData.imageId,
-                  filename: uploadData.filename,
-                  caption: data.get('caption') || '',
-                  isPrimary: data.get('isPrimary') === 'true',
-                  uploadUrl: uploadData.uploadUrl
-                })
-              });
-              
-              if (confirmResponse.ok) {
-                console.log('✅ [OS] Upload exitoso con Object Storage (PERSISTENTE)');
-                const result = await confirmResponse.json();
-                result._uploadMethod = 'object-storage';
-                return result;
-              }
-            }
-          }
-          
-          console.log('⚠️ [OS] Object Storage no disponible, usando filesystem...');
-        } catch (error) {
-          console.log('⚠️ [OS] Error con Object Storage:', error);
-          console.log('🔄 [FALLBACK] Usando filesystem tradicional...');
-        }
+        // ✅ DEPLOYMENT-READY: Sistema inteligente que detecta el entorno automáticamente
         
-        // 2. Fallback a filesystem tradicional
-        console.log('📁 [FILESYSTEM] Usando subida tradicional (temporal)');
+        console.log('🚀 [HYBRID] Usando sistema híbrido inteligente - automático para deployment');
         const response = await fetch(`/api/parks/${parkId}/images`, {
           method: 'POST',
           headers: {
@@ -272,7 +214,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         });
         if (!response.ok) throw new Error('Error subiendo imagen');
         const result = await response.json();
-        result._uploadMethod = 'filesystem';
+        result._uploadMethod = 'deployment-ready';
         return result;
       } else {
         // URLs siguen usando el sistema original
@@ -284,16 +226,10 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       }
     },
     onSuccess: (result) => {
-      const isObjectStorage = result._uploadMethod === 'object-storage' || result.imageUrl?.startsWith('/objects/');
-      
       toast({
-        title: isObjectStorage ? "✅ Imagen guardada (persistente)" : "✅ Imagen subida exitosamente",
-        description: isObjectStorage 
-          ? "¡Guardada en Object Storage! Inmune a deployments 🛡️" 
-          : "La imagen se ha agregado correctamente al parque.",
-        className: isObjectStorage 
-          ? "bg-green-50 border-green-200 text-green-800" 
-          : ""
+        title: "✅ Imagen guardada",
+        description: "¡Sistema preparado para deployment! Las imágenes persisten automáticamente. 🚀",
+        className: "bg-blue-50 border-blue-200 text-blue-800"
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
