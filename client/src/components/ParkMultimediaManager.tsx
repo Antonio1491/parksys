@@ -241,6 +241,9 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         method: 'POST',
         data: {}
       });
+      if (!response.ok) {
+        throw new Error('Error al establecer imagen principal');
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -710,8 +713,8 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                       className="w-full h-48 object-cover"
                     />
                     {image.isPrimary && (
-                      <Badge className="absolute top-2 left-2 bg-yellow-500">
-                        <Star className="h-3 w-3 mr-1" />
+                      <Badge className="absolute top-2 left-2 bg-yellow-500 text-yellow-900">
+                        <Star className="h-3 w-3 mr-1 fill-yellow-600 text-yellow-600" />
                         Principal
                       </Badge>
                     )}
@@ -725,8 +728,9 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                           variant="outline"
                           onClick={() => setPrimaryImageMutation.mutate(image.id)}
                           disabled={setPrimaryImageMutation.isPending}
+                          className="border-yellow-300 text-yellow-600 hover:bg-yellow-50"
                         >
-                          <Star className="h-3 w-3" />
+                          <Star className="h-3 w-3 hover:fill-yellow-500" />
                         </Button>
                       )}
                       <Button
