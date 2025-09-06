@@ -72,21 +72,19 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
           setUploadProgress(`Subiendo imagen ${i + 1} de ${uploadData.files.length}: ${file.name}`);
           
           try {
-            // Sistema híbrido: enviar archivo directamente al servidor
+            // Sistema híbrido: enviar archivo directamente al servidor usando apiRequest
             const formData = new FormData();
             formData.append('imageFile', file);
             formData.append('caption', uploadData.caption || `Imagen ${i + 1}`);
             formData.append('isPrimary', String(isFirstImage));
             
-            const response = await fetch(`/api/parks/${parkId}/images`, {
+            const response = await apiRequest(`/api/parks/${parkId}/images`, {
               method: 'POST',
-              body: formData,
+              data: formData,
+              headers: {
+                // No incluir Content-Type para que el browser lo maneje automáticamente con multipart
+              }
             });
-            
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || `Error subiendo ${file.name}`);
-            }
             
             const result = await response.json();
             results.push(result);
