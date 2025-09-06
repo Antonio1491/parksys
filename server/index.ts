@@ -2208,15 +2208,11 @@ function startServer() {
         
         console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes with SPA routing");
       } else {
-        // 🔧 DEV FIX: Add temporary root route before Vite setup
-        app.get('/', (req: Request, res: Response, next: NextFunction) => {
-          console.log('🏠 [DEV] Root route accessed - delegating to Vite');
-          next();
-        });
-        
+        console.log('🔧 [DEV] Setting up Vite development server...');
         const { setupVite } = await import("./vite");
         await setupVite(app, appServer);
         console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");
+        console.log("✅ [DEV] Vite catch-all route should now handle all unmatched routes");
       }
       
       console.log('✅ [BACKGROUND] Full server initialization complete - API routes have priority over frontend');
