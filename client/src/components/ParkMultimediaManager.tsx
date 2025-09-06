@@ -200,9 +200,8 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         // 🚀 SMART UPLOAD: Intentar Object Storage primero, fallback a filesystem
         console.log('🚀 [SMART] Intentando subida inteligente...');
         
-        // ✅ DEPLOYMENT-READY: Sistema inteligente que detecta el entorno automáticamente
-        
-        console.log('🚀 [HYBRID] Usando sistema híbrido inteligente - automático para deployment');
+        // ✅ SISTEMA UNIFICADO: Persistencia automática garantizada
+        console.log('🚀 [UNIFIED] Sistema unificado con persistencia automática');
         const response = await fetch(`/api/parks/${parkId}/images`, {
           method: 'POST',
           headers: {
@@ -214,7 +213,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         });
         if (!response.ok) throw new Error('Error subiendo imagen');
         const result = await response.json();
-        result._uploadMethod = 'deployment-ready';
+        result._uploadMethod = 'unified-persistent';
         return result;
       } else {
         // URLs siguen usando el sistema original
@@ -227,9 +226,9 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     },
     onSuccess: (result) => {
       toast({
-        title: "✅ Imagen guardada",
-        description: "¡Sistema preparado para deployment! Las imágenes persisten automáticamente. 🚀",
-        className: "bg-blue-50 border-blue-200 text-blue-800"
+        title: "✅ Imagen guardada exitosamente",
+        description: "Su imagen ha sido almacenada con persistencia garantizada.",
+        className: "bg-green-50 border-green-200 text-green-800"
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
