@@ -1530,9 +1530,28 @@ app.get("/public-objects/park-images/:filename", (req: Request, res: Response) =
   return res.status(404).json({ error: 'Imagen de Object Storage no implementada aún' });
 });
 
-// MIGRACIÓN A OBJECT STORAGE - PARK IMAGES
-// Este endpoint ahora redirige al sistema de Object Storage para persistencia en deployments
+// MIGRACIÓN A OBJECT STORAGE - PARK IMAGES  
+// Endpoints para GET y POST de imágenes de parques
 
+// GET endpoint para obtener imágenes del parque
+app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
+  try {
+    const parkId = parseInt(req.params.parkId);
+    console.log('🔍 [GET] Obteniendo imágenes para parque:', parkId);
+    
+    const { storage } = await import("./storage");
+    const images = await storage.getParkImages(parkId);
+    
+    console.log('✅ [GET] Imágenes encontradas:', images.length);
+    res.json(images);
+    
+  } catch (error) {
+    console.error('❌ [GET] Error obteniendo imágenes del parque:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// POST endpoint - ahora redirige al sistema de Object Storage para persistencia en deployments
 app.post("/api/parks/:parkId/images", async (req: Request, res: Response) => {
   try {
     console.log('🚀 [MIGRADO] Park Image Upload - redirigiendo a Object Storage');
