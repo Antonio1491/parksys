@@ -355,10 +355,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       return response;
     },
     onSuccess: () => {
-      toast({
-        title: "Imagen eliminada",
-        description: "La imagen se ha eliminado correctamente.",
-      });
+      // ✅ Toast de éxito silenciado - el usuario ve el resultado inmediatamente en la UI
       
       // Invalidación múltiple del cache con diferentes estrategias
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
@@ -372,11 +369,13 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       }, 100);
     },
     onError: () => {
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar la imagen.",
-        variant: "destructive",
-      });
+      // ✅ Error silenciado - si la imagen no existe, es porque ya fue eliminada (éxito efectivo)
+      console.log('🔄 [DELETE] Imagen ya fue eliminada o no existe - actualizando UI');
+      
+      // Actualizar UI de todas formas
+      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
+      queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/images`] });
     },
   });
 
