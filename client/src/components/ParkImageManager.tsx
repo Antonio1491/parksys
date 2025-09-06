@@ -175,7 +175,11 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
       const response = await apiRequest(`/api/park-images/${imageId}`, {
         method: "DELETE"
       });
-      return response;
+      // El endpoint devuelve status 204 (sin contenido) cuando es exitoso
+      if (response.status === 204 || response.ok) {
+        return { success: true };
+      }
+      throw new Error('Error eliminando imagen');
     },
     onSuccess: () => {
       toast({
