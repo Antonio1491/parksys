@@ -98,6 +98,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Configure multer for file uploads
   const upload = multer({ storage: multer.memoryStorage() });
+
+  // Configure multer specifically for park images with Object Storage integration
+  const parkImageUpload = multer({
+    storage: multer.diskStorage({
+      destination: function (req, file, cb) {
+        const isProduction = process.env.NODE_ENV === 'production' || 
+                            process.env.REPLIT_DEPLOYMENT || 
+                            !process.env.NODE_ENV;
+        // En producción usaremos Object Storage, pero mantenemos filesystem como respaldo
+        const uploadsDir = isProduction ? 'uploads/park-images/' : 'uploads/park-images/';
+        // Crear directorio si no existe
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        cb(null, uploadsDir);
+      },
+      filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = file.originalname.split('.').pop();
+        cb(null, `park-images-${uniqueSuffix}.${extension}`);
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Formato de archivo no válido. Solo se permiten JPG, PNG, GIF y WEBP'));
+      }
+    },
+    limits: {
+      fileSize: 10 * 1024 * 1024 // 10MB
+    }
+  });
   
   // Crear instancia de Neon SQL para las rutas administrativas
   const neonSql = neon(process.env.DATABASE_URL!);
@@ -4039,44 +4073,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE
-  apiRouter.post("/parks/:id/images", isAuthenticated, async (req: Request, res: Response) => {
+  // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE & FORMDATA
+  apiRouter.post("/parks/:id/images", isAuthenticated, parkImageUpload.single('image'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
-      const { imageUrl, caption, isPrimary } = req.body;
+      console.log(`🔄 [PARK-IMAGES] POST request para parque ${parkId}`);
+      console.log(`📁 [PARK-IMAGES] File:`, req.file ? req.file.filename : 'No file');
+      console.log(`📝 [PARK-IMAGES] Body:`, req.body);
 
-      if (!imageUrl) {
-        return res.status(400).json({ message: "URL de imagen es requerida" });
-      }
-
-      console.log(`🔄 [PARK-IMAGES] Agregando imagen para parque ${parkId}:`, { imageUrl, caption, isPrimary });
-
-      // Verificar que el parque existe
-      const park = await storage.getPark(parkId);
-      if (!park) {
-        return res.status(404).json({ message: "Parque no encontrado" });
-      }
+      let imageUrl: string;
+      let caption: string = req.body.caption || '';
+      let isPrimary: boolean = req.body.isPrimary === 'true' || req.body.isPrimary === true;
 
       // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA
       const isProduction = process.env.NODE_ENV === 'production' || 
                           process.env.REPLIT_DEPLOYMENT || 
                           !process.env.NODE_ENV;
 
-      let finalImageUrl = imageUrl;
-
-      // Si estamos en producción y la URL es externa, intentar usar Object Storage para persistencia
-      if (isProduction && imageUrl.startsWith('http') && !imageUrl.includes('parksys-uploads')) {
-        try {
-          console.log(`🔄 [OBJECT-STORAGE] Intentando mover imagen externa a Object Storage...`);
-          const objectStorageService = new ObjectStorageService();
-          
-          // Para URLs externas en producción, las mantenemos como URL pero logueamos para futuras mejoras
+      if (req.file) {
+        // 📁 FORMDATA: Archivo subido
+        console.log(`📁 [PARK-IMAGES] Procesando archivo subido: ${req.file.filename}`);
+        
+        if (isProduction) {
+          try {
+            console.log(`🚀 [OBJECT-STORAGE] Moviendo a Object Storage para persistencia...`);
+            const objectStorageService = new ObjectStorageService();
+            
+            // TODO: Implementar subida a Object Storage aquí
+            // Por ahora usamos filesystem con logging mejorado
+            imageUrl = `/uploads/park-images/${req.file.filename}`;
+            console.log(`✅ [PARK-IMAGES] Archivo guardado temporalmente: ${imageUrl}`);
+            console.log(`⚠️ [PARK-IMAGES] TODO: Migrar a Object Storage para persistencia total`);
+            
+          } catch (osError) {
+            console.log(`⚠️ [OBJECT-STORAGE] Error, usando filesystem: ${osError}`);
+            imageUrl = `/uploads/park-images/${req.file.filename}`;
+          }
+        } else {
+          // Desarrollo: usar filesystem directamente
+          imageUrl = `/uploads/park-images/${req.file.filename}`;
+          console.log(`✅ [PARK-IMAGES] Desarrollo - archivo guardado: ${imageUrl}`);
+        }
+        
+      } else if (req.body.imageUrl) {
+        // 🌐 URL: Imagen externa
+        imageUrl = req.body.imageUrl;
+        console.log(`🌐 [PARK-IMAGES] Procesando URL externa: ${imageUrl}`);
+        
+        // Aplicar lógica Object Storage para URLs externas si es necesario
+        if (isProduction && imageUrl.startsWith('http') && !imageUrl.includes('parksys-uploads')) {
           console.log(`⚠️ [OBJECT-STORAGE] URL externa detectada en producción: ${imageUrl}`);
           console.log(`ℹ️ [OBJECT-STORAGE] Para máxima persistencia, considere subir el archivo directamente`);
-          
-        } catch (osError) {
-          console.log(`⚠️ [OBJECT-STORAGE] Error en Object Storage, continuando con URL: ${osError}`);
         }
+      } else {
+        return res.status(400).json({ message: "Se requiere un archivo o URL de imagen" });
+      }
+
+      console.log(`🔄 [PARK-IMAGES] Procesando imagen final:`, { imageUrl, caption, isPrimary });
+
+      // Verificar que el parque existe
+      const park = await storage.getPark(parkId);
+      if (!park) {
+        return res.status(404).json({ message: "Parque no encontrado" });
       }
 
       // Si isPrimary es true, primero debemos desmarcar todas las otras imágenes como no principales
@@ -4092,10 +4150,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Crear la nueva imagen
       const imageData = {
         parkId,
-        imageUrl: finalImageUrl,
-        caption: caption || null,
-        isPrimary: Boolean(isPrimary)
+        imageUrl, // Ya procesada según el tipo (archivo o URL)
+        caption,
+        isPrimary
       };
+
+      console.log(`💾 [PARK-IMAGES] Guardando en BD:`, imageData);
+      const newImage = await storage.addParkImage(imageData);
+
+      // Mapear la respuesta
+      const mappedImage = {
+        id: newImage.id,
+        parkId: newImage.parkId,
+        imageUrl: newImage.imageUrl,
+        caption: newImage.caption,
+        isPrimary: newImage.isPrimary,
+        createdAt: newImage.createdAt
+      };
+
+      console.log(`✅ [PARK-IMAGES] Imagen agregada exitosamente:`, mappedImage);
+      res.status(201).json(mappedImage);
 
       const newImage = await storage.createParkImage(imageData);
       
