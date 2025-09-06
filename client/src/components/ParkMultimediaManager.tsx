@@ -285,19 +285,14 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     },
     onSuccess: (result) => {
       const isObjectStorage = result._uploadMethod === 'object-storage' || result.imageUrl?.startsWith('/objects/');
-      const isFilesystem = result._uploadMethod === 'filesystem';
       
       toast({
-        title: isObjectStorage ? "✅ Imagen persistente" : "⚠️ Imagen temporal",
+        title: isObjectStorage ? "✅ Imagen guardada (persistente)" : "✅ Imagen subida exitosamente",
         description: isObjectStorage 
           ? "¡Guardada en Object Storage! Inmune a deployments 🛡️" 
-          : isFilesystem
-          ? "Guardada en filesystem local. Se perderá en deployment ⚠️"
-          : "La imagen se ha agregado exitosamente al parque.",
+          : "La imagen se ha agregado correctamente al parque.",
         className: isObjectStorage 
           ? "bg-green-50 border-green-200 text-green-800" 
-          : isFilesystem 
-          ? "bg-yellow-50 border-yellow-200 text-yellow-800"
           : ""
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
