@@ -2279,19 +2279,19 @@ function startServer() {
       registerRoleRoutes(app);
       console.log("✅ [API-PRIORITY] Role routes registered with priority over static files");
       
-      // 🔧 PRODUCTION FIX: Express.static BEFORE custom routes in production for reliable serving
-      if (process.env.NODE_ENV === 'production') {
-        // In production, prioritize express.static for better performance
-        app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
-        app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-        app.use(express.static(path.join(process.cwd(), 'public')));
-        console.log('📁 [PROD] Express.static /uploads enabled BEFORE custom routes for production');
-      } else {
-        // In development, custom routes handle uploads for debugging
-        app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-        app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
-        console.log('📁 [DEV] Static uploads/ files enabled AFTER custom routes for debugging');
-      }
+      // 🔧 FIXED: Correct order - uploads/ FIRST, then public/uploads/ as fallback
+      console.log('📁 [UNIFIED] Configurando archivos estáticos con orden correcto...');
+      
+      // ALWAYS prioritize uploads/ directory first (where new images are saved)
+      app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+      
+      // Then fallback to public/uploads/ for legacy images  
+      app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+      
+      // Standard public directory
+      app.use(express.static(path.join(process.cwd(), 'public')));
+      
+      console.log('✅ [UNIFIED] Archivos estáticos configurados: uploads/ PRIMERO, public/uploads/ FALLBACK');
       
       // Register activity payment routes
       registerActivityPaymentRoutes(app);

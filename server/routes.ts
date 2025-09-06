@@ -99,16 +99,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Configure multer for file uploads
   const upload = multer({ storage: multer.memoryStorage() });
 
-  // Configure multer specifically for park images with Object Storage integration
+  // Configure multer for park images - FIXED with production/development logic
   const parkImageUpload = multer({
     storage: multer.diskStorage({
       destination: function (req, file, cb) {
-        // Usar directorio temporal para procesamiento antes de Object Storage
-        const tempDir = '/tmp/park-images/';
-        if (!fs.existsSync(tempDir)) {
-          fs.mkdirSync(tempDir, { recursive: true });
+        // ✅ FIXED: Same pattern as fauna/instructors/activities
+        const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+        const uploadDir = isProduction ? 'public/uploads/park-images' : 'uploads/park-images';
+        
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
         }
-        cb(null, tempDir);
+        cb(null, uploadDir);
       },
       filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -4122,7 +4124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE & FORMDATA
+  // Add an image to a park - SIMPLIFIED like fauna/instructors
   apiRouter.post("/parks/:id/images", isAuthenticated, parkImageUpload.single('image'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
@@ -4130,94 +4132,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📁 [PARK-IMAGES] File:`, req.file ? req.file.filename : 'No file');
       console.log(`📝 [PARK-IMAGES] Body:`, req.body);
 
-      let imageUrl: string;
-      let caption: string = req.body.caption || '';
-      let isPrimary: boolean = req.body.isPrimary === 'true' || req.body.isPrimary === true;
-
-      // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA
-      const isProduction = process.env.NODE_ENV === 'production' || 
-                          process.env.REPLIT_DEPLOYMENT || 
-                          !process.env.NODE_ENV;
-
-      if (req.file) {
-        // 📁 FORMDATA: Archivo subido
-        console.log(`📁 [PARK-IMAGES] Procesando archivo subido: ${req.file.filename}`);
-        
-        try {
-          console.log(`🚀 [OBJECT-STORAGE] Guardando en Object Storage para persistencia TOTAL...`);
-          
-          // Leer el archivo del filesystem temporal
-          const fileBuffer = fs.readFileSync(req.file.path);
-          
-          // USAR CLIENTE DIRECTO - NO HAY MÁS ERRORES
-          const { Storage } = require('@google-cloud/storage');
-          
-          const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
-          
-          // Cliente directo de Object Storage
-          const objectStorageClient = new Storage({
-            credentials: {
-              audience: "replit",
-              subject_token_type: "access_token",
-              token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-              type: "external_account",
-              credential_source: {
-                url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-                format: {
-                  type: "json",
-                  subject_token_field_name: "access_token",
-                },
-              },
-              universe_domain: "googleapis.com",
-            },
-            projectId: "",
-          });
-          
-          // Subir a Object Storage directamente
-          console.log(`📤 [OBJECT-STORAGE] Subiendo ${req.file.filename} a bucket...`);
-          
-          const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
-          const objectName = `public/park-images/${req.file.filename}`;
-          const bucket = objectStorageClient.bucket(bucketName);
-          const file = bucket.file(objectName);
-          
-          await file.save(fileBuffer, {
-            metadata: {
-              contentType: req.file.mimetype,
-              cacheControl: 'public, max-age=3600'
-            }
-          });
-          
-          // URL pública de Object Storage
-          imageUrl = `/public-objects/park-images/${req.file.filename}`;
-          console.log(`✅ [OBJECT-STORAGE] ÉXITO TOTAL - Imagen subida: ${imageUrl}`);
-          
-          // Limpiar archivo temporal
-          fs.unlinkSync(req.file.path);
-          console.log(`🧹 [CLEANUP] Archivo temporal eliminado`);
-          
-        } catch (osError) {
-          console.error(`❌ [OBJECT-STORAGE] ERROR CRÍTICO:`, osError);
-          console.error(`❌ [OBJECT-STORAGE] ERROR STACK:`, osError.stack);
-          console.error(`❌ [OBJECT-STORAGE] FALLBACK: Usando filesystem temporal`);
-          imageUrl = `/uploads/park-images/${req.file.filename}`;
-        }
-        
-      } else if (req.body.imageUrl) {
-        // 🌐 URL: Imagen externa
-        imageUrl = req.body.imageUrl;
-        console.log(`🌐 [PARK-IMAGES] Procesando URL externa: ${imageUrl}`);
-        
-        // Aplicar lógica Object Storage para URLs externas si es necesario
-        if (isProduction && imageUrl.startsWith('http') && !imageUrl.includes('parksys-uploads')) {
-          console.log(`⚠️ [OBJECT-STORAGE] URL externa detectada en producción: ${imageUrl}`);
-          console.log(`ℹ️ [OBJECT-STORAGE] Para máxima persistencia, considere subir el archivo directamente`);
-        }
-      } else {
-        return res.status(400).json({ message: "Se requiere un archivo o URL de imagen" });
+      if (!req.file) {
+        return res.status(400).json({ error: 'No image file provided' });
       }
 
-      console.log(`🔄 [PARK-IMAGES] Procesando imagen final:`, { imageUrl, caption, isPrimary });
+      // ✅ SIMPLE: Direct URL like fauna/instructors/activities
+      const imageUrl = `/uploads/park-images/${req.file.filename}`;
+      const caption = req.body.caption || '';
+      const isPrimary = req.body.isPrimary === 'true' || req.body.isPrimary === true;
+
+      console.log(`✅ [PARK-IMAGES] Imagen procesada:`, { imageUrl, caption, isPrimary });
 
       // Verificar que el parque existe
       const park = await storage.getPark(parkId);
