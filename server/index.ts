@@ -1508,7 +1508,7 @@ console.log("📊 Rutas del módulo de evaluaciones registradas correctamente");
 // Intercepta requests a imágenes legacy y las sirve desde filesystem si existen
 app.get("/uploads/park-images/:filename", (req: Request, res: Response) => {
   const filename = req.params.filename;
-  const legacyPath = path.join(__dirname, '..', 'uploads', 'park-images', filename);
+  const legacyPath = path.join(process.cwd(), 'public', 'uploads', 'park-images', filename);
   
   console.log('🔄 [LEGACY] Buscando imagen legacy:', legacyPath);
   
@@ -1539,7 +1539,7 @@ import multer from 'multer';
 
 const parkImageStorage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
-    const uploadDir = 'uploads/park-images';
+    const uploadDir = 'public/uploads/park-images';
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
