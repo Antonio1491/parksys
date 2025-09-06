@@ -72,19 +72,43 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
           setUploadProgress(`Subiendo imagen ${i + 1} de ${uploadData.files.length}: ${file.name}`);
           
           try {
-            // Sistema híbrido: enviar archivo directamente al servidor usando apiRequest
+            // Sistema híbrido: enviar archivo directamente al servidor con fetch + auth headers
             const formData = new FormData();
             formData.append('imageFile', file);
             formData.append('caption', uploadData.caption || `Imagen ${i + 1}`);
             formData.append('isPrimary', String(isFirstImage));
             
-            const response = await apiRequest(`/api/parks/${parkId}/images`, {
+            // Headers de autenticación (copiados de apiRequest)
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+            let userId = "1";
+            let userRole = "super_admin";
+            
+            if (storedUser) {
+              try {
+                const userObj = JSON.parse(storedUser);
+                userId = userObj.id.toString();
+                userRole = userObj.role || "admin";
+              } catch (e) {
+                console.error("Error parsing stored user:", e);
+              }
+            }
+            
+            const response = await fetch(`/api/parks/${parkId}/images`, {
               method: 'POST',
-              data: formData,
+              body: formData, // FormData NO debe ser JSON.stringify
               headers: {
-                // No incluir Content-Type para que el browser lo maneje automáticamente con multipart
+                "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1754063087518",
+                "X-User-Id": userId,
+                "X-User-Role": userRole
+                // No incluir Content-Type - el browser lo manejará automáticamente con multipart
               }
             });
+            
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || `Error subiendo ${file.name}`);
+            }
             
             const result = await response.json();
             results.push(result);
