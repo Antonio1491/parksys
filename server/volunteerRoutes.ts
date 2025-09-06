@@ -428,7 +428,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
     }
   });
 
-  const volunteerUpload = multer({ 
+  const volunteerUpload2 = multer({ 
     storage: volunteerStorage,
     limits: {
       fileSize: 5 * 1024 * 1024 // Límite de 5MB
@@ -443,7 +443,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
   });
 
   // Registro público de voluntarios - Utilizamos directamente apiRouter en lugar de publicApiRouter
-  apiRouter.post("/volunteers/register", volunteerUpload.single('profileImage'), async (req: Request, res: Response) => {
+  apiRouter.post("/volunteers/register", volunteerUpload2.single('profileImage'), async (req: Request, res: Response) => {
     try {
       // Campos mínimos requeridos para registro público
       const requiredFields = [
@@ -587,7 +587,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
     }
   });
 
-  apiRouter.post("/volunteers", volunteerUpload.single('profileImage'), async (req: Request, res: Response) => {
+  apiRouter.post("/volunteers", volunteerUpload2.single('profileImage'), async (req: Request, res: Response) => {
     try {
       console.log("Datos recibidos:", req.body);
       
