@@ -103,7 +103,7 @@ export class UnifiedStorageService {
           persistent: true
         };
         
-      } catch (osError) {
+      } catch (osError: any) {
         console.error('❌ [UNIFIED-OBJECT-STORAGE] ERROR CRÍTICO:', osError);
         console.error('❌ [UNIFIED-OBJECT-STORAGE] ERROR STACK:', osError.stack);
         console.error('❌ [UNIFIED-OBJECT-STORAGE] FALLBACK: Usando filesystem temporal');
