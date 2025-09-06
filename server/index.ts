@@ -1504,22 +1504,31 @@ app.use('/api/visitors', visitorsDashboardRoutes);
 app.use(evaluacionesRoutes);
 console.log("📊 Rutas del módulo de evaluaciones registradas correctamente");
 
-// MIDDLEWARE DE COMPATIBILIDAD - IMÁGENES LEGACY
-// Intercepta requests a imágenes legacy y las sirve desde filesystem si existen
+// 🚀 MIDDLEWARE UNIFICADO - SISTEMA PERSISTENTE 
+// Sirve imágenes desde carpeta persistente primero, luego legacy como fallback
 app.get("/uploads/park-images/:filename", (req: Request, res: Response) => {
   const filename = req.params.filename;
+  
+  // ✅ NUEVA UBICACIÓN PERSISTENTE (prioritaria)
+  const persistentPath = path.join(process.cwd(), 'uploads', 'park-images', filename);
   const legacyPath = path.join(process.cwd(), 'public', 'uploads', 'park-images', filename);
   
-  console.log('🔄 [LEGACY] Buscando imagen legacy:', legacyPath);
+  console.log('🚀 [UNIFIED] Buscando imagen con sistema persistente:', filename);
   
-  // Check if file exists in legacy filesystem location
-  if (fs.existsSync(legacyPath)) {
-    console.log('✅ [LEGACY] Imagen encontrada y servida desde filesystem');
-    return res.sendFile(legacyPath);
-  } else {
-    console.log('❌ [LEGACY] Imagen no encontrada en filesystem:', filename);
-    return res.status(404).json({ error: 'Imagen legacy no encontrada' });
+  // 1. Buscar primero en carpeta persistente
+  if (fs.existsSync(persistentPath)) {
+    console.log('✅ [UNIFIED] Imagen servida desde carpeta persistente');
+    return res.sendFile(persistentPath);
   }
+  
+  // 2. Fallback a legacy para compatibilidad
+  if (fs.existsSync(legacyPath)) {
+    console.log('✅ [LEGACY] Imagen servida desde carpeta legacy');
+    return res.sendFile(legacyPath);
+  }
+  
+  console.log('❌ [UNIFIED] Imagen no encontrada:', filename);
+  return res.status(404).json({ error: 'Imagen no encontrada' });
 });
 
 // Middleware adicional para Object Storage paths (nuevas imágenes)
