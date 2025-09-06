@@ -312,16 +312,17 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const setPrimaryImageMutation = useMutation({
     mutationFn: async (imageId: number) => {
       console.log(`⭐ [PRIMARY] Estableciendo imagen ${imageId} como principal`);
-      const response = await apiRequest(`/api/park-images/${imageId}/set-primary`, {
-        method: 'POST',
-        data: {}
-      });
-      if (!response.ok) {
-        throw new Error('Error al establecer imagen principal');
+      try {
+        const response = await apiRequest(`/api/park-images/${imageId}/set-primary`, {
+          method: 'POST',
+          data: {}
+        });
+        console.log(`✅ [PRIMARY] Imagen principal actualizada:`, response);
+        return response;
+      } catch (error) {
+        console.error(`❌ [PRIMARY] Error en API:`, error);
+        throw error;
       }
-      const result = await response.json();
-      console.log(`✅ [PRIMARY] Imagen principal actualizada:`, result);
-      return result;
     },
     onSuccess: (result) => {
       toast({
