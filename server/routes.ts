@@ -1084,15 +1084,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Endpoint específico para subir imágenes de perfil de voluntarios
   
-  // Configurar multer para subida de imágenes de voluntarios
-  const volunteerUploadDir = path.resolve('./public/uploads/volunteers');
-  if (!fs.existsSync(volunteerUploadDir)) {
-    fs.mkdirSync(volunteerUploadDir, { recursive: true });
+  // Configurar multer para subida de imágenes de voluntarios CON OBJECT STORAGE
+  const volunteerTempDir = '/tmp/volunteers/';
+  if (!fs.existsSync(volunteerTempDir)) {
+    fs.mkdirSync(volunteerTempDir, { recursive: true });
   }
   
   const volunteerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, volunteerUploadDir);
+      cb(null, volunteerTempDir);
     },
     filename: (req, file, cb) => {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -1139,7 +1139,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const imageUrl = `/uploads/volunteers/${req.file.filename}`;
+      let imageUrl: string;
+      
+      try {
+        console.log(`🚀 [VOLUNTEER-IMAGES] Guardando en Object Storage: ${req.file.filename}`);
+        
+        // Leer archivo temporal
+        const fileBuffer = fs.readFileSync(req.file.path);
+        
+        // Cliente directo de Object Storage
+        const { Storage } = require('@google-cloud/storage');
+        const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+        
+        const objectStorageClient = new Storage({
+          credentials: {
+            audience: "replit",
+            subject_token_type: "access_token",
+            token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+            type: "external_account",
+            credential_source: {
+              url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+              format: {
+                type: "json",
+                subject_token_field_name: "access_token",
+              },
+            },
+            universe_domain: "googleapis.com",
+          },
+          projectId: "",
+        });
+        
+        // Subir a Object Storage
+        const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
+        const objectName = `public/volunteers/${req.file.filename}`;
+        const bucket = objectStorageClient.bucket(bucketName);
+        const file = bucket.file(objectName);
+        
+        await file.save(fileBuffer, {
+          metadata: {
+            contentType: req.file.mimetype,
+            cacheControl: 'public, max-age=3600'
+          }
+        });
+        
+        // URL persistente de Object Storage
+        imageUrl = `/public-objects/volunteers/${req.file.filename}`;
+        console.log(`✅ [VOLUNTEER-IMAGES] ÉXITO TOTAL - Imagen subida: ${imageUrl}`);
+        
+        // Limpiar archivo temporal
+        fs.unlinkSync(req.file.path);
+        
+      } catch (osError) {
+        console.error(`❌ [VOLUNTEER-IMAGES] ERROR CRÍTICO:`, osError);
+        imageUrl = `/uploads/volunteers/${req.file.filename}`;
+      }
       
       // Si se proporciona volunteerId, actualizar la base de datos
       const volunteerId = req.body.volunteerId;
