@@ -758,6 +758,7 @@ export const volunteers = pgTable("volunteers", {
   availableHours: text("available_hours"),
   interestAreas: text("interest_areas").array(),
   skills: text("skills"),
+  profileImageUrl: text("profile_image_url"),
   legalConsent: boolean("legal_consent").default(false),
   status: text("status").default("active"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
