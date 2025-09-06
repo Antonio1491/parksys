@@ -1561,10 +1561,10 @@ app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
   }
 });
 
-// POST endpoint - Sistema híbrido: archivos + Object Storage para persistencia en deployments
+// 🚀 NUEVO ENDPOINT - Sistema Unificado de Almacenamiento Persistente
 app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Request, res: Response) => {
   try {
-    console.log('🚀 [HÍBRIDO] Park Image Upload - archivos + Object Storage');
+    console.log('🚀 [UNIFIED] Park Image Upload - Sistema persistente automático');
     console.log('🔍 [DEBUG] Headers recibidos:', req.headers);
     console.log('🔍 [DEBUG] Body recibido:', req.body);
     console.log('🔍 [DEBUG] Files recibidos:', req.files);
@@ -1584,25 +1584,33 @@ app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Reques
     
     let finalImageUrl: string;
     
-    // Opción 1: Si hay archivo subido, procesarlo y mover a Object Storage (cuando sea posible)
+    // PROCESAR ARCHIVO SUBIDO CON SISTEMA UNIFICADO
     if (uploadedFile) {
-      console.log('📁 [HÍBRIDO] Procesando archivo subido:', uploadedFile.filename);
-      // Por ahora usar ruta local, después migrar a Object Storage automáticamente
-      finalImageUrl = `/uploads/park-images/${uploadedFile.filename}`;
+      console.log('🚀 [UNIFIED] Procesando archivo con sistema persistente:', uploadedFile.originalname);
       
-    // Opción 2: Si hay URL proporcionada, usarla directamente  
+      // ✅ USAR SISTEMA UNIFICADO PERSISTENTE
+      const uploadResult = await unifiedStorage.uploadImage(uploadedFile, 'park-images', {
+        caption: caption || null,
+        isPrimary: isPrimary === 'true' || isPrimary === true,
+        entityId: parkId
+      });
+      
+      console.log('🎯 [UNIFIED] Upload resultado:', uploadResult);
+      finalImageUrl = uploadResult.imageUrl;
+      
+    // USAR URL PROPORCIONADA DIRECTAMENTE  
     } else if (imageUrl) {
-      console.log('🔗 [HÍBRIDO] Usando URL proporcionada:', imageUrl);
+      console.log('🔗 [UNIFIED] Usando URL proporcionada:', imageUrl);
       finalImageUrl = imageUrl;
       
     } else {
       return res.status(400).json({ error: 'Se requiere archivo o URL de imagen' });
     }
     
-    console.log('📸 [OBJECT STORAGE] Procesando imagen para parque:', parkId);
-    console.log('📸 [OBJECT STORAGE] Image URL:', imageUrl);
-    console.log('📸 [OBJECT STORAGE] Caption:', caption);
-    console.log('📸 [OBJECT STORAGE] IsPrimary:', isPrimary);
+    console.log('📸 [UNIFIED] Procesando imagen para parque:', parkId);
+    console.log('📸 [UNIFIED] Final Image URL:', finalImageUrl);
+    console.log('📸 [UNIFIED] Caption:', caption);
+    console.log('📸 [UNIFIED] IsPrimary:', isPrimary);
     
     const { storage } = await import("./storage");
     
@@ -1614,10 +1622,10 @@ app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Reques
           await storage.updateParkImage(image.id, { isPrimary: false });
         }
       }
-      console.log('⭐ [OBJECT STORAGE] Desmarcando otras imágenes principales del parque');
+      console.log('⭐ [UNIFIED] Desmarcando otras imágenes principales del parque');
     }
     
-    // Crear nueva imagen con URL final (híbrida)
+    // Crear nueva imagen con URL persistente
     const imageData = {
       parkId,
       imageUrl: finalImageUrl,
@@ -1627,7 +1635,8 @@ app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Reques
     
     const newImage = await storage.createParkImage(imageData);
     
-    console.log('✅ [OBJECT STORAGE] Nueva imagen guardada para parque:', newImage);
+    console.log('✅ [UNIFIED] Nueva imagen guardada para parque:', newImage);
+    console.log(`🛡️ [UNIFIED] Sistema persistente activo - URL: ${finalImageUrl}`);
     
     // Mapear respuesta para compatibilidad con frontend
     const mappedImage = {
@@ -1642,7 +1651,7 @@ app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Reques
     res.status(201).json(mappedImage);
     
   } catch (error) {
-    console.error('❌ [OBJECT STORAGE] Error en park image upload:', error);
+    console.error('❌ [UNIFIED] Error en park image upload:', error);
     res.status(500).json({ error: 'Error al subir la imagen: ' + (error as Error).message });
   }
 });
