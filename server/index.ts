@@ -1504,6 +1504,24 @@ app.use('/api/visitors', visitorsDashboardRoutes);
 app.use(evaluacionesRoutes);
 console.log("📊 Rutas del módulo de evaluaciones registradas correctamente");
 
+// MIDDLEWARE DE COMPATIBILIDAD - IMÁGENES EXISTENTES
+// Sirve imágenes legacy de filesystem como fallback para Object Storage
+app.get("/public-objects/park-images/:filename", express.static('uploads'), (req: Request, res: Response) => {
+  const filename = req.params.filename;
+  const legacyPath = path.join(__dirname, '..', 'uploads', 'park-images', filename);
+  
+  console.log('🔄 [COMPATIBILITY] Buscando imagen legacy:', legacyPath);
+  
+  // Check if file exists in legacy filesystem location
+  if (fs.existsSync(legacyPath)) {
+    console.log('✅ [COMPATIBILITY] Imagen encontrada en filesystem legacy');
+    return res.sendFile(legacyPath);
+  } else {
+    console.log('❌ [COMPATIBILITY] Imagen no encontrada en filesystem legacy');
+    return res.status(404).json({ error: 'Imagen no encontrada' });
+  }
+});
+
 // MIGRACIÓN A OBJECT STORAGE - PARK IMAGES
 // Este endpoint ahora redirige al sistema de Object Storage para persistencia en deployments
 
