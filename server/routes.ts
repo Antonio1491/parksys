@@ -4170,20 +4170,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`✅ [PARK-IMAGES] Imagen agregada exitosamente:`, mappedImage);
       res.status(201).json(mappedImage);
-
-      const newImage = await storage.createParkImage(imageData);
-      
-      // Mapear la respuesta para el frontend
-      const mappedImage = {
-        id: newImage.id,
-        parkId: newImage.parkId,
-        imageUrl: newImage.imageUrl, // Usar directamente 'imageUrl'
-        caption: newImage.caption,
-        isPrimary: newImage.isPrimary,
-        createdAt: newImage.createdAt
-      };
-      
-      res.status(201).json(mappedImage);
     } catch (error) {
       console.error("Error uploading park image:", error);
       res.status(500).json({ message: "Error al subir la imagen" });
