@@ -197,60 +197,83 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const uploadImageMutation = useMutation({
     mutationFn: async (data: FormData | { imageUrl: string; caption: string; isPrimary: boolean }) => {
       if (data instanceof FormData) {
-        // 🚀 OBJECT STORAGE: Subida directa persistente
-        console.log('🚀 [OS] Usando Object Storage para subida persistente');
+        // 🚀 SMART UPLOAD: Intentar Object Storage primero, fallback a filesystem
+        console.log('🚀 [SMART] Intentando subida inteligente...');
         
-        // 1. Obtener URL de upload de Object Storage
-        const uploadResponse = await fetch(`/api/parks/${parkId}/images/upload-os`, {
+        try {
+          // 1. Intentar Object Storage (persistente)
+          console.log('🚀 [OS] Intentando Object Storage...');
+          const uploadResponse = await fetch(`/api/parks/${parkId}/images/upload-os`, {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer direct-token-1750522117022',
+              'X-User-Id': '1',
+              'X-User-Role': 'super_admin',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          });
+          
+          if (uploadResponse.ok) {
+            const uploadData = await uploadResponse.json();
+            console.log('📤 [OS] URL de upload obtenida:', uploadData);
+            
+            // Subir archivo directamente a Object Storage
+            const file = data.get('imageFile') as File;
+            const uploadToStorageResponse = await fetch(uploadData.uploadUrl, {
+              method: 'PUT',
+              body: file,
+            });
+            
+            if (uploadToStorageResponse.ok) {
+              // Confirmar upload en base de datos
+              const confirmResponse = await fetch(`/api/parks/${parkId}/images/confirm-os`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': 'Bearer direct-token-1750522117022',
+                  'X-User-Id': '1',
+                  'X-User-Role': 'super_admin',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  imageId: uploadData.imageId,
+                  filename: uploadData.filename,
+                  caption: data.get('caption') || '',
+                  isPrimary: data.get('isPrimary') === 'true',
+                  uploadUrl: uploadData.uploadUrl
+                })
+              });
+              
+              if (confirmResponse.ok) {
+                console.log('✅ [OS] Upload exitoso con Object Storage (PERSISTENTE)');
+                const result = await confirmResponse.json();
+                result._uploadMethod = 'object-storage';
+                return result;
+              }
+            }
+          }
+          
+          console.log('⚠️ [OS] Object Storage no disponible, usando filesystem...');
+        } catch (error) {
+          console.log('⚠️ [OS] Error con Object Storage:', error);
+          console.log('🔄 [FALLBACK] Usando filesystem tradicional...');
+        }
+        
+        // 2. Fallback a filesystem tradicional
+        console.log('📁 [FILESYSTEM] Usando subida tradicional (temporal)');
+        const response = await fetch(`/api/parks/${parkId}/images`, {
           method: 'POST',
           headers: {
             'Authorization': 'Bearer direct-token-1750522117022',
             'X-User-Id': '1',
-            'X-User-Role': 'super_admin',
-            'Content-Type': 'application/json'
+            'X-User-Role': 'super_admin'
           },
-          body: JSON.stringify({})
+          body: data
         });
-        if (!uploadResponse.ok) {
-          throw new Error('Error obteniendo URL de upload de Object Storage');
-        }
-        const uploadData = await uploadResponse.json();
-        console.log('📤 [OS] URL de upload obtenida:', uploadData);
-        
-        // 2. Subir archivo directamente a Object Storage
-        const file = data.get('imageFile') as File;
-        console.log('📤 [OS] Subiendo archivo a Object Storage...');
-        const uploadToStorageResponse = await fetch(uploadData.uploadUrl, {
-          method: 'PUT',
-          body: file,
-        });
-        if (!uploadToStorageResponse.ok) {
-          throw new Error('Error subiendo a Object Storage');
-        }
-        console.log('✅ [OS] Archivo subido a Object Storage exitosamente');
-        
-        // 3. Confirmar upload y guardar en base de datos
-        const confirmResponse = await fetch(`/api/parks/${parkId}/images/confirm-os`, {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer direct-token-1750522117022',
-            'X-User-Id': '1',
-            'X-User-Role': 'super_admin',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            imageId: uploadData.imageId,
-            filename: uploadData.filename,
-            caption: data.get('caption') || '',
-            isPrimary: data.get('isPrimary') === 'true',
-            uploadUrl: uploadData.uploadUrl
-          })
-        });
-        if (!confirmResponse.ok) {
-          throw new Error('Error confirmando upload en base de datos');
-        }
-        console.log('✅ [OS] Upload confirmado y guardado en BD');
-        return confirmResponse.json();
+        if (!response.ok) throw new Error('Error subiendo imagen');
+        const result = await response.json();
+        result._uploadMethod = 'filesystem';
+        return result;
       } else {
         // URLs siguen usando el sistema original
         const response = await apiRequest(`/api/parks/${parkId}/images`, {
@@ -261,13 +284,21 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       }
     },
     onSuccess: (result) => {
-      const isObjectStorage = result.imageUrl?.startsWith('/objects/');
+      const isObjectStorage = result._uploadMethod === 'object-storage' || result.imageUrl?.startsWith('/objects/');
+      const isFilesystem = result._uploadMethod === 'filesystem';
+      
       toast({
-        title: "Imagen subida",
+        title: isObjectStorage ? "✅ Imagen persistente" : "⚠️ Imagen temporal",
         description: isObjectStorage 
-          ? "Imagen guardada en Object Storage persistente. ¡Será inmune a deployments!" 
+          ? "¡Guardada en Object Storage! Inmune a deployments 🛡️" 
+          : isFilesystem
+          ? "Guardada en filesystem local. Se perderá en deployment ⚠️"
           : "La imagen se ha agregado exitosamente al parque.",
-        className: isObjectStorage ? "bg-green-50 border-green-200" : ""
+        className: isObjectStorage 
+          ? "bg-green-50 border-green-200 text-green-800" 
+          : isFilesystem 
+          ? "bg-yellow-50 border-yellow-200 text-yellow-800"
+          : ""
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
