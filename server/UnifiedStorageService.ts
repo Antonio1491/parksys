@@ -48,7 +48,7 @@ export class UnifiedStorageService {
       // 🚀 OBJECT STORAGE DIRECTO PARA PERSISTENCIA TOTAL
       try {
         // USAR CLIENTE DIRECTO DE OBJECT STORAGE
-        const { Storage } = require('@google-cloud/storage');
+        const { Storage } = await import('@google-cloud/storage');
         
         const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
         
@@ -79,7 +79,7 @@ export class UnifiedStorageService {
         // Subir a Object Storage directamente
         console.log(`📤 [UNIFIED-OBJECT-STORAGE] Subiendo ${filename} a bucket...`);
         
-        const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
+        const bucketName = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID || 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
         const objectName = `public/${module}/${filename}`;
         const bucket = objectStorageClient.bucket(bucketName);
         const fileObj = bucket.file(objectName);
