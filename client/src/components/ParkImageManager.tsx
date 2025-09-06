@@ -403,6 +403,15 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
                   disabled={isUploading}
                   className="cursor-pointer"
                 />
+                <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                  💡 <strong>Para seleccionar múltiples imágenes:</strong>
+                  <br />
+                  • <strong>Windows:</strong> Mantén Ctrl + Click en cada imagen
+                  <br />
+                  • <strong>Mac:</strong> Mantén Cmd + Click en cada imagen  
+                  <br />
+                  • <strong>Rango:</strong> Click en primera + Shift + Click en última
+                </div>
                 {selectedFiles.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-xs text-green-600 flex items-center">
@@ -430,6 +439,45 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
                     </div>
                   </div>
                 )}
+              </div>
+              
+              {/* Alternative single file selection */}
+              <div className="grid gap-2">
+                <Label htmlFor="single-image-file">📷 ¿No funciona múltiple? Añade de una en una</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="single-image-file"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const updatedFiles = [...selectedFiles, file];
+                        setSelectedFiles(updatedFiles);
+                        setNewImageUrl("");
+                        // Reset input
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }}
+                    disabled={isUploading}
+                    className="cursor-pointer flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.getElementById('single-image-file') as HTMLInputElement;
+                      input?.click();
+                    }}
+                    disabled={isUploading}
+                  >
+                    + Añadir otra
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Selecciona una imagen y repite para añadir más
+                </p>
               </div>
               
               <div className="text-center text-gray-400 text-sm">
