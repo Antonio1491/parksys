@@ -392,8 +392,7 @@ const RolesManagement: React.FC = () => {
           <Button 
             key="create"
             onClick={() => setShowCreateModal(true)}
-            variant="default"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            variant="primary"
           >
             <Plus className="h-4 w-4 mr-2" />
             Crear Rol
