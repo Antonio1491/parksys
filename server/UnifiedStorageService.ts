@@ -43,18 +43,74 @@ export class UnifiedStorageService {
     } = {}
   ): Promise<StorageResult> {
     try {
-      console.log(`🚀 [UNIFIED] Subiendo imagen para módulo: ${module}`);
+      console.log(`🚀 [UNIFIED-OBJECT-STORAGE] FORZANDO Object Storage para persistencia total...`);
       
-      // 1. INTENTAR OBJECT STORAGE (persistente)
+      // 🚀 OBJECT STORAGE DIRECTO PARA PERSISTENCIA TOTAL
       try {
-        const result = await this.uploadToObjectStorage(file, module, options);
-        console.log('✅ [UNIFIED] Object Storage exitoso - PERSISTENTE');
-        return result;
+        // USAR CLIENTE DIRECTO DE OBJECT STORAGE
+        const { Storage } = require('@google-cloud/storage');
+        
+        const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+        
+        // Cliente directo de Object Storage
+        const objectStorageClient = new Storage({
+          credentials: {
+            audience: "replit",
+            subject_token_type: "access_token",
+            token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+            type: "external_account",
+            credential_source: {
+              url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+              format: {
+                type: "json",
+                subject_token_field_name: "access_token",
+              },
+            },
+            universe_domain: "googleapis.com",
+          },
+          projectId: "",
+        });
+        
+        // Generar nombre único
+        const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        const filename = `${module}-${uniqueId}${extension}`;
+        
+        // Subir a Object Storage directamente
+        console.log(`📤 [UNIFIED-OBJECT-STORAGE] Subiendo ${filename} a bucket...`);
+        
+        const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
+        const objectName = `public/${module}/${filename}`;
+        const bucket = objectStorageClient.bucket(bucketName);
+        const fileObj = bucket.file(objectName);
+        
+        await fileObj.save(file.buffer, {
+          metadata: {
+            contentType: file.mimetype,
+            cacheControl: 'public, max-age=3600'
+          }
+        });
+        
+        // URL pública de Object Storage
+        const imageUrl = `/public-objects/${module}/${filename}`;
+        console.log(`✅ [UNIFIED-OBJECT-STORAGE] ÉXITO TOTAL - Imagen subida: ${imageUrl}`);
+        
+        return {
+          success: true,
+          imageUrl: imageUrl,
+          filename: filename,
+          method: 'object-storage',
+          persistent: true
+        };
+        
       } catch (osError) {
-        console.log('⚠️ [UNIFIED] Object Storage falló, usando filesystem...', osError);
+        console.error('❌ [UNIFIED-OBJECT-STORAGE] ERROR CRÍTICO:', osError);
+        console.error('❌ [UNIFIED-OBJECT-STORAGE] ERROR STACK:', osError.stack);
+        console.error('❌ [UNIFIED-OBJECT-STORAGE] FALLBACK: Usando filesystem temporal');
       }
 
       // 2. FALLBACK A FILESYSTEM (carpeta persistente)
+      console.log('📁 [UNIFIED] FALLBACK: Cambiando a filesystem persistente...');
       const result = await this.uploadToFilesystem(file, module, options);
       console.log('✅ [UNIFIED] Filesystem usado - carpeta persistente');
       return result;
