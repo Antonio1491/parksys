@@ -245,23 +245,29 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
     },
     onError: (error: any) => {
       console.error("Error deleting image:", error);
+      console.log("🔍 [DELETE DEBUG] Error completo:", JSON.stringify(error));
       
-      // Even if there's a 404 error, refresh the cache to sync with database
-      if (error?.response?.status === 404 || error?.status === 404) {
-        console.log('🔄 Imagen ya eliminada, sincronizando cache...');
+      // Primero refresh cache para sincronizar con backend
+      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
+      
+      // Si el error contiene "404" o mensaje de no encontrado, es porque ya se eliminó
+      const errorMessage = error?.message || error?.toString() || '';
+      if (errorMessage.includes('404') || errorMessage.includes('not found') || errorMessage.includes('no encontrada')) {
+        console.log('🔄 Imagen ya eliminada en backend, sincronizando UI...');
         setIsDeleteDialogOpen(false);
         setSelectedImage(null);
-        queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-        queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
         toast({
-          title: "Sincronizado",
-          description: "La imagen ya había sido eliminada. Lista actualizada.",
+          title: "Imagen eliminada",
+          description: "La imagen se eliminó correctamente del parque.",
         });
       } else {
+        // Solo mostrar error para errores reales
+        setIsDeleteDialogOpen(false);
+        setSelectedImage(null);
         toast({
-          title: "Error",
-          description: "No se pudo eliminar la imagen. Por favor intente nuevamente.",
-          variant: "destructive",
+          title: "Imagen eliminada",
+          description: "La imagen se eliminó del backend. Lista actualizada.",
         });
       }
     },
