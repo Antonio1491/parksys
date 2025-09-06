@@ -18,6 +18,38 @@ import {
   updateCompleteProfile
 } from "./volunteer-fields-updater";
 
+// ✅ CONFIGURACIÓN DE MULTER PARA VOLUNTARIOS - Same pattern as fauna/instructors
+const isProduction = process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT || !process.env.NODE_ENV;
+const volunteerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = isProduction ? 'public/uploads/volunteer-profiles' : 'uploads/volunteer-profiles';
+    const uploadPath = path.join(process.cwd(), uploadDir);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `volunteer-${uniqueSuffix}${path.extname(file.originalname)}`);
+  }
+});
+
+const volunteerUpload = multer({ 
+  storage: volunteerStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos de imagen (jpeg, jpg, png, gif, webp)'));
+    }
+  }
+});
+
 /**
  * Función que registra las rutas relacionadas con el módulo de voluntariado
  */
@@ -56,6 +88,44 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
     } catch (error) {
       console.error('Error obteniendo voluntarios públicos:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // ✅ UPLOAD VOLUNTEER PROFILE IMAGE - Same simple pattern as fauna/instructors
+  apiRouter.post("/volunteers/:id/image", isAuthenticated, volunteerUpload.single('image'), async (req: Request, res: Response) => {
+    try {
+      const volunteerId = Number(req.params.id);
+      console.log(`🔄 [VOLUNTEER-IMAGE] POST request for volunteer ${volunteerId}`);
+      console.log(`📁 [VOLUNTEER-IMAGE] File:`, req.file ? req.file.filename : 'No file');
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'No image file provided' });
+      }
+
+      // ✅ SIMPLE: Direct URL like fauna/instructors
+      const imageUrl = `/uploads/volunteer-profiles/${req.file.filename}`;
+      console.log(`✅ [VOLUNTEER-IMAGE] Image processed:`, { imageUrl });
+
+      // Update volunteer profile_image_url
+      const result = await db.execute(sql`
+        UPDATE volunteers 
+        SET profile_image_url = ${imageUrl}, updated_at = NOW()
+        WHERE id = ${volunteerId}
+        RETURNING id, profile_image_url as "profileImageUrl"
+      `);
+
+      if (!result.rows || result.rows.length === 0) {
+        return res.status(404).json({ error: 'Volunteer not found' });
+      }
+
+      console.log(`✅ [VOLUNTEER-IMAGE] Image updated successfully:`, result.rows[0]);
+      res.status(200).json({
+        success: true,
+        volunteer: result.rows[0]
+      });
+    } catch (error) {
+      console.error("Error uploading volunteer image:", error);
+      res.status(500).json({ error: "Error al subir la imagen" });
     }
   });
 
