@@ -1504,82 +1504,65 @@ app.use('/api/visitors', visitorsDashboardRoutes);
 app.use(evaluacionesRoutes);
 console.log("📊 Rutas del módulo de evaluaciones registradas correctamente");
 
-// ENDPOINT DIRECTO PARA SUBIDA DE IMÁGENES - PRIORITY ROUTING
+// MIGRACIÓN A OBJECT STORAGE - PARK IMAGES
+// Este endpoint ahora redirige al sistema de Object Storage para persistencia en deployments
 
-const imageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = 'uploads/park-images';
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const timestamp = Date.now();
-    const randomId = Math.floor(Math.random() * 1000000);
-    const extension = path.extname(file.originalname);
-    cb(null, `park-img-${timestamp}-${randomId}${extension}`);
-  }
-});
-
-const imageUpload = multer({ 
-  storage: imageStorage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req: any, file: any, cb: any) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Solo se permiten archivos de imagen'), false);
-    }
-  }
-});
-
-app.post("/api/parks/:parkId/images", imageUpload.single('image'), async (req: Request, res: Response) => {
+app.post("/api/parks/:parkId/images", async (req: Request, res: Response) => {
   try {
-    console.log('🚀 DIRECT IMAGE UPLOAD ENDPOINT REACHED');
-    console.log('📝 Params:', req.params);
-    console.log('📝 Body:', req.body);
-    console.log('📝 File:', req.file ? { filename: req.file.filename, size: req.file.size } : 'No file');
+    console.log('🚀 [MIGRADO] Park Image Upload - redirigiendo a Object Storage');
     
     const parkId = parseInt(req.params.parkId);
     const { imageUrl, caption, isPrimary } = req.body;
     
-    let finalImageUrl = imageUrl;
-    
-    if (req.file) {
-      finalImageUrl = `/uploads/park-images/${req.file.filename}`;
-      console.log('📁 File uploaded:', finalImageUrl);
+    // Validación básica
+    if (!imageUrl) {
+      return res.status(400).json({ error: 'Se requiere imageUrl para Object Storage' });
     }
     
-    if (!req.file && !imageUrl) {
-      return res.status(400).json({ error: 'Debe proporcionar un archivo de imagen o una URL' });
-    }
+    console.log('📸 [OBJECT STORAGE] Procesando imagen para parque:', parkId);
+    console.log('📸 [OBJECT STORAGE] Image URL:', imageUrl);
+    console.log('📸 [OBJECT STORAGE] Caption:', caption);
+    console.log('📸 [OBJECT STORAGE] IsPrimary:', isPrimary);
     
-    const { pool } = await import("./db");
+    const { storage } = await import("./storage");
     
     // Si es imagen principal, desmarcar otras
     if (isPrimary === 'true' || isPrimary === true) {
-      await pool.query('UPDATE park_images SET is_primary = false WHERE park_id = $1', [parkId]);
+      const existingImages = await storage.getParkImages(parkId);
+      for (const image of existingImages) {
+        if (image.isPrimary) {
+          await storage.updateParkImage(image.id, { isPrimary: false });
+        }
+      }
+      console.log('⭐ [OBJECT STORAGE] Desmarcando otras imágenes principales del parque');
     }
     
-    const insertQuery = `
-      INSERT INTO park_images (park_id, image_url, caption, is_primary)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, park_id as "parkId", image_url as "imageUrl", caption, is_primary as "isPrimary"
-    `;
-    
-    const result = await pool.query(insertQuery, [
+    // Crear nueva imagen con URL de Object Storage
+    const imageData = {
       parkId,
-      finalImageUrl,
-      caption || '',
-      isPrimary === 'true' || isPrimary === true
-    ]);
+      imageUrl,
+      caption: caption || '',
+      isPrimary: Boolean(isPrimary === 'true' || isPrimary === true)
+    };
     
-    console.log('✅ Image created successfully:', result.rows[0]);
-    res.status(201).json(result.rows[0]);
+    const newImage = await storage.createParkImage(imageData);
+    
+    console.log('✅ [OBJECT STORAGE] Nueva imagen guardada para parque:', newImage);
+    
+    // Mapear respuesta para compatibilidad con frontend
+    const mappedImage = {
+      id: newImage.id,
+      parkId: newImage.parkId,
+      imageUrl: newImage.imageUrl,
+      caption: newImage.caption,
+      isPrimary: newImage.isPrimary,
+      createdAt: newImage.createdAt
+    };
+    
+    res.status(201).json(mappedImage);
     
   } catch (error) {
-    console.error('❌ Error in direct image upload:', error);
+    console.error('❌ [OBJECT STORAGE] Error en park image upload:', error);
     res.status(500).json({ error: 'Error al subir la imagen: ' + (error as Error).message });
   }
 });
