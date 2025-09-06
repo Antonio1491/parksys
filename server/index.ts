@@ -1582,18 +1582,14 @@ app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
 });
 
 // POST endpoint - Sistema híbrido: archivos + Object Storage para persistencia en deployments
-app.post("/api/parks/:parkId/images", uploadMiddleware.fields([
-  { name: 'imageFile', maxCount: 1 },
-  { name: 'caption', maxCount: 1 },
-  { name: 'isPrimary', maxCount: 1 }
-]), async (req: Request, res: Response) => {
+app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Request, res: Response) => {
   try {
     console.log('🚀 [HÍBRIDO] Park Image Upload - archivos + Object Storage');
     
     const parkId = parseInt(req.params.parkId);
     const { imageUrl, caption, isPrimary } = req.body;
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-    const uploadedFile = files?.imageFile?.[0];
+    const files = req.files as Express.Multer.File[];
+    const uploadedFile = files?.find(f => f.fieldname === 'imageFile');
     
     let finalImageUrl: string;
     
