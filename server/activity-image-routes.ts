@@ -161,6 +161,8 @@ router.post("/:activityId/images", upload.single('image'), async (req: Request, 
       
     } catch (osError) {
       console.error(`❌ [ACTIVITY-COMPLEX-OBJECT-STORAGE] ERROR CRÍTICO:`, osError);
+      console.error(`❌ [ACTIVITY-COMPLEX-OBJECT-STORAGE] ERROR STACK:`, osError.stack);
+      console.error(`❌ [ACTIVITY-COMPLEX-OBJECT-STORAGE] FALLBACK: Usando filesystem temporal`);
       imageUrl = `/uploads/activity-images/${req.file.filename}`;
       console.log(`⚠️ [ACTIVITY-COMPLEX-FALLBACK] Usando filesystem temporal como respaldo`);
     }

@@ -4198,6 +4198,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
         } catch (osError) {
           console.error(`❌ [OBJECT-STORAGE] ERROR CRÍTICO:`, osError);
+          console.error(`❌ [OBJECT-STORAGE] ERROR STACK:`, osError.stack);
+          console.error(`❌ [OBJECT-STORAGE] FALLBACK: Usando filesystem temporal`);
           imageUrl = `/uploads/park-images/${req.file.filename}`;
         }
         
