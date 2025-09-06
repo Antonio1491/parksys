@@ -1585,11 +1585,22 @@ app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
 app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Request, res: Response) => {
   try {
     console.log('🚀 [HÍBRIDO] Park Image Upload - archivos + Object Storage');
+    console.log('🔍 [DEBUG] Headers recibidos:', req.headers);
+    console.log('🔍 [DEBUG] Body recibido:', req.body);
+    console.log('🔍 [DEBUG] Files recibidos:', req.files);
     
     const parkId = parseInt(req.params.parkId);
+    
+    if (isNaN(parkId)) {
+      console.log('❌ [DEBUG] ParkId inválido:', req.params.parkId);
+      return res.status(400).json({ error: 'Park ID inválido' });
+    }
+    
     const { imageUrl, caption, isPrimary } = req.body;
     const files = req.files as Express.Multer.File[];
     const uploadedFile = files?.find(f => f.fieldname === 'imageFile');
+    
+    console.log('🔍 [DEBUG] Datos procesados - parkId:', parkId, 'uploadedFile:', !!uploadedFile, 'imageUrl:', imageUrl);
     
     let finalImageUrl: string;
     
