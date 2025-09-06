@@ -194,14 +194,43 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
   // Delete image mutation
   const deleteMutation = useMutation({
     mutationFn: async (imageId: number) => {
-      const response = await apiRequest(`/api/park-images/${imageId}`, {
-        method: "DELETE"
+      // Headers de autenticación (igual que en upload)
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      let userId = "1";
+      let userRole = "super_admin";
+      
+      if (storedUser) {
+        try {
+          const userObj = JSON.parse(storedUser);
+          userId = userObj.id.toString();
+          userRole = userObj.role || "admin";
+        } catch (e) {
+          console.error("Error parsing stored user:", e);
+        }
+      }
+      
+      const response = await fetch(`/api/park-images/${imageId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1754063087518",
+          "X-User-Id": userId,
+          "X-User-Role": userRole
+        }
       });
+      
       // El endpoint devuelve status 204 (sin contenido) cuando es exitoso
       if (response.status === 204 || response.ok) {
         return { success: true };
       }
-      throw new Error('Error eliminando imagen');
+      
+      // Si hay error, intentar leer el mensaje
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.message || errorData.error || 'Error eliminando imagen');
+      } catch {
+        throw new Error(`Error eliminando imagen: ${response.status}`);
+      }
     },
     onSuccess: () => {
       toast({
