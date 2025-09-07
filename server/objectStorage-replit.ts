@@ -33,23 +33,30 @@ export class ReplitObjectStorageService {
     try {
       const uniqueFilename = `uploads/${Date.now()}-${randomUUID()}-${filename}`;
       
-      console.log(`📤 [REPLIT-STORAGE] Subiendo archivo: ${uniqueFilename}`);
+      console.log(`📤 [REPLIT-STORAGE] DETALLE: Iniciando upload`);
+      console.log(`📤 [REPLIT-STORAGE] - Filename objetivo: ${uniqueFilename}`);
+      console.log(`📤 [REPLIT-STORAGE] - Buffer size: ${file.length} bytes`);
+      console.log(`📤 [REPLIT-STORAGE] - Client disponible: ${!!replitStorageClient}`);
       
       const { ok, error } = await replitStorageClient.uploadFromBytes(
         uniqueFilename,
         file
       );
       
+      console.log(`📤 [REPLIT-STORAGE] RESPUESTA: ok=${ok}, error=${error}`);
+      
       if (!ok) {
-        console.error('❌ [REPLIT-STORAGE] Error subiendo archivo:', error);
+        console.error('❌ [REPLIT-STORAGE] Upload falló:', error);
         throw new Error(`Error subiendo archivo: ${error}`);
       }
       
-      console.log(`✅ [REPLIT-STORAGE] Archivo subido exitosamente: ${uniqueFilename}`);
+      console.log(`✅ [REPLIT-STORAGE] Upload exitoso: ${uniqueFilename}`);
       return uniqueFilename;
       
     } catch (error) {
-      console.error('❌ [REPLIT-STORAGE] Error en upload:', error);
+      console.error('❌ [REPLIT-STORAGE] Excepción en upload:', error);
+      console.error('❌ [REPLIT-STORAGE] Error type:', typeof error);
+      console.error('❌ [REPLIT-STORAGE] Error message:', error.message);
       throw error;
     }
   }

@@ -4081,16 +4081,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (isProduction) {
           try {
-            console.log(`🚀 [REPLIT-STORAGE] Subiendo a Object Storage oficial...`);
+            console.log(`🚀 [REPLIT-STORAGE] INICIANDO: Subiendo a Object Storage oficial...`);
+            console.log(`🔧 [REPLIT-STORAGE] Buffer size: ${req.file.buffer.length} bytes`);
+            console.log(`🔧 [REPLIT-STORAGE] Original filename: ${req.file.originalname}`);
             
             // Usar la librería oficial de Replit (autenticación automática)
             const filename = await replitObjectStorage.uploadFile(req.file.buffer, req.file.originalname);
             imageUrl = replitObjectStorage.getPublicUrl(filename);
             
-            console.log(`✅ [REPLIT-STORAGE] Imagen subida con persistencia garantizada: ${imageUrl}`);
+            console.log(`✅ [REPLIT-STORAGE] ÉXITO TOTAL - Imagen subida con persistencia garantizada: ${imageUrl}`);
+            console.log(`🎯 [REPLIT-STORAGE] Filename interno: ${filename}`);
             
           } catch (osError) {
-            console.log(`⚠️ [REPLIT-STORAGE] Error, usando fallback filesystem: ${osError}`);
+            console.error(`❌ [REPLIT-STORAGE] ERROR CRÍTICO en Object Storage:`, osError);
+            console.error(`❌ [REPLIT-STORAGE] Stack trace:`, osError.stack);
+            console.log(`⚠️ [REPLIT-STORAGE] FALLBACK: Usando filesystem temporal`);
+            
             // Fallback: crear archivo temporal
             const tempDir = 'uploads/park-images/';
             if (!fs.existsSync(tempDir)) {
@@ -4100,6 +4106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const tempPath = path.join(tempDir, tempFilename);
             fs.writeFileSync(tempPath, req.file.buffer);
             imageUrl = `/uploads/park-images/${tempFilename}`;
+            console.log(`🔄 [REPLIT-STORAGE] FALLBACK URL: ${imageUrl}`);
           }
         } else {
           // Desarrollo: crear archivo local
