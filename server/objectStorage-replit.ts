@@ -88,14 +88,16 @@ export class ReplitObjectStorageService {
         contentType = 'image/webp';
       }
       
-      // Servir archivo
+      // Servir archivo - Asegurar que sea Buffer
+      const buffer = Buffer.isBuffer(value) ? value : Buffer.from(value);
+      
       res.set({
         'Content-Type': contentType,
-        'Content-Length': value.length.toString(),
+        'Content-Length': buffer.length.toString(),
         'Cache-Control': 'public, max-age=3600'
       });
       
-      res.send(value);
+      res.end(buffer);
       console.log(`✅ [REPLIT-STORAGE] Archivo servido exitosamente: ${filename}`);
       
     } catch (error) {
