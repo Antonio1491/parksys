@@ -10,6 +10,20 @@ export function registerHybridRoleRoutes(app: Express) {
 
   // ===== RUTAS ESPECÍFICAS PRIMERO (antes de rutas con parámetros) =====
 
+  // Obtener matriz completa de permisos (DEBE IR ANTES QUE CUALQUIER RUTA CON PARÁMETROS)
+  app.get("/api/roles/permissions", async (req, res) => {
+    try {
+      console.log("🔧 [HYBRID] Obteniendo matriz completa de permisos...");
+      const permissionsMatrix = await roleService.getAllRolePermissions();
+      
+      console.log(`✅ [HYBRID] Matriz de permisos obtenida: ${Object.keys(permissionsMatrix).length} roles`);
+      res.json(permissionsMatrix);
+    } catch (error) {
+      console.error("❌ [HYBRID] Error obteniendo matriz de permisos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // Obtener estructura de módulos adaptativos (para frontend)
   app.get("/api/roles/adaptive-modules", async (req, res) => {
     try {
@@ -51,20 +65,6 @@ export function registerHybridRoleRoutes(app: Express) {
       res.json(adaptiveModules);
     } catch (error) {
       console.error("Error obteniendo módulos adaptativos:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
-
-  // Obtener matriz completa de permisos (para PermissionsMatrix)
-  app.get("/api/roles/permissions", async (req, res) => {
-    try {
-      console.log("🔧 [HYBRID] Obteniendo matriz completa de permisos...");
-      const permissionsMatrix = await roleService.getAllRolePermissions();
-      
-      console.log(`✅ [HYBRID] Matriz de permisos obtenida: ${Object.keys(permissionsMatrix).length} roles`);
-      res.json(permissionsMatrix);
-    } catch (error) {
-      console.error("❌ [HYBRID] Error obteniendo matriz de permisos:", error);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });
