@@ -603,6 +603,58 @@ export class RoleService {
       return false;
     }
   }
+
+  // Obtener matriz completa de permisos (para PermissionsMatrix)
+  async getAllRolePermissions(): Promise<Record<string, Record<string, string[]>>> {
+    try {
+      const allRoles = await this.getAllRoles();
+      const permissionsMatrix: Record<string, Record<string, string[]>> = {};
+      
+      allRoles.forEach(role => {
+        // Usar el slug del rol como clave
+        const roleSlug = role.slug;
+        const permissions = role.permissions as Record<string, any> || {};
+        
+        if (permissions.all === true) {
+          // Super Admin: expandir a todos los módulos con permisos completos
+          permissionsMatrix[roleSlug] = {
+            // Módulos principales del sistema
+            'dashboard': ['read', 'write', 'admin'],
+            'usuarios': ['read', 'write', 'admin'],  
+            'roles': ['read', 'write', 'admin'],
+            'parques': ['read', 'write', 'admin'],
+            'actividades': ['read', 'write', 'admin'],
+            'instructores': ['read', 'write', 'admin'],
+            'voluntarios': ['read', 'write', 'admin'],
+            'activos': ['read', 'write', 'admin'],
+            'mantenimiento': ['read', 'write', 'admin'],
+            'inventario': ['read', 'write', 'admin'],
+            'incidencias': ['read', 'write', 'admin'],
+            'contabilidad': ['read', 'write', 'admin'],
+            'presupuestos': ['read', 'write', 'admin'],
+            'facturacion': ['read', 'write', 'admin'],
+            'reportes-financieros': ['read', 'write', 'admin'],
+            'campanas': ['read', 'write', 'admin'],
+            'contenido': ['read', 'write', 'admin'],
+            'publicidad': ['read', 'write', 'admin'],
+            'comunicaciones': ['read', 'write', 'admin'],
+            'configuracion': ['read', 'write', 'admin'],
+            'seguridad': ['read', 'write', 'admin'],
+            'auditoria': ['read', 'write', 'admin'],
+            'respaldos': ['read', 'write', 'admin']
+          };
+        } else {
+          // Roles específicos: usar permisos existentes
+          permissionsMatrix[roleSlug] = permissions;
+        }
+      });
+      
+      return permissionsMatrix;
+    } catch (error) {
+      console.error('Error obteniendo matriz de permisos:', error);
+      return {};
+    }
+  }
 }
 
 export const roleService = new RoleService();
