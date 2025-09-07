@@ -100,27 +100,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Configure multer for file uploads
   const upload = multer({ storage: multer.memoryStorage() });
 
-  // Configure multer specifically for park images with Object Storage integration
+  // Configure multer specifically for park images with Replit Object Storage
   const parkImageUpload = multer({
-    storage: multer.diskStorage({
-      destination: function (req, file, cb) {
-        const isProduction = process.env.NODE_ENV === 'production' || 
-                            process.env.REPLIT_DEPLOYMENT || 
-                            !process.env.NODE_ENV;
-        // En producción usaremos Object Storage, pero mantenemos filesystem como respaldo
-        const uploadsDir = isProduction ? 'uploads/park-images/' : 'uploads/park-images/';
-        // Crear directorio si no existe
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-        cb(null, uploadsDir);
-      },
-      filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = file.originalname.split('.').pop();
-        cb(null, `park-images-${uniqueSuffix}.${extension}`);
-      }
-    }),
+    storage: multer.memoryStorage(), // Use memory storage for Object Storage uploads
     fileFilter: (req, file, cb) => {
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (allowedTypes.includes(file.mimetype)) {
