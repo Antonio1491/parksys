@@ -179,6 +179,33 @@ export class ReplitObjectStorageService {
     // Fallback: URL relativa (funciona en desarrollo y mayoría de deployments)
     return `/api/storage/file/${encodedFilename}`;
   }
+
+  /**
+   * 🛠️ NORMALIZAR URL: Corregir URLs que vengan del cliente oficial de Replit
+   * (Puede que el cliente genere URLs con dominios incorrectos)
+   */
+  normalizeUrl(originalUrl: string): string {
+    // Si ya es una URL relativa, generar la correcta
+    if (originalUrl.startsWith('/api/storage/file/')) {
+      const filename = originalUrl.replace('/api/storage/file/', '');
+      return this.getPublicUrl(decodeURIComponent(filename));
+    }
+    
+    // Si es una URL absoluta con dominio de spock.replit.dev, corregirla
+    if (originalUrl.includes('.spock.replit.dev/api/storage/file/')) {
+      const match = originalUrl.match(/\/api\/storage\/file\/(.+)$/);
+      if (match) {
+        const filename = match[1];
+        console.log(`🔧 [NORMALIZE] Corrigiendo URL con dominio incorrecto: ${originalUrl}`);
+        const correctedUrl = this.getPublicUrl(decodeURIComponent(filename));
+        console.log(`✅ [NORMALIZE] URL corregida: ${correctedUrl}`);
+        return correctedUrl;
+      }
+    }
+    
+    // Si ya está correcta, devolverla tal como está
+    return originalUrl;
+  }
 }
 
 // Instancia singleton del servicio

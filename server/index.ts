@@ -1614,9 +1614,13 @@ app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Reques
           
           // Usar la librería oficial de Replit (autenticación automática)
           const filename = await replitObjectStorage.uploadFile(uploadedFile.buffer, uploadedFile.originalname);
-          finalImageUrl = replitObjectStorage.getPublicUrl(filename);
+          let rawUrl = replitObjectStorage.getPublicUrl(filename);
+          
+          // 🛠️ NORMALIZAR URL: Asegurar que use el dominio correcto
+          finalImageUrl = replitObjectStorage.normalizeUrl(rawUrl);
           
           console.log(`✅ [REPLIT-STORAGE] ÉXITO TOTAL - Imagen subida con persistencia garantizada: ${finalImageUrl}`);
+          console.log(`🔧 [REPLIT-STORAGE] URL normalizada desde: ${rawUrl} -> ${finalImageUrl}`);
           
         } catch (osError) {
           console.error(`❌ [REPLIT-STORAGE] ERROR CRÍTICO en Object Storage:`, osError);

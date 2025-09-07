@@ -4087,10 +4087,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Usar la librería oficial de Replit (autenticación automática)
             const filename = await replitObjectStorage.uploadFile(req.file.buffer, req.file.originalname);
-            imageUrl = replitObjectStorage.getPublicUrl(filename);
+            let rawUrl = replitObjectStorage.getPublicUrl(filename);
+            
+            // 🛠️ NORMALIZAR URL: Asegurar que use el dominio correcto
+            imageUrl = replitObjectStorage.normalizeUrl(rawUrl);
             
             console.log(`✅ [REPLIT-STORAGE] ÉXITO TOTAL - Imagen subida con persistencia garantizada: ${imageUrl}`);
             console.log(`🎯 [REPLIT-STORAGE] Filename interno: ${filename}`);
+            console.log(`🔧 [REPLIT-STORAGE] URL normalizada desde: ${rawUrl} -> ${imageUrl}`);
             
           } catch (osError) {
             console.error(`❌ [REPLIT-STORAGE] ERROR CRÍTICO en Object Storage:`, osError);
