@@ -1,40 +1,23 @@
 import express, { Request, Response } from 'express';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import { isAuthenticated } from './middleware/auth';
+import { UnifiedStorageService } from './UnifiedStorageService';
 
 const router = express.Router();
 
-// Configuración de multer para eventos
-const eventImageStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = path.join(process.cwd(), 'uploads', 'event-images');
-    
-    // Crear directorio si no existe
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    // Generar nombre único para el archivo
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, 'event-img-' + uniqueSuffix + ext);
-  }
-});
+// 🚀 USAR SISTEMA HÍBRIDO IGUAL QUE PARQUES Y ACTIVIDADES
+const unifiedStorage = new UnifiedStorageService();
 
+// Configuración de multer para memoria (no disco)
 const eventImageUpload = multer({
-  storage: eventImageStorage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB límite
   },
   fileFilter: function (req, file, cb) {
     // Validar tipos de archivo
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = allowedTypes.test(file.originalname.toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
 
     if (mimetype && extname) {
@@ -45,8 +28,8 @@ const eventImageUpload = multer({
   }
 });
 
-// Endpoint para subir imagen de evento
-router.post('/upload-image', isAuthenticated, eventImageUpload.single('image'), (req: Request, res: Response) => {
+// Endpoint para subir imagen de evento con SISTEMA HÍBRIDO
+router.post('/upload-image', isAuthenticated, eventImageUpload.single('image'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ 
@@ -55,28 +38,38 @@ router.post('/upload-image', isAuthenticated, eventImageUpload.single('image'), 
       });
     }
 
-    // Construir URL de la imagen
-    const imageUrl = `/uploads/event-images/${req.file.filename}`;
-    
-    console.log('📸 Imagen de evento subida:', {
-      originalName: req.file.originalname,
-      filename: req.file.filename,
-      size: req.file.size,
-      path: req.file.path,
-      url: imageUrl
+    console.log('📸 [EVENT-HÍBRIDO] Iniciando upload de imagen de evento:', req.file.originalname);
+
+    // ✅ USAR UNIFIED STORAGE SERVICE (igual que parques y actividades)
+    const uploadResult = await unifiedStorage.uploadImage(
+      req.file, 
+      'event-images',
+      {
+        caption: 'Imagen de evento',
+        isPrimary: true
+      }
+    );
+
+    console.log('✅ [EVENT-HÍBRIDO] Upload exitoso:', {
+      method: uploadResult.method,
+      persistent: uploadResult.persistent,
+      url: uploadResult.imageUrl,
+      originalName: req.file.originalname
     });
 
     res.json({
       success: true,
       message: 'Imagen subida exitosamente',
-      imageUrl: imageUrl,
-      filename: req.file.filename,
+      imageUrl: uploadResult.imageUrl,
+      filename: uploadResult.filename,
       originalName: req.file.originalname,
-      size: req.file.size
+      size: req.file.size,
+      method: uploadResult.method,
+      persistent: uploadResult.persistent
     });
 
   } catch (error) {
-    console.error('Error al subir imagen de evento:', error);
+    console.error('❌ [EVENT-HÍBRIDO] Error al subir imagen de evento:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Error interno del servidor al subir la imagen' 
@@ -108,7 +101,7 @@ router.use((error: any, req: Request, res: Response, next: any) => {
     });
   }
   
-  console.error('Error en upload de imagen de evento:', error);
+  console.error('❌ [EVENT-HÍBRIDO] Error en upload de imagen de evento:', error);
   res.status(500).json({
     success: false,
     message: 'Error interno del servidor'
