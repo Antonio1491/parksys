@@ -19,7 +19,7 @@ const SYSTEM_ROLES = [
     name: 'Administrador General',
     slug: 'admin', // ✅ Corregido para coincidir con BD (era 'admin-general')
     description: 'Administrador general del sistema',
-    level: 1, // ✅ Mismo nivel que Super Admin
+    level: 2, // ✅ Nivel 2 según nueva estructura
     color: '#1e40af',
     permissions: {
       'Configuración': ['read', 'write'],

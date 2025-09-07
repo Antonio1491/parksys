@@ -46,6 +46,19 @@ export function registerRoleRoutes(app: Express) {
       // Validar datos de entrada
       const roleData = insertRoleSchema.parse(req.body);
       
+      // Obtener el nivel del usuario actual
+      const currentUser = await roleService.getUserWithRole(req.user.id);
+      const currentUserLevel = currentUser?.userRole?.level || 999; // Si no se encuentra, asumir nivel más bajo
+      
+      // Validar que el usuario no pueda crear roles de nivel superior o igual al suyo
+      // Super-admin (nivel 1) puede crear cualquier nivel
+      // Admin (nivel 2) solo puede crear nivel 3 (User)
+      if (currentUserLevel > 1 && roleData.level <= currentUserLevel) {
+        return res.status(403).json({ 
+          error: `No puedes crear roles de nivel ${roleData.level} o superior. Tu nivel actual es ${currentUserLevel}.` 
+        });
+      }
+      
       // Crear el rol
       const newRole = await roleService.createRole(roleData);
       
@@ -179,20 +192,7 @@ export function registerRoleRoutes(app: Express) {
     }
   });
 
-  // Crear nuevo rol
-  app.post("/api/roles", async (req, res) => {
-    try {
-      const validatedData = insertRoleSchema.parse(req.body);
-      const newRole = await roleService.createRole(validatedData);
-      res.status(201).json(newRole);
-    } catch (error) {
-      console.error("Error creando rol:", error);
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Datos inválidos", details: error.errors });
-      }
-      res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
+  // Endpoint duplicado eliminado - usar el de arriba con autenticación
 
   // Actualizar rol
   app.put("/api/roles/:id", async (req, res) => {
