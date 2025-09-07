@@ -4075,26 +4075,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (req.file) {
         // 📁 FORMDATA: Archivo subido
-        console.log(`📁 [PARK-IMAGES] Procesando archivo subido: ${req.file.filename}`);
+        console.log(`📁 [PARK-IMAGES] Procesando archivo subido: ${req.file.originalname}`);
         
         if (isProduction) {
           try {
-            console.log(`🚀 [OBJECT-STORAGE] Moviendo a Object Storage para persistencia...`);
-            const objectStorageService = new ObjectStorageService();
+            console.log(`🚀 [REPLIT-STORAGE] Subiendo a Object Storage oficial...`);
             
-            // TODO: Implementar subida a Object Storage aquí
-            // Por ahora usamos filesystem con logging mejorado
-            imageUrl = `/uploads/park-images/${req.file.filename}`;
-            console.log(`✅ [PARK-IMAGES] Archivo guardado temporalmente: ${imageUrl}`);
-            console.log(`⚠️ [PARK-IMAGES] TODO: Migrar a Object Storage para persistencia total`);
+            // Usar la librería oficial de Replit (autenticación automática)
+            const filename = await replitObjectStorage.uploadFile(req.file.buffer, req.file.originalname);
+            imageUrl = replitObjectStorage.getPublicUrl(filename);
+            
+            console.log(`✅ [REPLIT-STORAGE] Imagen subida con persistencia garantizada: ${imageUrl}`);
             
           } catch (osError) {
-            console.log(`⚠️ [OBJECT-STORAGE] Error, usando filesystem: ${osError}`);
-            imageUrl = `/uploads/park-images/${req.file.filename}`;
+            console.log(`⚠️ [REPLIT-STORAGE] Error, usando fallback filesystem: ${osError}`);
+            // Fallback: crear archivo temporal
+            const tempDir = 'uploads/park-images/';
+            if (!fs.existsSync(tempDir)) {
+              fs.mkdirSync(tempDir, { recursive: true });
+            }
+            const tempFilename = `temp-${Date.now()}-${req.file.originalname}`;
+            const tempPath = path.join(tempDir, tempFilename);
+            fs.writeFileSync(tempPath, req.file.buffer);
+            imageUrl = `/uploads/park-images/${tempFilename}`;
           }
         } else {
-          // Desarrollo: usar filesystem directamente
-          imageUrl = `/uploads/park-images/${req.file.filename}`;
+          // Desarrollo: crear archivo local
+          const devDir = 'uploads/park-images/';
+          if (!fs.existsSync(devDir)) {
+            fs.mkdirSync(devDir, { recursive: true });
+          }
+          const devFilename = `dev-${Date.now()}-${req.file.originalname}`;
+          const devPath = path.join(devDir, devFilename);
+          fs.writeFileSync(devPath, req.file.buffer);
+          imageUrl = `/uploads/park-images/${devFilename}`;
           console.log(`✅ [PARK-IMAGES] Desarrollo - archivo guardado: ${imageUrl}`);
         }
         
@@ -7803,6 +7817,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error obteniendo conteo de notificaciones:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // 🚀 Servir archivos desde Replit Object Storage
+  apiRouter.get("/storage/file/:filename(*)", async (req: Request, res: Response) => {
+    try {
+      const filename = req.params.filename;
+      console.log(`📥 [REPLIT-STORAGE] Solicitando archivo: ${filename}`);
+      
+      await replitObjectStorage.downloadFile(filename, res);
+    } catch (error) {
+      console.error("❌ [REPLIT-STORAGE] Error sirviendo archivo:", error);
+      res.status(404).json({ error: 'Archivo no encontrado' });
     }
   });
 
