@@ -59,6 +59,8 @@ const eventFormSchema = z.object({
     required_error: "La fecha de inicio es requerida",
   }),
   endDate: z.date().optional().nullable(),
+  startTime: z.string().optional().nullable(),
+  endTime: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   capacity: z.coerce
     .number()
@@ -151,6 +153,8 @@ const NewEventPageFixed: React.FC = () => {
       status: "draft",
       startDate: new Date(),
       endDate: null,
+      startTime: null,
+      endTime: null,
       location: "",
       capacity: null,
       registrationType: "free",
@@ -184,8 +188,8 @@ const NewEventPageFixed: React.FC = () => {
         featuredImageUrl: data.imageUrl || null,
         startDate: data.startDate ? data.startDate.toISOString().split('T')[0] : "", // ✅ Date → YYYY-MM-DD string
         endDate: data.endDate ? data.endDate.toISOString().split('T')[0] : null,
-        startTime: null, // Agregar si se necesita
-        endTime: null,   // Agregar si se necesita
+        startTime: data.startTime || null,
+        endTime: data.endTime || null,
         isRecurring: false,
         recurrencePattern: null,
         location: data.location || null,
@@ -377,8 +381,13 @@ const NewEventPageFixed: React.FC = () => {
 
             {/* Fecha y hora */}
             <div className="bg-card p-6 rounded-lg border">
-              <h3 className="text-lg font-medium mb-4">Fecha y hora</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <h3 className="text-lg font-medium mb-4">
+                <CalendarIcon className="w-5 h-5 inline-block mr-2" />
+                Fecha y hora
+              </h3>
+              
+              {/* Fechas */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <FormField
                   control={form.control}
                   name="startDate"
@@ -459,6 +468,59 @@ const NewEventPageFixed: React.FC = () => {
                       </Popover>
                       <FormDescription>
                         Opcional: si es un evento de varios días
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Horas */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="startTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <Clock className="w-4 h-4 inline-block mr-1" />
+                        Hora de inicio (opcional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="time"
+                          {...field}
+                          value={field.value || ""}
+                          placeholder="HH:MM"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Hora en formato 24 horas (ej: 14:30)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="endTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <Clock className="w-4 h-4 inline-block mr-1" />
+                        Hora de fin (opcional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="time"
+                          {...field}
+                          value={field.value || ""}
+                          placeholder="HH:MM"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Hora en formato 24 horas (ej: 17:30)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
