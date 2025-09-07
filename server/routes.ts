@@ -4069,9 +4069,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPrimary: boolean = req.body.isPrimary === 'true' || req.body.isPrimary === true;
 
       // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA
-      const isProduction = process.env.NODE_ENV === 'production' || 
-                          process.env.REPLIT_DEPLOYMENT || 
-                          !process.env.NODE_ENV;
+      const isProduction = process.env.REPLIT_ENVIRONMENT === 'production' ||
+                          process.env.NODE_ENV === 'production' || 
+                          process.env.REPLIT_DEPLOYMENT;
+      
+      console.log(`🔍 [PARK-IMAGES] Entorno detectado: isProduction=${isProduction}, REPLIT_ENVIRONMENT=${process.env.REPLIT_ENVIRONMENT}`);
 
       if (req.file) {
         // 📁 FORMDATA: Archivo subido

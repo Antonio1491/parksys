@@ -1,0 +1,78 @@
+🔥 Firebase initialized successfully
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+google.maps.Load @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-Cqvv0bbU.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-Cqvv0bbU.js:794 i18next: languageChanged es
+index-Cqvv0bbU.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+3index-Cqvv0bbU.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-Cqvv0bbU.js:49 🌐 [QUERY] GET /api/notifications/count
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 0, documents: 0, imagesLoading: true, documentsLoading: true, …}
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando imágenes para parque 89
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando documentos para parque 89
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando videos para parque 89
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Documentos cargados: []
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 0, documents: 0, imagesLoading: true, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Videos cargados: []
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 0, documents: 0, imagesLoading: true, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Imágenes cargadas: [{…}]
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-images-1757252567533-36124084.jpg:1  GET https://parksys-demo.replit.app/uploads/park-images/park-images-1757252567533-36124084.jpg 404 (Not Found)
+Image
+j4 @ index-Cqvv0bbU.js:41
+Aq @ index-Cqvv0bbU.js:41
+Aq @ index-Cqvv0bbU.js:41
+sie @ index-Cqvv0bbU.js:41
+uie @ index-Cqvv0bbU.js:41
+Ed @ index-Cqvv0bbU.js:41
+N4 @ index-Cqvv0bbU.js:41
+rd @ index-Cqvv0bbU.js:39
+(anonymous) @ index-Cqvv0bbU.js:41
+setTimeout
+lse @ index-Cqvv0bbU.js:49
+o @ index-Cqvv0bbU.js:49
+batch @ index-Cqvv0bbU.js:49
+Wo @ index-Cqvv0bbU.js:49
+setData @ index-Cqvv0bbU.js:49
+onSuccess @ index-Cqvv0bbU.js:49
+f @ index-Cqvv0bbU.js:49
+Promise.then
+x @ index-Cqvv0bbU.js:49
+start @ index-Cqvv0bbU.js:49
+fetch @ index-Cqvv0bbU.js:49
+Gp @ index-Cqvv0bbU.js:49
+onSubscribe @ index-Cqvv0bbU.js:49
+subscribe @ index-Cqvv0bbU.js:49
+(anonymous) @ index-Cqvv0bbU.js:49
+QB @ index-Cqvv0bbU.js:39
+_w @ index-Cqvv0bbU.js:41
+Kh @ index-Cqvv0bbU.js:41
+uie @ index-Cqvv0bbU.js:41
+Ed @ index-Cqvv0bbU.js:41
+N4 @ index-Cqvv0bbU.js:41
+rd @ index-Cqvv0bbU.js:39
+(anonymous) @ index-Cqvv0bbU.js:41
+setTimeout
+lse @ index-Cqvv0bbU.js:49
+o @ index-Cqvv0bbU.js:49
+batch @ index-Cqvv0bbU.js:49
+Wo @ index-Cqvv0bbU.js:49
+setData @ index-Cqvv0bbU.js:49
+onSuccess @ index-Cqvv0bbU.js:49
+f @ index-Cqvv0bbU.js:49
+Promise.then
+x @ index-Cqvv0bbU.js:49
+start @ index-Cqvv0bbU.js:49
+fetch @ index-Cqvv0bbU.js:49
+Gp @ index-Cqvv0bbU.js:49
+onSubscribe @ index-Cqvv0bbU.js:49
+subscribe @ index-Cqvv0bbU.js:49
+(anonymous) @ index-Cqvv0bbU.js:49
+QB @ index-Cqvv0bbU.js:39
+_w @ index-Cqvv0bbU.js:41
+Kh @ index-Cqvv0bbU.js:41
+(anonymous) @ index-Cqvv0bbU.js:41
+C @ index-Cqvv0bbU.js:26
+R @ index-Cqvv0bbU.js:26Understand this error
