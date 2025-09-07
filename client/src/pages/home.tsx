@@ -427,8 +427,8 @@ const Home: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-poppins font-black mb-8">
               <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
-              <span style={{ color: '#00444f' }}>Sistema de<br />
-              <span style={{ color: '#14b8a6' }}>Parques</span> de México</span>
+              <span style={{ color: '#00444f' }}>Sistema de</span><br />
+              <span style={{ color: '#14b8a6' }}>Parques</span> <span style={{ color: '#a8bd7d' }}>de México</span>
             </h2>
             <p className="text-xl font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
               Una red que integra y fortalece los espacios públicos del país, reconociendo a<br />
@@ -442,7 +442,7 @@ const Home: React.FC = () => {
               <div className="text-left">
                 <h3 className="leading-tight">
                   <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
-                  <span style={{ fontFamily: 'poppins', fontSize: '2.25rem', fontWeight: 'bold' }}>
+                  <span style={{ fontFamily: 'poppins', fontSize: '2.4rem', fontWeight: 'bold' }}>
                     <span style={{ color: '#00444f' }}>objetivos y </span>
                     <span style={{ color: '#14b8a6' }}>deseos</span>
                   </span><br />
