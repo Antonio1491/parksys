@@ -195,7 +195,9 @@ const NewEventPageFixed: React.FC = () => {
         organizerOrganization: data.organizer_organization || null,
         organizerEmail: data.contact_email || null,
         organizerPhone: data.contact_phone || null,
-        geolocation: data.geolocation || null,
+        geolocation: data.latitude && data.longitude 
+          ? { lat: data.latitude, lng: data.longitude }
+          : null,
         isFree: data.isFree,
         price: data.price ? data.price * 100 : null, // Convertir a centavos
         requiresApproval: data.requiresApproval,
@@ -241,16 +243,9 @@ const NewEventPageFixed: React.FC = () => {
 
   // Manejar envío del formulario
   const onSubmit = (data: EventFormValues) => {
-    // Crear el objeto de geolocation si se proporcionaron coordenadas
-    const eventData = {
-      ...data,
-      geolocation: data.latitude && data.longitude 
-        ? { lat: data.latitude, lng: data.longitude }
-        : null
-    };
-    
-    console.log("DATOS DEL FORMULARIO:", eventData);
-    createEventMutation.mutate(eventData);
+    console.log("DATOS DEL FORMULARIO:", data);
+    // ✅ Pasar datos RAW a la mutación para que la transformación ocurra ahí
+    createEventMutation.mutate(data);
   };
 
   if (parksLoading || categoriesLoading) {

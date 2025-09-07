@@ -1,0 +1,39 @@
+Firebase initialized successfully
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/parks
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/event-categories
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-DoEgMnTj.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-DoEgMnTj.js:794 i18next: languageChanged es
+index-DoEgMnTj.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+3index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/notifications/count
+3index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/notifications/count
+index-DoEgMnTj.js:2770 DATOS DEL FORMULARIO: {title: 'Prueba Luis', description: 'aqui va la descripcioón', eventType: '', categoryId: 1, targetAudience: 'all', …}
+index-DoEgMnTj.js:2770  POST https://parksys-demo.replit.app/api/events 400 (Bad Request)
+mutationFn @ index-DoEgMnTj.js:2770
+fn @ index-DoEgMnTj.js:49
+x @ index-DoEgMnTj.js:49
+start @ index-DoEgMnTj.js:49
+execute @ index-DoEgMnTj.js:49
+await in execute
+mutate @ index-DoEgMnTj.js:49
+(anonymous) @ index-DoEgMnTj.js:49
+c @ index-DoEgMnTj.js:2770
+(anonymous) @ index-DoEgMnTj.js:838
+await in (anonymous)
+kre @ index-DoEgMnTj.js:38
+Ore @ index-DoEgMnTj.js:38
+Ire @ index-DoEgMnTj.js:38
+GI @ index-DoEgMnTj.js:38
+DB @ index-DoEgMnTj.js:38
+(anonymous) @ index-DoEgMnTj.js:38
+aA @ index-DoEgMnTj.js:41
+sB @ index-DoEgMnTj.js:38
+aN @ index-DoEgMnTj.js:38
+OP @ index-DoEgMnTj.js:38
+Zre @ index-DoEgMnTj.js:38Understand this error
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/notifications/count
