@@ -417,7 +417,7 @@ export const roles = pgTable("roles", {
   name: varchar("name", { length: 100 }).notNull().unique(),
   slug: varchar("slug", { length: 100 }).notNull().unique(),
   description: text("description"),
-  level: integer("level").notNull(), // 1 = Super Admin, 7 = Consultor Auditor
+  level: integer("level").notNull(), // 1 = Super-admin, 2 = Admin, 3 = User
   color: varchar("color", { length: 7 }).default("#6366f1"), // Color para badges
   permissions: jsonb("permissions").$type<Record<string, any>>().default({}),
   isActive: boolean("is_active").default(true),

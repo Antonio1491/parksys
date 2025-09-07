@@ -21,20 +21,16 @@ const createRoleSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   slug: z.string().min(3, 'El slug debe tener al menos 3 caracteres').regex(/^[a-z-]+$/, 'Solo letras minúsculas y guiones'),
   description: z.string().optional(),
-  level: z.number().min(1).max(7)
+  level: z.number().min(1).max(3)
 });
 
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
 
 // Niveles de rol predefinidos con sus características
 const ROLE_LEVELS = [
-  { level: 1, name: 'Super Administrador', description: 'Control total del sistema', icon: Crown },
-  { level: 2, name: 'Administrador General', description: 'Gestión completa de módulos', icon: ShieldCheck },
-  { level: 3, name: 'Coordinador de Parques', description: 'Gestión de parques y actividades', icon: Shield },
-  { level: 4, name: 'Supervisor de Operaciones', description: 'Supervisión operativa', icon: UserCog },
-  { level: 5, name: 'Técnico Especialista', description: 'Especialización técnica', icon: Settings },
-  { level: 6, name: 'Operador de Campo', description: 'Operaciones básicas', icon: User },
-  { level: 7, name: 'Consultor Auditor', description: 'Solo lectura y auditoría', icon: Eye }
+  { level: 1, name: 'Super-admin', description: 'Acceso y control total del sistema, permisos CRUD para roles de cualquier nivel', icon: Crown },
+  { level: 2, name: 'Admin', description: 'Acceso y control total con excepciones, permisos CRUD para roles de nivel inferior, solo lectura para su nivel y superiores', icon: ShieldCheck },
+  { level: 3, name: 'User', description: 'Acceso y control según asignación por niveles superiores (gestión, operación, coordinación, etc.)', icon: User }
 ];
 
 interface RoleCreationModalProps {
@@ -52,7 +48,7 @@ export const RoleCreationModal: React.FC<RoleCreationModalProps> = ({ open, onOp
       name: '',
       slug: '',
       description: '',
-      level: 6
+      level: 3
     }
   });
 
