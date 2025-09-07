@@ -145,7 +145,7 @@ const NewEventPageFixed: React.FC = () => {
     defaultValues: {
       title: "",
       description: "",
-      eventType: "",
+      eventType: "recreational", // ✅ Valor por defecto válido
       categoryId: 1,
       targetAudience: "all",
       status: "draft",
@@ -174,12 +174,43 @@ const NewEventPageFixed: React.FC = () => {
   // Mutación para crear un evento
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormValues) => {
+      // 🚀 TRANSFORMAR DATOS para que coincidan con insertEventSchema del backend
+      const transformedData = {
+        title: data.title,
+        description: data.description || null,
+        eventType: data.eventType || "recreational", // ✅ Valor por defecto válido si está vacío
+        targetAudience: data.targetAudience,
+        status: data.status,
+        featuredImageUrl: data.imageUrl || null,
+        startDate: data.startDate ? data.startDate.toISOString().split('T')[0] : "", // ✅ Date → YYYY-MM-DD string
+        endDate: data.endDate ? data.endDate.toISOString().split('T')[0] : null,
+        startTime: null, // Agregar si se necesita
+        endTime: null,   // Agregar si se necesita
+        isRecurring: false,
+        recurrencePattern: null,
+        location: data.location || null,
+        capacity: data.capacity || null,
+        registrationType: data.registrationType === "open" ? "free" : "registration",
+        organizerName: data.organizer_name || null,
+        organizerOrganization: data.organizer_organization || null,
+        organizerEmail: data.contact_email || null,
+        organizerPhone: data.contact_phone || null,
+        geolocation: data.geolocation || null,
+        isFree: data.isFree,
+        price: data.price ? data.price * 100 : null, // Convertir a centavos
+        requiresApproval: data.requiresApproval,
+        // ✅ CAMPO CRÍTICO: parkIds como array con al menos 1 elemento
+        parkIds: data.parkIds && data.parkIds.length > 0 ? data.parkIds : [1] // Default al parque 1 si está vacío
+      };
+
+      console.log("🚀 DATOS TRANSFORMADOS PARA BACKEND:", transformedData);
+      
       const response = await fetch("/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(transformedData),
       });
       
       if (!response.ok) {
