@@ -604,48 +604,107 @@ export class RoleService {
     }
   }
 
+  // Mapeo de módulos antiguos a nuevos para migración de datos
+  private mapLegacyPermissions(legacyPermissions: Record<string, string[]>): Record<string, string[]> {
+    const mappedPermissions: Record<string, string[]> = {};
+    
+    // Mapeo de categorías antiguas a módulos específicos
+    const legacyMapping: Record<string, string[]> = {
+      // Recursos Humanos → múltiples módulos
+      'RH': ['empleados', 'nomina', 'vacaciones', 'instructores'],
+      
+      // Finanzas → múltiples módulos financieros  
+      'Finanzas': ['finanzas', 'contabilidad', 'presupuestos', 'facturacion', 'reportes-financieros', 'concesiones'],
+      
+      // Gestión → múltiples módulos de gestión
+      'Gestión': ['parques', 'actividades', 'eventos', 'reservas', 'evaluaciones'],
+      
+      // Marketing → múltiples módulos de comunicación
+      'Marketing': ['marketing', 'publicidad', 'comunicaciones', 'campanas', 'contenido'],
+      
+      // Seguridad → múltiples módulos de seguridad
+      'Seguridad': ['seguridad', 'auditoria', 'control-acceso', 'politicas'],
+      
+      // Operaciones → múltiples módulos operativos
+      'Operaciones': ['activos', 'incidencias', 'mantenimiento', 'inventario'],
+      
+      // Configuración → múltiples módulos del sistema
+      'Configuración': ['configuracion', 'usuarios', 'roles', 'notificaciones', 'respaldos']
+    };
+    
+    // Procesar cada permiso existente
+    Object.entries(legacyPermissions).forEach(([moduleKey, permissions]) => {
+      if (legacyMapping[moduleKey]) {
+        // Es un módulo antiguo - mapear a múltiples módulos nuevos
+        legacyMapping[moduleKey].forEach(newModuleId => {
+          mappedPermissions[newModuleId] = [...permissions];
+        });
+      } else {
+        // Es un módulo ya actualizado - mantener
+        mappedPermissions[moduleKey] = [...permissions];
+      }
+    });
+    
+    return mappedPermissions;
+  }
+
+  // Obtener todos los módulos esperados por useAdaptiveModules
+  private getAllExpectedModules(): string[] {
+    return [
+      // Dashboard
+      'dashboard',
+      
+      // Gestión
+      'parques', 'actividades', 'eventos', 'reservas', 'evaluaciones', 'amenidades', 'arbolado', 'fauna', 'visitantes',
+      
+      // Operaciones y Mantenimiento
+      'activos', 'incidencias', 'voluntarios', 'mantenimiento', 'inventario',
+      
+      // Finanzas
+      'finanzas', 'contabilidad', 'concesiones', 'presupuestos', 'facturacion', 'reportes-financieros',
+      
+      // Marketing y Comunicaciones
+      'marketing', 'publicidad', 'comunicaciones', 'campanas', 'contenido',
+      
+      // Recursos Humanos
+      'empleados', 'nomina', 'vacaciones', 'instructores',
+      
+      // Sistema y Seguridad
+      'usuarios', 'roles', 'configuracion', 'seguridad', 'auditoria', 'control-acceso', 'politicas', 
+      'notificaciones', 'mantenimiento-sistema', 'exportaciones', 'respaldos'
+    ];
+  }
+
   // Obtener matriz completa de permisos (para PermissionsMatrix)
   async getAllRolePermissions(): Promise<Record<string, Record<string, string[]>>> {
     try {
       const allRoles = await this.getAllRoles();
       const permissionsMatrix: Record<string, Record<string, string[]>> = {};
+      const expectedModules = this.getAllExpectedModules();
       
       allRoles.forEach(role => {
         // Usar el slug del rol como clave
         const roleSlug = role.slug;
-        const permissions = role.permissions as Record<string, any> || {};
+        const rawPermissions = role.permissions as Record<string, any> || {};
         
-        if (permissions.all === true) {
-          // Super Admin: expandir a todos los módulos con permisos completos
-          permissionsMatrix[roleSlug] = {
-            // Módulos principales del sistema
-            'dashboard': ['read', 'write', 'admin'],
-            'usuarios': ['read', 'write', 'admin'],  
-            'roles': ['read', 'write', 'admin'],
-            'parques': ['read', 'write', 'admin'],
-            'actividades': ['read', 'write', 'admin'],
-            'instructores': ['read', 'write', 'admin'],
-            'voluntarios': ['read', 'write', 'admin'],
-            'activos': ['read', 'write', 'admin'],
-            'mantenimiento': ['read', 'write', 'admin'],
-            'inventario': ['read', 'write', 'admin'],
-            'incidencias': ['read', 'write', 'admin'],
-            'contabilidad': ['read', 'write', 'admin'],
-            'presupuestos': ['read', 'write', 'admin'],
-            'facturacion': ['read', 'write', 'admin'],
-            'reportes-financieros': ['read', 'write', 'admin'],
-            'campanas': ['read', 'write', 'admin'],
-            'contenido': ['read', 'write', 'admin'],
-            'publicidad': ['read', 'write', 'admin'],
-            'comunicaciones': ['read', 'write', 'admin'],
-            'configuracion': ['read', 'write', 'admin'],
-            'seguridad': ['read', 'write', 'admin'],
-            'auditoria': ['read', 'write', 'admin'],
-            'respaldos': ['read', 'write', 'admin']
-          };
+        if (rawPermissions.all === true) {
+          // Super Admin: todos los módulos con permisos completos
+          const superAdminPermissions: Record<string, string[]> = {};
+          expectedModules.forEach(moduleId => {
+            superAdminPermissions[moduleId] = ['read', 'write', 'admin'];
+          });
+          permissionsMatrix[roleSlug] = superAdminPermissions;
         } else {
-          // Roles específicos: usar permisos existentes
-          permissionsMatrix[roleSlug] = permissions;
+          // Otros roles: mapear permisos existentes y normalizar
+          const mappedPermissions = this.mapLegacyPermissions(rawPermissions);
+          
+          // Asegurar que todos los módulos están presentes (vacíos si no tienen permisos)
+          const normalizedPermissions: Record<string, string[]> = {};
+          expectedModules.forEach(moduleId => {
+            normalizedPermissions[moduleId] = mappedPermissions[moduleId] || [];
+          });
+          
+          permissionsMatrix[roleSlug] = normalizedPermissions;
         }
       });
       
