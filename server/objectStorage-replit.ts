@@ -161,10 +161,23 @@ export class ReplitObjectStorageService {
 
   /**
    * 🔗 PUBLIC URL: Generar URL pública para archivo
-   * (Para Replit, simplemente retornamos la ruta del servidor)
+   * (Para Replit, ajustar según entorno de desarrollo vs producción)
    */
   getPublicUrl(filename: string): string {
-    return `/api/storage/file/${encodeURIComponent(filename)}`;
+    const encodedFilename = encodeURIComponent(filename);
+    
+    // En producción, usar URL completa si está disponible
+    const isProduction = process.env.REPLIT_ENVIRONMENT === 'production' ||
+                         process.env.NODE_ENV === 'production' || 
+                         process.env.REPLIT_DEPLOYMENT;
+    
+    if (isProduction && process.env.REPLIT_DEV_DOMAIN) {
+      // Usar dominio completo para producción
+      return `https://${process.env.REPLIT_DEV_DOMAIN}/api/storage/file/${encodedFilename}`;
+    }
+    
+    // Fallback: URL relativa (funciona en desarrollo y mayoría de deployments)
+    return `/api/storage/file/${encodedFilename}`;
   }
 }
 
