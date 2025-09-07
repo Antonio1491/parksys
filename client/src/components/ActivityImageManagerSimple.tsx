@@ -126,12 +126,11 @@ export function ActivityImageManager({ activityId }: ActivityImageManagerProps) 
         // Add image by URL
         return await apiRequest(`/api/activities/${activityId}/images`, {
           method: "POST",
-          body: JSON.stringify({
+          data: {
             imageUrl: uploadData.imageUrl,
             caption: uploadData.caption || "",
             isPrimary: images.length === 0
-          }),
-          headers: { "Content-Type": "application/json" }
+          }
         });
       }
       
@@ -196,8 +195,7 @@ export function ActivityImageManager({ activityId }: ActivityImageManagerProps) 
     mutationFn: async (imageId: number) => {
       return await apiRequest(`/api/activities/${activityId}/images/${imageId}`, {
         method: "PUT",
-        body: JSON.stringify({ isPrimary: true }),
-        headers: { "Content-Type": "application/json" }
+        data: { isPrimary: true }
       });
     },
     onSuccess: () => {
@@ -494,6 +492,4 @@ export function ActivityImageManager({ activityId }: ActivityImageManagerProps) 
     </div>
   );
 }
-                className="absolute -top-2 -right-2 h-6 w-6 p-0"
-                onClick={clearSelection}
-              >
+
