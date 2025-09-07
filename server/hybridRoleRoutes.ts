@@ -55,6 +55,20 @@ export function registerHybridRoleRoutes(app: Express) {
     }
   });
 
+  // Obtener matriz completa de permisos (para PermissionsMatrix)
+  app.get("/api/roles/permissions", async (req, res) => {
+    try {
+      console.log("🔧 [HYBRID] Obteniendo matriz completa de permisos...");
+      const permissionsMatrix = await roleService.getAllRolePermissions();
+      
+      console.log(`✅ [HYBRID] Matriz de permisos obtenida: ${Object.keys(permissionsMatrix).length} roles`);
+      res.json(permissionsMatrix);
+    } catch (error) {
+      console.error("❌ [HYBRID] Error obteniendo matriz de permisos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // Validar jerarquía de permisos (para sistema adaptativo)
   app.post("/api/roles/permissions/validate-hierarchy", async (req, res) => {
     try {
