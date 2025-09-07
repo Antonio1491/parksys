@@ -1,0 +1,51 @@
+🔥 Firebase initialized successfully
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+google.maps.Load @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-Cqvv0bbU.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-Cqvv0bbU.js:794 i18next: languageChanged es
+index-Cqvv0bbU.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+3index-Cqvv0bbU.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-Cqvv0bbU.js:49 🌐 [QUERY] GET /api/notifications/count
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 0, documents: 0, imagesLoading: true, documentsLoading: true, …}
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando imágenes para parque 90
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando documentos para parque 90
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando videos para parque 90
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Documentos cargados: []
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 0, documents: 0, imagesLoading: true, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Imágenes cargadas: (2) [{…}, {…}]
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 2, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Videos cargados: []
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 2, documents: 0, imagesLoading: false, documentsLoading: false, …}
+index-Cqvv0bbU.js:49 🌐 [API REQUEST] DELETE /api/park-images/268
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 2, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 🔄 [DELETE] Imagen ya fue eliminada o no existe - actualizando UI
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando imágenes para parque 90
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando imágenes para parque 90
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 2, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Imágenes cargadas: [{…}]
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Imágenes cargadas: [{…}]
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+index-Cqvv0bbU.js:838 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-Cqvv0bbU.js:838
+_w @ index-Cqvv0bbU.js:41
+Kh @ index-Cqvv0bbU.js:41
+uie @ index-Cqvv0bbU.js:41
+Ed @ index-Cqvv0bbU.js:41
+N4 @ index-Cqvv0bbU.js:41
+rd @ index-Cqvv0bbU.js:39
+(anonymous) @ index-Cqvv0bbU.js:41Understand this warning
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 📤 [UPLOAD-OS] Iniciando subida con Object Storage: FormData
+park-manage-pV8lHe2b.js:1 🚀 [UNIFIED-STORAGE] Usando sistema unificado con persistencia garantizada
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ [UNIFIED-STORAGE] Upload exitoso - PERSISTENCIA GARANTIZADA: {id: 269, parkId: 90, imageUrl: 'https://58098ffd-5b60-440e-838b-731e0f384d54-00-2r…b6-7615-4469-b56c-d8854534efdf-descarga%20(2).jpg', caption: null, isPrimary: false, …}
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando imágenes para parque 90
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Imágenes cargadas: (2) [{…}, {…}]
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 2, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 2, documents: 0, imagesLoading: false, documentsLoading: false, …}
