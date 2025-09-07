@@ -408,15 +408,16 @@ const Home: React.FC = () => {
             </div>
           )}
 
-          {/* Botón para ver todos los eventos - siempre visible */}
-          <div className="text-center">
-            <Link href="/events">
-              <Button size="lg" className="bg-[#f4f5f7] hover:bg-[#f4f5f7] text-[#00444f] font-poppins font-semibold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                VER TODOS LOS EVENTOS
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </Button>
-            </Link>
-          </div>
+          {/* Botón para ver todos los eventos si hay eventos disponibles */}
+          {featuredEvents.length > 0 && (
+            <div className="text-center">
+              <Link href="/events">
+                <Button size="lg" className="bg-[#f4f5f7] hover:bg-[#f4f5f7] text-[#00444f] font-poppins font-semibold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                  VER TODOS LOS EVENTOS
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -425,8 +426,10 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#51a19f', fontWeight: '300' }}>Conoce la</span><br />
-              <span style={{ color: '#19633c' }}>Agencia Metropolitana<br />de Bosques Urbanos</span>
+              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#51a19f', fontWeight: '300' }}>Somos el</span><br />
+              <span style={{ color: '#19633c' }}>Sistema de<br />
+              <span style={{ color: '#19633c' }}>Parques</span> 
+              <span style={{ color: '#19633c' }}>de México</span>
             </h2>
             <p className="text-xl font-bold text-gray-700 max-w-4xl mx-auto leading-relaxed">
               Somos un Organismo Público Descentralizado que gestiona y conserva los parques del Área<br />
