@@ -97,9 +97,12 @@ export class UnifiedStorageService {
     // Convertir URL a path del objeto
     const objectPath = this.objectStorageService.normalizeObjectEntityPath(uploadUrl);
     
+    // Generar URL local que siempre funciona
+    const localUrl = `/api/storage/file/${encodeURIComponent(filename)}`;
+    
     return {
       success: true,
-      imageUrl: `/api/storage/file/${encodeURIComponent(objectPath.replace('/objects/', ''))}`, // URL local que funciona
+      imageUrl: localUrl, // URL local que siempre funciona
       filename: filename,
       method: 'object-storage',
       persistent: true
