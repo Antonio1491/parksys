@@ -28,6 +28,7 @@ import { registerAssetAssignmentRoutes } from "./asset_assignment_routes";
 import { registerSpaceReservationRoutes } from "./space-reservations-routes";
 import { registerReservableSpacesRoutes } from "./reservable-spaces-routes";
 import { ObjectStorageService } from "./objectStorage";
+import { replitObjectStorage } from "./objectStorage-replit";
 import { registerObjectStorageRoutes } from "./objectStorageRoutes";
 import { registerTreeRoutes } from "./tree_routes";
 import { registerTreeMaintenanceRoutes } from "./tree_maintenance_routes";
