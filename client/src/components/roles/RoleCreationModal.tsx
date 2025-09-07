@@ -57,7 +57,7 @@ export const RoleCreationModal: React.FC<RoleCreationModalProps> = ({ open, onOp
     mutationFn: async (data: CreateRoleFormData) => {
       return apiRequest('/api/roles', {
         method: 'POST',
-        body: JSON.stringify(data),
+        data: data,
       });
     },
     onSuccess: () => {
