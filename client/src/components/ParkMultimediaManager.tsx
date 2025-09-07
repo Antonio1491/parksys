@@ -9,6 +9,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { uploadParkImageSmart } from '@/utils/objectStorageUpload';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -196,41 +197,49 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   // Mutaciones para imágenes
   const uploadImageMutation = useMutation({
     mutationFn: async (data: FormData | { imageUrl: string; caption: string; isPrimary: boolean }) => {
-      console.log('📤 [UPLOAD] Iniciando subida con datos:', data instanceof FormData ? 'FormData' : data);
-      
-      // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA AUTOMÁTICA
-      const isProduction = window.location.hostname.includes('replit.app') || 
-                          window.location.hostname !== 'localhost';
+      console.log('📤 [UPLOAD-OS] Iniciando subida con Object Storage:', data instanceof FormData ? 'FormData' : data);
       
       if (data instanceof FormData) {
-        // 🚀 SMART UPLOAD: Intentar Object Storage primero, fallback a filesystem
-        console.log('🚀 [SMART] Intentando subida inteligente...');
+        // 🚀 USAR OBJECT STORAGE: Persistencia garantizada
+        console.log('🚀 [OBJECT-STORAGE] Usando sistema persistente definitivo');
         
-        // ✅ SISTEMA UNIFICADO: Persistencia automática garantizada
-        console.log('🚀 [UNIFIED] Sistema unificado con persistencia automática');
-        const response = await fetch(`/api/parks/${parkId}/images`, {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer direct-token-1750522117022',
-            'X-User-Id': '1',
-            'X-User-Role': 'super_admin'
-          },
-          body: data
-        });
-        if (!response.ok) throw new Error('Error subiendo imagen');
-        const result = await response.json();
-        result._uploadMethod = 'unified-persistent';
-        return result;
+        // Extraer información del FormData
+        const file = data.get('imageFile') as File;
+        const caption = data.get('caption') as string || '';
+        const isPrimary = data.get('isPrimary') === 'true';
+        
+        if (!file) {
+          throw new Error('Archivo no encontrado en FormData');
+        }
+        
+        // Usar la función de Object Storage
+        const result = await uploadParkImageSmart(parkId, file, caption, isPrimary);
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Error subiendo imagen con Object Storage');
+        }
+        
+        console.log('✅ [OBJECT-STORAGE] Upload exitoso - PERSISTENCIA GARANTIZADA:', result);
+        
+        // Retornar en formato esperado por el frontend
+        return {
+          id: result.imageId,
+          imageUrl: result.imageUrl,
+          filename: result.filename,
+          caption: caption,
+          isPrimary: isPrimary,
+          _uploadMethod: 'object-storage-persistent'
+        };
       } else {
-        // 🎯 URLs: Ahora con detección de entorno para persistencia
-        console.log(`🌐 [UPLOAD] URL detectada, entorno: ${isProduction ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
-        console.log(`ℹ️ [UPLOAD] Sistema mejorado para persistencia en producción`);
+        // 🌐 URLs externas: Usar endpoint tradicional (solo para URLs)
+        console.log('🌐 [URL-UPLOAD] URL externa detectada, usando endpoint tradicional');
         
         const response = await apiRequest(`/api/parks/${parkId}/images`, {
           method: 'POST',
           data: {
             ...data,
-            _environment: isProduction ? 'production' : 'development'
+            _environment: 'production',
+            _isUrl: true
           }
         });
         return response.json();
