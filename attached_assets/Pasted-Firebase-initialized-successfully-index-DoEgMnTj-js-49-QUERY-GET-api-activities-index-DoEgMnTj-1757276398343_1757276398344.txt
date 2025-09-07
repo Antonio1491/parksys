@@ -1,0 +1,34 @@
+Firebase initialized successfully
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/actividades-fotos
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/parks
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activity-categories
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-DoEgMnTj.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-DoEgMnTj.js:794 i18next: languageChanged es
+index-DoEgMnTj.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+3index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/notifications/count
+activity-img-1757038933171-666561918.jpg:1  GET https://parksys-demo.replit.app/uploads/activity-images/activity-img-1757038933171-666561918.jpg 404 (Not Found)
+Image
+j4 @ index-DoEgMnTj.js:41
+Aq @ index-DoEgMnTj.js:41
+sie @ index-DoEgMnTj.js:41
+uie @ index-DoEgMnTj.js:41
+Ed @ index-DoEgMnTj.js:41
+kq @ index-DoEgMnTj.js:41
+C @ index-DoEgMnTj.js:26
+R @ index-DoEgMnTj.js:26Understand this error
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities
+3index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities/52/images
+index-DoEgMnTj.js:49 🌐 [API REQUEST] DELETE /api/activities/52/images/15
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities/52/images
+activity-images-eFRxb6BF.js:1 📤 [ACTIVITY-HÍBRIDO] Iniciando upload de 1 archivos para actividad: 52
+activity-images-eFRxb6BF.js:1 ✅ [ACTIVITY-HÍBRIDO] Imagen 1/1 completada: close-up-of-soccer-player-with-a-ball-during-pract-2024-12-13-22-13-36-utc.jpg
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities/52/images
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/notifications/count
