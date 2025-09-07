@@ -99,7 +99,7 @@ export class UnifiedStorageService {
     
     return {
       success: true,
-      imageUrl: objectPath, // /objects/uploads/xyz...
+      imageUrl: `/api/storage/file/${encodeURIComponent(objectPath.replace('/objects/', ''))}`, // URL local que funciona
       filename: filename,
       method: 'object-storage',
       persistent: true
