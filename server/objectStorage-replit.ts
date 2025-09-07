@@ -75,6 +75,15 @@ export class ReplitObjectStorageService {
         res.status(404).json({ error: 'Archivo no encontrado' });
         return;
       }
+
+      // DEBUG: Verificar qué tipo de datos recibimos
+      console.log(`🔍 [DEBUG] Tipo de value:`, typeof value);
+      console.log(`🔍 [DEBUG] Es Array:`, Array.isArray(value));
+      console.log(`🔍 [DEBUG] Es Buffer:`, Buffer.isBuffer(value));
+      console.log(`🔍 [DEBUG] Length original:`, value?.length);
+      if (value && value.length > 0) {
+        console.log(`🔍 [DEBUG] Primeros 10 elementos:`, value.slice(0, 10));
+      }
       
       // Detectar tipo de contenido
       let contentType = 'application/octet-stream';
