@@ -166,18 +166,26 @@ export class ReplitObjectStorageService {
   getPublicUrl(filename: string): string {
     const encodedFilename = encodeURIComponent(filename);
     
+    // Debug: Verificar variables de entorno disponibles
+    console.log(`🔧 [URL-GEN] Variables disponibles: REPLIT_DEV_DOMAIN=${process.env.REPLIT_DEV_DOMAIN}, REPLIT_ENVIRONMENT=${process.env.REPLIT_ENVIRONMENT}`);
+    
     // En producción, usar URL completa si está disponible
     const isProduction = process.env.REPLIT_ENVIRONMENT === 'production' ||
                          process.env.NODE_ENV === 'production' || 
                          process.env.REPLIT_DEPLOYMENT;
     
+    console.log(`🔧 [URL-GEN] isProduction=${isProduction}, filename=${filename}`);
+    
     if (isProduction && process.env.REPLIT_DEV_DOMAIN) {
-      // Usar dominio completo para producción
-      return `https://${process.env.REPLIT_DEV_DOMAIN}/api/storage/file/${encodedFilename}`;
+      const fullUrl = `https://${process.env.REPLIT_DEV_DOMAIN}/api/storage/file/${encodedFilename}`;
+      console.log(`✅ [URL-GEN] Generando URL completa: ${fullUrl}`);
+      return fullUrl;
     }
     
     // Fallback: URL relativa (funciona en desarrollo y mayoría de deployments)
-    return `/api/storage/file/${encodedFilename}`;
+    const relativeUrl = `/api/storage/file/${encodedFilename}`;
+    console.log(`⚠️ [URL-GEN] Usando URL relativa: ${relativeUrl}`);
+    return relativeUrl;
   }
 }
 
