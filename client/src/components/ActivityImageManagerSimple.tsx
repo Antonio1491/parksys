@@ -493,3 +493,4 @@ export function ActivityImageManager({ activityId }: ActivityImageManagerProps) 
   );
 }
 
+export default ActivityImageManager;
