@@ -22,7 +22,7 @@ import { registerPublicRoutes } from "./publicRoutes";
 import { registerAssetRoutes } from "./asset_routes";
 import { registerAssetImageRoutes } from "./asset-image-routes";
 import { registerAssetCategoriesRoutes } from "./asset-categories-routes";
-import activityImageRouter from "./activity-simple-routes";
+import activityImageRouter from "./activity-image-routes";
 import { registerMaintenanceRoutes } from "./maintenance_routes_fixed";
 import { registerAssetAssignmentRoutes } from "./asset_assignment_routes";
 import { registerSpaceReservationRoutes } from "./space-reservations-routes";

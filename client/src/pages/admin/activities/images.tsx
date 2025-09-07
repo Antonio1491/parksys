@@ -144,17 +144,7 @@ const ActivityImagesPage: React.FC = () => {
         )}
 
         {/* Gestor de imágenes */}
-        <Card>
-          <CardContent className="p-6">
-            <ActivityImageManagerSimple
-              activityId={activityId}
-              currentImageUrl={activity?.imageUrl || null}
-              onImageUpdated={(imageUrl) => {
-                console.log('Imagen actualizada:', imageUrl);
-              }}
-            />
-          </CardContent>
-        </Card>
+        <ActivityImageManagerSimple activityId={activityId} />
 
         {/* Botones de acción adicionales */}
         <div className="mt-6 flex gap-3 justify-center">
