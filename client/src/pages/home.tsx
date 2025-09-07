@@ -421,14 +421,14 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 🏛️ AGENCIA DE BOSQUES URBANOS SECTION */}
+      {/* 🏛️ SISTEMA DE PARQUES DE MEXICO SECTION */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-poppins font-bold mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#51a19f', fontWeight: '300' }}>Somos el</span><br />
-              <span style={{ color: '#19633c' }}>Sistema de<br />
-              <span style={{ color: '#19633c' }}>Parques</span> de México</span>
+            <h2 className="text-3xl md:text-5xl font-poppins font-black mb-8">
+              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
+              <span style={{ color: '#00444f' }}>Sistema de</span><br />
+              <span style={{ color: '#14b8a6' }}>Parques</span> <span style={{ color: '#a8bd7d' }}>de México</span>
             </h2>
             <p className="text-xl font-bold text-gray-700 max-w-4xl mx-auto leading-relaxed">
               Somos un Organismo Público Descentralizado que gestiona y conserva los parques del Área<br />
