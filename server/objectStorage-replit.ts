@@ -1,0 +1,165 @@
+/**
+ * REPLIT OBJECT STORAGE SERVICE - VERSIÓN OFICIAL
+ * ===============================================
+ * 
+ * Usa @replit/object-storage (librería oficial) 
+ * con autenticación automática - SIN problemas 401
+ */
+
+import { Client } from "@replit/object-storage";
+import { Response } from "express";
+import { randomUUID } from "crypto";
+
+// Cliente oficial de Replit - autenticación automática
+const replitStorageClient = new Client();
+
+export class ObjectNotFoundError extends Error {
+  constructor() {
+    super("Object not found");
+    this.name = "ObjectNotFoundError";
+    Object.setPrototypeOf(this, ObjectNotFoundError.prototype);
+  }
+}
+
+export class ReplitObjectStorageService {
+  constructor() {
+    console.log('✅ [REPLIT-STORAGE] Cliente oficial inicializado con autenticación automática');
+  }
+
+  /**
+   * 🚀 UPLOAD: Subir archivo usando la librería oficial de Replit
+   */
+  async uploadFile(file: Buffer, filename: string): Promise<string> {
+    try {
+      const uniqueFilename = `uploads/${Date.now()}-${randomUUID()}-${filename}`;
+      
+      console.log(`📤 [REPLIT-STORAGE] Subiendo archivo: ${uniqueFilename}`);
+      
+      const { ok, error } = await replitStorageClient.uploadFromBytes(
+        uniqueFilename,
+        file
+      );
+      
+      if (!ok) {
+        console.error('❌ [REPLIT-STORAGE] Error subiendo archivo:', error);
+        throw new Error(`Error subiendo archivo: ${error}`);
+      }
+      
+      console.log(`✅ [REPLIT-STORAGE] Archivo subido exitosamente: ${uniqueFilename}`);
+      return uniqueFilename;
+      
+    } catch (error) {
+      console.error('❌ [REPLIT-STORAGE] Error en upload:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 📥 DOWNLOAD: Descargar archivo para servir al cliente
+   */
+  async downloadFile(filename: string, res: Response): Promise<void> {
+    try {
+      console.log(`📥 [REPLIT-STORAGE] Descargando archivo: ${filename}`);
+      
+      const { ok, value, error } = await replitStorageClient.downloadAsBytes(filename);
+      
+      if (!ok) {
+        console.error('❌ [REPLIT-STORAGE] Error descargando archivo:', error);
+        res.status(404).json({ error: 'Archivo no encontrado' });
+        return;
+      }
+      
+      // Detectar tipo de contenido
+      let contentType = 'application/octet-stream';
+      if (filename.toLowerCase().endsWith('.jpg') || filename.toLowerCase().endsWith('.jpeg')) {
+        contentType = 'image/jpeg';
+      } else if (filename.toLowerCase().endsWith('.png')) {
+        contentType = 'image/png';
+      } else if (filename.toLowerCase().endsWith('.gif')) {
+        contentType = 'image/gif';
+      } else if (filename.toLowerCase().endsWith('.webp')) {
+        contentType = 'image/webp';
+      }
+      
+      // Servir archivo
+      res.set({
+        'Content-Type': contentType,
+        'Content-Length': value.length.toString(),
+        'Cache-Control': 'public, max-age=3600'
+      });
+      
+      res.send(value);
+      console.log(`✅ [REPLIT-STORAGE] Archivo servido exitosamente: ${filename}`);
+      
+    } catch (error) {
+      console.error('❌ [REPLIT-STORAGE] Error descargando archivo:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+
+  /**
+   * 🗑️ DELETE: Eliminar archivo
+   */
+  async deleteFile(filename: string): Promise<boolean> {
+    try {
+      console.log(`🗑️ [REPLIT-STORAGE] Eliminando archivo: ${filename}`);
+      
+      const { ok, error } = await replitStorageClient.delete(filename);
+      
+      if (!ok) {
+        console.error('❌ [REPLIT-STORAGE] Error eliminando archivo:', error);
+        return false;
+      }
+      
+      console.log(`✅ [REPLIT-STORAGE] Archivo eliminado exitosamente: ${filename}`);
+      return true;
+      
+    } catch (error) {
+      console.error('❌ [REPLIT-STORAGE] Error eliminando archivo:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 📂 LIST: Listar archivos (para debugging)
+   */
+  async listFiles(): Promise<string[]> {
+    try {
+      const { ok, value, error } = await replitStorageClient.list();
+      
+      if (!ok) {
+        console.error('❌ [REPLIT-STORAGE] Error listando archivos:', error);
+        return [];
+      }
+      
+      return value.map(file => file.name);
+      
+    } catch (error) {
+      console.error('❌ [REPLIT-STORAGE] Error listando archivos:', error);
+      return [];
+    }
+  }
+
+  /**
+   * 🔍 EXISTS: Verificar si un archivo existe
+   */
+  async fileExists(filename: string): Promise<boolean> {
+    try {
+      const { ok } = await replitStorageClient.downloadAsBytes(filename);
+      return ok;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * 🔗 PUBLIC URL: Generar URL pública para archivo
+   * (Para Replit, simplemente retornamos la ruta del servidor)
+   */
+  getPublicUrl(filename: string): string {
+    return `/api/storage/file/${encodeURIComponent(filename)}`;
+  }
+}
+
+// Instancia singleton del servicio
+export const replitObjectStorage = new ReplitObjectStorageService();
