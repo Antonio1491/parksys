@@ -1,0 +1,21 @@
+🔥 Firebase initialized successfully
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+google.maps.Load @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-Cqvv0bbU.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-Cqvv0bbU.js:794 i18next: languageChanged es
+index-Cqvv0bbU.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+3index-Cqvv0bbU.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-Cqvv0bbU.js:49 🌐 [QUERY] GET /api/notifications/count
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 0, documents: 0, imagesLoading: true, documentsLoading: true, …}
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando imágenes para parque 89
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando documentos para parque 89
+park-manage-pV8lHe2b.js:1 🔍 FRONTEND: Cargando videos para parque 89
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Documentos cargados: []
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 0, documents: 0, imagesLoading: true, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Videos cargados: []
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 0, documents: 0, imagesLoading: true, documentsLoading: false, …}
+park-manage-pV8lHe2b.js:1 ✅ FRONTEND: Imágenes cargadas: [{…}]
+park-manage-pV8lHe2b.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 89, images: 1, documents: 0, imagesLoading: false, documentsLoading: false, …}
