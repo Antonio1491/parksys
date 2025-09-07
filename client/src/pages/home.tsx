@@ -412,7 +412,7 @@ const Home: React.FC = () => {
           {featuredEvents.length > 0 && (
             <div className="text-center">
               <Link href="/events">
-                <Button size="lg" className="bg-[#bcd256] hover:bg-[#a8bd4a] text-[#19633c] font-bold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                <Button size="lg" className="bg-[#f4f5f7] hover:bg-[#f4f5f7] text-[#00444f] font-poppins font-semibold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
                   VER TODOS LOS EVENTOS
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Button>
