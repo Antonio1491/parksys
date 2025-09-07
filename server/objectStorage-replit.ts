@@ -56,7 +56,7 @@ export class ReplitObjectStorageService {
     } catch (error) {
       console.error('❌ [REPLIT-STORAGE] Excepción en upload:', error);
       console.error('❌ [REPLIT-STORAGE] Error type:', typeof error);
-      console.error('❌ [REPLIT-STORAGE] Error message:', error.message);
+      console.error('❌ [REPLIT-STORAGE] Error message:', error instanceof Error ? error.message : String(error));
       throw error;
     }
   }

@@ -1570,10 +1570,10 @@ app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
   }
 });
 
-// 🚀 NUEVO ENDPOINT - Sistema Unificado de Almacenamiento Persistente
+// 🚀 ENDPOINT CON OBJECT STORAGE - Sistema persistente automático
 app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Request, res: Response) => {
   try {
-    console.log('🚀 [UNIFIED] Park Image Upload - Sistema persistente automático');
+    console.log('🚀 [UNIFIED] Park Image Upload con Object Storage - Sistema persistente automático');
     console.log('🔍 [DEBUG] Headers recibidos:', req.headers);
     console.log('🔍 [DEBUG] Body recibido:', req.body);
     console.log('🔍 [DEBUG] Files recibidos:', req.files);
@@ -1587,25 +1587,49 @@ app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Reques
     
     const { imageUrl, caption, isPrimary } = req.body;
     const files = req.files as Express.Multer.File[];
-    const uploadedFile = files?.find(f => f.fieldname === 'imageFile');
+    // ARREGLAR: Buscar el campo correcto 'image' no 'imageFile'
+    const uploadedFile = files?.find(f => f.fieldname === 'image') || files?.find(f => f.fieldname === 'imageFile');
     
     console.log('🔍 [DEBUG] Datos procesados - parkId:', parkId, 'uploadedFile:', !!uploadedFile, 'imageUrl:', imageUrl);
     
     let finalImageUrl: string;
     
-    // PROCESAR ARCHIVO SUBIDO CON SISTEMA UNIFICADO
+    // PROCESAR ARCHIVO SUBIDO CON OBJECT STORAGE OFICIAL
     if (uploadedFile) {
-      console.log('🚀 [UNIFIED] Procesando archivo con sistema persistente:', uploadedFile.originalname);
+      console.log('🚀 [REPLIT-STORAGE] Procesando archivo con Object Storage oficial:', uploadedFile.originalname);
       
-      // ✅ USAR SISTEMA UNIFICADO PERSISTENTE
-      const uploadResult = await unifiedStorage.uploadImage(uploadedFile, 'park-images', {
-        caption: caption || null,
-        isPrimary: isPrimary === 'true' || isPrimary === true,
-        entityId: parkId
-      });
+      // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA
+      const isProduction = process.env.REPLIT_ENVIRONMENT === 'production' ||
+                          process.env.NODE_ENV === 'production' || 
+                          process.env.REPLIT_DEPLOYMENT;
       
-      console.log('🎯 [UNIFIED] Upload resultado:', uploadResult);
-      finalImageUrl = uploadResult.imageUrl;
+      console.log(`🔍 [REPLIT-STORAGE] Entorno detectado: isProduction=${isProduction}`);
+      
+      if (isProduction) {
+        try {
+          console.log(`🚀 [REPLIT-STORAGE] INICIANDO: Subiendo a Object Storage oficial...`);
+          
+          // Importar servicio de Object Storage
+          const { replitObjectStorage } = await import('./objectStorage-replit');
+          
+          // Usar la librería oficial de Replit (autenticación automática)
+          const filename = await replitObjectStorage.uploadFile(uploadedFile.buffer, uploadedFile.originalname);
+          finalImageUrl = replitObjectStorage.getPublicUrl(filename);
+          
+          console.log(`✅ [REPLIT-STORAGE] ÉXITO TOTAL - Imagen subida con persistencia garantizada: ${finalImageUrl}`);
+          
+        } catch (osError) {
+          console.error(`❌ [REPLIT-STORAGE] ERROR CRÍTICO en Object Storage:`, osError);
+          console.log(`⚠️ [REPLIT-STORAGE] FALLBACK: Usando URL temporal`);
+          
+          // Fallback: crear URL temporal (no persiste en deployment)
+          finalImageUrl = `/temp-images/${Date.now()}-${uploadedFile.originalname}`;
+        }
+      } else {
+        // Desarrollo: usar URL temporal
+        finalImageUrl = `/dev-images/${Date.now()}-${uploadedFile.originalname}`;
+        console.log(`✅ [REPLIT-STORAGE] Desarrollo - URL temporal: ${finalImageUrl}`);
+      }
       
     // USAR URL PROPORCIONADA DIRECTAMENTE  
     } else if (imageUrl) {

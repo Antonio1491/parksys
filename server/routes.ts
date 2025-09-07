@@ -4056,7 +4056,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE & FORMDATA
+  // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE & FORMDATA  
   apiRouter.post("/parks/:id/images", isAuthenticated, parkImageUpload.single('image'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
@@ -7839,6 +7839,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ [REPLIT-STORAGE] Error sirviendo archivo:", error);
       res.status(404).json({ error: 'Archivo no encontrado' });
+    }
+  });
+
+  // 🧪 ENDPOINT TEMPORAL: Probar Object Storage
+  apiRouter.post("/test-object-storage", async (req: Request, res: Response) => {
+    try {
+      console.log(`🧪 [TEST] Iniciando prueba de Object Storage...`);
+      console.log(`🧪 [TEST] Service disponible: ${!!replitObjectStorage}`);
+      console.log(`🧪 [TEST] REPLIT_ENVIRONMENT: ${process.env.REPLIT_ENVIRONMENT}`);
+      
+      // Crear un buffer de prueba
+      const testBuffer = Buffer.from('Test file content for Object Storage', 'utf-8');
+      
+      // Intentar subir archivo
+      const filename = await replitObjectStorage.uploadFile(testBuffer, 'test.txt');
+      const publicUrl = replitObjectStorage.getPublicUrl(filename);
+      
+      console.log(`🧪 [TEST] ¡Object Storage funciona! Archivo: ${filename}, URL: ${publicUrl}`);
+      
+      res.json({
+        success: true,
+        message: 'Object Storage funciona correctamente',
+        filename,
+        publicUrl,
+        environment: process.env.REPLIT_ENVIRONMENT
+      });
+      
+    } catch (error) {
+      console.error(`🧪 [TEST] Object Storage falló:`, error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        stack: error.stack,
+        environment: process.env.REPLIT_ENVIRONMENT
+      });
     }
   });
 
