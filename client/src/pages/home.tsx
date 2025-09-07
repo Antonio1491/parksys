@@ -320,8 +320,8 @@ const Home: React.FC = () => {
           
           <div className="text-center mb-12">
             <Link href="/parks">
-              <Button size="lg" className="bg-[#a8bd7d] hover:bg-[#a8bd7d] text-white font-bold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                Encuentra tu parque favorito
+              <Button size="lg" className="bg-[#a8bd7d] hover:bg-[#a8bd7d] text-white font-semibold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                VER TODOS LOS PARQUES
               </Button>
             </Link>
           </div>
@@ -330,15 +330,17 @@ const Home: React.FC = () => {
       </section>
       
       {/* EVENTOS SECTION */}
-      <section className="py-24" style={{ backgroundColor: '#19633c' }}>
+      <section className="py-24" style={{ backgroundColor: '#a8bd7d' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-bold mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#ffffff', fontWeight: '300' }}>Disfruta los</span><br />
-              <span style={{ color: '#bcd256' }}>Magníficos Eventos</span>
+            <h2 className="text-4xl md:text-6xl font-poppins font-black mb-8">
+              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#ffffff', fontWeight: '300' }}>Disfruta los magníficos</span><br />
+              <span style={{ color: '#00444f' }}>Eventos </span> 
+              <span style={{ color: '#ffffff' }}>Programados</span>
             </h2>
-            <p className="text-2xl font-bold text-white max-w-4xl mx-auto leading-relaxed">
-              Entérate de todas las actividades recreativas y culturales.
+            <p className="text-2xl font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
+              El Sistema de Parques de México gestiona una cartelera variada<br /> 
+              en cada uno de sus parques para que vivas y convivas 
             </p>
           </div>
 

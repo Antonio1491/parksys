@@ -128,25 +128,14 @@ export function PermissionsMatrix({
     if (apiPermissions) {
       setPermissions(apiPermissions as Record<string, Record<string, string[]>>);
     } else {
-      // Configurar Super Admin por defecto si no hay datos
-      const superAdminDefaults: Record<string, string[]> = {};
-      flatModules.forEach(moduleId => {
-        superAdminDefaults[moduleId] = ['read', 'create', 'update', 'delete', 'admin'];
+      // Solo inicializar con roles reales si no hay datos
+      const defaultPermissions: Record<string, Record<string, string[]>> = {};
+      (roles as Role[]).forEach(role => {
+        defaultPermissions[role.slug] = {};
       });
-
-      const defaultPermissions: Record<string, Record<string, string[]>> = {
-        'super-admin': superAdminDefaults,
-        'admin': {},
-        'coord': {},
-        'supervisor': {},
-        'especialista': {},
-        'operador': {},
-        'lector': {}
-      };
-
       setPermissions(defaultPermissions);
     }
-  }, [apiPermissions, flatModules]);
+  }, [apiPermissions, flatModules, roles]);
 
   // Funciones de utilidad
   const hasPermission = (roleSlug: string, moduleId: string, action: string): boolean => {

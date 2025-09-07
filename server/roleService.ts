@@ -593,10 +593,23 @@ export class RoleService {
   // Actualizar permisos de rol
   async updateRolePermissions(roleId: number, permissions: Record<string, any>): Promise<boolean> {
     try {
-      await db
-        .update(roles)
-        .set({ permissions, updatedAt: new Date() })
-        .where(eq(roles.id, roleId));
+      // ✅ CRÍTICO: Para super-admin, mantener el formato {"all": true}
+      const role = await this.getRoleById(roleId);
+      if (role?.slug === 'super-admin') {
+        // Super admin siempre mantiene {"all": true}
+        await db
+          .update(roles)
+          .set({ permissions: { all: true }, updatedAt: new Date() })
+          .where(eq(roles.id, roleId));
+      } else {
+        // ✅ CRÍTICO: Para otros roles, convertir de módulos modernos a formato legacy
+        const legacyPermissions = this.mapToLegacyPermissions(permissions);
+        
+        await db
+          .update(roles)
+          .set({ permissions: legacyPermissions, updatedAt: new Date() })
+          .where(eq(roles.id, roleId));
+      }
       return true;
     } catch (error) {
       console.error('Error actualizando permisos:', error);
@@ -604,7 +617,7 @@ export class RoleService {
     }
   }
 
-  // Mapeo de módulos antiguos a nuevos para migración de datos
+  // Mapeo de módulos antiguos a nuevos para migración de datos (SOLO LECTURA)
   private mapLegacyPermissions(legacyPermissions: Record<string, string[]>): Record<string, string[]> {
     const mappedPermissions: Record<string, string[]> = {};
     
@@ -646,6 +659,72 @@ export class RoleService {
     });
     
     return mappedPermissions;
+  }
+
+  // Mapeo INVERSO: de módulos nuevos a categorías legacy para escritura en BD
+  private mapToLegacyPermissions(modernPermissions: Record<string, string[]>): Record<string, string[]> {
+    const legacyPermissions: Record<string, string[]> = {};
+    
+    // Mapeo inverso: agrupar módulos modernos en categorías legacy
+    const modernToLegacy: Record<string, { category: string; modules: string[] }> = {
+      'RH': {
+        category: 'RH',
+        modules: ['empleados', 'nomina', 'vacaciones', 'instructores']
+      },
+      'Finanzas': {
+        category: 'Finanzas', 
+        modules: ['finanzas', 'contabilidad', 'presupuestos', 'facturacion', 'reportes-financieros', 'concesiones']
+      },
+      'Gestión': {
+        category: 'Gestión',
+        modules: ['parques', 'actividades', 'eventos', 'reservas', 'evaluaciones']
+      },
+      'Marketing': {
+        category: 'Marketing',
+        modules: ['marketing', 'publicidad', 'comunicaciones', 'campanas', 'contenido']
+      },
+      'Seguridad': {
+        category: 'Seguridad',
+        modules: ['seguridad', 'auditoria', 'control-acceso', 'politicas']
+      },
+      'Operaciones': {
+        category: 'Operaciones',
+        modules: ['activos', 'incidencias', 'mantenimiento', 'inventario']
+      },
+      'Configuración': {
+        category: 'Configuración',
+        modules: ['configuracion', 'usuarios', 'roles', 'notificaciones', 'respaldos']
+      }
+    };
+
+    // Procesar cada categoría legacy
+    Object.entries(modernToLegacy).forEach(([legacyKey, { category, modules }]) => {
+      // Obtener la unión de permisos de todos los módulos en esta categoría
+      const categoryPermissions = new Set<string>();
+      
+      modules.forEach(moduleId => {
+        const modulePerms = modernPermissions[moduleId] || [];
+        modulePerms.forEach(perm => categoryPermissions.add(perm));
+      });
+      
+      // Solo agregar si tiene permisos
+      if (categoryPermissions.size > 0) {
+        legacyPermissions[category] = Array.from(categoryPermissions);
+      }
+    });
+
+    // Agregar módulos individuales que no están en categorías legacy
+    Object.entries(modernPermissions).forEach(([moduleId, permissions]) => {
+      const isInLegacyCategory = Object.values(modernToLegacy).some(
+        ({ modules }) => modules.includes(moduleId)
+      );
+      
+      if (!isInLegacyCategory && permissions.length > 0) {
+        legacyPermissions[moduleId] = [...permissions];
+      }
+    });
+    
+    return legacyPermissions;
   }
 
   // Obtener todos los módulos esperados por useAdaptiveModules
