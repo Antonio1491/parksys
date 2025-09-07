@@ -5,44 +5,24 @@ import fs from "fs";
 import { db } from "./db";
 import { activityImages, activities } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
+import { replitObjectStorage } from "./objectStorage-replit";
 
 const router = Router();
 
-// Configuración de multer para imágenes de actividades
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Configuración dinámica basada en el entorno
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-    const uploadDir = isProduction ? 'public/uploads/activity-images' : 'uploads/activity-images';
-    
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'activity-img-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ 
-  storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB límite
-  },
+// Configure multer specifically for activity images with Replit Object Storage
+const activityImageUpload = multer({
+  storage: multer.memoryStorage(), // Use memory storage for Object Storage uploads
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extName = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimeType = allowedTypes.test(file.mimetype);
-    
-    if (mimeType && extName) {
-      return cb(null, true);
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
     } else {
-      cb(new Error('Solo se permiten archivos de imagen'));
+      cb(new Error('Formato de archivo no válido. Solo se permiten JPG, PNG, GIF y WEBP'));
     }
   },
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB límite
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB
+  }
 });
 
 // Obtener todas las imágenes de una actividad
@@ -73,8 +53,8 @@ router.get("/:activityId/images", async (req: Request, res: Response) => {
   }
 });
 
-// Subir una nueva imagen a una actividad
-router.post("/:activityId/images", upload.single('image'), async (req: Request, res: Response) => {
+// Subir una nueva imagen a una actividad (SISTEMA HÍBRIDO - igual que parques)
+router.post("/:activityId/images", activityImageUpload.single('imageFile'), async (req: Request, res: Response) => {
   try {
     const activityId = parseInt(req.params.activityId);
     
@@ -86,6 +66,8 @@ router.post("/:activityId/images", upload.single('image'), async (req: Request, 
       return res.status(400).json({ error: "No se proporcionó archivo de imagen" });
     }
     
+    console.log(`📤 [ACTIVITY-HÍBRIDO] Iniciando upload para actividad ${activityId}: ${req.file.originalname}`);
+    
     // Verificar que la actividad existe
     const activity = await db.select().from(activities).where(eq(activities.id, activityId)).limit(1);
     if (activity.length === 0) {
@@ -94,6 +76,33 @@ router.post("/:activityId/images", upload.single('image'), async (req: Request, 
     
     const { caption } = req.body;
     const isPrimary = req.body.isPrimary === 'true';
+    
+    let imageUrl: string;
+    
+    try {
+      // 1. INTENTAR REPLIT OBJECT STORAGE (persistente)
+      console.log('📤 [ACTIVITY-HÍBRIDO] Intentando Replit Object Storage...');
+      imageUrl = await replitObjectStorage.uploadFile(req.file.buffer, req.file.originalname);
+      imageUrl = replitObjectStorage.getPublicUrl(imageUrl);
+      console.log('✅ [ACTIVITY-HÍBRIDO] Object Storage exitoso:', imageUrl);
+      
+    } catch (objectStorageError) {
+      console.log('⚠️ [ACTIVITY-HÍBRIDO] Object Storage falló, usando filesystem...', objectStorageError);
+      
+      // 2. FALLBACK A FILESYSTEM (carpeta persistente)
+      const uploadDir = path.join(process.cwd(), 'uploads', 'activity-images');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const filename = `activity-img-${uniqueSuffix}${path.extname(req.file.originalname)}`;
+      const filePath = path.join(uploadDir, filename);
+      
+      fs.writeFileSync(filePath, req.file.buffer);
+      imageUrl = `/uploads/activity-images/${filename}`;
+      console.log('✅ [ACTIVITY-HÍBRIDO] Filesystem usado:', imageUrl);
+    }
     
     // Si esta imagen va a ser principal, quitar el flag de las demás
     if (isPrimary) {
@@ -107,7 +116,7 @@ router.post("/:activityId/images", upload.single('image'), async (req: Request, 
       .insert(activityImages)
       .values({
         activityId,
-        imageUrl: `/uploads/activity-images/${req.file.filename}`,
+        imageUrl,
         fileName: req.file.originalname,
         fileSize: req.file.size,
         mimeType: req.file.mimetype,
@@ -117,9 +126,11 @@ router.post("/:activityId/images", upload.single('image'), async (req: Request, 
       })
       .returning();
     
+    console.log(`✅ [ACTIVITY-HÍBRIDO] Imagen guardada en DB para actividad ${activityId}: ${imageUrl}`);
+    
     res.status(201).json(newImage[0]);
   } catch (error) {
-    console.error("Error al subir imagen de actividad:", error);
+    console.error("❌ [ACTIVITY-HÍBRIDO] Error al subir imagen de actividad:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
@@ -145,10 +156,25 @@ router.delete("/:activityId/images/:imageId", async (req: Request, res: Response
       return res.status(404).json({ error: "Imagen no encontrada" });
     }
     
-    // Eliminar archivo físico
-    const filePath = path.join(process.cwd(), 'uploads/activity-images', path.basename(image[0].imageUrl));
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // Eliminar archivo físico (sistema híbrido)
+    const imageUrl = image[0].imageUrl;
+    
+    if (imageUrl.startsWith('/api/storage/file/')) {
+      // Es Replit Object Storage - intentar eliminar
+      try {
+        const filename = imageUrl.replace('/api/storage/file/', '');
+        await replitObjectStorage.deleteFile(decodeURIComponent(filename));
+        console.log('🗑️ [ACTIVITY-HÍBRIDO] Archivo eliminado de Object Storage');
+      } catch (error) {
+        console.error('⚠️ [ACTIVITY-HÍBRIDO] Error eliminando de Object Storage:', error);
+      }
+    } else if (imageUrl.startsWith('/uploads/')) {
+      // Es filesystem local
+      const filePath = path.join(process.cwd(), imageUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log('🗑️ [ACTIVITY-HÍBRIDO] Archivo eliminado de filesystem');
+      }
     }
     
     // Eliminar registro de la base de datos
