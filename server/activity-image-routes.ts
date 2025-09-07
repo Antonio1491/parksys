@@ -103,15 +103,11 @@ router.post("/:activityId/images", upload.single('image'), async (req: Request, 
         .where(eq(activityImages.activityId, activityId));
     }
     
-    // ✅ SIMPLE: Direct URL like fauna/instructors/parks
-    const imageUrl = `/uploads/activity-images/${req.file.filename}`;
-    console.log(`✅ [ACTIVITY-IMAGE] Image processed:`, { imageUrl, caption, isPrimary });
-
     const newImage = await db
       .insert(activityImages)
       .values({
         activityId,
-        imageUrl: imageUrl,
+        imageUrl: `/uploads/activity-images/${req.file.filename}`,
         fileName: req.file.originalname,
         fileSize: req.file.size,
         mimeType: req.file.mimetype,

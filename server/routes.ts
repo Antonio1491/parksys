@@ -99,18 +99,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Configure multer for file uploads
   const upload = multer({ storage: multer.memoryStorage() });
 
-  // Configure multer for park images - FIXED with production/development logic
+  // Configure multer specifically for park images with Object Storage integration
   const parkImageUpload = multer({
     storage: multer.diskStorage({
       destination: function (req, file, cb) {
-        // ✅ FIXED: Same pattern as fauna/instructors/activities
-        const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-        const uploadDir = isProduction ? 'public/uploads/park-images' : 'uploads/park-images';
-        
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
+        const isProduction = process.env.NODE_ENV === 'production' || 
+                            process.env.REPLIT_DEPLOYMENT || 
+                            !process.env.NODE_ENV;
+        // En producción usaremos Object Storage, pero mantenemos filesystem como respaldo
+        const uploadsDir = isProduction ? 'uploads/park-images/' : 'uploads/park-images/';
+        // Crear directorio si no existe
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
         }
-        cb(null, uploadDir);
+        cb(null, uploadsDir);
       },
       filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -1086,15 +1088,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Endpoint específico para subir imágenes de perfil de voluntarios
   
-  // Configurar multer para subida de imágenes de voluntarios CON OBJECT STORAGE
-  const volunteerTempDir = '/tmp/volunteers/';
-  if (!fs.existsSync(volunteerTempDir)) {
-    fs.mkdirSync(volunteerTempDir, { recursive: true });
+  // Configurar multer para subida de imágenes de voluntarios
+  const volunteerUploadDir = path.resolve('./public/uploads/volunteers');
+  if (!fs.existsSync(volunteerUploadDir)) {
+    fs.mkdirSync(volunteerUploadDir, { recursive: true });
   }
   
   const volunteerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, volunteerTempDir);
+      cb(null, volunteerUploadDir);
     },
     filename: (req, file, cb) => {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -1141,60 +1143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      let imageUrl: string;
-      
-      try {
-        console.log(`🚀 [VOLUNTEER-IMAGES] Guardando en Object Storage: ${req.file.filename}`);
-        
-        // Leer archivo temporal
-        const fileBuffer = fs.readFileSync(req.file.path);
-        
-        // Cliente directo de Object Storage
-        const { Storage } = await import('@google-cloud/storage');
-        const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
-        
-        const objectStorageClient = new Storage({
-          credentials: {
-            audience: "replit",
-            subject_token_type: "access_token",
-            token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-            type: "external_account",
-            credential_source: {
-              url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-              format: {
-                type: "json",
-                subject_token_field_name: "access_token",
-              },
-            },
-            universe_domain: "googleapis.com",
-          },
-          projectId: "",
-        });
-        
-        // Subir a Object Storage
-        const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
-        const objectName = `public/volunteers/${req.file.filename}`;
-        const bucket = objectStorageClient.bucket(bucketName);
-        const file = bucket.file(objectName);
-        
-        await file.save(fileBuffer, {
-          metadata: {
-            contentType: req.file.mimetype,
-            cacheControl: 'public, max-age=3600'
-          }
-        });
-        
-        // URL persistente de Object Storage
-        imageUrl = `/public-objects/volunteers/${req.file.filename}`;
-        console.log(`✅ [VOLUNTEER-IMAGES] ÉXITO TOTAL - Imagen subida: ${imageUrl}`);
-        
-        // Limpiar archivo temporal
-        fs.unlinkSync(req.file.path);
-        
-      } catch (osError) {
-        console.error(`❌ [VOLUNTEER-IMAGES] ERROR CRÍTICO:`, osError);
-        imageUrl = `/uploads/volunteers/${req.file.filename}`;
-      }
+      const imageUrl = `/uploads/volunteers/${req.file.filename}`;
       
       // Si se proporciona volunteerId, actualizar la base de datos
       const volunteerId = req.body.volunteerId;
@@ -4124,7 +4073,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add an image to a park - SIMPLIFIED like fauna/instructors
+  // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE & FORMDATA
   apiRouter.post("/parks/:id/images", isAuthenticated, parkImageUpload.single('image'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
@@ -4132,16 +4081,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📁 [PARK-IMAGES] File:`, req.file ? req.file.filename : 'No file');
       console.log(`📝 [PARK-IMAGES] Body:`, req.body);
 
-      if (!req.file) {
-        return res.status(400).json({ error: 'No image file provided' });
+      let imageUrl: string;
+      let caption: string = req.body.caption || '';
+      let isPrimary: boolean = req.body.isPrimary === 'true' || req.body.isPrimary === true;
+
+      // 🚀 DETECCIÓN DE ENTORNO PARA PERSISTENCIA
+      const isProduction = process.env.NODE_ENV === 'production' || 
+                          process.env.REPLIT_DEPLOYMENT || 
+                          !process.env.NODE_ENV;
+
+      if (req.file) {
+        // 📁 FORMDATA: Archivo subido
+        console.log(`📁 [PARK-IMAGES] Procesando archivo subido: ${req.file.filename}`);
+        
+        if (isProduction) {
+          try {
+            console.log(`🚀 [OBJECT-STORAGE] Moviendo a Object Storage para persistencia...`);
+            const objectStorageService = new ObjectStorageService();
+            
+            // TODO: Implementar subida a Object Storage aquí
+            // Por ahora usamos filesystem con logging mejorado
+            imageUrl = `/uploads/park-images/${req.file.filename}`;
+            console.log(`✅ [PARK-IMAGES] Archivo guardado temporalmente: ${imageUrl}`);
+            console.log(`⚠️ [PARK-IMAGES] TODO: Migrar a Object Storage para persistencia total`);
+            
+          } catch (osError) {
+            console.log(`⚠️ [OBJECT-STORAGE] Error, usando filesystem: ${osError}`);
+            imageUrl = `/uploads/park-images/${req.file.filename}`;
+          }
+        } else {
+          // Desarrollo: usar filesystem directamente
+          imageUrl = `/uploads/park-images/${req.file.filename}`;
+          console.log(`✅ [PARK-IMAGES] Desarrollo - archivo guardado: ${imageUrl}`);
+        }
+        
+      } else if (req.body.imageUrl) {
+        // 🌐 URL: Imagen externa
+        imageUrl = req.body.imageUrl;
+        console.log(`🌐 [PARK-IMAGES] Procesando URL externa: ${imageUrl}`);
+        
+        // Aplicar lógica Object Storage para URLs externas si es necesario
+        if (isProduction && imageUrl.startsWith('http') && !imageUrl.includes('parksys-uploads')) {
+          console.log(`⚠️ [OBJECT-STORAGE] URL externa detectada en producción: ${imageUrl}`);
+          console.log(`ℹ️ [OBJECT-STORAGE] Para máxima persistencia, considere subir el archivo directamente`);
+        }
+      } else {
+        return res.status(400).json({ message: "Se requiere un archivo o URL de imagen" });
       }
 
-      // ✅ SIMPLE: Direct URL like fauna/instructors/activities
-      const imageUrl = `/uploads/park-images/${req.file.filename}`;
-      const caption = req.body.caption || '';
-      const isPrimary = req.body.isPrimary === 'true' || req.body.isPrimary === true;
-
-      console.log(`✅ [PARK-IMAGES] Imagen procesada:`, { imageUrl, caption, isPrimary });
+      console.log(`🔄 [PARK-IMAGES] Procesando imagen final:`, { imageUrl, caption, isPrimary });
 
       // Verificar que el parque existe
       const park = await storage.getPark(parkId);
@@ -4181,6 +4169,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       console.log(`✅ [PARK-IMAGES] Imagen agregada exitosamente:`, mappedImage);
+      res.status(201).json(mappedImage);
+
+      const newImage = await storage.createParkImage(imageData);
+      
+      // Mapear la respuesta para el frontend
+      const mappedImage = {
+        id: newImage.id,
+        parkId: newImage.parkId,
+        imageUrl: newImage.imageUrl, // Usar directamente 'imageUrl'
+        caption: newImage.caption,
+        isPrimary: newImage.isPrimary,
+        createdAt: newImage.createdAt
+      };
+      
       res.status(201).json(mappedImage);
     } catch (error) {
       console.error("Error uploading park image:", error);

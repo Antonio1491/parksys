@@ -1539,7 +1539,131 @@ app.get("/public-objects/park-images/:filename", (req: Request, res: Response) =
   return res.status(404).json({ error: 'Imagen de Object Storage no implementada aún' });
 });
 
-// ✅ PARK IMAGE ENDPOINTS SIMPLIFIED - Using fauna/instructors pattern in routes.ts
+// MIGRACIÓN A OBJECT STORAGE - PARK IMAGES  
+// Sistema híbrido: archivos locales + Object Storage para persistencia
+
+// Configuración de multer para park images
+import multer from 'multer';
+// path y fs ya importados arriba
+
+// 🚀 SISTEMA UNIFICADO: Migrado a UnifiedStorageService para persistencia garantizada
+import { unifiedStorage } from './UnifiedStorageService';
+
+// ✅ NUEVO: Usar sistema unificado para parques
+const uploadMiddleware = unifiedStorage.getMulterConfig('park-images');
+
+// GET endpoint para obtener imágenes del parque
+app.get("/api/parks/:parkId/images", async (req: Request, res: Response) => {
+  try {
+    const parkId = parseInt(req.params.parkId);
+    console.log('🔍 [GET] Obteniendo imágenes para parque:', parkId);
+    
+    const { storage } = await import("./storage");
+    const images = await storage.getParkImages(parkId);
+    
+    console.log('✅ [GET] Imágenes encontradas:', images.length);
+    res.json(images);
+    
+  } catch (error) {
+    console.error('❌ [GET] Error obteniendo imágenes del parque:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// 🚀 NUEVO ENDPOINT - Sistema Unificado de Almacenamiento Persistente
+app.post("/api/parks/:parkId/images", uploadMiddleware.any(), async (req: Request, res: Response) => {
+  try {
+    console.log('🚀 [UNIFIED] Park Image Upload - Sistema persistente automático');
+    console.log('🔍 [DEBUG] Headers recibidos:', req.headers);
+    console.log('🔍 [DEBUG] Body recibido:', req.body);
+    console.log('🔍 [DEBUG] Files recibidos:', req.files);
+    
+    const parkId = parseInt(req.params.parkId);
+    
+    if (isNaN(parkId)) {
+      console.log('❌ [DEBUG] ParkId inválido:', req.params.parkId);
+      return res.status(400).json({ error: 'Park ID inválido' });
+    }
+    
+    const { imageUrl, caption, isPrimary } = req.body;
+    const files = req.files as Express.Multer.File[];
+    const uploadedFile = files?.find(f => f.fieldname === 'imageFile');
+    
+    console.log('🔍 [DEBUG] Datos procesados - parkId:', parkId, 'uploadedFile:', !!uploadedFile, 'imageUrl:', imageUrl);
+    
+    let finalImageUrl: string;
+    
+    // PROCESAR ARCHIVO SUBIDO CON SISTEMA UNIFICADO
+    if (uploadedFile) {
+      console.log('🚀 [UNIFIED] Procesando archivo con sistema persistente:', uploadedFile.originalname);
+      
+      // ✅ USAR SISTEMA UNIFICADO PERSISTENTE
+      const uploadResult = await unifiedStorage.uploadImage(uploadedFile, 'park-images', {
+        caption: caption || null,
+        isPrimary: isPrimary === 'true' || isPrimary === true,
+        entityId: parkId
+      });
+      
+      console.log('🎯 [UNIFIED] Upload resultado:', uploadResult);
+      finalImageUrl = uploadResult.imageUrl;
+      
+    // USAR URL PROPORCIONADA DIRECTAMENTE  
+    } else if (imageUrl) {
+      console.log('🔗 [UNIFIED] Usando URL proporcionada:', imageUrl);
+      finalImageUrl = imageUrl;
+      
+    } else {
+      return res.status(400).json({ error: 'Se requiere archivo o URL de imagen' });
+    }
+    
+    console.log('📸 [UNIFIED] Procesando imagen para parque:', parkId);
+    console.log('📸 [UNIFIED] Final Image URL:', finalImageUrl);
+    console.log('📸 [UNIFIED] Caption:', caption);
+    console.log('📸 [UNIFIED] IsPrimary:', isPrimary);
+    
+    const { storage } = await import("./storage");
+    
+    // Si es imagen principal, desmarcar otras
+    if (isPrimary === 'true' || isPrimary === true) {
+      const existingImages = await storage.getParkImages(parkId);
+      for (const image of existingImages) {
+        if (image.isPrimary) {
+          await storage.updateParkImage(image.id, { isPrimary: false });
+        }
+      }
+      console.log('⭐ [UNIFIED] Desmarcando otras imágenes principales del parque');
+    }
+    
+    // Crear nueva imagen con URL persistente
+    const imageData = {
+      parkId,
+      imageUrl: finalImageUrl,
+      caption: caption || '',
+      isPrimary: Boolean(isPrimary === 'true' || isPrimary === true)
+    };
+    
+    const newImage = await storage.createParkImage(imageData);
+    
+    console.log('✅ [UNIFIED] Nueva imagen guardada para parque:', newImage);
+    console.log(`🛡️ [UNIFIED] Sistema persistente activo - URL: ${finalImageUrl}`);
+    
+    // Mapear respuesta para compatibilidad con frontend
+    const mappedImage = {
+      id: newImage.id,
+      parkId: newImage.parkId,
+      imageUrl: newImage.imageUrl,
+      caption: newImage.caption,
+      isPrimary: newImage.isPrimary,
+      createdAt: newImage.createdAt
+    };
+    
+    res.status(201).json(mappedImage);
+    
+  } catch (error) {
+    console.error('❌ [UNIFIED] Error en park image upload:', error);
+    res.status(500).json({ error: 'Error al subir la imagen: ' + (error as Error).message });
+  }
+});
 
 // ENDPOINT DIRECTO PARA ACTUALIZAR PARQUES
 app.put("/api/parks/:id", async (req: Request, res: Response) => {
@@ -2155,19 +2279,19 @@ function startServer() {
       registerRoleRoutes(app);
       console.log("✅ [API-PRIORITY] Role routes registered with priority over static files");
       
-      // 🔧 FIXED: Correct order - uploads/ FIRST, then public/uploads/ as fallback
-      console.log('📁 [UNIFIED] Configurando archivos estáticos con orden correcto...');
-      
-      // ALWAYS prioritize uploads/ directory first (where new images are saved)
-      app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-      
-      // Then fallback to public/uploads/ for legacy images  
-      app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
-      
-      // Standard public directory
-      app.use(express.static(path.join(process.cwd(), 'public')));
-      
-      console.log('✅ [UNIFIED] Archivos estáticos configurados: uploads/ PRIMERO, public/uploads/ FALLBACK');
+      // 🔧 PRODUCTION FIX: Express.static BEFORE custom routes in production for reliable serving
+      if (process.env.NODE_ENV === 'production') {
+        // In production, prioritize express.static for better performance
+        app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+        app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+        app.use(express.static(path.join(process.cwd(), 'public')));
+        console.log('📁 [PROD] Express.static /uploads enabled BEFORE custom routes for production');
+      } else {
+        // In development, custom routes handle uploads for debugging
+        app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+        app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+        console.log('📁 [DEV] Static uploads/ files enabled AFTER custom routes for debugging');
+      }
       
       // Register activity payment routes
       registerActivityPaymentRoutes(app);
@@ -2208,11 +2332,15 @@ function startServer() {
         
         console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes with SPA routing");
       } else {
-        console.log('🔧 [DEV] Setting up Vite development server...');
+        // 🔧 DEV FIX: Add temporary root route before Vite setup
+        app.get('/', (req: Request, res: Response, next: NextFunction) => {
+          console.log('🏠 [DEV] Root route accessed - delegating to Vite');
+          next();
+        });
+        
         const { setupVite } = await import("./vite");
         await setupVite(app, appServer);
         console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");
-        console.log("✅ [DEV] Vite catch-all route should now handle all unmatched routes");
       }
       
       console.log('✅ [BACKGROUND] Full server initialization complete - API routes have priority over frontend');

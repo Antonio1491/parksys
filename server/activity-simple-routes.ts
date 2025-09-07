@@ -77,69 +77,8 @@ router.post("/:activityId/image", upload.single('image'), async (req: Request, r
     fs.copyFileSync(fullPath, publicFullPath);
     console.log(`✅ [ACTIVITY-IMG] Copia de seguridad creada: ${publicFullPath}`);
     
-    // 🚀 OBJECT STORAGE PARA PERSISTENCIA TOTAL
-    let imageUrl: string;
-    
-    try {
-      console.log(`🚀 [ACTIVITY-OBJECT-STORAGE] Guardando en Object Storage para persistencia TOTAL...`);
-      
-      // Leer el archivo del filesystem temporal
-      const fileBuffer = fs.readFileSync(req.file.path);
-      
-      // USAR CLIENTE DIRECTO DE OBJECT STORAGE
-      const { Storage } = require('@google-cloud/storage');
-      
-      const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
-      
-      // Cliente directo de Object Storage
-      const objectStorageClient = new Storage({
-        credentials: {
-          audience: "replit",
-          subject_token_type: "access_token",
-          token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-          type: "external_account",
-          credential_source: {
-            url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-            format: {
-              type: "json",
-              subject_token_field_name: "access_token",
-            },
-          },
-          universe_domain: "googleapis.com",
-        },
-        projectId: "",
-      });
-      
-      // Subir a Object Storage directamente
-      console.log(`📤 [ACTIVITY-OBJECT-STORAGE] Subiendo ${req.file.filename} a bucket...`);
-      
-      const bucketName = 'replit-objstore-9ca2db9b-bad3-42a4-a139-f19b5a74d7e2';
-      const objectName = `public/activity-images/${req.file.filename}`;
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
-      
-      await file.save(fileBuffer, {
-        metadata: {
-          contentType: req.file.mimetype,
-          cacheControl: 'public, max-age=3600'
-        }
-      });
-      
-      // URL pública de Object Storage
-      imageUrl = `/public-objects/activity-images/${req.file.filename}`;
-      console.log(`✅ [ACTIVITY-OBJECT-STORAGE] ÉXITO TOTAL - Imagen subida: ${imageUrl}`);
-      
-      // Limpiar archivo temporal
-      fs.unlinkSync(req.file.path);
-      console.log(`🧹 [ACTIVITY-CLEANUP] Archivo temporal eliminado`);
-      
-    } catch (osError) {
-      console.error(`❌ [ACTIVITY-OBJECT-STORAGE] ERROR CRÍTICO:`, osError);
-      console.error(`❌ [ACTIVITY-OBJECT-STORAGE] ERROR STACK:`, osError.stack);
-      console.error(`❌ [ACTIVITY-OBJECT-STORAGE] FALLBACK: Usando filesystem temporal`);
-      imageUrl = `/uploads/activity-images/${req.file.filename}`;
-      console.log(`⚠️ [ACTIVITY-FALLBACK] Usando filesystem temporal como respaldo`);
-    }
+    // Actualizar directamente el campo image_url de la actividad (SISTEMA SIMPLE)
+    const imageUrl = `/uploads/activity-images/${req.file.filename}`;
     
     const updatedActivity = await db
       .update(activities)

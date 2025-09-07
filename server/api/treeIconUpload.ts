@@ -8,10 +8,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ DYNAMIC PATH DETECTION - Same pattern as other modules
-const isProduction = process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT || !process.env.NODE_ENV;
-const uploadDirBase = isProduction ? 'public/uploads/tree-icons' : 'uploads/tree-icons';
-const uploadDir = path.join(process.cwd(), uploadDirBase);
+// Configurar la carpeta de destino para iconos de especies de árboles
+const uploadDir = path.join(__dirname, '../../public/uploads/tree-icons');
 
 // Asegurarse de que existe la carpeta para los iconos de árboles
 if (!fs.existsSync(uploadDir)) {
@@ -54,9 +52,7 @@ export const uploadTreeIcon = multer({
 // Configurar multer para subida de fotos de especies de árboles
 const photoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // ✅ DYNAMIC PATH DETECTION - Same pattern as other modules
-    const photoDirBase = isProduction ? 'public/uploads/tree-photos' : 'uploads/tree-photos';
-    const photoDir = path.join(process.cwd(), photoDirBase);
+    const photoDir = path.join(__dirname, '../../public/uploads/tree-photos');
     if (!fs.existsSync(photoDir)) {
       fs.mkdirSync(photoDir, { recursive: true });
     }
