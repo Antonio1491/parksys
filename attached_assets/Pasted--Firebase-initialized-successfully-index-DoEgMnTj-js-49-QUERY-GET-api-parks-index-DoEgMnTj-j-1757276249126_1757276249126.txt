@@ -1,0 +1,48 @@
+🔥 Firebase initialized successfully
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/parks
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/sponsors
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/events
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413Understand this warning
+index-DoEgMnTj.js:794 i18next::backendConnector: loaded namespace common for language es Object
+index-DoEgMnTj.js:794 i18next: languageChanged es
+index-DoEgMnTj.js:794 i18next: initialized Object
+index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:838 ⚠️ No space mapping found for parks:footer
+spe @ index-DoEgMnTj.js:838Understand this warning
+index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:2367 ✅ Usuario autenticado, redirigiendo al dashboard...
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/users
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/hr/employees
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/volunteers
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/active-concessions
+index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+/api/users:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+index-DoEgMnTj.js:49 Query failed for: /api/users Error: Authentication required
+    at index-DoEgMnTj.js:49:46367
+(anonymous) @ index-DoEgMnTj.js:49Understand this error
+2index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/notifications/count
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activity-categories
+3index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/actividades-fotos
+3index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+/uploads/activity-images/activity-img-1757038933171-666561918.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities
+3index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities/52/images
+activity-images-eFRxb6BF.js:1 📤 [ACTIVITY-HÍBRIDO] Iniciando upload de 1 archivos para actividad: 52
+activity-images-eFRxb6BF.js:1 ✅ [ACTIVITY-HÍBRIDO] Imagen 1/1 completada: aquarium-at-passeio-publico-park-curitiba-paran-2025-03-24-12-32-30-utc.jpg
+index-DoEgMnTj.js:49 🌐 [QUERY] GET /api/activities/52/images
+3index-DoEgMnTj.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+activity-img-1757038933171-666561918.jpg:1  GET https://parksys-demo.replit.app/uploads/activity-images/activity-img-1757038933171-666561918.jpg 404 (Not Found)
+Image
+j4 @ index-DoEgMnTj.js:41
+Aq @ index-DoEgMnTj.js:41
+sie @ index-DoEgMnTj.js:41
+uie @ index-DoEgMnTj.js:41
+Ed @ index-DoEgMnTj.js:41
+kq @ index-DoEgMnTj.js:41
+C @ index-DoEgMnTj.js:26
+R @ index-DoEgMnTj.js:26Understand this error
