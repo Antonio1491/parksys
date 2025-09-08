@@ -16,13 +16,13 @@ import AdminLayout from '@/components/AdminLayout';
 import { apiRequest } from '@/lib/queryClient';
 import EventImageUploader from '@/components/EventImageUploader';
 
-// Schema de validación para evento (idéntico al de nuevo evento)
+// Schema de validación para evento (corregido)
 const editEventSchema = z.object({
   title: z.string().min(1, 'El título es requerido').max(255, 'El título es muy largo'),
   description: z.string().min(1, 'La descripción es requerida'),
   start_date: z.string().min(1, 'La fecha de inicio es requerida'),
   end_date: z.string().optional(),
-  start_time: z.string().min(1, 'La hora de inicio es requerida'),
+  start_time: z.string().optional(), // ✅ HORA OPCIONAL
   end_time: z.string().optional(),
   park_id: z.string().min(1, 'Debe seleccionar un parque'),
   category: z.string().min(1, 'Debe seleccionar una categoría'),
@@ -139,8 +139,8 @@ export default function EditEventPage() {
         description: event.description || '',
         start_date: formatDateForInput(event.startDate),
         end_date: formatDateForInput(event.endDate),
-        start_time: extractTime(event.startDate),
-        end_time: extractTime(event.endDate),
+        start_time: event.startTime || '',
+        end_time: event.endTime || '',
         park_id: event.parks && event.parks.length > 0 ? String(event.parks[0].id) : '',
         category: event.eventType || '',
         capacity: event.capacity ? String(event.capacity) : '',
