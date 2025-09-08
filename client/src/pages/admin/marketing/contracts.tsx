@@ -239,7 +239,11 @@ export default function ContractsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader title="Contratos de Patrocinio" />
+        <PageHeader 
+          title="Contratos de Patrocinio"
+          subtitle="Gestiona los contratos de patrocinio activos y en desarrollo"
+          icon={<FileText />}
+          />
 
         {/* Filters and Search */}
         <Card>

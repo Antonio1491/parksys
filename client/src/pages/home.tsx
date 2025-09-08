@@ -334,12 +334,12 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-poppins font-black mb-6">
-              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
-              <span style={{ color: '#00444f' }}>Sistema</span><br />
+              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#f4f5f7', fontWeight: '300' }}>Somos el</span><br />
+              <span style={{ color: '#f4f5f7' }}>Sistema</span><br />
               <span style={{ color: '#14b8a6' }}>Parques</span>
               <span style={{ color: '#a8bd7d' }}> de México</span>
             </h2>
-            <p className="text-lg font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg font-poppins font-regular text-[#f4f5f7] max-w-4xl mx-auto leading-relaxed">
               Una red que integra y fortalece los espacios públicos del país, reconociendo a<br />
               los parques como motores de salud, cohesión social y sostenibilidad ambiental.
             </p>
@@ -350,12 +350,12 @@ const Home: React.FC = () => {
             <div className="col-span-2 flex items-center">
               <div className="text-left">
                 <h3 className="leading-tight">
-                  <span style={{ fontFamily: 'Guttery', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
+                  <span style={{ fontFamily: 'Guttery', color: '#f4f5f7', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
                   <span style={{ fontFamily: 'poppins', fontSize: '2.3rem', fontWeight: 'bold' }}>
-                    <span style={{ color: '#00444f' }}>objetivos y </span>
+                    <span style={{ color: '#f4f5f7' }}>objetivos y </span>
                     <span style={{ color: '#14b8a6' }}>deseos</span>
                   </span><br />
-                  <span style={{ fontFamily: 'poppins', color: '#00444f', fontSize: 'large', fontWeight: '400' }}>como Organismo Público Descentralizado que gestiona y opera parques </span>
+                  <span style={{ fontFamily: 'poppins', color: '#f4f5f7', fontSize: 'large', fontWeight: '400' }}>como Organismo Público Descentralizado que gestiona y opera parques </span>
                 </h3>
               </div>
             </div>
@@ -456,6 +456,47 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* 🌳 ACTIVIDADES E INSTRUCTORES SECTION */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
+
+          {/* Texto actividades */}
+          <div>
+            <h2 className="text-5xl font-poppins font-black leading-tight">
+              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery' }}>Contamos con</span>
+              <span className="block text-[#14b8a6] text-4xl">Actividades</span>
+              <span className="block text-[#00444f] text-4xl">Variadas</span>
+            </h2>
+            <button className="mt-4 px-4 py-2 bg-lime-600 text-white rounded-lg shadow hover:bg-lime-700 transition">
+              VER CALENDARIO
+            </button>
+          </div>
+
+          {/* Tarjeta actividades */}
+          <div className="bg-gray-100 rounded-xl h-40 flex items-center justify-center">
+            {/* Aquí luego se mapearán actividades desde el sistema */}
+            <span className="text-gray-400">[Tarjeta de actividades]</span>
+          </div>
+
+          {/* Tarjeta instructores */}
+          <div className="bg-gray-100 rounded-xl h-40 flex items-center justify-center md:col-start-1">
+            {/* Aquí luego se mapearán instructores desde el sistema */}
+            <span className="text-gray-400">[Tarjeta de instructores]</span>
+          </div>
+
+          {/* Texto instructores */}
+          <div className="text-right">
+            <h3 className="text-xl font-bold leading-tight">
+              <span className="block italic text-gray-800">guiados por</span>
+              <span className="block text-lime-600">instructores</span>
+              <span className="block text-gray-900">especializados</span>
+            </h3>
+          </div>
+
+        </div>
+      </section>
+
       
       {/* EVENTOS SECTION */}
       <section className="py-24" style={{ backgroundColor: '#a8bd7d' }}>

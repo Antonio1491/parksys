@@ -227,7 +227,172 @@ export default function SponsorsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader title="Gestión de Patrocinadores" />
+        <PageHeader 
+          title="Patrocinadores"
+          subtitle='Gestión de patrocinadores y sus niveles de patrocinio'
+          icon={<Building />}
+          actions={[
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="primary"
+                  onClick={resetForm}>
+                  <Plus className="mr-2" />
+                  Nuevo Patrocinador
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {selectedSponsor ? 'Editar Patrocinador' : 'Nuevo Patrocinador'}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name">Nombre de la Empresa *</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="category">Categoría *</Label>
+                      <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar categoría" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="corporativo">Corporativo</SelectItem>
+                          <SelectItem value="local">Local</SelectItem>
+                          <SelectItem value="institucional">Institucional</SelectItem>
+                          <SelectItem value="ong">ONG</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="tier">Nivel de Patrocinio</Label>
+                      <Select value={formData.tier} onValueChange={(value) => setFormData({ ...formData, tier: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(tierNames).map(([tier, name]) => (
+                            <SelectItem key={tier} value={tier}>
+                              Nivel {tier} - {name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="status">Estado</Label>
+                      <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="activo">Activo</SelectItem>
+                          <SelectItem value="inactivo">Inactivo</SelectItem>
+                          <SelectItem value="pendiente">Pendiente</SelectItem>
+                          <SelectItem value="suspendido">Suspendido</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="representative">Representante</Label>
+                      <Input
+                        id="representative"
+                        value={formData.representative}
+                        onChange={(e) => setFormData({ ...formData, representative: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Teléfono</Label>
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="website">Sitio Web</Label>
+                      <Input
+                        id="website"
+                        value={formData.website}
+                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="contractValue">Valor del Contrato</Label>
+                      <Input
+                        id="contractValue"
+                        value={formData.contractValue}
+                        onChange={(e) => setFormData({ ...formData, contractValue: e.target.value })}
+                        placeholder="$0.00"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="address">Dirección</Label>
+                      <Input
+                        id="address"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="city">Ciudad</Label>
+                      <Input
+                        id="city"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state">Estado</Label>
+                      <Input
+                        id="state"
+                        value={formData.state}
+                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="notes">Notas Adicionales</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={createSponsorMutation.isPending || updateSponsorMutation.isPending}>
+                      {createSponsorMutation.isPending || updateSponsorMutation.isPending ? 'Guardando...' : 'Guardar'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          ]}
+          />
 
         {/* Filters and Search */}
         <Card>
@@ -279,163 +444,7 @@ export default function SponsorsPage() {
                 </Select>
               </div>
 
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={resetForm}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nuevo Patrocinador
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {selectedSponsor ? 'Editar Patrocinador' : 'Nuevo Patrocinador'}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="name">Nombre de la Empresa *</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="category">Categoría *</Label>
-                        <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar categoría" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="corporativo">Corporativo</SelectItem>
-                            <SelectItem value="local">Local</SelectItem>
-                            <SelectItem value="institucional">Institucional</SelectItem>
-                            <SelectItem value="ong">ONG</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="tier">Nivel de Patrocinio</Label>
-                        <Select value={formData.tier} onValueChange={(value) => setFormData({ ...formData, tier: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(tierNames).map(([tier, name]) => (
-                              <SelectItem key={tier} value={tier}>
-                                Nivel {tier} - {name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="status">Estado</Label>
-                        <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="activo">Activo</SelectItem>
-                            <SelectItem value="inactivo">Inactivo</SelectItem>
-                            <SelectItem value="pendiente">Pendiente</SelectItem>
-                            <SelectItem value="suspendido">Suspendido</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="representative">Representante</Label>
-                        <Input
-                          id="representative"
-                          value={formData.representative}
-                          onChange={(e) => setFormData({ ...formData, representative: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone">Teléfono</Label>
-                        <Input
-                          id="phone"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="website">Sitio Web</Label>
-                        <Input
-                          id="website"
-                          value={formData.website}
-                          onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                          placeholder="https://..."
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="contractValue">Valor del Contrato</Label>
-                        <Input
-                          id="contractValue"
-                          value={formData.contractValue}
-                          onChange={(e) => setFormData({ ...formData, contractValue: e.target.value })}
-                          placeholder="$0.00"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="address">Dirección</Label>
-                        <Input
-                          id="address"
-                          value={formData.address}
-                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="city">Ciudad</Label>
-                        <Input
-                          id="city"
-                          value={formData.city}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="state">Estado</Label>
-                        <Input
-                          id="state"
-                          value={formData.state}
-                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="notes">Notas Adicionales</Label>
-                      <Textarea
-                        id="notes"
-                        value={formData.notes}
-                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        rows={3}
-                      />
-                    </div>
 
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                        Cancelar
-                      </Button>
-                      <Button type="submit" disabled={createSponsorMutation.isPending || updateSponsorMutation.isPending}>
-                        {createSponsorMutation.isPending || updateSponsorMutation.isPending ? 'Guardando...' : 'Guardar'}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
             </div>
           </CardContent>
         </Card>
