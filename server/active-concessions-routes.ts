@@ -60,17 +60,43 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
       const { pool } = await import('./db');
       
       const result = await pool.query(`
-        SELECT DISTINCT
-          ac.*,
-          ct.name as "concessionTypeName",
-          ct.description as "concessionTypeDescription",
-          ct.impact_level as "impactLevel",
-          cn.name as "concessionaireName",
-          cn.email as "concessionaireEmail",
-          cn.phone as "concessionairePhone",
-          p.name as "parkName",
-          p.address as "parkLocation",
-          COALESCE(img_count.count, 0) as "imageCount",
+        SELECT 
+          ac.id,
+          MAX(ac.name) as name,
+          MAX(ac.description) as description,
+          MAX(ac.concession_type_id) as concession_type_id,
+          MAX(ac.concessionaire_id) as concessionaire_id,
+          MAX(ac.park_id) as park_id,
+          MAX(ac.specific_location) as specific_location,
+          MAX(ac.start_date) as start_date,
+          MAX(ac.end_date) as end_date,
+          MAX(ac.status) as status,
+          MAX(ac.priority) as priority,
+          MAX(ac.monthly_payment) as monthly_payment,
+          MAX(ac.operating_hours) as operating_hours,
+          MAX(ac.operating_days) as operating_days,
+          MAX(ac.terms_conditions) as terms_conditions,
+          MAX(ac.emergency_contact) as emergency_contact,
+          MAX(ac.emergency_phone) as emergency_phone,
+          MAX(ac.created_at) as created_at,
+          MAX(ac.updated_at) as updated_at,
+          MAX(ac.coordinates) as coordinates,
+          MAX(ac.area) as area,
+          MAX(ac.contract_number) as contract_number,
+          MAX(ac.revenue_percentage) as revenue_percentage,
+          MAX(ac.deposit) as deposit,
+          MAX(ac.special_requirements) as special_requirements,
+          MAX(ac.notes) as notes,
+          MAX(ac.internal_notes) as internal_notes,
+          MAX(ct.name) as "concessionTypeName",
+          MAX(ct.description) as "concessionTypeDescription",
+          MAX(ct.impact_level) as "impactLevel",
+          MAX(cn.name) as "concessionaireName",
+          MAX(cn.email) as "concessionaireEmail",
+          MAX(cn.phone) as "concessionairePhone",
+          MAX(p.name) as "parkName",
+          MAX(p.address) as "parkLocation",
+          COALESCE(COUNT(aci.id), 0) as "imageCount",
           (
             SELECT image_url 
             FROM active_concession_images 
@@ -81,12 +107,9 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
         LEFT JOIN concession_types ct ON ac.concession_type_id = ct.id
         LEFT JOIN concessionaires cn ON ac.concessionaire_id = cn.id
         LEFT JOIN parks p ON ac.park_id = p.id
-        LEFT JOIN (
-          SELECT concession_id, COUNT(*) as count
-          FROM active_concession_images 
-          GROUP BY concession_id
-        ) img_count ON ac.id = img_count.concession_id
-        ORDER BY ac.created_at DESC
+        LEFT JOIN active_concession_images aci ON ac.id = aci.concession_id
+        GROUP BY ac.id
+        ORDER BY MAX(ac.created_at) DESC
       `);
       
 
