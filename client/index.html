@@ -21,18 +21,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Google Maps API con carga optimizada -->
-    <script type="module">
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-      if (apiKey) {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
-        script.async = true;
-        script.defer = true;
-        script.id = 'google-maps-script';
-        document.head.appendChild(script);
-      }
-    </script>
+    <!-- Google Maps se carga dinámicamente desde GoogleMapsService -->
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
