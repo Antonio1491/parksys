@@ -243,6 +243,147 @@ export default function ContractsPage() {
           title="Contratos de Patrocinio"
           subtitle="Gestiona los contratos de patrocinio activos y en desarrollo"
           icon={<FileText />}
+          actions={[
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="primary"
+                  onClick={resetForm}>
+                  <Plus className="mr-2" />
+                  Nuevo Contrato
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {selectedContract ? 'Editar Contrato' : 'Nuevo Contrato'}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="sponsorId">Patrocinador *</Label>
+                      <Select value={formData.sponsorId} onValueChange={(value) => setFormData({ ...formData, sponsorId: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar patrocinador" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sponsors.map((sponsor: Sponsor) => (
+                            <SelectItem key={sponsor.id} value={sponsor.id.toString()}>
+                              {sponsor.name} ({sponsor.category})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="packageId">Paquete de Patrocinio *</Label>
+                      <Select value={formData.packageId} onValueChange={(value) => setFormData({ ...formData, packageId: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar paquete" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {packages.map((pkg: SponsorshipPackage) => (
+                            <SelectItem key={pkg.id} value={pkg.id.toString()}>
+                              {pkg.name} - ${pkg.price} ({pkg.duration} meses)
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="startDate">Fecha de Inicio *</Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={formData.startDate}
+                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endDate">Fecha de Fin *</Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={formData.endDate}
+                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="totalAmount">Monto Total *</Label>
+                      <Input
+                        id="totalAmount"
+                        value={formData.totalAmount}
+                        onChange={(e) => setFormData({ ...formData, totalAmount: e.target.value })}
+                        placeholder="$0.00"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="status">Estado</Label>
+                      <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Borrador</SelectItem>
+                          <SelectItem value="active">Activo</SelectItem>
+                          <SelectItem value="expired">Expirado</SelectItem>
+                          <SelectItem value="terminated">Terminado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="paymentSchedule">Cronograma de Pagos</Label>
+                      <Select value={formData.paymentSchedule} onValueChange={(value) => setFormData({ ...formData, paymentSchedule: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="monthly">Mensual</SelectItem>
+                          <SelectItem value="quarterly">Trimestral</SelectItem>
+                          <SelectItem value="annually">Anual</SelectItem>
+                          <SelectItem value="one-time">Pago Único</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="autoRenewal"
+                        checked={formData.autoRenewal}
+                        onChange={(e) => setFormData({ ...formData, autoRenewal: e.target.checked })}
+                        className="rounded border-gray-300"
+                      />
+                      <Label htmlFor="autoRenewal">Renovación Automática</Label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="terms">Términos y Condiciones</Label>
+                    <Textarea
+                      id="terms"
+                      value={formData.terms}
+                      onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+                      rows={4}
+                      placeholder="Términos específicos del contrato..."
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={createContractMutation.isPending || updateContractMutation.isPending}>
+                      {createContractMutation.isPending || updateContractMutation.isPending ? 'Guardando...' : 'Guardar'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          ]}
           />
 
         {/* Filters and Search */}
@@ -279,143 +420,7 @@ export default function ContractsPage() {
                 </Select>
               </div>
 
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={resetForm}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nuevo Contrato
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {selectedContract ? 'Editar Contrato' : 'Nuevo Contrato'}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="sponsorId">Patrocinador *</Label>
-                        <Select value={formData.sponsorId} onValueChange={(value) => setFormData({ ...formData, sponsorId: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar patrocinador" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {sponsors.map((sponsor: Sponsor) => (
-                              <SelectItem key={sponsor.id} value={sponsor.id.toString()}>
-                                {sponsor.name} ({sponsor.category})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="packageId">Paquete de Patrocinio *</Label>
-                        <Select value={formData.packageId} onValueChange={(value) => setFormData({ ...formData, packageId: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar paquete" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {packages.map((pkg: SponsorshipPackage) => (
-                              <SelectItem key={pkg.id} value={pkg.id.toString()}>
-                                {pkg.name} - ${pkg.price} ({pkg.duration} meses)
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="startDate">Fecha de Inicio *</Label>
-                        <Input
-                          id="startDate"
-                          type="date"
-                          value={formData.startDate}
-                          onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="endDate">Fecha de Fin *</Label>
-                        <Input
-                          id="endDate"
-                          type="date"
-                          value={formData.endDate}
-                          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="totalAmount">Monto Total *</Label>
-                        <Input
-                          id="totalAmount"
-                          value={formData.totalAmount}
-                          onChange={(e) => setFormData({ ...formData, totalAmount: e.target.value })}
-                          placeholder="$0.00"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="status">Estado</Label>
-                        <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="draft">Borrador</SelectItem>
-                            <SelectItem value="active">Activo</SelectItem>
-                            <SelectItem value="expired">Expirado</SelectItem>
-                            <SelectItem value="terminated">Terminado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="paymentSchedule">Cronograma de Pagos</Label>
-                        <Select value={formData.paymentSchedule} onValueChange={(value) => setFormData({ ...formData, paymentSchedule: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="monthly">Mensual</SelectItem>
-                            <SelectItem value="quarterly">Trimestral</SelectItem>
-                            <SelectItem value="annually">Anual</SelectItem>
-                            <SelectItem value="one-time">Pago Único</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="autoRenewal"
-                          checked={formData.autoRenewal}
-                          onChange={(e) => setFormData({ ...formData, autoRenewal: e.target.checked })}
-                          className="rounded border-gray-300"
-                        />
-                        <Label htmlFor="autoRenewal">Renovación Automática</Label>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="terms">Términos y Condiciones</Label>
-                      <Textarea
-                        id="terms"
-                        value={formData.terms}
-                        onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
-                        rows={4}
-                        placeholder="Términos específicos del contrato..."
-                      />
-                    </div>
-
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                        Cancelar
-                      </Button>
-                      <Button type="submit" disabled={createContractMutation.isPending || updateContractMutation.isPending}>
-                        {createContractMutation.isPending || updateContractMutation.isPending ? 'Guardando...' : 'Guardar'}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              
             </div>
           </CardContent>
         </Card>
