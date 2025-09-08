@@ -286,10 +286,14 @@ export async function updateEvent(req: Request, res: Response) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
     
-    // Validar los datos de entrada
-    const validationResult = insertEventSchema.safeParse(req.body);
+    // Importar el schema de actualización
+    const { updateEventSchema } = await import("@shared/events-schema");
+    
+    // Validar los datos de entrada con el schema de actualización
+    const validationResult = updateEventSchema.safeParse(req.body);
     
     if (!validationResult.success) {
+      console.log("❌ Errores de validación:", validationResult.error.errors);
       return res.status(400).json({ 
         message: "Datos inválidos", 
         errors: validationResult.error.errors 

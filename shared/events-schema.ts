@@ -143,9 +143,16 @@ export const insertEventSchema = createInsertSchema(events, {
   parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque")
 });
 
+// Schema para actualización de eventos (más permisivo)
+export const updateEventSchema = insertEventSchema.partial().extend({
+  title: z.string().min(3, "El título es requerido"),
+  parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque")
+});
+
 // Tipos para TypeScript
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
+export type UpdateEvent = z.infer<typeof updateEventSchema>;
 export type EventPark = typeof eventParks.$inferSelect;
 export type EventResource = typeof eventResources.$inferSelect;
 export type EventRegistration = typeof eventRegistrations.$inferSelect;
