@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/AdminLayout';
-import PageHeader from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui/page-header';
 
 interface Sponsor {
   id: number;
@@ -158,8 +158,8 @@ export default function SponsorsPage() {
     const matchesSearch = sponsor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          sponsor.representative?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          sponsor.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !filterCategory || sponsor.category === filterCategory;
-    const matchesStatus = !filterStatus || sponsor.status === filterStatus;
+    const matchesCategory = !filterCategory || filterCategory === 'all' || sponsor.category === filterCategory;
+    const matchesStatus = !filterStatus || filterStatus === 'all' || sponsor.status === filterStatus;
     
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -227,10 +227,7 @@ export default function SponsorsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Gestión de Patrocinadores"
-          description="Administra patrocinadores, contratos y relaciones comerciales"
-        />
+        <PageHeader title="Gestión de Patrocinadores" />
 
         {/* Filters and Search */}
         <Card>
@@ -257,7 +254,7 @@ export default function SponsorsPage() {
                     <SelectValue placeholder="Todas las categorías" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas las categorías</SelectItem>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
                     <SelectItem value="corporativo">Corporativo</SelectItem>
                     <SelectItem value="local">Local</SelectItem>
                     <SelectItem value="institucional">Institucional</SelectItem>
@@ -273,7 +270,7 @@ export default function SponsorsPage() {
                     <SelectValue placeholder="Todos los estados" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los estados</SelectItem>
+                    <SelectItem value="all">Todos los estados</SelectItem>
                     <SelectItem value="activo">Activo</SelectItem>
                     <SelectItem value="inactivo">Inactivo</SelectItem>
                     <SelectItem value="pendiente">Pendiente</SelectItem>

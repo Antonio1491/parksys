@@ -97,7 +97,7 @@ export default function SponsoredAssetsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     sponsorId: '',
-    contractId: '',
+    contractId: 'none',
     assetType: '',
     assetName: '',
     parkLocation: '',
@@ -194,8 +194,8 @@ export default function SponsoredAssetsPage() {
     const matchesSearch = asset.assetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          asset.sponsor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          asset.parkLocation?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !filterType || asset.assetType === filterType;
-    const matchesStatus = !filterStatus || asset.status === filterStatus;
+    const matchesType = !filterType || filterType === 'all' || asset.assetType === filterType;
+    const matchesStatus = !filterStatus || filterStatus === 'all' || asset.status === filterStatus;
     
     return matchesSearch && matchesType && matchesStatus;
   });
@@ -203,7 +203,7 @@ export default function SponsoredAssetsPage() {
   const resetForm = () => {
     setFormData({
       sponsorId: '',
-      contractId: '',
+      contractId: 'none',
       assetType: '',
       assetName: '',
       parkLocation: '',
@@ -224,7 +224,7 @@ export default function SponsoredAssetsPage() {
     setSelectedAsset(asset);
     setFormData({
       sponsorId: asset.sponsorId?.toString() || '',
-      contractId: asset.contractId?.toString() || '',
+      contractId: asset.contractId ? asset.contractId.toString() : 'none',
       assetType: asset.assetType || '',
       assetName: asset.assetName || '',
       parkLocation: asset.parkLocation || '',
@@ -247,7 +247,7 @@ export default function SponsoredAssetsPage() {
     const payload = {
       ...formData,
       sponsorId: parseInt(formData.sponsorId),
-      contractId: formData.contractId ? parseInt(formData.contractId) : null,
+      contractId: formData.contractId && formData.contractId !== 'none' ? parseInt(formData.contractId) : null,
       impressionsPerDay: formData.impressionsPerDay ? parseInt(formData.impressionsPerDay) : null
     };
     
@@ -273,10 +273,7 @@ export default function SponsoredAssetsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Activos Patrocinados"
-          description="Gestiona la asignación de patrocinadores a activos de los parques"
-        />
+        <PageHeader title="Activos Patrocinados" />
 
         {/* Filters and Search */}
         <Card>
@@ -303,7 +300,7 @@ export default function SponsoredAssetsPage() {
                     <SelectValue placeholder="Todos los tipos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los tipos</SelectItem>
+                    <SelectItem value="all">Todos los tipos</SelectItem>
                     <SelectItem value="banners">Banners</SelectItem>
                     <SelectItem value="digital_screens">Pantallas Digitales</SelectItem>
                     <SelectItem value="park_furniture">Mobiliario</SelectItem>
@@ -320,7 +317,7 @@ export default function SponsoredAssetsPage() {
                     <SelectValue placeholder="Todos los estados" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los estados</SelectItem>
+                    <SelectItem value="all">Todos los estados</SelectItem>
                     <SelectItem value="active">Activo</SelectItem>
                     <SelectItem value="pending">Pendiente</SelectItem>
                     <SelectItem value="maintenance">En Mantenimiento</SelectItem>
@@ -366,7 +363,7 @@ export default function SponsoredAssetsPage() {
                             <SelectValue placeholder="Seleccionar contrato (opcional)" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Sin contrato específico</SelectItem>
+                            <SelectItem value="none">Sin contrato específico</SelectItem>
                             {getAvailableContracts(formData.sponsorId).map((contract: Contract) => (
                               <SelectItem key={contract.id} value={contract.id.toString()}>
                                 Contrato #{contract.id} - {contract.sponsor?.name}

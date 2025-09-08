@@ -173,7 +173,7 @@ export default function ContractsPage() {
   const filteredContracts = contracts.filter((contract: SponsorshipContract) => {
     const matchesSearch = contract.sponsor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          contract.package?.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = !filterStatus || contract.status === filterStatus;
+    const matchesStatus = !filterStatus || filterStatus === 'all' || contract.status === filterStatus;
     
     return matchesSearch && matchesStatus;
   });
@@ -239,10 +239,7 @@ export default function ContractsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Contratos de Patrocinio"
-          description="Gestiona contratos, paquetes y términos de patrocinio"
-        />
+        <PageHeader title="Contratos de Patrocinio" />
 
         {/* Filters and Search */}
         <Card>
@@ -269,7 +266,7 @@ export default function ContractsPage() {
                     <SelectValue placeholder="Todos los estados" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los estados</SelectItem>
+                    <SelectItem value="all">Todos los estados</SelectItem>
                     <SelectItem value="draft">Borrador</SelectItem>
                     <SelectItem value="active">Activo</SelectItem>
                     <SelectItem value="expired">Expirado</SelectItem>

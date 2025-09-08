@@ -88,7 +88,7 @@ export default function SponsoredEventsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     sponsorId: '',
-    contractId: '',
+    contractId: 'none',
     eventName: '',
     eventDate: '',
     eventLocation: '',
@@ -183,8 +183,8 @@ export default function SponsoredEventsPage() {
     const matchesSearch = event.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.sponsor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.eventLocation?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLevel = !filterLevel || event.sponsorshipLevel === filterLevel;
-    const matchesStatus = !filterStatus || event.status === filterStatus;
+    const matchesLevel = !filterLevel || filterLevel === 'all' || event.sponsorshipLevel === filterLevel;
+    const matchesStatus = !filterStatus || filterStatus === 'all' || event.status === filterStatus;
     
     return matchesSearch && matchesLevel && matchesStatus;
   });
@@ -192,7 +192,7 @@ export default function SponsoredEventsPage() {
   const resetForm = () => {
     setFormData({
       sponsorId: '',
-      contractId: '',
+      contractId: 'none',
       eventName: '',
       eventDate: '',
       eventLocation: '',
@@ -211,7 +211,7 @@ export default function SponsoredEventsPage() {
     setSelectedEvent(event);
     setFormData({
       sponsorId: event.sponsorId?.toString() || '',
-      contractId: event.contractId?.toString() || '',
+      contractId: event.contractId ? event.contractId.toString() : 'none',
       eventName: event.eventName || '',
       eventDate: event.eventDate ? format(new Date(event.eventDate), 'yyyy-MM-dd') : '',
       eventLocation: event.eventLocation || '',
@@ -232,7 +232,7 @@ export default function SponsoredEventsPage() {
     const payload = {
       ...formData,
       sponsorId: parseInt(formData.sponsorId),
-      contractId: formData.contractId ? parseInt(formData.contractId) : null,
+      contractId: formData.contractId && formData.contractId !== 'none' ? parseInt(formData.contractId) : null,
       exposureMinutes: formData.exposureMinutes ? parseInt(formData.exposureMinutes) : null
     };
     
@@ -258,10 +258,7 @@ export default function SponsoredEventsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Eventos Patrocinados"
-          description="Gestiona la asignación de patrocinadores a eventos de los parques"
-        />
+        <PageHeader title="Eventos Patrocinados" />
 
         {/* Filters and Search */}
         <Card>
@@ -288,7 +285,7 @@ export default function SponsoredEventsPage() {
                     <SelectValue placeholder="Todos los niveles" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los niveles</SelectItem>
+                    <SelectItem value="all">Todos los niveles</SelectItem>
                     <SelectItem value="principal">Principal</SelectItem>
                     <SelectItem value="secundario">Secundario</SelectItem>
                     <SelectItem value="colaborador">Colaborador</SelectItem>
@@ -303,7 +300,7 @@ export default function SponsoredEventsPage() {
                     <SelectValue placeholder="Todos los estados" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los estados</SelectItem>
+                    <SelectItem value="all">Todos los estados</SelectItem>
                     <SelectItem value="pending">Pendiente</SelectItem>
                     <SelectItem value="confirmed">Confirmado</SelectItem>
                     <SelectItem value="completed">Completado</SelectItem>
@@ -349,7 +346,7 @@ export default function SponsoredEventsPage() {
                             <SelectValue placeholder="Seleccionar contrato (opcional)" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Sin contrato específico</SelectItem>
+                            <SelectItem value="none">Sin contrato específico</SelectItem>
                             {getAvailableContracts(formData.sponsorId).map((contract: Contract) => (
                               <SelectItem key={contract.id} value={contract.id.toString()}>
                                 Contrato #{contract.id} - {contract.sponsor?.name}

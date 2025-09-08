@@ -175,13 +175,13 @@ const Home: React.FC = () => {
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-xl md:text-4xl font-poppins font-black text-gray-900 mb-8">
-              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
+            <h2 className="text-xl md:text-5xl font-poppins font-black text-gray-900 mb-6">
+              <span style={{ fontFamily: 'Guttery', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
               <span style={{ color: '#00444f' }}>Tu </span>
               <span style={{ color: '#14b8a6' }}>Parque </span>
               <span style={{ color: '#00444f' }}>Favorito</span>
             </h2>
-            <p className="text-xl font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
               Navega a través de los parques más emblemáticos,<br /> 
               pertenecientes al Sistema de Parques de México 
             </p>
@@ -328,17 +328,145 @@ const Home: React.FC = () => {
 
         </div>
       </section>
+
+      {/* 🏛️ SISTEMA DE PARQUES DE MEXICO SECTION */}
+      <section className="py-20 bg-[#00444f]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-poppins font-black mb-6">
+              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
+              <span style={{ color: '#00444f' }}>Sistema</span><br />
+              <span style={{ color: '#14b8a6' }}>Parques</span>
+              <span style={{ color: '#a8bd7d' }}> de México</span>
+            </h2>
+            <p className="text-lg font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
+              Una red que integra y fortalece los espacios públicos del país, reconociendo a<br />
+              los parques como motores de salud, cohesión social y sostenibilidad ambiental.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-5 gap-8">
+            {/* Columna 2/5 - Texto descriptivo */}
+            <div className="col-span-2 flex items-center">
+              <div className="text-left">
+                <h3 className="leading-tight">
+                  <span style={{ fontFamily: 'Guttery', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
+                  <span style={{ fontFamily: 'poppins', fontSize: '2.3rem', fontWeight: 'bold' }}>
+                    <span style={{ color: '#00444f' }}>objetivos y </span>
+                    <span style={{ color: '#14b8a6' }}>deseos</span>
+                  </span><br />
+                  <span style={{ fontFamily: 'poppins', color: '#00444f', fontSize: 'large', fontWeight: '400' }}>como Organismo Público Descentralizado que gestiona y opera parques </span>
+                </h3>
+              </div>
+            </div>
+
+            {/* Columna 3/5 - Tarjetas horizontales */}
+            <div className="col-span-3">
+              <div className="grid grid-cols-2 gap-4">
+
+                {/* Eje 1: Gestión y Mantenimiento */}
+                <Card className="group transition-all duration-300">
+                  <CardContent className="p-6 flex items-center gap-4">
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
+                      <Trees className="h-8 w-8 text-white" />
+                    </div>
+                    {/* Texto */}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#00444f]">
+                        Conservar y mejorar
+                      </h3>
+                      <p className="font-poppins font-regular text-[#00444f]">
+                        los parques existentes
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Eje 2: Educación Ambiental */}
+                <Card className="group transition-all duration-300">
+                  <CardContent className="p-6 flex items-center gap-4">
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
+                      <Sprout className="h-8 w-8 text-white" />
+                    </div>
+                    {/* Texto */}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#00444f]">
+                        Crear nuevos
+                      </h3>
+                      <p className="font-poppins font-regular text-[#00444f]">
+                        espacios para todos
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Eje 3: Participación Ciudadana */}
+                <Card className="group transition-all duration-300">
+                  <CardContent className="p-6 flex items-center gap-4">
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
+                      <Users className="h-8 w-8 text-white" />
+                    </div>
+                    {/* Texto */}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#00444f]">
+                        Promover
+                      </h3>
+                      <p className="font-poppins font-regular text-[#00444f]">
+                        la participación ciudadana
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Eje 4: Desarrollo Sustentable */}
+                <Card className="group transition-all duration-300">
+                  <CardContent className="p-6 flex items-center gap-4">
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
+                      <Handshake className="h-8 w-8 text-white" />
+                    </div>
+                    {/* Texto */}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#00444f]">
+                        Fortalecer
+                      </h3>
+                      <p className="font-poppins font-regular text-[#00444f]">
+                        el tejido social
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       
       {/* EVENTOS SECTION */}
       <section className="py-24" style={{ backgroundColor: '#a8bd7d' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-poppins font-black mb-8">
+            <h2 className="text-4xl md:text-5xl font-poppins font-black mb-8">
               <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#ffffff', fontWeight: '300' }}>Disfruta los magníficos</span><br />
               <span style={{ color: '#00444f' }}>Eventos </span> 
               <span style={{ color: '#ffffff' }}>Programados</span>
             </h2>
-            <p className="text-2xl font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
               El Sistema de Parques de México gestiona una cartelera variada<br /> 
               en cada uno de sus parques para que vivas y convivas 
             </p>
@@ -420,177 +548,6 @@ const Home: React.FC = () => {
           )}
         </div>
       </section>
-
-      {/* 🏛️ SISTEMA DE PARQUES DE MEXICO SECTION */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-poppins font-black mb-8">
-              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
-              <span style={{ color: '#00444f' }}>Sistema</span><br />
-              <span style={{ color: '#14b8a6' }}>Parques</span>
-              <span style={{ color: '#a8bd7d' }}> de México</span>
-            </h2>
-            <p className="text-xl font-poppins font-regular text-[#00444f] max-w-4xl mx-auto leading-relaxed">
-              Una red que integra y fortalece los espacios públicos del país, reconociendo a<br />
-              los parques como motores de salud, cohesión social y sostenibilidad ambiental.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-5 gap-8">
-            {/* Columna 2/5 - Texto descriptivo */}
-            <div className="col-span-2 flex items-center">
-              <div className="text-left">
-                <h3 className="leading-tight">
-                  <span style={{ fontFamily: 'Guttery', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
-                  <span style={{ fontFamily: 'poppins', fontSize: '2.4rem', fontWeight: 'bold' }}>
-                    <span style={{ color: '#00444f' }}>objetivos y </span>
-                    <span style={{ color: '#14b8a6' }}>deseos</span>
-                  </span><br />
-                  <span style={{ fontFamily: 'poppins', color: '#00444f', fontSize: '1.2rem', fontWeight: '400' }}>como Organismo Público Descentralizado que gestiona y opera parques </span>
-                </h3>
-              </div>
-            </div>
-
-            {/* Columna 3/5 - Tarjetas horizontales */}
-            <div className="col-span-3">
-              <div className="grid grid-cols-2 gap-4">
-                
-                {/* Eje 1: Gestión y Mantenimiento */}
-                <Card className="group transition-all duration-300">
-                  <CardContent className="p-6 flex items-center gap-4">
-                    {/* Icono */}
-                    <div
-                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
-                      style={{ backgroundColor: '#14b8a6' }}
-                    >
-                      <Trees className="h-8 w-8 text-white" />
-                    </div>
-                    {/* Texto */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-[#00444f]">
-                        Conservar y mejorar
-                      </h3>
-                      <p className="font-poppins font-regular text-[#00444f]">
-                        los parques existentes
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-
-                {/* Eje 2: Educación Ambiental */}
-                <Card className="group transition-all duration-300">
-                  <CardContent className="p-6 flex items-center gap-4">
-                    {/* Icono */}
-                    <div
-                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
-                      style={{ backgroundColor: '#14b8a6' }}
-                    >
-                      <Sprout className="h-8 w-8 text-white" />
-                    </div>
-                    {/* Texto */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-[#00444f]">
-                        Crear nuevos
-                      </h3>
-                      <p className="font-poppins font-regular text-[#00444f]">
-                        espacios para todos
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Eje 3: Participación Ciudadana */}
-                <Card className="group transition-all duration-300">
-                  <CardContent className="p-6 flex items-center gap-4">
-                    {/* Icono */}
-                    <div
-                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
-                      style={{ backgroundColor: '#14b8a6' }}
-                    >
-                      <Users className="h-8 w-8 text-white" />
-                    </div>
-                    {/* Texto */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-[#00444f]">
-                        Promover
-                      </h3>
-                      <p className="font-poppins font-regular text-[#00444f]">
-                        la participación ciudadana
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Eje 4: Desarrollo Sustentable */}
-                <Card className="group transition-all duration-300">
-                  <CardContent className="p-6 flex items-center gap-4">
-                    {/* Icono */}
-                    <div
-                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
-                      style={{ backgroundColor: '#14b8a6' }}
-                    >
-                      <Handshake className="h-8 w-8 text-white" />
-                    </div>
-                    {/* Texto */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-[#00444f]">
-                        Fortalecer
-                      </h3>
-                      <p className="font-poppins font-regular text-[#00444f]">
-                        el tejido social
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CENTRO METROPOLITANO DE CONSERVACIÓN DE VIDA SILVESTRE URBANO */}
-      <section className="py-24" style={{ backgroundColor: '#19633c' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-7 gap-8">
-            {/* Columna 5/7 - Imagen (lado izquierdo) */}
-            <div className="col-span-5 flex items-center">
-              <div className="relative w-full">
-                <div className="aspect-[5/3] bg-gradient-to-br from-emerald-200 to-teal-200 rounded-3xl overflow-hidden shadow-2xl">
-                  <img 
-                    src="/attached_assets/CMC2_1754778732652.png"
-                    alt="Centro de Conservación de Vida Silvestre - Guacamayas"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Columna 2/7 - Texto (lado derecho) */}
-            <div className="col-span-2 flex items-center">
-              <div className="text-right">
-                <h2 className="leading-tight mb-6">
-                  <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#aaaf4f', fontSize: '3rem', fontWeight: '300' }}>Comprometidos</span><br />
-                  <span style={{ color: '#aaaf4f', fontSize: '2.5rem', fontWeight: '400' }}>con la naturaleza</span>
-                </h2>
-                <p className="text-xl text-green-100 leading-relaxed mb-6 font-bold">
-                  Tenemos programas de educación<br />
-                  y protección de la flora y fauna
-                </p>
-                
-                <Button size="lg" className="bg-white hover:bg-gray-50 text-gray-900 font-bold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 border border-gray-200 shadow-md">
-                  Ver más
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
 
       {/* PATROCINADORES */}
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">

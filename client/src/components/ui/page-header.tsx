@@ -3,7 +3,7 @@ import * as React from "react"
 type PageHeaderProps = {
   title: string;
   subtitle?: string;
-  icon?: React.ReactNode;
+  icon?: React.ReactElement;
   actions?: React.ReactNode[]; // hasta 3 botones
   backgroundColor?: string;
 };
@@ -20,7 +20,8 @@ export const PageHeader = ({
   >
     {/* Sección izquierda: ícono + título + subtítulo */}
     <div className="flex items-start gap-2 mt-5">
-      {React.cloneElement(icon as React.ReactElement, {className: 'h-8 w-8 text-white mt-1',})}
+      {React.isValidElement(icon) &&
+      React.cloneElement(icon, { className: 'h-8 w-8 text-white mt-1' })}
       <div>
         <h1 className="text-3xl font-semibold text-white font-poppins">
           {title}
@@ -41,3 +42,5 @@ export const PageHeader = ({
     </div>
   </div>
 );
+
+export default PageHeader;
