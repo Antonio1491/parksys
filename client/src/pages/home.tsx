@@ -442,7 +442,7 @@ const Home: React.FC = () => {
             <div className="col-span-2 flex items-center">
               <div className="text-left">
                 <h3 className="leading-tight">
-                  <span style={{ fontFamily: 'Guttery Regular', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
+                  <span style={{ fontFamily: 'Guttery', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
                   <span style={{ fontFamily: 'poppins', fontSize: '2.4rem', fontWeight: 'bold' }}>
                     <span style={{ color: '#00444f' }}>objetivos y </span>
                     <span style={{ color: '#14b8a6' }}>deseos</span>

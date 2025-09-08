@@ -1,0 +1,91 @@
+🔥 Firebase initialized successfully
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-vhdYXHVC.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-vhdYXHVC.js:794 i18next: languageChanged es
+index-vhdYXHVC.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/events
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/parks
+index-vhdYXHVC.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+uploads%2Fevent-images%2Fevent-images-1757342515223-608615309.jpg:1  GET https://parksys-demo.replit.app/api/storage/file/uploads%2Fevent-images%2Fevent-images-1757342515223-608615309.jpg 404 (Not Found)
+Image
+j4 @ index-vhdYXHVC.js:41
+Aq @ index-vhdYXHVC.js:41
+Aq @ index-vhdYXHVC.js:41
+sie @ index-vhdYXHVC.js:41
+uie @ index-vhdYXHVC.js:41
+Ed @ index-vhdYXHVC.js:41
+N4 @ index-vhdYXHVC.js:41
+rd @ index-vhdYXHVC.js:39
+(anonymous) @ index-vhdYXHVC.js:41
+setTimeout
+lse @ index-vhdYXHVC.js:49
+o @ index-vhdYXHVC.js:49
+batch @ index-vhdYXHVC.js:49
+Wo @ index-vhdYXHVC.js:49
+setData @ index-vhdYXHVC.js:49
+onSuccess @ index-vhdYXHVC.js:49
+f @ index-vhdYXHVC.js:49
+Promise.then
+x @ index-vhdYXHVC.js:49
+start @ index-vhdYXHVC.js:49
+fetch @ index-vhdYXHVC.js:49
+Gp @ index-vhdYXHVC.js:49
+onSubscribe @ index-vhdYXHVC.js:49
+subscribe @ index-vhdYXHVC.js:49
+(anonymous) @ index-vhdYXHVC.js:49
+QB @ index-vhdYXHVC.js:39
+_w @ index-vhdYXHVC.js:41
+Kh @ index-vhdYXHVC.js:41
+(anonymous) @ index-vhdYXHVC.js:41
+C @ index-vhdYXHVC.js:26
+R @ index-vhdYXHVC.js:26Understand this error
+Events-DqdxPHX_.js:1 Error loading image: /uploads/event-images/event-images-1757342515223-608615309.jpg
+onError @ Events-DqdxPHX_.js:1
+kre @ index-vhdYXHVC.js:38
+Ore @ index-vhdYXHVC.js:38
+Ire @ index-vhdYXHVC.js:38
+GI @ index-vhdYXHVC.js:38
+DB @ index-vhdYXHVC.js:38
+(anonymous) @ index-vhdYXHVC.js:38
+aA @ index-vhdYXHVC.js:41
+sB @ index-vhdYXHVC.js:38
+aN @ index-vhdYXHVC.js:38
+OP @ index-vhdYXHVC.js:38Understand this error
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/events/3
+uploads%2Fevent-images%2Fevent-images-1757342515223-608615309.jpg:1  GET https://parksys-demo.replit.app/api/storage/file/uploads%2Fevent-images%2Fevent-images-1757342515223-608615309.jpg 404 (Not Found)
+Image
+j4 @ index-vhdYXHVC.js:41
+Aq @ index-vhdYXHVC.js:41
+Aq @ index-vhdYXHVC.js:41
+sie @ index-vhdYXHVC.js:41
+uie @ index-vhdYXHVC.js:41
+Ed @ index-vhdYXHVC.js:41
+N4 @ index-vhdYXHVC.js:41
+rd @ index-vhdYXHVC.js:39
+(anonymous) @ index-vhdYXHVC.js:41
+setTimeout
+lse @ index-vhdYXHVC.js:49
+o @ index-vhdYXHVC.js:49
+batch @ index-vhdYXHVC.js:49
+Wo @ index-vhdYXHVC.js:49
+setData @ index-vhdYXHVC.js:49
+onSuccess @ index-vhdYXHVC.js:49
+f @ index-vhdYXHVC.js:49
+Promise.then
+x @ index-vhdYXHVC.js:49
+start @ index-vhdYXHVC.js:49
+fetch @ index-vhdYXHVC.js:49
+Gp @ index-vhdYXHVC.js:49
+onSubscribe @ index-vhdYXHVC.js:49
+subscribe @ index-vhdYXHVC.js:49
+(anonymous) @ index-vhdYXHVC.js:49
+QB @ index-vhdYXHVC.js:39
+_w @ index-vhdYXHVC.js:41
+Kh @ index-vhdYXHVC.js:41
+(anonymous) @ index-vhdYXHVC.js:41
+C @ index-vhdYXHVC.js:26
+R @ index-vhdYXHVC.js:26Understand this error
