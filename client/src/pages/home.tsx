@@ -447,7 +447,7 @@ const Home: React.FC = () => {
                     <span style={{ color: '#00444f' }}>objetivos y </span>
                     <span style={{ color: '#14b8a6' }}>deseos</span>
                   </span><br />
-                  <span style={{ color: '#19633c', fontSize: '1.5rem', fontWeight: '700' }}>se compone de 4 ejes principales</span>
+                  <span style={{ color: '#00444f', fontSize: '1.3rem', fontWeight: '700' }}>como Organismo Público Descentralizado que gestiona y opera parques </span>
                 </h3>
               </div>
             </div>
