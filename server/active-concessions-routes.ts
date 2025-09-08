@@ -174,6 +174,8 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
   // Crear una nueva concesión activa
   apiRouter.post('/active-concessions', isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log('🔄 [CONCESSIONS] POST /active-concessions llamado');
+      console.log('📥 [CONCESSIONS] Datos recibidos:', req.body);
       const { pool } = await import('./db');
       
       const concessionData = {
@@ -228,6 +230,7 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
         concessionData.internal_notes, concessionData.created_at, concessionData.updated_at
       ]);
 
+      console.log('✅ [CONCESSIONS] Concesión creada exitosamente:', result.rows[0].id);
       res.status(201).json({
         status: 'success',
         message: 'Concesión activa creada exitosamente',
@@ -322,10 +325,12 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
   // Eliminar una concesión activa
   apiRouter.delete('/active-concessions/:id', isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log('🗑️ [CONCESSIONS] DELETE /active-concessions/:id llamado para ID:', req.params.id);
       const { pool } = await import('./db');
       const concessionId = parseInt(req.params.id);
 
       const result = await pool.query('DELETE FROM active_concessions WHERE id = $1 RETURNING *', [concessionId]);
+      console.log('📊 [CONCESSIONS] Registros eliminados:', result.rowCount);
 
       if (result.rows.length === 0) {
         return res.status(404).json({
@@ -334,6 +339,7 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
         });
       }
 
+      console.log('✅ [CONCESSIONS] Concesión eliminada exitosamente:', concessionId);
       res.json({
         status: 'success',
         message: 'Concesión activa eliminada exitosamente'

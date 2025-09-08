@@ -1138,14 +1138,14 @@ const AdminSidebarComplete: React.FC = () => {
                 icon={<Calendar className="h-4 w-4" />}
                 active={location.startsWith('/admin/marketing/events')}
               >
-                Eventos Patrocinados
+                Eventos
               </NavItem>
               <NavItem 
                 href="/admin/marketing/assets" 
                 icon={<Package className="h-4 w-4" />}
                 active={location.startsWith('/admin/marketing/assets')}
               >
-                Activos Patrocinados
+                Activos
               </NavItem>
             </CollapsibleSubmenu>
 

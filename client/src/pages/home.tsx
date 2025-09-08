@@ -463,8 +463,8 @@ const Home: React.FC = () => {
 
           {/* Texto actividades */}
           <div>
-            <h2 className="text-5xl font-poppins font-black leading-tight">
-              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery' }}>Contamos con</span>
+            <h2 className="text-4xl font-poppins font-black leading-tight">
+              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery', fontSize: '3rem', fontWeight: '300' }}>Contamos con</span>
               <span className="block text-[#14b8a6] text-4xl">Actividades</span>
               <span className="block text-[#00444f] text-4xl">Variadas</span>
             </h2>

@@ -137,7 +137,14 @@ function ActiveConcessionsList() {
   };
 
   const handleDelete = (concession: ActiveConcession) => {
+    // Prevenir múltiples clics durante la eliminación
+    if (deleteMutation.isPending) {
+      console.log('⚠️ Eliminación ya en progreso, ignorando click');
+      return;
+    }
+
     if (window.confirm(`¿Estás seguro de que deseas eliminar la concesión "${concession.name}"?`)) {
+      console.log('🗑️ Eliminando concesión:', concession.id, concession.name);
       deleteMutation.mutate(concession.id);
     }
   };
@@ -386,7 +393,8 @@ function ActiveConcessionsList() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleDelete(concession)}
-                  className="text-red-600 hover:text-red-700"
+                  disabled={deleteMutation.isPending}
+                  className="text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

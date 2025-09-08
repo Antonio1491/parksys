@@ -139,7 +139,8 @@ function ActiveConcessionForm() {
 
   // Mutación para crear/actualizar
   const saveMutation = useMutation({
-    mutationFn: (mappedData: any) => {
+    mutationFn: async (mappedData: any) => {
+      console.log('🔄 Enviando concesión:', mappedData);
       if (isEdit) {
         return apiRequest(`/api/active-concessions/${id}`, {
           method: 'PUT',
@@ -176,6 +177,12 @@ function ActiveConcessionForm() {
   });
 
   const onSubmit = (data: ActiveConcessionFormData) => {
+    // Prevenir múltiples envíos
+    if (saveMutation.isPending) {
+      console.log('⚠️ Operación ya en progreso, ignorando submit');
+      return;
+    }
+
     // Mapear los datos del frontend al formato esperado por el backend
     const mappedData = {
       name: data.name,
@@ -204,6 +211,7 @@ function ActiveConcessionForm() {
       internalNotes: data.internalNotes
     };
     
+    console.log('📤 Enviando concesión:', mappedData);
     saveMutation.mutate(mappedData);
   };
 
