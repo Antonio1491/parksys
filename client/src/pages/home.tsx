@@ -176,7 +176,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-6xl font-poppins font-black text-gray-900 mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
+              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
               <span style={{ color: '#00444f' }}>Tu </span>
               <span style={{ color: '#14b8a6' }}>Parque </span>
               <span style={{ color: '#00444f' }}>Favorito</span>
@@ -377,10 +377,7 @@ const Home: React.FC = () => {
                     <div className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 h-[500px] flex flex-col cursor-pointer">
                       <div className="h-2/3 relative overflow-hidden">
                         <img 
-                          src={event.featuredImageUrl?.startsWith('/uploads/') 
-                            ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
-                            : event.featuredImageUrl || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
-                          }
+                          src={event.featuredImageUrl}
                           alt={event.title}
                           className="w-full h-full object-cover"
                         />
