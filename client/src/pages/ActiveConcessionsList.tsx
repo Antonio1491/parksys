@@ -82,12 +82,15 @@ function ActiveConcessionsList() {
 
   const concessions: ActiveConcession[] = Array.isArray(concessionsResponse?.data) ? concessionsResponse.data : (Array.isArray(concessionsResponse) ? concessionsResponse : []);
   
-  // Image URLs have been fixed in database
+  // Filtrar duplicados por ID para prevenir keys duplicadas en React
+  const uniqueConcessions = concessions.filter((concession, index, arr) => 
+    arr.findIndex(c => c.id === concession.id) === index
+  );
 
   const parks = Array.isArray(parksResponse?.data) ? parksResponse.data : (Array.isArray(parksResponse) ? parksResponse : []);
 
-  // Filtrar concesiones
-  const filteredConcessions = concessions.filter(concession => {
+  // Filtrar concesiones (usar uniqueConcessions en lugar de concessions)
+  const filteredConcessions = uniqueConcessions.filter(concession => {
     // Asegurar que los campos existen antes de usarlos
     const name = concession.name || '';
     const typeName = concession.concessionTypeName || '';
