@@ -469,10 +469,10 @@ const Home: React.FC = () => {
 
                     {/* Texto */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">
+                      <h3 className="text-lg font-bold text-#00444f">
                         Conservar y mejorar
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="font-poppins font-regular text-gray-600">
                         los parques existentes
                       </p>
                     </div>
