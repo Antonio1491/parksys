@@ -271,15 +271,18 @@ const Events: React.FC = () => {
                     <div className="relative h-2/3 overflow-hidden">
                       {event.featured_image_url ? (
                         <img 
-                          src={`http://localhost:5000${event.featured_image_url}`} 
+                          src={event.featured_image_url?.startsWith('/uploads/') 
+                            ? `/api/storage/file/${encodeURIComponent(event.featured_image_url.replace(/^\//, ''))}`
+                            : event.featured_image_url
+                          } 
                           alt={event.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
-                            console.error('Error loading image:', `http://localhost:5000${event.featured_image_url}`);
+                            console.error('Error loading image:', event.featured_image_url);
                             (e.target as HTMLImageElement).style.display = 'none';
                             (e.target as HTMLImageElement).nextElementSibling?.setAttribute('style', 'display: flex');
                           }}
-                          onLoad={() => console.log('Image loaded successfully:', `http://localhost:5000${event.featured_image_url}`)}
+                          onLoad={() => console.log('Image loaded successfully:', event.featured_image_url)}
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -397,7 +400,10 @@ const Events: React.FC = () => {
                       <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg">
                         {event.featured_image_url ? (
                           <img 
-                            src={`http://localhost:5000${event.featured_image_url}`} 
+                            src={event.featured_image_url?.startsWith('/uploads/') 
+                              ? `/api/storage/file/${encodeURIComponent(event.featured_image_url.replace(/^\//, ''))}`
+                              : event.featured_image_url
+                            } 
                             alt={event.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />

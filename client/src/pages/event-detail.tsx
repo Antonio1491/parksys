@@ -171,7 +171,10 @@ const EventDetail = () => {
                 <div className="aspect-video bg-gradient-to-br from-green-100 to-blue-100 relative">
                   {event.featuredImageUrl ? (
                     <img
-                      src={event.featuredImageUrl}
+                      src={event.featuredImageUrl?.startsWith('/uploads/') 
+                        ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
+                        : event.featuredImageUrl
+                      }
                       alt={event.title}
                       className="w-full h-full object-cover"
                     />

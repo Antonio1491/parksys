@@ -1045,7 +1045,10 @@ const EventDetailPage = () => {
                   {event.featuredImageUrl && (
                     <div className="overflow-hidden rounded-lg mb-6">
                       <img
-                        src={event.featuredImageUrl}
+                        src={event.featuredImageUrl?.startsWith('/uploads/') 
+                          ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
+                          : event.featuredImageUrl
+                        }
                         alt={event.title}
                         className="w-full h-auto object-cover rounded-lg"
                       />
