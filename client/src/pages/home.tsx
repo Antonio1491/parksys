@@ -377,7 +377,10 @@ const Home: React.FC = () => {
                     <div className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 h-[500px] flex flex-col cursor-pointer">
                       <div className="h-2/3 relative overflow-hidden">
                         <img 
-                          src={event.featuredImageUrl}
+                          src={event.featuredImageUrl?.startsWith('/uploads/') 
+                            ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
+                            : event.featuredImageUrl
+                          }
                           alt={event.title}
                           className="w-full h-full object-cover"
                         />
