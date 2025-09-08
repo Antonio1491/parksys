@@ -196,9 +196,13 @@ export default function ConcessionDetail() {
             {/* Imagen principal - ocupa 2x2 */}
             <div className="col-span-2 row-span-2 relative cursor-pointer" onClick={() => setSelectedImage(concession.image_url)}>
               <img 
-                src={concession.image_url || '/api/placeholder/400/400'} 
+                src={concession.image_url || concession.primaryImage || '/api/placeholder/400/400'} 
                 alt={`${concession.name} - Imagen principal`}
                 className="w-full h-full object-cover rounded-lg shadow-lg"
+                onError={(e) => {
+                  console.error('Error loading image:', concession.image_url);
+                  e.currentTarget.src = '/api/placeholder/400/400';
+                }}
               />
               <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-300 rounded-lg" />
             </div>
