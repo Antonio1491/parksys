@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
@@ -154,7 +154,11 @@ function ActiveConcessionForm() {
       }
     },
     onSuccess: (response) => {
-      setIsSubmitting(false); // Resetear estado de envío
+      // Resetear TODAS las protecciones
+      submissionRef.current = false;
+      processingRef.current.clear();
+      setIsSubmitting(false);
+      
       toast({
         title: isEdit ? 'Concesión actualizada' : 'Concesión creada',
         description: `La concesión ${isEdit ? 'se ha actualizado' : 'se ha creado'} exitosamente.`
@@ -169,7 +173,11 @@ function ActiveConcessionForm() {
       }
     },
     onError: (error: any) => {
-      setIsSubmitting(false); // Resetear estado de envío en caso de error
+      // Resetear TODAS las protecciones en caso de error
+      submissionRef.current = false;
+      processingRef.current.clear();
+      setIsSubmitting(false);
+      
       toast({
         title: 'Error',
         description: error.message || 'Ocurrió un error al guardar la concesión.',
@@ -178,25 +186,43 @@ function ActiveConcessionForm() {
     }
   });
 
-  // Estado para prevenir múltiples envíos con debouncing
+  // Estado para prevenir múltiples envíos con múltiples capas de protección
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const submissionRef = useRef(false);
+  const processingRef = useRef(new Set());
 
   const onSubmit = (data: ActiveConcessionFormData) => {
     const now = Date.now();
     
-    // Prevenir múltiples envíos con múltiples capas de protección
-    if (saveMutation.isPending || isSubmitting) {
-      console.log('⚠️ Operación ya en progreso, ignorando submit');
+    // Capa 1: Verificar flag global de envío
+    if (submissionRef.current) {
+      console.log('🛑 [GUARD-1] Envío bloqueado por flag global');
       return;
     }
     
-    // Debouncing: prevenir envíos demasiado rápidos (menos de 2 segundos)
+    // Capa 2: Verificar estados de mutación y componente
+    if (saveMutation.isPending || isSubmitting) {
+      console.log('🛑 [GUARD-2] Operación ya en progreso, ignorando submit');
+      return;
+    }
+    
+    // Capa 3: Debouncing temporal
     if (now - lastSubmitTime < 2000) {
-      console.log('⚠️ Envío demasiado rápido, ignorando submit');
+      console.log('🛑 [GUARD-3] Envío demasiado rápido, ignorando submit');
+      return;
+    }
+    
+    // Capa 4: Hash de datos para prevenir duplicados
+    const dataHash = JSON.stringify(data);
+    if (processingRef.current.has(dataHash)) {
+      console.log('🛑 [GUARD-4] Datos idénticos ya en procesamiento');
       return;
     }
 
+    // Activar todas las protecciones
+    submissionRef.current = true;
+    processingRef.current.add(dataHash);
     setIsSubmitting(true);
     setLastSubmitTime(now);
 
@@ -228,7 +254,7 @@ function ActiveConcessionForm() {
       internalNotes: data.internalNotes
     };
     
-    console.log('📤 Enviando concesión:', mappedData);
+    console.log('✅ [PROTECTED-SUBMIT] Enviando concesión con protecciones activas:', mappedData);
     saveMutation.mutate(mappedData);
   };
 
