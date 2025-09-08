@@ -4,23 +4,9 @@ import path from 'path';
 import fs from 'fs';
 import { replitObjectStorage } from './objectStorage-replit';
 
-// Configuración de multer para subida de archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = 'uploads/active-concessions';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `concession-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
-
+// Configuración de multer para subida de archivos (SISTEMA HÍBRIDO - igual que Actividades)
 const upload = multer({ 
-  storage,
+  storage: multer.memoryStorage(), // Use memory storage for Object Storage uploads
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB límite
   },
@@ -472,24 +458,9 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
     }
   });
 
-  // Configuración de multer para concesiones con sistema híbrido (igual que actividades)
-  const concessionImageUpload = multer({
-    storage: multer.memoryStorage(), // Use memory storage for Object Storage uploads
-    fileFilter: (req, file, cb) => {
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-      if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-      } else {
-        cb(new Error('Formato de archivo no válido. Solo se permiten JPG, PNG, GIF y WEBP'));
-      }
-    },
-    limits: {
-      fileSize: 5 * 1024 * 1024 // 5MB
-    }
-  });
 
   // Subir nueva imagen para una concesión activa (SISTEMA HÍBRIDO - igual que actividades)
-  apiRouter.post('/active-concessions/:id/images', isAuthenticated, concessionImageUpload.single('image'), async (req: Request, res: Response) => {
+  apiRouter.post('/active-concessions/:id/images', isAuthenticated, upload.single('image'), async (req: Request, res: Response) => {
     try {
       const { pool } = await import('./db');
       const concessionId = parseInt(req.params.id);
