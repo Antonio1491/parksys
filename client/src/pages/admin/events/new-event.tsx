@@ -81,11 +81,24 @@ export default function NewEventPage() {
   // Mutación para crear evento
   const createEventMutation = useMutation({
     mutationFn: async (data: NewEventForm) => {
+      console.log('🔍 DATOS DEL FORMULARIO:', data);
+      
+      // ⚠️ VALIDACIÓN: Verificar campos requeridos antes de enviar
+      if (!data.start_date) {
+        throw new Error('La fecha de inicio es requerida');
+      }
+      if (!data.park_id) {
+        throw new Error('Debe seleccionar un parque');
+      }
+      if (!data.category) {
+        throw new Error('Debe seleccionar una categoría');
+      }
+      
       const eventData = {
         title: data.title,
         description: data.description,
         eventType: data.category, // Usar category del formulario como eventType
-        startDate: data.start_date,
+        startDate: data.start_date, // ✅ Campo requerido
         endDate: data.end_date || null,
         startTime: data.start_time || null,
         endTime: data.end_time || null,
@@ -95,13 +108,13 @@ export default function NewEventPage() {
         organizerPhone: data.contact_phone || null,
         registrationType: data.registration_required ? 'registration' : 'free',
         status: 'published',
-        targetAudience: 'general',
-        featuredImageUrl: eventImage || null, // Agregar la imagen del evento
-        // Campo requerido por el backend - array de IDs de parques
+        targetAudience: 'all', // ✅ Campo requerido por backend
+        featuredImageUrl: eventImage || null,
+        // ✅ Campo requerido por el backend - array de IDs de parques  
         parkIds: data.park_id ? [parseInt(data.park_id)] : []
       };
 
-      console.log('🚀 Enviando datos del evento:', eventData);
+      console.log('🚀 DATOS TRANSFORMADOS PARA BACKEND:', eventData);
       return apiRequest('/api/events', {
         method: 'POST',
         data: eventData
