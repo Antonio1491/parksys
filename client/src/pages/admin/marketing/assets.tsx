@@ -273,7 +273,10 @@ export default function SponsoredAssetsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader title="Activos Patrocinados" />
+        <PageHeader 
+          title="Activos" 
+          subtitle='Gestión de activos patrocinados y sus detalles'
+          />
 
         {/* Filters and Search */}
         <Card>
