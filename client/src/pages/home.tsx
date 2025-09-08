@@ -176,7 +176,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-6xl font-poppins font-black text-gray-900 mb-8">
-              <span style={{ fontFamily: 'Guttery Regular', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
+              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
               <span style={{ color: '#00444f' }}>Tu </span>
               <span style={{ color: '#14b8a6' }}>Parque </span>
               <span style={{ color: '#00444f' }}>Favorito</span>
@@ -377,7 +377,10 @@ const Home: React.FC = () => {
                     <div className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 h-[500px] flex flex-col cursor-pointer">
                       <div className="h-2/3 relative overflow-hidden">
                         <img 
-                          src={event.featuredImageUrl}
+                          src={event.featuredImageUrl?.startsWith('/uploads/') 
+                            ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
+                            : event.featuredImageUrl || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
+                          }
                           alt={event.title}
                           className="w-full h-full object-cover"
                         />
@@ -459,11 +462,11 @@ const Home: React.FC = () => {
                 {/* Eje 1: Gestión y Mantenimiento */}
                 <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#51a19f' }}>
+                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
                       <Trees className="h-8 w-8 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Gestión y Mantenimiento</h3>
+                      <h3 className="text-lg font-bold text-gray-900">Conservar y mejorar</h3>
                     </div>
                   </CardContent>
                 </Card>
@@ -471,11 +474,11 @@ const Home: React.FC = () => {
                 {/* Eje 2: Educación Ambiental */}
                 <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#51a19f' }}>
+                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
                       <Users className="h-8 w-8 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Educación Ambiental</h3>
+                      <h3 className="text-lg font-bold text-gray-900">Promover</h3>
                     </div>
                   </CardContent>
                 </Card>
@@ -483,11 +486,11 @@ const Home: React.FC = () => {
                 {/* Eje 3: Participación Ciudadana */}
                 <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#51a19f' }}>
+                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
                       <Calendar className="h-8 w-8 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Participación Ciudadana</h3>
+                      <h3 className="text-lg font-bold text-gray-900">Crear nuevos</h3>
                     </div>
                   </CardContent>
                 </Card>
@@ -495,11 +498,11 @@ const Home: React.FC = () => {
                 {/* Eje 4: Desarrollo Sustentable */}
                 <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#51a19f' }}>
+                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
                       <TrendingUp className="h-8 w-8 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Desarrollo Sustentable</h3>
+                      <h3 className="text-lg font-bold text-gray-900">Fortalecer</h3>
                     </div>
                   </CardContent>
                 </Card>
