@@ -447,7 +447,7 @@ const Home: React.FC = () => {
                     <span style={{ color: '#00444f' }}>objetivos y </span>
                     <span style={{ color: '#14b8a6' }}>deseos</span>
                   </span><br />
-                  <span style={{ fontFamily: 'poppins', color: '#00444f', fontSize: '1.3rem', fontWeight: '400' }}>como Organismo Público Descentralizado que gestiona y opera parques </span>
+                  <span style={{ fontFamily: 'poppins', color: '#00444f', fontSize: '1.2rem', fontWeight: '400' }}>como Organismo Público Descentralizado que gestiona y opera parques </span>
                 </h3>
               </div>
             </div>

@@ -234,7 +234,7 @@ const NewEventPageFixed: React.FC = () => {
       queryClient.invalidateQueries({
         queryKey: ["/api/events"],
       });
-      navigate(`/admin/events/${data.id}`);
+      navigate(`/admin/events`);
     },
     onError: (error) => {
       toast({
