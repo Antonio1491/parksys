@@ -249,7 +249,7 @@ export default function ContractsPage() {
                 <Button 
                   variant="primary"
                   onClick={resetForm}>
-                  <Plus size={28} strokeWidth={3} absoluteStrokeWidth className="mr-2" />
+                  <Plus className="mr-2 h-7 w-7 stroke-[3]" />
                   Nuevo Contrato
                 </Button>
               </DialogTrigger>

@@ -82,10 +82,19 @@ function ActiveConcessionsList() {
 
   const concessions: ActiveConcession[] = Array.isArray(concessionsResponse?.data) ? concessionsResponse.data : (Array.isArray(concessionsResponse) ? concessionsResponse : []);
   
+  // DEBUG: Ver qué datos llegan exactamente
+  console.log('🔍 [DEBUG] Raw concessionsResponse:', concessionsResponse);
+  console.log('🔍 [DEBUG] Concessions array:', concessions);
+  console.log('🔍 [DEBUG] Concessions length:', concessions.length);
+  console.log('🔍 [DEBUG] Concessions IDs:', concessions.map(c => c.id));
+  
   // Filtrar duplicados por ID para prevenir keys duplicadas en React
   const uniqueConcessions = concessions.filter((concession, index, arr) => 
     arr.findIndex(c => c.id === concession.id) === index
   );
+  
+  console.log('🔍 [DEBUG] Unique concessions length:', uniqueConcessions.length);
+  console.log('🔍 [DEBUG] Unique concessions IDs:', uniqueConcessions.map(c => c.id));
 
   const parks = Array.isArray(parksResponse?.data) ? parksResponse.data : (Array.isArray(parksResponse) ? parksResponse : []);
 
