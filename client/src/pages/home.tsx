@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
-import { Map, ArrowRight, MapPin, Trees, Users, Calendar, Sparkles, TrendingUp, Zap, Leaf, Shield, Heart, BookOpen, GraduationCap, Target, Award, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Map, ArrowRight, MapPin, Trees, Users, Calendar, Sparkles, TrendingUp, Zap, Leaf, Shield, Heart, BookOpen, GraduationCap, Target, Award, ChevronLeft, ChevronRight, Sprout, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ParkCard from '@/components/ParkCard';
@@ -427,7 +427,7 @@ const Home: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-poppins font-black mb-8">
               <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
-              <span style={{ color: '#00444f' }}>Sistema de</span><br />
+              <span style={{ color: '#00444f' }}>Sistema</span><br />
               <span style={{ color: '#14b8a6' }}>Parques</span>
               <span style={{ color: '#a8bd7d' }}> de México</span>
             </h2>
@@ -487,7 +487,7 @@ const Home: React.FC = () => {
                       className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
                       style={{ backgroundColor: '#14b8a6' }}
                     >
-                      <Trees className="h-8 w-8 text-white" />
+                      <Sprout className="h-8 w-8 text-white" />
                     </div>
                     {/* Texto */}
                     <div className="flex-1">
@@ -509,7 +509,7 @@ const Home: React.FC = () => {
                       className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
                       style={{ backgroundColor: '#14b8a6' }}
                     >
-                      <Trees className="h-8 w-8 text-white" />
+                      <Users className="h-8 w-8 text-white" />
                     </div>
                     {/* Texto */}
                     <div className="flex-1">
@@ -517,20 +517,30 @@ const Home: React.FC = () => {
                         Promover
                       </h3>
                       <p className="font-poppins font-regular text-[#00444f]">
-                        los parques existentes
+                        la participación ciudadana
                       </p>
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* Eje 4: Desarrollo Sustentable */}
-                <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
+                <Card className="group transition-all duration-300">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
-                      <TrendingUp className="h-8 w-8 text-white" />
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
+                      <Handshake className="h-8 w-8 text-white" />
                     </div>
+                    {/* Texto */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Fortalecer</h3>
+                      <h3 className="text-lg font-bold text-[#00444f]">
+                        Fortalecer
+                      </h3>
+                      <p className="font-poppins font-regular text-[#00444f]">
+                        el tejido social
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

@@ -1152,6 +1152,31 @@ function Router() {
           </Suspense>
         </Route>
 
+        {/* Rutas del módulo Marketing */}
+        <Route path="/admin/marketing/sponsors">
+          <Suspense fallback={<div className="p-8 text-center">Cargando patrocinadores...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/sponsors')))}
+          </Suspense>
+        </Route>
+        
+        <Route path="/admin/marketing/contracts">
+          <Suspense fallback={<div className="p-8 text-center">Cargando contratos...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/contracts')))}
+          </Suspense>
+        </Route>
+        
+        <Route path="/admin/marketing/events">
+          <Suspense fallback={<div className="p-8 text-center">Cargando eventos patrocinados...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/events')))}
+          </Suspense>
+        </Route>
+        
+        <Route path="/admin/marketing/assets">
+          <Suspense fallback={<div className="p-8 text-center">Cargando activos patrocinados...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/assets')))}
+          </Suspense>
+        </Route>
+
         {/* Rutas del Centro de Ayuda */}
         <Route path="/help/visitantes-manual">
           <Suspense fallback={<div className="p-8 text-center">Cargando manual de visitantes...</div>}>

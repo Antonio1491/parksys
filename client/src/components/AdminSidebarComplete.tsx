@@ -1120,25 +1120,32 @@ const AdminSidebarComplete: React.FC = () => {
               isActive={isSubmenuActive('marketing')}
             >
               <NavItem 
-                href="/admin/marketing/campaigns" 
-                icon={<Megaphone className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/campaigns')}
+                href="/admin/marketing/sponsors" 
+                icon={<Handshake className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/sponsors')}
               >
-                Campañas
+                Patrocinadores
               </NavItem>
               <NavItem 
-                href="/admin/marketing/analytics" 
-                icon={<TrendingUp className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/analytics')}
-              >
-                Análisis
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/content" 
+                href="/admin/marketing/contracts" 
                 icon={<FileText className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/content')}
+                active={location.startsWith('/admin/marketing/contracts')}
               >
-                Contenido
+                Contratos
+              </NavItem>
+              <NavItem 
+                href="/admin/marketing/events" 
+                icon={<Calendar className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/events')}
+              >
+                Eventos Patrocinados
+              </NavItem>
+              <NavItem 
+                href="/admin/marketing/assets" 
+                icon={<Package className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/assets')}
+              >
+                Activos Patrocinados
               </NavItem>
             </CollapsibleSubmenu>
 
