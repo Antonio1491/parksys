@@ -1,0 +1,46 @@
+index-vhdYXHVC.js:2367 🔥 Firebase initialized successfully
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/events/6
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/parks
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/event-categories
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-vhdYXHVC.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-vhdYXHVC.js:794 i18next: languageChanged es
+index-vhdYXHVC.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+3index-vhdYXHVC.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/notifications/count
+index-vhdYXHVC.js:2770 🔄 Cargando datos del evento: {id: 6, title: 'Prueba Final', description: 'Aqui va la información del evento', eventType: 'recreational', targetAudience: 'all', …}
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/events/stats
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/events/recent
+3index-vhdYXHVC.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/events
+3index-vhdYXHVC.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-vhdYXHVC.js:49 🌐 [QUERY] GET /api/sponsors
+index-vhdYXHVC.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Events-DqdxPHX_.js:1 Image loaded successfully: /uploads/1757273791741-fb7c069b-5435-4a0b-9c71-ddb6e4259330-Parque_La_Plancha.jpg
+uploads%2Fevent-images%2Fevent-images-1757345843539-109459520.jpg:1  GET https://parksys-demo.replit.app/api/storage/file/uploads%2Fevent-images%2Fevent-images-1757345843539-109459520.jpg 404 (Not Found)
+Image
+NP @ index-vhdYXHVC.js:34
+nie @ index-vhdYXHVC.js:41
+Mq @ index-vhdYXHVC.js:41
+Iq @ index-vhdYXHVC.js:41
+die @ index-vhdYXHVC.js:41
+kq @ index-vhdYXHVC.js:41
+C @ index-vhdYXHVC.js:26
+R @ index-vhdYXHVC.js:26Understand this error
+Events-DqdxPHX_.js:1 Error loading image: /uploads/event-images/event-images-1757345843539-109459520.jpg
+onError @ Events-DqdxPHX_.js:1
+kre @ index-vhdYXHVC.js:38
+Ore @ index-vhdYXHVC.js:38
+Ire @ index-vhdYXHVC.js:38
+GI @ index-vhdYXHVC.js:38
+DB @ index-vhdYXHVC.js:38
+(anonymous) @ index-vhdYXHVC.js:38
+aA @ index-vhdYXHVC.js:41
+sB @ index-vhdYXHVC.js:38
+aN @ index-vhdYXHVC.js:38
+OP @ index-vhdYXHVC.js:38Understand this error
+uploads%2Fevent-images%2Fevent-images-1757345843539-109459520.jpg:1  GET https://parksys-demo.replit.app/api/storage/file/uploads%2Fevent-images%2Fevent-images-1757345843539-109459520.jpg 404 (Not Found)
