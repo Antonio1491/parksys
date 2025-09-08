@@ -9,7 +9,7 @@ import {
   eventEvaluations,
   insertEventSchema 
 } from "../shared/events-schema";
-import { parks, eventCategories } from "../shared/schema";
+import { parks, eventCategories, eventImages } from "../shared/schema";
 import { eq, and, desc, gte, sql, inArray } from "drizzle-orm";
 import { z } from "zod";
 
@@ -26,54 +26,71 @@ export async function getAllEvents(req: Request, res: Response) {
   try {
     const { status, type, park, search, upcoming } = req.query;
     
-    let baseQuery = db.select().from(events);
+    // Construir query con JOIN usando SQL directo (igual que actividades)
+    let whereConditions = [];
+    let queryParams = [];
+    let paramIndex = 1;
     
-    // Aplicar filtros si están presentes
+    // Aplicar filtros
     if (status) {
-      baseQuery = baseQuery.where(eq(events.status, status as string));
+      whereConditions.push(`e.status = $${paramIndex}`);
+      queryParams.push(status);
+      paramIndex++;
     }
     
     if (type) {
-      baseQuery = baseQuery.where(eq(events.eventType, type as string));
+      whereConditions.push(`e.event_type = $${paramIndex}`);
+      queryParams.push(type);
+      paramIndex++;
     }
     
-    // Para filtrar por parque, necesitamos un join con la tabla de relación
-    if (park) {
-      const parkId = parseInt(park as string);
-      
-      // Primero obtenemos los IDs de los eventos relacionados con este parque
-      const eventIds = await db
-        .select({ eventId: eventParks.eventId })
-        .from(eventParks)
-        .where(eq(eventParks.parkId, parkId));
-      
-      if (eventIds.length > 0) {
-        const ids = eventIds.map(item => item.eventId);
-        baseQuery = baseQuery.where(inArray(events.id, ids));
-      } else {
-        // Si no hay eventos en este parque, devolvemos array vacío
-        return res.json([]);
-      }
-    }
-    
-    // Filtrar por búsqueda en título o descripción
     if (search) {
-      const searchTerm = `%${search}%`;
-      baseQuery = baseQuery.where(
-        sql`(${events.title} ILIKE ${searchTerm} OR ${events.description} ILIKE ${searchTerm})`
-      );
+      whereConditions.push(`(e.title ILIKE $${paramIndex} OR e.description ILIKE $${paramIndex})`);
+      queryParams.push(`%${search}%`);
+      paramIndex++;
     }
     
-    // Filtrar solo eventos futuros
     if (upcoming === 'true') {
       const today = new Date().toISOString().split('T')[0];
-      baseQuery = baseQuery.where(sql`${events.startDate} >= ${today}`);
+      whereConditions.push(`e.start_date >= $${paramIndex}`);
+      queryParams.push(today);
+      paramIndex++;
     }
     
-    // Ordenar por fecha de inicio descendente
-    baseQuery = baseQuery.orderBy(desc(events.startDate));
+    // Para filtrar por parque, necesitamos un join adicional
+    let parkJoin = '';
+    if (park) {
+      const parkId = parseInt(park as string);
+      parkJoin = 'INNER JOIN event_parks ep ON e.id = ep.event_id';
+      whereConditions.push(`ep.park_id = $${paramIndex}`);
+      queryParams.push(parkId);
+      paramIndex++;
+    }
     
-    const allEvents = await baseQuery;
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+    
+    // Query principal con JOIN a event_images (igual que actividades)
+    const query = `
+      SELECT 
+        e.id, e.title, e.description, e.event_type, e.target_audience, 
+        e.status, e.start_date, e.end_date, e.start_time, e.end_time,
+        e.is_recurring, e.recurrence_pattern, e.location, e.capacity,
+        e.registration_type, e.organizer_name, e.organizer_email, 
+        e.organizer_phone, e.organizer_organization, e.geolocation,
+        e.price, e.is_free, e.requires_approval, e.created_at, e.updated_at,
+        ei.image_url as "imageUrl"
+      FROM events e
+      LEFT JOIN event_images ei ON e.id = ei.event_id AND ei.is_primary = true
+      ${parkJoin}
+      ${whereClause}
+      ORDER BY e.start_date DESC
+    `;
+    
+    console.log("🎯 QUERY EVENTOS CON JOIN:", query);
+    console.log("🎯 PARÁMETROS:", queryParams);
+    
+    const result = await db.execute(sql.raw(query, queryParams));
+    const allEvents = result.rows;
     
     // Si la consulta incluye eventos con parques, obtenemos la información de parques
     if (allEvents.length > 0) {
@@ -128,15 +145,33 @@ export async function getEventById(req: Request, res: Response) {
       return res.status(400).json({ message: "ID de evento inválido" });
     }
     
-    // Obtener el evento
-    const [event] = await db
-      .select()
-      .from(events)
-      .where(eq(events.id, eventId));
+    // Query con JOIN a event_images (igual que actividades)
+    const query = `
+      SELECT 
+        e.id, e.title, e.description, e.event_type, e.target_audience, 
+        e.status, e.start_date, e.end_date, e.start_time, e.end_time,
+        e.is_recurring, e.recurrence_pattern, e.location, e.capacity,
+        e.registration_type, e.organizer_name, e.organizer_email, 
+        e.organizer_phone, e.organizer_organization, e.geolocation,
+        e.price, e.is_free, e.requires_approval, e.created_at, e.updated_at,
+        ei.image_url as "imageUrl"
+      FROM events e
+      LEFT JOIN event_images ei ON e.id = ei.event_id AND ei.is_primary = true
+      WHERE e.id = $1
+      LIMIT 1
+    `;
     
-    if (!event) {
+    console.log("🎯 GET EVENT BY ID - Query:", query);
+    console.log("🎯 GET EVENT BY ID - Params:", [eventId]);
+    
+    const result = await db.execute(sql.raw(query, [eventId]));
+    const eventData = result.rows;
+    
+    if (eventData.length === 0) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
+    
+    const [event] = eventData;
     
     // Obtener los parques relacionados
     const eventParkRelations = await db
