@@ -426,7 +426,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-poppins font-black mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
+              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Somos el</span><br />
               <span style={{ color: '#00444f' }}>Sistema de</span><br />
               <span style={{ color: '#14b8a6' }}>Parques</span>
               <span style={{ color: '#a8bd7d' }}> de México</span>
