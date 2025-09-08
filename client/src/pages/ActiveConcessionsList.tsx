@@ -51,7 +51,7 @@ function ActiveConcessionsList() {
   // Obtener concesiones activas
   const { data: concessionsResponse, isLoading, refetch } = useQuery({
     queryKey: ['/api/active-concessions'],
-    suspense: false,
+
     retry: 1,
     queryFn: async () => {
       const response = await fetch('/api/active-concessions');
@@ -64,7 +64,7 @@ function ActiveConcessionsList() {
   // Obtener parques para filtro
   const { data: parksResponse } = useQuery({
     queryKey: ['/api/parks'],
-    suspense: false,
+
     retry: 1,
     queryFn: async () => {
       const response = await fetch('/api/parks');
@@ -82,11 +82,6 @@ function ActiveConcessionsList() {
 
   const concessions: ActiveConcession[] = Array.isArray(concessionsResponse?.data) ? concessionsResponse.data : (Array.isArray(concessionsResponse) ? concessionsResponse : []);
   
-  // DEBUG: Verificar datos recibidos
-  console.log('🏪 CONCESSIONS DEBUG:', {
-    concessionsLength: concessions.length,
-    concessionsResponse: concessions
-  });
 
   const parks = Array.isArray(parksResponse?.data) ? parksResponse.data : (Array.isArray(parksResponse) ? parksResponse : []);
 
