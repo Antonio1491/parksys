@@ -262,6 +262,7 @@ export default function SponsoredEventsPage() {
           title="Eventos"
           subtitle='Gestión de eventos patrocinados y sus detalles'
           icon={<Calendar />}
+          
           />
 
         {/* Filters and Search */}
