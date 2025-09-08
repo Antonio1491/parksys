@@ -457,22 +457,21 @@ const Home: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 
                 {/* Eje 1: Gestión y Mantenimiento */}
-                <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
+                <Card className="group transition-all duration-300">
                   <CardContent className="p-6 flex items-center gap-4">
                     {/* Icono */}
                     <div
-                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
                       style={{ backgroundColor: '#14b8a6' }}
                     >
                       <Trees className="h-8 w-8 text-white" />
                     </div>
-
                     {/* Texto */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-#00444f">
+                      <h3 className="text-lg font-bold text-[#00444f]">
                         Conservar y mejorar
                       </h3>
-                      <p className="font-poppins font-regular text-gray-600">
+                      <p className="font-poppins font-regular text-[#00444f]">
                         los parques existentes
                       </p>
                     </div>
@@ -481,25 +480,45 @@ const Home: React.FC = () => {
 
 
                 {/* Eje 2: Educación Ambiental */}
-                <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
+                <Card className="group transition-all duration-300">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
-                      <Users className="h-8 w-8 text-white" />
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
+                      <Trees className="h-8 w-8 text-white" />
                     </div>
+                    {/* Texto */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Promover</h3>
+                      <h3 className="text-lg font-bold text-[#00444f]">
+                        Crear nuevos
+                      </h3>
+                      <p className="font-poppins font-regular text-[#00444f]">
+                        espacios para todos
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* Eje 3: Participación Ciudadana */}
-                <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
+                <Card className="group transition-all duration-300">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
-                      <Calendar className="h-8 w-8 text-white" />
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
+                      <Trees className="h-8 w-8 text-white" />
                     </div>
+                    {/* Texto */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Crear nuevos</h3>
+                      <h3 className="text-lg font-bold text-[#00444f]">
+                        Promover
+                      </h3>
+                      <p className="font-poppins font-regular text-[#00444f]">
+                        los parques existentes
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

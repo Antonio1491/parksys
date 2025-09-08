@@ -1,0 +1,33 @@
+index-BZb_XS7a.js:2367 🔥 Firebase initialized successfully
+index-BZb_XS7a.js:49 🌐 [QUERY] GET /api/parks
+index-BZb_XS7a.js:49 🌐 [QUERY] GET /api/sponsors
+index-BZb_XS7a.js:49 🌐 [QUERY] GET /api/events
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413Understand this warning
+index-BZb_XS7a.js:794 i18next::backendConnector: loaded namespace common for language es Object
+index-BZb_XS7a.js:794 i18next: languageChanged es
+index-BZb_XS7a.js:794 i18next: initialized Object
+index-BZb_XS7a.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-BZb_XS7a.js:838 ⚠️ No space mapping found for parks:footer
+spe @ index-BZb_XS7a.js:838Understand this warning
+index-BZb_XS7a.js:49 🌐 [QUERY] GET /api/parks/104/extended
+index-BZb_XS7a.js:49 🌐 [SAFE API] GET /api/parks/104/evaluation-stats
+index-BZb_XS7a.js:838 ⚠️ No space mapping found for parks:footer
+spe @ index-BZb_XS7a.js:838Understand this warning
+uploads%2Ftest-image.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+Events-C8-MO5tl.js:1 Error loading image: /uploads/test-image.jpg
+onError @ Events-C8-MO5tl.js:1Understand this error
+index-BZb_XS7a.js:49 🌐 [QUERY] GET /api/events/7
+uploads%2Ftest-image.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+Events-C8-MO5tl.js:1 Error loading image: /uploads/test-image.jpg
+onError @ Events-C8-MO5tl.js:1Understand this error
+index-BZb_XS7a.js:49 🌐 [QUERY] GET /api/events/8
+uploads%2Ftest-image.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+Events-C8-MO5tl.js:1 Error loading image: /uploads/test-image.jpg
+onError @ Events-C8-MO5tl.js:1Understand this error
+index-BZb_XS7a.js:838 ⚠️ No space mapping found for parks:footer
+spe @ index-BZb_XS7a.js:838Understand this warning
+uploads%2Ftest-image.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+Events-C8-MO5tl.js:1 Error loading image: /uploads/test-image.jpg
+onError @ Events-C8-MO5tl.js:1Understand this error
+index-BZb_XS7a.js:49 🌐 [QUERY] GET /api/events/7
