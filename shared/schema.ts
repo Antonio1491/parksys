@@ -1560,21 +1560,45 @@ export const events = pgTable("events", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  start_date: timestamp("start_date").notNull(),
-  end_date: timestamp("end_date"),
-  park_id: integer("park_id").references(() => parks.id),
-  category_id: integer("category_id").references(() => eventCategories.id),
+  eventType: varchar("event_type", { length: 50 }).notNull(), // deportivo, cultural, ambiental, etc.
+  targetAudience: varchar("target_audience", { length: 100 }), // niños, jóvenes, adultos mayores, familias
+  status: varchar("status", { length: 20 }).default("draft").notNull(), // borrador, publicado, cancelado, pospuesto
+  featuredImageUrl: varchar("featured_image_url", { length: 500 }),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date"),
+  startTime: time("start_time"),
+  endTime: time("end_time"),
+  isRecurring: boolean("is_recurring").default(false),
+  recurrencePattern: varchar("recurrence_pattern", { length: 100 }), // 'weekly', 'monthly', etc.
+  location: varchar("location", { length: 255 }),
   capacity: integer("capacity"),
+  registrationType: varchar("registration_type", { length: 50 }).default("none"), // none, required, optional
+  organizerName: varchar("organizer_name", { length: 255 }),
+  organizerEmail: varchar("organizer_email", { length: 255 }),
+  organizerPhone: varchar("organizer_phone", { length: 20 }),
+  organizerOrganization: varchar("organizer_organization", { length: 255 }),
+  geolocation: varchar("geolocation", { length: 100 }), // lat,lng format
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdById: integer("created_by_id"),
   price: decimal("price", { precision: 10, scale: 2 }).default("0.00"),
-  location: varchar("location", { length: 255 }), // Ubicación específica dentro del parque
-  organizer_name: varchar("organizer_name", { length: 255 }),
-  organizer_organization: varchar("organizer_organization", { length: 255 }),
-  contact_email: varchar("contact_email", { length: 255 }),
-  contact_phone: varchar("contact_phone", { length: 20 }),
-  notes: text("notes"),
-  status: varchar("status", { length: 50 }).default("programado"), // programado, en_curso, completado, cancelado
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  isFree: boolean("is_free").default(true),
+  requiresApproval: boolean("requires_approval").default(false),
+});
+
+// Tabla de imágenes de eventos (idéntica al patrón de actividades y parques)
+export const eventImages = pgTable("event_images", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
+  imageUrl: text("image_url").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size"), // Tamaño en bytes
+  mimeType: text("mime_type").notNull(),
+  caption: text("caption"),
+  isPrimary: boolean("is_primary").notNull().default(false),
+  uploadedById: integer("uploaded_by_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
 });
 
 // Tipos para eventos
@@ -1582,6 +1606,16 @@ export type EventCategory = typeof eventCategories.$inferSelect;
 export type InsertEventCategory = typeof eventCategories.$inferInsert;
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = typeof events.$inferInsert;
+
+// Tipos para imágenes de eventos
+export type EventImage = typeof eventImages.$inferSelect;
+export type InsertEventImage = typeof eventImages.$inferInsert;
+
+export const insertEventImageSchema = createInsertSchema(eventImages).omit({ 
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
 
 // Esquemas de validación para categorías de eventos
 export const insertEventCategorySchema = createInsertSchema(eventCategories).omit({
