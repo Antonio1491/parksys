@@ -459,14 +459,26 @@ const Home: React.FC = () => {
                 {/* Eje 1: Gestión y Mantenimiento */}
                 <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#14b8a6' }}>
+                    {/* Icono */}
+                    <div
+                      className="rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+                      style={{ backgroundColor: '#14b8a6' }}
+                    >
                       <Trees className="h-8 w-8 text-white" />
                     </div>
+
+                    {/* Texto */}
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">Conservar y mejorar</h3>
+                      <h3 className="text-lg font-bold text-gray-900">
+                        Conservar y mejorar
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        los parques existentes
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
+
 
                 {/* Eje 2: Educación Ambiental */}
                 <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-102">
