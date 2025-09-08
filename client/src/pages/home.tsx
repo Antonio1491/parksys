@@ -175,7 +175,7 @@ const Home: React.FC = () => {
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-6xl font-poppins font-black text-gray-900 mb-8">
+            <h2 className="text-xl md:text-4xl font-poppins font-black text-gray-900 mb-8">
               <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
               <span style={{ color: '#00444f' }}>Tu </span>
               <span style={{ color: '#14b8a6' }}>Parque </span>
