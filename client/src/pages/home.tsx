@@ -176,7 +176,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-6xl font-poppins font-black text-gray-900 mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
+              <span style={{ fontFamily: 'Guttery Regular', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />
               <span style={{ color: '#00444f' }}>Tu </span>
               <span style={{ color: '#14b8a6' }}>Parque </span>
               <span style={{ color: '#00444f' }}>Favorito</span>
@@ -442,7 +442,7 @@ const Home: React.FC = () => {
             <div className="col-span-2 flex items-center">
               <div className="text-left">
                 <h3 className="leading-tight">
-                  <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
+                  <span style={{ fontFamily: 'Guttery Regular', color: '#00444f', fontSize: '3rem', fontWeight: '300' }}>Nuestros</span><br />
                   <span style={{ fontFamily: 'poppins', fontSize: '2.4rem', fontWeight: 'bold' }}>
                     <span style={{ color: '#00444f' }}>objetivos y </span>
                     <span style={{ color: '#14b8a6' }}>deseos</span>
