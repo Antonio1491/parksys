@@ -48,7 +48,7 @@ interface EventData {
   eventType: string;
   targetAudience: string;
   status: string;
-  featuredImageUrl?: string;
+  imageUrl?: string; // Cambiar de featuredImageUrl a imageUrl
   startDate: string;
   endDate?: string;
   startTime?: string;
@@ -128,9 +128,9 @@ export default function EditEventPage() {
     if (event) {
       console.log('🔄 Cargando datos del evento:', event);
       
-      // Establecer la imagen del evento
-      if (event.featuredImageUrl) {
-        setEventImage(event.featuredImageUrl);
+      // Establecer la imagen del evento (usar imageUrl que viene del LEFT JOIN)
+      if (event.imageUrl) {
+        setEventImage(event.imageUrl);
       }
 
       // Actualizar valores del formulario
@@ -138,7 +138,7 @@ export default function EditEventPage() {
         title: event.title || '',
         description: event.description || '',
         start_date: formatDateForInput(event.startDate),
-        end_date: formatDateForInput(event.endDate),
+        end_date: formatDateForInput(event.endDate || ''),
         start_time: event.startTime || '',
         end_time: event.endTime || '',
         park_id: event.parks && event.parks.length > 0 ? String(event.parks[0].id) : '',
@@ -191,7 +191,7 @@ export default function EditEventPage() {
         registrationType: data.registration_required ? 'registration' : 'free',
         status: 'published',
         targetAudience: 'general',
-        featuredImageUrl: eventImage || null, // Agregar la imagen del evento
+        imageUrl: eventImage || null, // Cambiar de featuredImageUrl a imageUrl
         // Campo requerido por el backend - array de IDs de parques
         parkIds: data.park_id ? [parseInt(data.park_id)] : []
       };
@@ -325,7 +325,7 @@ export default function EditEventPage() {
                           <SelectValue placeholder="Seleccionar parque" />
                         </SelectTrigger>
                         <SelectContent>
-                          {parks?.map((park: any) => (
+                          {(parks as any[])?.map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
@@ -347,7 +347,7 @@ export default function EditEventPage() {
                           <SelectValue placeholder="Seleccionar categoría" />
                         </SelectTrigger>
                         <SelectContent>
-                          {eventCategories?.map((category: any) => (
+                          {(eventCategories as any[])?.map((category: any) => (
                             <SelectItem key={category.id} value={category.name}>
                               <div className="flex items-center gap-2">
                                 <div 

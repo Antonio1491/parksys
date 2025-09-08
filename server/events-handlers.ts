@@ -370,7 +370,7 @@ export async function updateEvent(req: Request, res: Response) {
       });
     }
     
-    const { parkIds, ...eventData } = req.body;
+    const { parkIds, imageUrl, ...eventData } = req.body;
     
     // Asegurarse de que hay al menos un parque seleccionado
     if (!parkIds || !Array.isArray(parkIds) || parkIds.length === 0) {
@@ -379,7 +379,9 @@ export async function updateEvent(req: Request, res: Response) {
       });
     }
     
-    // Actualizar el evento
+    console.log('🖼️ [UPDATE-EVENT] Datos procesados:', { parkIds, imageUrl, eventData });
+    
+    // Actualizar el evento (SIN imageUrl que se maneja por separado)
     const [updatedEvent] = await db
       .update(events)
       .set({
@@ -395,6 +397,60 @@ export async function updateEvent(req: Request, res: Response) {
       })
       .where(eq(events.id, eventId))
       .returning();
+    
+    // Si se proporciona una imagen, manejar la tabla event_images
+    if (imageUrl !== undefined) {
+      console.log("🖼️ [UPDATE-EVENT] Procesando imagen:", imageUrl);
+      
+      if (imageUrl && imageUrl.trim() !== '') {
+        // Verificar si ya existe una imagen primaria para este evento
+        const existingImage = await db
+          .select()
+          .from(eventImages)
+          .where(and(
+            eq(eventImages.eventId, eventId),
+            eq(eventImages.isPrimary, true)
+          ))
+          .limit(1);
+        
+        if (existingImage.length > 0) {
+          // Actualizar la imagen existente
+          console.log("🔄 [UPDATE-EVENT] Actualizando imagen existente");
+          await db
+            .update(eventImages)
+            .set({
+              imageUrl: imageUrl,
+              fileName: 'updated-image',
+              updatedAt: new Date()
+            })
+            .where(and(
+              eq(eventImages.eventId, eventId),
+              eq(eventImages.isPrimary, true)
+            ));
+        } else {
+          // Crear nueva imagen primaria
+          console.log("➕ [UPDATE-EVENT] Creando nueva imagen primaria");
+          await db
+            .insert(eventImages)
+            .values({
+              eventId: eventId,
+              imageUrl: imageUrl,
+              fileName: 'event-image',
+              fileSize: null,
+              mimeType: 'image/jpeg',
+              caption: null,
+              isPrimary: true,
+              uploadedById: 1 // TODO: obtener del contexto de usuario
+            });
+        }
+      } else {
+        // Si imageUrl está vacío, eliminar imágenes existentes
+        console.log("🗑️ [UPDATE-EVENT] Eliminando imágenes del evento");
+        await db
+          .delete(eventImages)
+          .where(eq(eventImages.eventId, eventId));
+      }
+    }
     
     // Actualizar las relaciones con parques (eliminar las existentes y crear nuevas)
     await db
