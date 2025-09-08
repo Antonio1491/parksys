@@ -82,15 +82,16 @@ function ActiveConcessionsList() {
 
   const concessions: ActiveConcession[] = Array.isArray(concessionsResponse?.data) ? concessionsResponse.data : (Array.isArray(concessionsResponse) ? concessionsResponse : []);
   
-  // Filtrar duplicados por ID para prevenir keys duplicadas en React (ya no debería ser necesario)
-  const uniqueConcessions = concessions.filter((concession, index, arr) => 
-    arr.findIndex(c => c.id === concession.id) === index
-  );
+  // DEBUG: Verificar datos recibidos
+  console.log('🏪 CONCESSIONS DEBUG:', {
+    concessionsLength: concessions.length,
+    concessionsResponse: concessions
+  });
 
   const parks = Array.isArray(parksResponse?.data) ? parksResponse.data : (Array.isArray(parksResponse) ? parksResponse : []);
 
-  // Filtrar concesiones (usar uniqueConcessions en lugar de concessions)
-  const filteredConcessions = uniqueConcessions.filter(concession => {
+  // Filtrar concesiones
+  const filteredConcessions = concessions.filter(concession => {
     // Asegurar que los campos existen antes de usarlos
     const name = concession.name || '';
     const typeName = concession.concessionTypeName || '';

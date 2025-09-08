@@ -258,7 +258,11 @@ export default function SponsoredEventsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader title="Eventos Patrocinados" />
+        <PageHeader 
+          title="Eventos"
+          subtitle='Gestión de eventos patrocinados y sus detalles'
+          icon={<Calendar />}
+          />
 
         {/* Filters and Search */}
         <Card>

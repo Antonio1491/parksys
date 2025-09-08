@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Trash2, Mail, Phone, Globe, MapPin, Star, Building, User } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Mail, Phone, Globe, MapPin, Star, Building, User, Handshake } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/queryClient';
@@ -230,14 +230,14 @@ export default function SponsorsPage() {
         <PageHeader 
           title="Patrocinadores"
           subtitle='Gestión de patrocinadores y sus niveles de patrocinio'
-          icon={<Building />}
+          icon={<Handshake />}
           actions={[
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
                   variant="primary"
                   onClick={resetForm}>
-                  <Plus className="mr-2" />
+                  <Plus className="mr-2 stroke-[4]" />
                   Nuevo Patrocinador
                 </Button>
               </DialogTrigger>

@@ -240,7 +240,7 @@ export default function ContractsPage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader 
-          title="Contratos de Patrocinio"
+          title="Contratos"
           subtitle="Gestiona los contratos de patrocinio activos y en desarrollo"
           icon={<FileText />}
           actions={[
@@ -249,7 +249,7 @@ export default function ContractsPage() {
                 <Button 
                   variant="primary"
                   onClick={resetForm}>
-                  <Plus className="mr-2 h-7 w-7 stroke-[3]" />
+                  <Plus className="mr-2 stroke-[4]" />
                   Nuevo Contrato
                 </Button>
               </DialogTrigger>

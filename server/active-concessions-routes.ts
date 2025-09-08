@@ -582,6 +582,7 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
       }
 
       // Eliminar archivo físico  
+      const concessionUploadsDir = 'uploads/concession-images';
       const filePath = path.join(process.cwd(), concessionUploadsDir, path.basename(image.image_url));
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
