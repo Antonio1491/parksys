@@ -69,28 +69,45 @@ export async function getAllEvents(req: Request, res: Response) {
     
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
     
-    // Query principal con JOIN a event_images (igual que actividades)
-    const query = `
-      SELECT 
-        e.id, e.title, e.description, e.event_type, e.target_audience, 
-        e.status, e.start_date, e.end_date, e.start_time, e.end_time,
-        e.is_recurring, e.recurrence_pattern, e.location, e.capacity,
-        e.registration_type, e.organizer_name, e.organizer_email, 
-        e.organizer_phone, e.organizer_organization, e.geolocation,
-        e.price, e.is_free, e.requires_approval, e.created_at, e.updated_at,
-        ei.image_url as "imageUrl"
-      FROM events e
-      LEFT JOIN event_images ei ON e.id = ei.event_id AND ei.is_primary = true
-      ${parkJoin}
-      ${whereClause}
-      ORDER BY e.start_date DESC
-    `;
-    
-    console.log("🎯 QUERY EVENTOS CON JOIN:", query);
-    console.log("🎯 PARÁMETROS:", queryParams);
-    
-    const result = await db.execute(sql.raw(query, queryParams));
-    const allEvents = result.rows;
+    // Usar el query builder de Drizzle con JOIN (más seguro que raw SQL)
+    const eventsQuery = db
+      .select({
+        id: events.id,
+        title: events.title,
+        description: events.description,
+        eventType: events.eventType,
+        targetAudience: events.targetAudience,
+        status: events.status,
+        startDate: events.startDate,
+        endDate: events.endDate,
+        startTime: events.startTime,
+        endTime: events.endTime,
+        isRecurring: events.isRecurring,
+        recurrencePattern: events.recurrencePattern,
+        location: events.location,
+        capacity: events.capacity,
+        registrationType: events.registrationType,
+        organizerName: events.organizerName,
+        organizerEmail: events.organizerEmail,
+        organizerPhone: events.organizerPhone,
+        organizerOrganization: events.organizerOrganization,
+        geolocation: events.geolocation,
+        price: events.price,
+        isFree: events.isFree,
+        requiresApproval: events.requiresApproval,
+        createdAt: events.createdAt,
+        updatedAt: events.updatedAt,
+        imageUrl: eventImages.imageUrl
+      })
+      .from(events)
+      .leftJoin(eventImages, and(
+        eq(eventImages.eventId, events.id),
+        eq(eventImages.isPrimary, true)
+      ))
+      .orderBy(desc(events.startDate));
+
+    console.log("🎯 USING DRIZZLE QUERY BUILDER FOR EVENTS");
+    const allEvents = await eventsQuery;
     
     // Si la consulta incluye eventos con parques, obtenemos la información de parques
     if (allEvents.length > 0) {
@@ -145,27 +162,45 @@ export async function getEventById(req: Request, res: Response) {
       return res.status(400).json({ message: "ID de evento inválido" });
     }
     
-    // Query con JOIN a event_images (igual que actividades)
-    const query = `
-      SELECT 
-        e.id, e.title, e.description, e.event_type, e.target_audience, 
-        e.status, e.start_date, e.end_date, e.start_time, e.end_time,
-        e.is_recurring, e.recurrence_pattern, e.location, e.capacity,
-        e.registration_type, e.organizer_name, e.organizer_email, 
-        e.organizer_phone, e.organizer_organization, e.geolocation,
-        e.price, e.is_free, e.requires_approval, e.created_at, e.updated_at,
-        ei.image_url as "imageUrl"
-      FROM events e
-      LEFT JOIN event_images ei ON e.id = ei.event_id AND ei.is_primary = true
-      WHERE e.id = $1
-      LIMIT 1
-    `;
+    // Usar el query builder de Drizzle con JOIN (más seguro)
+    console.log("🎯 GET EVENT BY ID - Using Drizzle query builder for event ID:", eventId);
     
-    console.log("🎯 GET EVENT BY ID - Query:", query);
-    console.log("🎯 GET EVENT BY ID - Params:", [eventId]);
-    
-    const result = await db.execute(sql.raw(query, [eventId]));
-    const eventData = result.rows;
+    const eventData = await db
+      .select({
+        id: events.id,
+        title: events.title,
+        description: events.description,
+        eventType: events.eventType,
+        targetAudience: events.targetAudience,
+        status: events.status,
+        startDate: events.startDate,
+        endDate: events.endDate,
+        startTime: events.startTime,
+        endTime: events.endTime,
+        isRecurring: events.isRecurring,
+        recurrencePattern: events.recurrencePattern,
+        location: events.location,
+        capacity: events.capacity,
+        registrationType: events.registrationType,
+        organizerName: events.organizerName,
+        organizerEmail: events.organizerEmail,
+        organizerPhone: events.organizerPhone,
+        organizerOrganization: events.organizerOrganization,
+        geolocation: events.geolocation,
+        price: events.price,
+        isFree: events.isFree,
+        requiresApproval: events.requiresApproval,
+        createdAt: events.createdAt,
+        updatedAt: events.updatedAt,
+        imageUrl: eventImages.imageUrl
+      })
+      .from(events)
+      .leftJoin(eventImages, and(
+        eq(eventImages.eventId, events.id),
+        eq(eventImages.isPrimary, true)
+      ))
+      .where(eq(events.id, eventId))
+      .limit(1);
     
     if (eventData.length === 0) {
       return res.status(404).json({ message: "Evento no encontrado" });
