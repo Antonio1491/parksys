@@ -334,7 +334,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-poppins font-black mb-8">
-              <span style={{ fontFamily: 'Guttery Regular, Georgia, Times, serif', color: '#ffffff', fontWeight: '300' }}>Disfruta los magníficos</span><br />
+              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#ffffff', fontWeight: '300' }}>Disfruta los magníficos</span><br />
               <span style={{ color: '#00444f' }}>Eventos </span> 
               <span style={{ color: '#ffffff' }}>Programados</span>
             </h2>
@@ -377,10 +377,7 @@ const Home: React.FC = () => {
                     <div className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 h-[500px] flex flex-col cursor-pointer">
                       <div className="h-2/3 relative overflow-hidden">
                         <img 
-                          src={event.featuredImageUrl?.startsWith('/uploads/') 
-                            ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
-                            : event.featuredImageUrl
-                          }
+                          src={event.featuredImageUrl}
                           alt={event.title}
                           className="w-full h-full object-cover"
                         />
