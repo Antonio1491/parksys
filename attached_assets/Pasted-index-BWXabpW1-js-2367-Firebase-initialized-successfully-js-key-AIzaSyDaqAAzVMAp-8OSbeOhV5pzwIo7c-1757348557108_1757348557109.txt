@@ -1,0 +1,59 @@
+index-BWXabpW1.js:2367 🔥 Firebase initialized successfully
+js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1413
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:14
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683
+(anonymous) @ js?key=AIzaSyDaqAAzVMAp-8OSbeOhV5pzwIo7cX509Io&libraries=places:1683Understand this warning
+index-BWXabpW1.js:794 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-BWXabpW1.js:794 i18next: languageChanged es
+index-BWXabpW1.js:794 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+index-BWXabpW1.js:49 🌐 [QUERY] GET /api/events
+index-BWXabpW1.js:49 🌐 [QUERY] GET /api/parks
+index-BWXabpW1.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Events-HkcyUl2s.js:1 Image loaded successfully: /uploads/1757280590530-04d92813-8f21-4102-8cda-a1072fbbb095-eyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvOTI4NzY4ODgvN2JkZmY1YjZmNzhlMDE2OTZkMWE2YzdjMGNlNWQzMjAuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJ3ZWJwIiwicmVzaXplIjp7IndpZHRoIjoxMD.webp
+uploads%2Fevent-images%2Fevent-images-1757348515867-555209083.jpg:1  GET https://parksys-demo.replit.app/api/storage/file/uploads%2Fevent-images%2Fevent-images-1757348515867-555209083.jpg 404 (Not Found)
+Image
+w4 @ index-BWXabpW1.js:41
+kq @ index-BWXabpW1.js:41
+kq @ index-BWXabpW1.js:41
+sie @ index-BWXabpW1.js:41
+uie @ index-BWXabpW1.js:41
+Ed @ index-BWXabpW1.js:41
+S4 @ index-BWXabpW1.js:41
+nd @ index-BWXabpW1.js:39
+(anonymous) @ index-BWXabpW1.js:41
+setTimeout
+lse @ index-BWXabpW1.js:49
+o @ index-BWXabpW1.js:49
+batch @ index-BWXabpW1.js:49
+Wo @ index-BWXabpW1.js:49
+setData @ index-BWXabpW1.js:49
+onSuccess @ index-BWXabpW1.js:49
+f @ index-BWXabpW1.js:49
+Promise.then
+x @ index-BWXabpW1.js:49
+start @ index-BWXabpW1.js:49
+fetch @ index-BWXabpW1.js:49
+Gp @ index-BWXabpW1.js:49
+onSubscribe @ index-BWXabpW1.js:49
+subscribe @ index-BWXabpW1.js:49
+(anonymous) @ index-BWXabpW1.js:49
+JB @ index-BWXabpW1.js:39
+_w @ index-BWXabpW1.js:41
+Kh @ index-BWXabpW1.js:41
+(anonymous) @ index-BWXabpW1.js:41
+C @ index-BWXabpW1.js:26
+R @ index-BWXabpW1.js:26Understand this error
+Events-HkcyUl2s.js:1 Error loading image: /uploads/event-images/event-images-1757348515867-555209083.jpg
+onError @ Events-HkcyUl2s.js:1
+kre @ index-BWXabpW1.js:38
+Ore @ index-BWXabpW1.js:38
+Ire @ index-BWXabpW1.js:38
+ZI @ index-BWXabpW1.js:38
+LB @ index-BWXabpW1.js:38
+(anonymous) @ index-BWXabpW1.js:38
+sA @ index-BWXabpW1.js:41
+oB @ index-BWXabpW1.js:38
+iN @ index-BWXabpW1.js:38
+MP @ index-BWXabpW1.js:38Understand this error
+index-BWXabpW1.js:49 🌐 [QUERY] GET /api/events/7
