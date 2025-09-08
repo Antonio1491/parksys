@@ -5,17 +5,14 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-md font-semibold font-poppins ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-md font-semibold font-poppins ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/70",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/70",
-        outline:
-          "bg-background text-accent hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/70",
+        outline: "bg-background text-accent hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         primary: "bg-principal text-white hover:bg-accent hover:text-accent-foreground",
@@ -26,10 +23,18 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
       },
+      iconStyle: {
+        xs: "[&_svg]:size-2 [&_svg]:stroke-[1]",
+        sm: "[&_svg]:size-3 [&_svg]:stroke-[1.5]",
+        md: "[&_svg]:size-4 [&_svg]:stroke-[2]",
+        lg: "[&_svg]:size-5 [&_svg]:stroke-[2.5]",
+        bold: "[&_svg]:size-6 [&_svg]:stroke-[3]",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      iconStyle: "md",
     },
   }
 )

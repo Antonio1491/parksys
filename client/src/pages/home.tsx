@@ -464,11 +464,11 @@ const Home: React.FC = () => {
           {/* Texto actividades */}
           <div>
             <h2 className="text-4xl font-poppins font-black leading-tight">
-              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery', fontSize: '3rem', fontWeight: '300' }}>Contamos con</span>
+              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery', fontSize: '2.4rem', fontWeight: '300' }}>Contamos con</span>
               <span className="block text-[#14b8a6] text-4xl">Actividades</span>
               <span className="block text-[#00444f] text-4xl">Variadas</span>
             </h2>
-            <button className="mt-4 px-4 py-2 bg-lime-600 text-white rounded-lg shadow hover:bg-lime-700 transition">
+            <button className="mt-4 px-4 py-2 bg-[#a8bd7d] text-white font-poppins font-bold rounded-xl shadow hover:bg-[#a8bd7d] transition">
               VER CALENDARIO
             </button>
           </div>
@@ -487,10 +487,10 @@ const Home: React.FC = () => {
 
           {/* Texto instructores */}
           <div className="text-right">
-            <h3 className="text-xl font-bold leading-tight">
-              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery', fontSize: '3rem', fontWeight: '300' }}">guiados por</span>
-              <span className="block text-lime-600">instructores</span>
-              <span className="block text-gray-900">especializados</span>
+            <h3 className="text-xl font-poppins font-black leading-tight">
+              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery', fontSize: '2.4rem', fontWeight: '300' }}>guiadas por</span>
+              <span className="block text-[#a8bd7d] text-3xl">instructores</span>
+              <span className="block text-[#00444f] text-3xl">especializados</span>
             </h3>
           </div>
 
@@ -503,7 +503,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-poppins font-black mb-8">
-              <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#ffffff', fontWeight: '300' }}>Disfruta los magníficos</span><br />
+              <span style={{ fontFamily: 'Guttery', color: '#ffffff', fontWeight: '300' }}>Disfruta los magníficos</span><br />
               <span style={{ color: '#00444f' }}>Eventos </span> 
               <span style={{ color: '#ffffff' }}>Programados</span>
             </h2>
@@ -611,16 +611,11 @@ const Home: React.FC = () => {
               <div className="relative z-10">
                 <h3 className="text-4xl font-bold text-white mb-4 text-right">¿Quieres colaborar con nosotros?</h3>
                 <p className="text-white mb-6 text-xl font-medium text-right">
-                  Únete a nuestras alianzas estratégicas y contribuye al desarrollo sostenible de la zona metropolitana
+                  Únete a nuestras alianzas estratégicas y contribuye al desarrollo sostenible de los espacios públicos en México.
                 </p>
                 <div className="flex gap-4 justify-end">
                   <Button size="lg" className="bg-white hover:bg-gray-50 font-bold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg" style={{ color: '#51a19f' }}>
                     Ser Voluntario
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button size="lg" className="bg-white hover:bg-gray-50 font-bold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg" style={{ color: '#51a19f' }}>
-                    Servicio Social
-                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
               </div>
@@ -628,13 +623,14 @@ const Home: React.FC = () => {
           </div>
 
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl mb-8">
-              <span style={{ color: '#51a19f', fontFamily: 'Guttery Regular, serif', fontWeight: '300' }}>Gracias a nuestros</span>
+            <h2 className="font-poppins text-4xl md:text-6xl mb-4">
+              <span style={{ color: '#00444f', fontFamily: 'Guttery Regular', fontWeight: '300' }}>Gracias a nuestros</span>
               <br />
-              <span style={{ color: '#19633c' }} className="font-bold">Patrocinadores</span>
+              <span style={{ color: '#14b8a6' }} className="font-black">Patrocinadores</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-bold">
-              Bosques para Siempre es un programa que funciona como eje rector para la construcción y seguimiento en las alianzas, donativos y/o patrocinios.
+            <p className="text-lg font-poppins text-[#00444f] max-w-4xl mx-auto leading-relaxed font-regular">
+              Gracias al compromiso de nuestros patrocinadores,<br />
+              más comunidades disfrutan de parques vivos y accesibles para todos.
             </p>
           </div>
           
@@ -697,9 +693,8 @@ const Home: React.FC = () => {
           
           {/* Botón CTA para ser patrocinador */}
           <div className="text-center mt-16">
-            <Button size="lg" className="bg-white hover:bg-gray-50 font-bold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg" style={{ color: '#51a19f' }}>
-              ¿Quieres ser patrocinador?
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <Button size="lg" className="bg-[#a8bd7d] hover:bg-[#a8bd7d] font-poppins font-bold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg" style={{ color: '#f4f5f7' }}>
+              ¿QUIERES SER PATROCINADOR?
             </Button>
           </div>
 
