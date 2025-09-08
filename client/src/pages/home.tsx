@@ -488,7 +488,7 @@ const Home: React.FC = () => {
           {/* Texto instructores */}
           <div className="text-right">
             <h3 className="text-xl font-bold leading-tight">
-              <span className="block italic text-gray-800">guiados por</span>
+              <span className="text-[#00444f]" style={{ fontFamily: 'Guttery', fontSize: '3rem', fontWeight: '300' }}">guiados por</span>
               <span className="block text-lime-600">instructores</span>
               <span className="block text-gray-900">especializados</span>
             </h3>
