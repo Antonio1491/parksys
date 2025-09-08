@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { replitObjectStorage } from './objectStorage-replit';
 
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
@@ -428,63 +429,79 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
     }
   });
 
-  // Configuración de multer para subida de imágenes de concesiones
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-  const concessionUploadsDir = isProduction ? 'public/uploads/concession-images' : 'uploads/concession-images';
-  
-  if (!fs.existsSync(concessionUploadsDir)) {
-    fs.mkdirSync(concessionUploadsDir, { recursive: true });
-  }
-  
-  const concessionImageStorage = multer.diskStorage({
-    destination: function (req: any, file: any, cb: any) {
-      cb(null, concessionUploadsDir);
-    },
-    filename: function (req: any, file: any, cb: any) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, 'concession-img-' + uniqueSuffix + path.extname(file.originalname));
-    }
-  });
-  
-  const concessionImageUpload = multer({ 
-    storage: concessionImageStorage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-    fileFilter: function (req: any, file: any, cb: any) {
-      if (file.mimetype.startsWith('image/')) {
+  // Configuración de multer para concesiones con sistema híbrido (igual que actividades)
+  const concessionImageUpload = multer({
+    storage: multer.memoryStorage(), // Use memory storage for Object Storage uploads
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);
       } else {
-        cb(new Error('Solo se permiten archivos de imagen'), false);
+        cb(new Error('Formato de archivo no válido. Solo se permiten JPG, PNG, GIF y WEBP'));
       }
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024 // 5MB
     }
   });
 
-  // Subir nueva imagen para una concesión activa
+  // Subir nueva imagen para una concesión activa (SISTEMA HÍBRIDO - igual que actividades)
   apiRouter.post('/active-concessions/:id/images', isAuthenticated, concessionImageUpload.single('image'), async (req: Request, res: Response) => {
     try {
       const { pool } = await import('./db');
-      const { id } = req.params;
-      const { caption } = req.body;
-      const file = req.file as Express.Multer.File;
-
-      if (!file) {
-        return res.status(400).json({ error: 'No se proporcionó imagen' });
+      const concessionId = parseInt(req.params.id);
+      
+      if (isNaN(concessionId)) {
+        return res.status(400).json({ error: 'ID de concesión inválido' });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ error: 'No se proporcionó archivo de imagen' });
       }
 
+      console.log(`📤 [CONCESSION-HÍBRIDO] Iniciando upload para concesión ${concessionId}: ${req.file.originalname}`);
+      
       // Verificar que la concesión activa existe
-      const concessionCheck = await pool.query('SELECT id FROM active_concessions WHERE id = $1', [id]);
+      const concessionCheck = await pool.query('SELECT id FROM active_concessions WHERE id = $1', [concessionId]);
       if (concessionCheck.rows.length === 0) {
         return res.status(404).json({ error: 'Concesión activa no encontrada' });
       }
 
-      const imageUrl = `/uploads/concession-images/${file.filename}`;
+      const { caption } = req.body;
+      let imageUrl: string;
+      
+      try {
+        // 1. INTENTAR REPLIT OBJECT STORAGE (persistente)
+        console.log('📤 [CONCESSION-HÍBRIDO] Intentando Replit Object Storage...');
+        imageUrl = await replitObjectStorage.uploadFile(req.file.buffer, req.file.originalname);
+        imageUrl = replitObjectStorage.getPublicUrl(imageUrl);
+        console.log('✅ [CONCESSION-HÍBRIDO] Object Storage exitoso:', imageUrl);
+        
+      } catch (objectStorageError) {
+        console.log('⚠️ [CONCESSION-HÍBRIDO] Object Storage falló, usando filesystem...', objectStorageError);
+        
+        // 2. FALLBACK A FILESYSTEM (carpeta persistente)
+        const uploadDir = path.join(process.cwd(), 'uploads', 'concession-images');
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const filename = `concession-img-${uniqueSuffix}${path.extname(req.file.originalname)}`;
+        const filePath = path.join(uploadDir, filename);
+        
+        fs.writeFileSync(filePath, req.file.buffer);
+        imageUrl = `/uploads/concession-images/${filename}`;
+        console.log('✅ [CONCESSION-HÍBRIDO] Filesystem usado:', imageUrl);
+      }
       
       // Si es la primera imagen, marcarla como principal
-      const existingImages = await pool.query('SELECT COUNT(*) as count FROM active_concession_images WHERE concession_id = $1', [id]);
+      const existingImages = await pool.query('SELECT COUNT(*) as count FROM active_concession_images WHERE concession_id = $1', [concessionId]);
       const isPrimary = existingImages.rows[0].count === '0';
 
       const result = await pool.query(
         'INSERT INTO active_concession_images (concession_id, image_url, title, description, is_primary) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [id, imageUrl, caption || null, null, isPrimary]
+        [concessionId, imageUrl, caption || null, null, isPrimary]
       );
 
       res.json(result.rows[0]);
