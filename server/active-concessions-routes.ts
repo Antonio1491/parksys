@@ -60,7 +60,7 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
       const { pool } = await import('./db');
       
       const result = await pool.query(`
-        SELECT 
+        SELECT DISTINCT
           ac.*,
           ct.name as "concessionTypeName",
           ct.description as "concessionTypeDescription",
@@ -71,7 +71,12 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
           p.name as "parkName",
           p.address as "parkLocation",
           COALESCE(img_count.count, 0) as "imageCount",
-          primary_img.image_url as "primaryImage"
+          (
+            SELECT image_url 
+            FROM active_concession_images 
+            WHERE concession_id = ac.id AND is_primary = true 
+            LIMIT 1
+          ) as "primaryImage"
         FROM active_concessions ac
         LEFT JOIN concession_types ct ON ac.concession_type_id = ct.id
         LEFT JOIN concessionaires cn ON ac.concessionaire_id = cn.id
@@ -81,7 +86,6 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
           FROM active_concession_images 
           GROUP BY concession_id
         ) img_count ON ac.id = img_count.concession_id
-        LEFT JOIN active_concession_images primary_img ON ac.id = primary_img.concession_id AND primary_img.is_primary = true
         ORDER BY ac.created_at DESC
       `);
       
