@@ -53,6 +53,16 @@ const Home: React.FC = () => {
   const { data: eventsResponse = [], isLoading: eventsLoading } = useQuery<any[]>({
     queryKey: ['/api/events'],
   });
+
+  // Fetch activities para la sección de actividades
+  const { data: activitiesResponse = [], isLoading: activitiesLoading } = useQuery<any[]>({
+    queryKey: ['/api/activities-summary-data'],
+  });
+
+  // Fetch instructors para la sección de instructores
+  const { data: instructorsResponse = [], isLoading: instructorsLoading } = useQuery<any[]>({
+    queryKey: ['/public-api/instructors/public'],
+  });
   
   const allParks = parksResponse || [];
   
@@ -65,6 +75,22 @@ const Home: React.FC = () => {
   const featuredEvents = (eventsResponse || [])
     .filter((event: any) => event.featuredImageUrl) // Solo eventos con imagen
     .slice(0, 3); // Limitar a 3 eventos
+
+  // Procesar datos de actividades
+  const featuredActivities = Array.isArray(activitiesResponse) 
+    ? activitiesResponse.filter((activity: any) => activity.status === 'activa').slice(0, 3)
+    : [];
+
+  // Procesar datos de instructores
+  let instructorsData = [];
+  if (Array.isArray(instructorsResponse)) {
+    instructorsData = instructorsResponse;
+  } else if (instructorsResponse && 'data' in instructorsResponse) {
+    instructorsData = instructorsResponse.data || [];
+  }
+  const featuredInstructors = instructorsData
+    .filter((instructor: any) => instructor.status === 'active')
+    .slice(0, 3);
   
   // Función para formatear fechas
   const formatEventDate = (startDate: string, endDate: string, startTime?: string) => {
@@ -468,21 +494,102 @@ const Home: React.FC = () => {
               <span className="block text-[#14b8a6] text-4xl">Actividades</span>
               <span className="block text-[#00444f] text-4xl">Variadas</span>
             </h2>
-            <button className="mt-4 px-4 py-2 bg-[#a8bd7d] text-white font-poppins font-bold rounded-xl shadow hover:bg-[#a8bd7d] transition">
-              VER CALENDARIO
-            </button>
+            <Link href="/activities">
+              <Button className="mt-4 px-4 py-2 bg-[#a8bd7d] text-white font-poppins font-bold rounded-xl shadow hover:bg-[#a8bd7d] transition">
+                <Calendar className="mr-2 h-4 w-4" />
+                VER CALENDARIO
+              </Button>
+            </Link>
           </div>
 
           {/* Tarjeta actividades */}
-          <div className="bg-gray-100 rounded-xl h-40 flex items-center justify-center">
-            {/* Aquí luego se mapearán actividades desde el sistema */}
-            <span className="text-gray-400">[Tarjeta de actividades]</span>
+          <div className="bg-gradient-to-br from-[#14b8a6] to-[#a8bd7d] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer" onClick={() => window.location.href = '/activities'}>
+            {activitiesLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            ) : featuredActivities.length > 0 ? (
+              <div className="h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center mb-2">
+                    <Calendar className="h-5 w-5 mr-2" />
+                    <span className="font-semibold">Próximas Actividades</span>
+                  </div>
+                  <div className="text-sm opacity-90">
+                    {featuredActivities.slice(0, 2).map((activity: any, index: number) => (
+                      <div key={activity.id} className="mb-1">
+                        • {activity.title}
+                      </div>
+                    ))}
+                    {featuredActivities.length > 2 && (
+                      <div className="text-xs opacity-75">
+                        +{featuredActivities.length - 2} más
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center text-xs opacity-90">
+                  <Users className="h-3 w-3 mr-1" />
+                  {featuredActivities.length} actividades disponibles
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full text-center">
+                <div>
+                  <Calendar className="h-8 w-8 mx-auto mb-2 opacity-75" />
+                  <div className="font-semibold">Próximamente</div>
+                  <div className="text-sm opacity-90">Nuevas actividades</div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Tarjeta instructores */}
-          <div className="bg-gray-100 rounded-xl h-40 flex items-center justify-center md:col-start-1">
-            {/* Aquí luego se mapearán instructores desde el sistema */}
-            <span className="text-gray-400">[Tarjeta de instructores]</span>
+          <div className="bg-gradient-to-br from-[#a8bd7d] to-[#00444f] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer md:col-start-1" onClick={() => window.location.href = '/instructors'}>
+            {instructorsLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            ) : featuredInstructors.length > 0 ? (
+              <div className="h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center mb-2">
+                    <GraduationCap className="h-5 w-5 mr-2" />
+                    <span className="font-semibold">Nuestros Instructores</span>
+                  </div>
+                  <div className="text-sm opacity-90">
+                    {featuredInstructors.slice(0, 2).map((instructor: any, index: number) => (
+                      <div key={instructor.id} className="mb-1 flex items-center">
+                        • {instructor.full_name || instructor.fullName}
+                        {instructor.rating && (
+                          <div className="ml-2 flex items-center">
+                            <Star className="h-3 w-3 text-yellow-300 fill-current" />
+                            <span className="text-xs ml-1">{instructor.rating}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {featuredInstructors.length > 2 && (
+                      <div className="text-xs opacity-75">
+                        +{featuredInstructors.length - 2} más
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center text-xs opacity-90">
+                  <Award className="h-3 w-3 mr-1" />
+                  {featuredInstructors.length} instructores especializados
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full text-center">
+                <div>
+                  <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-75" />
+                  <div className="font-semibold">Equipo Profesional</div>
+                  <div className="text-sm opacity-90">Instructores certificados</div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Texto instructores */}
