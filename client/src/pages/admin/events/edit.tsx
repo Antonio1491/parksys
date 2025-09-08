@@ -71,10 +71,12 @@ export default function EditEventPage() {
   const queryClient = useQueryClient();
   const [eventImage, setEventImage] = useState<string>('');
 
-  // Consultar el evento para editar
+  // Consultar el evento para editar (deshabilitar cache para debugging)
   const { data: event, isLoading } = useQuery<EventData>({
     queryKey: [`/api/events/${id}`],
     enabled: !!id,
+    staleTime: 0, // Siempre considerar datos como obsoletos
+    gcTime: 0, // No cachear los datos
   });
 
   // Función para convertir fecha ISO a formato de input date
@@ -202,14 +204,25 @@ export default function EditEventPage() {
         data: eventData
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('✅ [FRONTEND] Evento actualizado exitosamente:', data);
       toast({
         title: 'Evento actualizado',
         description: 'El evento ha sido actualizado exitosamente.'
       });
+      
+      // Invalidar múltiples queries relacionadas y refrescar inmediatamente
       queryClient.invalidateQueries({ queryKey: [`/api/events/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
-      setLocation('/admin/events');
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${id}/images`] });
+      
+      // Forzar refetch inmediato para actualizar la UI
+      queryClient.refetchQueries({ queryKey: [`/api/events/${id}`] });
+      
+      // Pequeño delay antes de redirigir para que se vea el cambio
+      setTimeout(() => {
+        setLocation('/admin/events');
+      }, 500);
     },
     onError: (error: any) => {
       toast({
