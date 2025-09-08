@@ -172,12 +172,28 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
     }
   });
 
-  // Crear una nueva concesión activa
+  // Crear una nueva concesión activa con protección de idempotencia
   apiRouter.post('/active-concessions', isAuthenticated, async (req: Request, res: Response) => {
     try {
       console.log('🔄 [CONCESSIONS] POST /active-concessions llamado');
       console.log('📥 [CONCESSIONS] Datos recibidos:', req.body);
       const { pool } = await import('./db');
+      
+      // Protección de idempotencia: verificar duplicados recientes (últimos 5 segundos)
+      const duplicateCheck = await pool.query(`
+        SELECT id FROM active_concessions 
+        WHERE name = $1 AND description = $2 AND park_id = $3 
+        AND created_at > NOW() - INTERVAL '5 seconds'
+      `, [req.body.name, req.body.description, req.body.parkId]);
+      
+      if (duplicateCheck.rows.length > 0) {
+        console.log('⚠️ [CONCESSIONS] Duplicado detectado, devolviendo existente:', duplicateCheck.rows[0].id);
+        return res.status(200).json({
+          status: 'success',
+          message: 'Concesión ya existente',
+          data: { id: duplicateCheck.rows[0].id }
+        });
+      }
       
       const concessionData = {
         name: req.body.name,

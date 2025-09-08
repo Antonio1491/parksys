@@ -154,6 +154,7 @@ function ActiveConcessionForm() {
       }
     },
     onSuccess: (response) => {
+      setIsSubmitting(false); // Resetear estado de envío
       toast({
         title: isEdit ? 'Concesión actualizada' : 'Concesión creada',
         description: `La concesión ${isEdit ? 'se ha actualizado' : 'se ha creado'} exitosamente.`
@@ -168,6 +169,7 @@ function ActiveConcessionForm() {
       }
     },
     onError: (error: any) => {
+      setIsSubmitting(false); // Resetear estado de envío en caso de error
       toast({
         title: 'Error',
         description: error.message || 'Ocurrió un error al guardar la concesión.',
@@ -176,12 +178,27 @@ function ActiveConcessionForm() {
     }
   });
 
+  // Estado para prevenir múltiples envíos con debouncing
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+
   const onSubmit = (data: ActiveConcessionFormData) => {
-    // Prevenir múltiples envíos
-    if (saveMutation.isPending) {
+    const now = Date.now();
+    
+    // Prevenir múltiples envíos con múltiples capas de protección
+    if (saveMutation.isPending || isSubmitting) {
       console.log('⚠️ Operación ya en progreso, ignorando submit');
       return;
     }
+    
+    // Debouncing: prevenir envíos demasiado rápidos (menos de 2 segundos)
+    if (now - lastSubmitTime < 2000) {
+      console.log('⚠️ Envío demasiado rápido, ignorando submit');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setLastSubmitTime(now);
 
     // Mapear los datos del frontend al formato esperado por el backend
     const mappedData = {
@@ -777,10 +794,10 @@ function ActiveConcessionForm() {
             </Link>
             <Button 
               type="submit" 
-              disabled={saveMutation.isPending}
+              disabled={saveMutation.isPending || isSubmitting}
               className="bg-green-600 hover:bg-green-700"
             >
-              {saveMutation.isPending ? (
+              {(saveMutation.isPending || isSubmitting) ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Guardando...

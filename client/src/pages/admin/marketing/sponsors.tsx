@@ -236,6 +236,7 @@ export default function SponsorsPage() {
               <DialogTrigger asChild>
                 <Button 
                   variant="primary"
+                  iconStyle="bold"
                   onClick={resetForm}>
                   <Plus className="mr-2" />
                   Nuevo Patrocinador
