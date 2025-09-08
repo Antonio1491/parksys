@@ -457,11 +457,9 @@ function ActivityDetailPage() {
               <div className="aspect-video bg-gradient-to-br from-green-100 to-blue-100 relative">
                 {primaryImage ? (
                   <img
-                    src={
-                      // En Replit development, usar URL completa del backend
-                      window.location.hostname.includes('replit.') || import.meta.env.DEV
-                        ? `${window.location.protocol}//${window.location.host}${primaryImage.imageUrl}` 
-                        : primaryImage.imageUrl
+                    src={primaryImage.imageUrl?.startsWith('/uploads/') 
+                      ? `/api/storage/file/${encodeURIComponent(primaryImage.imageUrl.replace(/^\//, ''))}`
+                      : primaryImage.imageUrl
                     }
                     alt={activity.title}
                     className="w-full h-full object-cover"
@@ -710,11 +708,9 @@ function ActivityDetailPage() {
                   {images.slice(0, 8).map((image: ActivityImage, index: number) => (
                     <div key={image.id} className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                       <img
-                        src={
-                          // En Replit development, usar URL completa del backend
-                          window.location.hostname.includes('replit.') || import.meta.env.DEV
-                            ? `${window.location.protocol}//${window.location.host}${image.imageUrl}` 
-                            : image.imageUrl
+                        src={image.imageUrl?.startsWith('/uploads/') 
+                          ? `/api/storage/file/${encodeURIComponent(image.imageUrl.replace(/^\//, ''))}`
+                          : image.imageUrl
                         }
                         alt={`Imagen ${index + 1}`}
                         className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"

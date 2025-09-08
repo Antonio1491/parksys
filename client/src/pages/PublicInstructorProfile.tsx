@@ -106,11 +106,9 @@ function PublicInstructorProfile() {
           <div className="flex items-center gap-4">
             {instructor.profileImageUrl ? (
               <img 
-                src={
-                  // En Replit development, usar URL completa del backend
-                  window.location.hostname.includes('replit.') || import.meta.env.DEV
-                    ? `${window.location.protocol}//${window.location.host}${instructor.profileImageUrl}` 
-                    : instructor.profileImageUrl
+                src={instructor.profileImageUrl?.startsWith('/uploads/') 
+                  ? `/api/storage/file/${encodeURIComponent(instructor.profileImageUrl.replace(/^\//, ''))}`
+                  : instructor.profileImageUrl
                 } 
                 alt={instructor.fullName}
                 className="w-16 h-16 rounded-full object-cover"
