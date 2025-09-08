@@ -53,14 +53,17 @@ const ParksMap: React.FC<ParksMapProps> = ({
           const newMap = await googleMapsService.createMap(mapRef.current!, {
             center: defaultCenter,
             zoom: 12,
-        fullscreenControl: false,
-        streetViewControl: false,
-        zoomControl: false,
-      });
+          });
+          
+          setMap(newMap);
+        } catch (error) {
+          console.error('Error inicializando mapa:', error);
+        }
+      };
       
-      setMap(newMap);
+      initMap();
     }
-  }, [mapLoaded, mapRef, map]);
+  }, [mapLoaded, map]);
 
   // Update markers when parks change
   useEffect(() => {
