@@ -45,6 +45,8 @@ export default function EventImageUploader({
     setUploading(true);
 
     try {
+      console.log('📤 [EVENT-FRONTEND] Iniciando upload de imagen:', file.name);
+      
       const formData = new FormData();
       formData.append('image', file);
 
@@ -56,22 +58,34 @@ export default function EventImageUploader({
         body: formData
       });
 
+      console.log('📤 [EVENT-FRONTEND] Respuesta del servidor:', response.status);
+
       if (!response.ok) {
-        throw new Error('Error al subir la imagen');
+        const errorData = await response.json().catch(() => ({ message: 'Error desconocido' }));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
       }
 
       const result = await response.json();
-      onImageUpload(result.imageUrl);
+      console.log('✅ [EVENT-FRONTEND] Upload exitoso:', result);
+      
+      // Usar la URL transformada si existe, si no la URL original
+      const imageUrl = result.imageUrl || result.url || result.data?.imageUrl;
+      
+      if (imageUrl) {
+        onImageUpload(imageUrl);
+        toast({
+          title: 'Éxito',
+          description: `Imagen subida correctamente (${result.method || 'híbrido'})`
+        });
+      } else {
+        throw new Error('No se recibió URL de imagen válida');
+      }
 
-      toast({
-        title: 'Éxito',
-        description: 'Imagen subida correctamente'
-      });
-    } catch (error) {
-      console.error('Error uploading image:', error);
+    } catch (error: any) {
+      console.error('❌ [EVENT-FRONTEND] Error uploading image:', error);
       toast({
         title: 'Error',
-        description: 'Error al subir la imagen. Inténtalo de nuevo.',
+        description: `Error al subir la imagen: ${error.message || 'Inténtalo de nuevo'}`,
         variant: 'destructive'
       });
     } finally {
