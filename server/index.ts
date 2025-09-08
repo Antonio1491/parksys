@@ -2247,11 +2247,19 @@ function startServer() {
     }
   });
 
-  // Register critical events API route
+  // Register critical events API route with JOIN para imágenes
   criticalApiRouter.get("/events", async (req: any, res: any) => {
     try {
       const { pool } = await import("./db");
-      const result = await pool.query('SELECT * FROM events ORDER BY start_date DESC LIMIT 50');
+      const result = await pool.query(`
+        SELECT 
+          e.*,
+          ei.image_url as "imageUrl"
+        FROM events e
+        LEFT JOIN event_images ei ON e.id = ei.event_id AND ei.is_primary = true
+        ORDER BY e.start_date DESC 
+        LIMIT 50
+      `);
       console.log(`📅 [CRITICAL] Returning ${result.rows.length} events via critical route`);
       res.json(result.rows);
     } catch (error) {
