@@ -351,6 +351,12 @@ const IncidentsPage = () => {
   return (
     <AdminLayout>
       <div className="p-6">
+        {/* DEPURACIÓN: VERSIÓN 2.0 - NUEVA SECCIÓN FORMULARIO */}
+        <div className="bg-yellow-200 p-4 mb-4 border-2 border-yellow-500">
+          <h2 className="text-lg font-bold">🟡 DEBUGGING: ¿PUEDES VER ESTO?</h2>
+          <p>Si puedes ver esto, el componente está actualizando</p>
+        </div>
+
         {/* Header con patrón Card estandarizado */}
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex items-center justify-between">
