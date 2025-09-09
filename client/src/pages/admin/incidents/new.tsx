@@ -31,14 +31,54 @@ import { ArrowLeft, Save, AlertTriangle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
-// Esquema de validación
+// Esquema de validación completo con todas las secciones
 const incidentSchema = z.object({
+  // === INFORMACIÓN DE LA INCIDENCIA ===
   title: z.string().min(1, 'El título es obligatorio'),
   description: z.string().min(10, 'La descripción debe tener al menos 10 caracteres'),
+  incidenciaId: z.string().optional(),
+  fechaReporte: z.date().optional(),
+  fechaOcurrencia: z.date().optional(),
+  tipoAfectacion: z.string().min(1, 'El tipo de afectación es obligatorio'),
+  nivelRiesgo: z.string().min(1, 'El nivel de riesgo es obligatorio'),
+  descripcionDetallada: z.string().optional(),
+  ubicacionGps: z.string().optional(),
+  parkId: z.string().min(1, 'El parque es obligatorio'),
+  activoId: z.string().optional(),
+  
+  // === SEGUIMIENTO OPERATIVO ===
+  departamentoResponsable: z.string().optional(),
+  responsableAsignado: z.string().optional(),
+  fechaAsignacion: z.date().optional(),
+  fechaInicioAtencion: z.date().optional(),
+  fechaResolucion: z.date().optional(),
+  accionesRealizadas: z.string().optional(),
+  materialesUtilizados: z.string().optional(),
+  costoEstimado: z.string().optional(),
+  costoReal: z.string().optional(),
+  fuenteFinanciamiento: z.string().optional(),
+  
+  // === CONTROL Y CALIDAD ===
+  estatusValidacion: z.string().optional(),
+  supervisorValidador: z.string().optional(),
+  comentariosSupervision: z.string().optional(),
+  satisfaccionUsuario: z.string().optional(),
+  seguimientoPostResolucion: z.string().optional(),
+  frecuenciaIncidente: z.string().optional(),
+  
+  // === DIMENSIÓN COMUNITARIA Y AMBIENTAL ===
+  afectacionUsuarios: z.string().optional(),
+  numeroPersonasAfectadas: z.string().optional(),
+  afectacionMedioambiental: z.string().optional(),
+  participacionVoluntarios: z.string().optional(),
+  numeroVoluntarios: z.string().optional(),
+  grupoVoluntarios: z.string().optional(),
+  reporteComunidad: z.string().optional(),
+  
+  // Campos existentes que mantenemos
   priority: z.enum(['low', 'medium', 'high', 'critical']),
   categoryId: z.string().min(1, 'La categoría es obligatoria'),
   assetId: z.string().optional(),
-  parkId: z.string().min(1, 'El parque es obligatorio'),
   location: z.string().optional(),
   reportedBy: z.string().min(1, 'El responsable del reporte es obligatorio'),
   contactInfo: z.string().optional(),
@@ -59,12 +99,52 @@ const NewIncidentPage = () => {
   const form = useForm<IncidentFormData>({
     resolver: zodResolver(incidentSchema),
     defaultValues: {
+      // === INFORMACIÓN DE LA INCIDENCIA ===
       title: '',
       description: '',
+      incidenciaId: '',
+      fechaReporte: new Date(),
+      fechaOcurrencia: undefined,
+      tipoAfectacion: '',
+      nivelRiesgo: '',
+      descripcionDetallada: '',
+      ubicacionGps: '',
+      parkId: '',
+      activoId: assetIdFromUrl || '',
+      
+      // === SEGUIMIENTO OPERATIVO ===
+      departamentoResponsable: '',
+      responsableAsignado: '',
+      fechaAsignacion: undefined,
+      fechaInicioAtencion: undefined,
+      fechaResolucion: undefined,
+      accionesRealizadas: '',
+      materialesUtilizados: '',
+      costoEstimado: '',
+      costoReal: '',
+      fuenteFinanciamiento: '',
+      
+      // === CONTROL Y CALIDAD ===
+      estatusValidacion: 'pendiente',
+      supervisorValidador: '',
+      comentariosSupervision: '',
+      satisfaccionUsuario: '',
+      seguimientoPostResolucion: '',
+      frecuenciaIncidente: '',
+      
+      // === DIMENSIÓN COMUNITARIA Y AMBIENTAL ===
+      afectacionUsuarios: '',
+      numeroPersonasAfectadas: '',
+      afectacionMedioambiental: '',
+      participacionVoluntarios: '',
+      numeroVoluntarios: '',
+      grupoVoluntarios: '',
+      reporteComunidad: '',
+      
+      // Campos existentes
       priority: 'medium',
       categoryId: '',
       assetId: assetIdFromUrl || '',
-      parkId: '',
       location: '',
       reportedBy: '',
       contactInfo: '',
@@ -269,273 +349,735 @@ const NewIncidentPage = () => {
             )}
             
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Título */}
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Título de la Incidencia</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ej: Daño en resbaladilla" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Prioridad */}
-                  <FormField
-                    control={form.control}
-                    name="priority"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Prioridad</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccionar prioridad" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="low">Baja</SelectItem>
-                            <SelectItem value="medium">Media</SelectItem>
-                            <SelectItem value="high">Alta</SelectItem>
-                            <SelectItem value="critical">Crítica</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Categoría */}
-                  <FormField
-                    control={form.control}
-                    name="categoryId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Categoría</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccionar categoría" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {displayCategories.map((category: any) => (
-                              <SelectItem key={category.id} value={category.id.toString()}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Parque */}
-                  <FormField
-                    control={form.control}
-                    name="parkId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Parque
-                          {assetIdFromUrl && (
-                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                              Cargado automáticamente
-                            </span>
-                          )}
-                        </FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                          disabled={!!assetIdFromUrl}
-                        >
-                          <FormControl>
-                            <SelectTrigger className={assetIdFromUrl ? "bg-gray-50 cursor-not-allowed" : ""}>
-                              <SelectValue placeholder="Seleccionar parque" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {safeParks.map((park: any) => (
-                              <SelectItem key={park.id} value={park.id.toString()}>
-                                {park.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {assetIdFromUrl && (
-                          <p className="text-xs text-gray-600">
-                            El parque se cargó automáticamente desde el activo seleccionado
-                          </p>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                
+                {/* SECCIÓN 1: INFORMACIÓN DE LA INCIDENCIA */}
+                <Card className="border-blue-200">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-blue-800 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5" />
+                      1. Información de la Incidencia
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Título */}
+                      <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Título de la Incidencia *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ej: Daño en resbaladilla" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      />
 
-                  {/* Activo (opcional) */}
-                  {safeAssets.length > 0 && (
+                      {/* ID de Incidencia */}
+                      <FormField
+                        control={form.control}
+                        name="incidenciaId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>ID de Incidencia (Opcional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="INC-2025-001" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Tipo de Afectación */}
+                      <FormField
+                        control={form.control}
+                        name="tipoAfectacion"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tipo de Afectación *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar tipo" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="seguridad">Seguridad</SelectItem>
+                                <SelectItem value="ambiental">Ambiental</SelectItem>
+                                <SelectItem value="infraestructura">Infraestructura</SelectItem>
+                                <SelectItem value="servicio">Servicio</SelectItem>
+                                <SelectItem value="usuario">Usuario</SelectItem>
+                                <SelectItem value="otro">Otro</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Nivel de Riesgo */}
+                      <FormField
+                        control={form.control}
+                        name="nivelRiesgo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nivel de Riesgo *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar nivel" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="bajo">Bajo</SelectItem>
+                                <SelectItem value="medio">Medio</SelectItem>
+                                <SelectItem value="alto">Alto</SelectItem>
+                                <SelectItem value="critico">Crítico</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Parque */}
+                      <FormField
+                        control={form.control}
+                        name="parkId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Parque *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar parque" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {safeParks.map((park: any) => (
+                                  <SelectItem key={park.id} value={park.id.toString()}>
+                                    {park.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Activo Relacionado */}
+                      <FormField
+                        control={form.control}
+                        name="activoId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Activo Relacionado</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar activo (opcional)" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="">Sin activo específico</SelectItem>
+                                {safeAssets.map((asset: any) => (
+                                  <SelectItem key={asset.id} value={asset.id.toString()}>
+                                    {asset.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Descripción Detallada */}
                     <FormField
                       control={form.control}
-                      name="assetId"
+                      name="descripcionDetallada"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            Activo Relacionado {assetIdFromUrl ? '' : '(Opcional)'}
-                            {assetIdFromUrl && (
-                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                                Preseleccionado
-                              </span>
-                            )}
-                          </FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                            disabled={!!assetIdFromUrl}
-                          >
-                            <FormControl>
-                              <SelectTrigger className={assetIdFromUrl ? "bg-gray-50 cursor-not-allowed" : ""}>
-                                <SelectValue placeholder="Seleccionar activo" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="none">Sin activo específico</SelectItem>
-                              {safeAssets.map((asset: any) => (
-                                <SelectItem key={asset.id} value={asset.id.toString()}>
-                                  {asset.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {assetIdFromUrl && (
-                            <p className="text-xs text-gray-600">
-                              El activo fue preseleccionado desde el inventario de activos
-                            </p>
-                          )}
+                          <FormLabel>Descripción Detallada *</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Describe la incidencia con el mayor detalle posible..."
+                              className="min-h-[100px]"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  )}
 
-                  {/* Ubicación */}
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          Ubicación Específica
-                          {assetIdFromUrl && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                              Incluye coordenadas
-                            </span>
-                          )}
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Ej: Área de juegos infantiles" 
-                            {...field}
-                            readOnly={!!assetIdFromUrl}
-                            className={assetIdFromUrl ? "bg-gray-50 cursor-not-allowed" : ""}
-                          />
-                        </FormControl>
-                        {assetIdFromUrl && (
-                          <p className="text-xs text-gray-600">
-                            La ubicación se cargó automáticamente del activo con coordenadas precisas
-                          </p>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Descripción */}
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descripción Detallada</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe la incidencia con el mayor detalle posible..."
-                          className="min-h-[100px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Reportado por */}
-                  <FormField
-                    control={form.control}
-                    name="reportedBy"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Reportado Por</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nombre del responsable" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Información de contacto */}
-                  <FormField
-                    control={form.control}
-                    name="contactInfo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Información de Contacto</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Email o teléfono" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Fecha */}
-                <div>
-                  <Label>Fecha de la Incidencia</Label>
-                  <div className="mt-2">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
-                      className="rounded-md border w-fit"
+                    {/* Ubicación GPS */}
+                    <FormField
+                      control={form.control}
+                      name="ubicacionGps"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Coordenadas GPS</FormLabel>
+                          <FormControl>
+                            <Input placeholder="20.6596988, -103.3496092" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
+
+                {/* SECCIÓN 2: SEGUIMIENTO OPERATIVO */}
+                <Card className="border-green-200">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-green-800 flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      2. Seguimiento Operativo
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Departamento Responsable */}
+                      <FormField
+                        control={form.control}
+                        name="departamentoResponsable"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Departamento Responsable</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar departamento" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="mantenimiento">Mantenimiento</SelectItem>
+                                <SelectItem value="seguridad">Seguridad</SelectItem>
+                                <SelectItem value="jardineria">Jardinería</SelectItem>
+                                <SelectItem value="concesiones">Concesiones</SelectItem>
+                                <SelectItem value="limpieza">Limpieza</SelectItem>
+                                <SelectItem value="administracion">Administración</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Responsable Asignado */}
+                      <FormField
+                        control={form.control}
+                        name="responsableAsignado"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Responsable Asignado</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nombre del responsable o cuadrilla" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Fuente de Financiamiento */}
+                      <FormField
+                        control={form.control}
+                        name="fuenteFinanciamiento"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fuente de Financiamiento</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar fuente" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="presupuesto_municipal">Presupuesto Municipal</SelectItem>
+                                <SelectItem value="concesion">Concesión</SelectItem>
+                                <SelectItem value="patrocinio">Patrocinio</SelectItem>
+                                <SelectItem value="donativo">Donativo</SelectItem>
+                                <SelectItem value="voluntariado">Voluntariado</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Costo Estimado */}
+                      <FormField
+                        control={form.control}
+                        name="costoEstimado"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Costo Estimado (MXN)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="0.00" type="number" step="0.01" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Acciones Realizadas */}
+                    <FormField
+                      control={form.control}
+                      name="accionesRealizadas"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Acciones Realizadas</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Detalla las acciones que se han realizado o están pendientes..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Materiales Utilizados */}
+                    <FormField
+                      control={form.control}
+                      name="materialesUtilizados"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Materiales Utilizados</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Lista de materiales e insumos utilizados..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* SECCIÓN 3: CONTROL Y CALIDAD */}
+                <Card className="border-orange-200">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-orange-800 flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      3. Control y Calidad
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Estatus de Validación */}
+                      <FormField
+                        control={form.control}
+                        name="estatusValidacion"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Estatus de Validación</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar estatus" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="pendiente">Pendiente</SelectItem>
+                                <SelectItem value="validado">Validado</SelectItem>
+                                <SelectItem value="rechazado">Rechazado</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Supervisor Validador */}
+                      <FormField
+                        control={form.control}
+                        name="supervisorValidador"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Supervisor Validador</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nombre del supervisor" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Satisfacción del Usuario */}
+                      <FormField
+                        control={form.control}
+                        name="satisfaccionUsuario"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Satisfacción del Usuario (1-5)</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Calificar satisfacción" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="1">1 - Muy insatisfecho</SelectItem>
+                                <SelectItem value="2">2 - Insatisfecho</SelectItem>
+                                <SelectItem value="3">3 - Neutral</SelectItem>
+                                <SelectItem value="4">4 - Satisfecho</SelectItem>
+                                <SelectItem value="5">5 - Muy satisfecho</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Frecuencia del Incidente */}
+                      <FormField
+                        control={form.control}
+                        name="frecuenciaIncidente"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Frecuencia del Incidente</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar frecuencia" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="unico">Único</SelectItem>
+                                <SelectItem value="recurrente">Recurrente</SelectItem>
+                                <SelectItem value="patron_detectado">Patrón detectado</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Comentarios de Supervisión */}
+                    <FormField
+                      control={form.control}
+                      name="comentariosSupervision"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Comentarios de Supervisión</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Comentarios del supervisor sobre la resolución..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Seguimiento Post-Resolución */}
+                    <FormField
+                      control={form.control}
+                      name="seguimientoPostResolucion"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seguimiento Post-Resolución</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Notas sobre seguimiento, garantías o revisitas..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* SECCIÓN 4: DIMENSIÓN COMUNITARIA Y AMBIENTAL */}
+                <Card className="border-purple-200">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-purple-800 flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      4. Dimensión Comunitaria y Ambiental
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Afectación a Usuarios */}
+                      <FormField
+                        control={form.control}
+                        name="afectacionUsuarios"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>¿Afecta a Usuarios?</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="si">Sí</SelectItem>
+                                <SelectItem value="no">No</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Número de Personas Afectadas */}
+                      <FormField
+                        control={form.control}
+                        name="numeroPersonasAfectadas"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Número de Personas Afectadas</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Estimado de personas" type="number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Participación de Voluntarios */}
+                      <FormField
+                        control={form.control}
+                        name="participacionVoluntarios"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>¿Participan Voluntarios?</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="si">Sí</SelectItem>
+                                <SelectItem value="no">No</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Número de Voluntarios */}
+                      <FormField
+                        control={form.control}
+                        name="numeroVoluntarios"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Número de Voluntarios</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Cantidad de voluntarios" type="number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Afectación Medioambiental */}
+                    <FormField
+                      control={form.control}
+                      name="afectacionMedioambiental"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Afectación Medioambiental</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Describe la afectación al suelo, agua, flora, fauna..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Grupo de Voluntarios */}
+                    <FormField
+                      control={form.control}
+                      name="grupoVoluntarios"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Grupo de Voluntarios</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ej: Grupo Ecológico, Asociación de Vecinos" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Reporte de Comunidad */}
+                    <FormField
+                      control={form.control}
+                      name="reporteComunidad"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Reporte de Comunidad</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Si fue reportado por un vecino, asociación o visitante, detalla la información..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* INFORMACIÓN ADICIONAL */}
+                <Card className="border-gray-200">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-gray-800 flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Información Adicional
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Categoría (campo existente) */}
+                      <FormField
+                        control={form.control}
+                        name="categoryId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Categoría *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar categoría" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {displayCategories.map((category: any) => (
+                                  <SelectItem key={category.id} value={category.id.toString()}>
+                                    {category.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Prioridad (campo existente) */}
+                      <FormField
+                        control={form.control}
+                        name="priority"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Prioridad *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar prioridad" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="low">Baja</SelectItem>
+                                <SelectItem value="medium">Media</SelectItem>
+                                <SelectItem value="high">Alta</SelectItem>
+                                <SelectItem value="critical">Crítica</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Reportado por */}
+                      <FormField
+                        control={form.control}
+                        name="reportedBy"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Reportado Por *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nombre del responsable" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Información de contacto */}
+                      <FormField
+                        control={form.control}
+                        name="contactInfo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Información de Contacto</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Email o teléfono" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Descripción (campo existente) */}
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descripción (Resumen) *</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Resumen breve de la incidencia..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
 
                 {/* Botones */}
-                <div className="flex gap-4 pt-4">
+                <div className="flex gap-4 pt-6">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setLocation('/admin/incidents')}
+                    className="flex-1"
                   >
                     Cancelar
                   </Button>
                   <Button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="flex items-center gap-2"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
                   >
-                    <Save className="h-4 w-4" />
+                    <Save className="h-4 w-4 mr-2" />
                     {createMutation.isPending ? 'Guardando...' : 'Crear Incidencia'}
                   </Button>
                 </div>
