@@ -1165,6 +1165,12 @@ function Router() {
           </Suspense>
         </Route>
         
+        <Route path="/admin/marketing/packages">
+          <Suspense fallback={<div className="p-8 text-center">Cargando paquetes...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/packages')))}
+          </Suspense>
+        </Route>
+        
         <Route path="/admin/marketing/events">
           <Suspense fallback={<div className="p-8 text-center">Cargando eventos patrocinados...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/marketing/events')))}

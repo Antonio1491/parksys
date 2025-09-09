@@ -96,6 +96,7 @@ import {
   Download,
   Upload,
   Bird,
+  PackagePlus,
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -1132,6 +1133,13 @@ const AdminSidebarComplete: React.FC = () => {
                 active={location.startsWith('/admin/marketing/contracts')}
               >
                 Contratos
+              </NavItem>
+              <NavItem 
+                href="/admin/marketing/packages" 
+                icon={<PackagePlus className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/packages')}
+              >
+                Paquetes
               </NavItem>
               <NavItem 
                 href="/admin/marketing/events" 
