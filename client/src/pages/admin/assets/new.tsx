@@ -57,6 +57,9 @@ const assetCreateSchema = z.object({
   description: z.string().nullable().optional(),
   serialNumber: z.string().nullable().optional(),
   categoryId: z.number().min(1, 'La categoría es obligatoria'),
+  subcategoryId: z.number().nullable().optional(),
+  useId: z.number().nullable().optional(),
+  customAssetId: z.string().nullable().optional(),
   parkId: z.number().min(1, 'El parque es obligatorio'),
   amenityId: z.number().nullable().optional(),
   locationDescription: z.string().nullable().optional(),
@@ -124,6 +127,9 @@ const CreateAssetPage: React.FC = () => {
       description: '',
       serialNumber: '',
       categoryId: 0,
+      subcategoryId: null,
+      useId: null,
+      customAssetId: '',
       parkId: 0,
       amenityId: null,
       locationDescription: '',
@@ -160,11 +166,70 @@ const CreateAssetPage: React.FC = () => {
       if (parent.children) {
         parent.children.forEach((child: any) => {
           flattened.push(child);
+          if (child.children) {
+            child.children.forEach((grandchild: any) => {
+              flattened.push(grandchild);
+            });
+          }
         });
       }
     });
     return flattened;
   }, [categoriesTree]);
+
+  // Obtener categorías principales (sin parentId)
+  const mainCategories = React.useMemo(() => {
+    return allCategories.filter(cat => !cat.parentId);
+  }, [allCategories]);
+
+  // Obtener subcategorías para la categoría seleccionada
+  const selectedCategoryId = form.watch('categoryId');
+  const availableSubcategories = React.useMemo(() => {
+    if (!selectedCategoryId || selectedCategoryId === 0) return [];
+    return allCategories.filter(cat => cat.parentId === selectedCategoryId);
+  }, [allCategories, selectedCategoryId]);
+
+  // Obtener usos para la subcategoría seleccionada
+  const selectedSubcategoryId = form.watch('subcategoryId');
+  const availableUses = React.useMemo(() => {
+    if (!selectedSubcategoryId) return [];
+    return allCategories.filter(cat => cat.parentId === selectedSubcategoryId);
+  }, [allCategories, selectedSubcategoryId]);
+
+  // Resetear campos dependientes cuando cambia la categoría
+  useEffect(() => {
+    if (selectedCategoryId) {
+      form.setValue('subcategoryId', null);
+      form.setValue('useId', null);
+    }
+  }, [selectedCategoryId, form]);
+
+  // Resetear uso cuando cambia la subcategoría
+  useEffect(() => {
+    if (selectedSubcategoryId !== null) {
+      form.setValue('useId', null);
+    }
+  }, [selectedSubcategoryId, form]);
+
+  // Actualizar categoryId final basado en la selección jerárquica
+  const selectedUseId = form.watch('useId');
+  useEffect(() => {
+    // El categoryId final será el nivel más específico seleccionado
+    let finalCategoryId = selectedCategoryId;
+    
+    if (selectedSubcategoryId) {
+      finalCategoryId = selectedSubcategoryId;
+    }
+    
+    if (selectedUseId) {
+      finalCategoryId = selectedUseId;
+    }
+
+    // Solo actualizar si ha cambiado
+    if (finalCategoryId && finalCategoryId !== form.getValues('categoryId')) {
+      form.setValue('categoryId', finalCategoryId);
+    }
+  }, [selectedCategoryId, selectedSubcategoryId, selectedUseId, form]);
 
   // Función helper para obtener nombre de categoría con jerarquía
   const getCategoryDisplayName = (categoryId: number) => {
@@ -293,7 +358,25 @@ const CreateAssetPage: React.FC = () => {
   
   // Manejar envío del formulario
   const handleSubmit = (values: AssetFormData) => {
-    createMutation.mutate(values);
+    // Preparar los datos para envío
+    const submitData = {
+      ...values,
+      // Usar customAssetId como serialNumber si está presente
+      serialNumber: values.customAssetId || values.serialNumber || null,
+    };
+    
+    // Eliminar campos que no pertenecen al esquema de la base de datos
+    const { subcategoryId, useId, customAssetId, ...finalData } = submitData;
+    
+    console.log('📊 [ASSET CREATION] Datos finales a enviar:', finalData);
+    console.log('📊 [ASSET CREATION] Jerarquía seleccionada:', {
+      category: selectedCategoryId,
+      subcategory: selectedSubcategoryId,
+      use: selectedUseId,
+      finalCategoryId: finalData.categoryId
+    });
+    
+    createMutation.mutate(finalData);
   };
   
   // Determinar si el formulario está listo para enviar
@@ -374,12 +457,13 @@ const CreateAssetPage: React.FC = () => {
                     )}
                   />
                   
+                  {/* Categoría Principal */}
                   <FormField
                     control={form.control}
                     name="categoryId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Categoría*</FormLabel>
+                        <FormLabel>Categoría Principal*</FormLabel>
                         <FormControl>
                           <Select 
                             value={field.value ? field.value.toString() : ''}
@@ -389,33 +473,141 @@ const CreateAssetPage: React.FC = () => {
                               <SelectValue placeholder="Seleccione una categoría" />
                             </SelectTrigger>
                             <SelectContent>
-                              {categoriesTree && Array.isArray(categoriesTree) ? categoriesTree.map((parentCategory: any) => [
-                                // Categoría principal
-                                <SelectItem key={parentCategory.id} value={parentCategory.id.toString()}>
-                                  <span className="font-semibold text-gray-900">
-                                    {parentCategory.name}
-                                  </span>
-                                </SelectItem>,
-                                // Subcategorías (si existen)
-                                ...(parentCategory.children && parentCategory.children.length > 0 
-                                  ? parentCategory.children.map((subCategory: any) => (
-                                      <SelectItem key={subCategory.id} value={subCategory.id.toString()}>
-                                        <span className="text-gray-600 ml-4">
-                                          ↳ {subCategory.name}
-                                        </span>
-                                      </SelectItem>
-                                    ))
-                                  : []
-                                )
-                              ]).flat() : null}
+                              {mainCategories.map((category: any) => (
+                                <SelectItem key={category.id} value={category.id.toString()}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </FormControl>
-                        {field.value && field.value > 0 && (
-                          <div className="text-sm text-gray-600 mt-2 p-2 bg-gray-50 rounded-md">
-                            <span className="font-medium">Categoría seleccionada:</span> {getCategoryDisplayName(field.value)}
-                          </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Indicador de Jerarquía Seleccionada */}
+                  {(selectedCategoryId || selectedSubcategoryId || selectedUseId) && (
+                    <div className="md:col-span-2 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                        <span className="font-medium text-blue-800">Jerarquía seleccionada:</span>
+                      </div>
+                      <div className="mt-2 flex items-center gap-2 text-sm text-blue-700">
+                        {selectedCategoryId && (
+                          <span className="px-2 py-1 bg-blue-100 rounded">
+                            {allCategories.find(cat => cat.id === selectedCategoryId)?.name}
+                          </span>
                         )}
+                        {selectedSubcategoryId && (
+                          <>
+                            <span className="text-blue-400">→</span>
+                            <span className="px-2 py-1 bg-blue-100 rounded">
+                              {allCategories.find(cat => cat.id === selectedSubcategoryId)?.name}
+                            </span>
+                          </>
+                        )}
+                        {selectedUseId && (
+                          <>
+                            <span className="text-blue-400">→</span>
+                            <span className="px-2 py-1 bg-blue-100 rounded">
+                              {allCategories.find(cat => cat.id === selectedUseId)?.name}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Subcategoría */}
+                  <FormField
+                    control={form.control}
+                    name="subcategoryId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subcategoría</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value ? field.value.toString() : ''}
+                            onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                            disabled={!selectedCategoryId || availableSubcategories.length === 0}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={
+                                !selectedCategoryId 
+                                  ? "Seleccione primero una categoría"
+                                  : availableSubcategories.length === 0
+                                    ? "No hay subcategorías disponibles"
+                                    : "Seleccione una subcategoría"
+                              } />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableSubcategories.map((subcategory: any) => (
+                                <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                                  {subcategory.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Uso */}
+                  <FormField
+                    control={form.control}
+                    name="useId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Uso</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value ? field.value.toString() : ''}
+                            onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                            disabled={!selectedSubcategoryId || availableUses.length === 0}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={
+                                !selectedSubcategoryId 
+                                  ? "Seleccione primero una subcategoría"
+                                  : availableUses.length === 0
+                                    ? "No hay usos disponibles"
+                                    : "Seleccione un uso"
+                              } />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableUses.map((use: any) => (
+                                <SelectItem key={use.id} value={use.id.toString()}>
+                                  {use.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* ID Personalizado del Activo */}
+                  <FormField
+                    control={form.control}
+                    name="customAssetId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ID del Activo</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="ID personalizado del activo" 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Identificador personalizado para el activo (opcional)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
