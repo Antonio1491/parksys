@@ -27,7 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { ArrowLeft, Save, AlertTriangle, User } from 'lucide-react';
+import { ArrowLeft, Save, AlertTriangle, User, CheckCircle, Settings, Users, BarChart } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
