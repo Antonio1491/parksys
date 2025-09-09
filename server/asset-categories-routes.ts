@@ -6,12 +6,15 @@ import csv from "csv-parser";
 // Configuración de multer para subida de archivos
 const upload = multer({ 
   storage: multer.memoryStorage(),
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
       cb(null, true);
     } else {
-      cb(new Error('Solo se permiten archivos CSV'), false);
+      cb(new Error('Solo se permiten archivos CSV'));
     }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB max
   }
 });
 
@@ -381,11 +384,22 @@ export function registerAssetCategoriesRoutes(app: any, apiRouter: Router) {
   // POST: Importar categorías desde CSV
   apiRouter.post("/asset-categories/import", upload.single('csvFile'), async (req: Request, res: Response) => {
     try {
-      console.log("📤 Iniciando importación de categorías desde CSV");
+      console.log("📤 [CSV ENDPOINT] Endpoint de importación CSV llamado");
+      console.log("📤 [CSV ENDPOINT] Headers recibidos:", JSON.stringify(req.headers, null, 2));
+      console.log("📤 [CSV ENDPOINT] Body keys:", Object.keys(req.body || {}));
+      console.log("📤 [CSV ENDPOINT] File presente:", !!req.file);
       
       if (!req.file) {
+        console.log("❌ [CSV ENDPOINT] No se encontró archivo en req.file");
         return res.status(400).json({ message: "No se ha proporcionado un archivo CSV" });
       }
+      
+      console.log("📤 [CSV ENDPOINT] Archivo recibido:", {
+        fieldname: req.file.fieldname,
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      });
 
       const results: any[] = [];
       const errors: string[] = [];

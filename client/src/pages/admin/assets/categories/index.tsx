@@ -289,10 +289,17 @@ const AssetCategoriesPage: React.FC = () => {
   // Importar categorías desde CSV
   const importMutation = useMutation({
     mutationFn: async (formData: FormData) => {
+      console.log('📤 [CSV IMPORT] Iniciando importación de CSV');
+      console.log('📤 [CSV IMPORT] FormData entries:');
+      for (let pair of formData.entries()) {
+        console.log('📤 [CSV IMPORT] -', pair[0], ':', pair[1]);
+      }
+      
       const response = await apiRequest('/api/asset-categories/import', { 
         method: 'POST', 
         data: formData 
       });
+      console.log('📤 [CSV IMPORT] Respuesta recibida:', response);
       return response;
     },
     onSuccess: (data) => {
