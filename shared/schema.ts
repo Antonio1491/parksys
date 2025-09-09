@@ -2215,29 +2215,55 @@ export const assetCategories = pgTable("asset_categories", {
 // Tabla principal de activos
 export const assets = pgTable("assets", {
   id: serial("id").primaryKey(),
+  // IDENTIFICACIÓN
   name: text("name").notNull(),
+  serialNumber: text("serial_number"), // Número de serie
+  categoryId: integer("category_id").notNull(), // Categoría principal
+  subcategoryId: integer("subcategory_id"), // Subcategoría
+  customAssetId: text("custom_asset_id"), // ID del activo personalizado
   description: text("description"),
-  serialNumber: text("serial_number"), // Número de serie o identificador único del activo
-  categoryId: integer("category_id").notNull(),
-  parkId: integer("park_id").notNull(), // Parque donde se encuentra el activo
-  amenityId: integer("amenity_id"), // Amenidad donde se encuentra el activo (opcional)
-  locationDescription: text("location_description"), // Descripción textual de la ubicación
-  latitude: text("latitude"), // Coordenadas para ubicación exacta
+  
+  // UBICACIÓN
+  parkId: integer("park_id").notNull(), // Parque donde se encuentra
+  amenityId: integer("amenity_id"), // Amenidad (opcional)
+  locationDescription: text("location_description"), // Descripción de la ubicación
+  latitude: text("latitude"), // Coordenadas
   longitude: text("longitude"),
-  acquisitionDate: date("acquisition_date"), // Fecha de adquisición
-  acquisitionCost: decimal("acquisition_cost", { precision: 10, scale: 2 }), // Costo de adquisición
-  currentValue: decimal("current_value", { precision: 10, scale: 2 }), // Valor actual después de depreciación
+  
+  // ESPECIFICACIONES TÉCNICAS
   manufacturer: text("manufacturer"), // Fabricante
   model: text("model"), // Modelo
-  status: text("status").notNull().default("active"), // active, maintenance, damaged, retired
+  serialNumberTech: text("serial_number_tech"), // Número de serie técnico
+  material: text("material"), // metal, madera, plástico, mixto
+  dimensionsCapacity: text("dimensions_capacity"), // Dimensiones/Capacidad
+  
+  // CICLO DE VIDA
+  installationDate: date("installation_date"), // Fecha de instalación
+  lastInspectionDate: date("last_inspection_date"), // Fecha última inspección
+  estimatedUsefulLife: integer("estimated_useful_life"), // Vida útil estimada en meses
+  status: text("status").notNull().default("activo"), // activo, en mantenimiento, dañado, retirado
+  maintenanceHistory: text("maintenance_history").array(), // Historial de mantenimientos
+  
+  // COSTOS
+  acquisitionCost: decimal("acquisition_cost", { precision: 10, scale: 2 }), // Costo de adquisición
+  currentValue: decimal("current_value", { precision: 10, scale: 2 }), // Valor actual (amortización)
+  financingSource: text("financing_source"), // Presupuesto, Patrocinio, Donación, Concesión
+  
+  // CONTROL Y GESTIÓN
+  responsiblePersonId: integer("responsible_person_id"), // Responsable asignado
+  assignedArea: text("assigned_area"), // Área o departamento asignado
+  maintenanceManualUrl: text("maintenance_manual_url"), // Manual de mantenimiento (URL)
+  usagePolicies: text("usage_policies"), // Políticas de uso
+  
+  // CAMPOS HEREDADOS (para compatibilidad)
+  acquisitionDate: date("acquisition_date"), // Fecha de adquisición
   condition: text("condition").notNull().default("good"), // excellent, good, fair, poor
   maintenanceFrequency: text("maintenance_frequency"), // daily, weekly, monthly, quarterly, yearly
   lastMaintenanceDate: date("last_maintenance_date"),
   nextMaintenanceDate: date("next_maintenance_date"),
   expectedLifespan: integer("expected_lifespan"), // Vida útil esperada en meses
-  notes: text("notes"),
-  qrCode: text("qr_code"), // URL o identificador del código QR para escaneo
-  responsiblePersonId: integer("responsible_person_id"), // Persona responsable del activo
+  notes: text("notes"), // Notas adicionales
+  qrCode: text("qr_code"), // URL o identificador del código QR
   photos: text("photos").array(), // URLs de fotos del activo
   documents: text("documents").array(), // URLs de documentos relacionados
   createdAt: timestamp("created_at").notNull().defaultNow(),

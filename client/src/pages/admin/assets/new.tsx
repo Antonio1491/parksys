@@ -51,34 +51,60 @@ import {
 } from '@/components/ui/select';
 import { ASSET_CONDITIONS, ASSET_STATUSES, MAINTENANCE_FREQUENCIES } from '@shared/asset-schema';
 
-// Esquema de validación para crear activo (completo)
+// Esquema de validación para crear activo (reorganizado)
 const assetCreateSchema = z.object({
+  // IDENTIFICACIÓN
   name: z.string().min(1, 'El nombre es obligatorio'),
-  description: z.string().nullable().optional(),
   serialNumber: z.string().nullable().optional(),
-  categoryId: z.number().min(1, 'La categoría es obligatoria'),
+  categoryId: z.number().min(1, 'La categoría principal es obligatoria'),
   subcategoryId: z.number().nullable().optional(),
-  useId: z.number().nullable().optional(),
   customAssetId: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  
+  // UBICACIÓN
   parkId: z.number().min(1, 'El parque es obligatorio'),
   amenityId: z.number().nullable().optional(),
   locationDescription: z.string().nullable().optional(),
   latitude: z.string().nullable().optional(),
   longitude: z.string().nullable().optional(),
-  acquisitionDate: z.string().nullable().optional(),
-  acquisitionCost: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
-  currentValue: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
+  
+  // ESPECIFICACIONES TÉCNICAS
   manufacturer: z.string().nullable().optional(),
   model: z.string().nullable().optional(),
+  serialNumberTech: z.string().nullable().optional(),
+  material: z.string().nullable().optional(),
+  dimensionsCapacity: z.string().nullable().optional(),
+  
+  // CICLO DE VIDA
+  installationDate: z.string().nullable().optional(),
+  lastInspectionDate: z.string().nullable().optional(),
+  estimatedUsefulLife: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
   status: z.string().min(1, 'El estado es obligatorio'),
+  maintenanceHistory: z.array(z.string()).optional(),
+  
+  // COSTOS
+  acquisitionCost: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
+  currentValue: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
+  financingSource: z.string().nullable().optional(),
+  
+  // CONTROL Y GESTIÓN
+  responsiblePersonId: z.number().nullable().optional(),
+  assignedArea: z.string().nullable().optional(),
+  maintenanceManualUrl: z.string().nullable().optional(),
+  usagePolicies: z.string().nullable().optional(),
+  
+  // NOTAS ADICIONALES
+  notes: z.string().nullable().optional(),
+  
+  // CAMPOS HEREDADOS (compatibilidad)
+  useId: z.number().nullable().optional(),
+  acquisitionDate: z.string().nullable().optional(),
   condition: z.string().min(1, 'La condición es obligatoria'),
   maintenanceFrequency: z.string().nullable().optional(),
   lastMaintenanceDate: z.string().nullable().optional(),
   nextMaintenanceDate: z.string().nullable().optional(),
   expectedLifespan: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
-  notes: z.string().nullable().optional(),
   qrCode: z.string().nullable().optional(),
-  responsiblePersonId: z.number().nullable().optional(),
 });
 
 type AssetFormData = z.infer<typeof assetCreateSchema>;
@@ -123,32 +149,58 @@ const CreateAssetPage: React.FC = () => {
   const form = useForm<AssetFormData>({
     resolver: zodResolver(assetCreateSchema),
     defaultValues: {
+      // IDENTIFICACIÓN
       name: '',
-      description: '',
       serialNumber: '',
       categoryId: 0,
       subcategoryId: null,
-      useId: null,
       customAssetId: '',
+      description: '',
+      
+      // UBICACIÓN
       parkId: 0,
       amenityId: null,
       locationDescription: '',
       latitude: '',
       longitude: '',
-      acquisitionDate: new Date().toISOString().split('T')[0],
-      acquisitionCost: null,
-      currentValue: null,
+      
+      // ESPECIFICACIONES TÉCNICAS
       manufacturer: '',
       model: '',
-      status: 'active',
+      serialNumberTech: '',
+      material: '',
+      dimensionsCapacity: '',
+      
+      // CICLO DE VIDA
+      installationDate: '',
+      lastInspectionDate: '',
+      estimatedUsefulLife: null,
+      status: 'activo',
+      maintenanceHistory: [],
+      
+      // COSTOS
+      acquisitionCost: null,
+      currentValue: null,
+      financingSource: '',
+      
+      // CONTROL Y GESTIÓN
+      responsiblePersonId: null,
+      assignedArea: '',
+      maintenanceManualUrl: '',
+      usagePolicies: '',
+      
+      // NOTAS ADICIONALES
+      notes: '',
+      
+      // CAMPOS HEREDADOS (compatibilidad)
+      useId: null,
+      acquisitionDate: new Date().toISOString().split('T')[0],
       condition: 'good',
       maintenanceFrequency: null,
       lastMaintenanceDate: '',
       nextMaintenanceDate: '',
       expectedLifespan: null,
-      notes: '',
       qrCode: '',
-      responsiblePersonId: null,
     },
   });
   
@@ -409,15 +461,15 @@ const CreateAssetPage: React.FC = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             
-            {/* Información Básica */}
+            {/* 1. IDENTIFICACIÓN */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Settings className="h-5 w-5" />
-                  Información Básica
+                  Identificación
                 </CardTitle>
                 <CardDescription>
-                  Información general del activo
+                  Información básica de identificación del activo
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -744,7 +796,7 @@ const CreateAssetPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Ubicación */}
+            {/* 2. UBICACIÓN */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -952,15 +1004,251 @@ const CreateAssetPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Información Financiera */}
+            {/* 3. ESPECIFICACIONES TÉCNICAS */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Especificaciones Técnicas
+                </CardTitle>
+                <CardDescription>
+                  Detalles técnicos y de fabricación del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Fabricante */}
+                  <FormField
+                    control={form.control}
+                    name="manufacturer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fabricante</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Fabricante del activo" 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {/* Modelo */}
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Modelo</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Modelo del activo" 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Número de Serie Técnico */}
+                  <FormField
+                    control={form.control}
+                    name="serialNumberTech"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número de Serie</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Número de serie técnico" 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Material */}
+                  <FormField
+                    control={form.control}
+                    name="material"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Material</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value || ''} 
+                            onValueChange={(value) => field.onChange(value || null)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione el material" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="metal">Metal</SelectItem>
+                              <SelectItem value="madera">Madera</SelectItem>
+                              <SelectItem value="plastico">Plástico</SelectItem>
+                              <SelectItem value="mixto">Mixto</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Dimensiones / Capacidad */}
+                <div className="mt-4">
+                  <FormField
+                    control={form.control}
+                    name="dimensionsCapacity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dimensiones / Capacidad</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Dimensiones (ej: 2m x 1.5m x 0.8m) o capacidad (ej: 50 personas)" 
+                            {...field} 
+                            value={field.value || ''}
+                            rows={2}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 4. CICLO DE VIDA */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Ciclo de Vida
+                </CardTitle>
+                <CardDescription>
+                  Información sobre el estado y mantenimiento del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Fecha de Instalación */}
+                  <FormField
+                    control={form.control}
+                    name="installationDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha de Instalación</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Fecha última de Inspección */}
+                  <FormField
+                    control={form.control}
+                    name="lastInspectionDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha Última de Inspección</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Vida Útil Estimada */}
+                  <FormField
+                    control={form.control}
+                    name="estimatedUsefulLife"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vida Útil Estimada (meses)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="Vida útil en meses" 
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value);
+                              field.onChange(isNaN(value) ? null : value);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Estado */}
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado*</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value} 
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione un estado" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="activo">Activo</SelectItem>
+                              <SelectItem value="en_mantenimiento">En Mantenimiento</SelectItem>
+                              <SelectItem value="dañado">Dañado</SelectItem>
+                              <SelectItem value="retirado">Retirado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Historial de Mantenimientos (nota informativa) */}
+                <div className="mt-4 p-3 bg-muted rounded-lg">
+                  <p className="text-sm font-medium mb-1">Historial de Mantenimientos</p>
+                  <p className="text-sm text-muted-foreground">
+                    El historial de mantenimientos se generará automáticamente con las incidencias resueltas asociadas a este activo.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 5. COSTOS */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
-                  Información Financiera
+                  Costos
                 </CardTitle>
                 <CardDescription>
-                  Datos económicos y de valoración del activo
+                  Información financiera del activo
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1039,6 +1327,34 @@ const CreateAssetPage: React.FC = () => {
                             value={field.value === null ? '' : field.value}
                             onChange={e => field.onChange(e.target.value === '' ? null : parseFloat(e.target.value))}
                           />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Fuente de Financiamiento */}
+                  <FormField
+                    control={form.control}
+                    name="financingSource"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>Fuente de Financiamiento</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value || ''} 
+                            onValueChange={(value) => field.onChange(value || null)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione la fuente de financiamiento" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="presupuesto">Presupuesto</SelectItem>
+                              <SelectItem value="patrocinio">Patrocinio</SelectItem>
+                              <SelectItem value="donacion">Donación</SelectItem>
+                              <SelectItem value="concesion">Concesión</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1131,7 +1447,112 @@ const CreateAssetPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Notas */}
+            {/* 6. CONTROL Y GESTIÓN */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Control y Gestión
+                </CardTitle>
+                <CardDescription>
+                  Asignación de responsabilidades y gestión del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Responsable Asignado */}
+                  <FormField
+                    control={form.control}
+                    name="responsiblePersonId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Responsable Asignado (Persona)</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value ? field.value.toString() : ''}
+                            onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione un responsable" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.isArray(users) && users.map((user: any) => (
+                                <SelectItem key={user.id} value={user.id.toString()}>
+                                  {user.fullName || user.username}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Área Asignada */}
+                  <FormField
+                    control={form.control}
+                    name="assignedArea"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Área Asignada (Área o Departamento)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Ej: Mantenimiento, Jardinería, Seguridad" 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Manual de Mantenimiento */}
+                  <FormField
+                    control={form.control}
+                    name="maintenanceManualUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Manual de Mantenimiento (URL)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://..." 
+                            {...field} 
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Políticas de Uso */}
+                <div className="mt-4">
+                  <FormField
+                    control={form.control}
+                    name="usagePolicies"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Políticas de Uso</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Políticas, restricciones o normas de uso del activo..." 
+                            {...field} 
+                            value={field.value || ''}
+                            rows={3}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 7. NOTAS ADICIONALES */}
             <Card>
               <CardHeader>
                 <CardTitle>Notas Adicionales</CardTitle>

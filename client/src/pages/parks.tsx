@@ -143,7 +143,7 @@ const Parks: React.FC = () => {
               </div>
             </h1>
             <p className="text-xl text-green-100 max-w-2xl mx-auto">
-              Descubre espacios verdes únicos en la Zona Metropolitana de Guadalajara para toda la familia
+              Descubre los espacios públicos más emblemáticos del país, pertenecientes al Sistema de Parques de México.
             </p>
             <div className="flex items-center justify-center gap-4 text-green-100">
               <div className="flex items-center gap-2">
