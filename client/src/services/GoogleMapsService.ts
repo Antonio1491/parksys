@@ -126,13 +126,12 @@ class GoogleMapsService {
     options: google.maps.MapOptions
   ): Promise<google.maps.Map> {
     await this.loadGoogleMaps();
-    const googleMaps = this.getGoogleMaps();
     
-    if (!googleMaps) {
+    if (!this.isGoogleMapsLoaded()) {
       throw new Error('Google Maps no está disponible');
     }
 
-    return new googleMaps.Map(container, {
+    return new google.maps.Map(container, {
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: true,
@@ -149,13 +148,12 @@ class GoogleMapsService {
     options: google.maps.MarkerOptions
   ): Promise<google.maps.Marker> {
     await this.loadGoogleMaps();
-    const googleMaps = this.getGoogleMaps();
     
-    if (!googleMaps) {
+    if (!this.isGoogleMapsLoaded()) {
       throw new Error('Google Maps no está disponible');
     }
 
-    return new googleMaps.Marker({
+    return new google.maps.Marker({
       map,
       ...options
     });
@@ -166,17 +164,16 @@ class GoogleMapsService {
    */
   async geocodeAddress(address: string): Promise<google.maps.GeocoderResult[]> {
     await this.loadGoogleMaps();
-    const googleMaps = this.getGoogleMaps();
     
-    if (!googleMaps) {
+    if (!this.isGoogleMapsLoaded()) {
       throw new Error('Google Maps no está disponible');
     }
 
-    const geocoder = new googleMaps.Geocoder();
+    const geocoder = new google.maps.Geocoder();
     
     return new Promise((resolve, reject) => {
       geocoder.geocode({ address }, (results, status) => {
-        if (status === googleMaps.GeocoderStatus.OK && results) {
+        if (status === google.maps.GeocoderStatus.OK && results) {
           resolve(results);
         } else {
           reject(new Error(`Geocoding falló: ${status}`));
@@ -192,14 +189,13 @@ class GoogleMapsService {
     point1: google.maps.LatLng | google.maps.LatLngLiteral,
     point2: google.maps.LatLng | google.maps.LatLngLiteral
   ): number {
-    const googleMaps = this.getGoogleMaps();
-    if (!googleMaps) {
+    if (!this.isGoogleMapsLoaded()) {
       throw new Error('Google Maps no está disponible');
     }
 
-    return googleMaps.geometry.spherical.computeDistanceBetween(
-      point1 instanceof googleMaps.LatLng ? point1 : new googleMaps.LatLng(point1.lat, point1.lng),
-      point2 instanceof googleMaps.LatLng ? point2 : new googleMaps.LatLng(point2.lat, point2.lng)
+    return google.maps.geometry.spherical.computeDistanceBetween(
+      point1 instanceof google.maps.LatLng ? point1 : new google.maps.LatLng(point1.lat, point1.lng),
+      point2 instanceof google.maps.LatLng ? point2 : new google.maps.LatLng(point2.lat, point2.lng)
     );
   }
 }
