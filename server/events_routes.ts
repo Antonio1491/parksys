@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { db } from "./db";
 import { events, eventParks, EventTypes, TargetAudiences, EventStatuses } from "@shared/events-schema";
 import { eq, and, gte, lte, like, desc, asc } from "drizzle-orm";
+import { replitObjectStorage } from './objectStorage-replit';
 
 /**
  * Registra las rutas relacionadas con el módulo de eventos
@@ -74,10 +75,24 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
           eventIds.includes(event.id)
         );
         
-        return res.json(filteredEvents);
+        // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+        const filteredEventsWithNormalizedImages = filteredEvents.map(event => ({
+          ...event,
+          imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+          featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
+        }));
+        
+        return res.json(filteredEventsWithNormalizedImages);
       }
       
-      return res.json(eventsList);
+      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+      const eventsWithNormalizedImages = eventsList.map(event => ({
+        ...event,
+        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
+      }));
+
+      return res.json(eventsWithNormalizedImages);
     } catch (error) {
       console.error("Error al obtener eventos:", error);
       return res.status(500).json({ 
@@ -121,11 +136,15 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         }
       }
       
-      // Devolver evento con parques asociados
-      return res.json({
+      // 🎯 NORMALIZAR URLs de imágenes y devolver evento con parques asociados
+      const eventWithNormalizedImages = {
         ...event,
+        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
         parks: parksInfo
-      });
+      };
+
+      return res.json(eventWithNormalizedImages);
     } catch (error) {
       console.error(`Error al obtener evento ${req.params.id}:`, error);
       return res.status(500).json({ 
@@ -370,7 +389,14 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         }
       }
       
-      return res.json(eventsList);
+      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+      const eventsWithNormalizedImages = eventsList.map(event => ({
+        ...event,
+        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
+      }));
+
+      return res.json(eventsWithNormalizedImages);
     } catch (error) {
       console.error(`Error al obtener eventos del parque ${req.params.id}:`, error);
       return res.status(500).json({ 

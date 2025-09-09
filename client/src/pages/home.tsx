@@ -198,8 +198,8 @@ const Home: React.FC = () => {
       </section>
       
       {/* 🎯 FEATURED PARKS SECTION RENOVADO */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-xl md:text-5xl font-poppins font-black text-gray-900 mb-6">
               <span style={{ fontFamily: 'Guttery', color: '#00444f', fontWeight: '300' }}>Encuentra</span><br />

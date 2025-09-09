@@ -368,10 +368,7 @@ const EventsList: React.FC = () => {
                     <div className="relative h-48 bg-gray-100">
                       {(event.imageUrl || event.featuredImageUrl) ? (
                         <img 
-                          src={(event.imageUrl || event.featuredImageUrl)?.startsWith('/uploads/') 
-                            ? `/api/storage/file/${encodeURIComponent((event.imageUrl || event.featuredImageUrl).replace(/^\//, ''))}`
-                            : (event.imageUrl || event.featuredImageUrl)
-                          }
+                          src={event.imageUrl || event.featuredImageUrl}
                           alt={event.title}
                           className="w-full h-full object-cover"
                         />
@@ -605,10 +602,7 @@ const EventsList: React.FC = () => {
               {(selectedEvent.imageUrl || selectedEvent.featuredImageUrl) && (
                 <div className="w-full h-64 overflow-hidden rounded-lg">
                   <img 
-                    src={(selectedEvent.imageUrl || selectedEvent.featuredImageUrl)?.startsWith('/uploads/') 
-                      ? `/api/storage/file/${encodeURIComponent((selectedEvent.imageUrl || selectedEvent.featuredImageUrl).replace(/^\//, ''))}`
-                      : (selectedEvent.imageUrl || selectedEvent.featuredImageUrl)
-                    }
+                    src={selectedEvent.imageUrl || selectedEvent.featuredImageUrl}
                     alt={selectedEvent.title}
                     className="w-full h-full object-cover"
                   />
