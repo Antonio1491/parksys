@@ -523,7 +523,7 @@ const NewIncidentPage = () => {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="">Sin activo específico</SelectItem>
+                                <SelectItem value="sin-activo">Sin activo específico</SelectItem>
                                 {safeAssets.map((asset: any) => (
                                   <SelectItem key={asset.id} value={asset.id.toString()}>
                                     {asset.name}
