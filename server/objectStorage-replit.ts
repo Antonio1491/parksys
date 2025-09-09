@@ -173,46 +173,64 @@ export class ReplitObjectStorageService {
   getPublicUrl(filename: string): string {
     const encodedFilename = encodeURIComponent(filename);
     
-    // En producción, usar URL completa si está disponible
-    const isProduction = process.env.REPLIT_ENVIRONMENT === 'production' ||
-                         process.env.NODE_ENV === 'production' || 
-                         process.env.REPLIT_DEPLOYMENT;
-    
-    if (isProduction && process.env.REPLIT_DEV_DOMAIN) {
-      // Usar dominio completo para producción
-      return `https://${process.env.REPLIT_DEV_DOMAIN}/api/storage/file/${encodedFilename}`;
+    // 🎯 PRODUCCIÓN: Usar dominio absoluto para deployment
+    if (process.env.REPLIT_DEPLOYMENT) {
+      // En deployment, construir URL absoluta usando variables de entorno de Replit
+      const replitId = process.env.REPL_ID;
+      const replitOwner = process.env.REPL_OWNER;
+      
+      if (replitId && replitOwner) {
+        // Formato estándar de URLs de Replit para deployments
+        const deploymentUrl = `https://${replitId}.${replitOwner}.repl.co/api/storage/file/${encodedFilename}`;
+        console.log(`🚀 [PRODUCTION] Generando URL absoluta para deployment: ${deploymentUrl}`);
+        return deploymentUrl;
+      }
+      
+      // Fallback para deployments: usar dominio actual del request
+      if (process.env.REPLIT_DEV_DOMAIN) {
+        const fallbackUrl = `https://${process.env.REPLIT_DEV_DOMAIN}/api/storage/file/${encodedFilename}`;
+        console.log(`🚀 [PRODUCTION] Usando fallback con REPLIT_DEV_DOMAIN: ${fallbackUrl}`);
+        return fallbackUrl;
+      }
     }
     
-    // Fallback: URL relativa (funciona en desarrollo y mayoría de deployments)
+    // 🔧 DESARROLLO: URL relativa (funciona perfectamente con Vite)
     return `/api/storage/file/${encodedFilename}`;
   }
 
   /**
    * 🛠️ NORMALIZAR URL: Corregir URLs que vengan del cliente oficial de Replit
-   * (Siempre devuelve URLs relativas para máxima compatibilidad)
+   * (Genera URLs apropiadas según el entorno: relativas en desarrollo, absolutas en producción)
    */
   normalizeUrl(originalUrl: string): string {
-    // Si ya es una URL relativa, mantenerla así
-    if (originalUrl.startsWith('/api/storage/file/')) {
-      return originalUrl;
-    }
-    
-    // Si es una URL absoluta con cualquier dominio de Replit, convertir a relativa
-    if (originalUrl.includes('.replit.dev/api/storage/file/') || 
-        originalUrl.includes('.spock.replit.dev/api/storage/file/')) {
-      const match = originalUrl.match(/\/api\/storage\/file\/(.+)$/);
-      if (match) {
-        const filename = match[1];
-        console.log(`🔧 [NORMALIZE] Convirtiendo URL absoluta a relativa: ${originalUrl}`);
-        const relativeUrl = `/api/storage/file/${filename}`;
-        console.log(`✅ [NORMALIZE] URL normalizada: ${relativeUrl}`);
-        return relativeUrl;
-      }
-    }
-    
     // Si es una URL filesystem, mantenerla
     if (originalUrl.startsWith('/uploads/')) {
       return originalUrl;
+    }
+    
+    // Si ya es una URL relativa, verificar si necesita ser absoluta para producción
+    if (originalUrl.startsWith('/api/storage/file/')) {
+      // En producción, convertir URLs relativas a absolutas
+      if (process.env.REPLIT_DEPLOYMENT) {
+        const filename = originalUrl.replace('/api/storage/file/', '');
+        return this.getPublicUrl(decodeURIComponent(filename));
+      }
+      // En desarrollo, mantener relativa
+      return originalUrl;
+    }
+    
+    // Si es una URL absoluta con cualquier dominio de Replit, extraer filename y regenerar URL correcta
+    if (originalUrl.includes('.replit.dev/api/storage/file/') || 
+        originalUrl.includes('.spock.replit.dev/api/storage/file/') ||
+        originalUrl.includes('.repl.co/api/storage/file/')) {
+      const match = originalUrl.match(/\/api\/storage\/file\/(.+)$/);
+      if (match) {
+        const filename = match[1];
+        console.log(`🔧 [NORMALIZE] Regenerando URL correcta para entorno: ${originalUrl}`);
+        const correctUrl = this.getPublicUrl(decodeURIComponent(filename));
+        console.log(`✅ [NORMALIZE] URL normalizada: ${correctUrl}`);
+        return correctUrl;
+      }
     }
     
     // Si ya está correcta, devolverla tal como está
