@@ -381,21 +381,12 @@ const IncidentsPage = () => {
                 Categorías
               </Button>
               
-              {/* BOTÓN VISIBLE DE NUEVA INCIDENCIA */}
               <Button 
                 onClick={handleNewIncident}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 text-lg shadow-lg border-4 border-green-800"
-                style={{ 
-                  minWidth: '200px', 
-                  minHeight: '50px',
-                  zIndex: 9999,
-                  position: 'relative',
-                  display: 'block !important',
-                  visibility: 'visible !important'
-                }}
+                className="bg-green-600 hover:bg-green-700 text-white"
               >
-                <Plus className="h-6 w-6 mr-3" />
-                ✅ NUEVA INCIDENCIA ✅
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Incidencia
               </Button>
             </div>
           </div>
