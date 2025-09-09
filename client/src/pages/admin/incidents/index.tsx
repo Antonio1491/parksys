@@ -69,7 +69,6 @@ declare global {
 
 // Componente principal de incidencias
 const IncidentsPage = () => {
-  console.log('🔴 COMPONENTE INCIDENTES SE ESTÁ EJECUTANDO');
   const [location, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -353,30 +352,6 @@ const IncidentsPage = () => {
     <AdminLayout>
       <div className="p-6">
         {/* Header con patrón Card estandarizado */}
-        {/* BOTÓN TEMPORAL MEGA VISIBLE */}
-        <div style={{ 
-          background: 'red', 
-          padding: '20px', 
-          margin: '20px 0',
-          border: '5px solid black',
-          textAlign: 'center'
-        }}>
-          <button 
-            onClick={handleNewIncident}
-            style={{
-              background: 'yellow',
-              color: 'black',
-              padding: '15px 30px',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              border: '3px solid blue',
-              cursor: 'pointer'
-            }}
-          >
-            🚨 NUEVA INCIDENCIA - BOTÓN TEMPORAL 🚨
-          </button>
-        </div>
-
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex items-center justify-between">
             <div>
@@ -415,6 +390,34 @@ const IncidentsPage = () => {
               </Button>
             </div>
           </div>
+        </Card>
+
+        {/* Nueva sección: Formulario */}
+        <Card className="p-4 mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
+              <ClipboardList className="h-5 w-5" />
+              Formulario
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={handleNewIncident}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Incidencia
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleManageCategories}
+              >
+                <Bookmark className="h-4 w-4 mr-2" />
+                Gestionar Categorías
+              </Button>
+            </div>
+          </CardContent>
         </Card>
           
         <Tabs defaultValue="all" className="flex-1">
