@@ -3951,47 +3951,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const parkId = parseInt(req.params.id);
       const { volunteerId } = req.body;
       
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] POST /parks/:id/volunteers called');
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] parkId:', parkId);
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] req.body:', req.body);
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] volunteerId:', volunteerId);
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] typeof volunteerId:', typeof volunteerId);
+      
       if (!volunteerId) {
+        console.log('❌ [VOLUNTEER ASSIGNMENT] Error: volunteerId es requerido');
         return res.status(400).json({ error: 'volunteerId es requerido' });
       }
       
       // Verificar que el voluntario existe y está activo
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] Checking volunteer with ID:', volunteerId);
       const volunteerCheck = await pool.query(
         'SELECT id, status FROM volunteers WHERE id = $1',
         [volunteerId]
       );
       
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] Volunteer query result:', volunteerCheck.rows);
+      
       if (volunteerCheck.rows.length === 0) {
+        console.log('❌ [VOLUNTEER ASSIGNMENT] Error: Voluntario no encontrado');
         return res.status(404).json({ error: 'Voluntario no encontrado' });
       }
       
-      if (volunteerCheck.rows[0].status !== 'active') {
+      const volunteerStatus = volunteerCheck.rows[0].status;
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] Volunteer status:', volunteerStatus);
+      
+      if (volunteerStatus !== 'active' && volunteerStatus !== 'activo') {
+        console.log('❌ [VOLUNTEER ASSIGNMENT] Error: Voluntario no está activo, status:', volunteerStatus);
         return res.status(400).json({ error: 'Solo se pueden asignar voluntarios activos' });
       }
       
       // Verificar que el parque existe
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] Checking park with ID:', parkId);
       const parkCheck = await pool.query(
         'SELECT id FROM parks WHERE id = $1',
         [parkId]
       );
       
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] Park query result:', parkCheck.rows);
+      
       if (parkCheck.rows.length === 0) {
+        console.log('❌ [VOLUNTEER ASSIGNMENT] Error: Parque no encontrado');
         return res.status(404).json({ error: 'Parque no encontrado' });
       }
       
       // Asignar el voluntario al parque
+      console.log('🔍 [VOLUNTEER ASSIGNMENT] Assigning volunteer', volunteerId, 'to park', parkId);
       await pool.query(
         'UPDATE volunteers SET preferred_park_id = $1 WHERE id = $2',
         [parkId, volunteerId]
       );
       
+      console.log('✅ [VOLUNTEER ASSIGNMENT] Volunteer assigned successfully');
       res.json({ 
         message: 'Voluntario asignado correctamente',
         volunteerId,
         parkId 
       });
     } catch (error) {
-      console.error('Error assigning volunteer to park:', error);
+      console.error('❌ [VOLUNTEER ASSIGNMENT] Error assigning volunteer to park:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });

@@ -1,0 +1,91 @@
+i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-qUU7XWu9.js:799 i18next: languageChanged es
+index-qUU7XWu9.js:799 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+3index-qUU7XWu9.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-qUU7XWu9.js:49 🌐 [QUERY] GET /api/notifications/count
+park-manage-Bqt4luIL.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 0, documents: 0, imagesLoading: true, documentsLoading: true, …}
+park-manage-Bqt4luIL.js:1 🔍 FRONTEND: Cargando imágenes para parque 90
+park-manage-Bqt4luIL.js:1 🔍 FRONTEND: Cargando documentos para parque 90
+park-manage-Bqt4luIL.js:1 🔍 FRONTEND: Cargando videos para parque 90
+park-manage-Bqt4luIL.js:1 ✅ FRONTEND: Videos cargados: []
+park-manage-Bqt4luIL.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 0, documents: 0, imagesLoading: true, documentsLoading: true, …}
+park-manage-Bqt4luIL.js:1 ✅ FRONTEND: Documentos cargados: []
+park-manage-Bqt4luIL.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 0, documents: 0, imagesLoading: true, documentsLoading: false, …}
+park-manage-Bqt4luIL.js:1 ✅ FRONTEND: Imágenes cargadas: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-Bqt4luIL.js:1 🔍 MULTIMEDIA MANAGER - Renderizando con: {parkId: 90, images: 6, documents: 0, imagesLoading: false, documentsLoading: false, …}
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteers: 0
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: assignedIds: []
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: availableVolunteers: 0
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersLoading: true
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersError: null
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: searchTerm: 
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: statusFilter: all
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: filteredAvailableVolunteers: 0
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: primer voluntario ejemplo: undefined
+park-manage-Bqt4luIL.js:1 🎯 RENDERIZANDO ParkVolunteersManager con: 0 voluntarios
+park-manage-Bqt4luIL.js:1 🔍 FRONTEND: Cargando voluntarios asignados para parque 90
+park-manage-Bqt4luIL.js:1 🔍 FRONTEND: Cargando TODOS los voluntarios disponibles
+park-manage-Bqt4luIL.js:1 ✅ FRONTEND: Todos los voluntarios cargados: 23 (23) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: assignedIds: []
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: availableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersLoading: false
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersError: null
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: searchTerm: 
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: statusFilter: all
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: filteredAvailableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+park-manage-Bqt4luIL.js:1 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
+park-manage-Bqt4luIL.js:1 ✅ FRONTEND: Voluntarios asignados cargados: []
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: assignedIds: []
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: availableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersLoading: false
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersError: null
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: searchTerm: 
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: statusFilter: all
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: filteredAvailableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+park-manage-Bqt4luIL.js:1 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: assignedIds: []
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: availableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersLoading: false
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersError: null
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: searchTerm: 
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: statusFilter: all
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: filteredAvailableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+park-manage-Bqt4luIL.js:1 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
+park-manage-Bqt4luIL.js:1  POST https://parksys-demo.replit.app/api/parks/90/volunteers 400 (Bad Request)
+mutationFn @ park-manage-Bqt4luIL.js:1
+fn @ index-qUU7XWu9.js:49
+x @ index-qUU7XWu9.js:49
+start @ index-qUU7XWu9.js:49
+execute @ index-qUU7XWu9.js:49
+await in execute
+mutate @ index-qUU7XWu9.js:49
+(anonymous) @ index-qUU7XWu9.js:49
+q @ park-manage-Bqt4luIL.js:1
+onClick @ park-manage-Bqt4luIL.js:1
+Tre @ index-qUU7XWu9.js:38
+Ire @ index-qUU7XWu9.js:38
+Mre @ index-qUU7XWu9.js:38
+YI @ index-qUU7XWu9.js:38
+$B @ index-qUU7XWu9.js:38
+(anonymous) @ index-qUU7XWu9.js:38
+oA @ index-qUU7XWu9.js:41
+lB @ index-qUU7XWu9.js:38
+sN @ index-qUU7XWu9.js:38
+RP @ index-qUU7XWu9.js:38
+Yre @ index-qUU7XWu9.js:38Understand this error
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: assignedIds: []
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: availableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersLoading: false
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: allVolunteersError: null
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: searchTerm: 
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: statusFilter: all
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: filteredAvailableVolunteers: 23
+park-manage-Bqt4luIL.js:1 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}age: 22availability: "flexible"created_at: "2025-09-04 23:02:31.618693"email: "valeria.jimenez@example.com"full_name: "Fernando Jiménez"id: 24phone: "(55) 2591 1229"previous_experience: "Experiencia en reforestación y actividades comunitarias"profile_image_url: "/uploads/volunteers/volunteer-1757097374228-560120114.jpg"source: "module"status: "activo"[[Prototype]]: Object
+park-manage-Bqt4luIL.js:1 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
