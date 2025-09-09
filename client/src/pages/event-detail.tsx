@@ -169,11 +169,11 @@ const EventDetail = () => {
             <div className="lg:col-span-2">
               <Card className="overflow-hidden">
                 <div className="aspect-video bg-gradient-to-br from-green-100 to-blue-100 relative">
-                  {event.featuredImageUrl ? (
+                  {(event.featuredImageUrl || event.imageUrl) ? (
                     <img
-                      src={event.featuredImageUrl?.startsWith('/uploads/') 
-                        ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
-                        : event.featuredImageUrl
+                      src={(event.featuredImageUrl || event.imageUrl)?.startsWith('/uploads/') 
+                        ? `/api/storage/file/${encodeURIComponent((event.featuredImageUrl || event.imageUrl).replace(/^\//, ''))}`
+                        : (event.featuredImageUrl || event.imageUrl)
                       }
                       alt={event.title}
                       className="w-full h-full object-cover"
