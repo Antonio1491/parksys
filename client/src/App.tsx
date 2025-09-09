@@ -369,7 +369,15 @@ function Router() {
         <Route path="/admin/analytics" component={AdminAnalytics} />
         <Route path="/admin/documents" component={AdminDocuments} />
         <Route path="/admin/comments" component={AdminComments} />
-        <Route path="/admin/incidents" component={AdminIncidents} />
+        <Route path="/admin/incidents" component={() => {
+          setLocation('/admin/incidents/nueva');
+          return null;
+        }} />
+        <Route path="/admin/incidents/nueva">
+          <Suspense fallback={<div className="p-8 text-center">Cargando incidencias...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/incidents/incidents-nueva')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/incidents/new">
           <Suspense fallback={<div className="p-8 text-center">Cargando formulario de nueva incidencia...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/incidents/new')))}
