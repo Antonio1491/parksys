@@ -7883,7 +7883,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // PASO 2: Fallback al filesystem local
-      const filesystemPath = path.join(process.cwd(), filename);
+      const filesystemPath = path.join(process.cwd(), 'public', filename);
       console.log(`🔍 [HYBRID-STORAGE] Verificando filesystem: ${filesystemPath}`);
         
         if (fs.existsSync(filesystemPath)) {
