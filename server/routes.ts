@@ -7859,19 +7859,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // 🚀 Servir archivos desde Replit Object Storage
+  // 🚀 HÍBRIDO: Servir archivos desde Replit Object Storage con fallback a filesystem
   apiRouter.get("/storage/file/:filename(*)", async (req: Request, res: Response) => {
     try {
-      const filename = req.params.filename;
-      console.log(`📥 [REPLIT-STORAGE] Solicitando archivo: ${filename}`);
+      const filename = decodeURIComponent(req.params.filename);
+      console.log(`📥 [HYBRID-STORAGE] Solicitando archivo: ${filename}`);
       
-      await replitObjectStorage.downloadFile(filename, res);
-    } catch (error) {
-      console.error("❌ [REPLIT-STORAGE] Error sirviendo archivo:", error);
+      // PASO 1: Verificar si el archivo existe en Object Storage ANTES de intentar descargarlo
+      console.log(`🔍 [HYBRID-STORAGE] Verificando existencia en Object Storage: ${filename}`);
+      const existsInObjectStorage = await replitObjectStorage.fileExists(filename);
+      
+      if (existsInObjectStorage) {
+        try {
+          console.log(`✅ [HYBRID-STORAGE] Archivo encontrado en Object Storage, descargando: ${filename}`);
+          await replitObjectStorage.downloadFile(filename, res);
+          console.log(`✅ [HYBRID-STORAGE] Archivo servido desde Object Storage: ${filename}`);
+          return;
+        } catch (objectStorageError) {
+          console.log(`❌ [HYBRID-STORAGE] Error descargando desde Object Storage: ${objectStorageError.message}`);
+        }
+      } else {
+        console.log(`⚠️ [HYBRID-STORAGE] Archivo no existe en Object Storage, intentando filesystem: ${filename}`);
+      }
+      
+      // PASO 2: Fallback al filesystem local
+      const filesystemPath = path.join(process.cwd(), filename);
+      console.log(`🔍 [HYBRID-STORAGE] Verificando filesystem: ${filesystemPath}`);
+        
+        if (fs.existsSync(filesystemPath)) {
+          console.log(`✅ [HYBRID-STORAGE] Archivo encontrado en filesystem: ${filesystemPath}`);
+          
+          // Determinar Content-Type
+          let contentType = 'application/octet-stream';
+          const ext = path.extname(filename).toLowerCase();
+          
+          if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+          else if (ext === '.png') contentType = 'image/png';
+          else if (ext === '.gif') contentType = 'image/gif';
+          else if (ext === '.webp') contentType = 'image/webp';
+          else if (ext === '.svg') contentType = 'image/svg+xml';
+          
+          const stat = fs.statSync(filesystemPath);
+          
+          res.set({
+            'Content-Type': contentType,
+            'Content-Length': stat.size.toString(),
+            'Cache-Control': 'public, max-age=3600'
+          });
+          
+          // Enviar archivo desde filesystem
+          const stream = fs.createReadStream(filesystemPath);
+          stream.pipe(res);
+          
+          console.log(`✅ [HYBRID-STORAGE] Archivo servido desde filesystem: ${filename}`);
+          return;
+        } else {
+          console.log(`❌ [HYBRID-STORAGE] Archivo no encontrado en filesystem: ${filesystemPath}`);
+        }
+      
+      // PASO 3: Si ambos fallan
+      console.error(`❌ [HYBRID-STORAGE] Archivo no encontrado en ningún storage: ${filename}`);
       res.status(404).json({ error: 'Archivo no encontrado' });
+      
+    } catch (error) {
+      console.error("❌ [HYBRID-STORAGE] Error general sirviendo archivo:", error);
+      res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
-
 
   console.log("✅ Rutas de archivos estáticos configuradas");
 

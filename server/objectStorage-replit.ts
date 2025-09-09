@@ -203,9 +203,25 @@ export class ReplitObjectStorageService {
    * (Genera URLs apropiadas según el entorno: relativas en desarrollo, absolutas en producción)
    */
   normalizeUrl(originalUrl: string): string {
-    // Si es una URL filesystem, mantenerla
+    console.log(`🔧 [NORMALIZE] Evaluando URL: ${originalUrl}`);
+    
+    // Si es una URL filesystem (/uploads/...), convertirla al endpoint correcto
     if (originalUrl.startsWith('/uploads/')) {
-      return originalUrl;
+      const filename = originalUrl.substring(1); // Quitar el '/' inicial
+      const encodedFilename = encodeURIComponent(filename);
+      
+      // En producción, usar URL absoluta
+      if (process.env.REPLIT_DEPLOYMENT) {
+        const domain = process.env.REPL_URL || process.env.REPLIT_URL || 'https://localhost:5000';
+        const absoluteUrl = `${domain}/api/storage/file/${encodedFilename}`;
+        console.log(`🔧 [NORMALIZE] Convirtiendo filesystem a absoluta: ${absoluteUrl}`);
+        return absoluteUrl;
+      }
+      
+      // En desarrollo, usar URL relativa
+      const relativeUrl = `/api/storage/file/${encodedFilename}`;
+      console.log(`🔧 [NORMALIZE] Convirtiendo filesystem a relativa: ${relativeUrl}`);
+      return relativeUrl;
     }
     
     // Si ya es una URL relativa, verificar si necesita ser absoluta para producción
