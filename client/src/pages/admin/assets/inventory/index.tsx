@@ -801,30 +801,61 @@ const InventoryPage: React.FC = () => {
   // Función para descargar plantilla CSV
   const downloadTemplate = () => {
     const headers = [
+      // IDENTIFICACIÓN
       'ID',
       'Nombre',
       'Descripción',
       'Número de Serie',
-      'Categoría',
+      'ID Personalizado de Activo',
+      'Categoría Principal',
+      'Subcategoría',
+      'Uso Específico',
+      
+      // UBICACIÓN
       'Parque',
       'Amenidad',
-      'Ubicación Descripción',
+      'Descripción de Ubicación',
       'Latitud',
       'Longitud',
-      'Estado',
-      'Condición',
+      
+      // ESPECIFICACIONES TÉCNICAS
       'Fabricante',
       'Modelo',
+      'Número de Serie Técnico',
+      'Material',
+      'Dimensiones/Capacidad',
+      
+      // CICLO DE VIDA
+      'Fecha de Instalación',
+      'Fecha de Última Inspección',
+      'Vida Útil Estimada (años)',
+      'Estado',
+      'Condición',
+      'Historial de Mantenimiento',
+      
+      // COSTOS
       'Fecha de Adquisición',
       'Costo de Adquisición (MXN)',
       'Valor Actual (MXN)',
+      'Fuente de Financiamiento',
+      
+      // CONTROL Y GESTIÓN
+      'Persona Responsable',
+      'Área Asignada',
+      'URL Manual de Mantenimiento',
+      'Políticas de Uso',
+      
+      // MANTENIMIENTO (campos heredados)
       'Frecuencia de Mantenimiento',
-      'Último Mantenimiento',
-      'Próximo Mantenimiento',
+      'Fecha de Último Mantenimiento',
+      'Fecha de Próximo Mantenimiento',
       'Vida Útil Esperada (meses)',
       'Código QR',
-      'Persona Responsable',
-      'Notas',
+      
+      // NOTAS
+      'Notas Adicionales',
+      
+      // CAMPOS DEL SISTEMA
       'Fecha de Creación',
       'Última Actualización'
     ];
