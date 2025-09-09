@@ -69,6 +69,7 @@ declare global {
 
 // Componente principal de incidencias
 const IncidentsPage = () => {
+  console.log('🔴 COMPONENTE INCIDENTES SE ESTÁ EJECUTANDO');
   const [location, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -352,6 +353,30 @@ const IncidentsPage = () => {
     <AdminLayout>
       <div className="p-6">
         {/* Header con patrón Card estandarizado */}
+        {/* BOTÓN TEMPORAL MEGA VISIBLE */}
+        <div style={{ 
+          background: 'red', 
+          padding: '20px', 
+          margin: '20px 0',
+          border: '5px solid black',
+          textAlign: 'center'
+        }}>
+          <button 
+            onClick={handleNewIncident}
+            style={{
+              background: 'yellow',
+              color: 'black',
+              padding: '15px 30px',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              border: '3px solid blue',
+              cursor: 'pointer'
+            }}
+          >
+            🚨 NUEVA INCIDENCIA - BOTÓN TEMPORAL 🚨
+          </button>
+        </div>
+
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex items-center justify-between">
             <div>
