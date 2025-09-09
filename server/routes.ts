@@ -5666,6 +5666,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get incidents statistics
+  apiRouter.get("/incidents/stats", async (req: Request, res: Response) => {
+    try {
+      console.log("📊 GET /api/incidents/stats - Obteniendo estadísticas de incidencias");
+      
+      const { pool } = await import("./db");
+      
+      // Obtener estadísticas básicas de incidencias
+      const statsQuery = `
+        SELECT 
+          COUNT(*) as total,
+          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+          SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
+          SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
+          SUM(CASE WHEN severity = 'low' THEN 1 ELSE 0 END) as low_severity,
+          SUM(CASE WHEN severity = 'medium' THEN 1 ELSE 0 END) as medium_severity,
+          SUM(CASE WHEN severity = 'high' THEN 1 ELSE 0 END) as high_severity,
+          SUM(CASE WHEN severity = 'critical' THEN 1 ELSE 0 END) as critical_severity
+        FROM incidents
+      `;
+      
+      const result = await pool.query(statsQuery);
+      const stats = result.rows[0];
+      
+      // Convertir los valores a números
+      const formattedStats = {
+        total: parseInt(stats.total),
+        pending: parseInt(stats.pending),
+        in_progress: parseInt(stats.in_progress),
+        resolved: parseInt(stats.resolved),
+        severity: {
+          low: parseInt(stats.low_severity),
+          medium: parseInt(stats.medium_severity),
+          high: parseInt(stats.high_severity),
+          critical: parseInt(stats.critical_severity)
+        }
+      };
+      
+      console.log("📊 Estadísticas obtenidas:", formattedStats);
+      res.json(formattedStats);
+    } catch (error) {
+      console.error("Error obteniendo estadísticas de incidencias:", error);
+      res.status(500).json({ message: "Error obteniendo estadísticas de incidencias" });
+    }
+  });
+
   // Get all incidents
   apiRouter.get("/incidents", async (req: Request, res: Response) => {
     try {
