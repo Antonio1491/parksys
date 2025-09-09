@@ -166,11 +166,17 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
         ORDER BY is_primary DESC, display_order ASC
       `, [concessionId]);
       
-      // Mapear campos para consistencia
+      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
       concession.imageCount = parseInt(concession.imageCount?.toString()) || 0;
+      concession.primaryImage = concession.primaryImage ? replitObjectStorage.normalizeUrl(concession.primaryImage) : concession.primaryImage;
       concession.image_url = concession.primaryImage || null;
-      concession.images = imagesResult.rows || [];
+      concession.images = (imagesResult.rows || []).map(image => ({
+        ...image,
+        image_url: image.image_url ? replitObjectStorage.normalizeUrl(image.image_url) : image.image_url
+      }));
       concession.documents = [];
+
+      console.log(`🔧 [CONCESSION-NORMALIZE] Concesión ${concessionId} - URLs normalizadas correctamente`);
 
       res.json({
         status: 'success',
