@@ -124,8 +124,10 @@ const ImportCSVDialog = ({ isOpen, onClose, onImportSuccess }) => {
   };
 
   const downloadTemplate = () => {
-    const csvContent = 'titulo,descripcion,parque_id,categoria,estado,prioridad,ubicacion,reportero_nombre,reportero_email,reportero_telefono\n"Ejemplo de incidencia",,"5","Mantenimiento","pending","normal","Plaza Principal","Juan Pérez","juan@example.com","555-1234"';
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // BOM (Byte Order Mark) para UTF-8 para asegurar compatibilidad con Excel
+    const BOM = '\uFEFF';
+    const csvContent = 'titulo,descripcion,parque_id,categoria,estado,prioridad,ubicacion,reportero_nombre,reportero_email,reportero_telefono\n"Ejemplo de incidencia","Descripción detallada del problema","5","Mantenimiento","pending","normal","Plaza Principal","Juan Perez","juan@example.com","555-1234"';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = 'plantilla_incidencias.csv';
