@@ -5,12 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, ClipboardList, Search, X, AlertTriangle, BarChart, Bookmark, Calendar, MapPin, User, Clock, Filter, ExternalLink } from 'lucide-react';
+import { Plus, ClipboardList, Search, X, AlertTriangle, BarChart, Bookmark, Calendar, MapPin, User, Clock, Filter, ExternalLink, Upload, Download, FileSpreadsheet } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import AdminLayout from '@/components/AdminLayout';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { toast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 export default function IncidentsNueva() {
   const [location, setLocation] = useLocation();
@@ -60,7 +62,7 @@ export default function IncidentsNueva() {
 
   // Filtrar incidencias
   const filteredIncidents = useMemo(() => {
-    return incidents.filter(incident => {
+    return (incidents as any[]).filter((incident: any) => {
       const matchesSearch = searchQuery === '' || 
         incident.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         incident.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -100,6 +102,159 @@ export default function IncidentsNueva() {
       case 'closed': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  // Función para descargar plantilla CSV
+  const downloadTemplate = () => {
+    const headers = [
+      // INFORMACIÓN DE LA INCIDENCIA
+      'titulo',
+      'descripcion', 
+      'tipoAfectacion',
+      'nivelRiesgo',
+      'ubicacionGps',
+      'parqueId',
+      'activoId',
+      'fechaOcurrencia',
+      'reporterName',
+      'reporterEmail',
+      
+      // SEGUIMIENTO OPERATIVO
+      'departamentoResponsable',
+      'responsableAsignado',
+      'accionesRealizadas',
+      'materialesUtilizados',
+      'costoEstimado',
+      'fuenteFinanciamiento',
+      
+      // CONTROL Y CALIDAD
+      'estatusValidacion',
+      'supervisorValidador',
+      'comentariosSupervision',
+      'satisfaccionUsuario',
+      'frecuenciaIncidente',
+      
+      // DIMENSIÓN COMUNITARIA Y AMBIENTAL
+      'numeroPersonasAfectadas',
+      'afectacionMedioambiental',
+      'numeroVoluntarios',
+      'grupoVoluntarios'
+    ];
+    
+    const csvContent = headers.join(',') + '\n';
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'plantilla_incidencias.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Plantilla descargada",
+      description: "La plantilla CSV se ha descargado correctamente.",
+    });
+  };
+
+  // Función para manejar importación CSV
+  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const text = e.target?.result as string;
+        const lines = text.split('\n');
+        const headers = lines[0].split(',').map(h => h.trim());
+        
+        const incidents = [];
+        for (let i = 1; i < lines.length; i++) {
+          if (lines[i].trim() === '') continue;
+          
+          const values = lines[i].split(',').map(v => v.trim());
+          const incident: any = {};
+          
+          headers.forEach((header, index) => {
+            const value = values[index] || '';
+            incident[header] = value;
+          });
+          
+          // Validaciones básicas
+          if (incident.titulo && incident.descripcion) {
+            incidents.push({
+              title: incident.titulo,
+              description: incident.descripcion,
+              park_id: incident.parqueId ? parseInt(incident.parqueId) : null,
+              asset_id: incident.activoId ? parseInt(incident.activoId) : null,
+              status: 'pending',
+              severity: incident.nivelRiesgo || 'media',
+              category: incident.tipoAfectacion || 'General',
+              location: incident.ubicacionGps || '',
+              reporter_name: incident.reporterName || 'Importación CSV',
+              reporter_email: incident.reporterEmail || '',
+              // Campos adicionales como JSON
+              metadata: {
+                departamentoResponsable: incident.departamentoResponsable,
+                responsableAsignado: incident.responsableAsignado,
+                accionesRealizadas: incident.accionesRealizadas,
+                materialesUtilizados: incident.materialesUtilizados,
+                costoEstimado: incident.costoEstimado,
+                fuenteFinanciamiento: incident.fuenteFinanciamiento,
+                estatusValidacion: incident.estatusValidacion,
+                supervisorValidador: incident.supervisorValidador,
+                comentariosSupervision: incident.comentariosSupervision,
+                satisfaccionUsuario: incident.satisfaccionUsuario,
+                frecuenciaIncidente: incident.frecuenciaIncidente,
+                numeroPersonasAfectadas: incident.numeroPersonasAfectadas,
+                afectacionMedioambiental: incident.afectacionMedioambiental,
+                numeroVoluntarios: incident.numeroVoluntarios,
+                grupoVoluntarios: incident.grupoVoluntarios
+              }
+            });
+          }
+        }
+        
+        if (incidents.length === 0) {
+          toast({
+            title: "Error",
+            description: "No se encontraron incidencias válidas en el archivo.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Enviar incidencias al backend
+        for (const incident of incidents) {
+          await apiRequest('/api/incidents', {
+            method: 'POST',
+            body: JSON.stringify(incident),
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        
+        toast({
+          title: "Importación exitosa",
+          description: `Se importaron ${incidents.length} incidencias correctamente.`,
+        });
+        
+        // Recargar datos
+        window.location.reload();
+        
+      } catch (error) {
+        console.error('Error importing CSV:', error);
+        toast({
+          title: "Error de importación",
+          description: "Hubo un error al procesar el archivo CSV.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
   };
 
   const renderIncidentRow = (incident: any) => (
@@ -195,21 +350,58 @@ export default function IncidentsNueva() {
             <ClipboardList className="h-5 w-5 text-gray-700" />
             <h2 className="text-lg font-semibold text-gray-900">Formulario</h2>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button 
-              onClick={handleNewIncident}
-              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Nueva Incidencia
-            </button>
-            <button 
-              onClick={handleManageCategories}
-              className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md border border-gray-300 transition-colors"
-            >
-              <Bookmark className="h-4 w-4 mr-2" />
-              Gestionar Categorías
-            </button>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Herramientas para crear y gestionar incidencias. Puedes crear incidencias individuales o importar múltiples mediante CSV.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button 
+                onClick={handleNewIncident}
+                className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Incidencia
+              </button>
+              
+              <button 
+                onClick={handleManageCategories}
+                className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md border border-gray-300 transition-colors"
+              >
+                <Bookmark className="h-4 w-4 mr-2" />
+                Gestionar Categorías
+              </button>
+            </div>
+            
+            {/* Sección de importación CSV */}
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Importación CSV</h3>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button 
+                  onClick={downloadTemplate}
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Descargar Plantilla CSV
+                </button>
+                
+                <label className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors cursor-pointer">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importar CSV
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleImportCSV}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+              
+              <div className="mt-2 text-xs text-gray-500">
+                <FileSpreadsheet className="h-4 w-4 inline mr-1" />
+                Descarga la plantilla, complétala con tus datos y súbela para importar múltiples incidencias.
+              </div>
+            </div>
           </div>
         </div>
 
@@ -262,7 +454,7 @@ export default function IncidentsNueva() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos los parques</SelectItem>
-                    {parks.map((park: any) => (
+                    {(parks as any[]).map((park: any) => (
                       <SelectItem key={park.id} value={park.id.toString()}>
                         {park.name}
                       </SelectItem>
