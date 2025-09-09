@@ -48,6 +48,12 @@ const ParksDashboardMap: React.FC<ParksDashboardMapProps> = ({ parks, className 
 
     const initMap = async () => {
       try {
+        // Verificar que Google Maps esté completamente disponible
+        if (!window.google || !window.google.maps || !window.google.maps.Map) {
+          console.error('Google Maps API no está completamente cargada');
+          return;
+        }
+
         // Filtrar coordenadas válidas
         const validParks = parks.filter(
           park => 
@@ -88,7 +94,8 @@ const ParksDashboardMap: React.FC<ParksDashboardMapProps> = ({ parks, className 
           else zoom = 7;
         }
 
-        const newMap = await googleMapsService.createMap(mapRef.current!, {
+        // Crear el mapa directamente usando google.maps.Map
+        const newMap = new google.maps.Map(mapRef.current!, {
           center,
           zoom,
           mapTypeControl: false,
@@ -103,7 +110,9 @@ const ParksDashboardMap: React.FC<ParksDashboardMapProps> = ({ parks, className 
       }
     };
 
-    initMap();
+    // Dar un pequeño delay para asegurar que Google Maps esté listo
+    const timeoutId = setTimeout(initMap, 100);
+    return () => clearTimeout(timeoutId);
   }, [isLoaded, parks, map]);
 
   // Actualizar marcadores cuando cambien los parques
@@ -126,8 +135,15 @@ const ParksDashboardMap: React.FC<ParksDashboardMapProps> = ({ parks, className 
 
     const createMarkers = async () => {
       try {
+        // Verificar que Google Maps esté disponible
+        if (!window.google || !window.google.maps || !window.google.maps.Marker) {
+          console.error('Google Maps API no está disponible para crear marcadores');
+          return;
+        }
+
         for (const park of validParks) {
-          const marker = await googleMapsService.createMarker(map, {
+          const marker = new google.maps.Marker({
+            map,
             position: { lat: park.latitude, lng: park.longitude },
             title: park.name,
             icon: {
