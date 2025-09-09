@@ -1,0 +1,34 @@
+Información de la Incidencia
+•	Incidencia: incidencia_id (identificador único)
+•	Fecha de Reporte: fecha_reporte (día y hora de registro)
+•	Fecha de Ocurrencia: fecha_ocurrencia (si difiere del reporte)
+•	Tipo de Afectación: tipo_afectacion (seguridad, ambiental, infraestructura, servicio, usuario, otro)
+•	Nivel de Riesgo: nivel_riesgo (bajo, medio, alto, crítico)
+•	Descripción Detallada: descripcion_detallada (campo expandido, checklist o fotos)
+•	Fotos y/o Videos: fotos/videos_adjuntos (evidencia multimedia)
+•	Ubicación: ubicacion_gps (coordenadas exactas)
+•	Id del Activo: activo_id (si aplica, vinculado al inventario de activos del parque)
+Seguimiento Operativo
+•	Departamento o Área Responsables: departamento_responsable (mantenimiento, seguridad, jardinería, concesiones, etc.)
+•	Personal Responsible: responsable_asignado (persona o cuadrilla)
+•	Fecha de Asignación: fecha_asignacion
+•	Fecha de Inicio de Atención: fecha_inicio_atencion
+•	Fecha de Resolución: fecha_resolucion
+•	Tiempo de Respuesta: tiempo_respuesta (calculado)
+•	Acciones Realizadas: acciones_realizadas (texto o checklist)
+•	Materiales Utilizados: materiales_utilizados (catálogo de insumos, vinculado a almacén)
+•	Costo Estimado: costo_estimado (para control presupuestal)
+•	Costo Real: costo_real (al cierre)
+•	Fuente de Financiamiento: fuente_financiamiento (presupuesto municipal, concesión, patrocinio, donativo, voluntariado)
+Control y Calidad
+•	Estatus: estatus_validacion (pendiente, validado, rechazado)
+•	Supervisor: supervisor_validador (firma o ID de quien valida)
+•	Comentarios del Supervisor: comentarios_supervision
+•	Satisfacción del Usuario: satisfaccion_usuario (escala 1–5, si se trata de un reporte ciudadano)
+•	Seguimiento: seguimiento_post_resolucion (para revisitas, garantías o reincidencia)
+•	Frecuencia del Incidente: frecuencia_incidente (único, recurrente, patrón detectado)
+Dimensión Comunitaria y Ambiental
+•	Afectación a Usuarios: afectacion_usuarios (sí/no; número estimado de personas afectadas)
+•	Afectación Medioambiental: afectacion_medioambiental (suelo, agua, flora, fauna)
+•	Voluntariado: participacion_voluntarios (sí/no, cuántos y de qué grupo)
+•	Reporte Comunitario: reporte_comunidad (si fue un vecino, asociación o visitante

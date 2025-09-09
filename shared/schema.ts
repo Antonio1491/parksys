@@ -737,7 +737,48 @@ export const incidents = pgTable("incidents", {
   imageUrls: text("image_urls").array(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  resolvedAt: timestamp("resolved_at")
+  resolvedAt: timestamp("resolved_at"),
+  
+  // === INFORMACIÓN DE LA INCIDENCIA ===
+  incidenciaId: text("incidencia_id"), // identificador único personalizado
+  fechaReporte: timestamp("fecha_reporte").defaultNow(),
+  fechaOcurrencia: timestamp("fecha_ocurrencia"),
+  tipoAfectacion: text("tipo_afectacion"), // seguridad, ambiental, infraestructura, servicio, usuario, otro
+  nivelRiesgo: text("nivel_riesgo"), // bajo, medio, alto, crítico
+  descripcionDetallada: text("descripcion_detallada"),
+  fotosVideosAdjuntos: text("fotos_videos_adjuntos").array().default([]),
+  ubicacionGps: text("ubicacion_gps"), // coordenadas exactas
+  activoId: integer("activo_id"), // vinculado al inventario de activos
+  
+  // === SEGUIMIENTO OPERATIVO ===
+  departamentoResponsable: text("departamento_responsable"), // mantenimiento, seguridad, jardinería, concesiones, etc.
+  responsableAsignado: text("responsable_asignado"), // persona o cuadrilla
+  fechaAsignacion: timestamp("fecha_asignacion"),
+  fechaInicioAtencion: timestamp("fecha_inicio_atencion"),
+  fechaResolucion: timestamp("fecha_resolucion"),
+  tiempoRespuesta: integer("tiempo_respuesta"), // calculado en horas
+  accionesRealizadas: text("acciones_realizadas"), // texto o checklist
+  materialesUtilizados: text("materiales_utilizados"), // catálogo de insumos
+  costoEstimado: decimal("costo_estimado", { precision: 10, scale: 2 }),
+  costoReal: decimal("costo_real", { precision: 10, scale: 2 }),
+  fuenteFinanciamiento: text("fuente_financiamiento"), // presupuesto municipal, concesión, patrocinio, donativo, voluntariado
+  
+  // === CONTROL Y CALIDAD ===
+  estatusValidacion: text("estatus_validacion").default("pendiente"), // pendiente, validado, rechazado
+  supervisorValidador: text("supervisor_validador"), // firma o ID de quien valida
+  comentariosSupervision: text("comentarios_supervision"),
+  satisfaccionUsuario: integer("satisfaccion_usuario"), // escala 1–5
+  seguimientoPostResolucion: text("seguimiento_post_resolucion"), // para revisitas, garantías o reincidencia
+  frecuenciaIncidente: text("frecuencia_incidente"), // único, recurrente, patrón detectado
+  
+  // === DIMENSIÓN COMUNITARIA Y AMBIENTAL ===
+  afectacionUsuarios: boolean("afectacion_usuarios").default(false), // sí/no
+  numeroPersonasAfectadas: integer("numero_personas_afectadas"), // número estimado
+  afectacionMedioambiental: text("afectacion_medioambiental"), // suelo, agua, flora, fauna
+  participacionVoluntarios: boolean("participacion_voluntarios").default(false), // sí/no
+  numeroVoluntarios: integer("numero_voluntarios"), // cuántos
+  grupoVoluntarios: text("grupo_voluntarios"), // de qué grupo
+  reporteComunidad: text("reporte_comunidad"), // si fue un vecino, asociación o visitante
 });
 
 // Tabla volunteers - Catálogo independiente alimentado desde /volunteers/register
