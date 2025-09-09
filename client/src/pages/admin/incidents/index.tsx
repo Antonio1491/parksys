@@ -383,7 +383,8 @@ const IncidentsPage = () => {
               
               <Button 
                 onClick={handleNewIncident}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 shadow-md"
+                style={{ minWidth: '160px', zIndex: 1000 }}
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Nueva Incidencia
