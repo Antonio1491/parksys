@@ -278,7 +278,7 @@ export default function VolunteersList() {
               {/* Imagen principal - ocupa 2x2 - Gran grupo de voluntarios */}
               <div className="col-span-2 row-span-2 relative cursor-pointer group">
                 <img 
-                  src="/volunteer-3.webp"
+                  src="/images/volunteer-hero.jpg"
                   alt="Gran grupo de voluntarios celebrando en parque natural"
                   className="w-full h-full object-cover rounded-lg shadow-lg"
                 />
@@ -288,7 +288,7 @@ export default function VolunteersList() {
               {/* Imagen 1 - Educación ambiental con niños */}
               <div className="relative cursor-pointer group">
                 <img 
-                  src="/volunteer-1.png"
+                  src="/images/parks-hero.jpg"
                   alt="Voluntarios educando niños sobre medio ambiente en parque"
                   className="w-full h-full object-cover rounded-lg shadow-md"
                 />
@@ -298,7 +298,7 @@ export default function VolunteersList() {
               {/* Imagen 2 - Actividades deportivas */}
               <div className="relative cursor-pointer group">
                 <img 
-                  src="/volunteer-2.png"
+                  src="/images/activities-hero.jpg"
                   alt="Voluntarios organizando actividades deportivas para niños"
                   className="w-full h-full object-cover rounded-lg shadow-md"
                 />
@@ -308,7 +308,7 @@ export default function VolunteersList() {
               {/* Imagen 3 - Jardín japonés */}
               <div className="relative cursor-pointer group">
                 <img 
-                  src="/volunteer-4.jpg"
+                  src="/images/park-people-leisure.jpg"
                   alt="Voluntarios cuidando jardín japonés en parque de Guadalajara"
                   className="w-full h-full object-cover rounded-lg shadow-md"
                 />
@@ -318,7 +318,7 @@ export default function VolunteersList() {
               {/* Imagen 4 - Voluntarios trabajando en jardín tradicional */}
               <div className="relative cursor-pointer group">
                 <img 
-                  src="/volunteer-garden.jpg"
+                  src="/images/park-lake-bridge.jpg"
                   alt="Voluntarios felices con plantas y herramientas de jardinería trabajando en el parque"
                   className="w-full h-full object-cover rounded-lg shadow-md"
                 />
