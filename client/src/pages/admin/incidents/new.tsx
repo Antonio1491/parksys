@@ -170,8 +170,9 @@ const NewIncidentPage = () => {
   // Mutación para crear incidencia
   const createMutation = useMutation({
     mutationFn: async (data: IncidentFormData) => {
-      // Mapear campos del frontend a lo que espera el backend
+      // Mapear campos del frontend a lo que espera el backend con todas las secciones
       const incidentData = {
+        // Campos existentes
         title: data.title,
         description: data.description,
         assetId: data.assetId && data.assetId !== 'none' ? parseInt(data.assetId) : null,
@@ -181,10 +182,49 @@ const NewIncidentPage = () => {
         location: data.location,
         reporterName: data.reportedBy, // reportedBy -> reporterName
         reporterEmail: data.contactInfo, // contactInfo -> reporterEmail
-        status: 'pending' // El servidor espera 'pending', no 'reported'
+        status: 'pending',
+        
+        // === INFORMACIÓN DE LA INCIDENCIA ===
+        incidenciaId: data.incidenciaId,
+        fechaReporte: data.fechaReporte,
+        fechaOcurrencia: data.fechaOcurrencia,
+        tipoAfectacion: data.tipoAfectacion,
+        nivelRiesgo: data.nivelRiesgo,
+        descripcionDetallada: data.descripcionDetallada,
+        ubicacionGps: data.ubicacionGps,
+        activoId: data.activoId && data.activoId !== '' ? parseInt(data.activoId) : null,
+        
+        // === SEGUIMIENTO OPERATIVO ===
+        departamentoResponsable: data.departamentoResponsable,
+        responsableAsignado: data.responsableAsignado,
+        fechaAsignacion: data.fechaAsignacion,
+        fechaInicioAtencion: data.fechaInicioAtencion,
+        fechaResolucion: data.fechaResolucion,
+        accionesRealizadas: data.accionesRealizadas,
+        materialesUtilizados: data.materialesUtilizados,
+        costoEstimado: data.costoEstimado ? parseFloat(data.costoEstimado) : null,
+        costoReal: data.costoReal ? parseFloat(data.costoReal) : null,
+        fuenteFinanciamiento: data.fuenteFinanciamiento,
+        
+        // === CONTROL Y CALIDAD ===
+        estatusValidacion: data.estatusValidacion,
+        supervisorValidador: data.supervisorValidador,
+        comentariosSupervision: data.comentariosSupervision,
+        satisfaccionUsuario: data.satisfaccionUsuario ? parseInt(data.satisfaccionUsuario) : null,
+        seguimientoPostResolucion: data.seguimientoPostResolucion,
+        frecuenciaIncidente: data.frecuenciaIncidente,
+        
+        // === DIMENSIÓN COMUNITARIA Y AMBIENTAL ===
+        afectacionUsuarios: data.afectacionUsuarios === 'si',
+        numeroPersonasAfectadas: data.numeroPersonasAfectadas ? parseInt(data.numeroPersonasAfectadas) : null,
+        afectacionMedioambiental: data.afectacionMedioambiental,
+        participacionVoluntarios: data.participacionVoluntarios === 'si',
+        numeroVoluntarios: data.numeroVoluntarios ? parseInt(data.numeroVoluntarios) : null,
+        grupoVoluntarios: data.grupoVoluntarios,
+        reporteComunidad: data.reporteComunidad,
       };
       
-      console.log('📝 Datos del formulario a enviar:', data);
+      console.log('📝 Datos del formulario completo a enviar:', data);
       console.log('📝 Datos procesados para envío:', incidentData);
       
       return apiRequest('/api/incidents', {

@@ -5747,12 +5747,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create a new incident
+  // Create a new incident with comprehensive fields (4 sections)
   apiRouter.post("/incidents", async (req: Request, res: Response) => {
     try {
-      console.log("📝 CREANDO NUEVA INCIDENCIA:", req.body);
+      console.log("📝 CREANDO NUEVA INCIDENCIA CON CAMPOS COMPLETOS:", req.body);
       
       const {
+        // Campos existentes
         title,
         description,
         assetId,
@@ -5763,31 +5764,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reporterName,
         reporterEmail,
         reporterPhone,
-        status = 'pending'
+        status = 'pending',
+        
+        // === INFORMACIÓN DE LA INCIDENCIA ===
+        incidenciaId,
+        fechaReporte,
+        fechaOcurrencia,
+        tipoAfectacion,
+        nivelRiesgo,
+        descripcionDetallada,
+        ubicacionGps,
+        activoId,
+        
+        // === SEGUIMIENTO OPERATIVO ===
+        departamentoResponsable,
+        responsableAsignado,
+        fechaAsignacion,
+        fechaInicioAtencion,
+        fechaResolucion,
+        accionesRealizadas,
+        materialesUtilizados,
+        costoEstimado,
+        costoReal,
+        fuenteFinanciamiento,
+        
+        // === CONTROL Y CALIDAD ===
+        estatusValidacion = 'pendiente',
+        supervisorValidador,
+        comentariosSupervision,
+        satisfaccionUsuario,
+        seguimientoPostResolucion,
+        frecuenciaIncidente,
+        
+        // === DIMENSIÓN COMUNITARIA Y AMBIENTAL ===
+        afectacionUsuarios = false,
+        numeroPersonasAfectadas,
+        afectacionMedioambiental,
+        participacionVoluntarios = false,
+        numeroVoluntarios,
+        grupoVoluntarios,
+        reporteComunidad,
       } = req.body;
       
-      // Validar campos requeridos
-      if (!title || !description || !parkId || !reporterName) {
+      // Validar campos requeridos básicos
+      if (!title || !tipoAfectacion || !nivelRiesgo || !parkId || !reporterName) {
         return res.status(400).json({
-          message: "Faltan campos requeridos: title, description, parkId, reporterName"
+          message: "Faltan campos requeridos: title, tipoAfectacion, nivelRiesgo, parkId, reporterName"
         });
       }
       
-      // Insertar la nueva incidencia
+      // Insertar la nueva incidencia con todos los campos
       const query = `
         INSERT INTO incidents (
+          -- Campos existentes
           title, description, asset_id, park_id, category, severity, 
           location, reporter_name, reporter_email, reporter_phone, 
-          status, created_at, updated_at
+          status, created_at, updated_at,
+          
+          -- INFORMACIÓN DE LA INCIDENCIA
+          incidencia_id, fecha_reporte, fecha_ocurrencia, tipo_afectacion, 
+          nivel_riesgo, descripcion_detallada, ubicacion_gps, activo_id,
+          
+          -- SEGUIMIENTO OPERATIVO
+          departamento_responsable, responsable_asignado, fecha_asignacion,
+          fecha_inicio_atencion, fecha_resolucion, acciones_realizadas,
+          materiales_utilizados, costo_estimado, costo_real, fuente_financiamiento,
+          
+          -- CONTROL Y CALIDAD
+          estatus_validacion, supervisor_validador, comentarios_supervision,
+          satisfaccion_usuario, seguimiento_post_resolucion, frecuencia_incidente,
+          
+          -- DIMENSIÓN COMUNITARIA Y AMBIENTAL
+          afectacion_usuarios, numero_personas_afectadas, afectacion_medioambiental,
+          participacion_voluntarios, numero_voluntarios, grupo_voluntarios, reporte_comunidad
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW()
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW(),
+          $12, $13, $14, $15, $16, $17, $18, $19,
+          $20, $21, $22, $23, $24, $25, $26, $27, $28, $29,
+          $30, $31, $32, $33, $34, $35,
+          $36, $37, $38, $39, $40, $41, $42
         ) RETURNING *
       `;
       
       const values = [
+        // Campos existentes (1-11)
         title,
-        description,
-        assetId || null,
+        description || descripcionDetallada, // Usar descripcionDetallada como fallback
+        assetId || activoId || null,
         parkId,
         categoryId ? `category_${categoryId}` : null,
         severity,
@@ -5795,16 +5858,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reporterName,
         reporterEmail || null,
         reporterPhone || null,
-        status
+        status,
+        
+        // INFORMACIÓN DE LA INCIDENCIA (12-19)
+        incidenciaId || null,
+        fechaReporte ? new Date(fechaReporte) : new Date(),
+        fechaOcurrencia ? new Date(fechaOcurrencia) : null,
+        tipoAfectacion,
+        nivelRiesgo,
+        descripcionDetallada || null,
+        ubicacionGps || null,
+        activoId || assetId || null,
+        
+        // SEGUIMIENTO OPERATIVO (20-29)
+        departamentoResponsable || null,
+        responsableAsignado || null,
+        fechaAsignacion ? new Date(fechaAsignacion) : null,
+        fechaInicioAtencion ? new Date(fechaInicioAtencion) : null,
+        fechaResolucion ? new Date(fechaResolucion) : null,
+        accionesRealizadas || null,
+        materialesUtilizados || null,
+        costoEstimado || null,
+        costoReal || null,
+        fuenteFinanciamiento || null,
+        
+        // CONTROL Y CALIDAD (30-35)
+        estatusValidacion,
+        supervisorValidador || null,
+        comentariosSupervision || null,
+        satisfaccionUsuario || null,
+        seguimientoPostResolucion || null,
+        frecuenciaIncidente || null,
+        
+        // DIMENSIÓN COMUNITARIA Y AMBIENTAL (36-42)
+        afectacionUsuarios,
+        numeroPersonasAfectadas || null,
+        afectacionMedioambiental || null,
+        participacionVoluntarios,
+        numeroVoluntarios || null,
+        grupoVoluntarios || null,
+        reporteComunidad || null
       ];
       
-      console.log("🔍 Ejecutando INSERT:", query);
-      console.log("🔍 Valores:", values);
+      console.log("🔍 Ejecutando INSERT COMPLETO:", query);
+      console.log("🔍 Valores completos:", values);
       
       const result = await pool.query(query, values);
       const newIncident = result.rows[0];
       
-      console.log("✅ Incidencia creada:", newIncident);
+      console.log("✅ Incidencia completa creada:", newIncident);
       
       // Obtener información adicional del parque y activo
       let enrichedIncident = { ...newIncident };
@@ -5821,10 +5923,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Obtener nombre del activo
-      if (newIncident.asset_id) {
+      if (newIncident.asset_id || newIncident.activo_id) {
+        const assetId = newIncident.asset_id || newIncident.activo_id;
         const assetQuery = await pool.query(
           "SELECT name FROM assets WHERE id = $1", 
-          [newIncident.asset_id]
+          [assetId]
         );
         if (assetQuery.rows.length > 0) {
           enrichedIncident.assetName = assetQuery.rows[0].name;
@@ -5845,18 +5948,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         category: enrichedIncident.category,
         createdAt: enrichedIncident.created_at,
         updatedAt: enrichedIncident.updated_at,
+        
+        // Nuevos campos de las 4 secciones
+        incidenciaId: enrichedIncident.incidencia_id,
+        tipoAfectacion: enrichedIncident.tipo_afectacion,
+        nivelRiesgo: enrichedIncident.nivel_riesgo,
+        descripcionDetallada: enrichedIncident.descripcion_detallada,
+        ubicacionGps: enrichedIncident.ubicacion_gps,
+        departamentoResponsable: enrichedIncident.departamento_responsable,
+        responsableAsignado: enrichedIncident.responsable_asignado,
+        estatusValidacion: enrichedIncident.estatus_validacion,
+        afectacionUsuarios: enrichedIncident.afectacion_usuarios,
+        participacionVoluntarios: enrichedIncident.participacion_voluntarios,
+        
         park: {
           id: enrichedIncident.park_id,
           name: enrichedIncident.parkName
         },
-        asset: enrichedIncident.asset_id ? {
-          id: enrichedIncident.asset_id,
+        asset: (enrichedIncident.asset_id || enrichedIncident.activo_id) ? {
+          id: enrichedIncident.asset_id || enrichedIncident.activo_id,
           name: enrichedIncident.assetName
         } : null
       });
     } catch (error) {
-      console.error("Error creando incidencia:", error);
-      return res.status(500).json({ message: "Error al crear la incidencia" });
+      console.error("Error creando incidencia completa:", error);
+      return res.status(500).json({ 
+        message: "Error al crear la incidencia", 
+        error: error.message,
+        details: error.detail || null 
+      });
     }
   });
   
