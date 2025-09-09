@@ -196,6 +196,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      
       {/* 🎯 FEATURED PARKS SECTION RENOVADO */}
       <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -217,12 +218,12 @@ const Home: React.FC = () => {
             <div className="flex items-center h-full w-full overflow-hidden">
               {isLoading ? (
                 // Loading skeleton
-                (<div className="flex w-full h-full items-center justify-center">
+                <div className="flex w-full h-full items-center justify-center">
                   <div className="w-[50vw] h-full">
                     <Card className="animate-pulse rounded-4xl overflow-hidden h-full w-full">
                     </Card>
                   </div>
-                </div>)
+                </div>
               ) : featuredParks.length > 0 ? (
                 <div className="flex items-center h-full w-full">
                   {/* Carousel container con vista de 3 tarjetas */}
@@ -327,7 +328,7 @@ const Home: React.FC = () => {
                 {/* Flecha izquierda */}
                 <button
                   onClick={prevSlide}
-                  className="absolute left-8 top-1/2 transform -translate-y-1/2 hover:bg-white p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 z-40 bg-[#ffffff00] text-[#ffffff] ml-[60px] mr-[60px]"
+                  className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 z-40"
                 >
                   <ChevronLeft className="h-7 w-7" />
                 </button>
@@ -335,7 +336,7 @@ const Home: React.FC = () => {
                 {/* Flecha derecha */}
                 <button
                   onClick={nextSlide}
-                  className="absolute right-8 top-1/2 transform -translate-y-1/2 hover:bg-white p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 z-40 bg-[#ffffff00] text-[#ffffff] ml-[60px] mr-[60px]"
+                  className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 z-40"
                 >
                   <ChevronRight className="h-7 w-7" />
                 </button>
@@ -353,6 +354,7 @@ const Home: React.FC = () => {
 
         </div>
       </section>
+
       {/* 🏛️ SISTEMA DE PARQUES DE MEXICO SECTION */}
       <section className="py-20 bg-[#00444f]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -480,6 +482,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
       {/* 🌳 ACTIVIDADES E INSTRUCTORES SECTION */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
@@ -600,6 +603,8 @@ const Home: React.FC = () => {
 
         </div>
       </section>
+
+      
       {/* EVENTOS SECTION */}
       <section className="py-24" style={{ backgroundColor: '#a8bd7d' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -691,6 +696,7 @@ const Home: React.FC = () => {
           )}
         </div>
       </section>
+
       {/* PATROCINADORES */}
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -739,7 +745,7 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
             {sponsorsLoading ? (
               // Loading skeleton
-              (Array.from({ length: 6 }).map((_, index) => (
+              Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="group">
                   <div className="bg-white rounded-2xl p-4 shadow-lg">
                     <div className="text-center">
@@ -747,10 +753,10 @@ const Home: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              )))
+              ))
             ) : sponsors.length > 0 ? (
               // Mostrar patrocinadores reales
-              (sponsors
+              sponsors
                 .filter((sponsor: any) => sponsor.status === 'activo' && sponsor.logo) // Solo activos con logo
                 .map((sponsor: any, index: number) => (
                   <div key={sponsor.id || index} className="group">
@@ -782,13 +788,13 @@ const Home: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                )))
+                ))
             ) : (
               // Fallback cuando no hay patrocinadores
-              (<div className="col-span-full text-center py-8">
+              <div className="col-span-full text-center py-8">
                 <div className="text-gray-400 text-lg mb-2">🤝</div>
                 <p className="text-gray-500">Próximamente más patrocinadores se unirán a nuestra causa</p>
-              </div>)
+              </div>
             )}
           </div>
           
@@ -801,6 +807,8 @@ const Home: React.FC = () => {
 
         </div>
       </section>
+
+      
       {/* Footer inspirado en bosquesamg.mx */}
       <footer className="bg-gradient-to-b from-[#067f5f] to-[#00a587] text-white">
         {/* Logo y descripción principal */}
