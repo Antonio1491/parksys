@@ -100,11 +100,11 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
       
 
 
-      // Mapear campos para consistencia con frontend
+      // Mapear campos para consistencia con frontend y normalizar URLs
       const mappedData = result.rows.map(row => ({
         ...row,
         imageCount: parseInt(row.imageCount?.toString()) || 0,
-        primaryImage: row.primaryImage || null
+        primaryImage: row.primaryImage ? replitObjectStorage.normalizeUrl(row.primaryImage) : null
       }));
 
       res.json(mappedData);
