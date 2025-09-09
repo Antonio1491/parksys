@@ -189,26 +189,30 @@ export class ReplitObjectStorageService {
 
   /**
    * 🛠️ NORMALIZAR URL: Corregir URLs que vengan del cliente oficial de Replit
-   * (Puede que el cliente genere URLs con dominios incorrectos)
+   * (Siempre devuelve URLs relativas para máxima compatibilidad)
    */
   normalizeUrl(originalUrl: string): string {
-    // Si ya es una URL relativa, generar la correcta
+    // Si ya es una URL relativa, mantenerla así
     if (originalUrl.startsWith('/api/storage/file/')) {
-      const filename = originalUrl.replace('/api/storage/file/', '');
-      return this.getPublicUrl(decodeURIComponent(filename));
+      return originalUrl;
     }
     
-    // Si es una URL absoluta con dominio de Replit obsoleto, corregirla
-    if (originalUrl.includes('replit.dev/api/storage/file/') || 
+    // Si es una URL absoluta con cualquier dominio de Replit, convertir a relativa
+    if (originalUrl.includes('.replit.dev/api/storage/file/') || 
         originalUrl.includes('.spock.replit.dev/api/storage/file/')) {
       const match = originalUrl.match(/\/api\/storage\/file\/(.+)$/);
       if (match) {
         const filename = match[1];
-        console.log(`🔧 [NORMALIZE] Corrigiendo URL con dominio incorrecto: ${originalUrl}`);
-        const correctedUrl = this.getPublicUrl(decodeURIComponent(filename));
-        console.log(`✅ [NORMALIZE] URL corregida: ${correctedUrl}`);
-        return correctedUrl;
+        console.log(`🔧 [NORMALIZE] Convirtiendo URL absoluta a relativa: ${originalUrl}`);
+        const relativeUrl = `/api/storage/file/${filename}`;
+        console.log(`✅ [NORMALIZE] URL normalizada: ${relativeUrl}`);
+        return relativeUrl;
       }
+    }
+    
+    // Si es una URL filesystem, mantenerla
+    if (originalUrl.startsWith('/uploads/')) {
+      return originalUrl;
     }
     
     // Si ya está correcta, devolverla tal como está
