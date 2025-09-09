@@ -351,12 +351,6 @@ const IncidentsPage = () => {
   return (
     <AdminLayout>
       <div className="p-6">
-        {/* DEPURACIÓN: VERSIÓN 2.0 - NUEVA SECCIÓN FORMULARIO */}
-        <div className="bg-yellow-200 p-4 mb-4 border-2 border-yellow-500">
-          <h2 className="text-lg font-bold">🟡 DEBUGGING: ¿PUEDES VER ESTO?</h2>
-          <p>Si puedes ver esto, el componente está actualizando</p>
-        </div>
-
         {/* Header con patrón Card estandarizado */}
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex items-center justify-between">
@@ -398,33 +392,29 @@ const IncidentsPage = () => {
           </div>
         </Card>
 
-        {/* Nueva sección: Formulario */}
-        <Card className="p-4 mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2">
-              <ClipboardList className="h-5 w-5" />
-              Formulario
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
-                onClick={handleNewIncident}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nueva Incidencia
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={handleManageCategories}
-              >
-                <Bookmark className="h-4 w-4 mr-2" />
-                Gestionar Categorías
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Sección Formulario */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <ClipboardList className="h-5 w-5 text-gray-700" />
+            <h2 className="text-lg font-semibold text-gray-900">Formulario</h2>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button 
+              onClick={handleNewIncident}
+              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nueva Incidencia
+            </button>
+            <button 
+              onClick={handleManageCategories}
+              className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md border border-gray-300 transition-colors"
+            >
+              <Bookmark className="h-4 w-4 mr-2" />
+              Gestionar Categorías
+            </button>
+          </div>
+        </div>
           
         <Tabs defaultValue="all" className="flex-1">
           <TabsList>
