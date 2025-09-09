@@ -10,6 +10,7 @@ import { eq, and, desc, sql } from "drizzle-orm";
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { replitObjectStorage } from './objectStorage-replit';
 import { volunteers, volunteerParticipations, volunteerEvaluations, volunteerRecognitions, users, parks } from "@shared/schema";
 // Importamos nuestro nuevo módulo para actualizar los campos de voluntarios preservando valores
 import { 
@@ -52,7 +53,13 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
         ORDER BY v.created_at DESC
       `);
       
-      res.json(result.rows || []);
+      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+      const volunteersWithNormalizedImages = (result.rows || []).map(volunteer => ({
+        ...volunteer,
+        profileImageUrl: volunteer.profileImageUrl ? replitObjectStorage.normalizeUrl(volunteer.profileImageUrl) : volunteer.profileImageUrl
+      }));
+      
+      res.json(volunteersWithNormalizedImages);
     } catch (error) {
       console.error('Error obteniendo voluntarios públicos:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
