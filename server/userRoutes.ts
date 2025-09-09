@@ -7,6 +7,7 @@ import { fromZodError } from 'zod-validation-error';
 import { db } from './db';
 import { sql } from 'drizzle-orm';
 import { syncInstructorProfileWithUser } from './syncInstructorProfile';
+import { replitObjectStorage } from './objectStorage-replit';
 
 // Esquema para validar la creación de un usuario
 const createUserSchema = z.object({
@@ -300,8 +301,14 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
               emergencyPhone: volunteerData.emergency_phone
             });
             
+            // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+            const userWithNormalizedImages = {
+              ...userDataWithVolunteer,
+              profileImageUrl: userDataWithVolunteer.profileImageUrl ? replitObjectStorage.normalizeUrl(userDataWithVolunteer.profileImageUrl) : userDataWithVolunteer.profileImageUrl
+            };
+            
             // Devolvemos directamente este objeto enriquecido
-            return res.json(userDataWithVolunteer);
+            return res.json(userWithNormalizedImages);
           }
         } catch (error) {
           console.error('Error al obtener datos de voluntario:', error);
