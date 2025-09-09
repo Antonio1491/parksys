@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test de Imágenes de Concesiones</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .image-test {
+            border: 1px solid #ccc;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        img {
+            max-width: 300px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Imágenes de Concesiones</h1>
+    
+    <div class="image-test">
+        <h3>1. Imagen del Filesystem</h3>
+        <p><strong>URL:</strong> <code>/uploads/concession-images/concession-img-1754871487214-952309607.jpg</code></p>
+        <img 
+            src="/uploads/concession-images/concession-img-1754871487214-952309607.jpg" 
+            alt="Imagen Filesystem"
+            onload="console.log('✅ Filesystem image loaded'); document.getElementById('status1').innerHTML = '✅ Cargó correctamente'"
+            onerror="console.log('❌ Filesystem image failed'); document.getElementById('status1').innerHTML = '❌ Error al cargar'"
+        />
+        <p><span id="status1">⏳ Cargando...</span></p>
+    </div>
+
+    <div class="image-test">
+        <h3>2. Imagen del Object Storage</h3>
+        <p><strong>URL:</strong> <code>/api/storage/file/uploads%2F1757431584936-e18b964d-9e54-4793-8a28-f72f1274a6bb-tim-foster-jhovC0t8f-8-unsplash.jpg</code></p>
+        <img 
+            src="/api/storage/file/uploads%2F1757431584936-e18b964d-9e54-4793-8a28-f72f1274a6bb-tim-foster-jhovC0t8f-8-unsplash.jpg" 
+            alt="Imagen Object Storage"
+            onload="console.log('✅ Object Storage image loaded'); document.getElementById('status2').innerHTML = '✅ Cargó correctamente'"
+            onerror="console.log('❌ Object Storage image failed'); document.getElementById('status2').innerHTML = '❌ Error al cargar'"
+        />
+        <p><span id="status2">⏳ Cargando...</span></p>
+    </div>
+
+    <div class="image-test">
+        <h3>3. Test del API de Concesiones</h3>
+        <button onclick="testAPI()">🔄 Cargar desde API</button>
+        <div id="api-results"></div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultsDiv = document.getElementById('api-results');
+            resultsDiv.innerHTML = '⏳ Cargando desde API...';
+            
+            try {
+                const response = await fetch('/api/active-concessions/6/images');
+                const images = await response.json();
+                
+                let html = `<p class="success">✅ API respondió con ${images.length} imágenes:</p>`;
+                
+                images.forEach((img, index) => {
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #eee;">
+                            <p><strong>Imagen ${index + 1} (ID: ${img.id}):</strong></p>
+                            <p><code>${img.image_url}</code></p>
+                            <img 
+                                src="${img.image_url}" 
+                                alt="Imagen ${index + 1}"
+                                style="max-width: 200px;"
+                                onload="console.log('✅ API image ${index + 1} loaded')"
+                                onerror="console.log('❌ API image ${index + 1} failed')"
+                            />
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // Test automático al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Página de test cargada. Verificando imágenes...');
+            setTimeout(testAPI, 1000);
+        });
+    </script>
+</body>
+</html>
