@@ -1,62 +1,379 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ClipboardList } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, ClipboardList, Search, X, AlertTriangle, BarChart, Bookmark, Calendar, MapPin, User, Clock, Filter, ExternalLink } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import AdminLayout from '@/components/AdminLayout';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default function IncidentsNueva() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterPark, setFilterPark] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Consulta para obtener todas las incidencias
+  const { data: incidents = [], isLoading } = useQuery({
+    queryKey: ['/api/incidents'],
+  });
+
+  // Consulta para obtener todos los parques
+  const { data: parks = [] } = useQuery({
+    queryKey: ['/api/parks'],
+  });
+
+  // Consulta para obtener categorías
+  const { data: categoriesRaw } = useQuery({
+    queryKey: ['/api/incident-categories'],
+  });
+
+  const categories = categoriesRaw && Array.isArray(categoriesRaw) && categoriesRaw.length > 0 
+    ? categoriesRaw 
+    : [
+        { id: 1, name: 'Daños', color: '#ef4444' },
+        { id: 2, name: 'Seguridad', color: '#f97316' },
+        { id: 3, name: 'Mantenimiento', color: '#3b82f6' },
+        { id: 4, name: 'Limpieza', color: '#10b981' },
+        { id: 5, name: 'Servicios', color: '#8b5cf6' }
+      ];
 
   const handleNewIncident = () => {
     setLocation('/admin/incidents/new');
   };
 
+  const handleManageCategories = () => {
+    setLocation('/admin/incidents/categories');
+  };
+
+  const handleViewDashboard = () => {
+    setLocation('/admin/incidents/dashboard');
+  };
+
+  // Filtrar incidencias
+  const filteredIncidents = useMemo(() => {
+    return incidents.filter(incident => {
+      const matchesSearch = searchQuery === '' || 
+        incident.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        incident.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        incident.reporterName?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesPark = filterPark === 'all' || incident.parkId?.toString() === filterPark;
+      const matchesStatus = filterStatus === 'all' || incident.status === filterStatus;
+      const matchesCategory = filterCategory === 'all' || incident.category === filterCategory;
+      const matchesPriority = filterPriority === 'all' || incident.severity === filterPriority;
+      
+      return matchesSearch && matchesPark && matchesStatus && matchesCategory && matchesPriority;
+    });
+  }, [incidents, searchQuery, filterPark, filterStatus, filterCategory, filterPriority]);
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setFilterPark('all');
+    setFilterStatus('all');
+    setFilterCategory('all');
+    setFilterPriority('all');
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'alta': return 'bg-red-100 text-red-800';
+      case 'media': return 'bg-yellow-100 text-yellow-800';
+      case 'baja': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'in_progress': return 'bg-blue-100 text-blue-800';
+      case 'resolved': return 'bg-green-100 text-green-800';
+      case 'closed': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const renderIncidentRow = (incident: any) => (
+    <tr key={incident.id} className="hover:bg-gray-50">
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        #{incident.id}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm font-medium text-gray-900">{incident.title}</div>
+        <div className="text-sm text-gray-500 truncate max-w-xs">{incident.description}</div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm text-gray-900">{incident.parkName || 'Sin parque'}</div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <Badge className={`${getSeverityColor(incident.severity)} border-0`}>
+          {incident.severity || 'No definida'}
+        </Badge>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <Badge className={`${getStatusColor(incident.status)} border-0`}>
+          {incident.status === 'pending' ? 'Pendiente' :
+           incident.status === 'in_progress' ? 'En Proceso' :
+           incident.status === 'resolved' ? 'Resuelta' :
+           incident.status === 'closed' ? 'Cerrada' : 'Estado desconocido'}
+        </Badge>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {incident.reporterName || 'Anónimo'}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        {incident.createdAt ? format(new Date(incident.createdAt), 'dd/MM/yyyy', { locale: es }) : 'Fecha no disponible'}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setLocation(`/admin/incidents/${incident.id}`)}
+        >
+          <ExternalLink className="h-4 w-4" />
+        </Button>
+      </td>
+    </tr>
+  );
+
   return (
     <AdminLayout>
       <div className="p-6">
-        {/* BANNER CRÍTICO PARA VERIFICAR CACHE */}
-        <div className="bg-red-600 text-white p-8 mb-6 rounded-lg text-center">
-          <h1 className="text-3xl font-bold">🚨 PÁGINA NUEVA - ESTO DEBE VERSE</h1>
-          <p className="text-xl mt-2">Si ves esto, significa que funciona el sistema de archivos</p>
-        </div>
+        {/* Header */}
+        <Card className="p-4 bg-gray-50 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-8 h-8 text-gray-900" />
+                <h1 className="text-3xl font-bold text-gray-900">Gestión de Incidencias</h1>
+              </div>
+              <p className="text-gray-600 mt-2">
+                Reportes y seguimiento de incidencias en parques y activos
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                variant="default" 
+                onClick={handleViewDashboard}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <BarChart className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={handleManageCategories}
+              >
+                <Bookmark className="h-4 w-4 mr-2" />
+                Categorías
+              </Button>
+              
+              <Button 
+                onClick={handleNewIncident}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Incidencia
+              </Button>
+            </div>
+          </div>
+        </Card>
 
         {/* Sección Formulario */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
-            <ClipboardList className="h-6 w-6 text-green-600" />
-            <h2 className="text-xl font-semibold text-gray-900">📝 Formulario de Incidencias</h2>
+            <ClipboardList className="h-5 w-5 text-gray-700" />
+            <h2 className="text-lg font-semibold text-gray-900">Formulario</h2>
           </div>
-          <div className="space-y-4">
-            <p className="text-gray-600">
-              Desde aquí puedes crear nuevas incidencias y gestionar las categorías.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
-                onClick={handleNewIncident}
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
-              >
-                <Plus className="h-5 w-5" />
-                ✨ Nueva Incidencia
-              </Button>
-              <Button 
-                variant="outline"
-                className="border-gray-300 hover:bg-gray-50"
-              >
-                <ClipboardList className="h-5 w-5 mr-2" />
-                📂 Gestionar Categorías
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button 
+              onClick={handleNewIncident}
+              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nueva Incidencia
+            </button>
+            <button 
+              onClick={handleManageCategories}
+              className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md border border-gray-300 transition-colors"
+            >
+              <Bookmark className="h-4 w-4 mr-2" />
+              Gestionar Categorías
+            </button>
           </div>
         </div>
 
-        {/* Información adicional */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-medium text-blue-800 mb-2">ℹ️ Información</h3>
-          <p className="text-blue-700 text-sm">
-            Esta es la nueva sección "Formulario" que fue añadida al módulo de incidencias.
-            Aquí encontrarás las herramientas para crear y gestionar incidencias.
-          </p>
-        </div>
+        {/* Filtros y búsqueda */}
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="search"
+                  placeholder="Buscar incidencias..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-2.5 text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  Filtros
+                </Button>
+                
+                {(filterPark !== 'all' || filterStatus !== 'all' || filterCategory !== 'all' || filterPriority !== 'all') && (
+                  <Button variant="ghost" onClick={clearFilters}>
+                    Limpiar
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            {showFilters && (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 pt-4 border-t">
+                <Select value={filterPark} onValueChange={setFilterPark}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos los parques" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los parques</SelectItem>
+                    {parks.map((park: any) => (
+                      <SelectItem key={park.id} value={park.id.toString()}>
+                        {park.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos los estados" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los estados</SelectItem>
+                    <SelectItem value="pending">Pendiente</SelectItem>
+                    <SelectItem value="in_progress">En Proceso</SelectItem>
+                    <SelectItem value="resolved">Resuelta</SelectItem>
+                    <SelectItem value="closed">Cerrada</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas las categorías" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
+                    {categories.map((category: any) => (
+                      <SelectItem key={category.id} value={category.name}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={filterPriority} onValueChange={setFilterPriority}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas las prioridades" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las prioridades</SelectItem>
+                    <SelectItem value="alta">Alta</SelectItem>
+                    <SelectItem value="media">Media</SelectItem>
+                    <SelectItem value="baja">Baja</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </CardHeader>
+        </Card>
+
+        {/* Lista de incidencias */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Lista de Incidencias</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <p className="mt-2 text-gray-600">Cargando incidencias...</p>
+              </div>
+            ) : filteredIncidents.length === 0 ? (
+              <div className="text-center py-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                  <ClipboardList className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No hay incidencias</h3>
+                <p className="text-gray-500 mb-4">No se encontraron incidencias con los filtros aplicados.</p>
+                <Button onClick={clearFilters}>
+                  Limpiar filtros
+                </Button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Título
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Parque
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Prioridad
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Estado
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Reportero
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Fecha
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Acciones
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredIncidents.map(renderIncidentRow)}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
