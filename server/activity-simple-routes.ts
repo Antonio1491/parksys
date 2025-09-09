@@ -5,6 +5,7 @@ import fs from "fs";
 import { db } from "./db";
 import { activities } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { replitObjectStorage } from './objectStorage-replit';
 
 const router = Router();
 
@@ -88,10 +89,16 @@ router.post("/:activityId/image", upload.single('image'), async (req: Request, r
     
     console.log(`✅ [ACTIVITY-IMG] DB actualizada - Actividad ${activityId}: ${imageUrl}`);
     
+    // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+    const activityWithNormalizedImages = {
+      ...updatedActivity[0],
+      imageUrl: updatedActivity[0].imageUrl ? replitObjectStorage.normalizeUrl(updatedActivity[0].imageUrl) : updatedActivity[0].imageUrl
+    };
+
     res.json({
       success: true,
-      activity: updatedActivity[0],
-      imageUrl,
+      activity: activityWithNormalizedImages,
+      imageUrl: imageUrl ? replitObjectStorage.normalizeUrl(imageUrl) : imageUrl,
       fileInfo: {
         filename: req.file.filename,
         size: req.file.size,
