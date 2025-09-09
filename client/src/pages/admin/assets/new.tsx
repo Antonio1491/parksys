@@ -488,24 +488,6 @@ const CreateAssetPage: React.FC = () => {
                     )}
                   />
                   
-                  <FormField
-                    control={form.control}
-                    name="serialNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Número de Serie</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Número de serie o código" 
-                            {...field} 
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
                   {/* Categoría Principal */}
                   <FormField
                     control={form.control}
@@ -658,116 +640,6 @@ const CreateAssetPage: React.FC = () => {
                         <FormDescription>
                           Identificador personalizado para el activo (opcional)
                         </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="manufacturer"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Fabricante</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Marca o fabricante" 
-                            {...field} 
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="model"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Modelo</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Modelo del activo" 
-                            {...field} 
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Estado*</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un estado" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ASSET_STATUSES.map((status) => (
-                                <SelectItem key={status.value} value={status.value}>
-                                  {status.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="condition"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Condición*</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione una condición" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ASSET_CONDITIONS.map((condition) => (
-                                <SelectItem key={condition.value} value={condition.value}>
-                                  {condition.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="qrCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Código QR</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="URL o código QR" 
-                            {...field} 
-                            value={field.value || ''}
-                          />
-                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -1201,33 +1073,6 @@ const CreateAssetPage: React.FC = () => {
                     )}
                   />
 
-                  {/* Estado */}
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Estado*</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un estado" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="activo">Activo</SelectItem>
-                              <SelectItem value="en_mantenimiento">En Mantenimiento</SelectItem>
-                              <SelectItem value="dañado">Dañado</SelectItem>
-                              <SelectItem value="retirado">Retirado</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
 
                 {/* Historial de Mantenimientos (nota informativa) */}
@@ -1364,88 +1209,6 @@ const CreateAssetPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Mantenimiento */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Mantenimiento
-                </CardTitle>
-                <CardDescription>
-                  Programación y seguimiento de mantenimiento
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="maintenanceFrequency"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Frecuencia de Mantenimiento</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value || ''}
-                            onValueChange={(value) => field.onChange(value || null)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione frecuencia" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Sin mantenimiento programado</SelectItem>
-                              {MAINTENANCE_FREQUENCIES.map((frequency) => (
-                                <SelectItem key={frequency.value} value={frequency.value}>
-                                  {frequency.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="md:col-span-1"></div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="lastMaintenanceDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Último Mantenimiento</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="date" 
-                            {...field} 
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="nextMaintenanceDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Próximo Mantenimiento</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="date" 
-                            {...field} 
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
 
             {/* 6. CONTROL Y GESTIÓN */}
             <Card>
