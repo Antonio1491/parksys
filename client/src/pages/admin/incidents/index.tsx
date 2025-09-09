@@ -351,6 +351,12 @@ const IncidentsPage = () => {
   return (
     <AdminLayout>
       <div className="p-6">
+        {/* 🟢 TIMESTAMP: 23:52 - DEBE APARECER FORMULARIO AHORA */}
+        <div className="bg-red-100 border-2 border-red-500 p-4 mb-4 rounded-lg">
+          <h1 className="text-red-800 font-bold text-xl">🚨 SI VES ESTO, EL CACHE SE ACTUALIZÓ</h1>
+          <p className="text-red-600">Timestamp: 23:52 - Actualizando caché</p>
+        </div>
+
         {/* Header con patrón Card estandarizado */}
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex items-center justify-between">
