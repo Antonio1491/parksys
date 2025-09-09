@@ -202,21 +202,14 @@ const ParksDashboard = () => {
     );
   }
 
-  // Cálculo de los límites del mapa basado en las coordenadas de los parques
-  const validCoordinates = data.parksWithCoordinates
-  ?.filter(
+  // Los parques con coordenadas válidas para el mapa
+  const parksWithValidCoordinates = data.parksWithCoordinates?.filter(
     (park) =>
       park.latitude != null &&
       park.longitude != null &&
       !isNaN(park.latitude) &&
       !isNaN(park.longitude)
-  )
-  .map((park) => [park.latitude, park.longitude] as [number, number]);
-
-  const parksBounds =
-    validCoordinates.length > 0
-      ? L.latLngBounds(validCoordinates).pad(0.1) // 10% de expansión
-      : L.latLngBounds([[20.6767, -103.3476]]); // fallback: Guadalajara
+  ) || [];
   
   return (
     <DashboardLayout 
@@ -406,38 +399,10 @@ const ParksDashboard = () => {
         <Card className="border-0 shadow-xl rounded-3xl overflow-hidden min-h-[28rem] h-full">
           <CardContent className="p-0 h-full">
             <div className="relative h-full min-h-[28rem] w-full">
-              <MapContainer
-                bounds={parksBounds}
-                scrollWheelZoom={false}
-                className="absolute inset-0 !h-full !w-full"
-                style={{ height: "100%", width: "100%", background: "transparent" }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {validCoordinates?.map(([lat, lng], index) => {
-                  const park = data.parksWithCoordinates[index];
-                  return (
-                    <Marker key={park.id} position={[lat, lng]}>
-                      <Popup>
-                        <div className="space-y-2">
-                          <h3 className="font-semibold">{park.name}</h3>
-                          <p className="text-sm text-gray-600">{park.municipality}</p>
-                          <div className="flex flex-wrap gap-1">
-                            <Badge variant="outline" className="text-xs">{park.type}</Badge>
-                            {park.area && (
-                              <Badge variant="secondary" className="text-xs">
-                                {(park.area / 10000).toFixed(1)} ha
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
-              </MapContainer>
+              <ParksDashboardMap 
+                parks={parksWithValidCoordinates}
+                className="absolute inset-0 !h-full !w-full rounded-3xl"
+              />
             </div>
           </CardContent>
         </Card>
