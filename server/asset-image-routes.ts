@@ -5,6 +5,7 @@ import { eq, and, desc, ne } from 'drizzle-orm';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { replitObjectStorage } from './objectStorage-replit';
 
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
@@ -128,7 +129,10 @@ export function registerAssetImageRoutes(app: any, apiRouter: Router, isAuthenti
         })
         .returning();
 
-      res.status(201).json(newImage);
+      res.status(201).json({
+        ...newImage,
+        imageUrl: replitObjectStorage.normalizeUrl(newImage.imageUrl)
+      });
     } catch (error) {
       console.error('Error al subir imagen:', error);
       
