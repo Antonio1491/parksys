@@ -135,11 +135,11 @@ const Parks: React.FC = () => {
               <div className="flex items-center justify-center gap-3 mb-2">
                 <Compass className="h-12 w-12 md:h-10 md:w-10 text-white" />
                 <span className="font-guttery font-thin text-white">
-                  Explora
+                  Nuestros
                 </span>
               </div>
-              <div className="font-bold text-white">
-                Nuestros Parques y Bosques
+              <div className="font-poppins font-bold text-white">
+                Parques y Bosques
               </div>
             </h1>
             <p className="text-xl text-green-100 max-w-2xl mx-auto">

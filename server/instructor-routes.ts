@@ -16,6 +16,7 @@ import {
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { replitObjectStorage } from './objectStorage-replit';
 
 // Configuración de multer para subida de archivos
 const storage = multer.diskStorage({
@@ -173,7 +174,14 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         }
         
         const instructorsArray = Array.from(uniqueInstructors.values());
-        res.json(instructorsArray);
+        
+        // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+        const instructorsWithNormalizedImages = instructorsArray.map(instructor => ({
+          ...instructor,
+          profile_image_url: instructor.profile_image_url ? replitObjectStorage.normalizeUrl(instructor.profile_image_url) : instructor.profile_image_url
+        }));
+        
+        res.json(instructorsWithNormalizedImages);
       } catch (error) {
         console.error("Error al obtener instructores públicos:", error);
         res.status(500).json({ message: "Error al obtener instructores" });
@@ -273,7 +281,13 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         })
       );
 
-      res.json(instructorsWithParkNames);
+      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+      const instructorsWithNormalizedImages = instructorsWithParkNames.map(instructor => ({
+        ...instructor,
+        profileImageUrl: instructor.profileImageUrl ? replitObjectStorage.normalizeUrl(instructor.profileImageUrl) : instructor.profileImageUrl
+      }));
+
+      res.json(instructorsWithNormalizedImages);
     } catch (error) {
       console.error('Error fetching instructors:', error);
       res.status(500).json({ message: 'Error al obtener instructores' });
@@ -303,7 +317,13 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
         fullName: instructor.fullName || `${instructor.firstName || ''} ${instructor.lastName || ''}`.trim()
       };
 
-      res.json(updatedInstructor);
+      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
+      const instructorWithNormalizedImages = {
+        ...updatedInstructor,
+        profileImageUrl: updatedInstructor.profileImageUrl ? replitObjectStorage.normalizeUrl(updatedInstructor.profileImageUrl) : updatedInstructor.profileImageUrl
+      };
+
+      res.json(instructorWithNormalizedImages);
     } catch (error) {
       console.error('Error fetching instructor:', error);
       res.status(500).json({ message: 'Error al obtener instructor' });
