@@ -128,7 +128,10 @@ router.post("/:activityId/images", activityImageUpload.single('imageFile'), asyn
     
     console.log(`✅ [ACTIVITY-HÍBRIDO] Imagen guardada en DB para actividad ${activityId}: ${imageUrl}`);
     
-    res.status(201).json(newImage[0]);
+    res.status(201).json({
+      ...newImage[0],
+      imageUrl: replitObjectStorage.normalizeUrl(newImage[0].imageUrl)
+    });
   } catch (error) {
     console.error("❌ [ACTIVITY-HÍBRIDO] Error al subir imagen de actividad:", error);
     res.status(500).json({ error: "Error interno del servidor" });

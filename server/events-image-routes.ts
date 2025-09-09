@@ -128,7 +128,10 @@ router.post("/:eventId/images", eventImageUpload.single('imageFile'), async (req
     
     console.log(`✅ [EVENT-HÍBRIDO] Imagen guardada en DB para evento ${eventId}: ${imageUrl}`);
     
-    res.status(201).json(newImage[0]);
+    res.status(201).json({
+      ...newImage[0],
+      imageUrl: replitObjectStorage.normalizeUrl(newImage[0].imageUrl)
+    });
   } catch (error) {
     console.error("❌ [EVENT-HÍBRIDO] Error al subir imagen de evento:", error);
     res.status(500).json({ error: "Error interno del servidor" });
