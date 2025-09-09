@@ -4,6 +4,7 @@ import { db } from "./db";
 import { reservableSpaces, spaceReservations, parks, spaceImages, spaceDocuments, spaceAvailability } from "../shared/schema";
 import { insertSpaceImageSchema, insertSpaceDocumentSchema } from "../shared/schema";
 import { ObjectStorageService } from "./objectStorage";
+import { replitObjectStorage } from "./objectStorage-replit";
 import multer from "multer";
 import path from "path";
 
@@ -66,18 +67,9 @@ export function registerReservableSpacesRoutes(app: Express) {
 
         console.log(`🖼️ Espacio ${space.name} (ID: ${space.id}) tiene ${images.length} imágenes:`, images.map(img => img.imageUrl));
 
-        // Formar URLs completas para las imágenes y string separado por comas
+        // Formar URLs completas para las imágenes y string separado por comas con normalización
         const imageUrls = images.map(img => {
-          // Si ya es una URL completa (http/https), mantenerla tal como está
-          if (img.imageUrl.startsWith('http://') || img.imageUrl.startsWith('https://')) {
-            return img.imageUrl;
-          }
-          // Si es una URL del object storage, mantenerla como está para ser servida por el servidor
-          if (img.imageUrl.startsWith('/objects/uploads/')) {
-            return img.imageUrl;
-          }
-          // Para otros casos, asumir que es una URL relativa
-          return img.imageUrl;
+          return replitObjectStorage.normalizeUrl(img.imageUrl);
         }).join(',');
         
         return {
@@ -141,26 +133,15 @@ export function registerReservableSpacesRoutes(app: Express) {
 
       console.log(`🖼️ Imágenes encontradas para espacio ${id}:`, images);
 
-      // Formar URLs completas para las imágenes y string separado por comas con corrección automática
+      // Formar URLs completas para las imágenes y string separado por comas con normalización automática
       const imageUrls = images.map(img => {
-        // Si ya es una URL completa (http/https), mantenerla tal como está
-        if (img.imageUrl.startsWith('http://') || img.imageUrl.startsWith('https://')) {
-          return img.imageUrl;
-        }
-        
-        // Para rutas /objects/, mantenerlas como están para que el servidor las pueda servir
-        if (img.imageUrl.startsWith('/objects/')) {
-          return img.imageUrl;
-        }
-        
-        // Para otros casos, asumir que es una URL relativa válida
-        return img.imageUrl;
+        return replitObjectStorage.normalizeUrl(img.imageUrl);
       }).join(',');
       
       const spaceWithImages = {
         ...space[0],
         images: imageUrls.length > 0 ? imageUrls : null,
-        imageUrls: images.length > 0 ? images.map(img => img.imageUrl) : null // Array de URLs para compatibilidad
+        imageUrls: images.length > 0 ? images.map(img => replitObjectStorage.normalizeUrl(img.imageUrl)) : null // Array de URLs normalizadas para compatibilidad
       };
 
       console.log(`🏛️ Espacio encontrado: ${spaceWithImages.name}`);
