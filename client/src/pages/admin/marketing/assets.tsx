@@ -276,6 +276,196 @@ export default function SponsoredAssetsPage() {
         <PageHeader 
           title="Activos" 
           subtitle='Gestión de activos patrocinados y sus detalles'
+          icon={<Package />}
+          actions={[
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="primary"
+                  onClick={resetForm}>
+                  <Plus className="mr-2 stroke-[4]" />
+                  Nuevo Activo
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {selectedAsset ? 'Editar Activo Patrocinado' : 'Nuevo Activo Patrocinado'}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="sponsorId">Patrocinador *</Label>
+                      <Select value={formData.sponsorId} onValueChange={(value) => setFormData({ ...formData, sponsorId: value, contractId: '' })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar patrocinador" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sponsors.map((sponsor: Sponsor) => (
+                            <SelectItem key={sponsor.id} value={sponsor.id.toString()}>
+                              {sponsor.name} (Tier {sponsor.tier})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="contractId">Contrato</Label>
+                      <Select value={formData.contractId} onValueChange={(value) => setFormData({ ...formData, contractId: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar contrato (opcional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Sin contrato específico</SelectItem>
+                          {getAvailableContracts(formData.sponsorId).map((contract: Contract) => (
+                            <SelectItem key={contract.id} value={contract.id.toString()}>
+                              Contrato #{contract.id} - {contract.sponsor?.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="assetType">Tipo de Activo *</Label>
+                      <Select value={formData.assetType} onValueChange={(value) => setFormData({ ...formData, assetType: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="banners">Banners</SelectItem>
+                          <SelectItem value="digital_screens">Pantallas Digitales</SelectItem>
+                          <SelectItem value="park_furniture">Mobiliario de Parque</SelectItem>
+                          <SelectItem value="infrastructure">Infraestructura</SelectItem>
+                          <SelectItem value="signage">Señalización</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="assetName">Nombre del Activo *</Label>
+                      <Input
+                        id="assetName"
+                        value={formData.assetName}
+                        onChange={(e) => setFormData({ ...formData, assetName: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="parkLocation">Ubicación en el Parque</Label>
+                      <Input
+                        id="parkLocation"
+                        value={formData.parkLocation}
+                        onChange={(e) => setFormData({ ...formData, parkLocation: e.target.value })}
+                        placeholder="Ej: Entrada principal, Área de juegos..."
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="sponsorshipLevel">Nivel de Patrocinio</Label>
+                      <Select value={formData.sponsorshipLevel} onValueChange={(value) => setFormData({ ...formData, sponsorshipLevel: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="premium">Premium</SelectItem>
+                          <SelectItem value="standard">Estándar</SelectItem>
+                          <SelectItem value="basic">Básico</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="logoPlacement">Colocación del Logo</Label>
+                      <Input
+                        id="logoPlacement"
+                        value={formData.logoPlacement}
+                        onChange={(e) => setFormData({ ...formData, logoPlacement: e.target.value })}
+                        placeholder="Ej: Esquina superior derecha"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="impressionsPerDay">Impresiones por Día</Label>
+                      <Input
+                        id="impressionsPerDay"
+                        type="number"
+                        value={formData.impressionsPerDay}
+                        onChange={(e) => setFormData({ ...formData, impressionsPerDay: e.target.value })}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="displayDuration">Duración de Exhibición</Label>
+                      <Input
+                        id="displayDuration"
+                        value={formData.displayDuration}
+                        onChange={(e) => setFormData({ ...formData, displayDuration: e.target.value })}
+                        placeholder="Ej: 6 meses, 1 año"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="maintenanceRequirement">Requerimientos de Mantenimiento</Label>
+                      <Input
+                        id="maintenanceRequirement"
+                        value={formData.maintenanceRequirement}
+                        onChange={(e) => setFormData({ ...formData, maintenanceRequirement: e.target.value })}
+                        placeholder="Ej: Limpieza semanal"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="installationCost">Costo de Instalación</Label>
+                      <Input
+                        id="installationCost"
+                        value={formData.installationCost}
+                        onChange={(e) => setFormData({ ...formData, installationCost: e.target.value })}
+                        placeholder="$0.00"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="monthlyFee">Cuota Mensual</Label>
+                      <Input
+                        id="monthlyFee"
+                        value={formData.monthlyFee}
+                        onChange={(e) => setFormData({ ...formData, monthlyFee: e.target.value })}
+                        placeholder="$0.00"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="status">Estado</Label>
+                      <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">Activo</SelectItem>
+                          <SelectItem value="pending">Pendiente</SelectItem>
+                          <SelectItem value="maintenance">En Mantenimiento</SelectItem>
+                          <SelectItem value="inactive">Inactivo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="specialRequirements">Requerimientos Especiales</Label>
+                    <Textarea
+                      id="specialRequirements"
+                      value={formData.specialRequirements}
+                      onChange={(e) => setFormData({ ...formData, specialRequirements: e.target.value })}
+                      rows={3}
+                      placeholder="Requerimientos específicos del activo..."
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={createAssetMutation.isPending || updateAssetMutation.isPending}>
+                      {createAssetMutation.isPending || updateAssetMutation.isPending ? 'Guardando...' : 'Guardar'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          ]}
           />
 
         {/* Filters and Search */}
@@ -328,192 +518,6 @@ export default function SponsoredAssetsPage() {
                   </SelectContent>
                 </Select>
               </div>
-
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={resetForm}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nuevo Activo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {selectedAsset ? 'Editar Activo Patrocinado' : 'Nuevo Activo Patrocinado'}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="sponsorId">Patrocinador *</Label>
-                        <Select value={formData.sponsorId} onValueChange={(value) => setFormData({ ...formData, sponsorId: value, contractId: '' })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar patrocinador" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {sponsors.map((sponsor: Sponsor) => (
-                              <SelectItem key={sponsor.id} value={sponsor.id.toString()}>
-                                {sponsor.name} (Tier {sponsor.tier})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="contractId">Contrato</Label>
-                        <Select value={formData.contractId} onValueChange={(value) => setFormData({ ...formData, contractId: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar contrato (opcional)" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">Sin contrato específico</SelectItem>
-                            {getAvailableContracts(formData.sponsorId).map((contract: Contract) => (
-                              <SelectItem key={contract.id} value={contract.id.toString()}>
-                                Contrato #{contract.id} - {contract.sponsor?.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="assetType">Tipo de Activo *</Label>
-                        <Select value={formData.assetType} onValueChange={(value) => setFormData({ ...formData, assetType: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar tipo" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="banners">Banners</SelectItem>
-                            <SelectItem value="digital_screens">Pantallas Digitales</SelectItem>
-                            <SelectItem value="park_furniture">Mobiliario de Parque</SelectItem>
-                            <SelectItem value="infrastructure">Infraestructura</SelectItem>
-                            <SelectItem value="signage">Señalización</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="assetName">Nombre del Activo *</Label>
-                        <Input
-                          id="assetName"
-                          value={formData.assetName}
-                          onChange={(e) => setFormData({ ...formData, assetName: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="parkLocation">Ubicación en el Parque</Label>
-                        <Input
-                          id="parkLocation"
-                          value={formData.parkLocation}
-                          onChange={(e) => setFormData({ ...formData, parkLocation: e.target.value })}
-                          placeholder="Ej: Entrada principal, Área de juegos..."
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="sponsorshipLevel">Nivel de Patrocinio</Label>
-                        <Select value={formData.sponsorshipLevel} onValueChange={(value) => setFormData({ ...formData, sponsorshipLevel: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="premium">Premium</SelectItem>
-                            <SelectItem value="standard">Estándar</SelectItem>
-                            <SelectItem value="basic">Básico</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="logoPlacement">Colocación del Logo</Label>
-                        <Input
-                          id="logoPlacement"
-                          value={formData.logoPlacement}
-                          onChange={(e) => setFormData({ ...formData, logoPlacement: e.target.value })}
-                          placeholder="Ej: Esquina superior derecha"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="impressionsPerDay">Impresiones por Día</Label>
-                        <Input
-                          id="impressionsPerDay"
-                          type="number"
-                          value={formData.impressionsPerDay}
-                          onChange={(e) => setFormData({ ...formData, impressionsPerDay: e.target.value })}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="displayDuration">Duración de Exhibición</Label>
-                        <Input
-                          id="displayDuration"
-                          value={formData.displayDuration}
-                          onChange={(e) => setFormData({ ...formData, displayDuration: e.target.value })}
-                          placeholder="Ej: 6 meses, 1 año"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="maintenanceRequirement">Requerimientos de Mantenimiento</Label>
-                        <Input
-                          id="maintenanceRequirement"
-                          value={formData.maintenanceRequirement}
-                          onChange={(e) => setFormData({ ...formData, maintenanceRequirement: e.target.value })}
-                          placeholder="Ej: Limpieza semanal"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="installationCost">Costo de Instalación</Label>
-                        <Input
-                          id="installationCost"
-                          value={formData.installationCost}
-                          onChange={(e) => setFormData({ ...formData, installationCost: e.target.value })}
-                          placeholder="$0.00"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="monthlyFee">Cuota Mensual</Label>
-                        <Input
-                          id="monthlyFee"
-                          value={formData.monthlyFee}
-                          onChange={(e) => setFormData({ ...formData, monthlyFee: e.target.value })}
-                          placeholder="$0.00"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="status">Estado</Label>
-                        <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="active">Activo</SelectItem>
-                            <SelectItem value="pending">Pendiente</SelectItem>
-                            <SelectItem value="maintenance">En Mantenimiento</SelectItem>
-                            <SelectItem value="inactive">Inactivo</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="specialRequirements">Requerimientos Especiales</Label>
-                      <Textarea
-                        id="specialRequirements"
-                        value={formData.specialRequirements}
-                        onChange={(e) => setFormData({ ...formData, specialRequirements: e.target.value })}
-                        rows={3}
-                        placeholder="Requerimientos específicos del activo..."
-                      />
-                    </div>
-
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                        Cancelar
-                      </Button>
-                      <Button type="submit" disabled={createAssetMutation.isPending || updateAssetMutation.isPending}>
-                        {createAssetMutation.isPending || updateAssetMutation.isPending ? 'Guardando...' : 'Guardar'}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
             </div>
           </CardContent>
         </Card>
