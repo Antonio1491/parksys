@@ -198,8 +198,9 @@ export class ReplitObjectStorageService {
       return this.getPublicUrl(decodeURIComponent(filename));
     }
     
-    // Si es una URL absoluta con dominio de spock.replit.dev, corregirla
-    if (originalUrl.includes('.spock.replit.dev/api/storage/file/')) {
+    // Si es una URL absoluta con dominio de Replit obsoleto, corregirla
+    if (originalUrl.includes('replit.dev/api/storage/file/') || 
+        originalUrl.includes('.spock.replit.dev/api/storage/file/')) {
       const match = originalUrl.match(/\/api\/storage\/file\/(.+)$/);
       if (match) {
         const filename = match[1];

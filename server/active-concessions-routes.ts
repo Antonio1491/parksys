@@ -451,7 +451,14 @@ export function registerActiveConcessionRoutes(app: any, apiRouter: any, isAuthe
         ORDER BY ci.is_primary DESC, ci.created_at DESC
       `, [id]);
 
-      res.json(result.rows);
+      // Normalizar URLs para corregir dominios obsoletos de Replit
+      const normalizedImages = result.rows.map(image => ({
+        ...image,
+        image_url: replitObjectStorage.normalizeUrl(image.image_url)
+      }));
+
+      console.log(`📸 [CONCESSION-IMAGES] Devolviendo ${normalizedImages.length} imágenes normalizadas para concesión ${id}`);
+      res.json(normalizedImages);
     } catch (error) {
       console.error('Error al obtener imágenes de concesión:', error);
       res.status(500).json({ error: 'Error al obtener imágenes de concesión' });
