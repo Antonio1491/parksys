@@ -133,14 +133,12 @@ const IncidentsPage = () => {
   const { data: users = [] } = useQuery({
     queryKey: ['/api/users'],
     // Si falla, continuamos sin datos de usuarios
-    onError: (err) => {
-      console.error("Error al cargar usuarios:", err);
-    }
   });
 
   // Función para filtrar incidencias
   const filteredIncidents = React.useMemo(() => {
-    return incidents.filter((incident: any) => {
+    const incidentsArray = Array.isArray(incidents) ? incidents : [];
+    return incidentsArray.filter((incident: any) => {
       // Filtro por búsqueda
       const matchesSearch = searchQuery === '' || 
         incident.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -447,7 +445,7 @@ const IncidentsPage = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Todos los parques</SelectItem>
-                          {parks.map((park: any) => (
+                          {Array.isArray(parks) && parks.map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
@@ -535,7 +533,7 @@ const IncidentsPage = () => {
                         <SelectContent>
                           <SelectItem value="all">Todos los usuarios</SelectItem>
                           <SelectItem value="unassigned">Sin asignar</SelectItem>
-                          {users && users.length > 0 && users.map((user: any) => (
+                          {Array.isArray(users) && users.length > 0 && users.map((user: any) => (
                             <SelectItem key={user.id} value={user.id.toString()}>
                               {user.fullName || user.username}
                             </SelectItem>
@@ -649,7 +647,7 @@ const IncidentsPage = () => {
                             <TableCell className="max-w-[120px] truncate">{incident.reporterName}</TableCell>
                             <TableCell>
                               {incident.assignedToId ? (
-                                users.find((u: any) => u.id === incident.assignedToId)?.fullName || 'Usuario'
+                                (Array.isArray(users) ? users : []).find((u: any) => u.id === incident.assignedToId)?.fullName || 'Usuario'
                               ) : (
                                 <span className="text-gray-500 text-sm">Sin asignar</span>
                               )}
@@ -783,7 +781,7 @@ const IncidentsPage = () => {
                               <div className="flex items-center">
                                 <User className="h-3 w-3 mr-1" />
                                 {incident.assignedToId ? (
-                                  users.find((u: any) => u.id === incident.assignedToId)?.fullName || 'Usuario'
+                                  (Array.isArray(users) ? users : []).find((u: any) => u.id === incident.assignedToId)?.fullName || 'Usuario'
                                 ) : (
                                   'Sin asignar'
                                 )}
@@ -851,7 +849,7 @@ const IncidentsPage = () => {
                               <div className="flex items-center">
                                 <User className="h-3 w-3 mr-1" />
                                 {incident.assignedToId ? (
-                                  users.find((u: any) => u.id === incident.assignedToId)?.fullName || 'Usuario'
+                                  (Array.isArray(users) ? users : []).find((u: any) => u.id === incident.assignedToId)?.fullName || 'Usuario'
                                 ) : (
                                   'Sistema'
                                 )}
