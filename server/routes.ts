@@ -3898,6 +3898,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const parkId = parseInt(req.params.id);
       
+      console.log('🔍 [GET PARK VOLUNTEERS] GET /parks/:id/volunteers called');
+      console.log('🔍 [GET PARK VOLUNTEERS] parkId:', parkId);
+      
       const volunteersQuery = await pool.query(
         `SELECT 
           id, 
@@ -3915,10 +3918,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           available_hours,
           previous_experience
         FROM volunteers 
-        WHERE preferred_park_id = $1 AND status = 'active'
+        WHERE preferred_park_id = $1 AND (status = 'active' OR status = 'activo')
         ORDER BY created_at DESC`,
         [parkId]
       );
+      
+      console.log('🔍 [GET PARK VOLUNTEERS] Query result rows:', volunteersQuery.rows.length);
       
       const volunteers = volunteersQuery.rows.map((volunteer: any) => ({
         id: volunteer.id,
