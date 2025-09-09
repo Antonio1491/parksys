@@ -1,0 +1,55 @@
+[]
+Console.js:61 🔍 DEBUG: allVolunteers: 23
+Console.js:61 🔍 DEBUG: assignedIds: []
+Console.js:61 🔍 DEBUG: availableVolunteers: 23
+Console.js:61 🔍 DEBUG: allVolunteersLoading: false
+Console.js:61 🔍 DEBUG: allVolunteersError: null
+Console.js:61 🔍 DEBUG: searchTerm: 
+Console.js:61 🔍 DEBUG: statusFilter: all
+Console.js:61 🔍 DEBUG: filteredAvailableVolunteers: 23
+Console.js:61 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+Console.js:61 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
+Console.js:61 🔍 FRONTEND: Cargando voluntarios asignados para parque 90
+Console.js:61 🔍 FRONTEND: Cargando TODOS los voluntarios disponibles
+Console.js:61 🔍 DEBUG: allVolunteers: 23
+Console.js:61 🔍 DEBUG: assignedIds: []
+Console.js:61 🔍 DEBUG: availableVolunteers: 23
+Console.js:61 🔍 DEBUG: allVolunteersLoading: false
+Console.js:61 🔍 DEBUG: allVolunteersError: null
+Console.js:61 🔍 DEBUG: searchTerm: 
+Console.js:61 🔍 DEBUG: statusFilter: all
+Console.js:61 🔍 DEBUG: filteredAvailableVolunteers: 23
+Console.js:61 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+Console.js:61 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
+Console.js:61 🔍 DEBUG: allVolunteers: 23
+Console.js:61 🔍 DEBUG: assignedIds: []
+Console.js:61 🔍 DEBUG: availableVolunteers: 23
+Console.js:61 🔍 DEBUG: allVolunteersLoading: false
+Console.js:61 🔍 DEBUG: allVolunteersError: null
+Console.js:61 🔍 DEBUG: searchTerm: 
+Console.js:61 🔍 DEBUG: statusFilter: all
+Console.js:61 🔍 DEBUG: filteredAvailableVolunteers: 23
+Console.js:61 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+Console.js:61 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
+Console.js:61 ✅ FRONTEND: Todos los voluntarios cargados: 23 (23) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+Console.js:61 ✅ FRONTEND: Voluntarios asignados cargados: []
+Console.js:61 🔍 DEBUG: allVolunteers: 23
+Console.js:61 🔍 DEBUG: assignedIds: []
+Console.js:61 🔍 DEBUG: availableVolunteers: 23
+Console.js:61 🔍 DEBUG: allVolunteersLoading: false
+Console.js:61 🔍 DEBUG: allVolunteersError: null
+Console.js:61 🔍 DEBUG: searchTerm: 
+Console.js:61 🔍 DEBUG: statusFilter: all
+Console.js:61 🔍 DEBUG: filteredAvailableVolunteers: 23
+Console.js:61 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+Console.js:61 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios
+Console.js:61 🔍 DEBUG: allVolunteers: 23
+Console.js:61 🔍 DEBUG: assignedIds: []
+Console.js:61 🔍 DEBUG: availableVolunteers: 23
+Console.js:61 🔍 DEBUG: allVolunteersLoading: false
+Console.js:61 🔍 DEBUG: allVolunteersError: null
+Console.js:61 🔍 DEBUG: searchTerm: 
+Console.js:61 🔍 DEBUG: statusFilter: all
+Console.js:61 🔍 DEBUG: filteredAvailableVolunteers: 23
+Console.js:61 🔍 DEBUG: primer voluntario ejemplo: {id: 24, full_name: 'Fernando Jiménez', email: 'valeria.jimenez@example.com', phone: '(55) 2591 1229', status: 'activo', …}
+Console.js:61 🎯 RENDERIZANDO ParkVolunteersManager con: 23 voluntarios

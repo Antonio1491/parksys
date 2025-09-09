@@ -3894,11 +3894,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // Obtener voluntarios asignados a un parque específico
-  apiRouter.get("/parks/:id/volunteers", async (req: Request, res: Response) => {
+  apiRouter.get("/parks/:id/volunteers", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const parkId = parseInt(req.params.id);
       
-      console.log('🔍 [GET PARK VOLUNTEERS] GET /parks/:id/volunteers called');
+      console.log('🚨🚨🚨 [GET PARK VOLUNTEERS] ENDPOINT LLAMADO 🚨🚨🚨');
       console.log('🔍 [GET PARK VOLUNTEERS] parkId:', parkId);
       
       const volunteersQuery = await pool.query(
