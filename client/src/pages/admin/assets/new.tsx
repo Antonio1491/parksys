@@ -558,41 +558,36 @@ const CreateAssetPage: React.FC = () => {
                     )}
                   />
 
-                  {/* Uso */}
-                  <FormField
-                    control={form.control}
-                    name="useId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Uso</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value ? field.value.toString() : ''}
-                            onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
-                            disabled={!selectedSubcategoryId || availableUses.length === 0}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder={
-                                !selectedSubcategoryId 
-                                  ? "Seleccione primero una subcategoría"
-                                  : availableUses.length === 0
-                                    ? "No hay usos disponibles"
-                                    : "Seleccione un uso"
-                              } />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {availableUses.map((use: any) => (
-                                <SelectItem key={use.id} value={use.id.toString()}>
-                                  {use.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Uso - Solo mostrar si realmente hay usos disponibles */}
+                  {availableUses.length > 0 && (
+                    <FormField
+                      control={form.control}
+                      name="useId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Uso</FormLabel>
+                          <FormControl>
+                            <Select 
+                              value={field.value ? field.value.toString() : ''}
+                              onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccione un uso" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableUses.map((use: any) => (
+                                  <SelectItem key={use.id} value={use.id.toString()}>
+                                    {use.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   {/* ID Personalizado del Activo */}
                   <FormField
