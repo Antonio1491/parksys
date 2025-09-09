@@ -1,5 +1,6 @@
 // direct-park-queries.ts
 import { pool } from './db';
+import { replitObjectStorage } from './objectStorage-replit';
 
 // Función para obtener la lista de parques
 export async function getParksDirectly(filters?: any) {
@@ -139,7 +140,8 @@ export async function getParksDirectly(filters?: any) {
           const imageResult = await pool.query(imageQuery, [park.id]);
           
           if (imageResult.rows.length > 0) {
-            primaryImage = imageResult.rows[0].image_url;
+            // Normalizar URL antes de asignar y loggear
+            primaryImage = replitObjectStorage.normalizeUrl(imageResult.rows[0].image_url);
             console.log(`Imagen principal para parque ${park.id}:`, primaryImage);
           }
         }
