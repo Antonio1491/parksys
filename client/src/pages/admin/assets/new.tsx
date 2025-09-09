@@ -211,25 +211,8 @@ const CreateAssetPage: React.FC = () => {
     }
   }, [selectedSubcategoryId, form]);
 
-  // Actualizar categoryId final basado en la selección jerárquica
+  // Watch para el uso seleccionado
   const selectedUseId = form.watch('useId');
-  useEffect(() => {
-    // El categoryId final será el nivel más específico seleccionado
-    let finalCategoryId = selectedCategoryId;
-    
-    if (selectedSubcategoryId) {
-      finalCategoryId = selectedSubcategoryId;
-    }
-    
-    if (selectedUseId) {
-      finalCategoryId = selectedUseId;
-    }
-
-    // Solo actualizar si ha cambiado
-    if (finalCategoryId && finalCategoryId !== form.getValues('categoryId')) {
-      form.setValue('categoryId', finalCategoryId);
-    }
-  }, [selectedCategoryId, selectedSubcategoryId, selectedUseId, form]);
 
   // Función helper para obtener nombre de categoría con jerarquía
   const getCategoryDisplayName = (categoryId: number) => {
@@ -358,9 +341,23 @@ const CreateAssetPage: React.FC = () => {
   
   // Manejar envío del formulario
   const handleSubmit = (values: AssetFormData) => {
+    // Determinar el categoryId final basado en la jerarquía seleccionada
+    let finalCategoryId = selectedCategoryId; // Categoría principal seleccionada
+    
+    // Si hay subcategoría seleccionada, usar esa
+    if (selectedSubcategoryId) {
+      finalCategoryId = selectedSubcategoryId;
+    }
+    
+    // Si hay uso seleccionado, usar ese (el más específico)
+    if (selectedUseId) {
+      finalCategoryId = selectedUseId;
+    }
+    
     // Preparar los datos para envío
     const submitData = {
       ...values,
+      categoryId: finalCategoryId, // Usar el nivel más específico
       // Usar customAssetId como serialNumber si está presente
       serialNumber: values.customAssetId || values.serialNumber || null,
     };
@@ -466,8 +463,14 @@ const CreateAssetPage: React.FC = () => {
                         <FormLabel>Categoría Principal*</FormLabel>
                         <FormControl>
                           <Select 
-                            value={field.value ? field.value.toString() : ''}
-                            onValueChange={(value) => field.onChange(parseInt(value))}
+                            value={selectedCategoryId ? selectedCategoryId.toString() : ''}
+                            onValueChange={(value) => {
+                              const categoryId = parseInt(value);
+                              form.setValue('categoryId', categoryId);
+                              // Limpiar campos dependientes
+                              form.setValue('subcategoryId', null);
+                              form.setValue('useId', null);
+                            }}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Seleccione una categoría" />
