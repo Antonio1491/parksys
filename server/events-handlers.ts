@@ -12,6 +12,7 @@ import {
 import { parks, eventCategories, eventImages } from "../shared/schema";
 import { eq, and, desc, gte, sql, inArray } from "drizzle-orm";
 import { z } from "zod";
+import { replitObjectStorage } from './objectStorage-replit';
 
 // Esquema de validación para registro de participantes
 const registerParticipantSchema = z.object({
@@ -254,9 +255,28 @@ export async function getEventById(req: Request, res: Response) {
       .from(eventEvaluations)
       .where(eq(eventEvaluations.eventId, eventId));
     
+    // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente (individual event)
+    console.log(`🔧 [DEBUG] Iniciando normalización para evento ${eventId}`);
+    let normalizedUrl = event.imageUrl;
+    
+    try {
+      console.log(`🔧 [DEBUG] Original imageUrl: ${event.imageUrl}`);
+      if (event.imageUrl) {
+        normalizedUrl = replitObjectStorage.normalizeUrl(event.imageUrl);
+        console.log(`🔧 [DEBUG] Normalized imageUrl: ${normalizedUrl}`);
+      }
+    } catch (error) {
+      console.error(`❌ [DEBUG] Error en normalización:`, error);
+    }
+    
+    const eventWithNormalizedImages = {
+      ...event,
+      imageUrl: normalizedUrl
+    };
+
     // Devolver el evento con toda su información relacionada
     return res.json({
-      ...event,
+      ...eventWithNormalizedImages,
       parks: parkDetails,
       resources,
       registrations,
