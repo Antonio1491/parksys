@@ -3946,7 +3946,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Asignar voluntario a un parque
-  apiRouter.post("/parks/:id/volunteers", async (req: Request, res: Response) => {
+  apiRouter.post("/parks/:id/volunteers", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const parkId = parseInt(req.params.id);
       const { volunteerId } = req.body;
