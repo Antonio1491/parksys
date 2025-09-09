@@ -11,6 +11,7 @@ import { ObjectStorageService } from './objectStorage';
 import { storage } from './storage';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import { replitObjectStorage } from './objectStorage-replit';
 
 const objectStorage = new ObjectStorageService();
 
@@ -173,7 +174,7 @@ export function registerObjectStorageRoutes(app: any, apiRouter: Router, isAuthe
       console.log(`📸 [OBJECT STORAGE] Imagen de actividad ${activityId} disponible en: ${finalImageUrl}`);
       
       res.json({
-        imageUrl: finalImageUrl,
+        imageUrl: replitObjectStorage.normalizeUrl(finalImageUrl),
         success: true
       });
       
@@ -237,7 +238,7 @@ export function registerObjectStorageRoutes(app: any, apiRouter: Router, isAuthe
       console.log(`📸 [OBJECT STORAGE] Imagen de evento ${eventId} disponible en: ${finalImageUrl}`);
       
       res.json({
-        imageUrl: finalImageUrl,
+        imageUrl: replitObjectStorage.normalizeUrl(finalImageUrl),
         success: true
       });
       
