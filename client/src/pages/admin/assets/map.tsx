@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
@@ -10,15 +10,7 @@ import {
   MapPin, 
   List, 
   AlertTriangle, 
-  Filter, 
-  Layers, 
-  ZoomIn, 
-  ZoomOut,
-  RotateCcw,
-  Eye,
-  Edit,
-  Wrench,
-  Calendar
+  Layers
 } from 'lucide-react';
 import {
   Select,
@@ -28,20 +20,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { googleMapsService } from '@/services/GoogleMapsService';
 
-// Fix for default markers in Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-// Constantes de estado y condición para activos (valores en español para coincidir con la BD)
+// Constantes de estado y condición para activos
 const ASSET_STATUSES = [
   { value: 'activo', label: 'Activo', color: '#10B981' },
   { value: 'mantenimiento', label: 'En Mantenimiento', color: '#F59E0B' },
@@ -57,7 +38,7 @@ const ASSET_CONDITIONS = [
   { value: 'critico', label: 'Crítico', color: '#DC2626' }
 ];
 
-// Tipado para los datos
+// Interfaces de tipos
 interface Asset {
   id: number;
   name: string;
@@ -69,14 +50,6 @@ interface Asset {
   latitude: string | null;
   longitude: string | null;
   locationDescription: string | null;
-  categoryName?: string;
-  parkName?: string;
-  nextMaintenanceDate?: string | null;
-  acquisitionDate?: string | null;
-  acquisitionCost?: number | null;
-  lastMaintenanceDate?: string | null;
-  maintenanceFrequency?: number | null;
-  maintenanceStatus?: string | null;
 }
 
 interface Park {
@@ -93,53 +66,122 @@ interface AssetCategory {
   color: string;
 }
 
-// Crear iconos personalizados para cada categoría y estado
-const createCustomIcon = (category: AssetCategory, status: string, condition: string) => {
-  const statusInfo = ASSET_STATUSES.find(s => s.value === status);
-  const conditionInfo = ASSET_CONDITIONS.find(c => c.value === condition);
-  
-  const color = conditionInfo?.color || category.color || '#3B82F6';
-  const borderColor = statusInfo?.color || '#6B7280';
-  
-  return L.divIcon({
-    html: `
-      <div style="
-        background-color: ${color};
-        border: 3px solid ${borderColor};
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        position: relative;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      ">
-        <div style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 8px;
-          height: 8px;
-          background-color: white;
-          border-radius: 50%;
-        "></div>
-      </div>
-    `,
-    className: 'custom-div-icon',
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-    popupAnchor: [0, -10]
-  });
-};
+// Componente del mapa con Google Maps
+const GoogleMapComponent: React.FC<{
+  assets: Asset[];
+  categories: AssetCategory[];
+  parks: Park[];
+}> = ({ assets, categories, parks }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
-// Componente para centrar el mapa
-const MapController: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
-  const map = useMap();
-  
   useEffect(() => {
-    map.setView(center, zoom);
-  }, [map, center, zoom]);
-  
-  return null;
+    let mounted = true;
+
+    const initMap = async () => {
+      if (!mapRef.current) return;
+
+      try {
+        // Cargar Google Maps
+        await googleMapsService.loadGoogleMaps();
+        
+        if (!mounted) return;
+
+        if (!googleMapsService.isGoogleMapsLoaded()) {
+          console.error('Google Maps no pudo cargarse');
+          return;
+        }
+
+        // Crear el mapa
+        const map = await googleMapsService.createMap(mapRef.current, {
+          center: { lat: 20.676667, lng: -103.347222 }, // Guadalajara
+          zoom: 12,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        // Crear marcadores para activos
+        const validAssets = assets.filter(asset => asset.latitude && asset.longitude);
+        
+        for (const asset of validAssets) {
+          try {
+            const marker = await googleMapsService.createMarker(map, {
+              position: {
+                lat: parseFloat(asset.latitude!),
+                lng: parseFloat(asset.longitude!)
+              },
+              title: asset.name,
+              icon: {
+                url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                scaledSize: new google.maps.Size(32, 32)
+              }
+            });
+
+            // InfoWindow básico
+            const infoWindow = new google.maps.InfoWindow({
+              content: `
+                <div style="padding: 8px;">
+                  <h3 style="margin: 0 0 8px 0; font-weight: bold;">${asset.name}</h3>
+                  <p style="margin: 4px 0;">ID: ${asset.id}</p>
+                  <p style="margin: 4px 0;">Estado: ${asset.status}</p>
+                  <p style="margin: 4px 0;">Condición: ${asset.condition}</p>
+                  ${asset.description ? `<p style="margin: 4px 0;">${asset.description}</p>` : ''}
+                </div>
+              `
+            });
+
+            marker.addListener('click', () => {
+              infoWindow.open(map, marker);
+            });
+          } catch (error) {
+            console.error('Error creando marcador:', error);
+          }
+        }
+
+        // Ajustar vista si hay múltiples activos
+        if (validAssets.length > 1) {
+          const bounds = new google.maps.LatLngBounds();
+          validAssets.forEach(asset => {
+            bounds.extend({
+              lat: parseFloat(asset.latitude!),
+              lng: parseFloat(asset.longitude!)
+            });
+          });
+          map.fitBounds(bounds);
+        }
+
+        setMapLoaded(true);
+
+      } catch (error) {
+        console.error('Error inicializando Google Maps:', error);
+      }
+    };
+
+    initMap();
+
+    return () => {
+      mounted = false;
+    };
+  }, [assets, categories, parks]);
+
+  return (
+    <div 
+      ref={mapRef} 
+      style={{ width: '100%', height: '600px', backgroundColor: '#f0f0f0' }}
+    >
+      {!mapLoaded && (
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100%',
+          fontSize: '16px',
+          color: '#666'
+        }}>
+          Cargando Google Maps...
+        </div>
+      )}
+    </div>
+  );
 };
 
 // Componente principal
@@ -149,12 +191,8 @@ const AssetMapPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<string | 'all'>('all');
   const [selectedCondition, setSelectedCondition] = useState<string | 'all'>('all');
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([20.676667, -103.347222]); // Guadalajara center
-  const [mapZoom, setMapZoom] = useState<number>(12);
 
-  // Consultar datos de activos
+  // Consultar datos
   const { data: apiAssets, isLoading: assetsLoading } = useQuery<Asset[]>({
     queryKey: ['/api/assets'],
     staleTime: 60000,
@@ -162,7 +200,6 @@ const AssetMapPage: React.FC = () => {
     retry: 1
   });
   
-  // Consultar datos de parques
   const { data: apiParks, isLoading: parksLoading } = useQuery({
     queryKey: ['/api/parks'],
     staleTime: 60000,
@@ -170,7 +207,6 @@ const AssetMapPage: React.FC = () => {
     retry: 1
   });
   
-  // Consultar datos de categorías
   const { data: apiCategories, isLoading: categoriesLoading } = useQuery<AssetCategory[]>({
     queryKey: ['/api/asset-categories'],
     staleTime: 60000,
@@ -182,10 +218,9 @@ const AssetMapPage: React.FC = () => {
   const parks = Array.isArray(apiParks?.data) ? apiParks.data : (Array.isArray(apiParks) ? apiParks : []);
   const categories = apiCategories || [];
 
-  // Filtrar activos según criterios seleccionados
+  // Filtrar activos
   const filteredAssets = useMemo(() => {
     return assets.filter(asset => {
-      // Solo mostrar activos con coordenadas válidas
       if (!asset.latitude || !asset.longitude) return false;
       
       const matchesPark = selectedPark === 'all' || asset.parkId === selectedPark;
@@ -197,49 +232,13 @@ const AssetMapPage: React.FC = () => {
     });
   }, [assets, selectedPark, selectedCategory, selectedStatus, selectedCondition]);
 
-  // Calcular estadísticas
   const unlocatedAssets = assets.filter(asset => !asset.latitude || !asset.longitude);
-  const showUnlocatedWarning = unlocatedAssets.length > 0;
-  const displayedAssetsCount = filteredAssets.length;
-  const totalLocatedAssets = assets.filter(asset => asset.latitude && asset.longitude).length;
-
-  // Centrar el mapa en los activos filtrados
-  useEffect(() => {
-    if (filteredAssets.length > 0) {
-      const validAssets = filteredAssets.filter(asset => asset.latitude && asset.longitude);
-      if (validAssets.length > 0) {
-        const lats = validAssets.map(asset => parseFloat(asset.latitude!));
-        const lngs = validAssets.map(asset => parseFloat(asset.longitude!));
-        
-        const centerLat = lats.reduce((a, b) => a + b, 0) / lats.length;
-        const centerLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
-        
-        setMapCenter([centerLat, centerLng]);
-        
-        // Ajustar zoom basado en la dispersión de los puntos
-        const latRange = Math.max(...lats) - Math.min(...lats);
-        const lngRange = Math.max(...lngs) - Math.min(...lngs);
-        const maxRange = Math.max(latRange, lngRange);
-        
-        let zoom = 12;
-        if (maxRange > 0.1) zoom = 10;
-        else if (maxRange > 0.05) zoom = 11;
-        else if (maxRange > 0.01) zoom = 13;
-        else if (maxRange > 0.005) zoom = 14;
-        else zoom = 15;
-        
-        setMapZoom(zoom);
-      }
-    }
-  }, [filteredAssets]);
-
   const isLoading = assetsLoading || parksLoading || categoriesLoading;
 
   if (isLoading) {
     return (
       <AdminLayout>
         <div className="p-6">
-          {/* Header con patrón Card estandarizado (estado loading) */}
           <Card className="p-4 bg-gray-50 mb-6">
             <div className="flex items-center gap-2">
               <MapPin className="w-8 h-8 text-gray-900" />
@@ -249,15 +248,7 @@ const AssetMapPage: React.FC = () => {
               Vista geográfica de todos los activos en los parques
             </p>
           </Card>
-          <div className="grid gap-6">
-            <Skeleton className="h-[600px] w-full" />
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-            </div>
-          </div>
+          <Skeleton className="h-[600px] w-full" />
         </div>
       </AdminLayout>
     );
@@ -266,7 +257,7 @@ const AssetMapPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="p-6">
-        {/* Header con patrón Card estandarizado */}
+        {/* Header */}
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex items-center justify-between">
             <div>
@@ -275,7 +266,7 @@ const AssetMapPage: React.FC = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Mapa de Activos</h1>
               </div>
               <p className="text-gray-600 mt-2">
-                Vista geográfica de todos los activos en los parques
+                Vista geográfica con Google Maps de todos los activos en los parques
               </p>
             </div>
             <div className="flex space-x-2">
@@ -294,29 +285,29 @@ const AssetMapPage: React.FC = () => {
         {/* Información sobre activos mostrados */}
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
-            Mostrando {displayedAssetsCount} de {totalLocatedAssets} activos con ubicación definida.
+            Mostrando {filteredAssets.length} activos con ubicación definida.
             {unlocatedAssets.length > 0 && ` (${unlocatedAssets.length} activos sin geolocalización)`}
           </p>
         </div>
 
         {/* Alerta para activos sin geolocalización */}
-        {showUnlocatedWarning && (
+        {unlocatedAssets.length > 0 && (
           <Alert className="mb-6 bg-amber-50 border-amber-200">
             <AlertTriangle className="h-5 w-5 text-amber-500 mr-2" />
             <AlertDescription className="text-amber-800">
               Hay {unlocatedAssets.length} activos sin coordenadas de geolocalización. 
-              Estos activos no aparecerán en el mapa. Puede agregar coordenadas editando cada activo.
+              Estos activos no aparecerán en el mapa.
             </AlertDescription>
           </Alert>
         )}
 
         {/* Filtros */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 relative z-50">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Select value={selectedPark.toString()} onValueChange={(value) => setSelectedPark(value === 'all' ? 'all' : parseInt(value))}>
             <SelectTrigger>
-              <SelectValue placeholder="Seleccione un parque" />
+              <SelectValue placeholder="Todos los parques" />
             </SelectTrigger>
-            <SelectContent className="z-[60]">
+            <SelectContent>
               <SelectItem value="all">Todos los parques</SelectItem>
               {parks?.map((park) => (
                 <SelectItem key={park.id} value={park.id.toString()}>
@@ -328,9 +319,9 @@ const AssetMapPage: React.FC = () => {
 
           <Select value={selectedCategory.toString()} onValueChange={(value) => setSelectedCategory(value === 'all' ? 'all' : parseInt(value))}>
             <SelectTrigger>
-              <SelectValue placeholder="Seleccione una categoría" />
+              <SelectValue placeholder="Todas las categorías" />
             </SelectTrigger>
-            <SelectContent className="z-[60]">
+            <SelectContent>
               <SelectItem value="all">Todas las categorías</SelectItem>
               {categories?.map((category) => (
                 <SelectItem key={category.id} value={category.id.toString()}>
@@ -342,9 +333,9 @@ const AssetMapPage: React.FC = () => {
 
           <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Seleccione un estado" />
+              <SelectValue placeholder="Todos los estados" />
             </SelectTrigger>
-            <SelectContent className="z-[60]">
+            <SelectContent>
               <SelectItem value="all">Todos los estados</SelectItem>
               {ASSET_STATUSES.map((status) => (
                 <SelectItem key={status.value} value={status.value}>
@@ -356,9 +347,9 @@ const AssetMapPage: React.FC = () => {
 
           <Select value={selectedCondition} onValueChange={(value) => setSelectedCondition(value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Seleccione una condición" />
+              <SelectValue placeholder="Todas las condiciones" />
             </SelectTrigger>
-            <SelectContent className="z-[60]">
+            <SelectContent>
               <SelectItem value="all">Todas las condiciones</SelectItem>
               {ASSET_CONDITIONS.map((condition) => (
                 <SelectItem key={condition.value} value={condition.value}>
@@ -369,132 +360,23 @@ const AssetMapPage: React.FC = () => {
           </Select>
         </div>
 
-        {/* Mapa interactivo */}
+        {/* Mapa con Google Maps */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Mapa Interactivo de Activos</span>
+              <span>Mapa Interactivo de Activos (Google Maps)</span>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span>{filteredAssets.length} activos mostrados</span>
               </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[600px] w-full rounded-lg overflow-hidden border relative z-10">
-              <MapContainer
-                center={mapCenter}
-                zoom={mapZoom}
-                style={{ height: '100%', width: '100%', zIndex: 1 }}
-                className="leaflet-container"
-                zoomControl={true}
-              >
-                <MapController center={mapCenter} zoom={mapZoom} />
-                
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                
-                <MarkerClusterGroup
-                  chunkedLoading
-                  maxClusterRadius={50}
-                  spiderfyOnMaxZoom={true}
-                  showCoverageOnHover={false}
-                >
-                  {filteredAssets.map((asset) => {
-                    if (!asset.latitude || !asset.longitude) return null;
-                    
-                    const category = categories.find(c => c.id === asset.categoryId);
-                    const parksArray = Array.isArray(parks) ? parks : (parks?.data || []);
-                    const park = parksArray.find(p => p.id === asset.parkId);
-                    const statusInfo = ASSET_STATUSES.find(s => s.value === asset.status);
-                    const conditionInfo = ASSET_CONDITIONS.find(c => c.value === asset.condition);
-                    
-                    const icon = createCustomIcon(
-                      category || { id: 0, name: 'Sin categoría', icon: 'default', color: '#3B82F6' },
-                      asset.status,
-                      asset.condition
-                    );
-
-                    return (
-                      <Marker
-                        key={asset.id}
-                        position={[parseFloat(asset.latitude), parseFloat(asset.longitude)]}
-                        icon={icon}
-                      >
-                        <Popup className="asset-popup" maxWidth={300}>
-                          <div className="p-2">
-                            <div className="flex items-start justify-between mb-3">
-                              <h3 className="font-semibold text-lg text-gray-900 leading-tight">
-                                {asset.name}
-                              </h3>
-                              <div 
-                                className="w-4 h-4 rounded-full ml-2 flex-shrink-0" 
-                                style={{ backgroundColor: category?.color || '#3B82F6' }}
-                              />
-                            </div>
-                            
-                            <div className="space-y-2 mb-3">
-                              <p className="text-sm text-gray-600">
-                                <strong>Categoría:</strong> {category?.name || 'Sin categoría'}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                <strong>Parque:</strong> {park?.name || 'Sin parque'}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                <strong>Ubicación:</strong> {asset.locationDescription || 'Sin descripción específica'}
-                              </p>
-                              {asset.description && (
-                                <p className="text-sm text-gray-600">
-                                  <strong>Descripción:</strong> {asset.description}
-                                </p>
-                              )}
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              <Badge 
-                                variant="outline" 
-                                className="text-xs"
-                                style={{ borderColor: statusInfo?.color, color: statusInfo?.color }}
-                              >
-                                {statusInfo?.label || asset.status}
-                              </Badge>
-                              <Badge 
-                                variant="outline" 
-                                className="text-xs"
-                                style={{ borderColor: conditionInfo?.color, color: conditionInfo?.color }}
-                              >
-                                {conditionInfo?.label || asset.condition}
-                              </Badge>
-                            </div>
-                            
-                            <div className="flex space-x-2">
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => setLocation(`/admin/assets/${asset.id}`)}
-                                className="flex-1"
-                              >
-                                <Eye className="h-3 w-3 mr-1" />
-                                Ver
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => setLocation(`/admin/assets/edit/${asset.id}`)}
-                                className="flex-1"
-                              >
-                                <Edit className="h-3 w-3 mr-1" />
-                                Editar
-                              </Button>
-                            </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    );
-                  })}
-                </MarkerClusterGroup>
-              </MapContainer>
+            <div className="h-[600px] w-full rounded-lg overflow-hidden border">
+              <GoogleMapComponent
+                assets={filteredAssets}
+                categories={categories}
+                parks={parks}
+              />
             </div>
           </CardContent>
         </Card>
@@ -506,7 +388,6 @@ const AssetMapPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Estados */}
               <div>
                 <h4 className="font-medium mb-3">Estados de Activos</h4>
                 <div className="space-y-2">
@@ -525,7 +406,6 @@ const AssetMapPage: React.FC = () => {
                 </div>
               </div>
               
-              {/* Condiciones */}
               <div>
                 <h4 className="font-medium mb-3">Condiciones de Activos</h4>
                 <div className="space-y-2">
@@ -544,8 +424,8 @@ const AssetMapPage: React.FC = () => {
             
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Cómo leer el mapa:</strong> Los marcadores muestran la condición del activo (color del círculo) 
-                y el estado operativo (color del borde). Haga clic en cualquier marcador para ver más detalles y opciones de acción.
+                <strong>Funcionalidad:</strong> Mapa interactivo usando Google Maps. 
+                Haga clic en cualquier marcador rojo para ver detalles del activo.
               </p>
             </div>
           </CardContent>
