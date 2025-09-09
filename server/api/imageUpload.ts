@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { storage } from '../storage';
+import { replitObjectStorage } from '../objectStorage-replit';
 
 // Obtener el directorio actual en módulos ES
 const __filename = fileURLToPath(import.meta.url);
@@ -94,14 +95,17 @@ export async function uploadParkImageHandler(req: Request, res: Response) {
     // Guardar la imagen en la base de datos
     const parkImage = await storage.createParkImage({
       parkId,
-      imageUrl: fileUrl,
+      imageUrl: replitObjectStorage.normalizeUrl(fileUrl),
       caption: req.body.caption || 'Imagen del parque',
       isPrimary: req.body.isPrimary === 'true' || false
     });
     
     return res.status(201).json({
       message: 'Imagen subida exitosamente',
-      image: parkImage
+      image: {
+        ...parkImage,
+        imageUrl: replitObjectStorage.normalizeUrl(parkImage.imageUrl)
+      }
     });
   } catch (error) {
     console.error('Error al procesar la imagen:', error);
