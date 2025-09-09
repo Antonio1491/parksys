@@ -43,6 +43,7 @@ interface AssetCategory {
 }
 
 const categorySchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   description: z.string().optional(),
   icon: z.string().min(1, "Selecciona un ícono"),
@@ -116,6 +117,7 @@ const AssetCategoriesPage: React.FC = () => {
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
+      id: '',
       name: '',
       description: '',
       icon: 'tag',
@@ -1430,6 +1432,20 @@ const AssetCategoriesPage: React.FC = () => {
                     <FormLabel>Nombre *</FormLabel>
                     <FormControl>
                       <Input placeholder="Ej: Mobiliario Urbano" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ID Personalizado</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej: MOBILIARIO-01" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
