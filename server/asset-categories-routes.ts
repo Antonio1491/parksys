@@ -1,5 +1,19 @@
 import { Request, Response, Router } from "express";
 import { pool } from "./db";
+import multer from "multer";
+import csv from "csv-parser";
+
+// Configuración de multer para subida de archivos
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos CSV'), false);
+    }
+  }
+});
 
 export function registerAssetCategoriesRoutes(app: any, apiRouter: Router) {
   
@@ -361,6 +375,132 @@ export function registerAssetCategoriesRoutes(app: any, apiRouter: Router) {
     } catch (error) {
       console.error("❌ Error al generar estructura de árbol:", error);
       res.status(500).json({ message: "Error al generar estructura de categorías" });
+    }
+  });
+
+  // POST: Importar categorías desde CSV
+  apiRouter.post("/asset-categories/import", upload.single('csvFile'), async (req: Request, res: Response) => {
+    try {
+      console.log("📤 Iniciando importación de categorías desde CSV");
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No se ha proporcionado un archivo CSV" });
+      }
+
+      const results: any[] = [];
+      const errors: string[] = [];
+      let success = 0;
+
+      // Convertir el buffer a string y parsearlo
+      const csvString = req.file.buffer.toString('utf-8');
+      const lines = csvString.split('\n').filter(line => line.trim() !== '');
+      
+      if (lines.length < 2) {
+        return res.status(400).json({ message: "El archivo CSV debe contener al menos una fila de datos además del header" });
+      }
+
+      // Verificar header
+      const header = lines[0].toLowerCase().split(',').map(h => h.trim());
+      const expectedColumns = ['category', 'subcategory', 'use', 'id'];
+      const hasAllColumns = expectedColumns.every(col => header.includes(col));
+      
+      if (!hasAllColumns) {
+        return res.status(400).json({ 
+          message: `El archivo CSV debe contener las columnas: ${expectedColumns.join(', ')}. Encontradas: ${header.join(', ')}` 
+        });
+      }
+
+      // Mapear índices de columnas
+      const columnIndices = {
+        category: header.indexOf('category'),
+        subcategory: header.indexOf('subcategory'),
+        use: header.indexOf('use'),
+        id: header.indexOf('id')
+      };
+
+      // Procesar cada fila
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, '')); // Remover comillas
+        
+        if (values.length < expectedColumns.length) {
+          errors.push(`Fila ${i + 1}: Insuficientes columnas`);
+          continue;
+        }
+
+        const category = values[columnIndices.category];
+        const subcategory = values[columnIndices.subcategory];
+        const use = values[columnIndices.use];
+        const customId = values[columnIndices.id];
+
+        if (!category) {
+          errors.push(`Fila ${i + 1}: La categoría principal es requerida`);
+          continue;
+        }
+
+        try {
+          // Crear/obtener categoría principal
+          let parentId: number | null = null;
+          
+          const existingParent = await pool.query(`
+            SELECT id FROM asset_categories WHERE name = $1 AND parent_id IS NULL
+          `, [category]);
+
+          if (existingParent.rows.length > 0) {
+            parentId = existingParent.rows[0].id;
+            console.log(`📁 Categoría principal existente encontrada: ${category} (ID: ${parentId})`);
+          } else {
+            // Crear categoría principal
+            const newParent = await pool.query(`
+              INSERT INTO asset_categories (name, description, icon, color, parent_id, created_at, updated_at)
+              VALUES ($1, $2, $3, $4, NULL, NOW(), NOW())
+              RETURNING id
+            `, [category, use || null, 'tag', '#3B82F6']);
+            
+            parentId = newParent.rows[0].id;
+            success++;
+            console.log(`➕ Categoría principal creada: ${category} (ID: ${parentId})`);
+          }
+
+          // Si hay subcategoría, crearla
+          if (subcategory && subcategory.trim() !== '') {
+            const existingSubcategory = await pool.query(`
+              SELECT id FROM asset_categories WHERE name = $1 AND parent_id = $2
+            `, [subcategory, parentId]);
+
+            if (existingSubcategory.rows.length === 0) {
+              await pool.query(`
+                INSERT INTO asset_categories (name, description, icon, color, parent_id, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+              `, [subcategory, use || null, 'tag', '#10B981', parentId]);
+              
+              success++;
+              console.log(`➕ Subcategoría creada: ${subcategory} bajo ${category}`);
+            } else {
+              console.log(`📁 Subcategoría existente: ${subcategory} bajo ${category}`);
+            }
+          }
+
+        } catch (error: any) {
+          console.error(`❌ Error procesando fila ${i + 1}:`, error);
+          errors.push(`Fila ${i + 1}: ${error.message}`);
+        }
+      }
+
+      console.log(`✅ Importación completada: ${success} categorías procesadas, ${errors.length} errores`);
+      
+      res.json({
+        success,
+        errors,
+        message: `Importación completada: ${success} categorías importadas`
+      });
+
+    } catch (error: any) {
+      console.error("❌ Error en importación CSV:", error);
+      res.status(500).json({ 
+        message: "Error al procesar el archivo CSV", 
+        details: error.message 
+      });
     }
   });
 

@@ -20,7 +20,8 @@ import {
   FolderPlus, Edit2, Trash2, Tag, FolderOpen, 
   TreePine, Settings, Plus, ChevronRight, Building2,
   Wrench, Car, Lightbulb, Camera, Wifi, Search,
-  Filter, X, ChevronLeft, LayoutGrid, List, ChevronDown
+  Filter, X, ChevronLeft, LayoutGrid, List, ChevronDown,
+  Upload, FileText, Download
 } from 'lucide-react';
 
 // ===== TIPOS Y ESQUEMAS =====
@@ -87,9 +88,12 @@ const AssetCategoriesPage: React.FC = () => {
   // Estados
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<AssetCategory | null>(null);
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("list");
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [importResults, setImportResults] = useState<{ success: number; errors: string[] } | null>(null);
   
   // Estado para manejar categorías expandidas en vista jerárquica
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
@@ -282,6 +286,38 @@ const AssetCategoriesPage: React.FC = () => {
     },
   });
 
+  // Importar categorías desde CSV
+  const importMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await apiRequest('/api/asset-categories/import', { 
+        method: 'POST', 
+        data: formData 
+      });
+      return response;
+    },
+    onSuccess: (data) => {
+      setImportResults(data);
+      setCsvFile(null);
+      
+      // Refetch todas las categorías
+      queryClient.refetchQueries({ queryKey: ['/api/asset-categories'] });
+      queryClient.refetchQueries({ queryKey: ['/api/asset-categories/parents'] });
+      queryClient.refetchQueries({ queryKey: ['/api/asset-categories/tree/structure'] });
+      
+      toast({
+        title: "✅ Importación completada",
+        description: `${data.success} categorías importadas exitosamente.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "❌ Error en importación",
+        description: error.message || "Error al importar las categorías",
+        variant: "destructive",
+      });
+    },
+  });
+
   // ===== FUNCIONES DE MANEJO =====
   
   const handleCreate = (data: CategoryFormData) => {
@@ -348,6 +384,45 @@ const AssetCategoriesPage: React.FC = () => {
 
   const collapseAll = () => {
     setExpandedCategories(new Set());
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === 'text/csv') {
+      setCsvFile(file);
+    } else {
+      toast({
+        title: "❌ Error",
+        description: "Por favor selecciona un archivo CSV válido",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImportCSV = () => {
+    if (!csvFile) {
+      toast({
+        title: "❌ Error",
+        description: "Por favor selecciona un archivo CSV",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('csvFile', csvFile);
+    importMutation.mutate(formData);
+  };
+
+  const downloadTemplate = () => {
+    const csvContent = "category,subcategory,use,id\nInfraestructura,Edificios,Oficinas administrativas,1\nVehículos,Automóviles,Transporte personal,2";
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'plantilla_categorias.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   // ===== COMPONENTES DE RENDERIZADO =====
@@ -598,6 +673,14 @@ const AssetCategoriesPage: React.FC = () => {
           subtitle="Gestiona las categorías jerárquicas para organizar tus activos"
           icon={<Tag />}
           actions={[
+            <Button 
+              key="importar-csv"
+              onClick={() => setIsImportDialogOpen(true)}
+              variant="outline"
+            >
+              <Upload className="mr-2" size={16} />
+              Importar CSV
+            </Button>,
             <Button 
               key="nueva-categoria"
               onClick={() => openCreateDialog()}
@@ -1477,6 +1560,119 @@ const AssetCategoriesPage: React.FC = () => {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Importar CSV */}
+      <Dialog open={isImportDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setIsImportDialogOpen(false);
+          setCsvFile(null);
+          setImportResults(null);
+        }
+      }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Importar Categorías desde CSV</DialogTitle>
+            <DialogDescription>
+              Selecciona un archivo CSV con las categorías a importar. El archivo debe contener las columnas: category, subcategory, use, id
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Información sobre el formato */}
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <FileText className="w-4 h-4 text-blue-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-blue-800">Formato requerido:</p>
+                  <p className="text-blue-700 mt-1">
+                    <strong>Columnas:</strong> category, subcategory, use, id<br/>
+                    <strong>Ejemplo:</strong> Infraestructura, Edificios, Oficinas administrativas, 1
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Botón para descargar plantilla */}
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={downloadTemplate}
+                className="text-blue-600 hover:bg-blue-50"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Descargar Plantilla CSV
+              </Button>
+            </div>
+
+            {/* Selector de archivo */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Archivo CSV *</label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="flex-1"
+                />
+                {csvFile && (
+                  <Badge variant="secondary" className="text-xs">
+                    {csvFile.name}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Resultados de importación */}
+            {importResults && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <div className="text-sm">
+                    <p className="font-medium text-green-800">
+                      ✅ Importación completada
+                    </p>
+                    <p className="text-green-700 mt-1">
+                      {importResults.success} categorías importadas exitosamente
+                    </p>
+                    {importResults.errors.length > 0 && (
+                      <div className="mt-2">
+                        <p className="font-medium text-orange-800">Errores:</p>
+                        <ul className="list-disc list-inside text-orange-700 text-xs">
+                          {importResults.errors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setIsImportDialogOpen(false);
+                setCsvFile(null);
+                setImportResults(null);
+              }}
+            >
+              {importResults ? 'Cerrar' : 'Cancelar'}
+            </Button>
+            {!importResults && (
+              <Button 
+                onClick={handleImportCSV}
+                disabled={!csvFile || importMutation.isPending}
+              >
+                {importMutation.isPending ? 'Importando...' : 'Importar'}
+              </Button>
+            )}
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       </div>
