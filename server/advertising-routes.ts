@@ -5,6 +5,7 @@ import { eq, and, gte, lte, desc, asc, sql } from 'drizzle-orm';
 import multer from 'multer';
 import path from 'path';
 import { isAuthenticated } from './middleware/auth';
+import { replitObjectStorage } from './objectStorage-replit';
 
 const router = Router();
 
@@ -199,7 +200,7 @@ router.get('/advertisements', async (req, res) => {
       id: row.id,
       title: row.title,
       description: row.description,
-      imageUrl: row.image_url,
+      imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
       content: row.content,
       targetUrl: row.content, // Asegurar que targetUrl existe para el formulario de assignments
       button_text: row.button_text,
@@ -266,7 +267,7 @@ router.get('/campaigns/:campaignId/advertisements', async (req, res) => {
       id: row.id,
       title: row.title,
       description: row.description,
-      imageUrl: row.image_url,
+      imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
       content: row.content,
       button_text: row.button_text,
       campaignId: row.campaign_id,
@@ -491,7 +492,7 @@ router.get('/placements', async (req, res) => {
         id: row.advertisement_id,
         title: row.title,
         description: row.description,
-        imageUrl: row.image_url,
+        imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
         targetUrl: row.target_url,
         altText: row.alt_text,
         buttonText: row.button_text,
@@ -759,7 +760,7 @@ router.get('/assignments', async (req, res) => {
         id: row.advertisement_id,
         title: row.ad_title,
         description: row.ad_description,
-        imageUrl: row.image_url,
+        imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
         targetUrl: row.target_url,
         isActive: row.ad_is_active,
       }
