@@ -137,11 +137,15 @@ const GoogleMapComponent: React.FC<{
       if (!mapRef.current) return;
 
       try {
+        console.log('🗺️ [MAPA] Iniciando carga de Google Maps...');
+        
         // Limpiar completamente el contenedor
         const container = mapRef.current;
         while (container.firstChild) {
           container.removeChild(container.firstChild);
         }
+        
+        console.log('🗺️ [MAPA] Contenedor limpiado, cargando API...');
         
         // Cargar Google Maps
         await googleMapsService.loadGoogleMaps();
@@ -149,9 +153,12 @@ const GoogleMapComponent: React.FC<{
         if (!mounted) return;
 
         if (!googleMapsService.isGoogleMapsLoaded()) {
-          console.error('Google Maps no pudo cargarse');
+          console.error('🗺️ [MAPA ERROR] Google Maps no pudo cargarse después del loadGoogleMaps()');
+          setMapLoaded(false);
           return;
         }
+
+        console.log('🗺️ [MAPA] API cargada exitosamente, creando mapa...');
 
         // Crear el mapa
         map = await googleMapsService.createMap(mapRef.current, {
@@ -160,8 +167,11 @@ const GoogleMapComponent: React.FC<{
           mapTypeId: google.maps.MapTypeId.ROADMAP
         });
 
+        console.log('🗺️ [MAPA] Mapa creado exitosamente');
+
         // Crear marcadores para activos
         const validAssets = assets.filter(asset => asset.latitude && asset.longitude);
+        console.log(`🗺️ [MAPA] Creando ${validAssets.length} marcadores de ${assets.length} activos totales`);
         
         for (const asset of validAssets) {
           try {
@@ -215,7 +225,12 @@ const GoogleMapComponent: React.FC<{
         setMapLoaded(true);
 
       } catch (error) {
-        console.error('Error inicializando Google Maps:', error);
+        console.error('Error inicializando Google Maps:', {
+          error: error,
+          message: error instanceof Error ? error.message : 'Error desconocido',
+          stack: error instanceof Error ? error.stack : null,
+          apiKey: googleMapsService.isGoogleMapsLoaded() ? 'OK' : 'FALLO'
+        });
       }
     };
 
