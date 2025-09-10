@@ -2,17 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-// Fix for default markers in Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+import { googleMapsService } from '@/services/GoogleMapsService';
 
 import { 
   ArrowLeft, 
@@ -110,31 +100,91 @@ const assetEditSchema = z.object({
 
 type AssetFormData = z.infer<typeof assetEditSchema>;
 
-// Componente para actualizar la vista del mapa
-function MapUpdater({ center }: { center: [number, number] }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (center) {
-      map.setView(center, 16);
-    }
-  }, [center, map]);
-
-  return null;
+// Componente de mapa con Google Maps
+interface GoogleMapComponentProps {
+  position: [number, number] | null;
+  onLocationSelect: (lat: number, lng: number) => void;
+  height?: string;
 }
 
-// Componente para manejar clicks en el mapa
-function LocationPicker({ position, onLocationSelect }: { 
-  position: [number, number] | null; 
-  onLocationSelect: (lat: number, lng: number) => void 
-}) {
-  useMapEvents({
-    click(e) {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-    },
-  });
+function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: GoogleMapComponentProps) {
+  const mapRef = React.useRef<HTMLDivElement>(null);
+  const [mapLoaded, setMapLoaded] = React.useState(false);
+  const [mapInstance, setMapInstance] = React.useState<google.maps.Map | null>(null);
+  const [marker, setMarker] = React.useState<google.maps.Marker | null>(null);
 
-  return position ? <Marker position={position} /> : null;
+  React.useEffect(() => {
+    const initMap = async () => {
+      if (!mapRef.current) return;
+
+      try {
+        await googleMapsService.loadGoogleMaps();
+
+        if (!googleMapsService.isGoogleMapsLoaded()) {
+          console.error('Google Maps no pudo cargarse');
+          return;
+        }
+
+        // Crear el mapa
+        const map = await googleMapsService.createMap(mapRef.current, {
+          center: position ? { lat: position[0], lng: position[1] } : { lat: 20.676667, lng: -103.347222 },
+          zoom: 16,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        setMapInstance(map);
+
+        // Agregar listener para clicks
+        map.addListener('click', (event: google.maps.MapMouseEvent) => {
+          const lat = event.latLng?.lat() || 0;
+          const lng = event.latLng?.lng() || 0;
+          onLocationSelect(lat, lng);
+        });
+
+        setMapLoaded(true);
+      } catch (error) {
+        console.error('Error inicializando Google Maps:', error);
+      }
+    };
+
+    initMap();
+  }, []);
+
+  // Actualizar posición del marcador
+  React.useEffect(() => {
+    if (mapInstance && position) {
+      // Limpiar marcador anterior
+      if (marker) {
+        marker.setMap(null);
+      }
+
+      // Crear nuevo marcador
+      const newMarker = new google.maps.Marker({
+        position: { lat: position[0], lng: position[1] },
+        map: mapInstance,
+        title: 'Ubicación del activo'
+      });
+
+      // Centrar el mapa en la nueva posición
+      mapInstance.setCenter({ lat: position[0], lng: position[1] });
+
+      setMarker(newMarker);
+    }
+  }, [mapInstance, position]);
+
+  return (
+    <div 
+      ref={mapRef} 
+      style={{ height, width: '100%', borderRadius: '8px' }}
+      className="border"
+    >
+      {!mapLoaded && (
+        <div className="flex items-center justify-center h-full text-muted-foreground">
+          Cargando Google Maps...
+        </div>
+      )}
+    </div>
+  );
 }
 
 const EditAssetPage: React.FC = () => {
@@ -286,10 +336,13 @@ const EditAssetPage: React.FC = () => {
   // Mutación para actualizar el activo
   const updateAssetMutation = useMutation({
     mutationFn: (data: AssetFormData) => 
-      apiRequest(`/api/assets/${id}`, {
+      fetch(`/api/assets/${id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data),
-      }),
+      }).then(res => res.json()),
     onSuccess: () => {
       toast({
         title: "Éxito",
@@ -323,13 +376,13 @@ const EditAssetPage: React.FC = () => {
   const selectedCategoryId = form.watch('categoryId');
   const selectedParkId = form.watch('parkId');
   
-  const subcategories = categories?.filter((cat: any) => 
+  const subcategories = Array.isArray(categories) ? categories.filter((cat: any) => 
     cat.parentId === selectedCategoryId
-  ) || [];
+  ) : [];
 
-  const amenitiesByPark = amenities?.filter((amenity: any) => 
+  const amenitiesByPark = Array.isArray(amenities) ? amenities.filter((amenity: any) => 
     amenity.parkId === selectedParkId
-  ) || [];
+  ) : [];
 
   const isLoading = loadingParks || loadingCategories || loadingAmenities || loadingUsers || loadingAsset;
 
@@ -441,11 +494,11 @@ const EditAssetPage: React.FC = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {categories?.filter((cat: any) => !cat.parentId).map((category: any) => (
+                            {Array.isArray(categories) ? categories.filter((cat: any) => !cat.parentId).map((category: any) => (
                               <SelectItem key={category.id} value={category.id.toString()}>
                                 {category.name}
                               </SelectItem>
-                            ))}
+                            )) : null}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -555,11 +608,11 @@ const EditAssetPage: React.FC = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {parks?.map((park: any) => (
+                            {Array.isArray(parks) ? parks.map((park: any) => (
                               <SelectItem key={park.id} value={park.id.toString()}>
                                 {park.name}
                               </SelectItem>
-                            ))}
+                            )) : null}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -678,22 +731,12 @@ const EditAssetPage: React.FC = () => {
                     <h4 className="text-sm font-medium">Seleccionar Ubicación en el Mapa</h4>
                     <p className="text-sm text-gray-600">Haz clic en el mapa para establecer las coordenadas</p>
                   </div>
-                  <div className="h-96 w-full border rounded-md overflow-hidden">
-                    <MapContainer
-                      center={mapPosition || [19.432608, -99.133209]}
-                      zoom={16}
-                      style={{ height: '100%', width: '100%' }}
-                    >
-                      <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      />
-                      {mapPosition && <MapUpdater center={mapPosition} />}
-                      <LocationPicker 
-                        position={selectedLocation} 
-                        onLocationSelect={handleLocationSelect} 
-                      />
-                    </MapContainer>
+                  <div className="h-96 w-full">
+                    <GoogleMapComponent
+                      position={selectedLocation}
+                      onLocationSelect={handleLocationSelect}
+                      height="384px"
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -1073,11 +1116,11 @@ const EditAssetPage: React.FC = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {users?.map((user: any) => (
+                            {Array.isArray(users) ? users.map((user: any) => (
                               <SelectItem key={user.id} value={user.id.toString()}>
                                 {user.fullName || user.username}
                               </SelectItem>
-                            ))}
+                            )) : null}
                           </SelectContent>
                         </Select>
                         <FormMessage />
