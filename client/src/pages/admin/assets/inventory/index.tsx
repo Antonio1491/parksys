@@ -309,6 +309,20 @@ const InventoryPage: React.FC = () => {
     setCurrentPage(1);
   }, [searchTerm, selectedStatus, selectedCondition, selectedPark, selectedCategory]);
 
+  // Limpiar selección cuando cambian los datos o filtros
+  React.useEffect(() => {
+    clearSelection();
+  }, [currentPage, searchTerm, selectedStatus, selectedCondition, selectedPark, selectedCategory]);
+
+  // Actualizar estado de "seleccionar todos" basado en la selección actual
+  React.useEffect(() => {
+    if (assets && assets.length > 0) {
+      const allCurrentPageIds = assets.map((asset: any) => asset.id);
+      const allSelected = allCurrentPageIds.every(id => selectedAssets.includes(id));
+      setIsSelectAllChecked(allSelected && selectedAssets.length > 0);
+    }
+  }, [selectedAssets, assets]);
+
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedStatus('all');
@@ -1052,6 +1066,20 @@ const InventoryPage: React.FC = () => {
           <Plus className="h-4 w-4 mr-2" />
           Nuevo Activo
         </Button>
+        {selectedAssets.length > 0 && (
+          <Button 
+            variant="destructive"
+            onClick={handleBulkDelete}
+            disabled={bulkDeleteMutation.isPending}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            {bulkDeleteMutation.isPending 
+              ? `Eliminando ${selectedAssets.length}...` 
+              : `Eliminar ${selectedAssets.length} seleccionado(s)`
+            }
+          </Button>
+        )}
         <Button variant="outline" onClick={exportToCSV}>
           <Download className="h-4 w-4 mr-2" />
           Exportar Inventario
@@ -1319,6 +1347,13 @@ const InventoryPage: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={isSelectAllChecked}
+                          onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                          aria-label="Seleccionar todos"
+                        />
+                      </TableHead>
                       <TableHead>ID</TableHead>
                       <TableHead>Nombre</TableHead>
                       <TableHead>Categoría</TableHead>
@@ -1334,6 +1369,13 @@ const InventoryPage: React.FC = () => {
                   <TableBody>
                     {paginatedAssets.map((asset) => (
                       <TableRow key={asset.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedAssets.includes(asset.id)}
+                            onCheckedChange={(checked) => handleSelectAsset(asset.id, checked as boolean)}
+                            aria-label={`Seleccionar ${asset.name}`}
+                          />
+                        </TableCell>
                         <TableCell>{asset.id}</TableCell>
                         <TableCell className="font-medium">{asset.name}</TableCell>
                         <TableCell>{asset.categoryName}</TableCell>
