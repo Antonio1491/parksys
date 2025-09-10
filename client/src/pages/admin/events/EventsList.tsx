@@ -266,14 +266,14 @@ const EventsList: React.FC = () => {
               variant="primary"
               onClick={() => window.location.href = '/admin/events/new'}>
               <Plus className="mr-2 stroke-[4]" />
-              Nuevo Evento
+              Nuevo
             </Button>
           ]}
         />
 
         {/* Filtros y controles */}
         <Card className="mb-6">
-          <CardContent className="p-6">
+          <CardContent className="p-8">
             <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-4 flex-1">
                 <div className="relative flex-1 max-w-md">

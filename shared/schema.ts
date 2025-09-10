@@ -3258,31 +3258,22 @@ export const insertSponsorshipCampaignSchema = createInsertSchema(sponsorshipCam
   updatedAt: true
 });
 
-// Tabla de contratos de patrocinio
+// Enums para contratos de patrocinio
+export const contractTypeEnum = pgEnum("contract_type", ["paquete", "activo", "evento", "otro"]);
+export const contractStatusEnum = pgEnum("contract_status", ["activo", "vencido", "en_negociacion", "en_revision"]);
+
+// Tabla de contratos de patrocinio  
 export const sponsorshipContracts = pgTable("sponsorship_contracts", {
-  id: serial("id").primaryKey(),
+  id: serial("id").primaryKey(), // Mantengo serial por compatibilidad con datos existentes
+  number: varchar("number", { length: 50 }).notNull().unique(), // clave alfanumérica para control
   sponsorId: integer("sponsor_id").notNull().references(() => sponsors.id),
-  packageId: integer("package_id").notNull().references(() => sponsorshipPackages.id),
-  
-  // Fechas del contrato
+  type: contractTypeEnum("type").notNull(),
+  packageId: integer("package_id").references(() => sponsorshipPackages.id), // nullable, solo si type es "paquete"
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // aportación económica
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
-  
-  // Detalles financieros
-  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
-  
-  // Estado y términos
-  status: varchar("status", { length: 50 }).default("draft"), // draft, active, expired, terminated
-  termsConditions: text("terms_conditions"),
-  
-  // Renovación
-  renewalNoticeDate: date("renewal_notice_date"),
-  autoRenewal: boolean("auto_renewal").default(false),
-  
-  // Contacto
-  contactPerson: varchar("contact_person", { length: 255 }),
-  contactEmail: varchar("contact_email", { length: 255 }),
-  contactPhone: varchar("contact_phone", { length: 50 }),
+  status: contractStatusEnum("status").default("en_negociacion"),
+  notes: text("notes"), // observaciones
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
@@ -3453,6 +3444,12 @@ export const insertSponsorshipContractSchema = createInsertSchema(sponsorshipCon
   id: true,
   createdAt: true,
   updatedAt: true
+}).extend({
+  // Validaciones adicionales
+  number: z.string().min(1, "El número de contrato es requerido"),
+  amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "El monto debe ser mayor a 0"),
+  startDate: z.string().min(1, "La fecha de inicio es requerida"),
+  endDate: z.string().min(1, "La fecha de fin es requerida")
 });
 
 export const insertSponsorEventSchema = createInsertSchema(sponsorEvents).omit({

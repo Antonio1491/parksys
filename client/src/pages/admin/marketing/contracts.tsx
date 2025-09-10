@@ -17,20 +17,20 @@ import { format } from 'date-fns';
 
 interface SponsorshipContract {
   id: number;
+  number: string; // clave alfanumérica para control
   sponsorId: number;
-  packageId: number;
+  type: 'paquete' | 'activo' | 'evento' | 'otro';
+  packageId?: number; // nullable, solo si type es "paquete"
+  amount: string; // aportación económica
   startDate: string;
   endDate: string;
-  totalAmount: string;
-  status: string;
-  terms?: string;
-  autoRenewal: boolean;
-  paymentSchedule?: string;
+  status: 'activo' | 'vencido' | 'en_negociacion' | 'en_revision';
+  notes?: string; // observaciones
   createdAt: string;
   updatedAt: string;
   sponsor?: {
     name: string;
-    category: string;
+    sector: string;
   };
   package?: {
     name: string;
@@ -60,17 +60,24 @@ interface Sponsor {
 }
 
 const statusColors = {
-  draft: 'bg-gray-100 text-gray-800',
-  active: 'bg-green-100 text-green-800',
-  expired: 'bg-red-100 text-red-800',
-  terminated: 'bg-orange-100 text-orange-800'
+  activo: 'bg-green-100 text-green-800',
+  vencido: 'bg-red-100 text-red-800',
+  en_negociacion: 'bg-blue-100 text-blue-800',
+  en_revision: 'bg-yellow-100 text-yellow-800'
 };
 
 const statusLabels = {
-  draft: 'Borrador',
-  active: 'Activo',
-  expired: 'Expirado',
-  terminated: 'Terminado'
+  activo: 'Activo',
+  vencido: 'Vencido',
+  en_negociacion: 'En Negociación',
+  en_revision: 'En Revisión'
+};
+
+const typeLabels = {
+  paquete: 'Paquete',
+  activo: 'Activo',
+  evento: 'Evento',
+  otro: 'Otro'
 };
 
 export default function ContractsPage() {
@@ -81,15 +88,15 @@ export default function ContractsPage() {
   const [selectedContract, setSelectedContract] = useState<SponsorshipContract | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
+    number: '',
     sponsorId: '',
+    type: 'paquete' as 'paquete' | 'activo' | 'evento' | 'otro',
     packageId: '',
+    amount: '',
     startDate: '',
     endDate: '',
-    totalAmount: '',
-    status: 'draft',
-    terms: '',
-    autoRenewal: false,
-    paymentSchedule: 'monthly'
+    status: 'en_negociacion' as 'activo' | 'vencido' | 'en_negociacion' | 'en_revision',
+    notes: ''
   });
 
   // Fetch contracts
@@ -180,15 +187,15 @@ export default function ContractsPage() {
 
   const resetForm = () => {
     setFormData({
+      number: '',
       sponsorId: '',
+      type: 'paquete',
       packageId: '',
+      amount: '',
       startDate: '',
       endDate: '',
-      totalAmount: '',
-      status: 'draft',
-      terms: '',
-      autoRenewal: false,
-      paymentSchedule: 'monthly'
+      status: 'en_negociacion',
+      notes: ''
     });
     setSelectedContract(null);
   };
@@ -196,15 +203,15 @@ export default function ContractsPage() {
   const handleEdit = (contract: SponsorshipContract) => {
     setSelectedContract(contract);
     setFormData({
+      number: contract.number || '',
       sponsorId: contract.sponsorId?.toString() || '',
+      type: contract.type || 'paquete',
       packageId: contract.packageId?.toString() || '',
+      amount: contract.amount || '',
       startDate: contract.startDate ? format(new Date(contract.startDate), 'yyyy-MM-dd') : '',
       endDate: contract.endDate ? format(new Date(contract.endDate), 'yyyy-MM-dd') : '',
-      totalAmount: contract.totalAmount || '',
-      status: contract.status || 'draft',
-      terms: contract.terms || '',
-      autoRenewal: contract.autoRenewal || false,
-      paymentSchedule: contract.paymentSchedule || 'monthly'
+      status: contract.status || 'en_negociacion',
+      notes: contract.notes || ''
     });
     setIsDialogOpen(true);
   };
@@ -212,21 +219,19 @@ export default function ContractsPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const submitData = {
+      ...formData,
+      sponsorId: parseInt(formData.sponsorId),
+      packageId: formData.packageId ? parseInt(formData.packageId) : null // nullable para tipos que no son paquete
+    };
+    
     if (selectedContract) {
       updateContractMutation.mutate({ 
         id: selectedContract.id, 
-        data: {
-          ...formData,
-          sponsorId: parseInt(formData.sponsorId),
-          packageId: parseInt(formData.packageId)
-        }
+        data: submitData
       });
     } else {
-      createContractMutation.mutate({
-        ...formData,
-        sponsorId: parseInt(formData.sponsorId),
-        packageId: parseInt(formData.packageId)
-      });
+      createContractMutation.mutate(submitData);
     }
   };
 
@@ -262,6 +267,16 @@ export default function ContractsPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                      <Label htmlFor="number">Número de Contrato *</Label>
+                      <Input
+                        id="number"
+                        value={formData.number}
+                        onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                        placeholder="CT-2024-001"
+                        required
+                      />
+                    </div>
+                    <div>
                       <Label htmlFor="sponsorId">Patrocinador *</Label>
                       <Select value={formData.sponsorId} onValueChange={(value) => setFormData({ ...formData, sponsorId: value })}>
                         <SelectTrigger>
@@ -277,20 +292,36 @@ export default function ContractsPage() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="packageId">Paquete de Patrocinio *</Label>
-                      <Select value={formData.packageId} onValueChange={(value) => setFormData({ ...formData, packageId: value })}>
+                      <Label htmlFor="type">Tipo de Contrato *</Label>
+                      <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value as any })}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar paquete" />
+                          <SelectValue placeholder="Seleccionar tipo" />
                         </SelectTrigger>
                         <SelectContent>
-                          {packages.map((pkg: SponsorshipPackage) => (
-                            <SelectItem key={pkg.id} value={pkg.id.toString()}>
-                              {pkg.name} - ${pkg.price} ({pkg.duration} meses)
-                            </SelectItem>
-                          ))}
+                          <SelectItem value="paquete">Paquete</SelectItem>
+                          <SelectItem value="activo">Activo</SelectItem>
+                          <SelectItem value="evento">Evento</SelectItem>
+                          <SelectItem value="otro">Otro</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+                    {formData.type === 'paquete' && (
+                      <div>
+                        <Label htmlFor="packageId">Paquete de Patrocinio</Label>
+                        <Select value={formData.packageId} onValueChange={(value) => setFormData({ ...formData, packageId: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar paquete" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {packages.map((pkg: SponsorshipPackage) => (
+                              <SelectItem key={pkg.id} value={pkg.id.toString()}>
+                                {pkg.name} - ${pkg.price} ({pkg.duration} meses)
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     <div>
                       <Label htmlFor="startDate">Fecha de Inicio *</Label>
                       <Input
@@ -312,12 +343,12 @@ export default function ContractsPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="totalAmount">Monto Total *</Label>
+                      <Label htmlFor="amount">Monto *</Label>
                       <Input
-                        id="totalAmount"
-                        value={formData.totalAmount}
-                        onChange={(e) => setFormData({ ...formData, totalAmount: e.target.value })}
-                        placeholder="$0.00"
+                        id="amount"
+                        value={formData.amount}
+                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                        placeholder="0.00"
                         required
                       />
                     </div>
@@ -328,47 +359,23 @@ export default function ContractsPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="draft">Borrador</SelectItem>
-                          <SelectItem value="active">Activo</SelectItem>
-                          <SelectItem value="expired">Expirado</SelectItem>
-                          <SelectItem value="terminated">Terminado</SelectItem>
+                          <SelectItem value="activo">Activo</SelectItem>
+                          <SelectItem value="vencido">Vencido</SelectItem>
+                          <SelectItem value="en_negociacion">En Negociación</SelectItem>
+                          <SelectItem value="en_revision">En Revisión</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="paymentSchedule">Cronograma de Pagos</Label>
-                      <Select value={formData.paymentSchedule} onValueChange={(value) => setFormData({ ...formData, paymentSchedule: value })}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="monthly">Mensual</SelectItem>
-                          <SelectItem value="quarterly">Trimestral</SelectItem>
-                          <SelectItem value="annually">Anual</SelectItem>
-                          <SelectItem value="one-time">Pago Único</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="autoRenewal"
-                        checked={formData.autoRenewal}
-                        onChange={(e) => setFormData({ ...formData, autoRenewal: e.target.checked })}
-                        className="rounded border-gray-300"
-                      />
-                      <Label htmlFor="autoRenewal">Renovación Automática</Label>
                     </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="terms">Términos y Condiciones</Label>
+                    <Label htmlFor="notes">Observaciones</Label>
                     <Textarea
-                      id="terms"
-                      value={formData.terms}
-                      onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={4}
-                      placeholder="Términos específicos del contrato..."
+                      placeholder="Observaciones del contrato..."
                     />
                   </div>
 
@@ -434,15 +441,15 @@ export default function ContractsPage() {
                   <div className="flex-1">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <FileText className="h-5 w-5" />
-                      {contract.sponsor?.name} - {contract.package?.name}
+                      {contract.number} - {contract.sponsor?.name}
                     </CardTitle>
                     <div className="flex gap-2 mt-2">
                       <Badge className={statusColors[contract.status as keyof typeof statusColors]}>
                         {statusLabels[contract.status as keyof typeof statusLabels]}
                       </Badge>
-                      {contract.autoRenewal && (
-                        <Badge variant="outline">Renovación Automática</Badge>
-                      )}
+                      <Badge variant="outline">
+                        {typeLabels[contract.type as keyof typeof typeLabels]}
+                      </Badge>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -474,40 +481,42 @@ export default function ContractsPage() {
                       Financieros
                     </h4>
                     <div className="space-y-1 text-sm">
-                      <div>Monto Total: {contract.totalAmount}</div>
-                      <div>Cronograma: {contract.paymentSchedule}</div>
+                      <div>Monto: ${contract.amount}</div>
+                      <div>Tipo: {typeLabels[contract.type as keyof typeof typeLabels]}</div>
                     </div>
                   </div>
                   
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      Paquete
-                    </h4>
-                    <div className="space-y-1 text-sm">
-                      <div>Nivel: {contract.package?.level}</div>
-                      <div>Duración: {contract.package?.duration} meses</div>
-                      {contract.package?.benefits && contract.package.benefits.length > 0 && (
-                        <div>
-                          <div className="font-medium mt-2">Beneficios:</div>
-                          <ul className="list-disc list-inside space-y-1">
-                            {contract.package.benefits.slice(0, 3).map((benefit, index) => (
-                              <li key={index} className="text-xs">{benefit}</li>
-                            ))}
-                            {contract.package.benefits.length > 3 && (
-                              <li className="text-xs text-gray-500">+{contract.package.benefits.length - 3} más...</li>
-                            )}
-                          </ul>
-                        </div>
-                      )}
+                  {contract.type === 'paquete' && contract.package && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                        <Package className="h-4 w-4" />
+                        Paquete
+                      </h4>
+                      <div className="space-y-1 text-sm">
+                        <div>Nivel: {contract.package?.level}</div>
+                        <div>Duración: {contract.package?.duration} meses</div>
+                        {contract.package?.benefits && contract.package.benefits.length > 0 && (
+                          <div>
+                            <div className="font-medium mt-2">Beneficios:</div>
+                            <ul className="list-disc list-inside space-y-1">
+                              {contract.package.benefits.slice(0, 3).map((benefit, index) => (
+                                <li key={index} className="text-xs">{benefit}</li>
+                              ))}
+                              {contract.package.benefits.length > 3 && (
+                                <li className="text-xs text-gray-500">+{contract.package.benefits.length - 3} más...</li>
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
-                {contract.terms && (
+                {contract.notes && (
                   <div className="mt-4 p-3 bg-gray-50 rounded">
-                    <h5 className="font-medium text-gray-900 mb-2">Términos Especiales</h5>
-                    <p className="text-sm text-gray-600">{contract.terms}</p>
+                    <h5 className="font-medium text-gray-900 mb-2">Observaciones</h5>
+                    <p className="text-sm text-gray-600">{contract.notes}</p>
                   </div>
                 )}
               </CardContent>
