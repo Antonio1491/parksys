@@ -354,7 +354,7 @@ export default function ContractsPage() {
                     </div>
                     <div>
                       <Label htmlFor="status">Estado</Label>
-                      <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                      <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as any })}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>

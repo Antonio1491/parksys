@@ -147,10 +147,9 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
           s.website_url,
           s.representative,
           s.contact_info,
-          s.created_at,
           s.updated_at
         FROM sponsors s
-        ORDER BY s.created_at DESC
+        ORDER BY s.id DESC
       `);
       
       // Mapear a camelCase para la nueva estructura simplificada
@@ -163,7 +162,6 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         website_url: row.website_url,
         representative: row.representative,
         contact_info: row.contact_info,
-        createdAt: row.created_at,
         updatedAt: row.updated_at
       }));
       
@@ -333,8 +331,8 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
     try {
       console.log('🔍 Obteniendo contratos de patrocinio...');
       
-      // Primero, probar consulta simple
-      const contractsResult = await pool.query('SELECT * FROM sponsorship_contracts ORDER BY created_at DESC');
+      // Primero, probar consulta simple  
+      const contractsResult = await pool.query('SELECT * FROM sponsorship_contracts ORDER BY id DESC');
       console.log('✅ Contratos base encontrados:', contractsResult.rows.length);
       
       // Si hay contratos, devolver directamente los datos básicos
