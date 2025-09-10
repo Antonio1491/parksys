@@ -113,22 +113,44 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
   const [mapError, setMapError] = React.useState<string | null>(null);
   const [mapInstance, setMapInstance] = React.useState<google.maps.Map | null>(null);
   const [marker, setMarker] = React.useState<google.maps.Marker | null>(null);
+  const isMountedRef = React.useRef(true);
+
+  // Efecto de limpieza al desmontar
+  React.useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      // Limpiar el marker
+      if (marker) {
+        marker.setMap(null);
+      }
+      // No intentamos limpiar el mapa directamente para evitar problemas con el DOM
+      setMapInstance(null);
+      setMarker(null);
+    };
+  }, [marker]);
 
   React.useEffect(() => {
     const initMap = async () => {
-      if (!mapRef.current) return;
+      if (!mapRef.current || !isMountedRef.current) return;
 
       try {
         console.log('🗺️ [GOOGLE MAPS] Iniciando carga...');
         await googleMapsService.loadGoogleMaps();
 
+        if (!isMountedRef.current) return; // Verificar si aún está montado
+        
         if (!googleMapsService.isGoogleMapsLoaded()) {
           console.error('🗺️ [GOOGLE MAPS ERROR] No pudo cargarse');
-          setMapError('Error al cargar Google Maps API');
+          if (isMountedRef.current) {
+            setMapError('Error al cargar Google Maps API');
+          }
           return;
         }
 
         console.log('🗺️ [GOOGLE MAPS] API cargada, creando mapa...');
+
+        // Verificar nuevamente si el componente sigue montado
+        if (!mapRef.current || !isMountedRef.current) return;
 
         // Crear el mapa usando el servicio (sin acceso directo a google.maps)
         const map = await googleMapsService.createMap(mapRef.current, {
@@ -136,10 +158,13 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
           zoom: 16
         });
 
+        if (!isMountedRef.current) return; // Verificar una vez más
+
         setMapInstance(map);
 
         // Agregar listener para clicks
         map.addListener('click', (event: google.maps.MapMouseEvent) => {
+          if (!isMountedRef.current) return;
           const lat = event.latLng?.lat() || 0;
           const lng = event.latLng?.lng() || 0;
           onLocationSelect(lat, lng);
@@ -159,28 +184,36 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
   // Actualizar posición del marcador
   React.useEffect(() => {
-    if (mapInstance && position) {
+    if (mapInstance && position && isMountedRef.current) {
       const updateMarker = async () => {
-        // Limpiar marcador anterior
-        if (marker) {
-          marker.setMap(null);
+        try {
+          // Limpiar marcador anterior
+          if (marker) {
+            marker.setMap(null);
+          }
+
+          if (!isMountedRef.current) return;
+
+          // Crear nuevo marcador usando el servicio
+          const newMarker = await googleMapsService.createMarker(mapInstance, {
+            position: { lat: position[0], lng: position[1] },
+            title: 'Ubicación del activo'
+          });
+
+          if (!isMountedRef.current) return;
+
+          // Centrar el mapa en la nueva posición
+          mapInstance.setCenter({ lat: position[0], lng: position[1] });
+
+          setMarker(newMarker);
+        } catch (error) {
+          console.error('🗺️ [GOOGLE MAPS ERROR] Error actualizando marcador:', error);
         }
-
-        // Crear nuevo marcador usando el servicio
-        const newMarker = await googleMapsService.createMarker(mapInstance, {
-          position: { lat: position[0], lng: position[1] },
-          title: 'Ubicación del activo'
-        });
-
-        // Centrar el mapa en la nueva posición
-        mapInstance.setCenter({ lat: position[0], lng: position[1] });
-
-        setMarker(newMarker);
       };
 
       updateMarker();
     }
-  }, [mapInstance, position, marker]);
+  }, [mapInstance, position]);
 
   return (
     <div 
