@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Calendar, MapPin, Users, Clock, Edit, Trash2, Eye, Grid, List, ClipboardList, Building } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, Clock, Edit, Trash2, Eye, Grid, List, ClipboardList, Building, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import AdminLayout from '@/components/AdminLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { apiRequest } from '@/lib/queryClient';
 
 interface Event {
@@ -254,16 +255,21 @@ const EventsList: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        {/* Header con patrón Card */}
-        <Card className="bg-gray-50 mb-6">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <ClipboardList className="w-8 h-8 text-gray-900" />
-              <h1 className="text-3xl font-bold text-gray-900">Listado de Eventos</h1>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        <PageHeader 
+          title="Listado de eventos"
+          subtitle="Eventos registrados en el sistema"
+          icon={<List />}
+          actions={[
+            <Button 
+              key="new-event"
+              variant="primary"
+              onClick={() => window.location.href = '/admin/events/new'}>
+              <Plus className="mr-2 stroke-[4]" />
+              Nuevo Evento
+            </Button>
+          ]}
+        />
 
         {/* Filtros y controles */}
         <Card className="mb-6">

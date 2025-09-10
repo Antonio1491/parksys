@@ -9,14 +9,15 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { 
-  Home, 
+  NotebookPen, 
   Map, 
   Calendar, 
   FileText, 
   MessageSquare, 
   Bell, 
   Users, 
-  Settings, 
+  Settings,
+  UserSearch,
   LogOut,
   Tag,
   BarChart3,
@@ -43,7 +44,6 @@ import {
   Target,
   ArrowRightLeft,
   Calculator,
-  NotebookPen,
   Megaphone,
   Handshake,
   Store,
@@ -100,6 +100,8 @@ import {
   PackagePlus,
   Trees,
   List,
+  Shovel,
+  Binoculars,
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -140,7 +142,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
       <Button
         variant="ghost"
         className={cn(
-          "w-full flex items-center justify-start rounded-full text-sm font-light h-9 px-4 transition-colors duration-200",
+          "w-full flex items-center justify-start rounded-full text-sm font-light h-9 px-2 transition-colors duration-200",
           active
             ? "bg-white text-sidebar-primary hover:bg-white hover:text-header-background"
             : "text-sidebar-primary hover:bg-sidebar-hover hover:text-header-background"
@@ -625,7 +627,7 @@ const AdminSidebarComplete: React.FC = () => {
               </NavItem>
               <NavItem 
                 href="/admin/trees/maintenance" 
-                icon={<Scissors className="h-4 w-4" />}
+                icon={<Shovel className="h-4 w-4" />}
                 active={location.startsWith('/admin/trees/maintenance')}
               >
                 {t('navigation.maintenance')}
@@ -636,7 +638,7 @@ const AdminSidebarComplete: React.FC = () => {
             <CollapsibleSubmenu
               id="fauna"
               title="Fauna"
-              icon={<Heart className="h-4 w-4" />}
+              icon={<Binoculars className="h-4 w-4" />}
               href="/admin/fauna/species"
               collapsible={false}
               isExpanded={false}
@@ -655,7 +657,7 @@ const AdminSidebarComplete: React.FC = () => {
             >
               <NavItem 
                 href="/admin/visitors/count" 
-                icon={<Users className="h-4 w-4" />}
+                icon={<UserSearch className="h-4 w-4" />}
                 active={location.startsWith('/admin/visitors/count')}
               >
                 Conteo
@@ -688,32 +690,11 @@ const AdminSidebarComplete: React.FC = () => {
                 Nuevo Evento
               </NavItem>
               <NavItem 
-                href="/admin/events/categories" 
-                icon={<Tag className="h-4 w-4" />}
-                active={location.startsWith('/admin/events/categories')}
-              >
-                Categorías
-              </NavItem>
-              <NavItem 
                 href="/admin/events/list" 
-                icon={<ClipboardList className="h-4 w-4" />}
+                icon={<List className="h-4 w-4" />}
                 active={location.startsWith('/admin/events/list')}
               >
                 Listado
-              </NavItem>
-              <NavItem 
-                href="/admin/events/registrations" 
-                icon={<UserCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/events/registrations')}
-              >
-                Inscripciones
-              </NavItem>
-              <NavItem 
-                href="/admin/eventos-ambu" 
-                icon={<FileText className="h-4 w-4" />}
-                active={location.startsWith('/admin/eventos-ambu')}
-              >
-                Eventos
               </NavItem>
               <NavItem 
                 href="/admin/eventos-ambu/calendar" 
@@ -721,6 +702,20 @@ const AdminSidebarComplete: React.FC = () => {
                 active={location.startsWith('/admin/eventos-ambu/calendar')}
               >
                 Calendario
+              </NavItem>
+              <NavItem 
+                href="/admin/events/categories" 
+                icon={<Tag className="h-4 w-4" />}
+                active={location.startsWith('/admin/events/categories')}
+              >
+                Categorías
+              </NavItem>
+              <NavItem 
+                href="/admin/events/registrations" 
+                icon={<UserCheck className="h-4 w-4" />}
+                active={location.startsWith('/admin/events/registrations')}
+              >
+                Inscripciones
               </NavItem>
               <NavItem 
                 href="/admin/eventos-ambu/tabulador" 
