@@ -334,7 +334,7 @@ const InventoryPage: React.FC = () => {
 
   // Handlers para acciones
   const handleEdit = (id: number) => {
-    setLocation(`/admin/assets/${id}/edit`);
+    setLocation(`/admin/assets/${id}/edit-enhanced`);
   };
 
   const handleReportIncident = (id: number) => {

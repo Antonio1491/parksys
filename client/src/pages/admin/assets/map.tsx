@@ -301,31 +301,28 @@ const AssetMapPage: React.FC = () => {
   const { data: apiAssets, isLoading: assetsLoading } = useQuery<Asset[]>({
     queryKey: ['/api/assets'],
     staleTime: 60000,
-    suspense: false,
     retry: 1
   });
   
   const { data: apiParks, isLoading: parksLoading } = useQuery({
     queryKey: ['/api/parks'],
     staleTime: 60000,
-    suspense: false,
     retry: 1
   });
   
   const { data: apiCategories, isLoading: categoriesLoading } = useQuery<AssetCategory[]>({
     queryKey: ['/api/asset-categories'],
     staleTime: 60000,
-    suspense: false,
     retry: 1
   });
 
   const assets = apiAssets || [];
-  const parks = Array.isArray(apiParks?.data) ? apiParks.data : (Array.isArray(apiParks) ? apiParks : []);
+  const parks = Array.isArray((apiParks as any)?.data) ? (apiParks as any).data : (Array.isArray(apiParks) ? apiParks : []);
   const categories = apiCategories || [];
 
   // Filtrar activos
   const filteredAssets = useMemo(() => {
-    return assets.filter(asset => {
+    return assets.filter((asset: Asset) => {
       if (!asset.latitude || !asset.longitude) return false;
       
       const matchesPark = selectedPark === 'all' || asset.parkId === selectedPark;
@@ -337,7 +334,7 @@ const AssetMapPage: React.FC = () => {
     });
   }, [assets, selectedPark, selectedCategory, selectedStatus, selectedCondition]);
 
-  const unlocatedAssets = assets.filter(asset => !asset.latitude || !asset.longitude);
+  const unlocatedAssets = assets.filter((asset: Asset) => !asset.latitude || !asset.longitude);
   const isLoading = assetsLoading || parksLoading || categoriesLoading;
 
   if (isLoading) {
@@ -414,7 +411,7 @@ const AssetMapPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los parques</SelectItem>
-              {parks?.map((park) => (
+              {parks?.map((park: any) => (
                 <SelectItem key={park.id} value={park.id.toString()}>
                   {park.name}
                 </SelectItem>
@@ -428,7 +425,7 @@ const AssetMapPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas las categorías</SelectItem>
-              {categories?.map((category) => (
+              {categories?.map((category: any) => (
                 <SelectItem key={category.id} value={category.id.toString()}>
                   {category.name}
                 </SelectItem>
