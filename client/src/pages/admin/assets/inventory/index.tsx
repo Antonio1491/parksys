@@ -404,10 +404,7 @@ const InventoryPage: React.FC = () => {
     mutationFn: async (ids: number[]) => {
       return apiRequest('/api/assets/bulk-delete', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ids }),
+        data: { ids },
       });
     },
     onSuccess: (data) => {
