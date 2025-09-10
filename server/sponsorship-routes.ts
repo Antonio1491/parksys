@@ -136,71 +136,44 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
     try {
       console.log('🔍 Obteniendo patrocinadores...');
       
-      // Usar query SQL directo con JOIN para obtener información de paquetes
+      // Usar query SQL directo para la nueva estructura simplificada
       const result = await pool.query(`
         SELECT 
           s.id,
           s.name,
-          s.category,
-          s.logo,
-          s.representative,
-          s.email,
-          s.phone,
-          s.address,
-          s.website_url,
+          s.sector,
+          s.logo_url,
           s.status,
-          sp.name as package_name,
-          sp.category as package_category,
-          s.contract_value,
-          s.contract_start,
-          s.contract_end,
-          s.events_sponsored,
-          s.renewal_probability,
-          s.notes,
+          s.website_url,
+          s.representative,
+          s.contact_info,
           s.created_at,
-          s.updated_at,
-          sp.level as package_level,
-          sp.benefits as package_benefits,
-          sp.price as package_price
+          s.updated_at
         FROM sponsors s
-        LEFT JOIN sponsorship_packages sp ON s.package_name = sp.name
         ORDER BY s.created_at DESC
       `);
       
-      // Mapear a camelCase manualmente
+      // Mapear a camelCase para la nueva estructura simplificada
       const mappedSponsors = result.rows.map(row => ({
         id: row.id,
         name: row.name,
-        category: row.category,
-        logo: row.logo,
-        representative: row.representative,
-        email: row.email,
-        phone: row.phone,
-        address: row.address,
-        websiteUrl: row.website_url,
+        sector: row.sector,
+        logo_url: row.logo_url,
         status: row.status,
-        packageName: row.package_name,
-        packageCategory: row.package_category,
-        contractValue: row.contract_value,
-        contractStart: row.contract_start,
-        contractEnd: row.contract_end,
-        eventsSponsored: row.events_sponsored,
-        renewalProbability: row.renewal_probability,
-        notes: row.notes,
+        website_url: row.website_url,
+        representative: row.representative,
+        contact_info: row.contact_info,
         createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        packageLevel: row.package_level,
-        packageBenefits: row.package_benefits,
-        packagePrice: row.package_price
+        updatedAt: row.updated_at
       }));
       
       console.log('✅ Patrocinadores encontrados:', mappedSponsors.length);
       if (mappedSponsors.length > 0) {
         console.log('📄 Primer patrocinador:', {
           name: mappedSponsors[0].name,
-          packageName: mappedSponsors[0].packageName,
-          packageCategory: mappedSponsors[0].packageCategory,
-          contractValue: mappedSponsors[0].contractValue
+          sector: mappedSponsors[0].sector,
+          status: mappedSponsors[0].status,
+          representative: mappedSponsors[0].representative
         });
       }
       

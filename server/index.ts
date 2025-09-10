@@ -2238,7 +2238,7 @@ function startServer() {
   criticalApiRouter.get("/sponsors", async (req: any, res: any) => {
     try {
       const { pool } = await import("./db");
-      const result = await pool.query('SELECT * FROM sponsors ORDER BY tier ASC');
+      const result = await pool.query('SELECT * FROM sponsors ORDER BY name ASC');
       console.log(`🏆 [CRITICAL] Returning ${result.rows.length} sponsors via critical route`);
       res.json(result.rows);
     } catch (error) {
