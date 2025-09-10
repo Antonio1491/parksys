@@ -49,6 +49,7 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ASSET_CONDITIONS, ASSET_STATUSES } from '@/lib/constants';
 import { 
   BarChart as RechartsBarChart, 
@@ -157,6 +158,10 @@ const InventoryPage: React.FC = () => {
   
   // Estado para Analytics
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+
+  // Estados para selección múltiple y eliminación masiva
+  const [selectedAssets, setSelectedAssets] = useState<number[]>([]);
+  const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
 
   // Obtener datos de inventario con parámetros de paginación
   const { 
@@ -351,6 +356,77 @@ const InventoryPage: React.FC = () => {
   const handleDelete = (id: number) => {
     if (confirm('¿Estás seguro de que deseas eliminar este activo?')) {
       deleteAssetMutation.mutate(id);
+    }
+  };
+
+  // Funciones para manejo de selección múltiple
+  const handleSelectAsset = (assetId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedAssets(prev => [...prev, assetId]);
+    } else {
+      setSelectedAssets(prev => prev.filter(id => id !== assetId));
+      setIsSelectAllChecked(false);
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allAssetIds = assets.map((asset: any) => asset.id);
+      setSelectedAssets(allAssetIds);
+      setIsSelectAllChecked(true);
+    } else {
+      setSelectedAssets([]);
+      setIsSelectAllChecked(false);
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedAssets([]);
+    setIsSelectAllChecked(false);
+  };
+
+  // Mutation para eliminación masiva
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      return apiRequest('/api/assets/bulk-delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ids }),
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/assets/inventory'] });
+      clearSelection();
+      toast({
+        title: "Eliminación masiva exitosa",
+        description: data.message || `Se eliminaron ${data.deletedCount} activos correctamente.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error en eliminación masiva",
+        description: error.message || "No se pudieron eliminar los activos seleccionados.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleBulkDelete = () => {
+    if (selectedAssets.length === 0) {
+      toast({
+        title: "Sin selección",
+        description: "Por favor selecciona al menos un activo para eliminar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const confirmMessage = `¿Estás seguro de que deseas eliminar ${selectedAssets.length} activo(s) seleccionado(s)? Esta acción no se puede deshacer.`;
+    
+    if (confirm(confirmMessage)) {
+      bulkDeleteMutation.mutate(selectedAssets);
     }
   };
 
