@@ -110,6 +110,7 @@ interface GoogleMapComponentProps {
 function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: GoogleMapComponentProps) {
   const mapRef = React.useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = React.useState(false);
+  const [mapError, setMapError] = React.useState<string | null>(null);
   const [mapInstance, setMapInstance] = React.useState<google.maps.Map | null>(null);
   const [marker, setMarker] = React.useState<google.maps.Marker | null>(null);
 
@@ -123,6 +124,7 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
         if (!googleMapsService.isGoogleMapsLoaded()) {
           console.error('🗺️ [GOOGLE MAPS ERROR] No pudo cargarse');
+          setMapError('Error al cargar Google Maps API');
           return;
         }
 
@@ -145,8 +147,10 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
         console.log('🗺️ [GOOGLE MAPS] Mapa creado exitosamente');
         setMapLoaded(true);
+        setMapError(null);
       } catch (error) {
         console.error('🗺️ [GOOGLE MAPS ERROR] Error inicializando:', error);
+        setMapError(error instanceof Error ? error.message : 'Error desconocido');
       }
     };
 
@@ -184,7 +188,16 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
       style={{ height, width: '100%', borderRadius: '8px' }}
       className="border"
     >
-      {!mapLoaded && (
+      {mapError && (
+        <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4">
+          <p className="text-center text-red-500 mb-2">Error al cargar Google Maps</p>
+          <p className="text-sm text-center">{mapError}</p>
+          <p className="text-xs text-center mt-2">
+            Por favor, configura GOOGLE_MAPS_API_KEY en las variables de entorno
+          </p>
+        </div>
+      )}
+      {!mapLoaded && !mapError && (
         <div className="flex items-center justify-center h-full text-muted-foreground">
           Cargando Google Maps...
         </div>
