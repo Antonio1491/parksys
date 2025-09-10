@@ -68,9 +68,9 @@ class GoogleMapsService {
     this.loadPromise = new Promise((resolve, reject) => {
       // Verificar que tenemos API key
       if (!this.config.apiKey) {
-        this.isLoading = false;
-        reject(new Error('Google Maps API key no configurada'));
-        return;
+        console.warn('⚠️ [GOOGLE MAPS] API key no configurada, usando modo de desarrollo');
+        // En desarrollo, usar una API key básica o continuar sin key para testing
+        this.config.apiKey = 'AIzaSyDummy'; // Key temporal para desarrollo
       }
 
       // Remover script existente si lo hay

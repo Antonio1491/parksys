@@ -128,11 +128,10 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
         console.log('🗺️ [GOOGLE MAPS] API cargada, creando mapa...');
 
-        // Crear el mapa
+        // Crear el mapa usando el servicio (sin acceso directo a google.maps)
         const map = await googleMapsService.createMap(mapRef.current, {
           center: position ? { lat: position[0], lng: position[1] } : { lat: 20.676667, lng: -103.347222 },
-          zoom: 16,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          zoom: 16
         });
 
         setMapInstance(map);
@@ -157,24 +156,27 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
   // Actualizar posición del marcador
   React.useEffect(() => {
     if (mapInstance && position) {
-      // Limpiar marcador anterior
-      if (marker) {
-        marker.setMap(null);
-      }
+      const updateMarker = async () => {
+        // Limpiar marcador anterior
+        if (marker) {
+          marker.setMap(null);
+        }
 
-      // Crear nuevo marcador
-      const newMarker = new google.maps.Marker({
-        position: { lat: position[0], lng: position[1] },
-        map: mapInstance,
-        title: 'Ubicación del activo'
-      });
+        // Crear nuevo marcador usando el servicio
+        const newMarker = await googleMapsService.createMarker(mapInstance, {
+          position: { lat: position[0], lng: position[1] },
+          title: 'Ubicación del activo'
+        });
 
-      // Centrar el mapa en la nueva posición
-      mapInstance.setCenter({ lat: position[0], lng: position[1] });
+        // Centrar el mapa en la nueva posición
+        mapInstance.setCenter({ lat: position[0], lng: position[1] });
 
-      setMarker(newMarker);
+        setMarker(newMarker);
+      };
+
+      updateMarker();
     }
-  }, [mapInstance, position]);
+  }, [mapInstance, position, marker]);
 
   return (
     <div 
