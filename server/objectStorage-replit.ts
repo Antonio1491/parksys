@@ -94,7 +94,7 @@ export class ReplitObjectStorageService {
         ? value[0]  // Extraer el Buffer del Array
         : Buffer.isBuffer(value) 
           ? value 
-          : Buffer.from(value);
+          : Buffer.from(value as any);
       
       res.set({
         'Content-Type': contentType,
@@ -171,7 +171,10 @@ export class ReplitObjectStorageService {
    * (Para Replit, ajustar según entorno de desarrollo vs producción)
    */
   getPublicUrl(filename: string): string {
-    const encodedFilename = encodeURIComponent(filename);
+    // Codificar solo partes individuales del path, no las barras
+    const pathParts = filename.split('/');
+    const encodedParts = pathParts.map(part => encodeURIComponent(part));
+    const encodedFilename = encodedParts.join('/');
     
     // 🎯 PRODUCCIÓN: Usar dominio absoluto para deployment
     if (process.env.REPLIT_DEPLOYMENT) {
@@ -208,7 +211,10 @@ export class ReplitObjectStorageService {
     // Si es una URL filesystem (/uploads/...), convertirla al endpoint correcto
     if (originalUrl.startsWith('/uploads/')) {
       const filename = originalUrl.substring(1); // Quitar el '/' inicial
-      const encodedFilename = encodeURIComponent(filename);
+      // Codificar solo partes individuales del path, no las barras
+      const pathParts = filename.split('/');
+      const encodedParts = pathParts.map(part => encodeURIComponent(part));
+      const encodedFilename = encodedParts.join('/');
       
       // En producción, usar URL absoluta
       if (process.env.REPLIT_DEPLOYMENT) {
