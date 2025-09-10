@@ -43,6 +43,7 @@ import {
   Target,
   ArrowRightLeft,
   Calculator,
+  NotebookPen,
   Megaphone,
   Handshake,
   Store,
@@ -98,6 +99,7 @@ import {
   Bird,
   PackagePlus,
   Trees,
+  List,
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -551,7 +553,7 @@ const AdminSidebarComplete: React.FC = () => {
             >
               <NavItem 
                 href="/admin/activities/management" 
-                icon={<Activity className="h-4 w-4" />}
+                icon={<List className="h-4 w-4" />}
                 active={location.startsWith('/admin/activities/management')}
               >
                 {t('navigation.listing')}
@@ -609,7 +611,7 @@ const AdminSidebarComplete: React.FC = () => {
             >
               <NavItem 
                 href="/admin/trees/inventory" 
-                icon={<Archive className="h-4 w-4" />}
+                icon={<NotebookPen className="h-4 w-4" />}
                 active={location.startsWith('/admin/trees/inventory')}
               >
                 {t('navigation.inventory')}
