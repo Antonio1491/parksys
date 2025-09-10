@@ -549,13 +549,6 @@ const AdminSidebarComplete: React.FC = () => {
               isActive={isSubmenuActive('actividades')}
             >
               <NavItem 
-                href="/admin/activities/categories" 
-                icon={<Tag className="h-4 w-4" />}
-                active={location.startsWith('/admin/activities/categories')}
-              >
-                Categorías
-              </NavItem>
-              <NavItem 
                 href="/admin/activities/management" 
                 icon={<Activity className="h-4 w-4" />}
                 active={location.startsWith('/admin/activities/management')}
@@ -563,18 +556,18 @@ const AdminSidebarComplete: React.FC = () => {
                 {t('navigation.listing')}
               </NavItem>
               <NavItem 
-                href="/admin/organizador/catalogo/crear" 
-                icon={<Plus className="h-4 w-4" />}
-                active={location.startsWith('/admin/organizador/catalogo/crear')}
-              >
-                Nueva Actividad
-              </NavItem>
-              <NavItem 
                 href="/admin/activities/calendar" 
                 icon={<Calendar className="h-4 w-4" />}
                 active={location.startsWith('/admin/activities/calendar')}
               >
-                Cal. Actividades
+                Calendario
+              </NavItem>
+              <NavItem 
+                href="/admin/activities/categories" 
+                icon={<Tag className="h-4 w-4" />}
+                active={location.startsWith('/admin/activities/categories')}
+              >
+                Categorías
               </NavItem>
               <NavItem 
                 href="/admin/activities/registrations" 

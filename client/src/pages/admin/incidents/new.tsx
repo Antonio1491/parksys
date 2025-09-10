@@ -39,6 +39,7 @@ const incidentSchema = z.object({
   incidenciaId: z.string().optional(),
   fechaReporte: z.date().optional(),
   fechaOcurrencia: z.date().optional(),
+  fotosVideosAdjuntos: z.string().optional(), // URLs de archivos multimedia
   tipoAfectacion: z.string().min(1, 'El tipo de afectación es obligatorio'),
   nivelRiesgo: z.string().min(1, 'El nivel de riesgo es obligatorio'),
   descripcionDetallada: z.string().optional(),
@@ -52,6 +53,7 @@ const incidentSchema = z.object({
   fechaAsignacion: z.date().optional(),
   fechaInicioAtencion: z.date().optional(),
   fechaResolucion: z.date().optional(),
+  tiempoRespuesta: z.string().optional(), // Calculado automáticamente
   accionesRealizadas: z.string().optional(),
   materialesUtilizados: z.string().optional(),
   costoEstimado: z.string().optional(),
@@ -105,6 +107,7 @@ const NewIncidentPage = () => {
       incidenciaId: '',
       fechaReporte: new Date(),
       fechaOcurrencia: undefined,
+      fotosVideosAdjuntos: '',
       tipoAfectacion: '',
       nivelRiesgo: '',
       descripcionDetallada: '',
@@ -118,6 +121,7 @@ const NewIncidentPage = () => {
       fechaAsignacion: undefined,
       fechaInicioAtencion: undefined,
       fechaResolucion: undefined,
+      tiempoRespuesta: '',
       accionesRealizadas: '',
       materialesUtilizados: '',
       costoEstimado: '',
@@ -188,6 +192,7 @@ const NewIncidentPage = () => {
         incidenciaId: data.incidenciaId,
         fechaReporte: data.fechaReporte,
         fechaOcurrencia: data.fechaOcurrencia,
+        fotosVideosAdjuntos: data.fotosVideosAdjuntos,
         tipoAfectacion: data.tipoAfectacion,
         nivelRiesgo: data.nivelRiesgo,
         descripcionDetallada: data.descripcionDetallada,
@@ -200,6 +205,7 @@ const NewIncidentPage = () => {
         fechaAsignacion: data.fechaAsignacion,
         fechaInicioAtencion: data.fechaInicioAtencion,
         fechaResolucion: data.fechaResolucion,
+        tiempoRespuesta: data.tiempoRespuesta,
         accionesRealizadas: data.accionesRealizadas,
         materialesUtilizados: data.materialesUtilizados,
         costoEstimado: data.costoEstimado ? parseFloat(data.costoEstimado) : null,
@@ -248,6 +254,33 @@ const NewIncidentPage = () => {
       });
     },
   });
+
+  // Función para calcular tiempo de respuesta
+  const calcularTiempoRespuesta = (fechaReporte: Date | undefined, fechaResolucion: Date | undefined): string => {
+    if (!fechaReporte || !fechaResolucion) return '';
+    
+    const diffMs = fechaResolucion.getTime() - fechaReporte.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    const remainingHours = diffHours % 24;
+    
+    if (diffDays > 0) {
+      return `${diffDays} días, ${remainingHours} horas`;
+    } else {
+      return `${diffHours} horas`;
+    }
+  };
+
+  // Actualizar tiempo de respuesta automáticamente cuando cambien las fechas
+  useEffect(() => {
+    const fechaReporte = form.watch('fechaReporte');
+    const fechaResolucion = form.watch('fechaResolucion');
+    
+    if (fechaReporte && fechaResolucion) {
+      const tiempoCalculado = calcularTiempoRespuesta(fechaReporte, fechaResolucion);
+      form.setValue('tiempoRespuesta', tiempoCalculado);
+    }
+  }, [form.watch('fechaReporte'), form.watch('fechaResolucion'), form]);
 
   const onSubmit = (data: IncidentFormData) => {
     createMutation.mutate(data);
@@ -538,6 +571,66 @@ const NewIncidentPage = () => {
                       />
                     </div>
 
+                    {/* Fechas del Reporte */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Fecha de Reporte */}
+                      <FormField
+                        control={form.control}
+                        name="fechaReporte"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fecha y Hora de Registro *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="datetime-local"
+                                value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Fecha de Ocurrencia */}
+                      <FormField
+                        control={form.control}
+                        name="fechaOcurrencia"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fecha de Ocurrencia (si difiere)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="datetime-local"
+                                value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Evidencia Multimedia */}
+                    <FormField
+                      control={form.control}
+                      name="fotosVideosAdjuntos"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Fotos/Videos Adjuntos (Evidencia)</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="URLs de fotos y videos como evidencia (una por línea)..."
+                              className="min-h-[80px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     {/* Descripción Detallada */}
                     <FormField
                       control={form.control}
@@ -620,6 +713,98 @@ const NewIncidentPage = () => {
                             <FormLabel>Responsable Asignado</FormLabel>
                             <FormControl>
                               <Input placeholder="Nombre del responsable o cuadrilla" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Fecha de Asignación */}
+                      <FormField
+                        control={form.control}
+                        name="fechaAsignacion"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fecha de Asignación</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="datetime-local"
+                                value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Fecha de Inicio de Atención */}
+                      <FormField
+                        control={form.control}
+                        name="fechaInicioAtencion"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fecha de Inicio de Atención</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="datetime-local"
+                                value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Fecha de Resolución */}
+                      <FormField
+                        control={form.control}
+                        name="fechaResolucion"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fecha de Resolución</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="datetime-local"
+                                value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Tiempo de Respuesta (Calculado) */}
+                      <FormField
+                        control={form.control}
+                        name="tiempoRespuesta"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tiempo de Respuesta (Calculado)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                readOnly 
+                                className="bg-gray-50" 
+                                placeholder="Se calcula automáticamente"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Costo Real */}
+                      <FormField
+                        control={form.control}
+                        name="costoReal"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Costo Real (al cierre)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="0.00" type="number" step="0.01" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
