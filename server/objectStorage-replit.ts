@@ -236,10 +236,10 @@ export class ReplitObjectStorageService {
     }
     
     // Si es una URL absoluta con cualquier dominio de Replit, extraer filename y regenerar URL correcta
-    if (originalUrl.includes('.replit.dev/api/storage/file/') || 
-        originalUrl.includes('.spock.replit.dev/api/storage/file/') ||
-        originalUrl.includes('.aspallatam.repl.co/api/storage/file/') ||
-        originalUrl.includes('.repl.co/api/storage/file/')) {
+    if (originalUrl.includes('/api/storage/file/') && 
+        (originalUrl.includes('.replit.dev/') || 
+         originalUrl.includes('.repl.co/') ||
+         originalUrl.match(/https:\/\/[a-f0-9-]+\..*\.repl/))) {
       const match = originalUrl.match(/\/api\/storage\/file\/(.+)$/);
       if (match) {
         const filename = match[1];
