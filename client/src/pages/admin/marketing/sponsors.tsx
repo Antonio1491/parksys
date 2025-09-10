@@ -17,75 +17,64 @@ import { PageHeader } from '@/components/ui/page-header';
 interface Sponsor {
   id: number;
   name: string;
-  category: string;
-  logo?: string;
-  tier: number;
-  representative?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  contractValue?: string;
-  eventsSponsored?: number;
-  renewalProbability?: number;
+  sector: string;
+  logo_url?: string;
   status: string;
-  notes?: string;
+  website_url?: string;
+  representative?: string;
+  contact_info?: {
+    phone?: string;
+    email?: string;
+    social_media?: {
+      facebook?: string;
+      twitter?: string;
+      linkedin?: string;
+      instagram?: string;
+    };
+    additional_contacts?: {
+      secondary_phone?: string;
+      secondary_email?: string;
+    };
+  };
   createdAt: string;
   updatedAt: string;
 }
 
-const tierNames = {
-  1: "Diamante",
-  2: "Platino",
-  3: "Oro",
-  4: "Plata",
-  5: "Bronce",
-  6: "Cobre",
-  7: "Hierro",
-  8: "Zinc",
-  9: "Estaño",
-  10: "Plomo"
-};
-
-const tierColors = {
-  1: "bg-blue-100 text-blue-800",
-  2: "bg-gray-100 text-gray-800", 
-  3: "bg-yellow-100 text-yellow-800",
-  4: "bg-gray-50 text-gray-600",
-  5: "bg-orange-100 text-orange-800",
-  6: "bg-red-100 text-red-800",
-  7: "bg-slate-100 text-slate-800",
-  8: "bg-zinc-100 text-zinc-800",
-  9: "bg-stone-100 text-stone-800",
-  10: "bg-neutral-100 text-neutral-800"
+const statusColors = {
+  "Activo": "bg-green-100 text-green-800",
+  "Inactivo": "bg-gray-100 text-gray-800",
+  "Suspendido": "bg-red-100 text-red-800"
 };
 
 export default function SponsorsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterSector, setFilterSector] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    category: '',
-    tier: '1',
+    sector: '',
+    logo_url: '',
+    status: 'Activo',
+    website_url: '',
     representative: '',
-    email: '',
-    phone: '',
-    website: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    contractValue: '',
-    status: 'activo',
-    notes: ''
+    contact_info: {
+      phone: '',
+      email: '',
+      social_media: {
+        facebook: '',
+        twitter: '',
+        linkedin: '',
+        instagram: ''
+      },
+      additional_contacts: {
+        secondary_phone: '',
+        secondary_email: ''
+      }
+    }
   });
 
   // Fetch sponsors
@@ -157,29 +146,35 @@ export default function SponsorsPage() {
   const filteredSponsors = sponsors.filter((sponsor: Sponsor) => {
     const matchesSearch = sponsor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          sponsor.representative?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         sponsor.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !filterCategory || filterCategory === 'all' || sponsor.category === filterCategory;
+                         sponsor.contact_info?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSector = !filterSector || filterSector === 'all' || sponsor.sector === filterSector;
     const matchesStatus = !filterStatus || filterStatus === 'all' || sponsor.status === filterStatus;
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesSector && matchesStatus;
   });
 
   const resetForm = () => {
     setFormData({
       name: '',
-      category: '',
-      tier: '1',
+      sector: '',
+      logo_url: '',
+      status: 'Activo',
+      website_url: '',
       representative: '',
-      email: '',
-      phone: '',
-      website: '',
-      address: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      contractValue: '',
-      status: 'activo',
-      notes: ''
+      contact_info: {
+        phone: '',
+        email: '',
+        social_media: {
+          facebook: '',
+          twitter: '',
+          linkedin: '',
+          instagram: ''
+        },
+        additional_contacts: {
+          secondary_phone: '',
+          secondary_email: ''
+        }
+      }
     });
     setSelectedSponsor(null);
   };
@@ -188,19 +183,25 @@ export default function SponsorsPage() {
     setSelectedSponsor(sponsor);
     setFormData({
       name: sponsor.name || '',
-      category: sponsor.category || '',
-      tier: sponsor.tier?.toString() || '1',
+      sector: sponsor.sector || '',
+      logo_url: sponsor.logo_url || '',
+      status: sponsor.status || 'Activo',
+      website_url: sponsor.website_url || '',
       representative: sponsor.representative || '',
-      email: sponsor.email || '',
-      phone: sponsor.phone || '',
-      website: sponsor.website || '',
-      address: sponsor.address || '',
-      city: sponsor.city || '',
-      state: sponsor.state || '',
-      zipCode: sponsor.zipCode || '',
-      contractValue: sponsor.contractValue || '',
-      status: sponsor.status || 'activo',
-      notes: sponsor.notes || ''
+      contact_info: {
+        phone: sponsor.contact_info?.phone || '',
+        email: sponsor.contact_info?.email || '',
+        social_media: {
+          facebook: sponsor.contact_info?.social_media?.facebook || '',
+          twitter: sponsor.contact_info?.social_media?.twitter || '',
+          linkedin: sponsor.contact_info?.social_media?.linkedin || '',
+          instagram: sponsor.contact_info?.social_media?.instagram || ''
+        },
+        additional_contacts: {
+          secondary_phone: sponsor.contact_info?.additional_contacts?.secondary_phone || '',
+          secondary_email: sponsor.contact_info?.additional_contacts?.secondary_email || ''
+        }
+      }
     });
     setIsDialogOpen(true);
   };
@@ -211,10 +212,10 @@ export default function SponsorsPage() {
     if (selectedSponsor) {
       updateSponsorMutation.mutate({ 
         id: selectedSponsor.id, 
-        data: { ...formData, tier: parseInt(formData.tier) }
+        data: formData
       });
     } else {
-      createSponsorMutation.mutate({ ...formData, tier: parseInt(formData.tier) });
+      createSponsorMutation.mutate(formData);
     }
   };
 

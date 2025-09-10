@@ -3196,36 +3196,29 @@ export const sponsorshipPackages = pgTable("sponsorship_packages", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
-// Tabla de patrocinadores
+// Tabla de patrocinadores simplificada
 export const sponsors = pgTable("sponsors", {
-  id: serial("id").primaryKey(),
+  id: serial("id").primaryKey(), // Mantengo serial por compatibilidad
   name: varchar("name", { length: 255 }).notNull(),
-  category: varchar("category", { length: 50 }).notNull(), // corporativo, local, institucional, ong
-  logo: varchar("logo", { length: 500 }),
-  tier: integer("tier").default(1), // nivel de patrocinio 1-10
-  
-  // Información de contacto
-  representative: varchar("representative", { length: 255 }),
-  email: varchar("email", { length: 255 }),
-  phone: varchar("phone", { length: 50 }),
-  address: text("address"),
-  websiteUrl: varchar("website_url", { length: 255 }),
-  
-  // Estado del patrocinador
-  status: varchar("status", { length: 50 }).default("potencial"), // activo, potencial, inactivo, renovacion
-  packageName: varchar("package_name", { length: 255 }).notNull(), // nombre del paquete asociado
-  
-  // Información del contrato
-  contractValue: decimal("contract_value", { precision: 10, scale: 2 }).default("0.00"),
-  contractStart: date("contract_start"),
-  contractEnd: date("contract_end"),
-  
-  // Métricas
-  eventsSponsored: integer("events_sponsored").default(0),
-  renewalProbability: integer("renewal_probability").default(0),
-  
-  // Notas
-  notes: text("notes"),
+  sector: varchar("sector", { length: 100 }).notNull(), // sector económico
+  logo_url: varchar("logo_url", { length: 500 }), // imagen/logo
+  status: varchar("status", { length: 50 }).default("Activo"), // Activo, Inactivo, Suspendido
+  website_url: varchar("website_url", { length: 255 }), // sitio web
+  representative: varchar("representative", { length: 255 }), // nombre del contacto
+  contact_info: json("contact_info").$type<{
+    phone?: string;
+    email?: string;
+    social_media?: {
+      facebook?: string;
+      twitter?: string;
+      linkedin?: string;
+      instagram?: string;
+    };
+    additional_contacts?: {
+      secondary_phone?: string;
+      secondary_email?: string;
+    };
+  }>().default({}),
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
@@ -3257,10 +3250,6 @@ export const insertSponsorSchema = createInsertSchema(sponsors).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-}).extend({
-  contractValue: z.union([z.string(), z.number()]).transform(val => String(val)),
-  eventsSponsored: z.union([z.string(), z.number()]).transform(val => Number(val)),
-  renewalProbability: z.union([z.string(), z.number()]).transform(val => Number(val))
 });
 
 export const insertSponsorshipCampaignSchema = createInsertSchema(sponsorshipCampaigns).omit({
