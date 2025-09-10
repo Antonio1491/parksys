@@ -22,6 +22,59 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { googleMapsService } from '@/services/GoogleMapsService';
 
+// Error Boundary para Google Maps
+class GoogleMapsErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; errorMessage: string }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, errorMessage: '' };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    // Solo captura errores específicos de Google Maps y DOM
+    if (error.message.includes('removeChild') || 
+        error.message.includes('Google Maps') ||
+        error.message.includes('appendChild')) {
+      return { hasError: true, errorMessage: error.message };
+    }
+    throw error; // Re-lanza otros errores
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    // Solo log para errores de Google Maps, no mostrar overlay
+    if (error.message.includes('removeChild') || 
+        error.message.includes('Google Maps') ||
+        error.message.includes('appendChild')) {
+      console.warn('Google Maps DOM error (no crítico):', error.message);
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ 
+          width: '100%', 
+          height: '600px', 
+          backgroundColor: '#f8f9fa',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          border: '1px solid #e9ecef',
+          borderRadius: '8px'
+        }}>
+          <p style={{ color: '#666', marginBottom: '12px' }}>Cargando mapa de activos...</p>
+          <p style={{ color: '#999', fontSize: '14px' }}>Si el mapa no carga, usa la tabla de inventario</p>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 // Constantes de estado y condición para activos
 const ASSET_STATUSES = [
   { value: 'activo', label: 'Activo', color: '#10B981' },
@@ -77,11 +130,19 @@ const GoogleMapComponent: React.FC<{
 
   useEffect(() => {
     let mounted = true;
+    let map: google.maps.Map | null = null;
+    let markers: google.maps.Marker[] = [];
 
     const initMap = async () => {
       if (!mapRef.current) return;
 
       try {
+        // Limpiar completamente el contenedor
+        const container = mapRef.current;
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+        
         // Cargar Google Maps
         await googleMapsService.loadGoogleMaps();
         
@@ -93,7 +154,7 @@ const GoogleMapComponent: React.FC<{
         }
 
         // Crear el mapa
-        const map = await googleMapsService.createMap(mapRef.current, {
+        map = await googleMapsService.createMap(mapRef.current, {
           center: { lat: 20.676667, lng: -103.347222 }, // Guadalajara
           zoom: 12,
           mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -132,6 +193,8 @@ const GoogleMapComponent: React.FC<{
             marker.addListener('click', () => {
               infoWindow.open(map, marker);
             });
+
+            markers.push(marker);
           } catch (error) {
             console.error('Error creando marcador:', error);
           }
@@ -160,27 +223,54 @@ const GoogleMapComponent: React.FC<{
 
     return () => {
       mounted = false;
+      
+      // Limpiar marcadores
+      markers.forEach(marker => {
+        try {
+          marker.setMap(null);
+        } catch (error) {
+          console.warn('Error limpiando marcador:', error);
+        }
+      });
+      
+      // Limpiar mapa y contenedor
+      try {
+        if (map) {
+          google.maps.event.clearInstanceListeners(map);
+        }
+        if (mapRef.current) {
+          const container = mapRef.current;
+          // Solo limpiar si el contenedor aún existe en el DOM
+          if (container.parentNode) {
+            container.innerHTML = '';
+          }
+        }
+      } catch (error) {
+        console.warn('Error limpiando mapa:', error);
+      }
     };
   }, [assets, categories, parks]);
 
   return (
-    <div 
-      ref={mapRef} 
-      style={{ width: '100%', height: '600px', backgroundColor: '#f0f0f0' }}
-    >
-      {!mapLoaded && (
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100%',
-          fontSize: '16px',
-          color: '#666'
-        }}>
-          Cargando Google Maps...
-        </div>
-      )}
-    </div>
+    <GoogleMapsErrorBoundary>
+      <div 
+        ref={mapRef} 
+        style={{ width: '100%', height: '600px', backgroundColor: '#f0f0f0' }}
+      >
+        {!mapLoaded && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '100%',
+            fontSize: '16px',
+            color: '#666'
+          }}>
+            Cargando Google Maps...
+          </div>
+        )}
+      </div>
+    </GoogleMapsErrorBoundary>
   );
 };
 
