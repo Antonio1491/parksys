@@ -251,7 +251,7 @@ export default function SponsorsPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="name">Nombre de la Empresa *</Label>
+                      <Label htmlFor="name">Nombre del Patrocinador *</Label>
                       <Input
                         id="name"
                         value={formData.name}
@@ -260,33 +260,23 @@ export default function SponsorsPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="category">Categoría *</Label>
-                      <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar categoría" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="corporativo">Corporativo</SelectItem>
-                          <SelectItem value="local">Local</SelectItem>
-                          <SelectItem value="institucional">Institucional</SelectItem>
-                          <SelectItem value="ong">ONG</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="sector">Sector Económico *</Label>
+                      <Input
+                        id="sector"
+                        value={formData.sector}
+                        onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
+                        placeholder="Ej: Tecnología, Salud, Educación..."
+                        required
+                      />
                     </div>
                     <div>
-                      <Label htmlFor="tier">Nivel de Patrocinio</Label>
-                      <Select value={formData.tier} onValueChange={(value) => setFormData({ ...formData, tier: value })}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(tierNames).map(([tier, name]) => (
-                            <SelectItem key={tier} value={tier}>
-                              Nivel {tier} - {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="logo_url">URL del Logo</Label>
+                      <Input
+                        id="logo_url"
+                        value={formData.logo_url}
+                        onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                        placeholder="https://..."
+                      />
                     </div>
                     <div>
                       <Label htmlFor="status">Estado</Label>
@@ -295,90 +285,163 @@ export default function SponsorsPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="activo">Activo</SelectItem>
-                          <SelectItem value="inactivo">Inactivo</SelectItem>
-                          <SelectItem value="pendiente">Pendiente</SelectItem>
-                          <SelectItem value="suspendido">Suspendido</SelectItem>
+                          <SelectItem value="Activo">Activo</SelectItem>
+                          <SelectItem value="Inactivo">Inactivo</SelectItem>
+                          <SelectItem value="Suspendido">Suspendido</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="representative">Representante</Label>
+                      <Label htmlFor="website_url">Sitio Web</Label>
                       <Input
-                        id="representative"
-                        value={formData.representative}
-                        onChange={(e) => setFormData({ ...formData, representative: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Teléfono</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="website">Sitio Web</Label>
-                      <Input
-                        id="website"
-                        value={formData.website}
-                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                        id="website_url"
+                        value={formData.website_url}
+                        onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
                         placeholder="https://..."
                       />
                     </div>
                     <div>
-                      <Label htmlFor="contractValue">Valor del Contrato</Label>
+                      <Label htmlFor="representative">Representante/Contacto</Label>
                       <Input
-                        id="contractValue"
-                        value={formData.contractValue}
-                        onChange={(e) => setFormData({ ...formData, contractValue: e.target.value })}
-                        placeholder="$0.00"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="address">Dirección</Label>
-                      <Input
-                        id="address"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="city">Ciudad</Label>
-                      <Input
-                        id="city"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="state">Estado</Label>
-                      <Input
-                        id="state"
-                        value={formData.state}
-                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                        id="representative"
+                        value={formData.representative}
+                        onChange={(e) => setFormData({ ...formData, representative: e.target.value })}
+                        placeholder="Nombre del contacto principal"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="notes">Notas Adicionales</Label>
-                    <Textarea
-                      id="notes"
-                      value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      rows={3}
-                    />
+                  {/* Información de Contacto */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900">Información de Contacto</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contact_phone">Teléfono</Label>
+                        <Input
+                          id="contact_phone"
+                          value={formData.contact_info.phone}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { ...formData.contact_info, phone: e.target.value }
+                          })}
+                          placeholder="+52 33 1234-5678"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="contact_email">Email</Label>
+                        <Input
+                          id="contact_email"
+                          type="email"
+                          value={formData.contact_info.email}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { ...formData.contact_info, email: e.target.value }
+                          })}
+                          placeholder="contacto@empresa.com"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Redes Sociales */}
+                    <h5 className="font-medium text-gray-700 text-sm">Redes Sociales</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="facebook">Facebook</Label>
+                        <Input
+                          id="facebook"
+                          value={formData.contact_info.social_media.facebook}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { 
+                              ...formData.contact_info, 
+                              social_media: { ...formData.contact_info.social_media, facebook: e.target.value }
+                            }
+                          })}
+                          placeholder="https://facebook.com/empresa"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="linkedin">LinkedIn</Label>
+                        <Input
+                          id="linkedin"
+                          value={formData.contact_info.social_media.linkedin}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { 
+                              ...formData.contact_info, 
+                              social_media: { ...formData.contact_info.social_media, linkedin: e.target.value }
+                            }
+                          })}
+                          placeholder="https://linkedin.com/company/empresa"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="twitter">Twitter</Label>
+                        <Input
+                          id="twitter"
+                          value={formData.contact_info.social_media.twitter}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { 
+                              ...formData.contact_info, 
+                              social_media: { ...formData.contact_info.social_media, twitter: e.target.value }
+                            }
+                          })}
+                          placeholder="https://twitter.com/empresa"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="instagram">Instagram</Label>
+                        <Input
+                          id="instagram"
+                          value={formData.contact_info.social_media.instagram}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { 
+                              ...formData.contact_info, 
+                              social_media: { ...formData.contact_info.social_media, instagram: e.target.value }
+                            }
+                          })}
+                          placeholder="https://instagram.com/empresa"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Contactos Adicionales */}
+                    <h5 className="font-medium text-gray-700 text-sm">Contactos Adicionales</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="secondary_phone">Teléfono Secundario</Label>
+                        <Input
+                          id="secondary_phone"
+                          value={formData.contact_info.additional_contacts.secondary_phone}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { 
+                              ...formData.contact_info, 
+                              additional_contacts: { ...formData.contact_info.additional_contacts, secondary_phone: e.target.value }
+                            }
+                          })}
+                          placeholder="+52 33 8765-4321"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="secondary_email">Email Secundario</Label>
+                        <Input
+                          id="secondary_email"
+                          type="email"
+                          value={formData.contact_info.additional_contacts.secondary_email}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            contact_info: { 
+                              ...formData.contact_info, 
+                              additional_contacts: { ...formData.contact_info.additional_contacts, secondary_email: e.target.value }
+                            }
+                          })}
+                          placeholder="contacto2@empresa.com"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex justify-end gap-2 pt-4">
@@ -414,17 +477,21 @@ export default function SponsorsPage() {
               </div>
               
               <div className="w-full md:w-48">
-                <Label>Categoría</Label>
-                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <Label>Sector</Label>
+                <Select value={filterSector} onValueChange={setFilterSector}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Todas las categorías" />
+                    <SelectValue placeholder="Todos los sectores" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todas las categorías</SelectItem>
-                    <SelectItem value="corporativo">Corporativo</SelectItem>
-                    <SelectItem value="local">Local</SelectItem>
-                    <SelectItem value="institucional">Institucional</SelectItem>
-                    <SelectItem value="ong">ONG</SelectItem>
+                    <SelectItem value="all">Todos los sectores</SelectItem>
+                    <SelectItem value="Tecnología">Tecnología</SelectItem>
+                    <SelectItem value="Salud">Salud</SelectItem>
+                    <SelectItem value="Educación">Educación</SelectItem>
+                    <SelectItem value="Financiero">Financiero</SelectItem>
+                    <SelectItem value="Retail">Retail</SelectItem>
+                    <SelectItem value="Alimentario">Alimentario</SelectItem>
+                    <SelectItem value="Construcción">Construcción</SelectItem>
+                    <SelectItem value="Automotriz">Automotriz</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -437,10 +504,9 @@ export default function SponsorsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos los estados</SelectItem>
-                    <SelectItem value="activo">Activo</SelectItem>
-                    <SelectItem value="inactivo">Inactivo</SelectItem>
-                    <SelectItem value="pendiente">Pendiente</SelectItem>
-                    <SelectItem value="suspendido">Suspendido</SelectItem>
+                    <SelectItem value="Activo">Activo</SelectItem>
+                    <SelectItem value="Inactivo">Inactivo</SelectItem>
+                    <SelectItem value="Suspendido">Suspendido</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -462,12 +528,8 @@ export default function SponsorsPage() {
                       {sponsor.name}
                     </CardTitle>
                     <div className="flex gap-2 mt-2">
-                      <Badge variant="secondary">{sponsor.category}</Badge>
-                      <Badge className={tierColors[sponsor.tier as keyof typeof tierColors] || 'bg-gray-100 text-gray-800'}>
-                        <Star className="h-3 w-3 mr-1" />
-                        {tierNames[sponsor.tier as keyof typeof tierNames] || `Nivel ${sponsor.tier}`}
-                      </Badge>
-                      <Badge variant={sponsor.status === 'activo' ? 'default' : 'secondary'}>
+                      <Badge variant="outline">{sponsor.sector}</Badge>
+                      <Badge className={statusColors[sponsor.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}>
                         {sponsor.status}
                       </Badge>
                     </div>
@@ -490,37 +552,29 @@ export default function SponsorsPage() {
                       {sponsor.representative}
                     </div>
                   )}
-                  {sponsor.email && (
+                  {sponsor.contact_info?.email && (
                     <div className="flex items-center gap-2 text-sm">
                       <Mail className="h-4 w-4 text-gray-500" />
-                      {sponsor.email}
+                      {sponsor.contact_info.email}
                     </div>
                   )}
-                  {sponsor.phone && (
+                  {sponsor.contact_info?.phone && (
                     <div className="flex items-center gap-2 text-sm">
                       <Phone className="h-4 w-4 text-gray-500" />
-                      {sponsor.phone}
+                      {sponsor.contact_info.phone}
                     </div>
                   )}
-                  {sponsor.website && (
+                  {sponsor.website_url && (
                     <div className="flex items-center gap-2 text-sm">
                       <Globe className="h-4 w-4 text-gray-500" />
-                      <a href={sponsor.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                        {sponsor.website}
+                      <a href={sponsor.website_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        {sponsor.website_url}
                       </a>
                     </div>
                   )}
-                  {(sponsor.city || sponsor.state) && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      {[sponsor.city, sponsor.state].filter(Boolean).join(', ')}
-                    </div>
-                  )}
-                  {sponsor.contractValue && (
-                    <div className="mt-3 p-2 bg-green-50 rounded">
-                      <div className="text-sm text-green-600 font-medium">
-                        Valor del Contrato: {sponsor.contractValue}
-                      </div>
+                  {sponsor.logo_url && (
+                    <div className="mt-3">
+                      <img src={sponsor.logo_url} alt={`${sponsor.name} logo`} className="h-8 object-contain" />
                     </div>
                   )}
                 </div>
@@ -533,7 +587,7 @@ export default function SponsorsPage() {
           <Card>
             <CardContent className="p-12 text-center">
               <div className="text-gray-500">
-                {searchTerm || filterCategory || filterStatus 
+                {searchTerm || filterSector || filterStatus 
                   ? 'No se encontraron patrocinadores que coincidan con los filtros.'
                   : 'No hay patrocinadores registrados aún.'}
               </div>
