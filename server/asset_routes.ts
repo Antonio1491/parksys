@@ -990,13 +990,13 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
             throw new Error('Nombre del activo es requerido');
           }
 
-          // Mapear nombres a IDs
-          const categoryId = categoriesMap.get(row.Categoría?.trim());
+          // Mapear nombres a IDs usando las columnas exactas de la plantilla
+          const categoryId = categoriesMap.get(row['Categoría Principal']?.trim());
           const parkId = parksMap.get(row.Parque?.trim());
           const amenityId = amenitiesMap.get(row.Amenidad?.trim());
 
           if (!categoryId) {
-            throw new Error(`Categoría '${row.Categoría}' no encontrada`);
+            throw new Error(`Categoría Principal '${row['Categoría Principal']}' no encontrada`);
           }
           if (!parkId) {
             throw new Error(`Parque '${row.Parque}' no encontrado`);
