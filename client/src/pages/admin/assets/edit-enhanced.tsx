@@ -1,19 +1,12 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
-import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, MapPin } from 'lucide-react';
-import AdminLayout from '@/components/AdminLayout';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-// Configurar el icono del marcador por defecto de Leaflet
+// Fix for default markers in Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -21,622 +14,1198 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Componente para manejar clics en el mapa
-function LocationMarker({ position, setPosition }: { position: [number, number] | null, setPosition: (pos: [number, number]) => void }) {
-  const map = useMapEvents({
+import { 
+  ArrowLeft, 
+  Save,
+  MapPin,
+  Calendar,
+  DollarSign,
+  User,
+  Settings
+} from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { apiRequest } from '@/lib/queryClient';
+
+import AdminLayout from '@/components/AdminLayout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ASSET_CONDITIONS, ASSET_STATUSES, MAINTENANCE_FREQUENCIES } from '@shared/asset-schema';
+
+// Esquema de validación para editar activo (similar al de crear)
+const assetEditSchema = z.object({
+  // IDENTIFICACIÓN
+  name: z.string().min(1, 'El nombre es obligatorio'),
+  serialNumber: z.string().nullable().optional(),
+  categoryId: z.number().min(1, 'La categoría principal es obligatoria'),
+  subcategoryId: z.number().nullable().optional(),
+  customAssetId: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  
+  // UBICACIÓN
+  parkId: z.number().min(1, 'El parque es obligatorio'),
+  amenityId: z.number().nullable().optional(),
+  locationDescription: z.string().nullable().optional(),
+  latitude: z.string().nullable().optional(),
+  longitude: z.string().nullable().optional(),
+  
+  // ESPECIFICACIONES TÉCNICAS
+  manufacturer: z.string().nullable().optional(),
+  model: z.string().nullable().optional(),
+  serialNumberTech: z.string().nullable().optional(),
+  material: z.string().nullable().optional(),
+  dimensionsCapacity: z.string().nullable().optional(),
+  
+  // CICLO DE VIDA
+  installationDate: z.string().nullable().optional(),
+  lastInspectionDate: z.string().nullable().optional(),
+  estimatedUsefulLife: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
+  status: z.string().min(1, 'El estado es obligatorio'),
+  maintenanceHistory: z.array(z.string()).optional(),
+  
+  // COSTOS
+  acquisitionCost: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
+  currentValue: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
+  financingSource: z.string().nullable().optional(),
+  
+  // CONTROL Y GESTIÓN
+  responsiblePersonId: z.number().nullable().optional(),
+  assignedArea: z.string().nullable().optional(),
+  maintenanceManualUrl: z.string().nullable().optional(),
+  usagePolicies: z.string().nullable().optional(),
+  
+  // NOTAS ADICIONALES
+  notes: z.string().nullable().optional(),
+  
+  // CAMPOS HEREDADOS (compatibilidad)
+  useId: z.number().nullable().optional(),
+  acquisitionDate: z.string().nullable().optional(),
+  condition: z.string().min(1, 'La condición es obligatoria'),
+  maintenanceFrequency: z.string().nullable().optional(),
+  lastMaintenanceDate: z.string().nullable().optional(),
+  nextMaintenanceDate: z.string().nullable().optional(),
+  expectedLifespan: z.union([z.number().positive(), z.nan()]).transform(val => isNaN(val) ? null : val).nullable().optional(),
+  qrCode: z.string().nullable().optional(),
+});
+
+type AssetFormData = z.infer<typeof assetEditSchema>;
+
+// Componente para actualizar la vista del mapa
+function MapUpdater({ center }: { center: [number, number] }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (center) {
+      map.setView(center, 16);
+    }
+  }, [center, map]);
+
+  return null;
+}
+
+// Componente para manejar clicks en el mapa
+function LocationPicker({ position, onLocationSelect }: { 
+  position: [number, number] | null; 
+  onLocationSelect: (lat: number, lng: number) => void 
+}) {
+  useMapEvents({
     click(e) {
-      setPosition([e.latlng.lat, e.latlng.lng]);
+      onLocationSelect(e.latlng.lat, e.latlng.lng);
     },
   });
 
-  return position === null ? null : (
-    <Marker position={position} />
-  );
+  return position ? <Marker position={position} /> : null;
 }
 
-export default function EditAssetEnhanced() {
+const EditAssetPage: React.FC = () => {
   const [, params] = useRoute('/admin/assets/:id/edit-enhanced');
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   
   const id = params?.id;
   
-  // Estados para el formulario
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [serialNumber, setSerialNumber] = useState('');
-  const [notes, setNotes] = useState('');
-  const [cost, setCost] = useState('');
-  const [status, setStatus] = useState('activo');
-  const [condition, setCondition] = useState('bueno');
-  const [parkId, setParkId] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [location, setLocationDesc] = useState('');
-  const [acquisitionDate, setAcquisitionDate] = useState('');
-  const [amenityId, setAmenityId] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
+  // Estado para el mapa
   const [mapPosition, setMapPosition] = useState<[number, number] | null>(null);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([19.432608, -99.133209]); // Centro de Ciudad de México por defecto
+  const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null);
   
-  // Estados para datos de selección
-  const [parks, setParks] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [amenities, setAmenities] = useState<any[]>([]);
+  // Formulario para editar activo
+  const form = useForm<AssetFormData>({
+    resolver: zodResolver(assetEditSchema),
+    defaultValues: {
+      // IDENTIFICACIÓN
+      name: '',
+      serialNumber: '',
+      categoryId: 0,
+      subcategoryId: null,
+      customAssetId: '',
+      description: '',
+      
+      // UBICACIÓN
+      parkId: 0,
+      amenityId: null,
+      locationDescription: '',
+      latitude: '',
+      longitude: '',
+      
+      // ESPECIFICACIONES TÉCNICAS
+      manufacturer: '',
+      model: '',
+      serialNumberTech: '',
+      material: '',
+      dimensionsCapacity: '',
+      
+      // CICLO DE VIDA
+      installationDate: '',
+      lastInspectionDate: '',
+      estimatedUsefulLife: null,
+      status: '',
+      
+      // COSTOS
+      acquisitionCost: null,
+      currentValue: null,
+      financingSource: '',
+      
+      // CONTROL Y GESTIÓN
+      responsiblePersonId: null,
+      assignedArea: '',
+      maintenanceManualUrl: '',
+      usagePolicies: '',
+      
+      // NOTAS ADICIONALES
+      notes: '',
+      
+      // CAMPOS HEREDADOS
+      condition: '',
+      acquisitionDate: '',
+      maintenanceFrequency: '',
+      lastMaintenanceDate: '',
+      nextMaintenanceDate: '',
+      expectedLifespan: null,
+      qrCode: '',
+    }
+  });
 
-  // Opciones de estado y condición
-  const statusOptions = [
-    { value: 'activo', label: 'Activo' },
-    { value: 'maintenance', label: 'En Mantenimiento' },
-    { value: 'retired', label: 'Retirado' },
-    { value: 'storage', label: 'En Almacén' }
-  ];
+  // Queries para obtener datos de selección
+  const { data: parks, isLoading: loadingParks } = useQuery({
+    queryKey: ['/api/parks'],
+  });
 
-  const conditionOptions = [
-    { value: 'excelente', label: 'Excelente' },
-    { value: 'bueno', label: 'Bueno' },
-    { value: 'regular', label: 'Regular' },
-    { value: 'malo', label: 'Malo' },
-    { value: 'critico', label: 'Crítico' }
-  ];
+  const { data: categories, isLoading: loadingCategories } = useQuery({
+    queryKey: ['/api/asset-categories'],
+  });
 
-  // Cargar datos del activo y opciones
+  const { data: amenities, isLoading: loadingAmenities } = useQuery({
+    queryKey: ['/api/amenities'],
+  });
+
+  const { data: users, isLoading: loadingUsers } = useQuery({
+    queryKey: ['/api/users'],
+  });
+
+  // Cargar datos del activo existente
+  const { data: asset, isLoading: loadingAsset } = useQuery({
+    queryKey: ['/api/assets', id],
+    queryFn: () => fetch(`/api/assets/${id}`).then(res => res.json()),
+    enabled: !!id,
+  });
+
+  // Poblar formulario cuando se cargan los datos del activo
   useEffect(() => {
-    if (!id) return;
-    
-    const loadData = async () => {
-      try {
-        // Cargar todos los datos en paralelo
-        const [assetRes, parksRes, categoriesRes] = await Promise.all([
-          fetch(`/api/assets/${id}`),
-          fetch('/api/parks'),
-          fetch('/api/asset-categories')
-        ]);
-
-        const asset = await assetRes.json();
-        const parksData = await parksRes.json();
-        const categoriesData = await categoriesRes.json();
-
-        // Establecer todos los datos del activo
-        setName(asset.name || '');
-        setDescription(asset.description || '');
-        setSerialNumber(asset.serialNumber || '');
-        setNotes(asset.notes || '');
-        setCost(asset.acquisitionCost || '');
-        setStatus(asset.status || 'activo');
-        setCondition(asset.condition || 'bueno');
-        
-        const parkIdValue = asset.parkId ? String(asset.parkId) : '';
-        const amenityIdValue = asset.amenityId ? String(asset.amenityId) : '';
-        
-        setParkId(parkIdValue);
-        setCategoryId(asset.categoryId ? String(asset.categoryId) : '');
-        setLocationDesc(asset.locationDescription || '');
-        setAmenityId(amenityIdValue);
-        setLatitude(asset.latitude || '');
-        setLongitude(asset.longitude || '');
-        
-        // Establecer datos de opciones
-        setParks(parksData);
-        setCategories(categoriesData);
-        
-        // Configurar posición del mapa
-        if (asset.latitude && asset.longitude) {
-          const lat = parseFloat(asset.latitude);
-          const lng = parseFloat(asset.longitude);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            setMapPosition([lat, lng]);
-            setMapCenter([lat, lng]);
-          }
-        } else if (asset.parkId) {
-          // Cargar ubicación del parque si no hay coordenadas del activo
-          const parkRes = await fetch(`/api/parks/${asset.parkId}`);
-          const park = await parkRes.json();
-          if (park.latitude && park.longitude) {
-            const lat = parseFloat(park.latitude);
-            const lng = parseFloat(park.longitude);
-            if (!isNaN(lat) && !isNaN(lng)) {
-              setMapCenter([lat, lng]);
-            }
-          }
-        }
-        
-        // Corregir manejo de fechas
-        if (asset.acquisitionDate) {
-          const date = new Date(asset.acquisitionDate + 'T00:00:00');
-          setAcquisitionDate(date.toISOString().split('T')[0]);
-        } else {
-          setAcquisitionDate('');
-        }
-        
-        // Cargar amenidades del parque si hay parkId
-        if (parkIdValue) {
-          const amenitiesRes = await fetch(`/api/parks/${parkIdValue}/amenities`);
-          const amenitiesData = await amenitiesRes.json();
-          setAmenities(amenitiesData);
-          
-          // Si el activo tiene amenityId, verificar que coincida con las amenidades del parque
-          if (amenityIdValue) {
-            const matchingAmenity = amenitiesData.find((a: any) => a.id === parseInt(amenityIdValue));
-            if (!matchingAmenity) {
-              // Si no encuentra la amenidad en este parque, buscar por amenity_id
-              const amenityByAmenityId = amenitiesData.find((a: any) => a.amenityId === parseInt(amenityIdValue));
-              if (amenityByAmenityId) {
-                setAmenityId(String(amenityByAmenityId.id));
-              }
-            }
-          }
-        }
-        
-        // Marcar que los datos están cargados
-        setAssetDataLoaded(true);
-        
-      } catch (err) {
-        console.error('Error al cargar datos:', err);
-        setError('Error al cargar los datos del activo');
-      }
-    };
-    
-    loadData();
-  }, [id]);
-
-  // Estado para controlar si ya se cargaron los datos iniciales del activo
-  const [assetDataLoaded, setAssetDataLoaded] = useState(false);
-  
-  // Cargar amenidades cuando cambie el parque manualmente (después de la carga inicial)
-  useEffect(() => {
-    if (parkId && assetDataLoaded) {
-      fetch(`/api/parks/${parkId}/amenities`)
-        .then(res => res.json())
-        .then(data => setAmenities(data))
-        .catch(err => console.error('Error al cargar amenidades:', err));
-    } else if (!parkId && assetDataLoaded) {
-      setAmenities([]);
-      setAmenityId('');
-      setLocationDesc('');
-    }
-  }, [parkId, assetDataLoaded]);
-
-
-
-  // Función para manejar el cambio manual de parque
-  const handleParkChange = async (newParkId: string) => {
-    setParkId(newParkId);
-    if (assetDataLoaded) {
-      // Solo limpiar si ya se cargaron los datos del activo (cambio manual)
-      setAmenityId('');
-      setLocationDesc('');
-    }
-    
-    // Centrar el mapa en la ubicación del parque seleccionado
-    if (newParkId) {
-      try {
-        const response = await fetch(`/api/parks/${newParkId}`);
-        if (response.ok) {
-          const park = await response.json();
-          if (park.latitude && park.longitude) {
-            const lat = parseFloat(park.latitude);
-            const lng = parseFloat(park.longitude);
-            if (!isNaN(lat) && !isNaN(lng)) {
-              setMapCenter([lat, lng]);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error al cargar ubicación del parque:', error);
-      }
-    }
-  };
-
-  // Función para manejar el cambio de amenidad y actualizar la descripción de ubicación
-  const handleAmenityChange = (selectedAmenityId: string) => {
-    setAmenityId(selectedAmenityId);
-    
-    if (selectedAmenityId && selectedAmenityId !== 'none') {
-      const selectedAmenity = amenities.find((a: any) => a.id === parseInt(selectedAmenityId));
-      if (selectedAmenity) {
-        // Usar name como descripción de ubicación
-        setLocationDesc(selectedAmenity.moduleName || selectedAmenity.name || '');
-      }
-    } else {
-      // Limpiar descripción de ubicación cuando se selecciona "Sin amenidad" o se quita la selección
-      setLocationDesc('');
-    }
-  };
-
-  // Función para manejar el cambio de posición en el mapa
-  const handleMapPositionChange = (newPosition: [number, number]) => {
-    setMapPosition(newPosition);
-    setLatitude(newPosition[0].toFixed(6));
-    setLongitude(newPosition[1].toFixed(6));
-  };
-
-  // Función para actualizar el mapa cuando cambian las coordenadas manualmente
-  const handleCoordinateChange = () => {
-    const lat = parseFloat(latitude);
-    const lng = parseFloat(longitude);
-    if (!isNaN(lat) && !isNaN(lng)) {
-      setMapPosition([lat, lng]);
-    }
-  };
-
-  const handleSave = async () => {
-    if (!id) {
-      setError('ID de activo no válido');
-      return;
-    }
-
-    if (!name.trim()) {
-      setError('El nombre es obligatorio');
-      return;
-    }
-
-    if (!parkId) {
-      setError('Debe seleccionar un parque');
-      return;
-    }
-
-    if (!categoryId) {
-      setError('Debe seleccionar una categoría');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      const updateData = {
-        name: name.trim(),
-        description: description.trim(),
-        serialNumber: serialNumber.trim(),
-        notes: notes.trim(),
-        acquisitionCost: cost ? cost.trim() : undefined, // Enviar como string
-        status,
-        condition,
-        parkId: parseInt(parkId),
-        categoryId: parseInt(categoryId),
-        location: location.trim(), // Cambiar de locationDescription a location
-        acquisitionDate: acquisitionDate || undefined,
-        amenityId: amenityId && amenityId !== 'none' ? parseInt(amenityId) : null,
-        latitude: latitude.trim() || undefined,
-        longitude: longitude.trim() || undefined
-      };
-
-      const response = await fetch(`/api/assets/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include cookies for authentication
-        body: JSON.stringify(updateData),
+    if (asset) {
+      form.reset({
+        name: asset.name || '',
+        serialNumber: asset.serialNumber || '',
+        categoryId: asset.categoryId || 0,
+        subcategoryId: asset.subcategoryId || null,
+        customAssetId: asset.customAssetId || '',
+        description: asset.description || '',
+        parkId: asset.parkId || 0,
+        amenityId: asset.amenityId || null,
+        locationDescription: asset.locationDescription || '',
+        latitude: asset.latitude || '',
+        longitude: asset.longitude || '',
+        manufacturer: asset.manufacturer || '',
+        model: asset.model || '',
+        serialNumberTech: asset.serialNumberTech || '',
+        material: asset.material || '',
+        dimensionsCapacity: asset.dimensionsCapacity || '',
+        installationDate: asset.installationDate || '',
+        lastInspectionDate: asset.lastInspectionDate || '',
+        estimatedUsefulLife: asset.estimatedUsefulLife || null,
+        status: asset.status || '',
+        acquisitionCost: asset.acquisitionCost || null,
+        currentValue: asset.currentValue || null,
+        financingSource: asset.financingSource || '',
+        responsiblePersonId: asset.responsiblePersonId || null,
+        assignedArea: asset.assignedArea || '',
+        maintenanceManualUrl: asset.maintenanceManualUrl || '',
+        usagePolicies: asset.usagePolicies || '',
+        notes: asset.notes || '',
+        condition: asset.condition || '',
+        acquisitionDate: asset.acquisitionDate || '',
+        maintenanceFrequency: asset.maintenanceFrequency || '',
+        lastMaintenanceDate: asset.lastMaintenanceDate || '',
+        nextMaintenanceDate: asset.nextMaintenanceDate || '',
+        expectedLifespan: asset.expectedLifespan || null,
+        qrCode: asset.qrCode || '',
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Error HTTP ${response.status}: ${errorText}`);
+      // Configurar posición del mapa si hay coordenadas
+      if (asset.latitude && asset.longitude) {
+        const lat = parseFloat(asset.latitude);
+        const lng = parseFloat(asset.longitude);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          setMapPosition([lat, lng]);
+          setSelectedLocation([lat, lng]);
+        }
       }
-
-      const result = await response.json();
-
-      // Invalidar cache de React Query para actualizar la vista
-      queryClient.invalidateQueries({ queryKey: [`/api/assets/${id}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/assets'] });
-
-      setSuccess('Activo actualizado correctamente');
-      
-      // Redirigir después de un momento
-      setTimeout(() => {
-        setLocation(`/admin/assets/${id}`);
-      }, 1500);
-
-    } catch (err) {
-      console.error('Error al guardar:', err);
-      setError('Error al actualizar el activo. Por favor, intente de nuevo.');
-    } finally {
-      setLoading(false);
     }
+  }, [asset, form]);
+
+  // Mutación para actualizar el activo
+  const updateAssetMutation = useMutation({
+    mutationFn: (data: AssetFormData) => 
+      apiRequest(`/api/assets/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      toast({
+        title: "Éxito",
+        description: "Activo actualizado correctamente",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/assets'] });
+      setLocation('/admin/assets/inventory');
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Error al actualizar el activo",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Manejar envío del formulario
+  const onSubmit = (data: AssetFormData) => {
+    updateAssetMutation.mutate(data);
   };
+
+  // Manejar selección de ubicación en el mapa
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setSelectedLocation([lat, lng]);
+    form.setValue('latitude', lat.toString());
+    form.setValue('longitude', lng.toString());
+  };
+
+  // Filtrar subcategorías según categoría seleccionada
+  const selectedCategoryId = form.watch('categoryId');
+  const selectedParkId = form.watch('parkId');
+  
+  const subcategories = categories?.filter((cat: any) => 
+    cat.parentId === selectedCategoryId
+  ) || [];
+
+  const amenitiesByPark = amenities?.filter((amenity: any) => 
+    amenity.parkId === selectedParkId
+  ) || [];
+
+  const isLoading = loadingParks || loadingCategories || loadingAmenities || loadingUsers || loadingAsset;
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="p-6">
+          <div className="text-center">Cargando datos del activo...</div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (!asset) {
+    return (
+      <AdminLayout>
+        <div className="p-6">
+          <div className="text-center text-red-600">No se encontró el activo especificado</div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
-      <div className="container mx-auto py-6">
-        <div className="flex items-center gap-4 mb-6">
+      <Helmet>
+        <title>Editar Activo - ParkSys</title>
+      </Helmet>
+      
+      <div className="container mx-auto py-8 px-4 max-w-4xl">
+        {/* Header */}
+        <div className="mb-8">
           <Button
             variant="ghost"
-            size="sm"
-            onClick={() => setLocation(`/admin/assets/${id}`)}
+            onClick={() => setLocation('/admin/assets/inventory')}
+            className="mb-4"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver al Inventario
           </Button>
-          <h1 className="text-2xl font-bold">Editar Activo</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Editar Activo</h1>
+          <p className="text-gray-600 mt-2">
+            Actualiza la información completa del activo
+          </p>
         </div>
 
-        <Card className="max-w-4xl">
-          <CardHeader>
-            <CardTitle>Información del Activo</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                {error}
-              </div>
-            )}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             
-            {success && (
-              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
-                {success}
-              </div>
-            )}
-
-            {/* Información básica */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Nombre *</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nombre del activo"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="serialNumber">Número de Serie</Label>
-                <Input
-                  id="serialNumber"
-                  value={serialNumber}
-                  onChange={(e) => setSerialNumber(e.target.value)}
-                  placeholder="Número de serie"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="description">Descripción</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Descripción del activo"
-                rows={3}
-              />
-            </div>
-
-            {/* Selecciones */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Parque *</Label>
-                <Select value={parkId} onValueChange={handleParkChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar parque" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {parks && (Array.isArray(parks) ? parks : parks.data || []).length > 0 ? (
-                      (Array.isArray(parks) ? parks : parks.data || []).map((park: any) => (
-                        <SelectItem key={park.id} value={String(park.id)}>
-                          {park.name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="loading" disabled>Cargando parques...</SelectItem>
+            {/* SECCIÓN 1: IDENTIFICACIÓN */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Identificación
+                </CardTitle>
+                <CardDescription>
+                  Información básica de identificación del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre del Activo *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Banco de madera" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </SelectContent>
-                </Select>
-              </div>
+                  />
 
-              <div>
-                <Label>Categoría *</Label>
-                <Select value={categoryId} onValueChange={setCategoryId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.length > 0 ? (
-                      categories.map((category: any) => (
-                        <SelectItem key={category.id} value={String(category.id)}>
-                          {category.name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="loading" disabled>Cargando categorías...</SelectItem>
+                  <FormField
+                    control={form.control}
+                    name="serialNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número de Serie</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: BM-001-2024" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Amenidad (opcional) */}
-            <div>
-              <Label>Amenidad (Opcional)</Label>
-              <Select 
-                value={amenityId} 
-                onValueChange={handleAmenityChange}
-                disabled={!parkId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={parkId ? "Seleccionar amenidad" : "Primero seleccione un parque"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin amenidad</SelectItem>
-                  {amenities.map((amenity: any) => (
-                    <SelectItem key={amenity.id} value={String(amenity.id)}>
-                      {amenity.name || amenity.moduleName || amenity.amenityName || `Amenidad ${amenity.id}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Estado y condición */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Estado</Label>
-                <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label>Condición</Label>
-                <Select value={condition} onValueChange={setCondition}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar condición" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {conditionOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Información adicional */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="cost">Costo de Adquisición</Label>
-                <Input
-                  id="cost"
-                  type="number"
-                  step="0.01"
-                  value={cost}
-                  onChange={(e) => setCost(e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="acquisitionDate">Fecha de Adquisición</Label>
-                <Input
-                  id="acquisitionDate"
-                  type="date"
-                  value={acquisitionDate}
-                  onChange={(e) => setAcquisitionDate(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="location">Descripción de Ubicación</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocationDesc(e.target.value)}
-                  placeholder={amenityId && amenityId !== 'none' ? "Se completó automáticamente desde la amenidad" : "Descripción manual de la ubicación"}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Sección de ubicación geográfica */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-blue-600" />
-                <Label className="text-lg font-medium">Ubicación Geográfica</Label>
-              </div>
-              
-              {/* Campos de coordenadas */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="latitude">Latitud</Label>
-                  <Input
-                    id="latitude"
-                    value={latitude}
-                    onChange={(e) => setLatitude(e.target.value)}
-                    onBlur={handleCoordinateChange}
-                    placeholder="Ej: 19.432608"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="longitude">Longitud</Label>
-                  <Input
-                    id="longitude"
-                    value={longitude}
-                    onChange={(e) => setLongitude(e.target.value)}
-                    onBlur={handleCoordinateChange}
-                    placeholder="Ej: -99.133209"
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Categoría Principal *</FormLabel>
+                        <Select 
+                          value={field.value ? field.value.toString() : ''} 
+                          onValueChange={(value) => {
+                            field.onChange(parseInt(value));
+                            form.setValue('subcategoryId', null);
+                          }}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona una categoría" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories?.filter((cat: any) => !cat.parentId).map((category: any) => (
+                              <SelectItem key={category.id} value={category.id.toString()}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="subcategoryId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subcategoría</FormLabel>
+                        <Select 
+                          value={field.value ? field.value.toString() : ''} 
+                          onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                          disabled={!selectedCategoryId || subcategories.length === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona una subcategoría" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {subcategories.map((subcategory: any) => (
+                              <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                                {subcategory.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-              </div>
 
-              {/* Mapa interactivo */}
-              <div className="space-y-2">
-                <Label>Mapa Interactivo</Label>
-                <p className="text-sm text-gray-600">Haz clic en el mapa para establecer la ubicación del activo</p>
-                <div className="h-64 w-full border rounded-lg overflow-hidden">
-                  <MapContainer
-                    center={mapCenter}
-                    zoom={13}
-                    style={{ height: '100%', width: '100%' }}
-                    key={`${mapCenter[0]}-${mapCenter[1]}`} // Forzar re-render cuando cambie el centro
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <LocationMarker 
-                      position={mapPosition} 
-                      setPosition={handleMapPositionChange}
-                    />
-                  </MapContainer>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="customAssetId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ID Personalizado</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: MOBUR-001" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormDescription>
+                          Identificador personalizado del activo
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </div>
-            </div>
 
-            <div>
-              <Label htmlFor="notes">Notas</Label>
-              <Textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Notas adicionales sobre el activo"
-                rows={3}
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descripción</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe el activo, sus características y función..."
+                          className="min-h-[100px]"
+                          {...field} 
+                          value={field.value || ''} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
 
-            {/* Botones */}
-            <div className="flex justify-end gap-4 pt-4">
+            {/* SECCIÓN 2: UBICACIÓN */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Ubicación
+                </CardTitle>
+                <CardDescription>
+                  Ubicación física del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="parkId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Parque *</FormLabel>
+                        <Select 
+                          value={field.value ? field.value.toString() : ''} 
+                          onValueChange={(value) => {
+                            field.onChange(parseInt(value));
+                            form.setValue('amenityId', null);
+                          }}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona un parque" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {parks?.map((park: any) => (
+                              <SelectItem key={park.id} value={park.id.toString()}>
+                                {park.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="amenityId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Amenidad/Área Específica</FormLabel>
+                        <Select 
+                          value={field.value ? field.value.toString() : ''} 
+                          onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                          disabled={!selectedParkId || amenitiesByPark.length === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona una amenidad" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {amenitiesByPark.map((amenity: any) => (
+                              <SelectItem key={amenity.id} value={amenity.id.toString()}>
+                                {amenity.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="locationDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descripción de Ubicación</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe la ubicación exacta dentro del parque..."
+                          className="min-h-[80px]"
+                          {...field} 
+                          value={field.value || ''} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="latitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Latitud</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="19.432608" 
+                            {...field} 
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              const lat = parseFloat(e.target.value);
+                              const lng = parseFloat(form.getValues('longitude') || '0');
+                              if (!isNaN(lat) && !isNaN(lng)) {
+                                setSelectedLocation([lat, lng]);
+                                setMapPosition([lat, lng]);
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="longitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Longitud</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="-99.133209" 
+                            {...field} 
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              const lng = parseFloat(e.target.value);
+                              const lat = parseFloat(form.getValues('latitude') || '0');
+                              if (!isNaN(lat) && !isNaN(lng)) {
+                                setSelectedLocation([lat, lng]);
+                                setMapPosition([lat, lng]);
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Mapa interactivo */}
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium">Seleccionar Ubicación en el Mapa</h4>
+                    <p className="text-sm text-gray-600">Haz clic en el mapa para establecer las coordenadas</p>
+                  </div>
+                  <div className="h-96 w-full border rounded-md overflow-hidden">
+                    <MapContainer
+                      center={mapPosition || [19.432608, -99.133209]}
+                      zoom={16}
+                      style={{ height: '100%', width: '100%' }}
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      {mapPosition && <MapUpdater center={mapPosition} />}
+                      <LocationPicker 
+                        position={selectedLocation} 
+                        onLocationSelect={handleLocationSelect} 
+                      />
+                    </MapContainer>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* SECCIÓN 3: ESPECIFICACIONES TÉCNICAS */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Especificaciones Técnicas
+                </CardTitle>
+                <CardDescription>
+                  Detalles técnicos y de fabricación del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="manufacturer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fabricante</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: MueblesPark SA" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Modelo</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Banco-Urban-2024" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="serialNumberTech"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número de Serie Técnico</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Número de serie del fabricante" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="material"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Material</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Madera tratada, metal galvanizado" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="dimensionsCapacity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dimensiones/Capacidad</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ej: 180cm x 45cm x 80cm / Capacidad: 3 personas" {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* SECCIÓN 4: CICLO DE VIDA */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Ciclo de Vida
+                </CardTitle>
+                <CardDescription>
+                  Información sobre el estado y mantenimiento del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado *</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona el estado" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {ASSET_STATUSES.map((status) => (
+                              <SelectItem key={status.value} value={status.value}>
+                                {status.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="condition"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Condición *</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona la condición" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {ASSET_CONDITIONS.map((condition) => (
+                              <SelectItem key={condition.value} value={condition.value}>
+                                {condition.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="installationDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha de Instalación</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="lastInspectionDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Última Inspección</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="maintenanceFrequency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Frecuencia de Mantenimiento</FormLabel>
+                        <Select value={field.value || ''} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona frecuencia" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {MAINTENANCE_FREQUENCIES.map((freq) => (
+                              <SelectItem key={freq.value} value={freq.value}>
+                                {freq.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="lastMaintenanceDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Último Mantenimiento</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="nextMaintenanceDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Próximo Mantenimiento</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="estimatedUsefulLife"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vida Útil Estimada (años)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="Ej: 10" 
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : null)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* SECCIÓN 5: COSTOS */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  Costos
+                </CardTitle>
+                <CardDescription>
+                  Información financiera del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="acquisitionCost"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Costo de Adquisición</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="0.00" 
+                            step="0.01"
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="currentValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Valor Actual</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="0.00" 
+                            step="0.01"
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="acquisitionDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha de Adquisición</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="financingSource"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fuente de Financiamiento</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ej: Presupuesto municipal, Fondos federales..." {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* SECCIÓN 6: CONTROL Y GESTIÓN */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Control y Gestión
+                </CardTitle>
+                <CardDescription>
+                  Asignación de responsabilidades y gestión del activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="responsiblePersonId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Persona Responsable</FormLabel>
+                        <Select 
+                          value={field.value ? field.value.toString() : ''} 
+                          onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona un responsable" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {users?.map((user: any) => (
+                              <SelectItem key={user.id} value={user.id.toString()}>
+                                {user.fullName || user.username}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="assignedArea"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Área Asignada</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Mantenimiento, Jardinería..." {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="maintenanceManualUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Manual de Mantenimiento (URL)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://..." {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="qrCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Código QR</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Código QR del activo" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="usagePolicies"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Políticas de Uso</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe las políticas y restricciones de uso..."
+                          className="min-h-[100px]"
+                          {...field} 
+                          value={field.value || ''} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* SECCIÓN 7: NOTAS ADICIONALES */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Notas Adicionales</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Observaciones y Notas</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Información adicional relevante sobre el activo..."
+                          className="min-h-[120px]"
+                          {...field} 
+                          value={field.value || ''} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Botones de acción */}
+            <div className="flex justify-end space-x-4 pb-8">
               <Button
+                type="button"
                 variant="outline"
-                onClick={() => setLocation(`/admin/assets/${id}`)}
+                onClick={() => setLocation('/admin/assets/inventory')}
               >
                 Cancelar
               </Button>
               <Button
-                onClick={handleSave}
-                disabled={loading}
+                type="submit"
+                disabled={updateAssetMutation.isPending}
               >
-                {loading ? (
-                  'Guardando...'
+                {updateAssetMutation.isPending ? (
+                  <>Actualizando...</>
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    Guardar Cambios
+                    Actualizar Activo
                   </>
                 )}
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </form>
+        </Form>
       </div>
     </AdminLayout>
   );
-}
+};
+
+export default EditAssetPage;
