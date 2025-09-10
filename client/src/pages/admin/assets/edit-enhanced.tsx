@@ -118,12 +118,15 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
       if (!mapRef.current) return;
 
       try {
+        console.log('🗺️ [GOOGLE MAPS] Iniciando carga...');
         await googleMapsService.loadGoogleMaps();
 
         if (!googleMapsService.isGoogleMapsLoaded()) {
-          console.error('Google Maps no pudo cargarse');
+          console.error('🗺️ [GOOGLE MAPS ERROR] No pudo cargarse');
           return;
         }
+
+        console.log('🗺️ [GOOGLE MAPS] API cargada, creando mapa...');
 
         // Crear el mapa
         const map = await googleMapsService.createMap(mapRef.current, {
@@ -141,9 +144,10 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
           onLocationSelect(lat, lng);
         });
 
+        console.log('🗺️ [GOOGLE MAPS] Mapa creado exitosamente');
         setMapLoaded(true);
       } catch (error) {
-        console.error('Error inicializando Google Maps:', error);
+        console.error('🗺️ [GOOGLE MAPS ERROR] Error inicializando:', error);
       }
     };
 
@@ -187,7 +191,7 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
   );
 }
 
-const EditAssetPage: React.FC = () => {
+export default function EditAssetPage() {
   const [, params] = useRoute('/admin/assets/:id/edit-enhanced');
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
@@ -274,10 +278,16 @@ const EditAssetPage: React.FC = () => {
   });
 
   // Cargar datos del activo existente
-  const { data: asset, isLoading: loadingAsset } = useQuery({
+  const { data: asset, isLoading: loadingAsset, error: assetError } = useQuery({
     queryKey: ['/api/assets', id],
-    queryFn: () => fetch(`/api/assets/${id}`).then(res => res.json()),
+    queryFn: () => fetch(`/api/assets/${id}`).then(res => {
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    }),
     enabled: !!id,
+    retry: 1,
   });
 
   // Poblar formulario cuando se cargan los datos del activo
@@ -1251,4 +1261,3 @@ const EditAssetPage: React.FC = () => {
   );
 };
 
-export default EditAssetPage;
