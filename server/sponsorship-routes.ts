@@ -343,7 +343,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         
         if (sponsorIds.length > 0) {
           const sponsorsResult = await pool.query(`
-            SELECT id, name, logo 
+            SELECT id, name, logo_url 
             FROM sponsors 
             WHERE id = ANY($1)
           `, [sponsorIds]);
@@ -351,7 +351,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
           sponsorsResult.rows.forEach(sponsor => {
             sponsorNames[sponsor.id] = {
               name: sponsor.name,
-              logo: sponsor.logo
+              logo: sponsor.logo_url
             };
           });
         }
@@ -383,36 +383,24 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       const {
         sponsorId,
         packageId,
-        campaignId,
-        contractNumber,
-        title,
-        description,
+        number,
+        type,
+        amount,
         startDate,
         endDate,
-        totalAmount,
-        paymentSchedule,
         status,
-        termsConditions,
-        deliverables,
-        performanceMetrics,
-        contactPerson,
-        contactEmail,
-        contactPhone
+        notes
       } = req.body;
 
       const result = await pool.query(`
         INSERT INTO sponsorship_contracts (
-          sponsor_id, package_id, campaign_id, contract_number, title, description,
-          start_date, end_date, total_amount, payment_schedule, status,
-          terms_conditions, deliverables, performance_metrics, contact_person,
-          contact_email, contact_phone, created_by
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+          sponsor_id, package_id, number, type, amount,
+          start_date, end_date, status, notes
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *
       `, [
-        sponsorId, packageId, campaignId, contractNumber, title, description,
-        startDate, endDate, totalAmount, paymentSchedule, status || 'draft',
-        termsConditions, deliverables, performanceMetrics, contactPerson,
-        contactEmail, contactPhone, 1 // created_by
+        sponsorId, packageId || null, number, type, amount,
+        startDate, endDate, status || 'en_negociacion', notes || null
       ]);
       
       res.status(201).json(result.rows[0]);
@@ -436,13 +424,10 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
           s.contact_phone as sponsor_phone,
           sp.name as package_name,
           sp.tier as package_tier,
-          sp.description as package_description,
-          scamp.name as campaign_name,
-          scamp.description as campaign_description
+          sp.description as package_description
         FROM sponsorship_contracts sc
         LEFT JOIN sponsors s ON sc.sponsor_id = s.id
         LEFT JOIN sponsorship_packages sp ON sc.package_id = sp.id
-        LEFT JOIN sponsorship_campaigns scamp ON sc.campaign_id = scamp.id
         WHERE sc.id = $1
       `, [id]);
       
@@ -464,37 +449,25 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       const {
         sponsorId,
         packageId,
-        campaignId,
-        title,
-        description,
+        number,
+        type,
+        amount,
         startDate,
         endDate,
-        totalAmount,
-        paymentSchedule,
         status,
-        signedDate,
-        termsConditions,
-        deliverables,
-        performanceMetrics,
-        contactPerson,
-        contactEmail,
-        contactPhone
+        notes
       } = req.body;
 
       const result = await pool.query(`
         UPDATE sponsorship_contracts SET
-          sponsor_id = $1, package_id = $2, campaign_id = $3, title = $4,
-          description = $5, start_date = $6, end_date = $7, total_amount = $8,
-          payment_schedule = $9, status = $10, signed_date = $11,
-          terms_conditions = $12, deliverables = $13, performance_metrics = $14,
-          contact_person = $15, contact_email = $16, contact_phone = $17,
-          updated_at = CURRENT_TIMESTAMP
-        WHERE id = $18
+          sponsor_id = $1, package_id = $2, number = $3, type = $4,
+          amount = $5, start_date = $6, end_date = $7, status = $8,
+          notes = $9
+        WHERE id = $10
         RETURNING *
       `, [
-        sponsorId, packageId, campaignId, title, description, startDate, endDate,
-        totalAmount, paymentSchedule, status, signedDate, termsConditions,
-        deliverables, performanceMetrics, contactPerson, contactEmail, contactPhone, id
+        sponsorId, packageId || null, number, type, amount,
+        startDate, endDate, status, notes || null, id
       ]);
       
       if (result.rows.length === 0) {
@@ -533,14 +506,12 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         SELECT 
           sc.*,
           s.name as sponsor_name,
-          sp.name as package_name,
-          scamp.name as campaign_name
+          sp.name as package_name
         FROM sponsorship_contracts sc
         LEFT JOIN sponsors s ON sc.sponsor_id = s.id
         LEFT JOIN sponsorship_packages sp ON sc.package_id = sp.id
-        LEFT JOIN sponsorship_campaigns scamp ON sc.campaign_id = scamp.id
         WHERE sc.sponsor_id = $1
-        ORDER BY sc.created_at DESC
+        ORDER BY sc.id DESC
       `, [sponsorId]);
       
       res.json(result.rows);
@@ -614,7 +585,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         SELECT 
           se.*,
           s.name as sponsor_name,
-          s.logo as sponsor_logo,
+          s.logo_url as sponsor_logo,
           sc.contract_number,
           sc.title as contract_title
         FROM sponsor_events se
@@ -660,7 +631,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         SELECT 
           se.*,
           s.name as sponsor_name,
-          s.logo as sponsor_logo,
+          s.logo_url as sponsor_logo,
           sc.contract_number,
           sc.title as contract_title
         FROM sponsor_events se
