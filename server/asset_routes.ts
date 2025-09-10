@@ -972,7 +972,7 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
       const [categoriesData, parksData, amenitiesData] = await Promise.all([
         pool.query('SELECT id, name FROM asset_categories WHERE parent_id IS NULL'),
         pool.query('SELECT id, name FROM parks'),
-        pool.query('SELECT id, name FROM park_amenities')
+        pool.query('SELECT id, name FROM amenities')
       ]);
 
       const categoriesMap = new Map(categoriesData.rows.map(cat => [cat.name, cat.id]));
