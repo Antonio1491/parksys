@@ -3,6 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Badge, Download, Upload, FileText } from 'lucide-react';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -806,75 +807,72 @@ const AdminActivities = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header con patrón Card estandarizado */}
-        <Card className="p-4 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-gray-900">Actividades</h1>
-              </div>
-              <p className="text-gray-600 mt-2">Gestiona todas las actividades del sistema</p>
-            </div>
-            <div className="flex items-center gap-3">
-            {/* Toggle de vista */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-              <Button
-                variant={viewMode === 'cards' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('cards')}
-                className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'table' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('table')}
-                className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            {/* Botones CSV */}
-            <Button 
-              variant="outline"
-              onClick={handleDownloadTemplate}
-              className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Plantilla CSV
-            </Button>
-            
-            <Button 
-              variant="outline"
-              onClick={handleExportCSV}
-              className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Exportar CSV
-            </Button>
-            
-            <Button 
-              variant="outline"
-              onClick={() => setShowImportDialog(true)}
-              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Importar CSV
-            </Button>
-            
-            <Button 
-              className="bg-[#00a587] hover:bg-[#067f5f]"
-              onClick={() => {
-                console.log('Botón Nueva Actividad clickeado - redirigiendo al organizador');
-                setLocation('/admin/organizador/catalogo/crear');
-              }}
+        <PageHeader
+          title="Listado de actividades"
+          subtitle="Actividades registradas en el sistema."
+          icon={<Calendar />}
+          actions={[
+            <Button
+              key="nuevo"
+              onClick={() => setLocation('/admin/organizador/catalogo/crear')}
+              className="bg-[#00a587] hover:bg-[#067f5f] text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Nueva Actividad
+              Nuevo
+            </Button>,
+            <Button
+              key="importar"
+              variant="outline"
+              onClick={() => setShowImportDialog(true)}
+              className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Importar
+            </Button>,
+            <Button
+              key="exportar"
+              variant="outline"
+              onClick={handleExportCSV}
+              className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
             </Button>
+          ]}
+        />
+
+        {/* Filtros y controles */}
+        <Card className="p-4 bg-gray-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {/* Toggle de vista */}
+              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('cards')}
+                  className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                  className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <Button 
+                variant="outline"
+                onClick={handleDownloadTemplate}
+                className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Plantilla CSV
+              </Button>
             </div>
           </div>
         </Card>
