@@ -165,32 +165,44 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
     <div className="space-y-6">
       {/* Fila 1: 2 tarjetas grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        {parks.slice(0, 2).map((park) => renderParkCard(park, 'large'))}
+        {parks.slice(0, 2).map((park) => (
+          <div key={park.id}>{renderParkCard(park, 'large')}</div>
+        ))}
       </div>
 
       {/* Fila 2: 3 tarjetas normales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {parks.slice(2, 5).map((park) => renderParkCard(park, 'normal'))}
+        {parks.slice(2, 5).map((park) => (
+          <div key={park.id}>{renderParkCard(park, 'normal')}</div>
+        ))}
       </div>
 
       {/* Fila 3: 1 tarjeta ancha */}
       <div className="grid grid-cols-1 gap-4">
-        {parks.slice(5, 6).map((park) => renderParkCard(park, 'wide'))}
+        {parks.slice(5, 6).map((park) => (
+          <div key={park.id}>{renderParkCard(park, 'wide')}</div>
+        ))}
       </div>
 
       {/* Fila 4: 2 tarjetas grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        {parks.slice(6, 8).map((park) => renderParkCard(park, 'large'))}
+        {parks.slice(6, 8).map((park) => (
+          <div key={park.id}>{renderParkCard(park, 'large')}</div>
+        ))}
       </div>
 
       {/* Fila 5: 3 tarjetas normales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {parks.slice(8, 11).map((park) => renderParkCard(park, 'normal'))}
+        {parks.slice(8, 11).map((park) => (
+          <div key={park.id}>{renderParkCard(park, 'normal')}</div>
+        ))}
       </div>
 
       {/* Fila 6: 2 tarjetas grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        {parks.slice(11, 13).map((park) => renderParkCard(park, 'large'))}
+        {parks.slice(11, 13).map((park) => (
+          <div key={park.id}>{renderParkCard(park, 'large')}</div>
+        ))}
       </div>
 
       {/* Tarjetas adicionales si hay más de 13 parques - continúa el patrón */}
@@ -198,7 +210,9 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
         <div className="space-y-6 pt-6 border-t border-gray-200">
           <h4 className="text-lg font-semibold text-gray-700 mb-4">Más Parques</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {parks.slice(13).map((park) => renderParkCard(park, 'normal'))}
+            {parks.slice(13).map((park) => (
+              <div key={park.id}>{renderParkCard(park, 'normal')}</div>
+            ))}
           </div>
         </div>
       )}
