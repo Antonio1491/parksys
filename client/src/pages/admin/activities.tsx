@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Badge, Download, Upload, FileText, Boxes } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Badge, Download, Upload, FileText, Blocks } from 'lucide-react';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { BlockList } from 'net';
 
 const AdminActivities = () => {
   const [, setLocation] = useLocation();
@@ -824,7 +825,7 @@ const AdminActivities = () => {
               key="importar"
               variant="outline"
               onClick={() => setShowImportDialog(true)}
-              className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
+              className="border-[#a0cc4d] text-[#00a587] hover:bg-[#00a587] hover:text-white"
             >
               <Upload className="h-4 w-4 mr-2" />
               Importar
