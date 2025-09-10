@@ -125,48 +125,58 @@ const GoogleMapComponent: React.FC<{
   categories: AssetCategory[];
   parks: Park[];
 }> = ({ assets, categories, parks }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const mountedRef = useRef(true);
+
+  // Limpieza al desmontar
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      try {
+        markersRef.current.forEach(marker => marker.setMap(null));
+        markersRef.current = [];
+      } catch (e) {
+        console.log('🗺️ [CLEANUP] Error limpiando markers:', e);
+      }
+    };
+  }, []);
 
   useEffect(() => {
-    let mounted = true;
-    let map: google.maps.Map | null = null;
-    let markers: google.maps.Marker[] = [];
-
     const initMap = async () => {
-      if (!mapRef.current) return;
+      if (!mapContainerRef.current || !mountedRef.current) return;
 
       try {
         console.log('🗺️ [MAPA] Iniciando carga de Google Maps...');
         
-        // Limpiar completamente el contenedor
-        const container = mapRef.current;
-        while (container.firstChild) {
-          container.removeChild(container.firstChild);
-        }
-        
-        console.log('🗺️ [MAPA] Contenedor limpiado, cargando API...');
-        
         // Cargar Google Maps
         await googleMapsService.loadGoogleMaps();
         
-        if (!mounted) return;
+        if (!mountedRef.current) return;
 
         if (!googleMapsService.isGoogleMapsLoaded()) {
           console.error('🗺️ [MAPA ERROR] Google Maps no pudo cargarse después del loadGoogleMaps()');
-          setMapLoaded(false);
+          if (mountedRef.current) {
+            setMapError('Error al cargar Google Maps API');
+          }
           return;
         }
 
         console.log('🗺️ [MAPA] API cargada exitosamente, creando mapa...');
 
         // Crear el mapa
-        map = await googleMapsService.createMap(mapRef.current, {
+        const map = await googleMapsService.createMap(mapContainerRef.current, {
           center: { lat: 20.676667, lng: -103.347222 }, // Guadalajara
           zoom: 12,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         });
 
+        if (!mountedRef.current) return;
+
+        mapInstanceRef.current = map;
         console.log('🗺️ [MAPA] Mapa creado exitosamente');
 
         // Crear marcadores para activos
@@ -204,7 +214,7 @@ const GoogleMapComponent: React.FC<{
               infoWindow.open(map, marker);
             });
 
-            markers.push(marker);
+            markersRef.current.push(marker);
           } catch (error) {
             console.error('Error creando marcador:', error);
           }
@@ -222,7 +232,10 @@ const GoogleMapComponent: React.FC<{
           map.fitBounds(bounds);
         }
 
-        setMapLoaded(true);
+        if (mountedRef.current) {
+          setMapLoaded(true);
+          setMapError(null);
+        }
 
       } catch (error) {
         console.error('Error inicializando Google Maps:', {
@@ -231,57 +244,38 @@ const GoogleMapComponent: React.FC<{
           stack: error instanceof Error ? error.stack : null,
           apiKey: googleMapsService.isGoogleMapsLoaded() ? 'OK' : 'FALLO'
         });
+        if (mountedRef.current) {
+          setMapError(error instanceof Error ? error.message : 'Error desconocido');
+        }
       }
     };
 
-    initMap();
-
-    return () => {
-      mounted = false;
-      
-      // Limpiar marcadores
-      markers.forEach(marker => {
-        try {
-          marker.setMap(null);
-        } catch (error) {
-          console.warn('Error limpiando marcador:', error);
-        }
-      });
-      
-      // Limpiar mapa y contenedor
-      try {
-        if (map) {
-          google.maps.event.clearInstanceListeners(map);
-        }
-        if (mapRef.current) {
-          const container = mapRef.current;
-          // Solo limpiar si el contenedor aún existe en el DOM
-          if (container.parentNode) {
-            container.innerHTML = '';
-          }
-        }
-      } catch (error) {
-        console.warn('Error limpiando mapa:', error);
-      }
-    };
+    if (!mapLoaded && !mapError) {
+      const timeoutId = setTimeout(initMap, 100);
+      return () => clearTimeout(timeoutId);
+    }
   }, [assets, categories, parks]);
 
   return (
     <GoogleMapsErrorBoundary>
-      <div 
-        ref={mapRef} 
-        style={{ width: '100%', height: '600px', backgroundColor: '#f0f0f0' }}
-      >
-        {!mapLoaded && (
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: '100%',
-            fontSize: '16px',
-            color: '#666'
-          }}>
-            Cargando Google Maps...
+      <div style={{ width: '100%', height: '600px', position: 'relative' }}>
+        <div 
+          ref={mapContainerRef} 
+          style={{ width: '100%', height: '100%' }}
+        />
+        {mapError && (
+          <div className="absolute inset-0 bg-white flex items-center justify-center">
+            <div className="text-red-500 text-center p-4">
+              <p>Error cargando el mapa: {mapError}</p>
+            </div>
+          </div>
+        )}
+        {!mapLoaded && !mapError && (
+          <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+            <div className="flex items-center space-x-2 text-gray-500">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-500"></div>
+              <span>Cargando mapa...</span>
+            </div>
           </div>
         )}
       </div>
