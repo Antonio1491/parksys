@@ -108,36 +108,63 @@ interface GoogleMapComponentProps {
 }
 
 function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: GoogleMapComponentProps) {
-  const mapRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const mapRef = React.useRef<HTMLDivElement | null>(null);
   const [mapLoaded, setMapLoaded] = React.useState(false);
   const [mapError, setMapError] = React.useState<string | null>(null);
   const [mapInstance, setMapInstance] = React.useState<google.maps.Map | null>(null);
   const [marker, setMarker] = React.useState<google.maps.Marker | null>(null);
   const isMountedRef = React.useRef(true);
+  const cleanupRef = React.useRef<(() => void) | null>(null);
 
   // Efecto de limpieza al desmontar
   React.useEffect(() => {
     return () => {
       isMountedRef.current = false;
+      
+      // Ejecutar limpieza si existe
+      if (cleanupRef.current) {
+        cleanupRef.current();
+      }
+      
       // Limpiar el marker
       if (marker) {
-        marker.setMap(null);
+        try {
+          marker.setMap(null);
+        } catch (e) {
+          console.log('🗺️ [CLEANUP] Error limpiando marker:', e);
+        }
       }
-      // No intentamos limpiar el mapa directamente para evitar problemas con el DOM
+      
+      // Limpiar referencias sin tocar el DOM directamente
       setMapInstance(null);
       setMarker(null);
     };
-  }, [marker]);
+  }, []);
 
   React.useEffect(() => {
     const initMap = async () => {
-      if (!mapRef.current || !isMountedRef.current) return;
+      if (!containerRef.current || !isMountedRef.current) return;
 
       try {
         console.log('🗺️ [GOOGLE MAPS] Iniciando carga...');
+        
+        // Crear un div específico para el mapa que será gestionado por Google Maps
+        const mapDiv = document.createElement('div');
+        mapDiv.style.width = '100%';
+        mapDiv.style.height = height;
+        mapDiv.style.borderRadius = '8px';
+        
+        // Limpiar el contenedor y agregar el nuevo div
+        if (containerRef.current) {
+          containerRef.current.innerHTML = '';
+          containerRef.current.appendChild(mapDiv);
+          mapRef.current = mapDiv;
+        }
+        
         await googleMapsService.loadGoogleMaps();
 
-        if (!isMountedRef.current) return; // Verificar si aún está montado
+        if (!isMountedRef.current || !mapRef.current) return;
         
         if (!googleMapsService.isGoogleMapsLoaded()) {
           console.error('🗺️ [GOOGLE MAPS ERROR] No pudo cargarse');
@@ -149,38 +176,48 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
         console.log('🗺️ [GOOGLE MAPS] API cargada, creando mapa...');
 
-        // Verificar nuevamente si el componente sigue montado
-        if (!mapRef.current || !isMountedRef.current) return;
-
-        // Crear el mapa usando el servicio (sin acceso directo a google.maps)
+        // Crear el mapa usando el servicio
         const map = await googleMapsService.createMap(mapRef.current, {
           center: position ? { lat: position[0], lng: position[1] } : { lat: 20.676667, lng: -103.347222 },
           zoom: 16
         });
 
-        if (!isMountedRef.current) return; // Verificar una vez más
+        if (!isMountedRef.current) return;
 
         setMapInstance(map);
 
         // Agregar listener para clicks
-        map.addListener('click', (event: google.maps.MapMouseEvent) => {
+        const clickListener = map.addListener('click', (event: google.maps.MapMouseEvent) => {
           if (!isMountedRef.current) return;
           const lat = event.latLng?.lat() || 0;
           const lng = event.latLng?.lng() || 0;
           onLocationSelect(lat, lng);
         });
 
+        // Configurar función de limpieza
+        cleanupRef.current = () => {
+          try {
+            if (clickListener) {
+              clickListener.remove();
+            }
+          } catch (e) {
+            console.log('🗺️ [CLEANUP] Error limpiando listeners:', e);
+          }
+        };
+
         console.log('🗺️ [GOOGLE MAPS] Mapa creado exitosamente');
         setMapLoaded(true);
         setMapError(null);
       } catch (error) {
         console.error('🗺️ [GOOGLE MAPS ERROR] Error inicializando:', error);
-        setMapError(error instanceof Error ? error.message : 'Error desconocido');
+        if (isMountedRef.current) {
+          setMapError(error instanceof Error ? error.message : 'Error desconocido');
+        }
       }
     };
 
     initMap();
-  }, []);
+  }, [height]);
 
   // Actualizar posición del marcador
   React.useEffect(() => {
@@ -217,22 +254,19 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
   return (
     <div 
-      ref={mapRef} 
-      style={{ height, width: '100%', borderRadius: '8px' }}
-      className="border"
+      ref={containerRef} 
+      style={{ width: '100%', height, borderRadius: '8px' }}
+      className="bg-gray-100 flex items-center justify-center overflow-hidden"
     >
       {mapError && (
-        <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4">
-          <p className="text-center text-red-500 mb-2">Error al cargar Google Maps</p>
-          <p className="text-sm text-center">{mapError}</p>
-          <p className="text-xs text-center mt-2">
-            Por favor, configura GOOGLE_MAPS_API_KEY en las variables de entorno
-          </p>
+        <div className="text-red-500 text-center p-4">
+          <p>Error cargando el mapa: {mapError}</p>
         </div>
       )}
       {!mapLoaded && !mapError && (
-        <div className="flex items-center justify-center h-full text-muted-foreground">
-          Cargando Google Maps...
+        <div className="flex items-center space-x-2 text-gray-500">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-500"></div>
+          <span>Cargando mapa...</span>
         </div>
       )}
     </div>
