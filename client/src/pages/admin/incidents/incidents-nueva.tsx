@@ -107,41 +107,132 @@ export default function IncidentsNueva() {
   // Función para descargar plantilla CSV
   const downloadTemplate = () => {
     const headers = [
-      // CAMPOS REQUERIDOS
+      // === INFORMACIÓN DE LA INCIDENCIA ===
       'titulo',
-      'descripcion', 
+      'descripcion_detallada',
+      'incidencia_id',
+      'fecha_reporte',
+      'fecha_ocurrencia',
+      'tipo_afectacion',
+      'nivel_riesgo',
+      'ubicacion_gps',
       'parque_id',
-      'categoria',
-      'estado',
+      'activo_id',
       
-      // CAMPOS OPCIONALES
+      // === SEGUIMIENTO OPERATIVO ===
+      'departamento_responsable',
+      'responsable_asignado',
+      'fecha_asignacion',
+      'fecha_inicio_atencion',
+      'fecha_resolucion',
+      'acciones_realizadas',
+      'materiales_utilizados',
+      'costo_estimado',
+      'costo_real',
+      'fuente_financiamiento',
+      
+      // === CONTROL Y CALIDAD ===
+      'estatus_validacion',
+      'supervisor_validador',
+      'comentarios_supervision',
+      'satisfaccion_usuario',
+      'seguimiento_post_resolucion',
+      'frecuencia_incidente',
+      
+      // === DIMENSIÓN COMUNITARIA Y AMBIENTAL ===
+      'afectacion_usuarios',
+      'numero_personas_afectadas',
+      'afectacion_medioambiental',
+      'participacion_voluntarios',
+      'numero_voluntarios',
+      'grupo_voluntarios',
+      'reporte_comunidad',
+      
+      // === CAMPOS EXISTENTES ===
       'prioridad',
-      'ubicacion',
-      'reportero_nombre',
-      'reportero_email',
-      'reportero_telefono'
+      'categoria_id',
+      'activo_relacionado',
+      'ubicacion_descriptiva',
+      'reportado_por',
+      'informacion_contacto'
     ];
     
-    // Agregar una fila de ejemplo
+    // Agregar una fila de ejemplo con todos los campos
     const exampleRow = [
-      'Ejemplo: Bancas dañadas',
-      'Descripción detallada del problema encontrado',
+      // === INFORMACIÓN DE LA INCIDENCIA ===
+      'Ejemplo: Bancas dañadas en área infantil',
+      'Descripción detallada del problema encontrado, incluyendo estado actual y necesidades de reparación',
+      'INC-2025-001',
+      '2025-09-10',
+      '2025-09-09',
+      'infraestructura',
+      'medio',
+      '20.676667, -103.347222',
       '1',
-      'Daños',
-      'pending',
-      'normal',
-      'Área de juegos infantiles',
+      '1',
+      
+      // === SEGUIMIENTO OPERATIVO ===
+      'Mantenimiento',
       'Juan Pérez',
-      'juan@email.com',
-      '555-0123'
+      '2025-09-10',
+      '2025-09-11',
+      '2025-09-12',
+      'Reparación de estructura y pintura',
+      'Soldadura, pintura, tornillos',
+      '1500.00',
+      '1350.00',
+      'Presupuesto municipal',
+      
+      // === CONTROL Y CALIDAD ===
+      'pendiente',
+      'María González',
+      'Revisión inicial completada',
+      '4',
+      'no',
+      'primera_vez',
+      
+      // === DIMENSIÓN COMUNITARIA Y AMBIENTAL ===
+      'si',
+      '15',
+      'ninguna',
+      'no',
+      '0',
+      '',
+      'Reportado por vecinos del área',
+      
+      // === CAMPOS EXISTENTES ===
+      'medium',
+      '1',
+      '1',
+      'Área de juegos infantiles, sector norte',
+      'Juan Pérez',
+      'juan@email.com - 555-0123'
     ];
     
-    const csvContent = headers.join(',') + '\n' + exampleRow.join(',') + '\n';
+    // Agregar filas de información sobre valores válidos
+    const infoRows = [
+      '',
+      '# INFORMACIÓN SOBRE VALORES VÁLIDOS:',
+      '# tipo_afectacion: seguridad, ambiental, infraestructura, servicio, usuario, otro',
+      '# nivel_riesgo: bajo, medio, alto, critico',
+      '# prioridad: low, medium, high, critical',
+      '# estatus_validacion: pendiente, validado, rechazado',
+      '# afectacion_usuarios: si, no',
+      '# participacion_voluntarios: si, no',
+      '# frecuencia_incidente: primera_vez, recurrente, frecuente',
+      '# satisfaccion_usuario: 1-5 (número)',
+      '# seguimiento_post_resolucion: si, no',
+      '# Fechas: formato YYYY-MM-DD',
+      '# Números: usar punto decimal (ej: 1500.50)',
+      '# Coordenadas GPS: formato "latitud, longitud" (ej: 20.676667, -103.347222)'
+    ];
+    
+    const csvContent = headers.join(',') + '\n' + exampleRow.join(',') + '\n' + infoRows.join('\n') + '\n';
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', 'plantilla_incidencias.csv');
+    link.setAttribute('download', 'plantilla_incidencias_completa.csv');
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();

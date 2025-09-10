@@ -264,7 +264,8 @@ const NewIncidentPage = () => {
 
   // Filtros defensivos para datos con valores válidos
   const safeCategories = React.useMemo(() => {
-    const categoriesToUse = categories.length > 0 ? categories : sampleCategories;
+    const categoriesArray = Array.isArray(categories) ? categories : [];
+    const categoriesToUse = categoriesArray.length > 0 ? categoriesArray : sampleCategories;
     return categoriesToUse.filter((category: any) => 
       category && 
       category.id && 
