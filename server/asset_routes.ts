@@ -292,7 +292,35 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
       
       console.log(`Intentando obtener activo con ID: ${id}`);
       
-      const [asset] = await db.select().from(assets).where(eq(assets.id, id));
+      const [asset] = await db.select({
+        id: assets.id,
+        name: assets.name,
+        description: assets.description,
+        serialNumber: assets.serialNumber,
+        categoryId: assets.categoryId,
+        subcategoryId: assets.subcategoryId,
+        parkId: assets.parkId,
+        amenityId: assets.amenityId,
+        status: assets.status,
+        condition: assets.condition,
+        locationDescription: assets.locationDescription,
+        acquisitionDate: assets.acquisitionDate,
+        acquisitionCost: assets.acquisitionCost,
+        currentValue: assets.currentValue,
+        notes: assets.notes,
+        latitude: assets.latitude,
+        longitude: assets.longitude,
+        manufacturer: assets.manufacturer,
+        model: assets.model,
+        maintenanceFrequency: assets.maintenanceFrequency,
+        lastMaintenanceDate: assets.lastMaintenanceDate,
+        nextMaintenanceDate: assets.nextMaintenanceDate,
+        expectedLifespan: assets.expectedLifespan,
+        qrCode: assets.qrCode,
+        responsiblePersonId: assets.responsiblePersonId,
+        createdAt: assets.createdAt,
+        updatedAt: assets.updatedAt
+      }).from(assets).where(eq(assets.id, id));
       
       if (!asset) {
         console.log(`No se encontró ningún activo con ID: ${id}`);

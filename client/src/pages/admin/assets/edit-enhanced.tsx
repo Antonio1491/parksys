@@ -1259,5 +1259,5 @@ export default function EditAssetPage() {
       </div>
     </AdminLayout>
   );
-};
+}
 
