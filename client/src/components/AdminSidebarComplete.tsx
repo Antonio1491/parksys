@@ -683,13 +683,6 @@ const AdminSidebarComplete: React.FC = () => {
               isActive={isSubmenuActive('eventos')}
             >
               <NavItem 
-                href="/admin/events/new" 
-                icon={<Plus className="h-4 w-4" />}
-                active={location.startsWith('/admin/events/new')}
-              >
-                Nuevo Evento
-              </NavItem>
-              <NavItem 
                 href="/admin/events/list" 
                 icon={<List className="h-4 w-4" />}
                 active={location.startsWith('/admin/events/list')}
