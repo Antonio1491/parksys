@@ -88,9 +88,22 @@ class GoogleMapsService {
       script.defer = true;
 
       script.onload = () => {
-        this.isLoaded = true;
-        this.isLoading = false;
-        resolve();
+        // Verificar que la API esté completamente disponible antes de marcar como cargada
+        const checkReady = () => {
+          if (typeof window.google !== 'undefined' && 
+              window.google.maps && 
+              typeof window.google.maps.Map === 'function') {
+            console.log('✅ [GOOGLE MAPS] API completamente cargada y verificada');
+            this.isLoaded = true;
+            this.isLoading = false;
+            resolve();
+          } else {
+            console.log('⏳ [GOOGLE MAPS] Esperando que la API termine de cargar...');
+            setTimeout(checkReady, 100);
+          }
+        };
+        
+        checkReady();
       };
 
       script.onerror = (error) => {
@@ -108,7 +121,20 @@ class GoogleMapsService {
    * Verifica si Google Maps está disponible
    */
   isGoogleMapsLoaded(): boolean {
-    return this.isLoaded && typeof window.google !== 'undefined' && !!window.google.maps;
+    const hasGoogle = typeof window.google !== 'undefined';
+    const hasMaps = hasGoogle && !!window.google.maps;
+    const hasMap = hasMaps && typeof window.google.maps.Map === 'function';
+    const hasMarker = hasMaps && typeof window.google.maps.Marker === 'function';
+    
+    console.log('🗺️ [GOOGLE MAPS DEBUG] Verificando disponibilidad:', {
+      isLoaded: this.isLoaded,
+      hasGoogle,
+      hasMaps,
+      hasMap,
+      hasMarker
+    });
+    
+    return this.isLoaded && hasGoogle && hasMaps && hasMap && hasMarker;
   }
 
   /**
@@ -131,7 +157,13 @@ class GoogleMapsService {
       throw new Error('Google Maps no está disponible');
     }
 
-    return new google.maps.Map(container, {
+    // Usar referencia directa para evitar problemas de timing
+    const GoogleMap = window.google.maps.Map;
+    if (typeof GoogleMap !== 'function') {
+      throw new Error('Google Maps Map constructor no está disponible');
+    }
+
+    return new GoogleMap(container, {
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: true,
