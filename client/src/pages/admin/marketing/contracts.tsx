@@ -94,13 +94,7 @@ export default function ContractsPage() {
   // Fetch contracts
   const { data: contracts = [], isLoading, error } = useQuery({
     queryKey: ['/api/sponsorship-contracts'],
-    queryFn: () => {
-      console.log('🔍 [DEBUG] Fetching contracts...');
-      return apiRequest('/api/sponsorship-contracts').then(res => {
-        console.log('🔍 [DEBUG] Contracts response:', res);
-        return res.data || res || [];
-      });
-    }
+    queryFn: () => apiRequest('/api/sponsorship-contracts').then(res => res.data || res || [])
   });
 
   // Fetch packages
@@ -537,20 +531,6 @@ export default function ContractsPage() {
             <CardContent className="p-12 text-center">
               <div className="text-red-500">
                 Error: {error.message || 'Error al cargar contratos'}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {!isLoading && !error && (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <div className="text-gray-500">
-                Debug: contracts.length = {contracts?.length || 0}
-                <br />
-                filteredContracts.length = {filteredContracts?.length || 0}
-                <br />
-                Raw contracts: {JSON.stringify(contracts, null, 2)}
               </div>
             </CardContent>
           </Card>
