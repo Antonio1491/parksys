@@ -97,6 +97,7 @@ import {
   Upload,
   Bird,
   PackagePlus,
+  Trees,
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -531,7 +532,7 @@ const AdminSidebarComplete: React.FC = () => {
             <CollapsibleSubmenu
               id="parques"
               title={t('navigation.parks')}
-              icon={<Map className="h-4 w-4" />}
+              icon={<Trees className="h-4 w-4" />}
               href="/admin/parks"
               collapsible={false}
               isExpanded={false}
