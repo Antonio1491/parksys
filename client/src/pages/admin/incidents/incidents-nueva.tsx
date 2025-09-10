@@ -107,41 +107,36 @@ export default function IncidentsNueva() {
   // Función para descargar plantilla CSV
   const downloadTemplate = () => {
     const headers = [
-      // INFORMACIÓN DE LA INCIDENCIA
+      // CAMPOS REQUERIDOS
       'titulo',
       'descripcion', 
-      'tipoAfectacion',
-      'nivelRiesgo',
-      'ubicacionGps',
-      'parqueId',
-      'activoId',
-      'fechaOcurrencia',
-      'reporterName',
-      'reporterEmail',
+      'parque_id',
+      'categoria',
+      'estado',
       
-      // SEGUIMIENTO OPERATIVO
-      'departamentoResponsable',
-      'responsableAsignado',
-      'accionesRealizadas',
-      'materialesUtilizados',
-      'costoEstimado',
-      'fuenteFinanciamiento',
-      
-      // CONTROL Y CALIDAD
-      'estatusValidacion',
-      'supervisorValidador',
-      'comentariosSupervision',
-      'satisfaccionUsuario',
-      'frecuenciaIncidente',
-      
-      // DIMENSIÓN COMUNITARIA Y AMBIENTAL
-      'numeroPersonasAfectadas',
-      'afectacionMedioambiental',
-      'numeroVoluntarios',
-      'grupoVoluntarios'
+      // CAMPOS OPCIONALES
+      'prioridad',
+      'ubicacion',
+      'reportero_nombre',
+      'reportero_email',
+      'reportero_telefono'
     ];
     
-    const csvContent = headers.join(',') + '\n';
+    // Agregar una fila de ejemplo
+    const exampleRow = [
+      'Ejemplo: Bancas dañadas',
+      'Descripción detallada del problema encontrado',
+      '1',
+      'Daños',
+      'pending',
+      'normal',
+      'Área de juegos infantiles',
+      'Juan Pérez',
+      'juan@email.com',
+      '555-0123'
+    ];
+    
+    const csvContent = headers.join(',') + '\n' + exampleRow.join(',') + '\n';
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -159,101 +154,50 @@ export default function IncidentsNueva() {
   };
 
   // Función para manejar importación CSV
-  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportCSV = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const text = e.target?.result as string;
-        const lines = text.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim());
-        
-        const incidents = [];
-        for (let i = 1; i < lines.length; i++) {
-          if (lines[i].trim() === '') continue;
-          
-          const values = lines[i].split(',').map(v => v.trim());
-          const incident: any = {};
-          
-          headers.forEach((header, index) => {
-            const value = values[index] || '';
-            incident[header] = value;
-          });
-          
-          // Validaciones básicas
-          if (incident.titulo && incident.descripcion) {
-            incidents.push({
-              title: incident.titulo,
-              description: incident.descripcion,
-              park_id: incident.parqueId ? parseInt(incident.parqueId) : null,
-              asset_id: incident.activoId ? parseInt(incident.activoId) : null,
-              status: 'pending',
-              severity: incident.nivelRiesgo || 'media',
-              category: incident.tipoAfectacion || 'General',
-              location: incident.ubicacionGps || '',
-              reporter_name: incident.reporterName || 'Importación CSV',
-              reporter_email: incident.reporterEmail || '',
-              // Campos adicionales como JSON
-              metadata: {
-                departamentoResponsable: incident.departamentoResponsable,
-                responsableAsignado: incident.responsableAsignado,
-                accionesRealizadas: incident.accionesRealizadas,
-                materialesUtilizados: incident.materialesUtilizados,
-                costoEstimado: incident.costoEstimado,
-                fuenteFinanciamiento: incident.fuenteFinanciamiento,
-                estatusValidacion: incident.estatusValidacion,
-                supervisorValidador: incident.supervisorValidador,
-                comentariosSupervision: incident.comentariosSupervision,
-                satisfaccionUsuario: incident.satisfaccionUsuario,
-                frecuenciaIncidente: incident.frecuenciaIncidente,
-                numeroPersonasAfectadas: incident.numeroPersonasAfectadas,
-                afectacionMedioambiental: incident.afectacionMedioambiental,
-                numeroVoluntarios: incident.numeroVoluntarios,
-                grupoVoluntarios: incident.grupoVoluntarios
-              }
-            });
-          }
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/incidents/import', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
         }
-        
-        if (incidents.length === 0) {
-          toast({
-            title: "Error",
-            description: "No se encontraron incidencias válidas en el archivo.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        // Enviar incidencias al backend
-        for (const incident of incidents) {
-          await apiRequest('/api/incidents', {
-            method: 'POST',
-            body: JSON.stringify(incident),
-            headers: { 'Content-Type': 'application/json' }
-          });
-        }
-        
-        toast({
-          title: "Importación exitosa",
-          description: `Se importaron ${incidents.length} incidencias correctamente.`,
-        });
-        
-        // Recargar datos
-        window.location.reload();
-        
-      } catch (error) {
-        console.error('Error importing CSV:', error);
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
         toast({
           title: "Error de importación",
-          description: "Hubo un error al procesar el archivo CSV.",
+          description: result.error || "Error al procesar el archivo",
           variant: "destructive",
         });
+        return;
       }
-    };
+      
+      toast({
+        title: "Importación exitosa",
+        description: `Se importaron ${result.importedCount} incidencias correctamente.`,
+      });
+      
+      // Recargar datos
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error importing CSV:', error);
+      toast({
+        title: "Error de importación",
+        description: "Hubo un error al procesar el archivo CSV.",
+        variant: "destructive",
+      });
+    }
     
-    reader.readAsText(file);
     event.target.value = ''; // Reset input
   };
 
