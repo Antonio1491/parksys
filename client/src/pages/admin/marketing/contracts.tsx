@@ -114,7 +114,7 @@ export default function ContractsPage() {
   // Fetch sponsors
   const { data: sponsors = [] } = useQuery({
     queryKey: ['/api/sponsors'],
-    queryFn: () => apiRequest('/api/sponsors').then(res => res.data || [])
+    queryFn: () => apiRequest('/api/sponsors').then(res => res || [])
   });
 
   // Create contract mutation
