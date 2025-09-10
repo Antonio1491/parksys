@@ -108,139 +108,111 @@ interface GoogleMapComponentProps {
 }
 
 function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: GoogleMapComponentProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const mapRef = React.useRef<HTMLDivElement | null>(null);
   const [mapLoaded, setMapLoaded] = React.useState(false);
   const [mapError, setMapError] = React.useState<string | null>(null);
-  const [mapInstance, setMapInstance] = React.useState<google.maps.Map | null>(null);
-  const [marker, setMarker] = React.useState<google.maps.Marker | null>(null);
-  const isMountedRef = React.useRef(true);
-  const initializingRef = React.useRef(false);
-  const cleanupRef = React.useRef<(() => void) | null>(null);
+  const mapContainerRef = React.useRef<HTMLDivElement>(null);
+  const mapInstanceRef = React.useRef<google.maps.Map | null>(null);
+  const markerRef = React.useRef<google.maps.Marker | null>(null);
+  const mountedRef = React.useRef(true);
 
-  // Efecto de limpieza al desmontar
+  // Limpieza al desmontar
   React.useEffect(() => {
     return () => {
-      isMountedRef.current = false;
-      
-      // Ejecutar limpieza si existe
-      if (cleanupRef.current) {
-        cleanupRef.current();
-      }
-      
-      // Limpiar el marker
-      if (marker) {
-        try {
-          marker.setMap(null);
-        } catch (e) {
-          console.log('🗺️ [CLEANUP] Error limpiando marker:', e);
+      mountedRef.current = false;
+      try {
+        if (markerRef.current) {
+          markerRef.current.setMap(null);
         }
+      } catch (e) {
+        console.log('🗺️ [CLEANUP] Error limpiando marker:', e);
       }
-      
-      // Limpiar referencias sin tocar el DOM directamente
-      setMapInstance(null);
-      setMarker(null);
     };
   }, []);
 
+  // Inicializar mapa
   React.useEffect(() => {
     const initMap = async () => {
-      // Evitar inicializaciones múltiples
-      if (initializingRef.current || !containerRef.current || !isMountedRef.current) return;
-      
-      initializingRef.current = true;
+      if (!mapContainerRef.current || !mountedRef.current) return;
 
       try {
         console.log('🗺️ [GOOGLE MAPS] Iniciando carga...');
         
         await googleMapsService.loadGoogleMaps();
         
-        if (!isMountedRef.current) {
-          initializingRef.current = false;
-          return;
-        }
+        if (!mountedRef.current) return;
         
         if (!googleMapsService.isGoogleMapsLoaded()) {
           console.error('🗺️ [GOOGLE MAPS ERROR] No pudo cargarse');
-          if (isMountedRef.current) {
+          if (mountedRef.current) {
             setMapError('Error al cargar Google Maps API');
           }
-          initializingRef.current = false;
           return;
         }
 
         console.log('🗺️ [GOOGLE MAPS] API cargada, creando mapa...');
 
-        // Verificar que el contenedor todavía existe
-        if (!containerRef.current) {
-          initializingRef.current = false;
-          return;
-        }
-
-        // Crear el mapa directamente en el contenedor sin manipular innerHTML
-        const map = await googleMapsService.createMap(containerRef.current, {
+        // Crear el mapa
+        const map = await googleMapsService.createMap(mapContainerRef.current, {
           center: position ? { lat: position[0], lng: position[1] } : { lat: 20.676667, lng: -103.347222 },
           zoom: 16
         });
 
-        if (!isMountedRef.current) {
-          initializingRef.current = false;
-          return;
-        }
+        if (!mountedRef.current) return;
 
-        setMapInstance(map);
+        mapInstanceRef.current = map;
 
         // Agregar listener para clicks
         map.addListener('click', (event: google.maps.MapMouseEvent) => {
-          if (!isMountedRef.current) return;
+          if (!mountedRef.current) return;
           const lat = event.latLng?.lat() || 0;
           const lng = event.latLng?.lng() || 0;
           onLocationSelect(lat, lng);
         });
 
         console.log('🗺️ [GOOGLE MAPS] Mapa creado exitosamente');
-        setMapLoaded(true);
-        setMapError(null);
+        if (mountedRef.current) {
+          setMapLoaded(true);
+          setMapError(null);
+        }
       } catch (error) {
         console.error('🗺️ [GOOGLE MAPS ERROR] Error inicializando:', error);
-        if (isMountedRef.current) {
+        if (mountedRef.current) {
           setMapError(error instanceof Error ? error.message : 'Error desconocido');
         }
-      } finally {
-        initializingRef.current = false;
       }
     };
 
-    // Solo inicializar si no hay error y no está cargado
     if (!mapLoaded && !mapError) {
-      initMap();
+      // Pequeño delay para asegurar que el contenedor esté listo
+      const timeoutId = setTimeout(initMap, 50);
+      return () => clearTimeout(timeoutId);
     }
-  }, [height, mapLoaded, mapError, onLocationSelect]);
+  }, [mapLoaded, mapError, onLocationSelect]);
 
   // Actualizar posición del marcador
   React.useEffect(() => {
-    if (mapInstance && position && isMountedRef.current) {
+    if (mapInstanceRef.current && position && mountedRef.current) {
       const updateMarker = async () => {
         try {
           // Limpiar marcador anterior
-          if (marker) {
-            marker.setMap(null);
+          if (markerRef.current) {
+            markerRef.current.setMap(null);
           }
 
-          if (!isMountedRef.current) return;
+          if (!mountedRef.current) return;
 
-          // Crear nuevo marcador usando el servicio
-          const newMarker = await googleMapsService.createMarker(mapInstance, {
+          // Crear nuevo marcador
+          const newMarker = await googleMapsService.createMarker(mapInstanceRef.current!, {
             position: { lat: position[0], lng: position[1] },
             title: 'Ubicación del activo'
           });
 
-          if (!isMountedRef.current) return;
+          if (!mountedRef.current) return;
 
           // Centrar el mapa en la nueva posición
-          mapInstance.setCenter({ lat: position[0], lng: position[1] });
+          mapInstanceRef.current!.setCenter({ lat: position[0], lng: position[1] });
 
-          setMarker(newMarker);
+          markerRef.current = newMarker;
         } catch (error) {
           console.error('🗺️ [GOOGLE MAPS ERROR] Error actualizando marcador:', error);
         }
@@ -248,23 +220,27 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
       updateMarker();
     }
-  }, [mapInstance, position]);
+  }, [position]);
 
   return (
-    <div 
-      ref={containerRef} 
-      style={{ width: '100%', height, borderRadius: '8px' }}
-      className="bg-gray-100 flex items-center justify-center overflow-hidden"
-    >
+    <div style={{ width: '100%', height, borderRadius: '8px' }} className="border overflow-hidden relative">
+      <div 
+        ref={mapContainerRef}
+        style={{ width: '100%', height: '100%' }}
+      />
       {mapError && (
-        <div className="text-red-500 text-center p-4">
-          <p>Error cargando el mapa: {mapError}</p>
+        <div className="absolute inset-0 bg-white flex items-center justify-center">
+          <div className="text-red-500 text-center p-4">
+            <p>Error cargando el mapa: {mapError}</p>
+          </div>
         </div>
       )}
       {!mapLoaded && !mapError && (
-        <div className="flex items-center space-x-2 text-gray-500">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-500"></div>
-          <span>Cargando mapa...</span>
+        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+          <div className="flex items-center space-x-2 text-gray-500">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-500"></div>
+            <span>Cargando mapa...</span>
+          </div>
         </div>
       )}
     </div>
