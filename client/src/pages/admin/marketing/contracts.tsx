@@ -17,29 +17,21 @@ import { format } from 'date-fns';
 
 interface SponsorshipContract {
   id: number;
-  number: string; // clave alfanumérica para control
-  sponsorId: number;
+  number: string;
+  sponsor_id: number;
   type: 'paquete' | 'activo' | 'evento' | 'otro';
-  packageId?: number; // nullable, solo si type es "paquete"
-  amount: string; // aportación económica
-  startDate: string;
-  endDate: string;
+  package_id?: number;
+  amount: string;
+  start_date: string;
+  end_date: string;
   status: 'activo' | 'vencido' | 'en_negociacion' | 'en_revision';
-  notes?: string; // observaciones
-  createdAt: string;
-  updatedAt: string;
-  sponsor?: {
-    name: string;
-    sector: string;
-  };
-  package?: {
-    name: string;
-    category: string;
-    level: number;
-    price: string;
-    duration: number;
-    benefits: string[];
-  };
+  notes?: string;
+  sponsor_name?: string;
+  sponsor_logo?: string;
+  package_name?: string;
+  package_level?: number;
+  package_duration?: number;
+  package_benefits?: string[];
 }
 
 interface SponsorshipPackage {
@@ -178,8 +170,9 @@ export default function ContractsPage() {
   });
 
   const filteredContracts = contracts.filter((contract: SponsorshipContract) => {
-    const matchesSearch = contract.sponsor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         contract.package?.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = contract.sponsor_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contract.package_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contract.number?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !filterStatus || filterStatus === 'all' || contract.status === filterStatus;
     
     return matchesSearch && matchesStatus;
@@ -204,12 +197,12 @@ export default function ContractsPage() {
     setSelectedContract(contract);
     setFormData({
       number: contract.number || '',
-      sponsorId: contract.sponsorId?.toString() || '',
+      sponsorId: contract.sponsor_id?.toString() || '',
       type: contract.type || 'paquete',
-      packageId: contract.packageId?.toString() || '',
+      packageId: contract.package_id?.toString() || '',
       amount: contract.amount || '',
-      startDate: contract.startDate ? format(new Date(contract.startDate), 'yyyy-MM-dd') : '',
-      endDate: contract.endDate ? format(new Date(contract.endDate), 'yyyy-MM-dd') : '',
+      startDate: contract.start_date ? format(new Date(contract.start_date), 'yyyy-MM-dd') : '',
+      endDate: contract.end_date ? format(new Date(contract.end_date), 'yyyy-MM-dd') : '',
       status: contract.status || 'en_negociacion',
       notes: contract.notes || ''
     });
@@ -441,7 +434,7 @@ export default function ContractsPage() {
                   <div className="flex-1">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <FileText className="h-5 w-5" />
-                      {contract.number} - {contract.sponsor?.name}
+                      {contract.number} - {contract.sponsor_name || 'Sin patrocinador'}
                     </CardTitle>
                     <div className="flex gap-2 mt-2">
                       <Badge className={statusColors[contract.status as keyof typeof statusColors]}>
@@ -470,8 +463,8 @@ export default function ContractsPage() {
                       Vigencia
                     </h4>
                     <div className="space-y-1 text-sm">
-                      <div>Inicio: {format(new Date(contract.startDate), 'dd/MM/yyyy')}</div>
-                      <div>Fin: {format(new Date(contract.endDate), 'dd/MM/yyyy')}</div>
+                      <div>Inicio: {format(new Date(contract.start_date), 'dd/MM/yyyy')}</div>
+                      <div>Fin: {format(new Date(contract.end_date), 'dd/MM/yyyy')}</div>
                     </div>
                   </div>
                   
@@ -486,24 +479,25 @@ export default function ContractsPage() {
                     </div>
                   </div>
                   
-                  {contract.type === 'paquete' && contract.package && (
+                  {contract.type === 'paquete' && contract.package_name && (
                     <div>
                       <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
                         <Package className="h-4 w-4" />
                         Paquete
                       </h4>
                       <div className="space-y-1 text-sm">
-                        <div>Nivel: {contract.package?.level}</div>
-                        <div>Duración: {contract.package?.duration} meses</div>
-                        {contract.package?.benefits && contract.package.benefits.length > 0 && (
+                        <div>Nombre: {contract.package_name}</div>
+                        {contract.package_level && <div>Nivel: {contract.package_level}</div>}
+                        {contract.package_duration && <div>Duración: {contract.package_duration} meses</div>}
+                        {contract.package_benefits && contract.package_benefits.length > 0 && (
                           <div>
                             <div className="font-medium mt-2">Beneficios:</div>
                             <ul className="list-disc list-inside space-y-1">
-                              {contract.package.benefits.slice(0, 3).map((benefit, index) => (
+                              {contract.package_benefits.slice(0, 3).map((benefit, index) => (
                                 <li key={index} className="text-xs">{benefit}</li>
                               ))}
-                              {contract.package.benefits.length > 3 && (
-                                <li className="text-xs text-gray-500">+{contract.package.benefits.length - 3} más...</li>
+                              {contract.package_benefits.length > 3 && (
+                                <li className="text-xs text-gray-500">+{contract.package_benefits.length - 3} más...</li>
                               )}
                             </ul>
                           </div>
