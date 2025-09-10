@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Badge, Download, Upload, FileText, Blocks, Boxes } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Badge, Download, Upload, FileText, Blocks } from 'lucide-react';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -816,7 +816,7 @@ const AdminActivities = () => {
             <Button
               key="nuevo"
               onClick={() => setLocation('/admin/organizador/catalogo/crear')}
-              className="bg-[#00a587] hover:bg-[#067f5f] text-white"
+              className="bg-[#a0cc4d] hover:bg-[#067f5f] text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Nuevo
