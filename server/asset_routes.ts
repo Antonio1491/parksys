@@ -439,6 +439,98 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
     }
   });
 
+  // Bulk delete assets with cascading delete - DEBE IR ANTES QUE /:id
+  apiRouter.delete("/assets/bulk-delete", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { ids } = req.body;
+      
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "Se requiere un array de IDs válidos" });
+      }
+
+      // Validate all IDs are numbers
+      const assetIds = ids.map(id => parseInt(id)).filter(id => !isNaN(id));
+      
+      if (assetIds.length !== ids.length) {
+        return res.status(400).json({ message: "Todos los IDs deben ser números válidos" });
+      }
+
+      console.log(`Iniciando eliminación masiva de ${assetIds.length} activos: [${assetIds.join(', ')}]`);
+
+      // Check which assets exist
+      const existingAssets = await pool.query(
+        `SELECT id, name FROM assets WHERE id = ANY($1)`,
+        [assetIds]
+      );
+
+      if (existingAssets.rows.length === 0) {
+        return res.status(404).json({ message: "No se encontraron activos para eliminar" });
+      }
+
+      const foundIds = existingAssets.rows.map(asset => asset.id);
+      const notFoundIds = assetIds.filter(id => !foundIds.includes(id));
+
+      console.log(`Activos encontrados: ${foundIds.length}`);
+      console.log(`Activos no encontrados: ${notFoundIds.length}`);
+
+      let deletedCount = 0;
+      const errors = [];
+
+      // Use transaction for bulk cascading delete
+      await db.transaction(async (tx) => {
+        for (const assetId of foundIds) {
+          try {
+            console.log(`Eliminando activo ID: ${assetId}`);
+
+            // Delete related maintenance records first
+            const deletedMaintenances = await tx.delete(assetMaintenances).where(eq(assetMaintenances.assetId, assetId));
+            console.log(`Mantenimientos eliminados para activo ${assetId}: ${deletedMaintenances.rowCount || 0}`);
+            
+            // Delete from asset_history table if it exists
+            try {
+              await pool.query("DELETE FROM asset_history WHERE asset_id = $1", [assetId]);
+              console.log(`Historial eliminado para activo ${assetId}`);
+            } catch (historyError) {
+              console.log(`No hay registros de historial para activo ${assetId}`);
+            }
+
+            // Delete from asset_assignments table if it exists
+            try {
+              await pool.query("DELETE FROM asset_assignments WHERE asset_id = $1", [assetId]);
+              console.log(`Asignaciones eliminadas para activo ${assetId}`);
+            } catch (assignmentsError) {
+              console.log(`No hay asignaciones para activo ${assetId}`);
+            }
+            
+            // Delete the asset itself
+            const deletedAsset = await tx.delete(assets).where(eq(assets.id, assetId));
+            console.log(`Activo ${assetId} eliminado: ${deletedAsset.rowCount || 0} registros`);
+            
+            deletedCount++;
+          } catch (error) {
+            console.error(`Error eliminando activo ${assetId}:`, error);
+            errors.push({ assetId, error: error.message });
+          }
+        }
+      });
+
+      console.log(`Eliminación masiva completada: ${deletedCount} activos eliminados`);
+      
+      const response = {
+        message: `${deletedCount} activos eliminados correctamente`,
+        deletedCount,
+        totalRequested: assetIds.length,
+        notFound: notFoundIds.length > 0 ? notFoundIds : undefined,
+        errors: errors.length > 0 ? errors : undefined
+      };
+
+      res.json(response);
+    } catch (error) {
+      console.error("Error en eliminación masiva:", error);
+      res.status(500).json({ message: "Error en eliminación masiva", error: error.message });
+    }
+  });
+
   // Delete asset with cascading delete
   apiRouter.delete("/assets/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
@@ -490,99 +582,6 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
     } catch (error) {
       console.error("Error al eliminar activo:", error);
       res.status(500).json({ message: "Error al eliminar activo" });
-    }
-  });
-
-  // Bulk delete assets with cascading delete
-  apiRouter.delete("/assets/bulk-delete", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const { ids } = req.body;
-      
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: "Se requiere un array de IDs válidos" });
-      }
-
-      // Validate all IDs are numbers
-      const assetIds = ids.map(id => parseInt(id)).filter(id => !isNaN(id));
-      
-      if (assetIds.length !== ids.length) {
-        return res.status(400).json({ message: "Todos los IDs deben ser números válidos" });
-      }
-
-      console.log(`Iniciando eliminación masiva de ${assetIds.length} activos: [${assetIds.join(', ')}]`);
-
-      // Check which assets exist
-      const existingAssets = await pool.query(
-        `SELECT id, name FROM assets WHERE id = ANY($1)`,
-        [assetIds]
-      );
-
-      if (existingAssets.rows.length === 0) {
-        return res.status(404).json({ message: "No se encontraron activos para eliminar" });
-      }
-
-      const foundIds = existingAssets.rows.map(asset => asset.id);
-      const notFoundIds = assetIds.filter(id => !foundIds.includes(id));
-
-      console.log(`Activos encontrados: ${foundIds.length}`);
-      console.log(`Activos no encontrados: ${notFoundIds.length}`);
-
-      let deletedCount = 0;
-      const errors = [];
-
-      // Use transaction for bulk cascading delete
-      await db.transaction(async (tx) => {
-        for (const assetId of foundIds) {
-          try {
-            console.log(`Eliminando activo ID: ${assetId}`);
-
-            // Delete related maintenance records first
-            const deletedMaintenances = await tx.delete(assetMaintenances).where(eq(assetMaintenances.assetId, assetId));
-            console.log(`Mantenimientos eliminados para activo ${assetId}: ${deletedMaintenances.rowCount || 0}`);
-            
-            // Delete from asset_history table if it exists
-            try {
-              await pool.query("DELETE FROM asset_history WHERE asset_id = $1", [assetId]);
-            } catch (historyError) {
-              console.log(`No hay historial para activo ${assetId}`);
-            }
-
-            // Delete from asset_assignments table if it exists
-            try {
-              await pool.query("DELETE FROM asset_assignments WHERE asset_id = $1", [assetId]);
-            } catch (assignmentsError) {
-              console.log(`No hay asignaciones para activo ${assetId}`);
-            }
-            
-            // Delete the asset itself
-            const deletedAsset = await tx.delete(assets).where(eq(assets.id, assetId));
-            
-            if (deletedAsset.rowCount && deletedAsset.rowCount > 0) {
-              deletedCount++;
-              console.log(`Activo ${assetId} eliminado exitosamente`);
-            }
-
-          } catch (error) {
-            console.error(`Error eliminando activo ${assetId}:`, error);
-            errors.push(`Activo ID ${assetId}: ${error.message}`);
-          }
-        }
-      });
-
-      console.log(`Eliminación masiva completada: ${deletedCount} activos eliminados`);
-      
-      const response = {
-        message: `Se eliminaron ${deletedCount} activos correctamente`,
-        deletedCount,
-        errors: errors.length > 0 ? errors : undefined,
-        notFoundIds: notFoundIds.length > 0 ? notFoundIds : undefined
-      };
-
-      res.json(response);
-      
-    } catch (error) {
-      console.error("Error en eliminación masiva:", error);
-      res.status(500).json({ message: "Error al eliminar activos", details: error.message });
     }
   });
 
