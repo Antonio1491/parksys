@@ -56,7 +56,7 @@ interface SponsorshipPackage {
 interface Sponsor {
   id: number;
   name: string;
-  category: string;
+  sector: string; // Corregido para coincidir con la BD
 }
 
 const statusColors = {
@@ -285,7 +285,7 @@ export default function ContractsPage() {
                         <SelectContent>
                           {sponsors.map((sponsor: Sponsor) => (
                             <SelectItem key={sponsor.id} value={sponsor.id.toString()}>
-                              {sponsor.name} ({sponsor.category})
+                              {sponsor.name} ({sponsor.sector})
                             </SelectItem>
                           ))}
                         </SelectContent>
