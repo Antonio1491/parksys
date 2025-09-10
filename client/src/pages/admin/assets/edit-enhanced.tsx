@@ -115,6 +115,7 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
   const [mapInstance, setMapInstance] = React.useState<google.maps.Map | null>(null);
   const [marker, setMarker] = React.useState<google.maps.Marker | null>(null);
   const isMountedRef = React.useRef(true);
+  const initializingRef = React.useRef(false);
   const cleanupRef = React.useRef<(() => void) | null>(null);
 
   // Efecto de limpieza al desmontar
@@ -144,66 +145,58 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 
   React.useEffect(() => {
     const initMap = async () => {
-      if (!containerRef.current || !isMountedRef.current) return;
+      // Evitar inicializaciones múltiples
+      if (initializingRef.current || !containerRef.current || !isMountedRef.current) return;
+      
+      initializingRef.current = true;
 
       try {
         console.log('🗺️ [GOOGLE MAPS] Iniciando carga...');
         
-        // Crear un div específico para el mapa que será gestionado por Google Maps
-        const mapDiv = document.createElement('div');
-        mapDiv.style.width = '100%';
-        mapDiv.style.height = height;
-        mapDiv.style.borderRadius = '8px';
-        
-        // Limpiar el contenedor y agregar el nuevo div
-        if (containerRef.current) {
-          containerRef.current.innerHTML = '';
-          containerRef.current.appendChild(mapDiv);
-          mapRef.current = mapDiv;
-        }
-        
         await googleMapsService.loadGoogleMaps();
-
-        if (!isMountedRef.current || !mapRef.current) return;
+        
+        if (!isMountedRef.current) {
+          initializingRef.current = false;
+          return;
+        }
         
         if (!googleMapsService.isGoogleMapsLoaded()) {
           console.error('🗺️ [GOOGLE MAPS ERROR] No pudo cargarse');
           if (isMountedRef.current) {
             setMapError('Error al cargar Google Maps API');
           }
+          initializingRef.current = false;
           return;
         }
 
         console.log('🗺️ [GOOGLE MAPS] API cargada, creando mapa...');
 
-        // Crear el mapa usando el servicio
-        const map = await googleMapsService.createMap(mapRef.current, {
+        // Verificar que el contenedor todavía existe
+        if (!containerRef.current) {
+          initializingRef.current = false;
+          return;
+        }
+
+        // Crear el mapa directamente en el contenedor sin manipular innerHTML
+        const map = await googleMapsService.createMap(containerRef.current, {
           center: position ? { lat: position[0], lng: position[1] } : { lat: 20.676667, lng: -103.347222 },
           zoom: 16
         });
 
-        if (!isMountedRef.current) return;
+        if (!isMountedRef.current) {
+          initializingRef.current = false;
+          return;
+        }
 
         setMapInstance(map);
 
         // Agregar listener para clicks
-        const clickListener = map.addListener('click', (event: google.maps.MapMouseEvent) => {
+        map.addListener('click', (event: google.maps.MapMouseEvent) => {
           if (!isMountedRef.current) return;
           const lat = event.latLng?.lat() || 0;
           const lng = event.latLng?.lng() || 0;
           onLocationSelect(lat, lng);
         });
-
-        // Configurar función de limpieza
-        cleanupRef.current = () => {
-          try {
-            if (clickListener) {
-              clickListener.remove();
-            }
-          } catch (e) {
-            console.log('🗺️ [CLEANUP] Error limpiando listeners:', e);
-          }
-        };
 
         console.log('🗺️ [GOOGLE MAPS] Mapa creado exitosamente');
         setMapLoaded(true);
@@ -213,11 +206,16 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
         if (isMountedRef.current) {
           setMapError(error instanceof Error ? error.message : 'Error desconocido');
         }
+      } finally {
+        initializingRef.current = false;
       }
     };
 
-    initMap();
-  }, [height]);
+    // Solo inicializar si no hay error y no está cargado
+    if (!mapLoaded && !mapError) {
+      initMap();
+    }
+  }, [height, mapLoaded, mapError, onLocationSelect]);
 
   // Actualizar posición del marcador
   React.useEffect(() => {
