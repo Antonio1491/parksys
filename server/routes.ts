@@ -51,6 +51,7 @@ import { registerBudgetRoutes } from "./budget-routes";
 import { registerBudgetPlanningRoutes } from "./budget-planning-routes";
 import { registerFinanceUpdateRoutes } from "./finance-update-routes";
 import { registerAccountingRoutes } from "./accounting-routes";
+import { registerSponsorshipRoutes } from "./sponsorship-routes";
 import { 
   uploadParkFile, 
   handleMulterErrors, 
@@ -909,6 +910,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registramos las rutas del módulo de contabilidad
   registerAccountingRoutes(app, apiRouter, isAuthenticated);
   console.log('🧮 Rutas del módulo de contabilidad registradas correctamente');
+  
+  // Registramos las rutas del módulo de patrocinios
+  registerSponsorshipRoutes(app, apiRouter, isAuthenticated);
+  console.log('🏆 Rutas del módulo de patrocinios registradas correctamente');
   
   // Registramos las rutas del módulo de publicidad
   apiRouter.use('/advertising', advertisingRoutes);

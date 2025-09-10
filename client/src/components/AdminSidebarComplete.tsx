@@ -543,7 +543,7 @@ const AdminSidebarComplete: React.FC = () => {
             <CollapsibleSubmenu
               id="actividades"
               title="Actividades"
-              icon={<Calendar className="h-4 w-4" />}
+              icon={<Boxes className="h-4 w-4" />}
               isExpanded={expandedSubmenus.includes('actividades')}
               onToggle={toggleSubmenu}
               isActive={isSubmenuActive('actividades')}
