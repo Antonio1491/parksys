@@ -23,7 +23,8 @@ import {
   DollarSign,
   Activity,
   X,
-  Package
+  Package,
+  Eye
 } from 'lucide-react';
 
 import AdminLayout from '@/components/AdminLayout';
@@ -342,6 +343,10 @@ const InventoryPage: React.FC = () => {
   };
 
   const handleScheduleMaintenance = (id: number) => {
+    setLocation(`/admin/assets/${id}`);
+  };
+
+  const handleViewAsset = (id: number) => {
     setLocation(`/admin/assets/${id}`);
   };
 
@@ -1394,6 +1399,16 @@ const InventoryPage: React.FC = () => {
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex justify-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700"
+                              title="Ver detalles del activo"
+                              onClick={() => handleViewAsset(asset.id)}
+                              data-testid={`button-view-${asset.id}`}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"
