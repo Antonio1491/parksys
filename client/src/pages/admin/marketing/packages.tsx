@@ -269,12 +269,12 @@ const SponsorshipPackagesPage = () => {
   };
 
   // Función para remover beneficio del paquete
-  const handleRemoveBenefit = (benefitId: number) => {
+  const handleRemoveBenefit = (relationId: number) => {
     if (!editingPackage) return;
     if (confirm('¿Estás seguro de que quieres eliminar este beneficio del paquete?')) {
       removeBenefitMutation.mutate({
         packageId: editingPackage.id,
-        benefitId: benefitId
+        benefitId: relationId
       });
     }
   };
@@ -427,7 +427,7 @@ const SponsorshipPackagesPage = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleRemoveBenefit(benefit.benefitId)}
+                                  onClick={() => handleRemoveBenefit(benefit.id)}
                                   disabled={removeBenefitMutation.isPending}
                                   data-testid={`button-remove-benefit-${benefit.id}`}
                                 >
@@ -448,7 +448,7 @@ const SponsorshipPackagesPage = () => {
                               <div>
                                 <Label htmlFor="benefit-select">Beneficio*</Label>
                                 <Select 
-                                  value={benefitFormData.benefitId.toString()} 
+                                  value={benefitFormData.benefitId > 0 ? benefitFormData.benefitId.toString() : ""} 
                                   onValueChange={(value) => setBenefitFormData(prev => ({...prev, benefitId: parseInt(value)}))}
                                 >
                                   <SelectTrigger data-testid="select-benefit">
