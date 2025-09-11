@@ -24,22 +24,21 @@ interface SponsorshipBenefit {
   updatedAt: string;
 }
 
-const CATEGORIES = [
-  { value: "marketing", label: "Marketing", icon: "📢" },
-  { value: "visibilidad", label: "Visibilidad", icon: "👁️" },
-  { value: "branding", label: "Branding", icon: "🎨" },
-  { value: "networking", label: "Networking", icon: "🤝" },
-  { value: "digital", label: "Digital", icon: "💻" },
-  { value: "eventos", label: "Eventos", icon: "🎉" },
-  { value: "otros", label: "Otros", icon: "🔗" },
-  { value: "Visibilidad", label: "Visibilidad (Legacy)", icon: "👁️" },
-  { value: "Acceso", label: "Acceso", icon: "🔑" },
-  { value: "Otro", label: "Otro (Legacy)", icon: "🔗" }
-];
+interface Category {
+  value: string;
+  label: string;
+  icon: string;
+}
 
 const SponsorshipBenefitsPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Query para obtener las categorías dinámicamente
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
+    queryKey: ['/api/sponsorship-benefit-categories'],
+    staleTime: 5 * 60 * 1000, // 5 minutos de cache
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -189,7 +188,7 @@ const SponsorshipBenefitsPage = () => {
   });
 
   const getCategoryInfo = (category: string) => {
-    const categoryInfo = CATEGORIES.find(cat => cat.value === category);
+    const categoryInfo = categories.find(cat => cat.value === category);
     return categoryInfo || { value: category, label: category, icon: "🔗" };
   };
 
@@ -232,11 +231,15 @@ const SponsorshipBenefitsPage = () => {
                       <SelectValue placeholder="Selecciona una categoría" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.icon} {category.label}
-                        </SelectItem>
-                      ))}
+                      {categoriesLoading ? (
+                        <SelectItem value="loading" disabled>Cargando...</SelectItem>
+                      ) : (
+                        categories.map((category) => (
+                          <SelectItem key={category.value} value={category.value}>
+                            {category.icon} {category.label}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -302,11 +305,15 @@ const SponsorshipBenefitsPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas las categorías</SelectItem>
-              {CATEGORIES.map((category) => (
-                <SelectItem key={category.value} value={category.value}>
-                  {category.icon} {category.label}
-                </SelectItem>
-              ))}
+              {categoriesLoading ? (
+                <SelectItem value="loading" disabled>Cargando...</SelectItem>
+              ) : (
+                categories.map((category) => (
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.icon} {category.label}
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
 
@@ -454,11 +461,15 @@ const SponsorshipBenefitsPage = () => {
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.icon} {category.label}
-                    </SelectItem>
-                  ))}
+                  {categoriesLoading ? (
+                    <SelectItem value="loading" disabled>Cargando...</SelectItem>
+                  ) : (
+                    categories.map((category) => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.icon} {category.label}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

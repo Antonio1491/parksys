@@ -27,7 +27,7 @@ import {
   insertSponsorshipRenewalSchema,
   insertSponsorEventBenefitSchema
 } from '../shared/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 
 /**
  * Rutas para el sistema de patrocinios
@@ -134,6 +134,69 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
   });
   
   // ===== BENEFICIOS DE PATROCINIO =====
+  
+  // Obtener todas las categorías de beneficios disponibles
+  apiRouter.get('/sponsorship-benefit-categories', async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`SELECT unnest(enum_range(NULL::benefits_categories)) AS value ORDER BY value`);
+      const categories = result.rows.map((row: any) => {
+        const value = row.value;
+        let label = value;
+        let icon = "🔗";
+        
+        // Mapear a etiquetas e iconos apropiados
+        switch (value) {
+          case "marketing":
+            label = "Marketing";
+            icon = "📢";
+            break;
+          case "visibilidad":
+            label = "Visibilidad";
+            icon = "👁️";
+            break;
+          case "branding":
+            label = "Branding";
+            icon = "🎨";
+            break;
+          case "networking":
+            label = "Networking";
+            icon = "🤝";
+            break;
+          case "digital":
+            label = "Digital";
+            icon = "💻";
+            break;
+          case "eventos":
+            label = "Eventos";
+            icon = "🎉";
+            break;
+          case "otros":
+            label = "Otros";
+            icon = "🔗";
+            break;
+          case "Visibilidad":
+            label = "Visibilidad (Legacy)";
+            icon = "👁️";
+            break;
+          case "Acceso":
+            label = "Acceso";
+            icon = "🔑";
+            break;
+          case "Otro":
+            label = "Otro (Legacy)";
+            icon = "🔗";
+            break;
+        }
+        
+        return { value, label, icon };
+      });
+      
+      res.json(categories);
+    } catch (error) {
+      console.error('Error al obtener categorías de beneficios:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
   
   // Obtener todos los beneficios de patrocinio
   apiRouter.get('/sponsorship-benefits', async (req: Request, res: Response) => {
@@ -365,11 +428,11 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       
       console.log('✅ Patrocinador actualizado exitosamente');
       res.json(updatedSponsor);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error al actualizar patrocinador:', error);
-      if (error.name === 'ZodError') {
-        console.error('Detalles del error de validación:', error.errors);
-        return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
+      if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+        console.error('Detalles del error de validación:', (error as any).errors);
+        return res.status(400).json({ error: 'Datos inválidos', details: (error as any).errors });
       }
       res.status(500).json({ error: 'Error interno del servidor' });
     }
@@ -444,8 +507,8 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       // Si hay contratos, devolver directamente los datos básicos
       if (contractsResult.rows.length > 0) {
         // Obtener información básica de sponsors para los contratos
-        const sponsorIds = contractsResult.rows.map(contract => contract.sponsor_id).filter(id => id);
-        let sponsorNames = {};
+        const sponsorIds = contractsResult.rows.map((contract: any) => contract.sponsor_id).filter((id: number) => id);
+        let sponsorNames: { [key: number]: { name: string; logo: string | null } } = {};
         
         if (sponsorIds.length > 0) {
           const sponsorsResult = await pool.query(`
@@ -454,7 +517,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
             WHERE id = ANY($1)
           `, [sponsorIds]);
           
-          sponsorsResult.rows.forEach(sponsor => {
+          sponsorsResult.rows.forEach((sponsor: any) => {
             sponsorNames[sponsor.id] = {
               name: sponsor.name,
               logo: sponsor.logo_url
@@ -463,7 +526,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         }
         
         // Agregar información de sponsor a cada contrato
-        const contractsWithSponsors = contractsResult.rows.map(contract => ({
+        const contractsWithSponsors = contractsResult.rows.map((contract: any) => ({
           ...contract,
           sponsor_name: sponsorNames[contract.sponsor_id]?.name || 'Sin asignar',
           sponsor_logo: sponsorNames[contract.sponsor_id]?.logo || null
@@ -476,9 +539,9 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         console.log('⚠️ No hay contratos en la base de datos');
         res.json([]);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Error al obtener contratos:', error);
-      console.error('❌ Error details:', error.message);
+      console.error('❌ Error details:', (error as Error).message);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
@@ -1242,8 +1305,8 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         db.select().from(sponsorEvents).where(eq(sponsorEvents.sponsorId, parseInt(sponsorId)))
       ]);
       
-      // Calcular ROI
-      const totalInvestment = parseFloat(sponsor.contractValue || '0');
+      // Calcular ROI (usando un campo existente o 0 por defecto)
+      const totalInvestment = 0; // TODO: Implementar cálculo basado en contratos reales
       const totalLeads = metrics.reduce((sum, m) => sum + (m.leadsGenerated || 0), 0);
       const totalConversions = metrics.reduce((sum, m) => sum + (m.conversions || 0), 0);
       const totalImpressions = metrics.reduce((sum, m) => sum + (m.impressions || 0), 0);
