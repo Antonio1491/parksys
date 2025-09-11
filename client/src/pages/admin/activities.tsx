@@ -857,7 +857,7 @@ const AdminActivities = () => {
 
             <div className="md:col-span-2">
               <Select value={filterPark} onValueChange={setFilterPark}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filtrar por parque" />
                 </SelectTrigger>
                 <SelectContent>

@@ -3192,6 +3192,28 @@ export const sponsorshipPackages = pgTable("sponsorship_packages", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+// Tabla de beneficios disponibles para patrocinios
+export const sponsorshipBenefits = pgTable("sponsorship_benefits", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Tabla de relación entre paquetes y beneficios
+export const sponsorshipPackageBenefits = pgTable("sponsorship_package_benefits", {
+  id: serial("id").primaryKey(),
+  packageId: integer("package_id").notNull().references(() => sponsorshipPackages.id, { onDelete: 'cascade' }),
+  benefitId: integer("benefit_id").notNull().references(() => sponsorshipBenefits.id, { onDelete: 'cascade' }),
+  quantity: integer("quantity").default(1),
+  customValue: text("custom_value"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
 // Tabla de patrocinadores simplificada
 export const sponsors = pgTable("sponsors", {
   id: serial("id").primaryKey(), // Mantengo serial por compatibilidad
@@ -3237,6 +3259,18 @@ export const sponsorshipCampaigns = pgTable("sponsorship_campaigns", {
 
 // Schemas de validación para patrocinios
 export const insertSponsorshipPackageSchema = createInsertSchema(sponsorshipPackages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertSponsorshipBenefitSchema = createInsertSchema(sponsorshipBenefits).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertSponsorshipPackageBenefitSchema = createInsertSchema(sponsorshipPackageBenefits).omit({
   id: true,
   createdAt: true,
   updatedAt: true
@@ -3488,6 +3522,12 @@ export const insertSponsorEventBenefitSchema = createInsertSchema(sponsorEventBe
 // Tipos TypeScript para patrocinios
 export type SponsorshipPackage = typeof sponsorshipPackages.$inferSelect;
 export type InsertSponsorshipPackage = z.infer<typeof insertSponsorshipPackageSchema>;
+
+export type SponsorshipBenefit = typeof sponsorshipBenefits.$inferSelect;
+export type InsertSponsorshipBenefit = z.infer<typeof insertSponsorshipBenefitSchema>;
+
+export type SponsorshipPackageBenefit = typeof sponsorshipPackageBenefits.$inferSelect;
+export type InsertSponsorshipPackageBenefit = z.infer<typeof insertSponsorshipPackageBenefitSchema>;
 
 export type Sponsor = typeof sponsors.$inferSelect;
 export type InsertSponsor = z.infer<typeof insertSponsorSchema>;

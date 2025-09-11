@@ -3,6 +3,8 @@ import { db } from './db';
 import { pool } from './db';
 import { 
   sponsorshipPackages, 
+  sponsorshipBenefits,
+  sponsorshipPackageBenefits,
   sponsors, 
   sponsorshipCampaigns,
   sponsorshipContracts,
@@ -12,7 +14,9 @@ import {
   sponsorshipEvaluations,
   sponsorshipRenewals,
   sponsorEventBenefits,
-  insertSponsorshipPackageSchema, 
+  insertSponsorshipPackageSchema,
+  insertSponsorshipBenefitSchema,
+  insertSponsorshipPackageBenefitSchema,
   insertSponsorSchema, 
   insertSponsorshipCampaignSchema,
   insertSponsorshipContractSchema,
@@ -125,6 +129,108 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       res.json({ message: 'Paquete eliminado exitosamente' });
     } catch (error) {
       console.error('Error al eliminar paquete:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // ===== BENEFICIOS DE PATROCINIO =====
+  
+  // Obtener todos los beneficios de patrocinio
+  apiRouter.get('/sponsorship-benefits', async (req: Request, res: Response) => {
+    try {
+      const benefits = await db
+        .select()
+        .from(sponsorshipBenefits)
+        .orderBy(sponsorshipBenefits.id);
+      
+      res.json(benefits);
+    } catch (error) {
+      console.error('Error al obtener beneficios de patrocinio:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // Obtener un beneficio específico
+  apiRouter.get('/sponsorship-benefits/:id', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const benefitResult = await db
+        .select()
+        .from(sponsorshipBenefits)
+        .where(eq(sponsorshipBenefits.id, parseInt(id)))
+        .limit(1);
+      
+      if (benefitResult.length === 0) {
+        return res.status(404).json({ error: 'Beneficio no encontrado' });
+      }
+      
+      res.json(benefitResult[0]);
+    } catch (error) {
+      console.error('Error al obtener beneficio:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // Crear nuevo beneficio de patrocinio
+  apiRouter.post('/sponsorship-benefits', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertSponsorshipBenefitSchema.parse(req.body);
+      
+      const [newBenefit] = await db
+        .insert(sponsorshipBenefits)
+        .values(validatedData)
+        .returning();
+      
+      res.status(201).json(newBenefit);
+    } catch (error) {
+      console.error('Error al crear beneficio:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // Actualizar beneficio de patrocinio
+  apiRouter.put('/sponsorship-benefits/:id', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertSponsorshipBenefitSchema.parse(req.body);
+      
+      const [updatedBenefit] = await db
+        .update(sponsorshipBenefits)
+        .set({ 
+          ...validatedData, 
+          updatedAt: new Date() 
+        })
+        .where(eq(sponsorshipBenefits.id, parseInt(id)))
+        .returning();
+      
+      if (!updatedBenefit) {
+        return res.status(404).json({ error: 'Beneficio no encontrado' });
+      }
+      
+      res.json(updatedBenefit);
+    } catch (error) {
+      console.error('Error al actualizar beneficio:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // Eliminar beneficio de patrocinio
+  apiRouter.delete('/sponsorship-benefits/:id', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const [deletedBenefit] = await db
+        .delete(sponsorshipBenefits)
+        .where(eq(sponsorshipBenefits.id, parseInt(id)))
+        .returning();
+      
+      if (!deletedBenefit) {
+        return res.status(404).json({ error: 'Beneficio no encontrado' });
+      }
+      
+      res.json({ message: 'Beneficio eliminado exitosamente' });
+    } catch (error) {
+      console.error('Error al eliminar beneficio:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });

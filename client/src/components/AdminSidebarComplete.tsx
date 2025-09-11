@@ -1126,6 +1126,13 @@ const AdminSidebarComplete: React.FC = () => {
                 Paquetes
               </NavItem>
               <NavItem 
+                href="/admin/marketing/benefits" 
+                icon={<Gift className="h-4 w-4" />}
+                active={location.startsWith('/admin/marketing/benefits')}
+              >
+                Beneficios
+              </NavItem>
+              <NavItem 
                 href="/admin/marketing/events" 
                 icon={<Calendar className="h-4 w-4" />}
                 active={location.startsWith('/admin/marketing/events')}
