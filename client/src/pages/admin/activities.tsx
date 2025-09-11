@@ -838,15 +838,6 @@ const AdminActivities = () => {
             >
               <Download className="h-4 w-4 mr-2" />
               Exportar
-            </Button>,
-            <Button 
-              key="plantilla"
-              variant="outline"
-              onClick={handleDownloadTemplate}
-              className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Plantilla CSV
             </Button>
           ]}
         />
@@ -874,7 +865,6 @@ const AdminActivities = () => {
                   <List className="h-4 w-4" />
                 </Button>
               </div>
-              
             </div>
           </div>
         </Card>
