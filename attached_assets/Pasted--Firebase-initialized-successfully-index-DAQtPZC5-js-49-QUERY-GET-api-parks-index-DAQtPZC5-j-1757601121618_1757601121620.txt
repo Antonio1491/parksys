@@ -1,0 +1,27 @@
+🔥 Firebase initialized successfully
+index-DAQtPZC5.js:49 🌐 [QUERY] GET /api/parks
+index-DAQtPZC5.js:824 i18next::backendConnector: loaded namespace common for language es Object
+index-DAQtPZC5.js:824 i18next: languageChanged es
+index-DAQtPZC5.js:824 i18next: initialized Object
+index-DAQtPZC5.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-DAQtPZC5.js:868 ⚠️ No space mapping found for parks:footer
+spe @ index-DAQtPZC5.js:868Understand this warning
+1757273691692-cf0204a0-a2de-4ce1-a209-9876e45aca4d-Bosque Colomos 4.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757273223769-d4de8754-3e30-4459-a3de-387628e8e120-78770.webp:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757273791741-fb7c069b-5435-4a0b-9c71-ddb6e4259330-Parque_La_Plancha.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757273976054-f506fa8c-03b0-4c12-afe4-6db0c86a77d9-arborizarxn_y_construirxn_nuevo_camino_en_el_bot…:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757274077612-b29aac7d-b39f-46ea-b8ab-845bb1601c11-parque-bicentenario-cdmx-reapertura-oficial-hora…:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757274188634-23846fbe-873e-412e-8e42-11ea6d397465-arton22267-933x680.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757281248873-8886db8e-b86b-4ca3-8de6-a6fcc164cc95-chipinque.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757350787618-1bf9ea56-227d-4891-aaa9-1f9789501508-propone-dessire-angel-ajustar-reglamento-para-pr…:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757350447334-aee2fa14-e54c-4491-9d0f-b2abd26e74a6-Captura de pantalla 2025-09-05 094652.png:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757278684172-770cad71-d2e4-41be-87ed-402ffaeaea43-71627b_c8c1bce3fe91415f880203a2535307e4~mv2.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757278055332-eb9cd47c-a225-40d8-8779-2dd5aeb2bd7c-WhatsApp_Image_2025-06-02_at_4.35.21_PM_(1) (1).…:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757278315089-7f589809-83af-4945-987a-b44c7041e5e4-120238810_4103759992984031_8247658761315465946_o…:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757280490713-6cee9f87-9256-4e1b-baea-19737388330c-parque-metropolitano-leon-portada.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757279707467-0f7dcdab-f94e-447d-91d3-a9757bdc3fcd-08idp2vzgi291.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757280582009-e54c4858-9eeb-42d9-bdca-04b2f8654636-Rufino-Tamayo.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757280738988-ad6aede6-ae81-451c-a659-da8b3fe4a91b-parque-tangamanga-slp-1-1.jpg-3.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757278863599-52600c8d-87ab-437c-abc4-f93ae3356dce-RUF535TQYBEHFMA7A7KACG6QWM.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757279128969-b456bc8a-3631-4e25-a57e-3acb8e3514af-Parque-Las-Riberas.webp:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+1757352198894-4fcff714-d1b9-47ad-bf25-4f6a7cbf99ca-DJI_0349.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
