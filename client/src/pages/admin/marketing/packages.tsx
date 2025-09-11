@@ -4,10 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Trash2, PackagePlus, DollarSign, Calendar, Star } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, PackagePlus, DollarSign } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/queryClient';
@@ -37,14 +35,14 @@ const SponsorshipPackagesPage = () => {
     amount: ''
   });
 
-  const { data: packages = [], isLoading } = useQuery({
+  const { data: packages = [], isLoading } = useQuery<SponsorshipPackage[]>({
     queryKey: ['/api/sponsorship-packages'],
   });
 
   const createMutation = useMutation({
     mutationFn: (data: any) => apiRequest('/api/sponsorship-packages', {
       method: 'POST',
-      body: JSON.stringify(data),
+      data,
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-packages'] });
@@ -68,7 +66,7 @@ const SponsorshipPackagesPage = () => {
     mutationFn: ({ id, data }: { id: number; data: any }) => 
       apiRequest(`/api/sponsorship-packages/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(data),
+        data,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-packages'] });
@@ -111,22 +109,27 @@ const SponsorshipPackagesPage = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      category: '',
-      level: 1,
-      price: '',
-      duration: 12,
-      benefits: [''],
-      isActive: true
+      description: '',
+      amount: ''
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const amount = parseFloat(formData.amount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Error",
+        description: "La aportación debe ser un número válido mayor a 0.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const submitData = {
       ...formData,
-      benefits: formData.benefits.filter(benefit => benefit.trim() !== ''),
-      price: parseFloat(formData.price)
+      amount
     };
 
     if (editingPackage) {
@@ -140,40 +143,15 @@ const SponsorshipPackagesPage = () => {
     setEditingPackage(packageItem);
     setFormData({
       name: packageItem.name,
-      category: packageItem.category,
-      level: packageItem.level,
-      price: packageItem.price,
-      duration: packageItem.duration,
-      benefits: packageItem.benefits.length > 0 ? packageItem.benefits : [''],
-      isActive: packageItem.isActive
+      description: packageItem.description || '',
+      amount: String(packageItem.amount || '')
     });
   };
 
-  const addBenefit = () => {
-    setFormData(prev => ({
-      ...prev,
-      benefits: [...prev.benefits, '']
-    }));
-  };
 
-  const updateBenefit = (index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      benefits: prev.benefits.map((benefit, i) => i === index ? value : benefit)
-    }));
-  };
-
-  const removeBenefit = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      benefits: prev.benefits.filter((_, i) => i !== index)
-    }));
-  };
-
-  const filteredPackages = packages.filter((packageItem: SponsorshipPackage) => {
+  const filteredPackages = (packages as SponsorshipPackage[]).filter((packageItem: SponsorshipPackage) => {
     const matchesSearch = packageItem.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || packageItem.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   return (
@@ -212,11 +190,12 @@ const SponsorshipPackagesPage = () => {
               </DialogHeader>
               
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4">
                   <div>
                     <Label htmlFor="name">Nombre del Paquete*</Label>
                     <Input
                       id="name"
+                      data-testid="input-name"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
                       placeholder="Ej: Paquete Oro Premium"
@@ -225,103 +204,31 @@ const SponsorshipPackagesPage = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="category">Categoría*</Label>
-                    <Select 
-                      value={formData.category}
-                      onValueChange={(value) => setFormData(prev => ({...prev, category: value}))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccione una categoría" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(categoryLabels).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>
-                            {label} ({key})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="level">Nivel*</Label>
-                    <Input
-                      id="level"
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={formData.level}
-                      onChange={(e) => setFormData(prev => ({...prev, level: parseInt(e.target.value)}))}
-                      required
+                    <Label htmlFor="description">Descripción</Label>
+                    <Textarea
+                      id="description"
+                      data-testid="input-description"
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+                      placeholder="Describe el paquete de patrocinio..."
+                      rows={3}
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="price">Precio*</Label>
+                    <Label htmlFor="amount">Aportación*</Label>
                     <Input
-                      id="price"
+                      id="amount"
+                      data-testid="input-amount"
                       type="number"
                       step="0.01"
-                      value={formData.price}
-                      onChange={(e) => setFormData(prev => ({...prev, price: e.target.value}))}
+                      min="0"
+                      value={formData.amount}
+                      onChange={(e) => setFormData(prev => ({...prev, amount: e.target.value}))}
                       placeholder="0.00"
                       required
                     />
                   </div>
-                  
-                  <div>
-                    <Label htmlFor="duration">Duración (meses)*</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      min="1"
-                      value={formData.duration}
-                      onChange={(e) => setFormData(prev => ({...prev, duration: parseInt(e.target.value)}))}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="isActive"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData(prev => ({...prev, isActive: e.target.checked}))}
-                    />
-                    <Label htmlFor="isActive">Paquete Activo</Label>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label>Beneficios</Label>
-                  {formData.benefits.map((benefit, index) => (
-                    <div key={index} className="flex gap-2 mt-2">
-                      <Input
-                        value={benefit}
-                        onChange={(e) => updateBenefit(index, e.target.value)}
-                        placeholder="Describe un beneficio..."
-                      />
-                      {formData.benefits.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => removeBenefit(index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={addBenefit}
-                    className="mt-2"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Agregar Beneficio
-                  </Button>
                 </div>
                 
                 <div className="flex justify-end space-x-2 pt-4">
@@ -359,22 +266,10 @@ const SponsorshipPackagesPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
+              data-testid="input-search"
             />
           </div>
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filtrar por categoría" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas las categorías</SelectItem>
-            {Object.entries(categoryLabels).map(([key, label]) => (
-              <SelectItem key={key} value={key}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Lista de Paquetes */}
@@ -390,22 +285,13 @@ const SponsorshipPackagesPage = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">{packageItem.name}</CardTitle>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge 
-                        className={categoryColors[packageItem.category as keyof typeof categoryColors]}
-                      >
-                        {categoryLabels[packageItem.category as keyof typeof categoryLabels]}
-                      </Badge>
-                      <Badge variant={packageItem.isActive ? "default" : "secondary"}>
-                        {packageItem.isActive ? "Activo" : "Inactivo"}
-                      </Badge>
-                    </div>
                   </div>
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(packageItem)}
+                      data-testid={`button-edit-${packageItem.id}`}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -417,6 +303,7 @@ const SponsorshipPackagesPage = () => {
                           deleteMutation.mutate(packageItem.id);
                         }
                       }}
+                      data-testid={`button-delete-${packageItem.id}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -427,33 +314,19 @@ const SponsorshipPackagesPage = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-600" />
-                    <span className="font-semibold text-lg">${packageItem.price}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-blue-600" />
-                    <span>{packageItem.duration} meses</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-600" />
-                    <span>Nivel {packageItem.level}</span>
+                    <span className="font-semibold text-lg" data-testid={`text-amount-${packageItem.id}`}>
+                      ${new Intl.NumberFormat('es-MX', { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 2 
+                      }).format(Number(packageItem.amount))}
+                    </span>
                   </div>
                   
-                  {packageItem.benefits && packageItem.benefits.length > 0 && (
+                  {packageItem.description && (
                     <div>
-                      <h4 className="font-medium text-sm mb-2">Beneficios:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        {packageItem.benefits.slice(0, 3).map((benefit, index) => (
-                          <li key={index} className="flex items-start gap-1">
-                            <span className="text-green-500 mt-1">•</span>
-                            {benefit}
-                          </li>
-                        ))}
-                        {packageItem.benefits.length > 3 && (
-                          <li className="text-gray-400 italic">
-                            +{packageItem.benefits.length - 3} beneficios más...
-                          </li>
-                        )}
-                      </ul>
+                      <p className="text-sm text-gray-600" data-testid={`text-description-${packageItem.id}`}>
+                        {packageItem.description}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -468,7 +341,7 @@ const SponsorshipPackagesPage = () => {
           <PackagePlus className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-semibold text-gray-900">Sin paquetes</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || categoryFilter !== 'all' 
+            {searchTerm 
               ? 'No se encontraron paquetes con los filtros aplicados.'
               : 'Comienza creando tu primer paquete de patrocinio.'
             }
