@@ -581,7 +581,7 @@ const SponsorshipPackagesPage = () => {
                       <Card className="p-4 bg-gray-50">
                         <div className="space-y-3">
                           <h4 className="font-medium">Agregar Nuevo Beneficio</h4>
-                          <form onSubmit={handleAddBenefit} className="space-y-3">
+                          <div className="space-y-3">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div>
                                 <Label htmlFor="benefit-select">Beneficio*</Label>
@@ -633,7 +633,8 @@ const SponsorshipPackagesPage = () => {
                             </div>
                             <div className="flex justify-end">
                               <Button
-                                type="submit"
+                                type="button"
+                                onClick={(e) => handleAddBenefit(e)}
                                 disabled={!benefitFormData.benefitId || addBenefitMutation.isPending}
                                 className="flex items-center gap-2"
                                 data-testid="button-add-benefit"
@@ -642,7 +643,7 @@ const SponsorshipPackagesPage = () => {
                                 {addBenefitMutation.isPending ? 'Agregando...' : 'Agregar Beneficio'}
                               </Button>
                             </div>
-                          </form>
+                          </div>
                         </div>
                       </Card>
                     </div>
