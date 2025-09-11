@@ -120,8 +120,11 @@ const SponsorshipPackagesPage = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-packages'] });
-      setEditingPackage(null);
-      resetForm();
+      // Solo cerrar el modal si no está en modo de edición de beneficios
+      if (!showBenefitsSection) {
+        setEditingPackage(null);
+        resetForm();
+      }
       toast({
         title: "Paquete actualizado",
         description: "El paquete ha sido actualizado exitosamente.",
@@ -207,7 +210,10 @@ const SponsorshipPackagesPage = () => {
       description: '',
       amount: ''
     });
-    setShowBenefitsSection(false);
+    // Solo ocultar la sección de beneficios si no está editando
+    if (!editingPackage) {
+      setShowBenefitsSection(false);
+    }
     setBenefitFormData({ benefitId: 0, quantity: 1, customValue: '' });
   };
 
@@ -244,6 +250,7 @@ const SponsorshipPackagesPage = () => {
       amount: String(packageItem.amount || '')
     });
     setShowBenefitsSection(true); // Mostrar beneficios al editar
+    setShowCreateDialog(true); // Asegurar que el modal esté abierto
   };
 
   // Función para agregar beneficio al paquete
@@ -308,6 +315,7 @@ const SponsorshipPackagesPage = () => {
               if (!open) {
                 setShowCreateDialog(false);
                 setEditingPackage(null);
+                setShowBenefitsSection(false);
                 resetForm();
               }
             }}
@@ -419,7 +427,7 @@ const SponsorshipPackagesPage = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleRemoveBenefit(benefit.id)}
+                                  onClick={() => handleRemoveBenefit(benefit.benefitId)}
                                   disabled={removeBenefitMutation.isPending}
                                   data-testid={`button-remove-benefit-${benefit.id}`}
                                 >
@@ -510,14 +518,17 @@ const SponsorshipPackagesPage = () => {
                     onClick={() => {
                       setShowCreateDialog(false);
                       setEditingPackage(null);
+                      setShowBenefitsSection(false);
                       resetForm();
                     }}
+                    data-testid="button-cancel"
                   >
                     Cancelar
                   </Button>
                   <Button 
                     type="submit"
                     disabled={createMutation.isPending || updateMutation.isPending}
+                    data-testid="button-submit"
                   >
                     {editingPackage ? 'Actualizar' : 'Crear'} Paquete
                   </Button>
