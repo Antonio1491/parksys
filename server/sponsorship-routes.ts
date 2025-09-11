@@ -273,6 +273,106 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
+
+  // ===== BENEFICIOS DE PAQUETES =====
+  
+  // Obtener beneficios de un paquete específico
+  apiRouter.get('/sponsorship-packages/:id/benefits', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const packageBenefits = await db
+        .select({
+          id: sponsorshipPackageBenefits.id,
+          packageId: sponsorshipPackageBenefits.packageId,
+          benefitId: sponsorshipPackageBenefits.benefitId,
+          quantity: sponsorshipPackageBenefits.quantity,
+          customValue: sponsorshipPackageBenefits.customValue,
+          createdAt: sponsorshipPackageBenefits.createdAt,
+          updatedAt: sponsorshipPackageBenefits.updatedAt,
+          // Datos del beneficio
+          benefitName: sponsorshipBenefits.name,
+          benefitDescription: sponsorshipBenefits.description,
+          benefitCategory: sponsorshipBenefits.category
+        })
+        .from(sponsorshipPackageBenefits)
+        .innerJoin(sponsorshipBenefits, eq(sponsorshipPackageBenefits.benefitId, sponsorshipBenefits.id))
+        .where(eq(sponsorshipPackageBenefits.packageId, parseInt(id)));
+      
+      res.json(packageBenefits);
+    } catch (error) {
+      console.error('Error al obtener beneficios del paquete:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // Agregar beneficio a un paquete
+  apiRouter.post('/sponsorship-packages/:id/benefits', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertSponsorshipPackageBenefitSchema.parse({
+        ...req.body,
+        packageId: parseInt(id)
+      });
+      
+      const [newPackageBenefit] = await db
+        .insert(sponsorshipPackageBenefits)
+        .values(validatedData)
+        .returning();
+      
+      res.status(201).json(newPackageBenefit);
+    } catch (error) {
+      console.error('Error al agregar beneficio al paquete:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // Actualizar beneficio de un paquete
+  apiRouter.put('/sponsorship-packages/:id/benefits/:benefitId', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id, benefitId } = req.params;
+      
+      const [updatedBenefit] = await db
+        .update(sponsorshipPackageBenefits)
+        .set({
+          quantity: req.body.quantity,
+          customValue: req.body.customValue,
+          updatedAt: new Date()
+        })
+        .where(eq(sponsorshipPackageBenefits.id, parseInt(benefitId)))
+        .returning();
+      
+      if (!updatedBenefit) {
+        return res.status(404).json({ error: 'Beneficio del paquete no encontrado' });
+      }
+      
+      res.json(updatedBenefit);
+    } catch (error) {
+      console.error('Error al actualizar beneficio del paquete:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  
+  // Eliminar beneficio de un paquete
+  apiRouter.delete('/sponsorship-packages/:id/benefits/:benefitId', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id, benefitId } = req.params;
+      
+      const [deletedBenefit] = await db
+        .delete(sponsorshipPackageBenefits)
+        .where(eq(sponsorshipPackageBenefits.id, parseInt(benefitId)))
+        .returning();
+      
+      if (!deletedBenefit) {
+        return res.status(404).json({ error: 'Beneficio del paquete no encontrado' });
+      }
+      
+      res.json({ message: 'Beneficio eliminado exitosamente' });
+    } catch (error) {
+      console.error('Error al eliminar beneficio del paquete:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
   
   // ===== PATROCINADORES =====
   

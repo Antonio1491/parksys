@@ -5,9 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Trash2, PackagePlus, DollarSign } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, PackagePlus, DollarSign, Gift, X, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/AdminLayout';
 import PageHeader from '@/components/ui/page-header';
@@ -21,6 +24,34 @@ interface SponsorshipPackage {
   updatedAt: string;
 }
 
+interface SponsorshipBenefit {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface PackageBenefit {
+  id: number;
+  packageId: number;
+  benefitId: number;
+  quantity: number;
+  customValue: string;
+  benefitName: string;
+  benefitDescription: string;
+  benefitCategory: string;
+}
+
+// Para formulario de beneficios
+interface BenefitFormData {
+  benefitId: number;
+  quantity: number;
+  customValue: string;
+}
+
 
 const SponsorshipPackagesPage = () => {
   const { toast } = useToast();
@@ -28,6 +59,14 @@ const SponsorshipPackagesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingPackage, setEditingPackage] = useState<SponsorshipPackage | null>(null);
+
+  // Estados para gestión de beneficios
+  const [showBenefitsSection, setShowBenefitsSection] = useState(false);
+  const [benefitFormData, setBenefitFormData] = useState<BenefitFormData>({
+    benefitId: 0,
+    quantity: 1,
+    customValue: ''
+  });
 
   const [formData, setFormData] = useState({
     name: '',
@@ -37,6 +76,17 @@ const SponsorshipPackagesPage = () => {
 
   const { data: packages = [], isLoading } = useQuery<SponsorshipPackage[]>({
     queryKey: ['/api/sponsorship-packages'],
+  });
+
+  // Query para obtener todos los beneficios disponibles
+  const { data: availableBenefits = [] } = useQuery<SponsorshipBenefit[]>({
+    queryKey: ['/api/sponsorship-benefits'],
+  });
+
+  // Query para obtener beneficios del paquete cuando se edita
+  const { data: packageBenefits = [], refetch: refetchPackageBenefits } = useQuery<PackageBenefit[]>({
+    queryKey: ['/api/sponsorship-packages', editingPackage?.id, 'benefits'],
+    enabled: !!editingPackage?.id,
   });
 
   const createMutation = useMutation({
@@ -106,12 +156,59 @@ const SponsorshipPackagesPage = () => {
     },
   });
 
+  // Mutaciones para beneficios de paquetes
+  const addBenefitMutation = useMutation({
+    mutationFn: ({ packageId, data }: { packageId: number; data: any }) => 
+      apiRequest(`/api/sponsorship-packages/${packageId}/benefits`, {
+        method: 'POST',
+        data,
+      }),
+    onSuccess: () => {
+      refetchPackageBenefits();
+      setBenefitFormData({ benefitId: 0, quantity: 1, customValue: '' });
+      toast({
+        title: "Beneficio agregado",
+        description: "El beneficio ha sido agregado al paquete exitosamente.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo agregar el beneficio. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const removeBenefitMutation = useMutation({
+    mutationFn: ({ packageId, benefitId }: { packageId: number; benefitId: number }) => 
+      apiRequest(`/api/sponsorship-packages/${packageId}/benefits/${benefitId}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: () => {
+      refetchPackageBenefits();
+      toast({
+        title: "Beneficio eliminado",
+        description: "El beneficio ha sido eliminado del paquete exitosamente.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el beneficio. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const resetForm = () => {
     setFormData({
       name: '',
       description: '',
       amount: ''
     });
+    setShowBenefitsSection(false);
+    setBenefitFormData({ benefitId: 0, quantity: 1, customValue: '' });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -146,6 +243,49 @@ const SponsorshipPackagesPage = () => {
       description: packageItem.description || '',
       amount: String(packageItem.amount || '')
     });
+    setShowBenefitsSection(true); // Mostrar beneficios al editar
+  };
+
+  // Función para agregar beneficio al paquete
+  const handleAddBenefit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPackage || !benefitFormData.benefitId) return;
+
+    addBenefitMutation.mutate({
+      packageId: editingPackage.id,
+      data: {
+        benefitId: benefitFormData.benefitId,
+        quantity: benefitFormData.quantity,
+        customValue: benefitFormData.customValue
+      }
+    });
+  };
+
+  // Función para remover beneficio del paquete
+  const handleRemoveBenefit = (benefitId: number) => {
+    if (!editingPackage) return;
+    if (confirm('¿Estás seguro de que quieres eliminar este beneficio del paquete?')) {
+      removeBenefitMutation.mutate({
+        packageId: editingPackage.id,
+        benefitId: benefitId
+      });
+    }
+  };
+
+  // Función para obtener el icono de la categoría
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Visibilidad':
+        return <Star className="h-4 w-4" />;
+      case 'Acceso':
+        return <Gift className="h-4 w-4" />;
+      case 'Branding':
+        return <Edit className="h-4 w-4" />;
+      case 'Otro':
+        return <Plus className="h-4 w-4" />;
+      default:
+        return <Gift className="h-4 w-4" />;
+    }
   };
 
 
@@ -230,6 +370,138 @@ const SponsorshipPackagesPage = () => {
                     />
                   </div>
                 </div>
+
+                {/* Sección de Beneficios Incluidos - Solo visible al editar */}
+                {editingPackage && (
+                  <>
+                    <Separator />
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Gift className="h-5 w-5 text-blue-600" />
+                          <h3 className="text-lg font-semibold">Beneficios Incluidos</h3>
+                        </div>
+                        <Badge variant="outline">
+                          {packageBenefits.length} beneficio{packageBenefits.length !== 1 ? 's' : ''}
+                        </Badge>
+                      </div>
+
+                      {/* Lista de beneficios actuales */}
+                      {packageBenefits.length > 0 && (
+                        <div className="space-y-2">
+                          {packageBenefits.map((benefit) => (
+                            <Card key={benefit.id} className="p-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  {getCategoryIcon(benefit.benefitCategory)}
+                                  <div className="flex-1">
+                                    <div className="font-medium">{benefit.benefitName}</div>
+                                    <div className="text-sm text-gray-600">
+                                      {benefit.benefitDescription}
+                                    </div>
+                                    <div className="flex items-center gap-3 mt-1">
+                                      <Badge variant="secondary" className="text-xs">
+                                        {benefit.benefitCategory}
+                                      </Badge>
+                                      {benefit.quantity > 1 && (
+                                        <span className="text-xs text-gray-500">
+                                          Cantidad: {benefit.quantity}
+                                        </span>
+                                      )}
+                                      {benefit.customValue && (
+                                        <span className="text-xs text-gray-500">
+                                          Valor: {benefit.customValue}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleRemoveBenefit(benefit.id)}
+                                  disabled={removeBenefitMutation.isPending}
+                                  data-testid={`button-remove-benefit-${benefit.id}`}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Formulario para agregar nuevo beneficio */}
+                      <Card className="p-4 bg-gray-50">
+                        <div className="space-y-3">
+                          <h4 className="font-medium">Agregar Nuevo Beneficio</h4>
+                          <form onSubmit={handleAddBenefit} className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <Label htmlFor="benefit-select">Beneficio*</Label>
+                                <Select 
+                                  value={benefitFormData.benefitId.toString()} 
+                                  onValueChange={(value) => setBenefitFormData(prev => ({...prev, benefitId: parseInt(value)}))}
+                                >
+                                  <SelectTrigger data-testid="select-benefit">
+                                    <SelectValue placeholder="Selecciona un beneficio" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {availableBenefits
+                                      .filter(benefit => benefit.isActive)
+                                      .map((benefit) => (
+                                        <SelectItem key={benefit.id} value={benefit.id.toString()}>
+                                          <div className="flex items-center gap-2">
+                                            {getCategoryIcon(benefit.category)}
+                                            <span>{benefit.name}</span>
+                                            <Badge variant="outline" className="text-xs ml-2">
+                                              {benefit.category}
+                                            </Badge>
+                                          </div>
+                                        </SelectItem>
+                                      ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label htmlFor="quantity">Cantidad</Label>
+                                <Input
+                                  id="quantity"
+                                  type="number"
+                                  min="1"
+                                  value={benefitFormData.quantity}
+                                  onChange={(e) => setBenefitFormData(prev => ({...prev, quantity: parseInt(e.target.value) || 1}))}
+                                  data-testid="input-quantity"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <Label htmlFor="custom-value">Valor Personalizado (Opcional)</Label>
+                              <Input
+                                id="custom-value"
+                                value={benefitFormData.customValue}
+                                onChange={(e) => setBenefitFormData(prev => ({...prev, customValue: e.target.value}))}
+                                placeholder="Ej: Logo de 300x150px, Mención de 30 segundos"
+                                data-testid="input-custom-value"
+                              />
+                            </div>
+                            <div className="flex justify-end">
+                              <Button
+                                type="submit"
+                                disabled={!benefitFormData.benefitId || addBenefitMutation.isPending}
+                                className="flex items-center gap-2"
+                                data-testid="button-add-benefit"
+                              >
+                                <Plus className="h-4 w-4" />
+                                {addBenefitMutation.isPending ? 'Agregando...' : 'Agregar Beneficio'}
+                              </Button>
+                            </div>
+                          </form>
+                        </div>
+                      </Card>
+                    </div>
+                  </>
+                )}
                 
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button 

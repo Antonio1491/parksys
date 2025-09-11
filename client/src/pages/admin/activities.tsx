@@ -854,7 +854,6 @@ const AdminActivities = () => {
                 className="pl-10 w-full"
               />
             </div>
-
             <div className="md:col-span-2">
               <Select value={filterPark} onValueChange={setFilterPark}>
                 <SelectTrigger className="w-40">
