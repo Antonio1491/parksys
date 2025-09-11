@@ -2268,9 +2268,66 @@ function startServer() {
     }
   });
 
+  // CRITICAL: Register object storage routes immediately for image serving
+  criticalApiRouter.get("/storage/file/:filename", async (req: any, res: any) => {
+    try {
+      const filename = decodeURIComponent(req.params.filename);
+      console.log(`🔧 [CRITICAL-STORAGE] Serving file: ${filename}`);
+      
+      // Import object storage service dynamically
+      const { replitObjectStorage } = await import('./objectStorage-replit');
+      
+      // Try to get file from object storage first
+      const fileBuffer = await replitObjectStorage.downloadFile(filename);
+      
+      if (fileBuffer && fileBuffer.length > 0) {
+        // Set appropriate content type
+        const ext = filename.split('.').pop()?.toLowerCase();
+        const contentType = {
+          jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+          gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml'
+        }[ext || ''] || 'application/octet-stream';
+        
+        res.set('Content-Type', contentType);
+        res.set('Cache-Control', 'public, max-age=31536000'); // 1 year cache
+        res.send(fileBuffer);
+        console.log(`✅ [CRITICAL-STORAGE] File served from object storage: ${filename}`);
+        return;
+      }
+      
+      // Fallback to filesystem
+      const fs = await import('fs');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'public', filename);
+      
+      if (fs.existsSync(filePath)) {
+        const stats = fs.statSync(filePath);
+        const ext = filename.split('.').pop()?.toLowerCase();
+        const contentType = {
+          jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+          gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml'
+        }[ext || ''] || 'application/octet-stream';
+        
+        res.set('Content-Type', contentType);
+        res.set('Content-Length', stats.size.toString());
+        res.set('Cache-Control', 'public, max-age=31536000'); // 1 year cache
+        
+        const stream = fs.createReadStream(filePath);
+        stream.pipe(res);
+        console.log(`✅ [CRITICAL-STORAGE] File served from filesystem: ${filename}`);
+      } else {
+        console.error(`❌ [CRITICAL-STORAGE] File not found: ${filename}`);
+        res.status(404).json({ error: 'File not found' });
+      }
+    } catch (error) {
+      console.error(`❌ [CRITICAL-STORAGE] Error serving file:`, error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Mount critical API router immediately
   app.use('/api', criticalApiRouter);
-  console.log("🚀 [IMMEDIATE] Critical API routes registered");
+  console.log("🚀 [IMMEDIATE] Critical API routes (including storage) registered");
 
   // Use environment port for deployment compatibility - ensure port 5000
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
