@@ -144,46 +144,22 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         let label = value;
         let icon = "🔗";
         
-        // Mapear a etiquetas e iconos apropiados
+        // Mapear a etiquetas e iconos apropiados para categorías originales
         switch (value) {
-          case "marketing":
-            label = "Marketing";
-            icon = "📢";
-            break;
-          case "visibilidad":
-            label = "Visibilidad";
-            icon = "👁️";
-            break;
-          case "branding":
-            label = "Branding";
-            icon = "🎨";
-            break;
-          case "networking":
-            label = "Networking";
-            icon = "🤝";
-            break;
-          case "digital":
-            label = "Digital";
-            icon = "💻";
-            break;
-          case "eventos":
-            label = "Eventos";
-            icon = "🎉";
-            break;
-          case "otros":
-            label = "Otros";
-            icon = "🔗";
-            break;
           case "Visibilidad":
-            label = "Visibilidad (Legacy)";
+            label = "Visibilidad";
             icon = "👁️";
             break;
           case "Acceso":
             label = "Acceso";
             icon = "🔑";
             break;
+          case "Branding":
+            label = "Branding";
+            icon = "🎨";
+            break;
           case "Otro":
-            label = "Otro (Legacy)";
+            label = "Otro";
             icon = "🔗";
             break;
         }

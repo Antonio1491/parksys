@@ -3185,13 +3185,10 @@ export type InsertContractMonthlyPayment = z.infer<typeof insertContractMonthlyP
 
 // Enum para categorías de beneficios de patrocinio
 export const benefitsCategoriesEnum = pgEnum("benefits_categories", [
-  "marketing", 
-  "visibilidad", 
-  "branding", 
-  "networking", 
-  "digital", 
-  "eventos", 
-  "otros"
+  "Visibilidad",
+  "Acceso", 
+  "Branding", 
+  "Otro"
 ]);
 
 // Tabla de paquetes de patrocinio
