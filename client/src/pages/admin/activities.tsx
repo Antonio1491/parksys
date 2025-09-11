@@ -65,21 +65,21 @@ const AdminActivities = () => {
   const { toast } = useToast();
 
   // Fetch data
-  const { data: activitiesData, isLoading, error, refetch } = useQuery({
+  const { data: activitiesData = [], isLoading, error, refetch } = useQuery<any[]>({
     queryKey: ['/api/activities'],
   });
 
   // Fetch activities with images for card view
-  const { data: activitiesWithImagesData } = useQuery({
+  const { data: activitiesWithImagesData = [] } = useQuery<any[]>({
     queryKey: ['/api/actividades-fotos'],
     enabled: viewMode === 'cards',
   });
 
-  const { data: parksData = [] } = useQuery({
+  const { data: parksData = [] } = useQuery<any[]>({
     queryKey: ['/api/parks'],
   });
 
-  const { data: categoriesData = [] } = useQuery({
+  const { data: categoriesData = [] } = useQuery<any[]>({
     queryKey: ['/api/activity-categories'],
   });
 
@@ -888,12 +888,12 @@ const AdminActivities = () => {
             </div>
 
             {/* Botón limpiar filtros */}
-            <div>
+            <div className="flex items-center">
               <Button 
                 variant="outline" 
                 size="default"
                 onClick={handleClearFilters} 
-                className="h-10 w-10 p-0"
+                className="h-10 w-10 p-0 flex items-center justify-center"
                 data-testid="button-clear-filters"
                 title="Limpiar filtros"
               >
