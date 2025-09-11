@@ -843,7 +843,7 @@ const AdminActivities = () => {
         />
 
         {/* Filtros y controles */}
-        <Card className="p-4 bg-gray-50">
+        <Card className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Toggle de vista */}
@@ -870,7 +870,7 @@ const AdminActivities = () => {
         </Card>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
