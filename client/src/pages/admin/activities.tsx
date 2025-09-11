@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Boxes, Download, Upload, FileText, Blocks } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Boxes, Download, Upload, FileText, Blocks, Brush } from 'lucide-react';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -844,78 +844,70 @@ const AdminActivities = () => {
 
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg">
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-            {/* Filtros agrupados a la izquierda */}
-            <div className="flex flex-col md:flex-row gap-4 flex-1">
-              {/* Barra de búsqueda */}
-              <div className="relative flex-1 md:max-w-sm">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />
-                <Input
-                  placeholder="Buscar actividades..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full"
-                  data-testid="input-search-activities"
-                />
-              </div>
-
-              {/* Filtro por parques */}
-              <div className="w-full md:w-auto">
-                <Select value={filterPark} onValueChange={setFilterPark}>
-                  <SelectTrigger className="w-full md:w-48" data-testid="select-park-filter">
-                    <SelectValue placeholder="Filtrar por parque" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los parques</SelectItem>
-                    {Array.isArray(parksData) && parksData.map((park: any) => (
-                      <SelectItem key={park.id} value={park.id.toString()}>
-                        {park.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Filtro por categorías */}
-              <div className="w-full md:w-auto">
-                <Select value={filterCategory} onValueChange={setFilterCategory}>
-                  <SelectTrigger className="w-full md:w-52" data-testid="select-category-filter">
-                    <SelectValue placeholder="Filtrar por categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas las categorías</SelectItem>
-                    {Array.isArray(categoriesData) && categoriesData.map((category: any) => (
-                      <SelectItem key={category.id} value={category.id.toString()}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Botón limpiar filtros */}
-              <div className="w-full md:w-auto">
-                <Button 
-                  variant="outline" 
-                  onClick={handleClearFilters} 
-                  className="w-full md:w-auto"
-                  data-testid="button-clear-filters"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Limpiar filtros
-                </Button>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+            <div className="relative md:col-span-5 lg:col-span-4">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />
+              <Input
+                placeholder="Buscar actividades..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-full"
+              />
             </div>
 
-            {/* Toggle de vista a la derecha */}
-            <div className="flex items-center">
+            <div className="md:col-span-2">
+              <Select value={filterPark} onValueChange={setFilterPark}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Filtrar por parque" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los parques</SelectItem>
+                  {Array.isArray(parksData) && parksData.map((park: any) => (
+                    <SelectItem key={park.id} value={park.id.toString()}>
+                      {park.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="md:col-span-2">
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="w-50">
+                  <SelectValue placeholder="Filtrar por categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
+                  {Array.isArray(categoriesData) && categoriesData.map((category: any) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Botón limpiar filtros */}
+            <div className="w-full md:w-auto">
+              <Button 
+                variant="outline" 
+                onClick={handleClearFilters} 
+                className="flex h-10 w-full md:w-10 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                data-testid="button-clear-filters"
+                title="Limpiar filtros"
+              >
+                <Brush className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Toggle de vista */}
+            <div className="md:col-span-1 flex justify-end md:justify-start">
               <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                 <Button
                   variant={viewMode === 'cards' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('cards')}
                   className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
-                  data-testid="button-view-cards"
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
@@ -924,7 +916,6 @@ const AdminActivities = () => {
                   size="sm"
                   onClick={() => setViewMode('table')}
                   className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
-                  data-testid="button-view-table"
                 >
                   <List className="h-4 w-4" />
                 </Button>
