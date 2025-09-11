@@ -845,7 +845,7 @@ const AdminActivities = () => {
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
-            <div className="relative md:col-span-5 lg:col-span-6">
+            <div className="relative md:col-span-5 lg:col-span-4">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />
               <Input
                 placeholder="Buscar actividades..."
