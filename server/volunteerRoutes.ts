@@ -176,8 +176,14 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
         );
         
         if (traditionalVolunteersResult.rows && Array.isArray(traditionalVolunteersResult.rows)) {
+          // Normalizar URLs de imágenes antes de agregar voluntarios a la lista
+          const volunteersWithNormalizedImages = traditionalVolunteersResult.rows.map(volunteer => ({
+            ...volunteer,
+            profile_image_url: volunteer.profile_image_url ? replitObjectStorage.normalizeUrl(volunteer.profile_image_url) : volunteer.profile_image_url
+          }));
+          
           // Agregamos los voluntarios tradicionales a nuestra lista
-          allVolunteers = [...traditionalVolunteersResult.rows];
+          allVolunteers = [...volunteersWithNormalizedImages];
           
           // Los voluntarios tradicionales no tienen user_id, simplemente agregamos los voluntarios
         }
