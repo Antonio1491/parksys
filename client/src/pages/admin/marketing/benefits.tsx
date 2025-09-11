@@ -194,11 +194,14 @@ const SponsorshipBenefitsPage = () => {
     <AdminLayout>
       <PageHeader
         title="Beneficios de Patrocinio"
-        description="Gestiona los beneficios disponibles para los paquetes de patrocinio"
+        subtitle="Gestiona los beneficios disponibles para los paquetes de patrocinio"
+        icon={<Gift />}
         actions={[
           <Dialog key="create" open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button data-testid="button-nuevo-beneficio">
+              <Button 
+                variant="primary"
+                data-testid="button-nuevo-beneficio">
                 <Plus className="w-4 h-4 mr-2" />
                 Nuevo Beneficio
               </Button>
