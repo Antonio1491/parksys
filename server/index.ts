@@ -1542,8 +1542,7 @@ app.get("/public-objects/park-images/:filename", (req: Request, res: Response) =
 // MIGRACIÓN A OBJECT STORAGE - PARK IMAGES  
 // Sistema híbrido: archivos locales + Object Storage para persistencia
 
-// Configuración de multer para park images
-import multer from 'multer';
+// Configuración de multer para park images (ya importado arriba)
 // path y fs ya importados arriba
 
 // 🚀 SISTEMA UNIFICADO: Migrado a UnifiedStorageService para persistencia garantizada
@@ -2166,7 +2165,7 @@ import { registerParkEvaluationRoutes } from "./park-evaluations-routes";
 import { registerEvaluationCriteriaRoutes } from "./evaluation-criteria-routes";
 import { registerSponsorshipRoutes } from "./sponsorship-routes";
 import feedbackRouter from "./feedback-routes";
-import { seedTreeSpecies } from "./seed-tree-species";
+// import { seedTreeSpecies } from "./seed-tree-species"; // Module not found, commented out
 
 import { initializeDatabase } from "./initialize-db";
 
@@ -2280,7 +2279,7 @@ function startServer() {
       // Try to get file from object storage first
       const fileBuffer = await replitObjectStorage.downloadFile(filename);
       
-      if (fileBuffer && fileBuffer.length > 0) {
+      if (fileBuffer && fileBuffer instanceof Buffer && fileBuffer.length > 0) {
         // Set appropriate content type
         const ext = filename.split('.').pop()?.toLowerCase();
         const contentType = {
