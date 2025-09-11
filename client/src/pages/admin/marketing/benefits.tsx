@@ -26,12 +26,15 @@ interface SponsorshipBenefit {
 
 const CATEGORIES = [
   { value: "marketing", label: "Marketing", icon: "📢" },
-  { value: "visibility", label: "Visibilidad", icon: "👁️" },
+  { value: "visibilidad", label: "Visibilidad", icon: "👁️" },
   { value: "branding", label: "Branding", icon: "🎨" },
   { value: "networking", label: "Networking", icon: "🤝" },
   { value: "digital", label: "Digital", icon: "💻" },
   { value: "eventos", label: "Eventos", icon: "🎉" },
-  { value: "otros", label: "Otros", icon: "🔗" }
+  { value: "otros", label: "Otros", icon: "🔗" },
+  { value: "Visibilidad", label: "Visibilidad (Legacy)", icon: "👁️" },
+  { value: "Acceso", label: "Acceso", icon: "🔑" },
+  { value: "Otro", label: "Otro (Legacy)", icon: "🔗" }
 ];
 
 const SponsorshipBenefitsPage = () => {
