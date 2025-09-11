@@ -202,7 +202,7 @@ const SponsorshipBenefitsPage = () => {
               <Button 
                 variant="primary"
                 data-testid="button-nuevo-beneficio">
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 stroke-[4]" />
                 Nuevo Beneficio
               </Button>
             </DialogTrigger>
