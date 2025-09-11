@@ -94,10 +94,16 @@ const SponsorshipPackagesPage = () => {
   });
 
   // Query para obtener beneficios del paquete cuando se edita
-  const { data: packageBenefits = [], refetch: refetchPackageBenefits } = useQuery<PackageBenefit[]>({
+  const { data: packageBenefits = [], refetch: refetchPackageBenefits, isLoading: benefitsLoading } = useQuery<PackageBenefit[]>({
     queryKey: ['/api/sponsorship-packages', editingPackage?.id, 'benefits'],
     enabled: !!editingPackage?.id,
   });
+
+  // DEBUG: Logs de depuración
+  console.log('🔍 [DEBUG] packageBenefits:', packageBenefits);
+  console.log('🔍 [DEBUG] editingPackage?.id:', editingPackage?.id);
+  console.log('🔍 [DEBUG] benefitsLoading:', benefitsLoading);
+  console.log('🔍 [DEBUG] packageBenefits.length:', packageBenefits.length);
 
   const createMutation = useMutation({
     mutationFn: (data: any) => apiRequest('/api/sponsorship-packages', {

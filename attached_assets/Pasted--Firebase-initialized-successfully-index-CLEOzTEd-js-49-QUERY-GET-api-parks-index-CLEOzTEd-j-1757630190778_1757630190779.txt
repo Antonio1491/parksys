@@ -1,0 +1,33 @@
+🔥 Firebase initialized successfully
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /api/parks
+index-CLEOzTEd.js:824 i18next::backendConnector: loaded namespace common for language es Object
+index-CLEOzTEd.js:824 i18next: languageChanged es
+index-CLEOzTEd.js:824 i18next: initialized Object
+index-CLEOzTEd.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-CLEOzTEd.js:868 ⚠️ No space mapping found for parks:footer
+spe @ index-CLEOzTEd.js:868Understand this warning
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /public-api/instructors/public
+index-CLEOzTEd.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-CLEOzTEd.js:2397 ✅ Usuario autenticado, redirigiendo al dashboard...
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /api/activities
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /api/users
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /api/hr/employees
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /api/volunteers
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /api/active-concessions
+index-CLEOzTEd.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+/api/users:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+index-CLEOzTEd.js:49 Query failed for: /api/users Error: Authentication required
+    at index-CLEOzTEd.js:49:46367
+(anonymous) @ index-CLEOzTEd.js:49Understand this error
+2index-CLEOzTEd.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+index-CLEOzTEd.js:49 🌐 [QUERY] GET /api/notifications/count
+3index-CLEOzTEd.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+volunteer-1757627481782-749178566.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627564387-711126317.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627579016-760322898.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627595889-997758738.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627512845-649604571.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627495371-5402007.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627531939-578658054.jpeg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627546465-793901321.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+volunteer-1757627614025-447514340.jpg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
