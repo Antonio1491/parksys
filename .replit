@@ -41,12 +41,12 @@ localPort = 41949
 externalPort = 3001
 
 [[ports]]
-localPort = 44041
-externalPort = 3000
+localPort = 43455
+externalPort = 3002
 
 [[ports]]
-localPort = 44343
-externalPort = 3002
+localPort = 44041
+externalPort = 3000
 
 [agent]
 integrations = ["javascript_object_storage:1.0.0"]
