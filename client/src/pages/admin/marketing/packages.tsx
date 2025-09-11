@@ -67,6 +67,16 @@ const SponsorshipPackagesPage = () => {
     quantity: 1,
     customValue: ''
   });
+  
+  // Para beneficios temporales durante creación
+  const [tempBenefits, setTempBenefits] = useState<Array<{
+    benefitId: number;
+    quantity: number;
+    customValue: string;
+    benefitName: string;
+    benefitDescription: string;
+    benefitCategory: string;
+  }>>([]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -215,6 +225,7 @@ const SponsorshipPackagesPage = () => {
       setShowBenefitsSection(false);
     }
     setBenefitFormData({ benefitId: 0, quantity: 1, customValue: '' });
+    setTempBenefits([]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -232,7 +243,15 @@ const SponsorshipPackagesPage = () => {
     
     const submitData = {
       ...formData,
-      amount: formData.amount // Enviar como string
+      amount: formData.amount, // Enviar como string
+      // Incluir beneficios temporales solo en modo creación
+      ...((!editingPackage && tempBenefits.length > 0) ? { 
+        benefits: tempBenefits.map(b => ({
+          benefitId: b.benefitId,
+          quantity: b.quantity,
+          customValue: b.customValue
+        }))
+      } : {})
     };
 
     if (editingPackage) {
@@ -253,28 +272,71 @@ const SponsorshipPackagesPage = () => {
     setShowCreateDialog(true); // Asegurar que el modal esté abierto
   };
 
-  // Función para agregar beneficio al paquete
+  // Función para agregar beneficio al paquete (edición) o a lista temporal (creación)
   const handleAddBenefit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingPackage || !benefitFormData.benefitId) return;
+    if (!benefitFormData.benefitId) return;
 
-    addBenefitMutation.mutate({
-      packageId: editingPackage.id,
-      data: {
-        benefitId: benefitFormData.benefitId,
-        quantity: benefitFormData.quantity,
-        customValue: benefitFormData.customValue
+    if (editingPackage) {
+      // Modo edición: agregar directo al paquete
+      addBenefitMutation.mutate({
+        packageId: editingPackage.id,
+        data: {
+          benefitId: benefitFormData.benefitId,
+          quantity: benefitFormData.quantity,
+          customValue: benefitFormData.customValue
+        }
+      });
+    } else {
+      // Modo creación: agregar a lista temporal
+      const selectedBenefit = availableBenefits.find(b => b.id === benefitFormData.benefitId);
+      if (selectedBenefit) {
+        // Verificar que no esté ya agregado
+        if (tempBenefits.find(b => b.benefitId === benefitFormData.benefitId)) {
+          toast({
+            title: "Beneficio duplicado",
+            description: "Este beneficio ya ha sido agregado al paquete.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setTempBenefits(prev => [...prev, {
+          benefitId: benefitFormData.benefitId,
+          quantity: benefitFormData.quantity,
+          customValue: benefitFormData.customValue,
+          benefitName: selectedBenefit.name,
+          benefitDescription: selectedBenefit.description,
+          benefitCategory: selectedBenefit.category
+        }]);
+
+        // Resetear formulario de beneficio
+        setBenefitFormData({ benefitId: 0, quantity: 1, customValue: '' });
+
+        toast({
+          title: "Beneficio agregado",
+          description: "El beneficio se agregará al crear el paquete.",
+        });
       }
-    });
+    }
   };
 
-  // Función para remover beneficio del paquete
+  // Función para remover beneficio del paquete (edición) o de lista temporal (creación)
   const handleRemoveBenefit = (relationId: number) => {
-    if (!editingPackage) return;
-    if (confirm('¿Estás seguro de que quieres eliminar este beneficio del paquete?')) {
-      removeBenefitMutation.mutate({
-        packageId: editingPackage.id,
-        benefitId: relationId
+    if (editingPackage) {
+      // Modo edición: remover del paquete
+      if (confirm('¿Estás seguro de que quieres eliminar este beneficio del paquete?')) {
+        removeBenefitMutation.mutate({
+          packageId: editingPackage.id,
+          benefitId: relationId
+        });
+      }
+    } else {
+      // Modo creación: remover de lista temporal
+      setTempBenefits(prev => prev.filter(b => b.benefitId !== relationId));
+      toast({
+        title: "Beneficio eliminado",
+        description: "El beneficio ha sido eliminado de la lista temporal.",
       });
     }
   };
@@ -379,8 +441,24 @@ const SponsorshipPackagesPage = () => {
                   </div>
                 </div>
 
-                {/* Sección de Beneficios Incluidos - Solo visible al editar */}
-                {editingPackage && (
+                {/* Botón para mostrar beneficios en modo creación */}
+                {!editingPackage && !showBenefitsSection && (
+                  <div className="flex justify-center">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowBenefitsSection(true)}
+                      className="flex items-center gap-2"
+                      data-testid="button-show-benefits"
+                    >
+                      <Gift className="h-4 w-4" />
+                      Agregar Beneficios al Paquete
+                    </Button>
+                  </div>
+                )}
+
+                {/* Sección de Beneficios Incluidos - Visible al editar o cuando se activa en creación */}
+                {(editingPackage || showBenefitsSection) && (
                   <>
                     <Separator />
                     <div className="space-y-4">
@@ -389,53 +467,113 @@ const SponsorshipPackagesPage = () => {
                           <Gift className="h-5 w-5 text-blue-600" />
                           <h3 className="text-lg font-semibold">Beneficios Incluidos</h3>
                         </div>
-                        <Badge variant="outline">
-                          {packageBenefits.length} beneficio{packageBenefits.length !== 1 ? 's' : ''}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">
+                            {editingPackage ? packageBenefits.length : tempBenefits.length} beneficio{(editingPackage ? packageBenefits.length : tempBenefits.length) !== 1 ? 's' : ''}
+                          </Badge>
+                          {!editingPackage && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setShowBenefitsSection(false)}
+                              className="text-gray-500 hover:text-gray-700"
+                              data-testid="button-hide-benefits"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Lista de beneficios actuales */}
-                      {packageBenefits.length > 0 && (
+                      {/* Lista de beneficios actuales - edición o temporales - creación */}
+                      {((editingPackage && packageBenefits.length > 0) || (!editingPackage && tempBenefits.length > 0)) && (
                         <div className="space-y-2">
-                          {packageBenefits.map((benefit) => (
-                            <Card key={benefit.id} className="p-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  {getCategoryIcon(benefit.benefitCategory)}
-                                  <div className="flex-1">
-                                    <div className="font-medium">{benefit.benefitName}</div>
-                                    <div className="text-sm text-gray-600">
-                                      {benefit.benefitDescription}
-                                    </div>
-                                    <div className="flex items-center gap-3 mt-1">
-                                      <Badge variant="secondary" className="text-xs">
-                                        {benefit.benefitCategory}
-                                      </Badge>
-                                      {benefit.quantity > 1 && (
-                                        <span className="text-xs text-gray-500">
-                                          Cantidad: {benefit.quantity}
-                                        </span>
-                                      )}
-                                      {benefit.customValue && (
-                                        <span className="text-xs text-gray-500">
-                                          Valor: {benefit.customValue}
-                                        </span>
-                                      )}
+                          {editingPackage ? (
+                            // Mostrar beneficios del paquete (modo edición)
+                            packageBenefits.map((benefit) => (
+                              <Card key={benefit.id} className="p-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    {getCategoryIcon(benefit.benefitCategory)}
+                                    <div className="flex-1">
+                                      <div className="font-medium">{benefit.benefitName}</div>
+                                      <div className="text-sm text-gray-600">
+                                        {benefit.benefitDescription}
+                                      </div>
+                                      <div className="flex items-center gap-3 mt-1">
+                                        <Badge variant="secondary" className="text-xs">
+                                          {benefit.benefitCategory}
+                                        </Badge>
+                                        {benefit.quantity > 1 && (
+                                          <span className="text-xs text-gray-500">
+                                            Cantidad: {benefit.quantity}
+                                          </span>
+                                        )}
+                                        {benefit.customValue && (
+                                          <span className="text-xs text-gray-500">
+                                            Valor: {benefit.customValue}
+                                          </span>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleRemoveBenefit(benefit.id)}
+                                    disabled={removeBenefitMutation.isPending}
+                                    data-testid={`button-remove-benefit-${benefit.id}`}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
                                 </div>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleRemoveBenefit(benefit.id)}
-                                  disabled={removeBenefitMutation.isPending}
-                                  data-testid={`button-remove-benefit-${benefit.id}`}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </Card>
-                          ))}
+                              </Card>
+                            ))
+                          ) : (
+                            // Mostrar beneficios temporales (modo creación)
+                            tempBenefits.map((benefit, index) => (
+                              <Card key={`temp-${benefit.benefitId}-${index}`} className="p-3 bg-blue-50 border-blue-200">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    {getCategoryIcon(benefit.benefitCategory)}
+                                    <div className="flex-1">
+                                      <div className="font-medium">{benefit.benefitName}</div>
+                                      <div className="text-sm text-gray-600">
+                                        {benefit.benefitDescription}
+                                      </div>
+                                      <div className="flex items-center gap-3 mt-1">
+                                        <Badge variant="secondary" className="text-xs">
+                                          {benefit.benefitCategory}
+                                        </Badge>
+                                        {benefit.quantity > 1 && (
+                                          <span className="text-xs text-gray-500">
+                                            Cantidad: {benefit.quantity}
+                                          </span>
+                                        )}
+                                        {benefit.customValue && (
+                                          <span className="text-xs text-gray-500">
+                                            Valor: {benefit.customValue}
+                                          </span>
+                                        )}
+                                        <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700">
+                                          Temporal
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleRemoveBenefit(benefit.benefitId)}
+                                    data-testid={`button-remove-temp-benefit-${benefit.benefitId}`}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </Card>
+                            ))
+                          )}
                         </div>
                       )}
 

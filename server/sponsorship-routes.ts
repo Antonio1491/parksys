@@ -75,12 +75,39 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
   // Crear nuevo paquete de patrocinio
   apiRouter.post('/sponsorship-packages', isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const validatedData = insertSponsorshipPackageSchema.parse(req.body);
+      const { benefits, ...packageData } = req.body;
+      const validatedData = insertSponsorshipPackageSchema.parse(packageData);
       
+      // Crear el paquete primero
       const [newPackage] = await db
         .insert(sponsorshipPackages)
         .values(validatedData)
         .returning();
+      
+      // Si hay beneficios, crearlos también en una transacción
+      if (benefits && Array.isArray(benefits) && benefits.length > 0) {
+        try {
+          for (const benefit of benefits) {
+            const validatedBenefit = insertSponsorshipPackageBenefitSchema.parse({
+              packageId: newPackage.id,
+              benefitId: benefit.benefitId,
+              quantity: benefit.quantity || 1,
+              customValue: benefit.customValue || ''
+            });
+            
+            await db
+              .insert(sponsorshipPackageBenefits)
+              .values(validatedBenefit);
+          }
+        } catch (benefitError) {
+          // Si falla la creación de beneficios, eliminar el paquete creado
+          await db
+            .delete(sponsorshipPackages)
+            .where(eq(sponsorshipPackages.id, newPackage.id));
+          
+          throw new Error(`Error al crear beneficios del paquete: ${benefitError}`);
+        }
+      }
       
       res.status(201).json(newPackage);
     } catch (error) {
