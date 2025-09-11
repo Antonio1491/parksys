@@ -1,0 +1,80 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:22 🔥 Firebase initialized successfully
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es Object
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized Object
+packages.tsx:103 🔍 [DEBUG] packageBenefits: Array(0)
+packages.tsx:104 🔍 [DEBUG] editingPackage?.id: undefined
+packages.tsx:105 🔍 [DEBUG] benefitsLoading: false
+packages.tsx:106 🔍 [DEBUG] packageBenefits.length: 0
+packages.tsx:110 🔍 [DEBUG] queryKey construido: Array(3)
+packages.tsx:111 🔍 [DEBUG] URL que debería llamar: /api/sponsorship-packages/undefined/benefits
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:211 🌐 [QUERY] GET /api/sponsorship-packages
+queryClient.ts:211 🌐 [QUERY] GET /api/sponsorship-benefits
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+packages.tsx:103 🔍 [DEBUG] packageBenefits: Array(0)
+packages.tsx:104 🔍 [DEBUG] editingPackage?.id: undefined
+packages.tsx:105 🔍 [DEBUG] benefitsLoading: false
+packages.tsx:106 🔍 [DEBUG] packageBenefits.length: 0
+packages.tsx:110 🔍 [DEBUG] queryKey construido: Array(3)
+packages.tsx:111 🔍 [DEBUG] URL que debería llamar: /api/sponsorship-packages/undefined/benefits
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+packages.tsx:103 🔍 [DEBUG] packageBenefits: Array(0)
+packages.tsx:104 🔍 [DEBUG] editingPackage?.id: undefined
+packages.tsx:105 🔍 [DEBUG] benefitsLoading: false
+packages.tsx:106 🔍 [DEBUG] packageBenefits.length: 0
+packages.tsx:110 🔍 [DEBUG] queryKey construido: Array(3)
+packages.tsx:111 🔍 [DEBUG] URL que debería llamar: /api/sponsorship-packages/undefined/benefits
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:211 🌐 [QUERY] GET /api/notifications/count
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+packages.tsx:103 🔍 [DEBUG] packageBenefits: []
+packages.tsx:104 🔍 [DEBUG] editingPackage?.id: 1
+packages.tsx:105 🔍 [DEBUG] benefitsLoading: true
+packages.tsx:106 🔍 [DEBUG] packageBenefits.length: 0
+packages.tsx:110 🔍 [DEBUG] queryKey construido: (3) ['/api/sponsorship-packages', '1', 'benefits']
+packages.tsx:111 🔍 [DEBUG] URL que debería llamar: /api/sponsorship-packages/1/benefits
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:211 🌐 [QUERY] GET /api/sponsorship-packages
+chunk-ZPMKMY5X.js?v=14eab8c0:339 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ chunk-ZPMKMY5X.js?v=14eab8c0:339
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+packages.tsx:103 🔍 [DEBUG] packageBenefits: [{…}]
+packages.tsx:104 🔍 [DEBUG] editingPackage?.id: 1
+packages.tsx:105 🔍 [DEBUG] benefitsLoading: false
+packages.tsx:106 🔍 [DEBUG] packageBenefits.length: 1
+packages.tsx:110 🔍 [DEBUG] queryKey construido: (3) ['/api/sponsorship-packages', '1', 'benefits']
+packages.tsx:111 🔍 [DEBUG] URL que debería llamar: /api/sponsorship-packages/1/benefits
+packages.tsx:115 🔍 [DEBUG] Primer elemento de packageBenefits: {id: '1', name: 'Amigo Ceiba', description: 'Reconocimiento Bosques para Siempre.\n30% de descue…\n4 Activaciones: 1 grande, 1 mediana y 2 pequeñas', amount: '150000', createdAt: null, …}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:211 🌐 [QUERY] GET /api/notifications/count
+queryClient.ts:211 🌐 [QUERY] GET /api/notifications/count

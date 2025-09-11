@@ -307,7 +307,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
   apiRouter.get('/sponsorship-packages/:id/benefits', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      
+        
       const packageBenefits = await db
         .select({
           id: sponsorshipPackageBenefits.id,
@@ -325,6 +325,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         .from(sponsorshipPackageBenefits)
         .innerJoin(sponsorshipBenefits, eq(sponsorshipPackageBenefits.benefitId, sponsorshipBenefits.id))
         .where(eq(sponsorshipPackageBenefits.packageId, parseInt(id)));
+      
       
       res.json(packageBenefits);
     } catch (error) {

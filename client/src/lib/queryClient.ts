@@ -203,7 +203,15 @@ export const getQueryFn: <T>(options: {
     };
 
     try {
-      const url = queryKey[0] as string;
+      // Construir la URL correctamente concatenando todos los elementos del queryKey
+      let url: string;
+      if (queryKey.length === 1) {
+        url = queryKey[0] as string;
+      } else {
+        // Para queryKeys con múltiples elementos, concatenar para formar la URL final
+        // Ejemplo: ['/api/sponsorship-packages', '1', 'benefits'] => '/api/sponsorship-packages/1/benefits'
+        url = queryKey.filter(Boolean).join('/');
+      }
       
       // Permitir todas las solicitudes de amenidades y municipios
       // (Bloqueo anterior removido para permitir funcionamiento normal)
