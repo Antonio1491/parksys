@@ -17,58 +17,24 @@ import PageHeader from '@/components/ui/page-header';
 interface SponsorshipPackage {
   id: number;
   name: string;
-  category: string;
-  level: number;
-  price: string;
-  duration: number;
-  benefits: string[];
-  isActive: boolean;
+  description: string;
+  amount: string;
   createdAt: string;
   updatedAt: string;
 }
 
-const categoryColors = {
-  nivel1: 'bg-red-100 text-red-800',
-  nivel2: 'bg-orange-100 text-orange-800',
-  nivel3: 'bg-yellow-100 text-yellow-800',
-  nivel4: 'bg-green-100 text-green-800',
-  nivel5: 'bg-blue-100 text-blue-800',
-  nivel6: 'bg-indigo-100 text-indigo-800',
-  nivel7: 'bg-purple-100 text-purple-800',
-  nivel8: 'bg-pink-100 text-pink-800',
-  nivel9: 'bg-gray-100 text-gray-800',
-  nivel10: 'bg-black text-white'
-};
-
-const categoryLabels = {
-  nivel1: 'Cobre',
-  nivel2: 'Bronce',
-  nivel3: 'Plata',
-  nivel4: 'Oro',
-  nivel5: 'Platino',
-  nivel6: 'Diamante',
-  nivel7: 'Esmeralda',
-  nivel8: 'Rubí',
-  nivel9: 'Zafiro',
-  nivel10: 'Elite'
-};
 
 const SponsorshipPackagesPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingPackage, setEditingPackage] = useState<SponsorshipPackage | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
-    category: '',
-    level: 1,
-    price: '',
-    duration: 12,
-    benefits: [''],
-    isActive: true
+    description: '',
+    amount: ''
   });
 
   const { data: packages = [], isLoading } = useQuery({
