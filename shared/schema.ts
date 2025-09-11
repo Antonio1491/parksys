@@ -3183,6 +3183,17 @@ export type InsertContractMonthlyPayment = z.infer<typeof insertContractMonthlyP
 
 // ===== SISTEMA DE PATROCINIOS =====
 
+// Enum para categorías de beneficios de patrocinio
+export const benefitsCategoriesEnum = pgEnum("benefits_categories", [
+  "marketing", 
+  "visibilidad", 
+  "branding", 
+  "networking", 
+  "digital", 
+  "eventos", 
+  "otros"
+]);
+
 // Tabla de paquetes de patrocinio
 export const sponsorshipPackages = pgTable("sponsorship_packages", {
   id: serial("id").primaryKey(),
@@ -3198,7 +3209,7 @@ export const sponsorshipBenefits = pgTable("sponsorship_benefits", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  category: varchar("category", { length: 50 }),
+  category: benefitsCategoriesEnum("category"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
