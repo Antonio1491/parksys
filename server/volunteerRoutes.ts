@@ -164,7 +164,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
             email, 
             phone, 
             status, 
-            profile_image_url, 
+            profile_image_url as "profileImageUrl", 
             created_at,
             age,
             available_hours as availability,
@@ -179,7 +179,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
           // Normalizar URLs de imágenes antes de agregar voluntarios a la lista
           const volunteersWithNormalizedImages = traditionalVolunteersResult.rows.map(volunteer => ({
             ...volunteer,
-            profile_image_url: volunteer.profile_image_url ? replitObjectStorage.normalizeUrl(volunteer.profile_image_url) : volunteer.profile_image_url
+            profileImageUrl: volunteer.profileImageUrl ? replitObjectStorage.normalizeUrl(volunteer.profileImageUrl) : volunteer.profileImageUrl
           }));
           
           // Agregamos los voluntarios tradicionales a nuestra lista
