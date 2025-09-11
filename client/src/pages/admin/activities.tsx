@@ -843,7 +843,7 @@ const AdminActivities = () => {
         />
 
         {/* Filters */}
-        <div className="rounded-lg">
+        <div className="bg-white p-4 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />
