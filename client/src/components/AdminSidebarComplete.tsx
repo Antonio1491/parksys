@@ -18,7 +18,7 @@ import {
   Users, 
   Settings,
   UserSearch,
-  LogOut,
+  Gift,
   Tag,
   BarChart3,
   BarChart,
