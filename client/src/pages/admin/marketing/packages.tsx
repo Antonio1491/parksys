@@ -129,7 +129,7 @@ const SponsorshipPackagesPage = () => {
     
     const submitData = {
       ...formData,
-      amount
+      amount: formData.amount // Enviar como string
     };
 
     if (editingPackage) {
