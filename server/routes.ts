@@ -8043,7 +8043,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existsInObjectStorage) {
         try {
           console.log(`✅ [HYBRID-STORAGE] Archivo encontrado en Object Storage, descargando: ${filename}`);
-          await replitObjectStorage.downloadFile(filename, res);
+          await replitObjectStorage.downloadFileToResponse(filename, res);
           console.log(`✅ [HYBRID-STORAGE] Archivo servido desde Object Storage: ${filename}`);
           return;
         } catch (objectStorageError) {

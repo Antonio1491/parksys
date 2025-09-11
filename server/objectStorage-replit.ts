@@ -62,9 +62,9 @@ export class ReplitObjectStorageService {
   }
 
   /**
-   * 📥 DOWNLOAD: Descargar archivo para servir al cliente
+   * 📥 DOWNLOAD AS BUFFER: Descargar archivo como Buffer
    */
-  async downloadFile(filename: string, res: Response): Promise<void> {
+  async downloadFile(filename: string): Promise<Buffer | null> {
     try {
       console.log(`📥 [REPLIT-STORAGE] Descargando archivo: ${filename}`);
       
@@ -72,11 +72,39 @@ export class ReplitObjectStorageService {
       
       if (!ok) {
         console.error('❌ [REPLIT-STORAGE] Error descargando archivo:', error);
+        return null;
+      }
+
+      // Convertir valor a Buffer - Extraer Buffer del Array si es necesario
+      const buffer = Array.isArray(value) && value.length === 1 && Buffer.isBuffer(value[0]) 
+        ? value[0]  // Extraer el Buffer del Array
+        : Buffer.isBuffer(value) 
+          ? value 
+          : Buffer.from(value as any);
+      
+      console.log(`✅ [REPLIT-STORAGE] Archivo descargado exitosamente: ${filename}`);
+      return buffer;
+      
+    } catch (error) {
+      console.error('❌ [REPLIT-STORAGE] Error descargando archivo:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 📥 DOWNLOAD TO RESPONSE: Descargar archivo para servir directamente al cliente
+   */
+  async downloadFileToResponse(filename: string, res: Response): Promise<void> {
+    try {
+      console.log(`📥 [REPLIT-STORAGE] Descargando archivo para response: ${filename}`);
+      
+      const buffer = await this.downloadFile(filename);
+      
+      if (!buffer) {
         res.status(404).json({ error: 'Archivo no encontrado' });
         return;
       }
 
-      
       // Detectar tipo de contenido
       let contentType = 'application/octet-stream';
       if (filename.toLowerCase().endsWith('.jpg') || filename.toLowerCase().endsWith('.jpeg')) {
@@ -89,13 +117,6 @@ export class ReplitObjectStorageService {
         contentType = 'image/webp';
       }
       
-      // Servir archivo - Extraer Buffer del Array si es necesario
-      const buffer = Array.isArray(value) && value.length === 1 && Buffer.isBuffer(value[0]) 
-        ? value[0]  // Extraer el Buffer del Array
-        : Buffer.isBuffer(value) 
-          ? value 
-          : Buffer.from(value as any);
-      
       res.set({
         'Content-Type': contentType,
         'Content-Length': buffer.length.toString(),
@@ -107,7 +128,9 @@ export class ReplitObjectStorageService {
       
     } catch (error) {
       console.error('❌ [REPLIT-STORAGE] Error descargando archivo:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
+      if (res && !res.headersSent) {
+        res.status(500).json({ error: 'Error interno del servidor' });
+      }
     }
   }
 
