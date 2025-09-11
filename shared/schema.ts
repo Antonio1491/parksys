@@ -3186,12 +3186,8 @@ export type InsertContractMonthlyPayment = z.infer<typeof insertContractMonthlyP
 export const sponsorshipPackages = pgTable("sponsorship_packages", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  category: varchar("category", { length: 50 }).notNull(), // nivel1, nivel2, nivel3, nivel4, nivel5, nivel6, nivel7, nivel8, nivel9, nivel10
-  level: integer("level"), // 1-10, mapeo directo del nivel numérico
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  duration: integer("duration").notNull(), // meses
-  benefits: json("benefits").$type<string[]>().default([]),
-  isActive: boolean("is_active").default(true),
+  description: text("description"),
+  amount: decimal("amount", { precision: 10, scale: 2 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
