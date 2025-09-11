@@ -104,6 +104,16 @@ const SponsorshipPackagesPage = () => {
   console.log('🔍 [DEBUG] editingPackage?.id:', editingPackage?.id);
   console.log('🔍 [DEBUG] benefitsLoading:', benefitsLoading);
   console.log('🔍 [DEBUG] packageBenefits.length:', packageBenefits.length);
+  
+  // DEBUG: Mostrar qué URL se está consultando
+  const queryKey = ['/api/sponsorship-packages', editingPackage?.id, 'benefits'];
+  console.log('🔍 [DEBUG] queryKey construido:', queryKey);
+  console.log('🔍 [DEBUG] URL que debería llamar:', `/api/sponsorship-packages/${editingPackage?.id}/benefits`);
+  
+  // DEBUG: Si hay datos, mostrar el primer elemento
+  if (packageBenefits.length > 0) {
+    console.log('🔍 [DEBUG] Primer elemento de packageBenefits:', packageBenefits[0]);
+  }
 
   const createMutation = useMutation({
     mutationFn: (data: any) => apiRequest('/api/sponsorship-packages', {
