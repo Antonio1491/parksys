@@ -1841,6 +1841,7 @@ export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid', 'o
 export const paymentTypeEnum = pgEnum('payment_type', ['monthly', 'quarterly', 'biannual', 'annual', 'one_time', 'variable']);
 export const evaluationStatusEnum = pgEnum('evaluation_status', ['draft', 'completed', 'pending_review', 'approved', 'rejected']);
 export const sanctionStatusEnum = pgEnum('sanction_status', ['pending', 'resolved', 'appealed', 'cancelled']);
+export const changeTypeEnum = pgEnum('change_type', ['creation', 'acquisition', 'updated', 'maintenance', 'retirement', 'status_changed', 'location_changed', 'assigned']);
 
 // Tabla para el catálogo de tipos de concesiones
 export const concessionTypes = pgTable("concession_types", {
@@ -2440,6 +2441,13 @@ export const insertAssetImageSchema = createInsertSchema(assetImages).omit({
   id: true,
   createdAt: true,
   updatedAt: true
+});
+
+export const insertAssetHistorySchema = createInsertSchema(assetHistory).omit({
+  id: true,
+  timestamp: true
+}).extend({
+  changeType: z.enum(['creation', 'acquisition', 'updated', 'maintenance', 'retirement', 'status_changed', 'location_changed', 'assigned'])
 });
 
 // Relaciones para activos

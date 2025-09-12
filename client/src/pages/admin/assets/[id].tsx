@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { apiRequest } from '@/lib/queryClient';
+import { AssetHistory } from '@shared/schema';
 
 import AdminLayout from '@/components/AdminLayout';
 import AssetImageManager from '@/components/AssetImageManager';
@@ -185,18 +186,11 @@ interface AssetMaintenance {
   updatedAt: string;
 }
 
-interface AssetHistoryEntry {
-  id: number;
-  assetId: number;
-  date: string;
-  changeType: string;
-  description: string;
-  changedBy: number;
-  previousValue: any;
-  newValue: any;
-  notes: string | null;
-  createdAt: string;
-}
+// Using shared type from schema.ts
+type AssetHistoryEntry = AssetHistory & {
+  userName: string;
+  userUsername: string;
+};
 
 // Obtener el color de la badge por estado
 const getStatusBadgeColor = (status: string) => {
@@ -952,7 +946,7 @@ const AssetDetailPage: React.FC = () => {
                 {isLoading ? (
                   <div className="space-y-4">
                     {Array.from({ length: 3 }).map((_, index) => (
-                      <Skeleton key={index} className="h-24 w-full" />
+                      <Skeleton key={index} className="h-32 w-full" />
                     ))}
                   </div>
                 ) : !history || history.length === 0 ? (
@@ -961,43 +955,170 @@ const AssetDetailPage: React.FC = () => {
                     <p>No hay registros en el historial de este activo.</p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    {history.map((entry) => (
-                      <Card key={entry.id} className="mb-4 overflow-hidden">
-                        <div className={`h-2 w-full ${
-                          entry.changeType === 'acquisition' ? 'bg-green-500' :
-                          entry.changeType === 'update' ? 'bg-blue-500' :
-                          entry.changeType === 'maintenance' ? 'bg-yellow-500' :
-                          entry.changeType === 'retirement' ? 'bg-red-500' :
-                          'bg-gray-500'
-                        }`} />
-                        <CardContent className="pt-4">
-                          <div className="grid gap-4">
-                            <div>
-                              <h4 className="font-medium">
-                                {entry.changeType === 'acquisition' ? 'Adquisición' :
-                                 entry.changeType === 'update' ? 'Actualización' :
-                                 entry.changeType === 'maintenance' ? 'Mantenimiento' :
-                                 entry.changeType === 'retirement' ? 'Retiro' :
-                                 'Cambio'}
-                              </h4>
-                              <p className="text-muted-foreground text-sm">
-                                {formatDate(entry.date)} • {formatDate(entry.createdAt)}
-                              </p>
-                            </div>
-                            
-                            <p>{entry.description}</p>
-                            
-                            {entry.notes && (
-                              <div>
-                                <span className="font-medium text-gray-500">Notas:</span>
-                                <p className="mt-1 text-sm">{entry.notes}</p>
+                  <div className="space-y-4">
+                    {history.map((entry) => {
+                      const formatValue = (value: any) => {
+                        if (value === null || value === undefined) return 'N/A';
+                        if (typeof value === 'object') return JSON.stringify(value, null, 2);
+                        return String(value);
+                      };
+                      
+                      const getChangeTypeIcon = (changeType: string) => {
+                        switch (changeType.toLowerCase()) {
+                          case 'creation':
+                          case 'acquisition':
+                            return <Check className="h-4 w-4" />;
+                          case 'updated':
+                          case 'modification':
+                            return <Edit className="h-4 w-4" />;
+                          case 'maintenance':
+                            return <Wrench className="h-4 w-4" />;
+                          case 'retirement':
+                          case 'deletion':
+                            return <Trash2 className="h-4 w-4" />;
+                          default:
+                            return <History className="h-4 w-4" />;
+                        }
+                      };
+                      
+                      const getChangeTypeName = (changeType: string) => {
+                        switch (changeType.toLowerCase()) {
+                          case 'creation':
+                            return 'Creación';
+                          case 'acquisition':
+                            return 'Adquisición';
+                          case 'updated':
+                            return 'Actualización';
+                          case 'modification':
+                            return 'Modificación';
+                          case 'maintenance':
+                            return 'Mantenimiento';
+                          case 'retirement':
+                            return 'Retiro';
+                          case 'deletion':
+                            return 'Eliminación';
+                          default:
+                            return changeType;
+                        }
+                      };
+                      
+                      const getChangeTypeColor = (changeType: string) => {
+                        switch (changeType.toLowerCase()) {
+                          case 'creation':
+                          case 'acquisition':
+                            return 'bg-green-500';
+                          case 'updated':
+                          case 'modification':
+                            return 'bg-blue-500';
+                          case 'maintenance':
+                            return 'bg-yellow-500';
+                          case 'retirement':
+                          case 'deletion':
+                            return 'bg-red-500';
+                          default:
+                            return 'bg-gray-500';
+                        }
+                      };
+
+                      return (
+                        <Card key={entry.id} className="overflow-hidden" data-testid={`history-entry-${entry.id}`}>
+                          <div className={`h-2 w-full ${getChangeTypeColor(entry.changeType)}`} />
+                          <CardContent className="pt-4">
+                            <div className="space-y-4">
+                              {/* Header with change type and timestamp */}
+                              <div className="flex items-start justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <div className={`p-2 rounded-full ${
+                                    entry.changeType.toLowerCase() === 'creation' || entry.changeType.toLowerCase() === 'acquisition' ? 'bg-green-100 text-green-600' :
+                                    entry.changeType.toLowerCase() === 'updated' || entry.changeType.toLowerCase() === 'modification' ? 'bg-blue-100 text-blue-600' :
+                                    entry.changeType.toLowerCase() === 'maintenance' ? 'bg-yellow-100 text-yellow-600' :
+                                    entry.changeType.toLowerCase() === 'retirement' || entry.changeType.toLowerCase() === 'deletion' ? 'bg-red-100 text-red-600' :
+                                    'bg-gray-100 text-gray-600'
+                                  }`}>
+                                    {getChangeTypeIcon(entry.changeType)}
+                                  </div>
+                                  <div>
+                                    <h4 className="font-medium text-lg" data-testid={`change-type-${entry.id}`}>
+                                      {getChangeTypeName(entry.changeType)}
+                                    </h4>
+                                    <p className="text-muted-foreground text-sm" data-testid={`timestamp-${entry.id}`}>
+                                      {formatDate(entry.timestamp)}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-sm font-medium" data-testid={`user-name-${entry.id}`}>
+                                    {entry.userName}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground" data-testid={`username-${entry.id}`}>
+                                    @{entry.userUsername}
+                                  </p>
+                                </div>
                               </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+
+                              {/* Description */}
+                              <div>
+                                <p className="text-gray-700" data-testid={`description-${entry.id}`}>
+                                  {entry.description}
+                                </p>
+                              </div>
+
+                              {/* Field changes */}
+                              {entry.fieldName && (entry.previousValue !== null || entry.newValue !== null) && (
+                                <div className="bg-slate-50 rounded-lg p-4" data-testid={`field-changes-${entry.id}`}>
+                                  <h5 className="font-medium text-sm mb-3 text-slate-700">
+                                    Campo modificado: <span className="font-semibold">{entry.fieldName}</span>
+                                  </h5>
+                                  
+                                  <div className="grid gap-3 md:grid-cols-2">
+                                    {entry.previousValue !== null && (
+                                      <div>
+                                        <span className="text-xs font-medium text-red-600 uppercase tracking-wide">
+                                          Valor anterior
+                                        </span>
+                                        <div className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-sm">
+                                          <pre className="whitespace-pre-wrap text-red-800" data-testid={`previous-value-${entry.id}`}>
+                                            {formatValue(entry.previousValue)}
+                                          </pre>
+                                        </div>
+                                      </div>
+                                    )}
+                                    
+                                    {entry.newValue !== null && (
+                                      <div>
+                                        <span className="text-xs font-medium text-green-600 uppercase tracking-wide">
+                                          Valor nuevo
+                                        </span>
+                                        <div className="mt-1 p-2 bg-green-50 border border-green-200 rounded text-sm">
+                                          <pre className="whitespace-pre-wrap text-green-800" data-testid={`new-value-${entry.id}`}>
+                                            {formatValue(entry.newValue)}
+                                          </pre>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Notes */}
+                              {entry.notes && (
+                                <div className="bg-blue-50 rounded-lg p-3" data-testid={`notes-${entry.id}`}>
+                                  <span className="text-xs font-medium text-blue-600 uppercase tracking-wide">
+                                    Notas
+                                  </span>
+                                  <p className="mt-1 text-sm text-blue-800">{entry.notes}</p>
+                                </div>
+                              )}
+
+                              {/* Entry ID for debugging */}
+                              <div className="text-xs text-gray-400 pt-2 border-t">
+                                ID del registro: {entry.id}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { db } from './db';
-import { assetHistory, assets, users } from '../shared/schema';
+import { assetHistory, assets, users, insertAssetHistorySchema } from '../shared/schema';
 import { eq, desc, and } from 'drizzle-orm';
 
 /**
@@ -49,6 +49,20 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
   apiRouter.post('/assets/:id/history', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const assetId = parseInt(req.params.id);
+      
+      // Validar datos de entrada con Zod
+      const validationResult = insertAssetHistorySchema.safeParse({
+        assetId,
+        ...req.body
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: 'Datos de entrada inválidos',
+          details: validationResult.error.errors 
+        });
+      }
+
       const {
         changeType,
         fieldName,
@@ -56,7 +70,7 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
         newValue,
         description,
         notes
-      } = req.body;
+      } = validationResult.data;
 
       const userId = (req as any).user?.id || null;
       const ipAddress = req.ip || req.connection.remoteAddress;
@@ -96,8 +110,35 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
         userAgent || null
       ]);
 
+      // Obtener datos del usuario para la respuesta consistente - SIEMPRE incluir campos
+      let createdEntry = result.rows[0];
+      let userName = null;
+      let userUsername = null;
+      
+      if (userId) {
+        const userQuery = `
+          SELECT 
+            u.full_name as "userName",
+            u.username as "userUsername"
+          FROM users u 
+          WHERE u.id = $1
+        `;
+        const userResult = await pool.query(userQuery, [userId]);
+        if (userResult.rows.length > 0) {
+          userName = userResult.rows[0].userName;
+          userUsername = userResult.rows[0].userUsername;
+        }
+      }
+      
+      // ALWAYS include userName and userUsername for consistent response shape
+      createdEntry = {
+        ...createdEntry,
+        userName,
+        userUsername
+      };
+
       console.log(`✅ Nueva entrada de historial creada para activo ${assetId}: ${changeType}`);
-      res.status(201).json(result.rows[0]);
+      res.status(201).json(createdEntry);
     } catch (error) {
       console.error('Error creating asset history entry:', error);
       res.status(500).json({ error: 'Error al crear la entrada de historial' });

@@ -2455,7 +2455,12 @@ function startServer() {
       
       // Registrar rutas de historial de activos
       const { registerAssetHistoryRoutes } = await import("./asset-history-routes");
-      registerAssetHistoryRoutes(app, apiRouter, (req: Request, res: Response, next: NextFunction) => next());
+      const { isAuthenticated } = await import("./middleware/auth");
+      const assetHistoryRouter = express.Router();
+      assetHistoryRouter.use(express.json({ limit: '50mb' }));
+      assetHistoryRouter.use(express.urlencoded({ extended: true, limit: '50mb' }));
+      registerAssetHistoryRoutes(app, assetHistoryRouter, isAuthenticated);
+      app.use("/api", assetHistoryRouter);
       console.log("✅ [API-PRIORITY] Asset history routes registered before Vite");
       
       // Register all other routes that were causing startup delays...
