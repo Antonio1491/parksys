@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Trash2, Package, MapPin, Users, DollarSign, Star, Clock, Building } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Package, MapPin, Users, DollarSign, Star, Clock, Building, Link2, Unlink, Settings } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/queryClient';
@@ -57,6 +57,32 @@ interface Contract {
   sponsor?: {
     name: string;
   };
+}
+
+interface PhysicalAsset {
+  id: number;
+  name: string;
+  description?: string;
+  serialNumber?: string;
+  categoryId?: number;
+  parkId: number;
+  locationDescription?: string;
+  status: string;
+}
+
+interface SponsorshipAssetLink {
+  id: number;
+  contractId: number;
+  assetId: number;
+  branding: string;
+  createdAt: string;
+  updatedAt: string;
+  contractStatus?: string;
+  sponsorName?: string;
+  sponsorTier?: number;
+  assetName?: string;
+  assetCategory?: number;
+  assetParkId?: number;
 }
 
 const assetTypeColors = {
@@ -112,6 +138,15 @@ export default function SponsoredAssetsPage() {
     status: 'pending'
   });
 
+  // Asset linking functionality
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [linkFormData, setLinkFormData] = useState({
+    contractId: '',
+    assetId: '',
+    branding: ''
+  });
+  const [selectedLinkContract, setSelectedLinkContract] = useState<string>('');
+
   // Fetch sponsor assets
   const { data: sponsorAssets = [], isLoading } = useQuery({
     queryKey: ['/api/sponsor-assets'],
@@ -128,6 +163,18 @@ export default function SponsoredAssetsPage() {
   const { data: contracts = [] } = useQuery({
     queryKey: ['/api/sponsorship-contracts'],
     queryFn: () => apiRequest('/api/sponsorship-contracts').then(res => res.data || [])
+  });
+
+  // Fetch all physical assets (like events fetches all events)
+  const { data: physicalAssets = [] } = useQuery({
+    queryKey: ['/api/assets'],
+    queryFn: () => apiRequest('/api/assets').then(res => res.data || [])
+  });
+
+  // Fetch sponsorship asset links
+  const { data: sponsorshipAssetLinks = [] } = useQuery({
+    queryKey: ['/api/sponsorship-assets'],
+    queryFn: () => apiRequest('/api/sponsorship-assets').then(res => res.data || [])
   });
 
   // Create sponsor asset mutation
@@ -184,6 +231,52 @@ export default function SponsoredAssetsPage() {
     onError: (error: any) => {
       toast({ 
         title: 'Error al eliminar activo patrocinado',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  });
+
+  // Link asset with contract mutation
+  const linkAssetMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/sponsorship-assets', {
+      method: 'POST',
+      data
+    }),
+    onSuccess: () => {
+      toast({ title: 'Activo vinculado al contrato exitosamente' });
+      // Invalidate both query keys for proper cache management
+      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/assets/available-for-sponsorship', selectedLinkContract] });
+      setIsLinkDialogOpen(false);
+      resetLinkForm();
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.status === 409 
+        ? 'Este activo ya está vinculado a este contrato'
+        : error.message;
+      toast({ 
+        title: 'Error al vincular activo',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+    }
+  });
+
+  // Unlink asset from contract mutation
+  const unlinkAssetMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/sponsorship-assets/${id}`, {
+      method: 'DELETE'
+    }),
+    onSuccess: () => {
+      toast({ title: 'Activo desvinculado del contrato exitosamente' });
+      // Invalidate both query keys for proper cache management
+      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/assets/available-for-sponsorship', selectedLinkContract] });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: 'Error al desvincular activo',
         description: error.message,
         variant: 'destructive'
       });
@@ -267,6 +360,55 @@ export default function SponsoredAssetsPage() {
   const getAvailableContracts = (sponsorId: string) => {
     return contracts.filter((contract: Contract) => 
       contract.sponsorId.toString() === sponsorId && contract.status === 'active'
+    );
+  };
+
+  const resetLinkForm = () => {
+    setLinkFormData({
+      contractId: '',
+      assetId: '',
+      branding: ''
+    });
+    setSelectedLinkContract('');
+  };
+
+  const handleLinkAsset = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const payload = {
+      contractId: parseInt(linkFormData.contractId),
+      assetId: parseInt(linkFormData.assetId),
+      branding: linkFormData.branding
+    };
+    
+    linkAssetMutation.mutate(payload);
+  };
+
+  const handleUnlinkAsset = (linkId: number) => {
+    if (confirm('¿Estás seguro de que deseas desvincular este activo del contrato?')) {
+      unlinkAssetMutation.mutate(linkId);
+    }
+  };
+
+  const getActiveContracts = () => {
+    return contracts.filter((contract: Contract) => contract.status === 'active');
+  };
+
+  // Following the successful events pattern with getUnlinkedAssets
+  const getUnlinkedAssets = () => {
+    // Get already linked assets for the selected contract
+    const selectedContractId = parseInt(selectedLinkContract);
+    if (!selectedContractId) {
+      return physicalAssets.filter((asset: PhysicalAsset) => asset.status === 'active');
+    }
+    
+    // Frontend filtering fallback to prevent 409s
+    const linkedAssetIds = sponsorshipAssetLinks
+      .filter((link: SponsorshipAssetLink) => link.contractId === selectedContractId)
+      .map((link: SponsorshipAssetLink) => link.assetId);
+    
+    return physicalAssets.filter((asset: PhysicalAsset) => 
+      asset.status === 'active' && !linkedAssetIds.includes(asset.id)
     );
   };
 
@@ -466,7 +608,177 @@ export default function SponsoredAssetsPage() {
               </DialogContent>
             </Dialog>
           ]}
-          />
+        />
+
+        {/* Asset Linking Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Link2 className="h-5 w-5" />
+              Vincular Activos Físicos con Contratos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1">
+                <Label>Contrato de Patrocinio</Label>
+                <Select 
+                  value={selectedLinkContract} 
+                  onValueChange={(value) => {
+                    setSelectedLinkContract(value);
+                    setLinkFormData({ ...linkFormData, contractId: value });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar contrato activo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getActiveContracts().map((contract: Contract) => (
+                      <SelectItem key={contract.id} value={contract.id.toString()}>
+                        Contrato #{contract.id} - {contract.sponsor?.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button 
+                onClick={() => {
+                  if (!selectedLinkContract) {
+                    toast({ 
+                      title: 'Selecciona un contrato', 
+                      description: 'Debes seleccionar un contrato para vincular activos.',
+                      variant: 'destructive'
+                    });
+                    return;
+                  }
+                  setIsLinkDialogOpen(true);
+                }}
+                data-testid="button-link-asset"
+              >
+                <Link2 className="mr-2 h-4 w-4" />
+                Vincular Activo
+              </Button>
+            </div>
+            
+            {/* Asset Linking Dialog */}
+            <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Vincular Activo Físico</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleLinkAsset} className="space-y-4">
+                  <div>
+                    <Label htmlFor="assetId">Activo Físico *</Label>
+                    <Select 
+                      value={linkFormData.assetId} 
+                      onValueChange={(value) => setLinkFormData({ ...linkFormData, assetId: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar activo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getUnlinkedAssets().map((asset: PhysicalAsset) => (
+                          <SelectItem key={asset.id} value={asset.id.toString()}>
+                            {asset.name} {asset.serialNumber ? `(${asset.serialNumber})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="branding">Configuración de Branding *</Label>
+                    <Textarea
+                      id="branding"
+                      value={linkFormData.branding}
+                      onChange={(e) => setLinkFormData({ ...linkFormData, branding: e.target.value })}
+                      placeholder="Ej: Logo en esquina superior derecha, 15x10cm, colores corporativos..."
+                      rows={3}
+                      required
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={linkAssetMutation.isPending}>
+                      {linkAssetMutation.isPending ? 'Vinculando...' : 'Vincular'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+
+        {/* Linked Assets Table */}
+        {sponsorshipAssetLinks.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Activos Vinculados a Contratos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2">Activo</th>
+                      <th className="text-left p-2">Contrato</th>
+                      <th className="text-left p-2">Patrocinador</th>
+                      <th className="text-left p-2">Branding</th>
+                      <th className="text-left p-2">Fecha</th>
+                      <th className="text-left p-2">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sponsorshipAssetLinks.map((link: SponsorshipAssetLink) => (
+                      <tr key={link.id} className="border-b hover:bg-gray-50">
+                        <td className="p-2">
+                          <div className="font-medium">{link.assetName}</div>
+                        </td>
+                        <td className="p-2">
+                          <Badge variant="outline">Contrato #{link.contractId}</Badge>
+                        </td>
+                        <td className="p-2">
+                          <div className="flex items-center gap-2">
+                            {link.sponsorName}
+                            {link.sponsorTier && (
+                              <Badge className="text-xs">
+                                Tier {link.sponsorTier}
+                              </Badge>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          <div className="max-w-xs truncate" title={link.branding}>
+                            {link.branding}
+                          </div>
+                        </td>
+                        <td className="p-2 text-sm text-gray-500">
+                          {new Date(link.createdAt).toLocaleDateString('es-ES')}
+                        </td>
+                        <td className="p-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleUnlinkAsset(link.id)}
+                            data-testid={`button-unlink-${link.id}`}
+                          >
+                            <Unlink className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Filters and Search */}
         <Card>

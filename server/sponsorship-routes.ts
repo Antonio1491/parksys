@@ -13,7 +13,9 @@ import {
   sponsorshipMetrics,
   sponsorshipEvaluations,
   sponsorshipRenewals,
+  sponsorshipAssets,
   events,
+  assets,
   insertSponsorshipPackageSchema,
   insertSponsorshipBenefitSchema,
   insertSponsorshipPackageBenefitSchema,
@@ -24,9 +26,10 @@ import {
   insertSponsorshipEventLinkSchema,
   insertSponsorshipMetricsSchema,
   insertSponsorshipEvaluationSchema,
-  insertSponsorshipRenewalSchema
+  insertSponsorshipRenewalSchema,
+  insertSponsorshipAssetSchema
 } from '../shared/schema';
-import { eq, desc, sql, and } from 'drizzle-orm';
+import { eq, desc, sql, and, notInArray } from 'drizzle-orm';
 
 /**
  * Rutas para el sistema de patrocinios
@@ -1539,6 +1542,251 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       res.json({ message: 'Evento desvinculado exitosamente' });
     } catch (error) {
       console.error('Error al desvincular evento:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // ===== VINCULACIÓN DE ACTIVOS FÍSICOS CON CONTRATOS =====
+  
+  // Obtener todas las vinculaciones de activos con contratos
+  apiRouter.get('/sponsorship-assets', async (req: Request, res: Response) => {
+    try {
+      const linksResult = await db
+        .select({
+          id: sponsorshipAssets.id,
+          contractId: sponsorshipAssets.contractId,
+          assetId: sponsorshipAssets.assetId,
+          branding: sponsorshipAssets.branding,
+          createdAt: sponsorshipAssets.createdAt,
+          updatedAt: sponsorshipAssets.updatedAt,
+          // Info del contrato
+          contractStatus: sponsorshipContracts.status,
+          sponsorName: sponsors.name,
+          sponsorTier: sponsors.tier,
+          // Info del activo
+          assetName: assets.name,
+          assetCategory: assets.categoryId,
+          assetParkId: assets.parkId
+        })
+        .from(sponsorshipAssets)
+        .leftJoin(sponsorshipContracts, eq(sponsorshipAssets.contractId, sponsorshipContracts.id))
+        .leftJoin(sponsors, eq(sponsorshipContracts.sponsorId, sponsors.id))
+        .leftJoin(assets, eq(sponsorshipAssets.assetId, assets.id))
+        .orderBy(desc(sponsorshipAssets.createdAt));
+
+      res.json({ data: linksResult });
+    } catch (error) {
+      console.error('Error al obtener vinculaciones de activos:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Obtener activos vinculados a un contrato específico
+  apiRouter.get('/sponsorship-contracts/:id/linked-assets', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const linkedAssets = await db
+        .select({
+          id: sponsorshipAssets.id,
+          contractId: sponsorshipAssets.contractId,
+          assetId: sponsorshipAssets.assetId,
+          branding: sponsorshipAssets.branding,
+          createdAt: sponsorshipAssets.createdAt,
+          // Info del activo
+          assetName: assets.name,
+          assetDescription: assets.description,
+          assetSerialNumber: assets.serialNumber,
+          assetLocation: assets.locationDescription,
+          assetParkId: assets.parkId
+        })
+        .from(sponsorshipAssets)
+        .leftJoin(assets, eq(sponsorshipAssets.assetId, assets.id))
+        .where(eq(sponsorshipAssets.contractId, parseInt(id)))
+        .orderBy(desc(sponsorshipAssets.createdAt));
+
+      res.json({ data: linkedAssets });
+    } catch (error) {
+      console.error('Error al obtener activos del contrato:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Obtener activos físicos disponibles para patrocinio
+  apiRouter.get('/assets/available-for-sponsorship', async (req: Request, res: Response) => {
+    try {
+      const { contractId } = req.query;
+      
+      let availableAssets;
+      
+      if (contractId) {
+        // Obtener activos no vinculados a este contrato específico
+        const linkedAssetIds = await db
+          .select({ assetId: sponsorshipAssets.assetId })
+          .from(sponsorshipAssets)
+          .where(eq(sponsorshipAssets.contractId, parseInt(contractId as string)));
+        
+        const linkedIds = linkedAssetIds.map(item => item.assetId);
+        
+        if (linkedIds.length > 0) {
+          availableAssets = await db
+            .select({
+              id: assets.id,
+              name: assets.name,
+              description: assets.description,
+              serialNumber: assets.serialNumber,
+              categoryId: assets.categoryId,
+              parkId: assets.parkId,
+              locationDescription: assets.locationDescription,
+              status: assets.status
+            })
+            .from(assets)
+            .where(notInArray(assets.id, linkedIds))
+            .orderBy(assets.name);
+        } else {
+          availableAssets = await db
+            .select({
+              id: assets.id,
+              name: assets.name,
+              description: assets.description,
+              serialNumber: assets.serialNumber,
+              categoryId: assets.categoryId,
+              parkId: assets.parkId,
+              locationDescription: assets.locationDescription,
+              status: assets.status
+            })
+            .from(assets)
+            .orderBy(assets.name);
+        }
+      } else {
+        // Obtener todos los activos físicos
+        availableAssets = await db
+          .select({
+            id: assets.id,
+            name: assets.name,
+            description: assets.description,
+            serialNumber: assets.serialNumber,
+            categoryId: assets.categoryId,
+            parkId: assets.parkId,
+            locationDescription: assets.locationDescription,
+            status: assets.status
+          })
+          .from(assets)
+          .orderBy(assets.name);
+      }
+
+      res.json({ data: availableAssets });
+    } catch (error) {
+      console.error('Error al obtener activos disponibles:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Crear nueva vinculación activo-contrato
+  apiRouter.post('/sponsorship-assets', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertSponsorshipAssetSchema.parse(req.body);
+      
+      // Verificar que el contrato existe y está activo
+      const contractExists = await db
+        .select({ id: sponsorshipContracts.id, status: sponsorshipContracts.status })
+        .from(sponsorshipContracts)
+        .where(eq(sponsorshipContracts.id, validatedData.contractId))
+        .limit(1);
+      
+      if (contractExists.length === 0) {
+        return res.status(404).json({ error: 'Contrato no encontrado' });
+      }
+      
+      if (contractExists[0].status !== 'active') {
+        return res.status(400).json({ error: 'Solo se pueden vincular activos a contratos activos' });
+      }
+
+      // Verificar que el activo existe
+      const assetExists = await db
+        .select({ id: assets.id })
+        .from(assets)
+        .where(eq(assets.id, validatedData.assetId))
+        .limit(1);
+      
+      if (assetExists.length === 0) {
+        return res.status(404).json({ error: 'Activo no encontrado' });
+      }
+
+      // Verificar que no existe ya una vinculación entre este contrato y activo
+      const existingLink = await db
+        .select({ id: sponsorshipAssets.id })
+        .from(sponsorshipAssets)
+        .where(and(
+          eq(sponsorshipAssets.contractId, validatedData.contractId),
+          eq(sponsorshipAssets.assetId, validatedData.assetId)
+        ))
+        .limit(1);
+      
+      if (existingLink.length > 0) {
+        return res.status(409).json({ error: 'Este activo ya está vinculado a este contrato' });
+      }
+
+      // Crear la vinculación
+      const [newLink] = await db
+        .insert(sponsorshipAssets)
+        .values({
+          ...validatedData,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      res.status(201).json({ data: newLink });
+    } catch (error) {
+      console.error('Error al crear vinculación activo-contrato:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Actualizar vinculación activo-contrato
+  apiRouter.put('/sponsorship-assets/:id', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertSponsorshipAssetSchema.parse(req.body);
+      
+      const [updatedLink] = await db
+        .update(sponsorshipAssets)
+        .set({ 
+          ...validatedData,
+          updatedAt: new Date()
+        })
+        .where(eq(sponsorshipAssets.id, parseInt(id)))
+        .returning();
+      
+      if (!updatedLink) {
+        return res.status(404).json({ error: 'Vinculación no encontrada' });
+      }
+      
+      res.json({ data: updatedLink });
+    } catch (error) {
+      console.error('Error al actualizar vinculación activo-contrato:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Eliminar vinculación activo-contrato
+  apiRouter.delete('/sponsorship-assets/:id', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const [deletedLink] = await db
+        .delete(sponsorshipAssets)
+        .where(eq(sponsorshipAssets.id, parseInt(id)))
+        .returning();
+      
+      if (!deletedLink) {
+        return res.status(404).json({ error: 'Vinculación no encontrada' });
+      }
+      
+      res.json({ message: 'Vinculación eliminada exitosamente' });
+    } catch (error) {
+      console.error('Error al eliminar vinculación activo-contrato:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });

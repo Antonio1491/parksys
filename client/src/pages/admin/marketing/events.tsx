@@ -274,9 +274,9 @@ export default function SponsoredEventsPage() {
   });
 
   const filteredEvents = sponsorEvents.filter((event: SponsorEvent) => {
-    const matchesSearch = event.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.sponsor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.eventLocation?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (event.eventName && event.eventName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         (event.sponsor?.name && event.sponsor.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         (event.eventLocation && event.eventLocation.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesLevel = !filterLevel || filterLevel === 'all' || event.sponsorshipLevel === filterLevel;
     const matchesStatus = !filterStatus || filterStatus === 'all' || event.status === filterStatus;
     
@@ -353,12 +353,16 @@ export default function SponsoredEventsPage() {
 
   const getAvailableContracts = (sponsorId: string) => {
     return contracts.filter((contract: Contract) => 
-      contract.sponsorId.toString() === sponsorId && contract.status === 'active'
+      contract.sponsorId && 
+      contract.sponsorId.toString() === sponsorId && 
+      contract.status === 'active'
     );
   };
 
   const getActiveContracts = () => {
-    return contracts.filter((contract: Contract) => contract.status === 'active');
+    return contracts.filter((contract: Contract) => 
+      contract && contract.status === 'active'
+    );
   };
 
   const getUnlinkedEvents = () => {
