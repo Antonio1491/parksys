@@ -1,0 +1,176 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:22 🔥 Firebase initialized successfully
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es Object
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized Object
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 0
+events.tsx:158 🔍 [DEBUG] Contracts data: Array(0)
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 0 Array(0)
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 0
+events.tsx:168 🔍 [DEBUG] Events data: Array(0)
+events.tsx:174 ✅ [DEBUG] Published events (no contract selected): 0 Array(0)
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+events.tsx:72 🔍 [DEBUG] Fetching contracts...
+queryClient.ts:119 🌐 [API REQUEST] GET /api/sponsorship-contracts
+events.tsx:86 🔍 [DEBUG] Fetching events...
+queryClient.ts:119 🌐 [API REQUEST] GET /api/events
+queryClient.ts:119 🌐 [API REQUEST] GET /api/sponsorship-events
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 0
+events.tsx:158 🔍 [DEBUG] Contracts data: Array(0)
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 0 Array(0)
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 0
+events.tsx:168 🔍 [DEBUG] Events data: Array(0)
+events.tsx:174 ✅ [DEBUG] Published events (no contract selected): 0 Array(0)
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+events.tsx:74 ✅ [DEBUG] Contracts full response: Array(2)
+events.tsx:75 ✅ [DEBUG] Contracts response.data: undefined
+events.tsx:76 ✅ [DEBUG] Contracts direct response: Array(2)
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: Array(2)
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 Array(2)
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 0
+events.tsx:168 🔍 [DEBUG] Events data: Array(0)
+events.tsx:174 ✅ [DEBUG] Published events (no contract selected): 0 Array(0)
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+events.tsx:88 ✅ [DEBUG] Events full response: Array(2)
+events.tsx:89 ✅ [DEBUG] Events response.data: undefined
+events.tsx:90 ✅ [DEBUG] Events direct response: Array(2)
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: Array(2)
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 Array(2)
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: Array(2)
+events.tsx:174 ✅ [DEBUG] Published events (no contract selected): 2 Array(2)
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:219 🌐 [QUERY] GET /api/notifications/count
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+events:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+events:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+events:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+events:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+events:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+events:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+client:223 [vite] hot updated: /src/pages/admin/parks.tsx
+client:223 [vite] hot updated: /src/index.css?v=Lz2XpB_tORzODwO4EMtrK
+queryClient.ts:219 🌐 [QUERY] GET /api/notifications/count
+queryClient.ts:219 🌐 [QUERY] GET /api/notifications/count
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: (2) [{…}, {…}]
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 (2) [{…}, {…}]
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: (2) [{…}, {…}]
+events.tsx:174 ✅ [DEBUG] Published events (no contract selected): 2 (2) [{…}, {…}]
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+chunk-ZPMKMY5X.js?v=14eab8c0:339 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ chunk-ZPMKMY5X.js?v=14eab8c0:339
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: (2) [{…}, {…}]
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 (2) [{…}, {…}]
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: (2) [{…}, {…}]
+events.tsx:186 ✅ [DEBUG] Unlinked events for contract 1 : 2 (2) [{…}, {…}]
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: (2) [{…}, {…}]
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 (2) [{…}, {…}]
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: (2) [{…}, {…}]
+events.tsx:186 ✅ [DEBUG] Unlinked events for contract 2 : 2 (2) [{…}, {…}]
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: (2) [{…}, {…}]
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 (2) [{…}, {…}]
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: (2) [{…}, {…}]
+events.tsx:186 ✅ [DEBUG] Unlinked events for contract 2 : 2 (2) [{…}, {…}]
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:119 🌐 [API REQUEST] POST /api/sponsorship-events-links
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: (2) [{…}, {…}]
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 (2) [{…}, {…}]
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: (2) [{…}, {…}]
+events.tsx:186 ✅ [DEBUG] Unlinked events for contract 2 : 2 (2) [{…}, {…}]
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:129  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/sponsorship-events-links 500 (Internal Server Error)
+apiRequest @ queryClient.ts:129
+mutationFn @ events.tsx:105
+fn @ @tanstack_react-query.js?v=14eab8c0:1203
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+execute @ @tanstack_react-query.js?v=14eab8c0:1239
+await in execute
+mutate @ @tanstack_react-query.js?v=14eab8c0:2655
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3371
+handleLinkSubmit @ events.tsx:204
+callCallback2 @ chunk-RPCDYKBN.js?v=14eab8c0:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=14eab8c0:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=14eab8c0:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=14eab8c0:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=14eab8c0:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=14eab8c0:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=14eab8c0:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=14eab8c0:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=14eab8c0:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=14eab8c0:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=14eab8c0:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=14eab8c0:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5449
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: (2) [{…}, {…}]
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 (2) [{…}, {…}]
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: (2) [{…}, {…}]
+events.tsx:186 ✅ [DEBUG] Unlinked events for contract 2 : 2 (2) [{…}, {…}]
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/notifications/count
+events.tsx:157 🔍 [DEBUG] getActiveContracts called. Total contracts: 2
+events.tsx:158 🔍 [DEBUG] Contracts data: (2) [{…}, {…}]
+events.tsx:162 ✅ [DEBUG] Filtered active contracts: 2 (2) [{…}, {…}]
+events.tsx:167 🔍 [DEBUG] getUnlinkedEvents called. Total events: 2
+events.tsx:168 🔍 [DEBUG] Events data: (2) [{…}, {…}]
+events.tsx:186 ✅ [DEBUG] Unlinked events for contract 2 : 2 (2) [{…}, {…}]
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}

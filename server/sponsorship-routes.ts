@@ -1479,10 +1479,14 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         });
       }
       
-      // Create the link
+      // Create the link with explicit field mapping
       const [newLink] = await db
         .insert(sponsorshipEventsLinks)
-        .values(validatedData)
+        .values({
+          contractId: validatedData.contractId,
+          eventId: validatedData.eventId,
+          visibility: validatedData.visibility
+        })
         .returning();
       
       res.status(201).json({ data: newLink });

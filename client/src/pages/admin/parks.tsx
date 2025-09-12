@@ -738,7 +738,7 @@ const AdminParksContent = () => {
                     variant={viewMode === 'list' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setViewMode('list')}
-                    data-testid="button-view-list bg-[#ededed]"
+                    data-testid="button-view-list"
                   >
                     <List className="h-4 w-4" />
                   </Button>
