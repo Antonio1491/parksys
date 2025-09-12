@@ -110,6 +110,7 @@ const AdminParksContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectionMode, setSelectionMode] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const itemsPerPage = 9;
 
   // Helper function to check if park is certified
@@ -710,7 +711,7 @@ const AdminParksContent = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                <DropdownMenu open={selectionMode ? undefined : false}>
+                <DropdownMenu open={selectionMode && showDropdown}>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant={selectionMode ? 'default' : 'outline'}
@@ -720,6 +721,15 @@ const AdminParksContent = () => {
                         if (!selectionMode) {
                           setSelectedParks(new Set());
                         }
+                        setShowDropdown(false);
+                      }}
+                      onMouseEnter={() => {
+                        if (selectionMode) {
+                          setShowDropdown(true);
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        setShowDropdown(false);
                       }}
                       data-testid="button-selection-toggle"
                     >
@@ -728,11 +738,16 @@ const AdminParksContent = () => {
                       {selectionMode && <ChevronDown className="h-4 w-4 ml-1" />}
                     </Button>
                   </DropdownMenuTrigger>
-                  {selectionMode && (
-                    <DropdownMenuContent align="end">
+                  {selectionMode && showDropdown && (
+                    <DropdownMenuContent 
+                      align="end"
+                      onMouseEnter={() => setShowDropdown(true)}
+                      onMouseLeave={() => setShowDropdown(false)}
+                    >
                       <DropdownMenuItem
                         onClick={() => {
                           handleSelectAllParks();
+                          setShowDropdown(false);
                         }}
                         data-testid="menu-select-all"
                       >
@@ -743,6 +758,7 @@ const AdminParksContent = () => {
                         onClick={() => {
                           handleDeselectAllParks();
                           setSelectionMode(false);
+                          setShowDropdown(false);
                         }}
                         data-testid="menu-deselect-all"
                       >
