@@ -424,11 +424,14 @@ const AdminParksContent = () => {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div className="flex items-start space-x-2 flex-1">
-                  <Checkbox
-                    checked={selectedParks.has(park.id)}
-                    onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
-                    className="mt-1"
-                  />
+                  {selectionMode && (
+                    <Checkbox
+                      checked={selectedParks.has(park.id)}
+                      onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                      className="mt-1"
+                      data-testid={`checkbox-park-grid-${park.id}`}
+                    />
+                  )}
                   <div className="flex-1">
                     <CardTitle className="text-lg">{park.name}</CardTitle>
                     {isParkCertified(park) && (
