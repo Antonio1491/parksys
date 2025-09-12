@@ -95,8 +95,8 @@ export default function SponsoredEventsPage() {
 
   // Fetch linked events
   const { data: linkedEvents = [], isLoading: isLoadingLinked } = useQuery({
-    queryKey: ['/api/sponsorship-events'],
-    queryFn: () => apiRequest('/api/sponsorship-events').then(res => res.data || [])
+    queryKey: ['/api/sponsorship-events-links'],
+    queryFn: () => apiRequest('/api/sponsorship-events-links').then(res => res.data || [])
   });
 
 
@@ -108,7 +108,7 @@ export default function SponsoredEventsPage() {
     }),
     onSuccess: () => {
       toast({ title: 'Evento vinculado exitosamente con el contrato' });
-      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-events'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-events-links'] });
       setIsLinkDialogOpen(false);
       resetLinkForm();
     },
@@ -132,7 +132,7 @@ export default function SponsoredEventsPage() {
     }),
     onSuccess: () => {
       toast({ title: 'Evento desvinculado exitosamente' });
-      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-events'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-events-links'] });
     },
     onError: (error: any) => {
       toast({ 
