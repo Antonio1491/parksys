@@ -159,23 +159,20 @@ async function createHistoryEntry(
   try {
     const query = `
       INSERT INTO asset_history (
-        asset_id, change_type, field_name, previous_value, 
-        new_value, description, user_id, notes, 
-        ip_address, user_agent, timestamp
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+        asset_id, change_type, previous_value, 
+        new_value, description, changed_by, notes, 
+        date, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, NOW())
     `;
 
     await client.query(query, [
       assetId,
       changeType,
-      fieldName || null,
       previousValue ? String(previousValue) : null,
       newValue ? String(newValue) : null,
       description,
-      userId || null,
-      notes || null,
-      ipAddress || null,
-      userAgent || null
+      userId ? `User ID: ${userId}` : 'Sistema',
+      notes || null
     ]);
 
     console.log(`🔒 [SECURE HISTORY] ${changeType}: ${description} para activo ${assetId}`);
@@ -229,9 +226,9 @@ export async function logAssetCreation(
       assetId,
       'creation',
       description,
-      null,
-      null,
-      null,
+      undefined,
+      undefined,
+      undefined,
       userId,
       notes,
       ipAddress,
@@ -335,13 +332,11 @@ export async function logAssetUpdate(
         assetId,
         'update',
         description,
-        fieldName,
+        undefined,
         previousValue,
         currentValue,
         userId,
-        null,
-        ipAddress,
-        userAgent
+        undefined
       );
     }
   } catch (error) {
@@ -370,9 +365,9 @@ export async function logAssetDeletion(
       assetId,
       'deletion',
       description,
-      null,
-      null,
-      null,
+      undefined,
+      undefined,
+      undefined,
       userId,
       notes,
       ipAddress,
