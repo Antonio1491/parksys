@@ -3321,29 +3321,12 @@ export const sponsorshipContracts = pgTable("sponsorship_contracts", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
-// Tabla de eventos patrocinados
-export const sponsorEvents = pgTable("sponsor_events", {
-  id: serial("id").primaryKey(),
-  sponsorId: integer("sponsor_id").notNull().references(() => sponsors.id),
-  contractId: integer("contract_id").references(() => sponsorshipContracts.id),
-  
-  // Información del evento
-  eventName: varchar("event_name", { length: 255 }).notNull(),
-  eventDate: date("event_date").notNull(),
-  eventLocation: varchar("event_location", { length: 255 }),
-  
-  // Detalles del patrocinio
-  sponsorshipLevel: varchar("sponsorship_level", { length: 50 }).default("colaborador"), // principal, secundario, colaborador
-  logoPlacement: varchar("logo_placement", { length: 100 }), // primary, secondary, footer
-  exposureMinutes: integer("exposure_minutes").default(0),
-  standSize: varchar("stand_size", { length: 50 }), // premium, standard, small
-  
-  // Presupuesto y requerimientos
-  activationBudget: decimal("activation_budget", { precision: 10, scale: 2 }).default("0.00"),
-  specialRequirements: text("special_requirements"),
-  
-  // Estado
-  status: varchar("status", { length: 20 }).default("pending"), // pending, confirmed, completed, cancelled
+// Tabla de eventos vinculados a contratos de patrocinio
+export const sponsorshipEvents = pgTable("sponsorship_events", {
+  id: serial("id").primaryKey(), // Mantengo serial por compatibilidad y seguridad
+  contractId: integer("contract_id").notNull().references(() => sponsorshipContracts.id, { onDelete: "cascade" }),
+  eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
+  visibility: varchar("visibility", { length: 255 }).notNull(), // tipo de publicidad en el evento
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
@@ -3378,31 +3361,12 @@ export const sponsorshipMetrics = pgTable("sponsorship_metrics", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
-// Tabla de activos promocionales
-export const sponsorAssets = pgTable("sponsor_assets", {
-  id: serial("id").primaryKey(),
-  sponsorId: integer("sponsor_id").notNull().references(() => sponsors.id),
-  
-  // Información del activo
-  assetType: varchar("asset_type", { length: 50 }).notNull(), // logo, banner, video, audio, brochure
-  assetName: varchar("asset_name", { length: 255 }).notNull(),
-  
-  // Archivo
-  fileName: varchar("file_name", { length: 255 }).notNull(),
-  fileUrl: varchar("file_url", { length: 500 }).notNull(),
-  fileSize: integer("file_size"), // bytes
-  
-  // Especificaciones
-  specifications: text("specifications"), // dimensiones, formato, resolución
-  
-  // Aprobación
-  approvalStatus: varchar("approval_status", { length: 50 }).default("pending"), // pending, approved, rejected
-  approvedBy: integer("approved_by").references(() => users.id),
-  approvedAt: timestamp("approved_at"),
-  
-  // Uso
-  usageRights: text("usage_rights"),
-  expirationDate: date("expiration_date"),
+// Tabla de activos vinculados a contratos de patrocinio
+export const sponsorshipAssets = pgTable("sponsorship_assets", {
+  id: serial("id").primaryKey(), // Mantengo serial por compatibilidad y seguridad
+  contractId: integer("contract_id").notNull().references(() => sponsorshipContracts.id, { onDelete: "cascade" }),
+  assetId: integer("asset_id").notNull().references(() => assets.id, { onDelete: "cascade" }),
+  branding: varchar("branding", { length: 255 }).notNull(), // elemento publicitario en el activo
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
@@ -3464,7 +3428,7 @@ export const sponsorshipRenewals = pgTable("sponsorship_renewals", {
 // Tabla de beneficios específicos por evento
 export const sponsorEventBenefits = pgTable("sponsor_event_benefits", {
   id: serial("id").primaryKey(),
-  sponsorEventId: integer("sponsor_event_id").notNull().references(() => sponsorEvents.id),
+  sponsorEventId: integer("sponsor_event_id").notNull().references(() => sponsorshipEvents.id),
   
   // Beneficio específico
   benefitType: varchar("benefit_type", { length: 50 }).notNull(), // logo_placement, stand_space, social_media, etc.
@@ -3494,7 +3458,7 @@ export const insertSponsorshipContractSchema = createInsertSchema(sponsorshipCon
   endDate: z.string().min(1, "La fecha de fin es requerida")
 });
 
-export const insertSponsorEventSchema = createInsertSchema(sponsorEvents).omit({
+export const insertSponsorshipEventSchema = createInsertSchema(sponsorshipEvents).omit({
   id: true,
   createdAt: true,
   updatedAt: true
@@ -3506,11 +3470,10 @@ export const insertSponsorshipMetricsSchema = createInsertSchema(sponsorshipMetr
   updatedAt: true
 });
 
-export const insertSponsorAssetSchema = createInsertSchema(sponsorAssets).omit({
+export const insertSponsorshipAssetSchema = createInsertSchema(sponsorshipAssets).omit({
   id: true,
   createdAt: true,
-  updatedAt: true,
-  approvedAt: true
+  updatedAt: true
 });
 
 export const insertSponsorshipEvaluationSchema = createInsertSchema(sponsorshipEvaluations).omit({
@@ -3550,14 +3513,14 @@ export type InsertSponsorshipCampaign = z.infer<typeof insertSponsorshipCampaign
 export type SponsorshipContract = typeof sponsorshipContracts.$inferSelect;
 export type InsertSponsorshipContract = z.infer<typeof insertSponsorshipContractSchema>;
 
-export type SponsorEvent = typeof sponsorEvents.$inferSelect;
-export type InsertSponsorEvent = z.infer<typeof insertSponsorEventSchema>;
+export type SponsorshipEvent = typeof sponsorshipEvents.$inferSelect;
+export type InsertSponsorshipEvent = z.infer<typeof insertSponsorshipEventSchema>;
 
 export type SponsorshipMetrics = typeof sponsorshipMetrics.$inferSelect;
 export type InsertSponsorshipMetrics = z.infer<typeof insertSponsorshipMetricsSchema>;
 
-export type SponsorAsset = typeof sponsorAssets.$inferSelect;
-export type InsertSponsorAsset = z.infer<typeof insertSponsorAssetSchema>;
+export type SponsorshipAsset = typeof sponsorshipAssets.$inferSelect;
+export type InsertSponsorshipAsset = z.infer<typeof insertSponsorshipAssetSchema>;
 
 export type SponsorshipEvaluation = typeof sponsorshipEvaluations.$inferSelect;
 export type InsertSponsorshipEvaluation = z.infer<typeof insertSponsorshipEvaluationSchema>;
