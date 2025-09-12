@@ -1442,7 +1442,10 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       
       // Verify contract exists and is active
       const contract = await db
-        .select()
+        .select({
+          id: sponsorshipContracts.id,
+          status: sponsorshipContracts.status
+        })
         .from(sponsorshipContracts)
         .where(eq(sponsorshipContracts.id, contractId))
         .limit(1);
@@ -1453,7 +1456,10 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       
       // Verify event exists
       const event = await db
-        .select()
+        .select({
+          id: events.id,
+          title: events.title
+        })
         .from(events)
         .where(eq(events.id, eventId))
         .limit(1);
@@ -1464,7 +1470,9 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       
       // Check if the link already exists
       const existingLink = await db
-        .select()
+        .select({
+          id: sponsorshipEventsLinks.id
+        })
         .from(sponsorshipEventsLinks)
         .where(and(
           eq(sponsorshipEventsLinks.contractId, contractId),
