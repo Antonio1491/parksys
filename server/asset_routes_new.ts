@@ -224,26 +224,7 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
     }
   });
 
-  // Get asset history
-  apiRouter.get("/assets/:id/history", async (req: Request, res: Response) => {
-    try {
-      const assetId = parseInt(req.params.id);
-      
-      if (isNaN(assetId)) {
-        return res.status(400).json({ message: "ID de activo inválido" });
-      }
-
-      const history = await db
-        .select()
-        .from(assetHistory)
-        .where(eq(assetHistory.assetId, assetId));
-
-      res.json(history);
-    } catch (error) {
-      console.error("Error al obtener historial:", error);
-      res.status(500).json({ message: "Error al obtener historial del activo" });
-    }
-  });
+  // Asset history route moved to server/asset-history-routes.ts for better security and authentication
 
   // Get assets by park
   apiRouter.get("/parks/:id/assets", async (req: Request, res: Response) => {

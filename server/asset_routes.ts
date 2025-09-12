@@ -79,7 +79,9 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
 
       if (search && search !== '') {
         // Búsqueda mejorada que incluye tolerancia a errores comunes
-        const searchString = Array.isArray(search) ? search[0] : String(search);
+        const raw = req.query.search; 
+        const s = Array.isArray(raw) ? (raw[0] ?? '') : (raw ?? ''); 
+        const searchString = String(s);
         const searchTerm = searchString.toLowerCase();
         
         conditions.push(`(
@@ -588,7 +590,8 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
     } catch (error) {
       await client.query('ROLLBACK');
       console.error("🚨 [SECURE] Error updating asset - transaction rolled back:", error);
-      res.status(500).json({ message: "Error al actualizar activo", details: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: "Error al actualizar activo", details: errorMessage });
     } finally {
       client.release();
     }
@@ -664,7 +667,8 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
           deletedCount++;
         } catch (error) {
           console.error(`🚨 [SECURE BULK DELETE] Error eliminando activo ${asset.id}:`, error);
-          errors.push({ assetId: asset.id, error: error.message });
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          errors.push({ assetId: asset.id, error: errorMessage });
           // Continue with other assets instead of rolling back entire transaction
         }
       }
@@ -693,7 +697,8 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
     } catch (error) {
       await client.query('ROLLBACK');
       console.error("🚨 [SECURE BULK DELETE] Error en eliminación masiva - transaction rolled back:", error);
-      res.status(500).json({ message: "Error en eliminación masiva", error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: "Error en eliminación masiva", error: errorMessage });
     } finally {
       client.release();
     }
@@ -1054,28 +1059,7 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
     }
   });
 
-  // Get asset history (simplified version)
-  apiRouter.get("/assets/:id/history", async (req: Request, res: Response) => {
-    try {
-      const assetId = parseInt(req.params.id);
-      
-      if (isNaN(assetId)) {
-        return res.status(400).json({ message: "ID de activo inválido" });
-      }
-
-      // Return empty array if history table doesn't exist
-      try {
-        const historyResult = await pool.query("SELECT * FROM asset_history WHERE asset_id = $1 ORDER BY created_at DESC", [assetId]);
-        res.json(historyResult.rows || []);
-      } catch (error) {
-        console.log("Tabla asset_history no existe, devolviendo array vacío");
-        res.json([]);
-      }
-    } catch (error) {
-      console.error("Error al obtener historial:", error);
-      res.status(500).json({ message: "Error al obtener historial del activo" });
-    }
-  });
+  // Asset history route moved to server/asset-history-routes.ts for better security and authentication
 
   // Get assets by park
   apiRouter.get("/parks/:id/assets", async (req: Request, res: Response) => {

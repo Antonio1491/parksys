@@ -19,20 +19,17 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
           ah.id,
           ah.asset_id as "assetId",
           ah.change_type as "changeType",
-          ah.field_name as "fieldName",
+          ah.description,
           ah.previous_value as "previousValue",
           ah.new_value as "newValue",
-          ah.description,
-          ah.user_id as "userId",
+          ah.changed_by as "changedBy",
           ah.notes,
-          ah.timestamp,
-          ah.ip_address as "ipAddress",
-          u.full_name as "userName",
-          u.username as "userUsername"
+          ah.date,
+          ah.created_at as "createdAt",
+          ah.updated_at as "updatedAt"
         FROM asset_history ah
-        LEFT JOIN users u ON ah.user_id = u.id
         WHERE ah.asset_id = $1
-        ORDER BY ah.timestamp DESC
+        ORDER BY ah.created_at DESC
       `;
 
       const result = await pool.query(query, [assetId]);
@@ -76,13 +73,12 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
           ah.asset_id as "assetId",
           ah.change_type as "changeType",
           ah.description,
-          ah.timestamp,
-          u.full_name as "userName",
+          ah.created_at as "createdAt",
+          ah.changed_by as "changedBy",
           a.name as "assetName"
         FROM asset_history ah
-        LEFT JOIN users u ON ah.user_id = u.id
         LEFT JOIN assets a ON ah.asset_id = a.id
-        ORDER BY ah.timestamp DESC
+        ORDER BY ah.created_at DESC
         LIMIT $1
       `;
 
@@ -105,10 +101,10 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
         SELECT 
           change_type as "changeType",
           COUNT(*) as count,
-          DATE_TRUNC('day', timestamp) as date
+          DATE_TRUNC('day', created_at) as date
         FROM asset_history 
-        WHERE timestamp >= NOW() - INTERVAL '30 days'
-        GROUP BY change_type, DATE_TRUNC('day', timestamp)
+        WHERE created_at >= NOW() - INTERVAL '30 days'
+        GROUP BY change_type, DATE_TRUNC('day', created_at)
         ORDER BY date DESC, count DESC
       `;
 

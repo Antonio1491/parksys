@@ -888,7 +888,7 @@ const AdminActivities = () => {
             </div>
 
             {/* Botón limpiar filtros */}
-            <div className="flex rounded-lg items-center">
+            <div className="flex rounded-lg items-center border-gray-300 border">
               <Button 
                 variant="outline" 
                 size="default"

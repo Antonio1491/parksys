@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square } from "lucide-react";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 import { ExportButton } from "@/components/ui/export-button";
@@ -647,25 +647,26 @@ const AdminParksContent = () => {
         <PageHeader
           title="Parques"
           subtitle="Gestión General del Sistema"
-          icon={<Map className="h-6 w-6 text-white" />}
+          icon={<Trees className="h-6 w-6 text-white" />}
           actions={[
-            <ExportButton
-              entity="parks"
-            />,
+            <Button variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo
+            </Button>,
             <Button variant="outline" onClick={() => window.location.href = "/admin/parks-import"}>
               <Upload className="h-4 w-4 mr-2" />
               Importar
             </Button>,
-            <Button variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Parque
-            </Button>,
+            <ExportButton
+              className="bg-[#00444f] text-[#ffffff] hover:bg-[#00a587] hover:text-white"
+              entity="parks"
+            />,
           ]}
         />
                   
         {/* BARRA DE BÚSQUEDA Y CONTROLES */}
         <div 
-          className="bg-white p-2 rounded-xl border shadow-sm"
+          className="bg-white p-2 rounded-xl border"
           data-no-filters="true"
           id="search-section-no-filters"
         >
