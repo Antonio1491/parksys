@@ -1432,8 +1432,12 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
   // Vincular evento existente con contrato de patrocinio
   apiRouter.post('/sponsorship-events-links', isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log('🔍 [DEBUG] Raw request body:', req.body);
+      
       // Validate input data with Zod schema
       const validatedData = insertSponsorshipEventLinkSchema.parse(req.body);
+      console.log('✅ [DEBUG] Validated data:', validatedData);
+      
       const { contractId, eventId, visibility } = validatedData;
       
       // Verify contract exists and is active
