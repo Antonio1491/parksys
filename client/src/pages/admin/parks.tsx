@@ -12,7 +12,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck, ChevronDown } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 import { ExportButton } from "@/components/ui/export-button";
@@ -561,6 +562,15 @@ const AdminParksContent = () => {
     }
   };
 
+  const handleSelectAllParks = () => {
+    const allParkIds = new Set(currentParks.map(park => park.id));
+    setSelectedParks(allParkIds);
+  };
+
+  const handleDeselectAllParks = () => {
+    setSelectedParks(new Set());
+  };
+
   const handleBulkDeleteClick = async () => {
     if (selectedParks.size === 0) return;
     setShowBulkDeleteDialog(true);
@@ -700,20 +710,43 @@ const AdminParksContent = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                <Button
-                  variant={selectionMode ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setSelectionMode(!selectionMode);
-                    if (!selectionMode) {
-                      setSelectedParks(new Set());
-                    }
-                  }}
-                  data-testid="button-selection-toggle"
-                >
-                  <CopyCheck className="h-4 w-4 mr-1" />
-                  Seleccionar
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant={selectionMode ? 'default' : 'outline'}
+                      size="sm"
+                      data-testid="button-selection-toggle"
+                    >
+                      <CopyCheck className="h-4 w-4 mr-1" />
+                      Seleccionar
+                      <ChevronDown className="h-4 w-4 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (!selectionMode) {
+                          setSelectionMode(true);
+                        }
+                        handleSelectAllParks();
+                      }}
+                      data-testid="menu-select-all"
+                    >
+                      <CheckSquare className="h-4 w-4 mr-2" />
+                      Seleccionar todo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        handleDeselectAllParks();
+                        setSelectionMode(false);
+                      }}
+                      data-testid="menu-deselect-all"
+                    >
+                      <Square className="h-4 w-4 mr-2" />
+                      Deseleccionar
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'outline'}
