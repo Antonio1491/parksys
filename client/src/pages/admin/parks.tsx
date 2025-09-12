@@ -749,7 +749,7 @@ const AdminParksContent = () => {
                   <Button
                     variant={selectionMode ? 'default' : 'outline'}
                     size="sm"
-                    className="flex items-center bg-[#ededed] h-10 w-10"
+                    className={`flex items-center h-10 w-10 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed] hover:bg-gray-200'}`}
                     data-testid="button-selection-toggle"
                   >
                     <CopyCheck className="h-4 w-4 mr-1" />
@@ -794,19 +794,18 @@ const AdminParksContent = () => {
                   </div>
                 </div>
 
-                {/* 3. Botón para eliminar elementos seleccionados */}
-                {selectionMode && selectedParks.size > 0 && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleBulkDeleteClick}
-                    className="flex items-center"
-                    data-testid="button-delete-selected"
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Eliminar ({selectedParks.size})
-                  </Button>
-                )}
+                {/* 3. Botón para eliminar elementos independiente */}
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDeleteClick}
+                  className="flex items-center"
+                  disabled={selectedParks.size === 0}
+                  data-testid="button-delete-selected"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Eliminar{selectedParks.size > 0 ? ` (${selectedParks.size})` : ''}
+                </Button>
               </div>
             </div>
           </div>
