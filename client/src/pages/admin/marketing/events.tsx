@@ -71,8 +71,10 @@ export default function SponsoredEventsPage() {
     queryFn: () => {
       console.log('🔍 [DEBUG] Fetching contracts...');
       return apiRequest('/api/sponsorship-contracts').then(res => {
-        console.log('✅ [DEBUG] Contracts response:', res.data);
-        return res.data || [];
+        console.log('✅ [DEBUG] Contracts full response:', res);
+        console.log('✅ [DEBUG] Contracts response.data:', res.data);
+        console.log('✅ [DEBUG] Contracts direct response:', res);
+        return res || [];
       });
     }
   });
@@ -83,8 +85,10 @@ export default function SponsoredEventsPage() {
     queryFn: () => {
       console.log('🔍 [DEBUG] Fetching events...');
       return apiRequest('/api/events').then(res => {
-        console.log('✅ [DEBUG] Events response:', res.data);
-        return res.data || [];
+        console.log('✅ [DEBUG] Events full response:', res);
+        console.log('✅ [DEBUG] Events response.data:', res.data);
+        console.log('✅ [DEBUG] Events direct response:', res);
+        return res || [];
       });
     }
   });
