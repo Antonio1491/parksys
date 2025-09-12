@@ -215,14 +215,14 @@ export default function SponsoredEventsPage() {
       <div className="space-y-6">
         <PageHeader 
           title="Eventos"
-          subtitle='Gestión de eventos patrocinados y sus detalles'
+          subtitle='Gestión de eventos y sus patrocinios'
           icon={<Calendar />}
           actions={[
             <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" onClick={resetLinkForm} data-testid="button-link-event">
-                  <Link className="mr-2 h-4 w-4" />
-                  Vincular Evento
+                  <Link className="mr-2" />
+                  Vincular
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-lg">

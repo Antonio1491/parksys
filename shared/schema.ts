@@ -617,6 +617,15 @@ export const activities = pgTable("activities", {
   isFree: boolean("is_free").default(true), // esGratuita
   isPriceRandom: boolean("is_price_random").default(false), // precio aleatorio
   price: decimal("price", { precision: 10, scale: 2 }), // precio
+  
+  // Campos de descuentos aplicables
+  discountSeniors: decimal("discount_seniors", { precision: 5, scale: 2 }).default("0.00"), // descuento adultos mayores
+  discountStudents: decimal("discount_students", { precision: 5, scale: 2 }).default("0.00"), // descuento estudiantes  
+  discountFamilies: decimal("discount_families", { precision: 5, scale: 2 }).default("0.00"), // descuento familias numerosas
+  discountDisability: decimal("discount_disability", { precision: 5, scale: 2 }).default("0.00"), // descuento discapacidad
+  discountEarlyBird: decimal("discount_early_bird", { precision: 5, scale: 2 }).default("0.00"), // descuento inscripción temprana
+  discountEarlyBirdDeadline: timestamp("discount_early_bird_deadline"), // fecha límite inscripción temprana
+  
   requirements: text("requirements"), // requisitos
   recurringDays: text("recurring_days").array(), // diasRecurrentes
   // Campos de segmentación como JSONB

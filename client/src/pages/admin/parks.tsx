@@ -677,7 +677,7 @@ const AdminParksContent = () => {
               onClick={() => setLocation("/admin/parks/new")}
               data-testid="button-new-park"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 mr-2 mr-2 stroke-[4]" />
               Nuevo
             </Button>,
             <Button 
@@ -804,7 +804,7 @@ const AdminParksContent = () => {
                   data-testid="button-delete-selected"
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
-                  Eliminar{selectedParks.size > 0 ? ` (${selectedParks.size})` : ''}
+                  {selectedParks.size > 0 ? ` (${selectedParks.size})` : ''}
                 </Button>
               </div>
             </div>

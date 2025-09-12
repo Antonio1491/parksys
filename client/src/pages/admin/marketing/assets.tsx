@@ -426,7 +426,7 @@ export default function SponsoredAssetsPage() {
                   variant="primary"
                   onClick={resetForm}>
                   <Plus className="mr-2 stroke-[4]" />
-                  Nuevo Activo
+                  Nuevo
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
