@@ -693,21 +693,37 @@ const AdminParksContent = () => {
                 )}
               </div>
               
-              <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
+              <div className="flex items-center space-x-2">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  variant={selectionMode ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => {
+                    setSelectionMode(!selectionMode);
+                    if (!selectionMode) {
+                      setSelectedParks(new Set());
+                    }
+                  }}
+                  data-testid="button-selection-toggle"
                 >
-                  <Grid className="h-4 w-4" />
+                  <CopyCheck className="h-4 w-4 mr-1" />
+                  Seleccionar
                 </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
+                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
