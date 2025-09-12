@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees } from "lucide-react";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 import { ExportButton } from "@/components/ui/export-button";
@@ -108,6 +108,7 @@ const AdminParksContent = () => {
   // Pagination and view states
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectionMode, setSelectionMode] = useState(false);
   const itemsPerPage = 9;
 
   // Helper function to check if park is certified
@@ -677,7 +678,7 @@ const AdminParksContent = () => {
                 <input
                   type="text"
                   placeholder="Buscar parques..."
-                  className="w-full font-poppins font-medium text-sm pl-10 pr-10 py-2 border border-gray-300 rounded-lg"
+                  className="w-full font-poppins font-medium text-sm pl-10 pr-10 py-2 border border-gray-300 rounded-xl"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -691,24 +692,6 @@ const AdminParksContent = () => {
                   </button>
                 )}
               </div>
-              
-              {/* Bulk Actions */}
-              {selectedParks.size > 0 && (
-                <div className="flex items-center space-x-2 mr-4">
-                  <span className="text-sm text-gray-600">
-                    {selectedParks.size} seleccionado{selectedParks.size > 1 ? 's' : ''}
-                  </span>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleBulkDeleteClick}
-                    disabled={bulkDeleteMutation.isPending}
-                  >
-                    <Trash className="h-4 w-4 mr-1" />
-                    Eliminar
-                  </Button>
-                </div>
-              )}
               
               <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
                 <Button
@@ -727,20 +710,6 @@ const AdminParksContent = () => {
                 </Button>
               </div>
             </div>
-            
-            {/* Select All Checkbox */}
-            {currentParks.length > 0 && (
-              <div className="flex items-center px-2 py-2 border-t">
-                <Checkbox
-                  checked={isAllSelected}
-                  onCheckedChange={handleSelectAll}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-600">
-                  Seleccionar todos en esta página ({currentParks.length})
-                </span>
-              </div>
-            )}
           </div>
         </div>
         {/* ===== FIN SECCIÓN BÚSQUEDA SIN FILTROS ===== */}
