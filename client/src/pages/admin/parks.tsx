@@ -718,7 +718,7 @@ const AdminParksContent = () => {
                     className="flex items-center"
                     data-testid="button-selection-toggle"
                   >
-                    <CopyCheck className="h-4 w-4 mr-1" />
+                    <CopyCheck className="h-4 w-4 mr-1 border-gray-300 border" />
                   </Button>
 
                   {/* Dropdown menu con CSS hover */}
