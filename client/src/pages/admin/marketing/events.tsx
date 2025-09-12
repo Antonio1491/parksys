@@ -28,9 +28,7 @@ interface Contract {
   id: number;
   number?: string;
   status: string;
-  sponsor?: {
-    name: string;
-  };
+  sponsor_name?: string;
 }
 
 interface LinkedEvent {
@@ -218,7 +216,7 @@ export default function SponsoredEventsPage() {
                       <SelectContent>
                         {getActiveContracts().map((contract: Contract) => (
                           <SelectItem key={contract.id} value={contract.id.toString()}>
-                            Contrato #{contract.number || contract.id} - {contract.sponsor?.name}
+                            Contrato #{contract.number || contract.id} - {contract.sponsor_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
