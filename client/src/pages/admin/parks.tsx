@@ -94,7 +94,7 @@ const AdminParksContent = () => {
   // Usuario específicamente pidió que NO aparezcan filtros de amenidades u otros
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [parkToDelete, setParkToDelete] = useState<Park | null>(null);
@@ -381,24 +381,27 @@ const AdminParksContent = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = `/admin/parks/${park.id}/view`}
+                    onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
                     title="Ver detalles del parque"
+                    data-testid={`button-view-park-list-${park.id}`}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = `/admin/parks/${park.id}/edit`}
+                    onClick={() => setLocation(`/admin/parks/${park.id}/edit`)}
+                    data-testid={`button-edit-park-list-${park.id}`}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = `/admin/parks/${park.id}/manage`}
+                    onClick={() => setLocation(`/admin/parks/${park.id}/manage`)}
                     title="Gestión completa del parque"
                     className="text-blue-600 hover:text-blue-700"
+                    data-testid={`button-manage-park-list-${park.id}`}
                   >
                     <Wrench className="h-4 w-4" />
                   </Button>
@@ -490,24 +493,27 @@ const AdminParksContent = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = `/admin/parks/${park.id}/view`}
+                    onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
                     title="Ver detalles del parque"
+                    data-testid={`button-view-park-grid-${park.id}`}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = `/admin/parks/${park.id}/edit`}
+                    onClick={() => setLocation(`/admin/parks/${park.id}/edit`)}
+                    data-testid={`button-edit-park-grid-${park.id}`}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = `/admin/parks/${park.id}/manage`}
+                    onClick={() => setLocation(`/admin/parks/${park.id}/manage`)}
                     title="Gestión completa del parque"
                     className="text-blue-600 hover:text-blue-700"
+                    data-testid={`button-manage-park-grid-${park.id}`}
                   >
                     <Wrench className="h-4 w-4" />
                   </Button>
@@ -666,11 +672,19 @@ const AdminParksContent = () => {
           subtitle="Gestión General del Sistema"
           icon={<Trees className="h-6 w-6 text-white" />}
           actions={[
-            <Button variant="primary" onClick={() => window.location.href = "/admin/parks/new"}>
+            <Button 
+              variant="primary" 
+              onClick={() => setLocation("/admin/parks/new")}
+              data-testid="button-new-park"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Nuevo
             </Button>,
-            <Button variant="outline" onClick={() => window.location.href = "/admin/parks-import"}>
+            <Button 
+              variant="outline" 
+              onClick={() => setLocation("/admin/parks-import")}
+              data-testid="button-import-parks"
+            >
               <Upload className="h-4 w-4 mr-2" />
               Importar
             </Button>,
@@ -710,7 +724,27 @@ const AdminParksContent = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                {/* Dropdown con patrón CSS hover (igual al Header.tsx) */}
+                {/* 1. Botón para cambiar los modos de visualización del grid */}
+                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    data-testid="button-view-grid"
+                  >
+                    <Grid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    data-testid="button-view-list"
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* 2. Botón de selección con menú desplegable */}
                 <div className="relative group">
                   <Button
                     variant={selectionMode ? 'default' : 'outline'}
@@ -759,22 +793,20 @@ const AdminParksContent = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
+
+                {/* 3. Botón para eliminar elementos seleccionados */}
+                {selectionMode && selectedParks.size > 0 && (
                   <Button
-                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    variant="destructive"
                     size="sm"
-                    onClick={() => setViewMode('grid')}
+                    onClick={handleBulkDeleteClick}
+                    className="flex items-center"
+                    data-testid="button-delete-selected"
                   >
-                    <Grid className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Eliminar ({selectedParks.size})
                   </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setViewMode('list')}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
+                )}
               </div>
             </div>
           </div>
