@@ -710,38 +710,15 @@ const AdminParksContent = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                {/* 1. Botón para cambiar los modos de visualización del grid */}
-                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setViewMode('grid')}
-                    title="Vista en cuadrícula"
-                    data-testid="button-view-grid"
-                  >
-                    <Grid className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setViewMode('list')}
-                    title="Vista en lista"
-                    data-testid="button-view-list"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* 2. Botón de selección con menú desplegable */}
+                {/* Dropdown con patrón CSS hover (igual al Header.tsx) */}
                 <div className="relative group">
                   <Button
                     variant={selectionMode ? 'default' : 'outline'}
                     size="sm"
                     className="flex items-center bg-[#ededed] h-10 w-10"
-                    title="Opciones de selección"
                     data-testid="button-selection-toggle"
                   >
-                    <CopyCheck className="h-4 w-4" />
+                    <CopyCheck className="h-4 w-4 mr-1" />
                   </Button>
 
                   {/* Dropdown menu con CSS hover */}
@@ -765,7 +742,7 @@ const AdminParksContent = () => {
                         className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
                         data-testid="menu-select-all"
                       >
-                        <CheckSquare className="h-4 w-4 mr-2" />
+                        <CheckSquare className="h-5 w-5 mr-2" />
                         Seleccionar todo
                       </button>
                       <button
@@ -782,23 +759,22 @@ const AdminParksContent = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* 3. Botón para eliminar */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleBulkDeleteClick}
-                  disabled={selectedParks.size === 0}
-                  className={`h-10 w-10 ${
-                    selectedParks.size > 0 
-                      ? 'text-red-600 hover:text-red-700 hover:bg-red-50' 
-                      : 'text-gray-400'
-                  }`}
-                  title={selectedParks.size > 0 ? `Eliminar ${selectedParks.size} parque${selectedParks.size > 1 ? 's' : ''} seleccionado${selectedParks.size > 1 ? 's' : ''}` : 'Selecciona parques para eliminar'}
-                  data-testid="button-delete-selected"
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
+                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

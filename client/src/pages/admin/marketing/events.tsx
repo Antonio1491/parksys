@@ -141,7 +141,7 @@ export default function SponsoredEventsPage() {
 
   const getActiveContracts = (): Contract[] => {
     return contracts.filter((contract: Contract) => 
-      contract && contract.status === 'active'
+      contract && (contract.status === 'active' || contract.status === 'en_negociacion')
     );
   };
 
