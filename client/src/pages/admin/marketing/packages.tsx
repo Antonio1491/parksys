@@ -86,16 +86,19 @@ const SponsorshipPackagesPage = () => {
 
   const { data: packages = [], isLoading } = useQuery<SponsorshipPackage[]>({
     queryKey: ['/api/sponsorship-packages'],
+    queryFn: () => apiRequest('/api/sponsorship-packages').then(res => res.data || res || [])
   });
 
   // Query para obtener todos los beneficios disponibles
   const { data: availableBenefits = [] } = useQuery<SponsorshipBenefit[]>({
     queryKey: ['/api/sponsorship-benefits'],
+    queryFn: () => apiRequest('/api/sponsorship-benefits').then(res => res.data || res || [])
   });
 
   // Query para obtener beneficios del paquete cuando se edita
   const { data: packageBenefits = [], refetch: refetchPackageBenefits, isLoading: benefitsLoading } = useQuery<PackageBenefit[]>({
     queryKey: ['/api/sponsorship-packages', editingPackage?.id, 'benefits'],
+    queryFn: () => apiRequest(`/api/sponsorship-packages/${editingPackage?.id}/benefits`).then(res => res.data || res || []),
     enabled: !!editingPackage?.id,
   });
 

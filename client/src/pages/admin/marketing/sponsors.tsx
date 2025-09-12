@@ -79,7 +79,8 @@ export default function SponsorsPage() {
 
   // Fetch sponsors
   const { data: sponsors = [], isLoading } = useQuery({
-    queryKey: ['/api/sponsors']
+    queryKey: ['/api/sponsors'],
+    queryFn: () => apiRequest('/api/sponsors').then(res => res.data || res || [])
   });
 
   // Create sponsor mutation

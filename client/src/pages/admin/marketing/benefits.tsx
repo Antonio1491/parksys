@@ -37,6 +37,7 @@ const SponsorshipBenefitsPage = () => {
   // Query para obtener las categorías dinámicamente
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ['/api/sponsorship-benefit-categories'],
+    queryFn: () => apiRequest('/api/sponsorship-benefit-categories').then(res => res.data || res || []),
     staleTime: 5 * 60 * 1000, // 5 minutos de cache
   });
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,6 +55,7 @@ const SponsorshipBenefitsPage = () => {
 
   const { data: benefits = [], isLoading } = useQuery<SponsorshipBenefit[]>({
     queryKey: ['/api/sponsorship-benefits'],
+    queryFn: () => apiRequest('/api/sponsorship-benefits').then(res => res.data || res || [])
   });
 
   const createMutation = useMutation({
