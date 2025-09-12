@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users, DollarSign, Star, Clock } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users, DollarSign, Star, Clock, Link, Unlink } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/queryClient';
@@ -53,8 +53,41 @@ interface Contract {
   id: number;
   sponsorId: number;
   status: string;
+  number?: string;
   sponsor?: {
     name: string;
+  };
+}
+
+interface Event {
+  id: number;
+  title: string;
+  description?: string;
+  startDate: string;
+  endDate?: string;
+  location?: string;
+  status: string;
+}
+
+interface LinkedEvent {
+  id: number;
+  contractId: number;
+  eventId: number;
+  visibility: string;
+  createdAt: string;
+  updatedAt: string;
+  event: {
+    id: number;
+    title: string;
+    description?: string;
+    startDate: string;
+    endDate?: string;
+    location?: string;
+  };
+  contract: {
+    id: number;
+    number?: string;
+    sponsorName?: string;
   };
 }
 
@@ -86,6 +119,12 @@ export default function SponsoredEventsPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<SponsorEvent | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [linkFormData, setLinkFormData] = useState({
+    contractId: '',
+    eventId: '',
+    visibility: 'public'
+  });
   const [formData, setFormData] = useState({
     sponsorId: '',
     contractId: 'none',
@@ -117,6 +156,18 @@ export default function SponsoredEventsPage() {
   const { data: contracts = [] } = useQuery({
     queryKey: ['/api/sponsorship-contracts'],
     queryFn: () => apiRequest('/api/sponsorship-contracts').then(res => res.data || [])
+  });
+
+  // Fetch existing events
+  const { data: availableEvents = [] } = useQuery({
+    queryKey: ['/api/events'],
+    queryFn: () => apiRequest('/api/events').then(res => res.data || [])
+  });
+
+  // Fetch linked events
+  const { data: linkedEvents = [], isLoading: isLoadingLinked } = useQuery({
+    queryKey: ['/api/sponsorship-events-links'],
+    queryFn: () => apiRequest('/api/sponsorship-events-links').then(res => res.data || [])
   });
 
   // Create sponsor event mutation
@@ -179,6 +230,49 @@ export default function SponsoredEventsPage() {
     }
   });
 
+  // Link event with contract mutation
+  const linkEventMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/sponsorship-events-links', {
+      method: 'POST',
+      data
+    }),
+    onSuccess: () => {
+      toast({ title: 'Evento vinculado exitosamente con el contrato' });
+      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-events-links'] });
+      setIsLinkDialogOpen(false);
+      resetLinkForm();
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.status === 409 
+        ? 'Este evento ya está vinculado con este contrato' 
+        : error.response?.data?.error || error.message || 'Error al vincular evento';
+      
+      toast({ 
+        title: 'Error al vincular evento',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+    }
+  });
+
+  // Unlink event mutation
+  const unlinkEventMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/sponsorship-events-links/${id}`, {
+      method: 'DELETE'
+    }),
+    onSuccess: () => {
+      toast({ title: 'Evento desvinculado exitosamente' });
+      queryClient.invalidateQueries({ queryKey: ['/api/sponsorship-events-links'] });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: 'Error al desvincular evento',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  });
+
   const filteredEvents = sponsorEvents.filter((event: SponsorEvent) => {
     const matchesSearch = event.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.sponsor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -205,6 +299,14 @@ export default function SponsoredEventsPage() {
       status: 'pending'
     });
     setSelectedEvent(null);
+  };
+
+  const resetLinkForm = () => {
+    setLinkFormData({
+      contractId: '',
+      eventId: '',
+      visibility: 'public'
+    });
   };
 
   const handleEdit = (event: SponsorEvent) => {
@@ -255,6 +357,45 @@ export default function SponsoredEventsPage() {
     );
   };
 
+  const getActiveContracts = () => {
+    return contracts.filter((contract: Contract) => contract.status === 'active');
+  };
+
+  const getUnlinkedEvents = () => {
+    // Get already linked pairs for the selected contract
+    const selectedContractId = parseInt(linkFormData.contractId);
+    if (!selectedContractId) {
+      return availableEvents.filter((event: Event) => event.status === 'published');
+    }
+    
+    const linkedEventIdsForContract = linkedEvents
+      .filter((link: LinkedEvent) => link.contractId === selectedContractId)
+      .map((link: LinkedEvent) => link.eventId);
+    
+    // Return events that are not already linked to THIS specific contract
+    return availableEvents.filter((event: Event) => 
+      !linkedEventIdsForContract.includes(event.id) && event.status === 'published'
+    );
+  };
+
+  const handleLinkSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const payload = {
+      contractId: parseInt(linkFormData.contractId),
+      eventId: parseInt(linkFormData.eventId),
+      visibility: linkFormData.visibility
+    };
+    
+    linkEventMutation.mutate(payload);
+  };
+
+  const handleUnlink = (id: number) => {
+    if (confirm('¿Estás seguro de que deseas desvincular este evento del contrato?')) {
+      unlinkEventMutation.mutate(id);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -263,13 +404,96 @@ export default function SponsoredEventsPage() {
           subtitle='Gestión de eventos patrocinados y sus detalles'
           icon={<Calendar />}
           actions={[
+            <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" onClick={resetLinkForm} data-testid="button-link-event">
+                  <Link className="mr-2 h-4 w-4" />
+                  Vincular Evento
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Vincular Evento Existente</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleLinkSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="contractId">Contrato de Patrocinio *</Label>
+                    <Select 
+                      value={linkFormData.contractId} 
+                      onValueChange={(value) => setLinkFormData({ ...linkFormData, contractId: value })}
+                      data-testid="select-contract"
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar contrato" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getActiveContracts().map((contract: Contract) => (
+                          <SelectItem key={contract.id} value={contract.id.toString()}>
+                            Contrato #{contract.number || contract.id} - {contract.sponsor?.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="eventId">Evento *</Label>
+                    <Select 
+                      value={linkFormData.eventId} 
+                      onValueChange={(value) => setLinkFormData({ ...linkFormData, eventId: value })}
+                      data-testid="select-event"
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar evento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getUnlinkedEvents().map((event: Event) => (
+                          <SelectItem key={event.id} value={event.id.toString()}>
+                            {event.title} - {event.startDate ? format(new Date(event.startDate), 'dd/MM/yyyy') : 'Sin fecha'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="visibility">Visibilidad del Patrocinio</Label>
+                    <Select 
+                      value={linkFormData.visibility} 
+                      onValueChange={(value) => setLinkFormData({ ...linkFormData, visibility: value })}
+                      data-testid="select-visibility"
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">Público</SelectItem>
+                        <SelectItem value="private">Privado</SelectItem>
+                        <SelectItem value="featured">Destacado</SelectItem>
+                        <SelectItem value="banner">Banner Principal</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={linkEventMutation.isPending} data-testid="button-submit-link">
+                      {linkEventMutation.isPending ? 'Vinculando...' : 'Vincular'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>,
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                      <DialogTrigger asChild>
                        <Button 
                          variant="primary"
-                         onClick={resetForm}>
+                         onClick={resetForm}
+                         data-testid="button-new-sponsor-event">
                          <Plus className="mr-2 stroke-[4]" />
-                         Nuevo Evento
+                         Nuevo Evento Patrocinado
                        </Button>
                      </DialogTrigger>
                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -493,9 +717,126 @@ export default function SponsoredEventsPage() {
           </CardContent>
         </Card>
 
-        {/* Events List */}
-        <div className="space-y-4">
-          {filteredEvents.map((event: SponsorEvent) => (
+        {/* Linked Events Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Link className="h-5 w-5" />
+                  Eventos Vinculados con Contratos
+                </CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  Eventos existentes vinculados con contratos de patrocinio
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingLinked ? (
+              <div className="flex justify-center py-8">
+                <div className="text-sm text-gray-500">Cargando eventos vinculados...</div>
+              </div>
+            ) : linkedEvents.length === 0 ? (
+              <div className="text-center py-8">
+                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No hay eventos vinculados con contratos</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Usa el botón "Vincular Evento" para conectar eventos existentes con contratos de patrocinio
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {linkedEvents.map((linkedEvent: LinkedEvent) => (
+                  <div key={linkedEvent.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50" data-testid={`linked-event-${linkedEvent.id}`}>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">
+                            {linkedEvent.event.title}
+                          </h4>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                            {linkedEvent.event.startDate && (
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {format(new Date(linkedEvent.event.startDate), 'dd/MM/yyyy')}
+                              </span>
+                            )}
+                            {linkedEvent.event.location && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                {linkedEvent.event.location}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-gray-900">
+                            {linkedEvent.contract.sponsorName}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            Contrato #{linkedEvent.contract.number || linkedEvent.contract.id}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            className={`${
+                              linkedEvent.visibility === 'public' ? 'bg-green-100 text-green-800' :
+                              linkedEvent.visibility === 'private' ? 'bg-gray-100 text-gray-800' :
+                              linkedEvent.visibility === 'featured' ? 'bg-blue-100 text-blue-800' :
+                              'bg-purple-100 text-purple-800'
+                            }`}
+                          >
+                            {linkedEvent.visibility === 'public' ? 'Público' :
+                             linkedEvent.visibility === 'private' ? 'Privado' :
+                             linkedEvent.visibility === 'featured' ? 'Destacado' : 'Banner'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleUnlink(linkedEvent.id)}
+                      className="ml-4 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      data-testid={`button-unlink-${linkedEvent.id}`}
+                    >
+                      <Unlink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Sponsor Events List */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Star className="h-5 w-5" />
+              Eventos Patrocinados Personalizados
+            </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              Eventos creados específicamente para patrocinadores
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="text-sm text-gray-500">Cargando eventos patrocinados...</div>
+                </div>
+              ) : filteredEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">No hay eventos patrocinados personalizados</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Crea nuevos eventos personalizados para patrocinadores específicos
+                  </p>
+                </div>
+              ) : (
+                filteredEvents.map((event: SponsorEvent) => (
             <Card key={event.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -593,20 +934,11 @@ export default function SponsoredEventsPage() {
                 )}
               </CardContent>
             </Card>
-          ))}
-        </div>
-
-        {filteredEvents.length === 0 && !isLoading && (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <div className="text-gray-500">
-                {searchTerm || filterLevel || filterStatus 
-                  ? 'No se encontraron eventos patrocinados que coincidan con los filtros.'
-                  : 'No hay eventos patrocinados registrados aún.'}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );

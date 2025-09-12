@@ -3322,14 +3322,26 @@ export const sponsorshipContracts = pgTable("sponsorship_contracts", {
 });
 
 // Tabla de eventos vinculados a contratos de patrocinio
-export const sponsorshipEvents = pgTable("sponsorship_events", {
-  id: serial("id").primaryKey(), // Mantengo serial por compatibilidad y seguridad
+export const sponsorshipEventsLinks = pgTable("sponsorship_events_links", {
+  id: serial("id").primaryKey(),
   contractId: integer("contract_id").notNull().references(() => sponsorshipContracts.id, { onDelete: "cascade" }),
   eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
-  visibility: varchar("visibility", { length: 255 }).notNull(), // tipo de publicidad en el evento
-  
+  visibility: varchar("visibility", { length: 255 }).notNull().default("public"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Keep the original sponsorshipEvents for legacy compatibility but point to different table
+export const sponsorshipEvents = pgTable("sponsorship_events", {
+  id: serial("id").primaryKey(),
+  sponsorId: integer("sponsor_id").notNull().references(() => sponsors.id),
+  eventName: varchar("event_name", { length: 255 }).notNull(),
+  eventDate: date("event_date").notNull(),
+  eventType: varchar("event_type", { length: 100 }),
+  participantsCount: integer("participants_count").default(0),
+  budgetAllocated: decimal("budget_allocated", { precision: 10, scale: 2 }).default("0.00"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow()
 });
 
 // Tabla de métricas de patrocinio
@@ -3458,10 +3470,17 @@ export const insertSponsorshipContractSchema = createInsertSchema(sponsorshipCon
   endDate: z.string().min(1, "La fecha de fin es requerida")
 });
 
-export const insertSponsorshipEventSchema = createInsertSchema(sponsorshipEvents).omit({
+// Insert schema for the links table
+export const insertSponsorshipEventLinkSchema = createInsertSchema(sponsorshipEventsLinks).omit({
   id: true,
   createdAt: true,
   updatedAt: true
+});
+
+// Keep the old schema for legacy compatibility
+export const insertSponsorshipEventSchema = createInsertSchema(sponsorshipEvents).omit({
+  id: true,
+  createdAt: true
 });
 
 export const insertSponsorshipMetricsSchema = createInsertSchema(sponsorshipMetrics).omit({
@@ -3513,6 +3532,11 @@ export type InsertSponsorshipCampaign = z.infer<typeof insertSponsorshipCampaign
 export type SponsorshipContract = typeof sponsorshipContracts.$inferSelect;
 export type InsertSponsorshipContract = z.infer<typeof insertSponsorshipContractSchema>;
 
+// Types for the links table
+export type SponsorshipEventLink = typeof sponsorshipEventsLinks.$inferSelect;
+export type InsertSponsorshipEventLink = z.infer<typeof insertSponsorshipEventLinkSchema>;
+
+// Legacy types
 export type SponsorshipEvent = typeof sponsorshipEvents.$inferSelect;
 export type InsertSponsorshipEvent = z.infer<typeof insertSponsorshipEventSchema>;
 

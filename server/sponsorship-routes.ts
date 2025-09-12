@@ -8,26 +8,25 @@ import {
   sponsors, 
   sponsorshipCampaigns,
   sponsorshipContracts,
-  sponsorEvents,
+  sponsorshipEvents,
+  sponsorshipEventsLinks,
   sponsorshipMetrics,
-  sponsorAssets,
   sponsorshipEvaluations,
   sponsorshipRenewals,
-  sponsorEventBenefits,
+  events,
   insertSponsorshipPackageSchema,
   insertSponsorshipBenefitSchema,
   insertSponsorshipPackageBenefitSchema,
   insertSponsorSchema, 
   insertSponsorshipCampaignSchema,
   insertSponsorshipContractSchema,
-  insertSponsorEventSchema,
+  insertSponsorshipEventSchema,
+  insertSponsorshipEventLinkSchema,
   insertSponsorshipMetricsSchema,
-  insertSponsorAssetSchema,
   insertSponsorshipEvaluationSchema,
-  insertSponsorshipRenewalSchema,
-  insertSponsorEventBenefitSchema
+  insertSponsorshipRenewalSchema
 } from '../shared/schema';
-import { eq, desc, sql } from 'drizzle-orm';
+import { eq, desc, sql, and } from 'drizzle-orm';
 
 /**
  * Rutas para el sistema de patrocinios
@@ -851,92 +850,22 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
   
   // ===== EVENTOS PATROCINADOS =====
   
-  // Obtener todos los eventos patrocinados
+  // Obtener todos los eventos patrocinados - TEMPORALMENTE DESHABILITADO
   apiRouter.get('/sponsor-events', async (req: Request, res: Response) => {
     try {
-      const result = await pool.query(`
-        SELECT 
-          se.*,
-          s.name as sponsor_name,
-          s.logo_url as sponsor_logo,
-          sc.contract_number,
-          sc.title as contract_title
-        FROM sponsor_events se
-        LEFT JOIN sponsors s ON se.sponsor_id = s.id
-        LEFT JOIN sponsorship_contracts sc ON se.contract_id = sc.id
-        ORDER BY se.event_date DESC
-      `);
-      
-      // Mapear a camelCase para el frontend
-      const events = result.rows.map(row => ({
-        id: row.id,
-        sponsorId: row.sponsor_id,
-        contractId: row.contract_id,
-        eventName: row.event_name,
-        eventDate: row.event_date,
-        eventLocation: row.event_location,
-        sponsorshipLevel: row.sponsorship_level,
-        logoPlacement: row.logo_placement,
-        exposureMinutes: row.exposure_minutes,
-        standSize: row.stand_size,
-        activationBudget: row.activation_budget,
-        specialRequirements: row.special_requirements,
-        status: row.status,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        sponsorName: row.sponsor_name,
-        sponsorLogo: row.sponsor_logo,
-        contractNumber: row.contract_number,
-        contractTitle: row.contract_title
-      }));
-      
-      res.json(events);
+      // La tabla sponsor_events no existe aún - usando array vacío
+      res.json({ data: [] });
     } catch (error) {
       console.error('Error al obtener eventos patrocinados:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
 
-  // Alias para compatibilidad con el frontend
+  // Alias para compatibilidad con el frontend - TEMPORALMENTE DESHABILITADO  
   apiRouter.get('/sponsorship-events', async (req: Request, res: Response) => {
     try {
-      const result = await pool.query(`
-        SELECT 
-          se.*,
-          s.name as sponsor_name,
-          s.logo_url as sponsor_logo,
-          sc.contract_number,
-          sc.title as contract_title
-        FROM sponsor_events se
-        LEFT JOIN sponsors s ON se.sponsor_id = s.id
-        LEFT JOIN sponsorship_contracts sc ON se.contract_id = sc.id
-        ORDER BY se.event_date DESC
-      `);
-      
-      // Mapear a camelCase para el frontend
-      const events = result.rows.map(row => ({
-        id: row.id,
-        sponsorId: row.sponsor_id,
-        contractId: row.contract_id,
-        eventName: row.event_name,
-        eventDate: row.event_date,
-        eventLocation: row.event_location,
-        sponsorshipLevel: row.sponsorship_level,
-        logoPlacement: row.logo_placement,
-        exposureMinutes: row.exposure_minutes,
-        standSize: row.stand_size,
-        activationBudget: row.activation_budget,
-        specialRequirements: row.special_requirements,
-        status: row.status,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        sponsorName: row.sponsor_name,
-        sponsorLogo: row.sponsor_logo,
-        contractNumber: row.contract_number,
-        contractTitle: row.contract_title
-      }));
-      
-      res.json(events);
+      // La tabla sponsor_events no existe aún - usando array vacío
+      res.json({ data: [] });
     } catch (error) {
       console.error('Error al obtener eventos patrocinados:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
@@ -1436,6 +1365,180 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       });
     } catch (error) {
       console.error('Error al generar reporte ROI:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+  // ===== VINCULACIÓN DE EVENTOS CON CONTRATOS =====
+  
+  // Obtener eventos vinculados a contratos de patrocinio
+  apiRouter.get('/sponsorship-events-links', async (req: Request, res: Response) => {
+    try {
+      const linkedEvents = await db
+        .select({
+          id: sponsorshipEventsLinks.id,
+          contractId: sponsorshipEventsLinks.contractId,
+          eventId: sponsorshipEventsLinks.eventId,
+          visibility: sponsorshipEventsLinks.visibility,
+          createdAt: sponsorshipEventsLinks.createdAt,
+          updatedAt: sponsorshipEventsLinks.updatedAt,
+          // Event data
+          eventTitle: events.title,
+          eventDescription: events.description,
+          eventStartDate: events.startDate,
+          eventEndDate: events.endDate,
+          eventLocation: events.location,
+          // Contract data
+          contractNumber: sponsorshipContracts.number,
+          sponsorName: sponsors.name
+        })
+        .from(sponsorshipEventsLinks)
+        .leftJoin(events, eq(sponsorshipEventsLinks.eventId, events.id))
+        .leftJoin(sponsorshipContracts, eq(sponsorshipEventsLinks.contractId, sponsorshipContracts.id))
+        .leftJoin(sponsors, eq(sponsorshipContracts.sponsorId, sponsors.id))
+        .orderBy(desc(sponsorshipEventsLinks.createdAt));
+
+      const formattedEvents = linkedEvents.map(row => ({
+        id: row.id,
+        contractId: row.contractId,
+        eventId: row.eventId,
+        visibility: row.visibility,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+        event: {
+          id: row.eventId,
+          title: row.eventTitle,
+          description: row.eventDescription,
+          startDate: row.eventStartDate,
+          endDate: row.eventEndDate,
+          location: row.eventLocation
+        },
+        contract: {
+          id: row.contractId,
+          number: row.contractNumber,
+          sponsorName: row.sponsorName
+        }
+      }));
+      
+      res.json({ data: formattedEvents });
+    } catch (error) {
+      console.error('Error al obtener eventos vinculados:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Vincular evento existente con contrato de patrocinio
+  apiRouter.post('/sponsorship-events-links', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Validate input data with Zod schema
+      const validatedData = insertSponsorshipEventLinkSchema.parse(req.body);
+      const { contractId, eventId, visibility } = validatedData;
+      
+      // Verify contract exists and is active
+      const contract = await db
+        .select()
+        .from(sponsorshipContracts)
+        .where(eq(sponsorshipContracts.id, contractId))
+        .limit(1);
+      
+      if (contract.length === 0) {
+        return res.status(404).json({ error: 'Contrato de patrocinio no encontrado' });
+      }
+      
+      // Verify event exists
+      const event = await db
+        .select()
+        .from(events)
+        .where(eq(events.id, eventId))
+        .limit(1);
+      
+      if (event.length === 0) {
+        return res.status(404).json({ error: 'Evento no encontrado' });
+      }
+      
+      // Check if the link already exists
+      const existingLink = await db
+        .select()
+        .from(sponsorshipEventsLinks)
+        .where(and(
+          eq(sponsorshipEventsLinks.contractId, contractId),
+          eq(sponsorshipEventsLinks.eventId, eventId)
+        ))
+        .limit(1);
+      
+      if (existingLink.length > 0) {
+        return res.status(409).json({ 
+          error: 'Este evento ya está vinculado con este contrato',
+          details: 'Un evento solo puede estar vinculado una vez al mismo contrato' 
+        });
+      }
+      
+      // Create the link
+      const [newLink] = await db
+        .insert(sponsorshipEventsLinks)
+        .values(validatedData)
+        .returning();
+      
+      res.status(201).json({ data: newLink });
+    } catch (error) {
+      console.error('Error al vincular evento:', error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: 'Datos de entrada inválidos', 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Actualizar vinculación de evento
+  apiRouter.put('/sponsorship-events-links/:id', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { visibility } = req.body;
+      
+      // Validate visibility value
+      if (!visibility || typeof visibility !== 'string') {
+        return res.status(400).json({ error: 'El campo visibility es requerido y debe ser una cadena de texto' });
+      }
+      
+      const [updatedLink] = await db
+        .update(sponsorshipEventsLinks)
+        .set({ 
+          visibility, 
+          updatedAt: new Date() 
+        })
+        .where(eq(sponsorshipEventsLinks.id, parseInt(id)))
+        .returning();
+      
+      if (!updatedLink) {
+        return res.status(404).json({ error: 'Vinculación no encontrada' });
+      }
+      
+      res.json({ data: updatedLink });
+    } catch (error) {
+      console.error('Error al actualizar vinculación:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  });
+
+  // Desvincular evento del contrato
+  apiRouter.delete('/sponsorship-events-links/:id', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const [deletedLink] = await db
+        .delete(sponsorshipEventsLinks)
+        .where(eq(sponsorshipEventsLinks.id, parseInt(id)))
+        .returning();
+      
+      if (!deletedLink) {
+        return res.status(404).json({ error: 'Vinculación no encontrada' });
+      }
+      
+      res.json({ message: 'Evento desvinculado exitosamente' });
+    } catch (error) {
+      console.error('Error al desvincular evento:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
