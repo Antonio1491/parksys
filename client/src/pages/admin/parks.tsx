@@ -711,34 +711,19 @@ const AdminParksContent = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                <DropdownMenu open={selectionMode && showDropdown}>
+                <DropdownMenu open={showDropdown}>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant={selectionMode ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => {
-                        setSelectionMode(!selectionMode);
-                        if (!selectionMode) {
-                          setSelectedParks(new Set());
-                        }
-                        setShowDropdown(false);
-                      }}
-                      onMouseEnter={() => {
-                        if (selectionMode) {
-                          setShowDropdown(true);
-                        }
-                      }}
-                      onMouseLeave={() => {
-                        setShowDropdown(false);
-                      }}
+                      onMouseEnter={() => setShowDropdown(true)}
+                      onMouseLeave={() => setShowDropdown(false)}
                       data-testid="button-selection-toggle"
                     >
-                      <CopyCheck className="h-4 w-4 mr-1" />
-                      Seleccionar
-                      {selectionMode && <ChevronDown className="h-4 w-4 ml-1" />}
+                      <CopyCheck className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  {selectionMode && showDropdown && (
+                  {showDropdown && (
                     <DropdownMenuContent 
                       align="end"
                       onMouseEnter={() => setShowDropdown(true)}
@@ -746,6 +731,19 @@ const AdminParksContent = () => {
                     >
                       <DropdownMenuItem
                         onClick={() => {
+                          setSelectionMode(true);
+                          setShowDropdown(false);
+                        }}
+                        data-testid="menu-enable-selection"
+                      >
+                        <CopyCheck className="h-4 w-4 mr-2" />
+                        Selección múltiple
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          if (!selectionMode) {
+                            setSelectionMode(true);
+                          }
                           handleSelectAllParks();
                           setShowDropdown(false);
                         }}
