@@ -66,15 +66,27 @@ export default function SponsoredEventsPage() {
 
 
   // Fetch contracts for linking
-  const { data: contracts = [] } = useQuery({
+  const { data: contracts = [], isLoading: isLoadingContracts, error: contractsError } = useQuery({
     queryKey: ['/api/sponsorship-contracts'],
-    queryFn: () => apiRequest('/api/sponsorship-contracts').then(res => res.data || [])
+    queryFn: () => {
+      console.log('🔍 [DEBUG] Fetching contracts...');
+      return apiRequest('/api/sponsorship-contracts').then(res => {
+        console.log('✅ [DEBUG] Contracts response:', res.data);
+        return res.data || [];
+      });
+    }
   });
 
   // Fetch existing events
-  const { data: availableEvents = [] } = useQuery({
+  const { data: availableEvents = [], isLoading: isLoadingEvents, error: eventsError } = useQuery({
     queryKey: ['/api/events'],
-    queryFn: () => apiRequest('/api/events').then(res => res.data || [])
+    queryFn: () => {
+      console.log('🔍 [DEBUG] Fetching events...');
+      return apiRequest('/api/events').then(res => {
+        console.log('✅ [DEBUG] Events response:', res.data);
+        return res.data || [];
+      });
+    }
   });
 
   // Fetch linked events
@@ -138,16 +150,25 @@ export default function SponsoredEventsPage() {
 
 
   const getActiveContracts = (): Contract[] => {
-    return contracts.filter((contract: Contract) => 
+    console.log('🔍 [DEBUG] getActiveContracts called. Total contracts:', contracts.length);
+    console.log('🔍 [DEBUG] Contracts data:', contracts);
+    const filtered = contracts.filter((contract: Contract) => 
       contract && (contract.status === 'active' || contract.status === 'en_negociacion')
     );
+    console.log('✅ [DEBUG] Filtered active contracts:', filtered.length, filtered);
+    return filtered;
   };
 
   const getUnlinkedEvents = (): Event[] => {
+    console.log('🔍 [DEBUG] getUnlinkedEvents called. Total events:', availableEvents.length);
+    console.log('🔍 [DEBUG] Events data:', availableEvents);
+    
     // Get already linked pairs for the selected contract
     const selectedContractId = parseInt(linkFormData.contractId);
     if (!selectedContractId) {
-      return availableEvents.filter((event: Event) => event.status === 'published');
+      const publishedEvents = availableEvents.filter((event: Event) => event.status === 'published');
+      console.log('✅ [DEBUG] Published events (no contract selected):', publishedEvents.length, publishedEvents);
+      return publishedEvents;
     }
     
     const linkedEventIdsForContract = linkedEvents
@@ -155,9 +176,11 @@ export default function SponsoredEventsPage() {
       .map((link: LinkedEvent) => link.eventId);
     
     // Return events that are not already linked to THIS specific contract
-    return availableEvents.filter((event: Event) => 
+    const unlinkedEvents = availableEvents.filter((event: Event) => 
       !linkedEventIdsForContract.includes(event.id) && event.status === 'published'
     );
+    console.log('✅ [DEBUG] Unlinked events for contract', selectedContractId, ':', unlinkedEvents.length, unlinkedEvents);
+    return unlinkedEvents;
   };
 
   // Validation helper
