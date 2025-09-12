@@ -694,7 +694,7 @@ const AdminParksContent = () => {
                 <input
                   type="text"
                   placeholder="Buscar parques..."
-                  className="w-full font-poppins font-medium text-sm pl-10 pr-10 py-2 border border-gray-300 rounded-xl"
+                  className="w-full font-poppins font-regular text-sm pl-10 pr-10 py-2 border border-gray-300 rounded-xl"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -718,8 +718,6 @@ const AdminParksContent = () => {
                       data-testid="button-selection-toggle"
                     >
                       <CopyCheck className="h-4 w-4 mr-1" />
-                      Seleccionar
-                      <ChevronDown className="h-4 w-4 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
