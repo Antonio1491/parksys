@@ -75,13 +75,14 @@ export const assetHistory = pgTable("asset_history", {
   id: serial("id").primaryKey(),
   assetId: integer("asset_id").notNull(),
   changeType: text("change_type").notNull(), // acquisition, transfer, status_change, maintenance, retirement
-  date: timestamp("date").notNull().defaultNow(),
+  date: date("date").notNull(), // Date field (matches database)
   description: text("description").notNull(),
-  changedBy: integer("changed_by").notNull(), // Usuario que hizo el cambio
-  previousValue: jsonb("previous_value"), // Valor anterior (puede ser variado)
-  newValue: jsonb("new_value"), // Nuevo valor
+  changedBy: text("changed_by"), // Usuario como texto (matches database TEXT field)
+  previousValue: text("previous_value"), // Valor anterior como texto (matches database)
+  newValue: text("new_value"), // Nuevo valor como texto (matches database)
   notes: text("notes"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(), // Matches database
+  updatedAt: timestamp("updated_at").defaultNow(), // Matches database
 });
 
 // Definición de relaciones
@@ -133,11 +134,8 @@ export const assetHistoryRelations = relations(assetHistory, ({ one }) => ({
     fields: [assetHistory.assetId],
     references: [assets.id]
   }),
-  changedByUser: one(users, {
-    fields: [assetHistory.changedBy],
-    references: [users.id],
-    relationName: "assetHistoryUser"
-  })
+  // 🚨 Note: changedBy is TEXT field, not a foreign key, so no user relation here
+  // Use backend queries to JOIN with users table when needed
 }));
 
 // Schemas de Inserción

@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { apiRequest } from '@/lib/queryClient';
-import { AssetHistory } from '@shared/schema';
+import { AssetHistoryEntry as BaseAssetHistoryEntry } from '@shared/asset-schema';
 
 import AdminLayout from '@/components/AdminLayout';
 import AssetImageManager from '@/components/AssetImageManager';
@@ -188,8 +188,8 @@ interface AssetMaintenance {
   updatedAt: string;
 }
 
-// Using shared type from schema.ts
-type AssetHistoryEntry = AssetHistory & {
+// Using shared type from schema.ts with additional frontend fields
+type ExtendedAssetHistoryEntry = BaseAssetHistoryEntry & {
   userName: string;
   userUsername: string;
 };
@@ -300,7 +300,7 @@ const AssetDetailPage: React.FC = () => {
   });
   
   // Consultar historial
-  const { data: history } = useQuery<AssetHistoryEntry[]>({
+  const { data: history } = useQuery<ExtendedAssetHistoryEntry[]>({
     queryKey: [`/api/assets/${id}/history`],
     enabled: !!id,
   });

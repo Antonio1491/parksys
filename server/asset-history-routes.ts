@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { db } from './db';
-import { assetHistory, assets, users, insertAssetHistorySchema } from '../shared/schema';
+import { assetHistory, insertAssetHistorySchema } from '../shared/asset-schema';
+import { assets, users } from '../shared/schema';
 import { eq, desc, and } from 'drizzle-orm';
 
 /**
@@ -14,6 +15,7 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
       const assetId = parseInt(req.params.id);
       const { pool } = await import("./db");
 
+      // 🔧 Updated query to handle text changed_by field and provide frontend-expected field names
       const query = `
         SELECT 
           ah.id,
@@ -26,8 +28,22 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
           ah.notes,
           ah.date,
           ah.created_at as "createdAt",
-          ah.updated_at as "updatedAt"
+          ah.updated_at as "updatedAt",
+          -- Try to get user info by joining with users table (changed_by might be user ID as text or username)
+          COALESCE(u.full_name, u.username, ah.changed_by) as "userName",
+          COALESCE(u.username, ah.changed_by) as "userUsername",
+          -- Use created_at as timestamp for frontend compatibility
+          ah.created_at as "timestamp",
+          -- For now, set fieldName to change_type until we have better field tracking
+          ah.change_type as "fieldName"
         FROM asset_history ah
+        LEFT JOIN users u ON (
+          -- Try to match changed_by as user ID (if it's numeric) or username
+          CASE 
+            WHEN ah.changed_by ~ '^[0-9]+$' THEN u.id::text = ah.changed_by
+            ELSE u.username = ah.changed_by OR u.email = ah.changed_by
+          END
+        )
         WHERE ah.asset_id = $1
         ORDER BY ah.created_at DESC
       `;
@@ -35,6 +51,7 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
       const result = await pool.query(query, [assetId]);
       
       console.log(`📋 Encontrados ${result.rows.length} registros de historial para activo ${assetId}`);
+      console.log(`🔍 Muestra de datos:`, result.rows.slice(0, 1));
       res.json(result.rows);
     } catch (error) {
       console.error('Error fetching asset history:', error);

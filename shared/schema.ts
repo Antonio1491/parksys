@@ -2367,37 +2367,8 @@ export type InsertAssetCategory = typeof assetCategories.$inferInsert;
 export type Asset = typeof assets.$inferSelect;
 export type InsertAsset = typeof assets.$inferInsert;
 
-// Tabla de historial de activos (auditoría)
-export const assetHistory = pgTable("asset_history", {
-  id: serial("id").primaryKey(),
-  assetId: integer("asset_id").notNull().references(() => assets.id, { onDelete: "cascade" }),
-  changeType: varchar("change_type", { length: 50 }).notNull(), // created/updated/status_changed/location_changed/assigned/maintenance/retired
-  fieldName: varchar("field_name", { length: 100 }), // Campo que cambió
-  previousValue: text("previous_value"), // Valor anterior
-  newValue: text("new_value"), // Valor nuevo
-  description: text("description").notNull(), // Descripción del cambio
-  userId: integer("user_id"), // Usuario que realizó el cambio
-  notes: text("notes"), // Notas adicionales
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
-  
-  // Información adicional para contexto
-  ipAddress: varchar("ip_address", { length: 45 }), // IP del usuario
-  userAgent: text("user_agent"), // Información del navegador
-});
-
-export const assetHistoryRelations = relations(assetHistory, ({ one }) => ({
-  asset: one(assets, {
-    fields: [assetHistory.assetId],
-    references: [assets.id]
-  }),
-  user: one(users, {
-    fields: [assetHistory.userId],
-    references: [users.id]
-  })
-}));
-
-export type AssetHistory = typeof assetHistory.$inferSelect;
-export type InsertAssetHistory = typeof assetHistory.$inferInsert;
+// ⚠️ DEPRECATED: assetHistory schema moved to shared/asset-schema.ts
+// This avoids duplicate definitions and conflicts. Import from shared/asset-schema.ts instead.
 
 export type AssetMaintenance = typeof assetMaintenances.$inferSelect;
 export type InsertAssetMaintenance = typeof assetMaintenances.$inferInsert;
@@ -2439,12 +2410,7 @@ export const insertAssetImageSchema = createInsertSchema(assetImages).omit({
   updatedAt: true
 });
 
-export const insertAssetHistorySchema = createInsertSchema(assetHistory).omit({
-  id: true,
-  timestamp: true
-}).extend({
-  changeType: z.enum(['creation', 'acquisition', 'updated', 'maintenance', 'retirement', 'status_changed', 'location_changed', 'assigned'])
-});
+// ⚠️ DEPRECATED: insertAssetHistorySchema moved to shared/asset-schema.ts
 
 // Relaciones para activos
 export const assetCategoriesRelations = relations(assetCategories, ({ many, one }) => ({
@@ -2476,7 +2442,7 @@ export const assetsRelations = relations(assets, ({ one, many }) => ({
   maintenances: many(assetMaintenances),
   assignments: many(assetAssignments),
   images: many(assetImages),
-  history: many(assetHistory)
+  // ⚠️ history: moved to shared/asset-schema.ts - import assetHistory from there if needed
 }));
 
 export const assetMaintenancesRelations = relations(assetMaintenances, ({ one }) => ({
