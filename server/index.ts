@@ -2453,6 +2453,11 @@ function startServer() {
       app.use("/api/hr", hrRouter);
       console.log("✅ [API-PRIORITY] HR routes registered before Vite");
       
+      // Registrar rutas de historial de activos
+      const { registerAssetHistoryRoutes } = await import("./asset-history-routes");
+      registerAssetHistoryRoutes(app, apiRouter, (req: Request, res: Response, next: NextFunction) => next());
+      console.log("✅ [API-PRIORITY] Asset history routes registered before Vite");
+      
       // Register all other routes that were causing startup delays...
       console.log("✅ [API-PRIORITY] All other routes registered successfully before Vite");
     } catch (error) {
