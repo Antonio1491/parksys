@@ -9,13 +9,63 @@ import { eq, desc, and } from 'drizzle-orm';
  */
 export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
   
-  // Obtener historial de un activo específico
+  // Obtener historial de un activo específico con paginación y filtros
   apiRouter.get('/assets/:id/history', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const assetId = parseInt(req.params.id);
       const { pool } = await import("./db");
 
-      // 🔧 Updated query to handle text changed_by field and provide frontend-expected field names
+      // Parámetros de paginación y filtros
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const search = req.query.search as string || '';
+      const changeType = req.query.type as string || '';
+      const dateFrom = req.query.dateFrom as string || '';
+      const dateTo = req.query.dateTo as string || '';
+      const sortBy = req.query.sortBy as string || 'created_at';
+      const sortOrder = req.query.sortOrder as string || 'DESC';
+      const offset = (page - 1) * limit;
+
+      // Construir condiciones WHERE dinámicamente
+      let whereConditions = ['ah.asset_id = $1'];
+      let queryParams: any[] = [assetId];
+      let paramCount = 1;
+
+      // Filtro de búsqueda en descripción
+      if (search) {
+        paramCount++;
+        whereConditions.push(`ah.description ILIKE $${paramCount}`);
+        queryParams.push(`%${search}%`);
+      }
+
+      // Filtro por tipo de cambio
+      if (changeType) {
+        paramCount++;
+        whereConditions.push(`ah.change_type = $${paramCount}`);
+        queryParams.push(changeType);
+      }
+
+      // Filtro por rango de fechas
+      if (dateFrom) {
+        paramCount++;
+        whereConditions.push(`ah.created_at >= $${paramCount}`);
+        queryParams.push(dateFrom);
+      }
+
+      if (dateTo) {
+        paramCount++;
+        whereConditions.push(`ah.created_at <= $${paramCount}`);
+        queryParams.push(dateTo + ' 23:59:59');
+      }
+
+      const whereClause = whereConditions.join(' AND ');
+
+      // Validar campo de ordenación
+      const validSortFields = ['created_at', 'change_type', 'description'];
+      const validSortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+      const validSortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+      // Query principal con paginación
       const query = `
         SELECT 
           ah.id,
@@ -29,30 +79,63 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
           ah.date,
           ah.created_at as "createdAt",
           ah.updated_at as "updatedAt",
-          -- Try to get user info by joining with users table (changed_by might be user ID as text or username)
+          -- Try to get user info by joining with users table
           COALESCE(u.full_name, u.username, ah.changed_by) as "userName",
           COALESCE(u.username, ah.changed_by) as "userUsername",
-          -- Use created_at as timestamp for frontend compatibility
           ah.created_at as "timestamp",
-          -- For now, set fieldName to change_type until we have better field tracking
           ah.change_type as "fieldName"
         FROM asset_history ah
         LEFT JOIN users u ON (
-          -- Try to match changed_by as user ID (if it's numeric) or username
           CASE 
             WHEN ah.changed_by ~ '^[0-9]+$' THEN u.id::text = ah.changed_by
             ELSE u.username = ah.changed_by OR u.email = ah.changed_by
           END
         )
-        WHERE ah.asset_id = $1
-        ORDER BY ah.created_at DESC
+        WHERE ${whereClause}
+        ORDER BY ah.${validSortField} ${validSortOrder}
+        LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}
       `;
 
-      const result = await pool.query(query, [assetId]);
+      queryParams.push(limit, offset);
+
+      // Query para contar total de registros
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM asset_history ah
+        WHERE ${whereClause}
+      `;
+
+      // Ejecutar ambas queries
+      const [result, countResult] = await Promise.all([
+        pool.query(query, queryParams),
+        pool.query(countQuery, queryParams.slice(0, -2)) // Remover LIMIT y OFFSET del conteo
+      ]);
+
+      const total = parseInt(countResult.rows[0].total);
+      const totalPages = Math.ceil(total / limit);
+
+      console.log(`📋 Historial activo ${assetId}: ${result.rows.length}/${total} registros (página ${page}/${totalPages})`);
       
-      console.log(`📋 Encontrados ${result.rows.length} registros de historial para activo ${assetId}`);
-      console.log(`🔍 Muestra de datos:`, result.rows.slice(0, 1));
-      res.json(result.rows);
+      // Respuesta con metadata de paginación
+      res.json({
+        data: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1
+        },
+        filters: {
+          search,
+          changeType,
+          dateFrom,
+          dateTo,
+          sortBy: validSortField,
+          sortOrder: validSortOrder
+        }
+      });
     } catch (error) {
       console.error('Error fetching asset history:', error);
       res.status(500).json({ error: 'Error interno del servidor' });

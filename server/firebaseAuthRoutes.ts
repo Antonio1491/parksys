@@ -4,6 +4,7 @@ import { users, pendingUsers, roles } from '../shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { linkExistingUserWithFirebase, isExistingUser, getUserByFirebaseUid, migrateKnownUsers, getMigrationInstructions } from './firebaseUserSync';
 import { isAuthenticated } from './middleware/auth';
+import { sanitizeUser, validateSafeResponse, debugLogUserFields } from './utils/userSanitizer';
 
 export function registerFirebaseAuthRoutes(app: express.Express) {
   console.log('🔥 [FIREBASE-AUTH] Registrando rutas de autenticación Firebase...');
@@ -23,19 +24,28 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
       if (approvedUser) {
         console.log(`✅ [AUTH-STATUS] Usuario aprobado encontrado: ${approvedUser.email}`);
         
-        // Usar el roleId directamente de la tabla users
+        // 🔒 SECURITY FIX: Sanitize user object before sending to frontend
+        const sanitizedUser = sanitizeUser(approvedUser);
         const userWithRoles = {
-          ...approvedUser,
+          ...sanitizedUser,
           roles: [{ roleId: approvedUser.roleId }] // Formato compatible
         };
 
-        return res.json({
+        // Debug logging to ensure no sensitive data
+        debugLogUserFields(userWithRoles, 'AUTH-STATUS approved user');
+
+        const response = {
           isApproved: true,
           isPending: false,
           isRejected: false,
           localUser: userWithRoles,
           needsPasswordReset: approvedUser.needsPasswordReset
-        });
+        };
+
+        // Validate response is safe before sending
+        validateSafeResponse(response);
+
+        return res.json(response);
       }
 
       // 2. Buscar en usuarios pendientes
@@ -89,19 +99,28 @@ export function registerFirebaseAuthRoutes(app: express.Express) {
       if (existingUserVinculado) {
         console.log(`🔗 [AUTO-LINK] Usuario existente vinculado automáticamente: ${email}`);
         
-        // El usuario ya tiene roleId, no necesitamos tabla separada
+        // 🔒 SECURITY FIX: Sanitize user object before sending to frontend
+        const sanitizedUser = sanitizeUser(existingUserVinculado);
         const userWithRoles = {
-          ...existingUserVinculado,
+          ...sanitizedUser,
           roles: [{ roleId: existingUserVinculado.roleId }] // Formato compatible
         };
 
-        return res.json({
+        // Debug logging to ensure no sensitive data
+        debugLogUserFields(userWithRoles, 'AUTO-LINK existing user');
+
+        const response = {
           success: true,
           isExistingUser: true,
           autoLinked: true,
           message: '¡Cuenta existente vinculada automáticamente!',
           localUser: userWithRoles
-        });
+        };
+
+        // Validate response is safe before sending
+        validateSafeResponse(response);
+
+        return res.json(response);
       }
 
       // Verificar si ya existe solicitud pendiente

@@ -12,12 +12,21 @@ import {
   Tag,
   AlertTriangle,
   Check,
-  Camera
+  Camera,
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  List,
+  Grid,
+  Calendar,
+  User
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, safeApiRequest } from '@/lib/queryClient';
 import { AssetHistoryEntry as BaseAssetHistoryEntry } from '@shared/asset-schema';
 
 import AdminLayout from '@/components/AdminLayout';
@@ -274,6 +283,16 @@ const AssetDetailPage: React.FC = () => {
   const [isMaintenanceDialogOpen, setIsMaintenanceDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   
+  // Estados para paginación y filtros del historial
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyLimit] = useState(10);
+  const [historySearch, setHistorySearch] = useState('');
+  const [historyType, setHistoryType] = useState('');
+  const [historyDateFrom, setHistoryDateFrom] = useState('');
+  const [historyDateTo, setHistoryDateTo] = useState('');
+  const [historyViewMode, setHistoryViewMode] = useState<'detailed' | 'compact'>('detailed');
+  const [expandedHistoryEntry, setExpandedHistoryEntry] = useState<number | null>(null);
+  
   // Estado para almacenar los datos originales del activo antes de la edición
   const [originalAssetData, setOriginalAssetData] = useState<Asset | null>(null);
   
@@ -299,11 +318,63 @@ const AssetDetailPage: React.FC = () => {
     enabled: !!id,
   });
   
-  // Consultar historial
-  const { data: history } = useQuery<ExtendedAssetHistoryEntry[]>({
-    queryKey: [`/api/assets/${id}/history`],
+  // Consultar historial con paginación y filtros
+  const { data: historyResponse, isLoading: historyLoading, error: historyError } = useQuery({
+    queryKey: [
+      '/api/assets',
+      id,
+      'history',
+      historyPage,
+      historyLimit,
+      historySearch,
+      historyType,
+      historyDateFrom,
+      historyDateTo
+    ],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: historyPage.toString(),
+        limit: historyLimit.toString(),
+        ...(historySearch && { search: historySearch }),
+        ...(historyType && historyType !== 'all' && { type: historyType }),
+        ...(historyDateFrom && { dateFrom: historyDateFrom }),
+        ...(historyDateTo && { dateTo: historyDateTo }),
+        sortBy: 'created_at',
+        sortOrder: 'DESC'
+      });
+      
+      const url = `/api/assets/${id}/history?${params}`;
+      return safeApiRequest(url);
+    },
     enabled: !!id,
+    retry: (failureCount, error) => {
+      // Only retry on network errors, not on 4xx/5xx responses
+      return failureCount < 2 && !error?.message?.includes('HTTP error');
+    },
   });
+
+  // Extraer datos del historial
+  const history = historyResponse?.data || [];
+  const historyPagination = historyResponse?.pagination || {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false
+  };
+
+  // Manejo de errores del historial con toast notification
+  React.useEffect(() => {
+    if (historyError) {
+      console.error('Error loading history:', historyError);
+      toast({
+        title: "Error al cargar historial",
+        description: "No se pudo cargar el historial del activo. Por favor, int\u00e9ntalo de nuevo.",
+        variant: "destructive",
+      });
+    }
+  }, [historyError, toast]);
 
   // Calcular fechas de mantenimiento basándose en los registros
   const lastMaintenanceDate = React.useMemo(() => {
@@ -535,7 +606,7 @@ const AssetDetailPage: React.FC = () => {
       
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
-          <Button variant="outline" onClick={handleBackToList} className="mr-4">
+          <Button variant="outline" onClick={handleBackToList} className="mr-4" data-testid="back-to-list-btn">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver
           </Button>
@@ -551,20 +622,21 @@ const AssetDetailPage: React.FC = () => {
           </div>
         </div>
         <div className="flex space-x-2">
-          <Button onClick={openMaintenanceDialog} variant="outline">
+          <Button onClick={openMaintenanceDialog} variant="outline" data-testid="register-maintenance-btn">
             <Wrench className="mr-2 h-4 w-4" />
             Registrar Mantenimiento
           </Button>
           <Button 
             onClick={() => window.location.href = `/admin/assets/${id}/edit-enhanced`} 
             variant="outline"
+            data-testid="edit-asset-btn"
           >
             <Edit className="mr-2 h-4 w-4" />
             Editar
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">
+              <Button variant="destructive" data-testid="delete-asset-btn">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Eliminar
               </Button>
@@ -577,10 +649,11 @@ const AssetDetailPage: React.FC = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogCancel data-testid="cancel-delete-btn">Cancelar</AlertDialogCancel>
                 <AlertDialogAction 
                   onClick={() => deleteMutation.mutate()}
                   className="bg-red-500 hover:bg-red-600 text-white"
+                  data-testid="confirm-delete-btn"
                 >
                   Eliminar
                 </AlertDialogAction>
@@ -620,8 +693,8 @@ const AssetDetailPage: React.FC = () => {
               <div className="flex items-center">
                 <History className="mr-2 h-4 w-4" />
                 Historial
-                {history && history.length > 0 && (
-                  <Badge className="ml-2">{history.length}</Badge>
+                {historyPagination.total > 0 && (
+                  <Badge className="ml-2">{historyPagination.total}</Badge>
                 )}
               </div>
             </TabsTrigger>
@@ -953,13 +1026,118 @@ const AssetDetailPage: React.FC = () => {
           <TabsContent value="history">
             <Card>
               <CardHeader>
-                <CardTitle>Historial de Cambios</CardTitle>
-                <CardDescription>
-                  Registro de todas las modificaciones y eventos relacionados con este activo
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Historial de Cambios</CardTitle>
+                    <CardDescription>
+                      Registro de todas las modificaciones y eventos relacionados con este activo
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {/* Toggle de vista */}
+                    <Button
+                      variant={historyViewMode === 'detailed' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setHistoryViewMode('detailed')}
+                      data-testid="view-detailed-btn"
+                    >
+                      <Grid className="h-4 w-4 mr-1" />
+                      Detallada
+                    </Button>
+                    <Button
+                      variant={historyViewMode === 'compact' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setHistoryViewMode('compact')}
+                      data-testid="view-compact-btn"
+                    >
+                      <List className="h-4 w-4 mr-1" />
+                      Lista
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
+              
               <CardContent>
-                {isLoading ? (
+                {/* Filtros */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="grid gap-4 md:grid-cols-4">
+                    {/* Búsqueda por texto */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Buscar en descripción..."
+                        value={historySearch}
+                        onChange={(e) => setHistorySearch(e.target.value)}
+                        className="pl-10"
+                        data-testid="search-input"
+                      />
+                    </div>
+                    
+                    {/* Filtro por tipo */}
+                    <Select value={historyType} onValueChange={setHistoryType}>
+                      <SelectTrigger data-testid="type-filter">
+                        <SelectValue placeholder="Tipo de cambio" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos los tipos</SelectItem>
+                        <SelectItem value="update">Actualización</SelectItem>
+                        <SelectItem value="creation">Creación</SelectItem>
+                        <SelectItem value="maintenance">Mantenimiento</SelectItem>
+                        <SelectItem value="retirement">Retiro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {/* Filtro de fecha desde */}
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="date"
+                        placeholder="Desde"
+                        value={historyDateFrom}
+                        onChange={(e) => setHistoryDateFrom(e.target.value)}
+                        className="pl-10"
+                        data-testid="date-from-input"
+                      />
+                    </div>
+                    
+                    {/* Filtro de fecha hasta */}
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="date"
+                        placeholder="Hasta"
+                        value={historyDateTo}
+                        onChange={(e) => setHistoryDateTo(e.target.value)}
+                        className="pl-10"
+                        data-testid="date-to-input"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Botón para limpiar filtros */}
+                  {(historySearch || (historyType && historyType !== 'all') || historyDateFrom || historyDateTo) && (
+                    <div className="mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setHistorySearch('');
+                          setHistoryType('all');
+                          setHistoryDateFrom('');
+                          setHistoryDateTo('');
+                          setHistoryPage(1);
+                        }}
+                        data-testid="clear-filters-btn"
+                      >
+                        <Filter className="h-4 w-4 mr-1" />
+                        Limpiar filtros
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Contenido del historial */}
+                {historyLoading ? (
                   <div className="space-y-4">
                     {Array.from({ length: 3 }).map((_, index) => (
                       <Skeleton key={index} className="h-32 w-full" />
@@ -969,173 +1147,297 @@ const AssetDetailPage: React.FC = () => {
                   <div className="text-center py-8 text-muted-foreground">
                     <History className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                     <p>No hay registros en el historial de este activo.</p>
+                    {(historySearch || (historyType && historyType !== 'all') || historyDateFrom || historyDateTo) && (
+                      <p className="text-sm mt-2">Intenta ajustar los filtros para ver más resultados.</p>
+                    )}
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {history.map((entry) => {
-                      const formatValue = (value: any) => {
-                        if (value === null || value === undefined) return 'N/A';
-                        if (typeof value === 'object') return JSON.stringify(value, null, 2);
-                        return String(value);
-                      };
-                      
-                      const getChangeTypeIcon = (changeType: string) => {
-                        switch (changeType.toLowerCase()) {
-                          case 'creation':
-                          case 'acquisition':
-                            return <Check className="h-4 w-4" />;
-                          case 'updated':
-                          case 'modification':
-                            return <Edit className="h-4 w-4" />;
-                          case 'maintenance':
-                            return <Wrench className="h-4 w-4" />;
-                          case 'retirement':
-                          case 'deletion':
-                            return <Trash2 className="h-4 w-4" />;
-                          default:
-                            return <History className="h-4 w-4" />;
-                        }
-                      };
-                      
-                      const getChangeTypeName = (changeType: string) => {
-                        switch (changeType.toLowerCase()) {
-                          case 'creation':
-                            return 'Creación';
-                          case 'acquisition':
-                            return 'Adquisición';
-                          case 'updated':
-                            return 'Actualización';
-                          case 'modification':
-                            return 'Modificación';
-                          case 'maintenance':
-                            return 'Mantenimiento';
-                          case 'retirement':
-                            return 'Retiro';
-                          case 'deletion':
-                            return 'Eliminación';
-                          default:
-                            return changeType;
-                        }
-                      };
-                      
-                      const getChangeTypeColor = (changeType: string) => {
-                        switch (changeType.toLowerCase()) {
-                          case 'creation':
-                          case 'acquisition':
-                            return 'bg-green-500';
-                          case 'updated':
-                          case 'modification':
-                            return 'bg-blue-500';
-                          case 'maintenance':
-                            return 'bg-yellow-500';
-                          case 'retirement':
-                          case 'deletion':
-                            return 'bg-red-500';
-                          default:
-                            return 'bg-gray-500';
-                        }
-                      };
+                  <>
+                    {/* Vista detallada */}
+                    {historyViewMode === 'detailed' && (
+                      <div className="space-y-4">
+                        {history.map((entry) => {
+                          const formatValue = (value: any) => {
+                            if (value === null || value === undefined) return 'N/A';
+                            if (typeof value === 'object') return JSON.stringify(value, null, 2);
+                            return String(value);
+                          };
+                          
+                          const getChangeTypeIcon = (changeType: string) => {
+                            switch (changeType.toLowerCase()) {
+                              case 'creation':
+                              case 'acquisition':
+                                return <Check className="h-4 w-4" />;
+                              case 'update':
+                              case 'modification':
+                                return <Edit className="h-4 w-4" />;
+                              case 'maintenance':
+                                return <Wrench className="h-4 w-4" />;
+                              case 'retirement':
+                              case 'deletion':
+                                return <Trash2 className="h-4 w-4" />;
+                              default:
+                                return <History className="h-4 w-4" />;
+                            }
+                          };
+                          
+                          const getChangeTypeName = (changeType: string) => {
+                            switch (changeType.toLowerCase()) {
+                              case 'creation':
+                                return 'Creación';
+                              case 'acquisition':
+                                return 'Adquisición';
+                              case 'update':
+                                return 'Actualización';
+                              case 'modification':
+                                return 'Modificación';
+                              case 'maintenance':
+                                return 'Mantenimiento';
+                              case 'retirement':
+                                return 'Retiro';
+                              case 'deletion':
+                                return 'Eliminación';
+                              default:
+                                return changeType;
+                            }
+                          };
+                          
+                          const getChangeTypeColor = (changeType: string) => {
+                            switch (changeType.toLowerCase()) {
+                              case 'creation':
+                              case 'acquisition':
+                                return 'bg-green-500';
+                              case 'update':
+                              case 'modification':
+                                return 'bg-blue-500';
+                              case 'maintenance':
+                                return 'bg-yellow-500';
+                              case 'retirement':
+                              case 'deletion':
+                                return 'bg-red-500';
+                              default:
+                                return 'bg-gray-500';
+                            }
+                          };
 
-                      return (
-                        <Card key={entry.id} className="overflow-hidden" data-testid={`history-entry-${entry.id}`}>
-                          <div className={`h-2 w-full ${getChangeTypeColor(entry.changeType)}`} />
-                          <CardContent className="pt-4">
-                            <div className="space-y-4">
-                              {/* Header with change type and timestamp */}
-                              <div className="flex items-start justify-between">
-                                <div className="flex items-center space-x-2">
-                                  <div className={`p-2 rounded-full ${
-                                    entry.changeType.toLowerCase() === 'creation' || entry.changeType.toLowerCase() === 'acquisition' ? 'bg-green-100 text-green-600' :
-                                    entry.changeType.toLowerCase() === 'updated' || entry.changeType.toLowerCase() === 'modification' ? 'bg-blue-100 text-blue-600' :
-                                    entry.changeType.toLowerCase() === 'maintenance' ? 'bg-yellow-100 text-yellow-600' :
-                                    entry.changeType.toLowerCase() === 'retirement' || entry.changeType.toLowerCase() === 'deletion' ? 'bg-red-100 text-red-600' :
-                                    'bg-gray-100 text-gray-600'
-                                  }`}>
-                                    {getChangeTypeIcon(entry.changeType)}
+                          return (
+                            <Card key={entry.id} className="overflow-hidden" data-testid={`history-entry-${entry.id}`}>
+                              <div className={`h-2 w-full ${getChangeTypeColor(entry.changeType)}`} />
+                              <CardContent className="pt-4">
+                                <div className="space-y-4">
+                                  {/* Header with change type and timestamp */}
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <div className={`p-2 rounded-full ${
+                                        entry.changeType.toLowerCase() === 'creation' || entry.changeType.toLowerCase() === 'acquisition' ? 'bg-green-100 text-green-600' :
+                                        entry.changeType.toLowerCase() === 'update' || entry.changeType.toLowerCase() === 'modification' ? 'bg-blue-100 text-blue-600' :
+                                        entry.changeType.toLowerCase() === 'maintenance' ? 'bg-yellow-100 text-yellow-600' :
+                                        entry.changeType.toLowerCase() === 'retirement' || entry.changeType.toLowerCase() === 'deletion' ? 'bg-red-100 text-red-600' :
+                                        'bg-gray-100 text-gray-600'
+                                      }`}>
+                                        {getChangeTypeIcon(entry.changeType)}
+                                      </div>
+                                      <div>
+                                        <h4 className="font-medium text-lg" data-testid={`change-type-${entry.id}`}>
+                                          {getChangeTypeName(entry.changeType)}
+                                        </h4>
+                                        <p className="text-muted-foreground text-sm" data-testid={`timestamp-${entry.id}`}>
+                                          {formatDate(entry.timestamp)}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <div className="text-right">
+                                        <p className="text-sm font-medium" data-testid={`user-name-${entry.id}`}>
+                                          {entry.userName}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground" data-testid={`username-${entry.id}`}>
+                                          @{entry.userUsername}
+                                        </p>
+                                      </div>
+                                      <div className="flex space-x-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => setExpandedHistoryEntry(
+                                            expandedHistoryEntry === entry.id ? null : entry.id
+                                          )}
+                                          data-testid={`view-entry-${entry.id}`}
+                                        >
+                                          <Eye className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
                                   </div>
+
+                                  {/* Description */}
                                   <div>
-                                    <h4 className="font-medium text-lg" data-testid={`change-type-${entry.id}`}>
-                                      {getChangeTypeName(entry.changeType)}
-                                    </h4>
-                                    <p className="text-muted-foreground text-sm" data-testid={`timestamp-${entry.id}`}>
-                                      {formatDate(entry.timestamp)}
+                                    <p className="text-gray-700" data-testid={`description-${entry.id}`}>
+                                      {entry.description}
                                     </p>
                                   </div>
-                                </div>
-                                <div className="text-right">
-                                  <p className="text-sm font-medium" data-testid={`user-name-${entry.id}`}>
-                                    {entry.userName}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground" data-testid={`username-${entry.id}`}>
-                                    @{entry.userUsername}
-                                  </p>
-                                </div>
-                              </div>
 
-                              {/* Description */}
-                              <div>
-                                <p className="text-gray-700" data-testid={`description-${entry.id}`}>
-                                  {entry.description}
-                                </p>
-                              </div>
+                                  {/* Field changes */}
+                                  {entry.fieldName && (entry.previousValue !== null || entry.newValue !== null) && (
+                                    <div className="bg-slate-50 rounded-lg p-4" data-testid={`field-changes-${entry.id}`}>
+                                      <h5 className="font-medium text-sm mb-3 text-slate-700">
+                                        Campo modificado: <span className="font-semibold">{entry.fieldName}</span>
+                                      </h5>
+                                      
+                                      <div className="grid gap-3 md:grid-cols-2">
+                                        {entry.previousValue !== null && (
+                                          <div>
+                                            <span className="text-xs font-medium text-red-600 uppercase tracking-wide">
+                                              Valor anterior
+                                            </span>
+                                            <div className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-sm">
+                                              <pre className="whitespace-pre-wrap text-red-800" data-testid={`previous-value-${entry.id}`}>
+                                                {formatValue(entry.previousValue)}
+                                              </pre>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {entry.newValue !== null && (
+                                          <div>
+                                            <span className="text-xs font-medium text-green-600 uppercase tracking-wide">
+                                              Valor nuevo
+                                            </span>
+                                            <div className="mt-1 p-2 bg-green-50 border border-green-200 rounded text-sm">
+                                              <pre className="whitespace-pre-wrap text-green-800" data-testid={`new-value-${entry.id}`}>
+                                                {formatValue(entry.newValue)}
+                                              </pre>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
 
-                              {/* Field changes */}
-                              {entry.fieldName && (entry.previousValue !== null || entry.newValue !== null) && (
-                                <div className="bg-slate-50 rounded-lg p-4" data-testid={`field-changes-${entry.id}`}>
-                                  <h5 className="font-medium text-sm mb-3 text-slate-700">
-                                    Campo modificado: <span className="font-semibold">{entry.fieldName}</span>
-                                  </h5>
-                                  
-                                  <div className="grid gap-3 md:grid-cols-2">
-                                    {entry.previousValue !== null && (
-                                      <div>
-                                        <span className="text-xs font-medium text-red-600 uppercase tracking-wide">
-                                          Valor anterior
-                                        </span>
-                                        <div className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-sm">
-                                          <pre className="whitespace-pre-wrap text-red-800" data-testid={`previous-value-${entry.id}`}>
-                                            {formatValue(entry.previousValue)}
-                                          </pre>
-                                        </div>
-                                      </div>
-                                    )}
-                                    
-                                    {entry.newValue !== null && (
-                                      <div>
-                                        <span className="text-xs font-medium text-green-600 uppercase tracking-wide">
-                                          Valor nuevo
-                                        </span>
-                                        <div className="mt-1 p-2 bg-green-50 border border-green-200 rounded text-sm">
-                                          <pre className="whitespace-pre-wrap text-green-800" data-testid={`new-value-${entry.id}`}>
-                                            {formatValue(entry.newValue)}
-                                          </pre>
-                                        </div>
-                                      </div>
-                                    )}
+                                  {/* Notes */}
+                                  {entry.notes && (
+                                    <div className="bg-blue-50 rounded-lg p-3" data-testid={`notes-${entry.id}`}>
+                                      <span className="text-xs font-medium text-blue-600 uppercase tracking-wide">
+                                        Notas
+                                      </span>
+                                      <p className="mt-1 text-sm text-blue-800">{entry.notes}</p>
+                                    </div>
+                                  )}
+
+                                  {/* Entry ID for debugging */}
+                                  <div className="text-xs text-gray-400 pt-2 border-t">
+                                    ID del registro: {entry.id}
                                   </div>
                                 </div>
-                              )}
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
 
-                              {/* Notes */}
-                              {entry.notes && (
-                                <div className="bg-blue-50 rounded-lg p-3" data-testid={`notes-${entry.id}`}>
-                                  <span className="text-xs font-medium text-blue-600 uppercase tracking-wide">
-                                    Notas
-                                  </span>
-                                  <p className="mt-1 text-sm text-blue-800">{entry.notes}</p>
+                    {/* Vista compacta */}
+                    {historyViewMode === 'compact' && (
+                      <div className="space-y-2">
+                        {history.map((entry) => {
+                          const getChangeTypeIcon = (changeType: string) => {
+                            switch (changeType.toLowerCase()) {
+                              case 'creation':
+                              case 'acquisition':
+                                return <Check className="h-4 w-4" />;
+                              case 'update':
+                              case 'modification':
+                                return <Edit className="h-4 w-4" />;
+                              case 'maintenance':
+                                return <Wrench className="h-4 w-4" />;
+                              case 'retirement':
+                              case 'deletion':
+                                return <Trash2 className="h-4 w-4" />;
+                              default:
+                                return <History className="h-4 w-4" />;
+                            }
+                          };
+
+                          return (
+                            <div
+                              key={entry.id}
+                              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                              data-testid={`compact-entry-${entry.id}`}
+                            >
+                              <div className="flex items-center space-x-3 flex-1">
+                                <div className={`p-1 rounded ${
+                                  entry.changeType.toLowerCase() === 'creation' || entry.changeType.toLowerCase() === 'acquisition' ? 'bg-green-100 text-green-600' :
+                                  entry.changeType.toLowerCase() === 'update' || entry.changeType.toLowerCase() === 'modification' ? 'bg-blue-100 text-blue-600' :
+                                  entry.changeType.toLowerCase() === 'maintenance' ? 'bg-yellow-100 text-yellow-600' :
+                                  entry.changeType.toLowerCase() === 'retirement' || entry.changeType.toLowerCase() === 'deletion' ? 'bg-red-100 text-red-600' :
+                                  'bg-gray-100 text-gray-600'
+                                }`}>
+                                  {getChangeTypeIcon(entry.changeType)}
                                 </div>
-                              )}
-
-                              {/* Entry ID for debugging */}
-                              <div className="text-xs text-gray-400 pt-2 border-t">
-                                ID del registro: {entry.id}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {entry.description}
+                                  </p>
+                                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                                    <User className="h-3 w-3" />
+                                    <span>{entry.userName}</span>
+                                    <span>•</span>
+                                    <span>{formatDate(entry.timestamp)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setExpandedHistoryEntry(
+                                    expandedHistoryEntry === entry.id ? null : entry.id
+                                  )}
+                                  data-testid={`view-compact-entry-${entry.id}`}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
                               </div>
                             </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                  </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Paginación */}
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                      <div className="text-sm text-muted-foreground">
+                        Mostrando {((historyPagination.page - 1) * historyPagination.limit) + 1} a{' '}
+                        {Math.min(historyPagination.page * historyPagination.limit, historyPagination.total)} de{' '}
+                        {historyPagination.total} registros
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setHistoryPage(historyPage - 1)}
+                          disabled={!historyPagination.hasPrevPage}
+                          data-testid="prev-page-btn"
+                        >
+                          <ChevronLeft className="h-4 w-4 mr-1" />
+                          Anterior
+                        </Button>
+                        <span className="text-sm font-medium">
+                          Página {historyPagination.page} de {historyPagination.totalPages}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setHistoryPage(historyPage + 1)}
+                          disabled={!historyPagination.hasNextPage}
+                          data-testid="next-page-btn"
+                        >
+                          Siguiente
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>

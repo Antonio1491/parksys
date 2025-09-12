@@ -8,6 +8,7 @@ import { db } from './db';
 import { sql } from 'drizzle-orm';
 import { syncInstructorProfileWithUser } from './syncInstructorProfile';
 import { replitObjectStorage } from './objectStorage-replit';
+import { sanitizeUser, sanitizeUsers, validateSafeResponse, debugLogUserFields } from './utils/userSanitizer';
 
 // Esquema para validar la creación de un usuario
 const createUserSchema = z.object({
@@ -50,6 +51,16 @@ const updateUserSchema = z.object({
   emergencyContactPhone: z.string().optional(),
   preferredParkId: z.number().nullable().optional(),
   legalConsent: z.boolean().optional(),
+  // Volunteer-specific fields
+  volunteerExperience: z.string().optional(),
+  availability: z.string().optional(),
+  availableDays: z.string().optional(),
+  interestNature: z.boolean().optional(),
+  interestEvents: z.boolean().optional(),
+  interestEducation: z.boolean().optional(),
+  interestMaintenance: z.boolean().optional(),
+  interestSports: z.boolean().optional(),
+  interestCultural: z.boolean().optional(),
 });
 
 // Función para sincronizar datos de usuario con la tabla de voluntarios
@@ -238,11 +249,14 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
     try {
       const users = await storage.getUsers();
       
-      // No enviamos las contraseñas al cliente
-      const safeUsers = users.map(user => {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
+      // 🔒 SECURITY FIX: Use sanitizer utility to ensure no sensitive data is sent
+      const safeUsers = sanitizeUsers(users);
+      
+      // Debug logging to ensure no sensitive data
+      console.log(`✅ [GET-USERS] Returning ${safeUsers.length} sanitized users`);
+      
+      // Validate response is safe before sending
+      validateSafeResponse(safeUsers);
       
       res.json(safeUsers);
     } catch (error) {
@@ -268,8 +282,12 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
       }
       
-      // No enviamos la contraseña al cliente
-      const { password, ...userWithoutPassword } = user;
+      // 🔒 SECURITY FIX: Use sanitizer utility to ensure no sensitive data is sent
+      let responseUser = sanitizeUser(user);
+      
+      if (!responseUser) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
       
       // Si el usuario es voluntario, obtenemos los datos adicionales de la tabla voluntarios
       if (user.role === 'voluntario') {
@@ -285,7 +303,7 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
             
             // Creamos un nuevo objeto que incluya los datos del usuario y del voluntario
             const userDataWithVolunteer = {
-              ...userWithoutPassword,
+              ...responseUser,
               preferredParkId: volunteerData.preferred_park_id,
               legalConsent: volunteerData.legal_consent === true,
               volunteerExperience: volunteerData.previous_experience,
@@ -307,6 +325,10 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
               profileImageUrl: userDataWithVolunteer.profileImageUrl ? replitObjectStorage.normalizeUrl(userDataWithVolunteer.profileImageUrl) : userDataWithVolunteer.profileImageUrl
             };
             
+            // Debug logging and validation
+            debugLogUserFields(userWithNormalizedImages, 'GET-USER volunteer data');
+            validateSafeResponse(userWithNormalizedImages);
+            
             // Devolvemos directamente este objeto enriquecido
             return res.json(userWithNormalizedImages);
           }
@@ -316,7 +338,11 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
         }
       }
       
-      res.json(userWithoutPassword);
+      // Debug logging and validation
+      debugLogUserFields(responseUser, 'GET-USER basic user');
+      validateSafeResponse(responseUser);
+      
+      res.json(responseUser);
     } catch (error) {
       console.error('Error fetching user:', error);
       res.status(500).json({ message: 'Error al obtener usuario' });
@@ -417,13 +443,17 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
             await syncUserWithConcessionaireTable(newUser, req.body);
           }
           
-          // No enviamos la contraseña en la respuesta
-          const { password, ...userWithoutPassword } = newUser;
+          // 🔒 SECURITY FIX: Use sanitizer utility to ensure no sensitive data is sent
+          const sanitizedNewUser = sanitizeUser(newUser);
           
-          res.status(201).json(userWithoutPassword);
+          // Debug logging and validation
+          debugLogUserFields(sanitizedNewUser, 'POST-USERS create user');
+          validateSafeResponse(sanitizedNewUser);
+          
+          res.status(201).json(sanitizedNewUser);
         } catch (dbError) {
           console.error("Error específico al crear usuario en la base de datos:", dbError);
-          res.status(500).json({ message: 'Error al crear usuario en la base de datos', details: dbError.message });
+          res.status(500).json({ message: 'Error al crear usuario en la base de datos', details: (dbError as Error).message });
         }
       } catch (validationError) {
         console.error("Error durante la validación:", validationError);
@@ -729,10 +759,14 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
         }
       }
       
-      // No enviamos la contraseña en la respuesta
-      const { password, ...userWithoutPassword } = updatedUser;
+      // 🔒 SECURITY FIX: Use sanitizer utility to ensure no sensitive data is sent  
+      const sanitizedUpdatedUser = sanitizeUser(updatedUser);
       
-      res.json(userWithoutPassword);
+      // Debug logging and validation
+      debugLogUserFields(sanitizedUpdatedUser, 'PUT-USERS update user');
+      validateSafeResponse(sanitizedUpdatedUser);
+      
+      res.json(sanitizedUpdatedUser);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const validationError = fromZodError(error);
@@ -797,7 +831,7 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
         email: volunteerData.email,
         phone: volunteerData.phone,
         gender: volunteerData.gender || 'no_especificar',
-        birthDate: volunteerData.birth_date ? new Date(volunteerData.birth_date).toISOString().split('T')[0] : '',
+        birthDate: volunteerData.birth_date && typeof volunteerData.birth_date === 'string' ? new Date(volunteerData.birth_date).toISOString().split('T')[0] : '',
         address: volunteerData.address || '',
         emergencyContactName: volunteerData.emergency_contact || '',
         emergencyContactPhone: volunteerData.emergency_phone || '',
@@ -940,7 +974,7 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
       const userId = parseInt(req.params.id);
       
       // Por ahora devolvemos un array vacío, más tarde se puede conectar con la base de datos
-      const favoriteParks = [];
+      const favoriteParks: any[] = [];
       
       res.json(favoriteParks);
     } catch (error) {
@@ -990,7 +1024,7 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
       const userId = parseInt(req.params.id);
       
       // Por ahora devolvemos un array vacío
-      const pendingParks = [];
+      const pendingParks: any[] = [];
       
       res.json(pendingParks);
     } catch (error) {
@@ -1026,7 +1060,7 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
       const userId = parseInt(req.params.id);
       
       // Por ahora devolvemos un array vacío
-      const upcomingActivities = [];
+      const upcomingActivities: any[] = [];
       
       res.json(upcomingActivities);
     } catch (error) {

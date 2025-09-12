@@ -21,7 +21,7 @@ export async function handleLogin(req: Request, res: Response) {
     const userData = result.rows[0];
     
     // Verificar la contraseña usando bcrypt
-    const passwordMatch = await bcrypt.compare(password, userData.password);
+    const passwordMatch = await bcrypt.compare(password, userData.password as string);
     if (!passwordMatch) {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
