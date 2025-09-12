@@ -710,40 +710,47 @@ const AdminParksContent = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <DropdownMenu open={selectionMode ? undefined : false}>
+                  <DropdownMenuTrigger asChild disabled={!selectionMode}>
                     <Button
                       variant={selectionMode ? 'default' : 'outline'}
                       size="sm"
+                      onClick={() => {
+                        setSelectionMode(!selectionMode);
+                        if (!selectionMode) {
+                          setSelectedParks(new Set());
+                        }
+                      }}
                       data-testid="button-selection-toggle"
                     >
                       <CopyCheck className="h-4 w-4 mr-1" />
+                      Seleccionar
+                      {selectionMode && <ChevronDown className="h-4 w-4 ml-1" />}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() => {
-                        if (!selectionMode) {
-                          setSelectionMode(true);
-                        }
-                        handleSelectAllParks();
-                      }}
-                      data-testid="menu-select-all"
-                    >
-                      <CheckSquare className="h-4 w-4 mr-2" />
-                      Seleccionar todo
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        handleDeselectAllParks();
-                        setSelectionMode(false);
-                      }}
-                      data-testid="menu-deselect-all"
-                    >
-                      <Square className="h-4 w-4 mr-2" />
-                      Deseleccionar
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
+                  {selectionMode && (
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          handleSelectAllParks();
+                        }}
+                        data-testid="menu-select-all"
+                      >
+                        <CheckSquare className="h-4 w-4 mr-2" />
+                        Seleccionar todo
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          handleDeselectAllParks();
+                          setSelectionMode(false);
+                        }}
+                        data-testid="menu-deselect-all"
+                      >
+                        <Square className="h-4 w-4 mr-2" />
+                        Deseleccionar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  )}
                 </DropdownMenu>
                 <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
                   <Button
