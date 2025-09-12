@@ -326,10 +326,13 @@ const AdminParksContent = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 flex-1">
-                  <Checkbox
-                    checked={selectedParks.has(park.id)}
-                    onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
-                  />
+                  {selectionMode && (
+                    <Checkbox
+                      checked={selectedParks.has(park.id)}
+                      onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                      data-testid={`checkbox-park-list-${park.id}`}
+                    />
+                  )}
                   <div className="flex-1">
                     <div className="flex items-center space-x-4">
                       <div className="flex-1">
