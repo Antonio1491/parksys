@@ -719,7 +719,6 @@ const AdminParksContent = () => {
                     data-testid="button-selection-toggle"
                   >
                     <CopyCheck className="h-4 w-4 mr-1" />
-                    <ChevronDown className="h-3 w-3" />
                   </Button>
 
                   {/* Dropdown menu con CSS hover */}

@@ -1109,8 +1109,8 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
     try {
       const assets = await db
         .select()
-        .from(sponsorAssets)
-        .orderBy(desc(sponsorAssets.createdAt));
+        .from(sponsorshipAssets)
+        .orderBy(desc(sponsorshipAssets.createdAt));
       
       res.json(assets);
     } catch (error) {
@@ -1148,10 +1148,10 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
   // Crear nuevo activo
   apiRouter.post('/sponsor-assets', isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const validatedData = insertSponsorAssetSchema.parse(req.body);
+      const validatedData = insertSponsorshipAssetSchema.parse(req.body);
       
       const [newAsset] = await db
-        .insert(sponsorAssets)
+        .insert(sponsorshipAssets)
         .values(validatedData)
         .returning();
       
@@ -1169,14 +1169,14 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       const { approvalStatus, approvedBy } = req.body;
       
       const [updatedAsset] = await db
-        .update(sponsorAssets)
+        .update(sponsorshipAssets)
         .set({ 
           approvalStatus,
           approvedBy,
           approvedAt: new Date(),
           updatedAt: new Date()
         })
-        .where(eq(sponsorAssets.id, parseInt(id)))
+        .where(eq(sponsorshipAssets.id, parseInt(id)))
         .returning();
       
       res.json(updatedAsset);
@@ -1338,7 +1338,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
       const [metrics, evaluations, events] = await Promise.all([
         db.select().from(sponsorshipMetrics).where(eq(sponsorshipMetrics.sponsorId, parseInt(sponsorId))),
         db.select().from(sponsorshipEvaluations).where(eq(sponsorshipEvaluations.sponsorId, parseInt(sponsorId))),
-        db.select().from(sponsorEvents).where(eq(sponsorEvents.sponsorId, parseInt(sponsorId)))
+        db.select().from(sponsorshipEvents).where(eq(sponsorshipEvents.sponsorId, parseInt(sponsorId)))
       ]);
       
       // Calcular ROI (usando un campo existente o 0 por defecto)

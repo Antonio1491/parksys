@@ -359,7 +359,7 @@ export default function SponsoredAssetsPage() {
 
   const getAvailableContracts = (sponsorId: string) => {
     return contracts.filter((contract: Contract) => 
-      contract.sponsorId.toString() === sponsorId && contract.status === 'active'
+      contract.sponsorId && contract.sponsorId.toString() === sponsorId && contract.status === 'active'
     );
   };
 
