@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users, DollarSign, Star, Clock, Link, Unlink } from 'lucide-react';
+import { Calendar, MapPin, Link, Unlink } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/AdminLayout';
 import PageHeader from '@/components/ui/page-header';
@@ -26,11 +24,20 @@ interface Event {
   status: string;
 }
 
+interface Contract {
+  id: number;
+  number?: string;
+  status: string;
+  sponsor?: {
+    name: string;
+  };
+}
+
 interface LinkedEvent {
   id: number;
   contractId: number;
   eventId: number;
-  visibility: string;
+  visibility: 'public' | 'private' | 'featured' | 'banner';
   createdAt: string;
   updatedAt: string;
   event: {
@@ -132,13 +139,13 @@ export default function SponsoredEventsPage() {
   };
 
 
-  const getActiveContracts = () => {
-    return contracts.filter((contract: any) => 
+  const getActiveContracts = (): Contract[] => {
+    return contracts.filter((contract: Contract) => 
       contract && contract.status === 'active'
     );
   };
 
-  const getUnlinkedEvents = () => {
+  const getUnlinkedEvents = (): Event[] => {
     // Get already linked pairs for the selected contract
     const selectedContractId = parseInt(linkFormData.contractId);
     if (!selectedContractId) {
@@ -153,6 +160,11 @@ export default function SponsoredEventsPage() {
     return availableEvents.filter((event: Event) => 
       !linkedEventIdsForContract.includes(event.id) && event.status === 'published'
     );
+  };
+
+  // Validation helper
+  const isFormValid = (): boolean => {
+    return !!(linkFormData.contractId && linkFormData.eventId);
   };
 
   const handleLinkSubmit = (e: React.FormEvent) => {
@@ -204,7 +216,7 @@ export default function SponsoredEventsPage() {
                         <SelectValue placeholder="Seleccionar contrato" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getActiveContracts().map((contract: any) => (
+                        {getActiveContracts().map((contract: Contract) => (
                           <SelectItem key={contract.id} value={contract.id.toString()}>
                             Contrato #{contract.number || contract.id} - {contract.sponsor?.name}
                           </SelectItem>
@@ -256,7 +268,11 @@ export default function SponsoredEventsPage() {
                     <Button type="button" variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
                       Cancelar
                     </Button>
-                    <Button type="submit" disabled={linkEventMutation.isPending} data-testid="button-submit-link">
+                    <Button 
+                      type="submit" 
+                      disabled={linkEventMutation.isPending || !isFormValid()} 
+                      data-testid="button-submit-link"
+                    >
                       {linkEventMutation.isPending ? 'Vinculando...' : 'Vincular'}
                     </Button>
                   </div>
