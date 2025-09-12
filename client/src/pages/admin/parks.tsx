@@ -711,7 +711,7 @@ const AdminParksContent = () => {
               
               <div className="flex items-center space-x-2">
                 <DropdownMenu open={selectionMode ? undefined : false}>
-                  <DropdownMenuTrigger asChild disabled={!selectionMode}>
+                  <DropdownMenuTrigger asChild>
                     <Button
                       variant={selectionMode ? 'default' : 'outline'}
                       size="sm"
