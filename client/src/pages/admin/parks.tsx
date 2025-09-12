@@ -110,7 +110,6 @@ const AdminParksContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectionMode, setSelectionMode] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const itemsPerPage = 9;
 
   // Helper function to check if park is certified
@@ -711,61 +710,56 @@ const AdminParksContent = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                <DropdownMenu open={showDropdown}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant={selectionMode ? 'default' : 'outline'}
-                      size="sm"
-                      onMouseEnter={() => setShowDropdown(true)}
-                      onMouseLeave={() => setShowDropdown(false)}
-                      data-testid="button-selection-toggle"
-                    >
-                      <CopyCheck className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  {showDropdown && (
-                    <DropdownMenuContent 
-                      align="end"
-                      onMouseEnter={() => setShowDropdown(true)}
-                      onMouseLeave={() => setShowDropdown(false)}
-                    >
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectionMode(true);
-                          setShowDropdown(false);
-                        }}
+                {/* Dropdown con patrón CSS hover (igual al Header.tsx) */}
+                <div className="relative group">
+                  <Button
+                    variant={selectionMode ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex items-center"
+                    data-testid="button-selection-toggle"
+                  >
+                    <CopyCheck className="h-4 w-4 mr-1" />
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+
+                  {/* Dropdown menu con CSS hover */}
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="py-1">
+                      <button
+                        onClick={() => setSelectionMode(true)}
+                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
                         data-testid="menu-enable-selection"
                       >
                         <CopyCheck className="h-4 w-4 mr-2" />
                         Selección múltiple
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
+                      </button>
+                      <button
                         onClick={() => {
                           if (!selectionMode) {
                             setSelectionMode(true);
                           }
                           handleSelectAllParks();
-                          setShowDropdown(false);
                         }}
+                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
                         data-testid="menu-select-all"
                       >
                         <CheckSquare className="h-4 w-4 mr-2" />
                         Seleccionar todo
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
+                      </button>
+                      <button
                         onClick={() => {
                           handleDeselectAllParks();
                           setSelectionMode(false);
-                          setShowDropdown(false);
                         }}
+                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
                         data-testid="menu-deselect-all"
                       >
                         <Square className="h-4 w-4 mr-2" />
                         Deseleccionar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  )}
-                </DropdownMenu>
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'outline'}
