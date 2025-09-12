@@ -5,6 +5,12 @@ import { eq, and, sql } from "drizzle-orm";
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { 
+  logAssetCreation, 
+  logAssetUpdate, 
+  logAssetDeletion, 
+  logAssetMaintenance 
+} from './utils/assetHistoryLogger';
 
 export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
   // Configurar multer para subida de fotos de mantenimiento
@@ -335,9 +341,13 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
     }
   });
 
-  // Create new asset
+  // Create new asset with automatic secure history logging
   apiRouter.post("/assets", isAuthenticated, async (req: Request, res: Response) => {
+    const client = await pool.connect();
+    
     try {
+      await client.query('BEGIN');
+      
       const assetData = {
         name: req.body.name,
         description: req.body.description || null,
@@ -364,32 +374,98 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
         responsiblePersonId: req.body.responsiblePersonId ? parseInt(req.body.responsiblePersonId) : null
       };
 
-      const [newAsset] = await db.insert(assets).values([assetData]).returning();
+      // 🔒 SECURE: Use raw SQL with the same client for true transactional integrity
+      const insertQuery = `
+        INSERT INTO assets (
+          name, description, serial_number, category_id, park_id, status, condition,
+          location_description, acquisition_date, acquisition_cost, notes, amenity_id,
+          latitude, longitude, manufacturer, model, current_value, maintenance_frequency,
+          last_maintenance_date, next_maintenance_date, expected_lifespan, qr_code,
+          responsible_person_id, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, NOW(), NOW())
+        RETURNING id, name, description, serial_number as "serialNumber", category_id as "categoryId",
+                  park_id as "parkId", status, condition, location_description as "locationDescription",
+                  acquisition_date as "acquisitionDate", acquisition_cost as "acquisitionCost",
+                  notes, amenity_id as "amenityId", latitude, longitude, manufacturer, model,
+                  current_value as "currentValue", maintenance_frequency as "maintenanceFrequency",
+                  last_maintenance_date as "lastMaintenanceDate", next_maintenance_date as "nextMaintenanceDate",
+                  expected_lifespan as "expectedLifespan", qr_code as "qrCode",
+                  responsible_person_id as "responsiblePersonId", created_at as "createdAt", updated_at as "updatedAt"
+      `;
+      
+      const insertResult = await client.query(insertQuery, [
+        assetData.name,
+        assetData.description,
+        assetData.serialNumber,
+        assetData.categoryId,
+        assetData.parkId,
+        assetData.status,
+        assetData.condition,
+        assetData.locationDescription,
+        assetData.acquisitionDate,
+        assetData.acquisitionCost,
+        assetData.notes,
+        assetData.amenityId,
+        assetData.latitude,
+        assetData.longitude,
+        assetData.manufacturer,
+        assetData.model,
+        assetData.currentValue,
+        assetData.maintenanceFrequency,
+        assetData.lastMaintenanceDate,
+        assetData.nextMaintenanceDate,
+        assetData.expectedLifespan,
+        assetData.qrCode,
+        assetData.responsiblePersonId
+      ]);
+      
+      const newAsset = insertResult.rows[0];
+      
+      // 🔒 SECURE: Log asset creation within the same transaction
+      const userId = (req as any).user?.id || null;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+      
+      await logAssetCreation(client, newAsset.id, assetData, userId, ipAddress, userAgent);
+      
+      await client.query('COMMIT');
+      console.log(`🔒 [SECURE] Asset created with automatic history logging: ${newAsset.id}`);
+      
       res.status(201).json(newAsset);
     } catch (error) {
-      console.error("Error al crear activo:", error);
+      await client.query('ROLLBACK');
+      console.error("🚨 [SECURE] Error creating asset - transaction rolled back:", error);
       res.status(500).json({ message: "Error al crear activo" });
+    } finally {
+      client.release();
     }
   });
 
-  // Update asset
+  // Update asset with automatic secure history logging
   apiRouter.put("/assets/:id", async (req: Request, res: Response) => {
+    const client = await pool.connect();
     
     try {
+      await client.query('BEGIN');
+      
       const id = parseInt(req.params.id);
       
-      console.log(`Actualizando activo ID: ${id}`);
-      console.log("Datos recibidos:", JSON.stringify(req.body, null, 2));
+      console.log(`🔒 [SECURE] Actualizando activo ID: ${id}`);
       
       if (isNaN(id)) {
         return res.status(400).json({ message: "ID de activo inválido" });
       }
 
-      // Check if asset exists
-      const [existingAsset] = await db.select().from(assets).where(eq(assets.id, id));
-      if (!existingAsset) {
+      // 🔒 SECURE: Get existing asset data BEFORE updating using the same client
+      const existingAssetQuery = 'SELECT * FROM assets WHERE id = $1';
+      const existingAssetResult = await client.query(existingAssetQuery, [id]);
+      
+      if (existingAssetResult.rows.length === 0) {
+        await client.query('ROLLBACK');
         return res.status(404).json({ message: "Activo no encontrado" });
       }
+      
+      const existingAsset = existingAssetResult.rows[0];
 
       // Prepare update data - only include fields that are actually being sent
       const updateData: any = {
@@ -442,34 +518,89 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
         console.log(`Longitud limpiada: "${req.body.longitude}" -> "${cleanLng}"`);
       }
 
-      console.log("Datos de actualización preparados:", JSON.stringify(updateData, null, 2));
-
-      console.log("=== INICIANDO ACTUALIZACIÓN EN BASE DE DATOS ===");
-      console.log(`Actualizando activo ID: ${id} con:`, updateData);
+      console.log("🔒 [SECURE] Datos de actualización preparados:", JSON.stringify(updateData, null, 2));
       
-      const [updatedAsset] = await db
-        .update(assets)
-        .set(updateData)
-        .where(eq(assets.id, id))
-        .returning();
-
-      console.log("=== ACTUALIZACIÓN COMPLETADA ===");
-      console.log("Activo actualizado exitosamente:", updatedAsset.id);
-      console.log("Coordenadas actualizadas:", {
-        latitude: updatedAsset.latitude,
-        longitude: updatedAsset.longitude
+      // 🔒 SECURE: Use raw SQL with the same client for true transactional integrity
+      const updateFields = [];
+      const updateValues = [];
+      let paramIndex = 1;
+      
+      // Build dynamic update query
+      Object.keys(updateData).forEach(key => {
+        if (key !== 'updatedAt') { // Handle updatedAt separately
+          const sqlKey = key === 'locationDescription' ? 'location_description' :
+                        key === 'serialNumber' ? 'serial_number' :
+                        key === 'categoryId' ? 'category_id' :
+                        key === 'parkId' ? 'park_id' :
+                        key === 'amenityId' ? 'amenity_id' :
+                        key === 'acquisitionDate' ? 'acquisition_date' :
+                        key === 'acquisitionCost' ? 'acquisition_cost' :
+                        key === 'currentValue' ? 'current_value' :
+                        key === 'maintenanceFrequency' ? 'maintenance_frequency' :
+                        key === 'lastMaintenanceDate' ? 'last_maintenance_date' :
+                        key === 'nextMaintenanceDate' ? 'next_maintenance_date' :
+                        key === 'expectedLifespan' ? 'expected_lifespan' :
+                        key === 'qrCode' ? 'qr_code' :
+                        key === 'responsiblePersonId' ? 'responsible_person_id' :
+                        key.replace(/([A-Z])/g, '_$1').toLowerCase();
+          
+          updateFields.push(`${sqlKey} = $${paramIndex}`);
+          updateValues.push(updateData[key]);
+          paramIndex++;
+        }
       });
+      
+      // Always update the timestamp
+      updateFields.push(`updated_at = NOW()`);
+      
+      const updateQuery = `
+        UPDATE assets 
+        SET ${updateFields.join(', ')}
+        WHERE id = $${paramIndex}
+        RETURNING id, name, description, serial_number as "serialNumber", category_id as "categoryId",
+                  park_id as "parkId", status, condition, location_description as "locationDescription",
+                  acquisition_date as "acquisitionDate", acquisition_cost as "acquisitionCost",
+                  notes, amenity_id as "amenityId", latitude, longitude, manufacturer, model,
+                  current_value as "currentValue", maintenance_frequency as "maintenanceFrequency",
+                  last_maintenance_date as "lastMaintenanceDate", next_maintenance_date as "nextMaintenanceDate",
+                  expected_lifespan as "expectedLifespan", qr_code as "qrCode",
+                  responsible_person_id as "responsiblePersonId", created_at as "createdAt", updated_at as "updatedAt"
+      `;
+      
+      updateValues.push(id);
+      const updateResult = await client.query(updateQuery, updateValues);
+      const updatedAsset = updateResult.rows[0];
+
+      // 🔒 SECURE: Log asset changes within the same transaction
+      const userId = (req as any).user?.id || null;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+      
+      // Create merged new data for comparison (includes unchanged fields)
+      const newAssetData = { ...existingAsset, ...updateData };
+      
+      await logAssetUpdate(client, id, existingAsset, newAssetData, userId, ipAddress, userAgent);
+      
+      await client.query('COMMIT');
+      console.log(`🔒 [SECURE] Asset updated with automatic history logging: ${id}`);
       
       res.json(updatedAsset);
     } catch (error) {
-      console.error("Error detallado al actualizar activo:", error);
+      await client.query('ROLLBACK');
+      console.error("🚨 [SECURE] Error updating asset - transaction rolled back:", error);
       res.status(500).json({ message: "Error al actualizar activo", details: error.message });
+    } finally {
+      client.release();
     }
   });
 
-  // Bulk delete assets with cascading delete - DEBE IR ANTES QUE /:id
+  // Bulk delete assets with cascading delete and secure history logging
   apiRouter.delete("/assets/bulk-delete", isAuthenticated, async (req: Request, res: Response) => {
+    const client = await pool.connect();
+    
     try {
+      await client.query('BEGIN');
+      
       const { ids } = req.body;
       
       if (!Array.isArray(ids) || ids.length === 0) {
@@ -483,69 +614,75 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
         return res.status(400).json({ message: "Todos los IDs deben ser números válidos" });
       }
 
-      console.log(`Iniciando eliminación masiva de ${assetIds.length} activos: [${assetIds.join(', ')}]`);
+      console.log(`🔒 [SECURE BULK DELETE] Iniciando eliminación de ${assetIds.length} activos: [${assetIds.join(', ')}]`);
 
-      // Check which assets exist
-      const existingAssets = await pool.query(
-        `SELECT id, name FROM assets WHERE id = ANY($1)`,
-        [assetIds]
-      );
+      // 🔒 SECURE: Get asset data BEFORE deletion for history logging (using same client)
+      const existingAssetsQuery = `SELECT * FROM assets WHERE id = ANY($1)`;
+      const existingAssetsResult = await client.query(existingAssetsQuery, [assetIds]);
 
-      if (existingAssets.rows.length === 0) {
+      if (existingAssetsResult.rows.length === 0) {
+        await client.query('ROLLBACK');
         return res.status(404).json({ message: "No se encontraron activos para eliminar" });
       }
 
-      const foundIds = existingAssets.rows.map(asset => asset.id);
+      const existingAssets = existingAssetsResult.rows;
+      const foundIds = existingAssets.map(asset => asset.id);
       const notFoundIds = assetIds.filter(id => !foundIds.includes(id));
 
-      console.log(`Activos encontrados: ${foundIds.length}`);
-      console.log(`Activos no encontrados: ${notFoundIds.length}`);
+      console.log(`🔒 [SECURE BULK DELETE] Activos encontrados: ${foundIds.length}`);
+      console.log(`🔒 [SECURE BULK DELETE] Activos no encontrados: ${notFoundIds.length}`);
 
       let deletedCount = 0;
       const errors = [];
+      
+      // Get user context for history logging
+      const userId = (req as any).user?.id || null;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
 
-      // Use transaction for bulk cascading delete
-      await db.transaction(async (tx) => {
-        for (const assetId of foundIds) {
-          try {
-            console.log(`Eliminando activo ID: ${assetId}`);
+      // 🔒 SECURE: Process each asset deletion within the same transaction
+      for (const asset of existingAssets) {
+        try {
+          console.log(`🔒 [SECURE BULK DELETE] Eliminando activo ID: ${asset.id} - ${asset.name}`);
 
-            // Delete related maintenance records first
-            const deletedMaintenances = await tx.delete(assetMaintenances).where(eq(assetMaintenances.assetId, assetId));
-            console.log(`Mantenimientos eliminados para activo ${assetId}: ${deletedMaintenances.rowCount || 0}`);
-            
-            // Delete from asset_history table if it exists
-            try {
-              await pool.query("DELETE FROM asset_history WHERE asset_id = $1", [assetId]);
-              console.log(`Historial eliminado para activo ${assetId}`);
-            } catch (historyError) {
-              console.log(`No hay registros de historial para activo ${assetId}`);
-            }
+          // 🔒 SECURE: Log asset deletion BEFORE deleting (using same client)
+          await logAssetDeletion(client, asset.id, asset, userId, ipAddress, userAgent);
 
-            // Delete from asset_assignments table if it exists
-            try {
-              await pool.query("DELETE FROM asset_assignments WHERE asset_id = $1", [assetId]);
-              console.log(`Asignaciones eliminadas para activo ${assetId}`);
-            } catch (assignmentsError) {
-              console.log(`No hay asignaciones para activo ${assetId}`);
-            }
-            
-            // Delete the asset itself
-            const deletedAsset = await tx.delete(assets).where(eq(assets.id, assetId));
-            console.log(`Activo ${assetId} eliminado: ${deletedAsset.rowCount || 0} registros`);
-            
-            deletedCount++;
-          } catch (error) {
-            console.error(`Error eliminando activo ${assetId}:`, error);
-            errors.push({ assetId, error: error.message });
-          }
+          // Delete related maintenance records first (using same client)
+          await client.query('DELETE FROM asset_maintenances WHERE asset_id = $1', [asset.id]);
+          console.log(`🔒 Mantenimientos eliminados para activo ${asset.id}`);
+          
+          // Delete from asset_assignments table if it exists (using same client)
+          await client.query('DELETE FROM asset_assignments WHERE asset_id = $1', [asset.id]);
+          console.log(`🔒 Asignaciones eliminadas para activo ${asset.id}`);
+          
+          // Delete the asset itself (using same client)
+          const deleteAssetQuery = 'DELETE FROM assets WHERE id = $1';
+          await client.query(deleteAssetQuery, [asset.id]);
+          console.log(`🔒 Activo ${asset.id} eliminado exitosamente`);
+          
+          deletedCount++;
+        } catch (error) {
+          console.error(`🚨 [SECURE BULK DELETE] Error eliminando activo ${asset.id}:`, error);
+          errors.push({ assetId: asset.id, error: error.message });
+          // Continue with other assets instead of rolling back entire transaction
         }
-      });
+      }
+      
+      if (errors.length === existingAssets.length) {
+        // All deletions failed, rollback
+        await client.query('ROLLBACK');
+        return res.status(500).json({ 
+          message: "Error: No se pudo eliminar ningún activo", 
+          errors 
+        });
+      }
 
-      console.log(`Eliminación masiva completada: ${deletedCount} activos eliminados`);
+      await client.query('COMMIT');
+      console.log(`🔒 [SECURE BULK DELETE] Eliminación completada: ${deletedCount} activos eliminados con historial seguro`);
       
       const response = {
-        message: `${deletedCount} activos eliminados correctamente`,
+        message: `${deletedCount} activos eliminados correctamente con historial completo`,
         deletedCount,
         totalRequested: assetIds.length,
         notFound: notFoundIds.length > 0 ? notFoundIds : undefined,
@@ -554,62 +691,76 @@ export function registerAssetRoutes(app: any, apiRouter: Router, isAuthenticated
 
       res.json(response);
     } catch (error) {
-      console.error("Error en eliminación masiva:", error);
+      await client.query('ROLLBACK');
+      console.error("🚨 [SECURE BULK DELETE] Error en eliminación masiva - transaction rolled back:", error);
       res.status(500).json({ message: "Error en eliminación masiva", error: error.message });
+    } finally {
+      client.release();
     }
   });
 
-  // Delete asset with cascading delete
+  // Delete asset with cascading delete and automatic secure history logging
   apiRouter.delete("/assets/:id", isAuthenticated, async (req: Request, res: Response) => {
+    const client = await pool.connect();
+    
     try {
+      await client.query('BEGIN');
+      
       const id = parseInt(req.params.id);
       
       if (isNaN(id)) {
         return res.status(400).json({ message: "ID de activo inválido" });
       }
 
-      console.log(`Intentando eliminar activo con ID: ${id}`);
+      console.log(`🔒 [SECURE] Intentando eliminar activo con ID: ${id}`);
 
-      // Check if asset exists
-      const [existingAsset] = await db.select().from(assets).where(eq(assets.id, id));
-      if (!existingAsset) {
+      // 🔒 SECURE: Check if asset exists and get data for history logging (using same client)
+      const existingAssetQuery = 'SELECT * FROM assets WHERE id = $1';
+      const existingAssetResult = await client.query(existingAssetQuery, [id]);
+      
+      if (existingAssetResult.rows.length === 0) {
+        await client.query('ROLLBACK');
         return res.status(404).json({ message: "Activo no encontrado" });
       }
+      
+      const existingAsset = existingAssetResult.rows[0];
 
-      console.log(`Activo encontrado, procediendo con eliminación: ${existingAsset.name}`);
+      console.log(`🔒 [SECURE] Activo encontrado, procediendo con eliminación: ${existingAsset.name}`);
 
-      // Use transaction for cascading delete
-      await db.transaction(async (tx) => {
-        // Delete related maintenance records first
-        const deletedMaintenances = await tx.delete(assetMaintenances).where(eq(assetMaintenances.assetId, id));
-        console.log(`Registros de mantenimiento eliminados: ${deletedMaintenances.rowCount || 0}`);
+      // 🔒 SECURE: Log asset deletion BEFORE deleting (so we have asset data)
+      const userId = (req as any).user?.id || null;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+      
+      await logAssetDeletion(client, id, existingAsset, userId, ipAddress, userAgent);
+
+      // 🔒 SECURE: Perform cascading delete using same client for true transactional integrity
+      // Delete related maintenance records first (using same client)
+      await client.query('DELETE FROM asset_maintenances WHERE asset_id = $1', [id]);
+      console.log(`🔒 [SECURE DELETE] Registros de mantenimiento eliminados para activo ${id}`);
         
-        // Delete from asset_history table if it exists
-        try {
-          await pool.query("DELETE FROM asset_history WHERE asset_id = $1", [id]);
-          console.log("Registros de historial eliminados");
-        } catch (historyError) {
-          console.log("Tabla asset_history no existe o no hay registros");
-        }
+      // Delete from asset_assignments table if it exists (using same client)
+      try {
+        await client.query("DELETE FROM asset_assignments WHERE asset_id = $1", [id]);
+        console.log("🔒 [SECURE DELETE] Asignaciones de activos eliminadas para activo ${id}");
+      } catch (assignmentsError) {
+        console.log("🔒 [SECURE DELETE] Tabla asset_assignments no existe o no hay registros para activo ${id}");
+      }
+      
+      // Delete the asset itself (using same client)
+      await client.query('DELETE FROM assets WHERE id = $1', [id]);
+      console.log(`🔒 [SECURE DELETE] Activo ${id} eliminado exitosamente`);
 
-        // Delete from asset_assignments table if it exists
-        try {
-          await pool.query("DELETE FROM asset_assignments WHERE asset_id = $1", [id]);
-          console.log("Asignaciones de activos eliminadas");
-        } catch (assignmentsError) {
-          console.log("Tabla asset_assignments no existe o no hay registros");
-        }
-        
-        // Delete the asset itself
-        const deletedAsset = await tx.delete(assets).where(eq(assets.id, id));
-        console.log(`Activo eliminado: ${deletedAsset.rowCount || 0} registros`);
-      });
-
-      console.log("Eliminación completada exitosamente");
+      await client.query('COMMIT');
+      console.log(`🔒 [SECURE] Asset deleted with automatic history logging: ${id}`);
+      
       res.json({ message: "Activo eliminado correctamente" });
     } catch (error) {
-      console.error("Error al eliminar activo:", error);
+      await client.query('ROLLBACK');
+      console.error("🚨 [SECURE] Error deleting asset - transaction rolled back:", error);
       res.status(500).json({ message: "Error al eliminar activo" });
+    } finally {
+      client.release();
     }
   });
 

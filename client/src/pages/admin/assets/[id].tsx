@@ -73,6 +73,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ASSET_CONDITIONS, ASSET_STATUSES, MAINTENANCE_TYPES } from '@/lib/constants';
 import { Separator } from '@/components/ui/separator';
+// REMOVED: import { logAssetUpdate } from '@/utils/assetHistoryHelpers';
+// 🔒 SECURITY: History logging is now handled automatically server-side
 
 // Función para formatear fechas
 const formatDate = (dateString: string | null) => {
@@ -272,6 +274,9 @@ const AssetDetailPage: React.FC = () => {
   const [isMaintenanceDialogOpen, setIsMaintenanceDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   
+  // Estado para almacenar los datos originales del activo antes de la edición
+  const [originalAssetData, setOriginalAssetData] = useState<Asset | null>(null);
+  
   // Consultar datos del activo
   const { data: asset, isLoading, isError } = useQuery<Asset>({
     queryKey: [`/api/assets/${id}`],
@@ -367,7 +372,15 @@ const AssetDetailPage: React.FC = () => {
     mutationFn: (updatedAsset: z.infer<typeof assetUpdateSchema>) => {
       return apiRequest(`/api/assets/${id}`, 'PUT', updatedAsset);
     },
-    onSuccess: () => {
+    onSuccess: async (response, updatedAssetData) => {
+      // 🔒 SECURITY: History logging is now handled automatically server-side
+      // Asset update history is automatically logged during server-side updates
+      if (id) {
+        // Invalidate history queries to refresh the history tab with new server-side entries
+        queryClient.invalidateQueries({ queryKey: [`/api/assets/${id}/history`] });
+        console.log('✅ Asset updated with automatic server-side history logging');
+      }
+      
       queryClient.invalidateQueries({ queryKey: [`/api/assets/${id}`] });
       setIsEditDialogOpen(false);
       toast({
@@ -451,6 +464,9 @@ const AssetDetailPage: React.FC = () => {
   // Función para abrir el diálogo de edición
   const openEditDialog = () => {
     if (asset) {
+      // Store original asset data for change detection
+      setOriginalAssetData({ ...asset });
+      
       form.reset({
         name: asset.name,
         description: asset.description,

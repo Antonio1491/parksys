@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { db, pool } from './db';
 import { eq, desc } from 'drizzle-orm';
+import { logAssetMaintenance } from './utils/assetHistoryLogger';
 
 /**
  * Registra las rutas para el módulo de mantenimientos de activos
@@ -73,11 +74,15 @@ export function registerMaintenanceRoutes(app: any, apiRouter: Router, isAuthent
     }
   });
 
-  // Crear nuevo mantenimiento
+  // Crear nuevo mantenimiento con automatic secure history logging
   apiRouter.post('/assets/:id/maintenances', isAuthenticated, async (req: Request, res: Response) => {
-    console.log('🔧 POST /assets/:id/maintenances - Solicitud recibida para activo:', req.params.id);
-    console.log('🔧 Body de la solicitud:', req.body);
+    console.log('🔧 [SECURE] POST /assets/:id/maintenances - Solicitud recibida para activo:', req.params.id);
+    
+    const client = await pool.connect();
+    
     try {
+      await client.query('BEGIN');
+      
       const assetId = parseInt(req.params.id);
       const {
         maintenanceType,
@@ -90,7 +95,7 @@ export function registerMaintenanceRoutes(app: any, apiRouter: Router, isAuthent
         notes
       } = req.body;
 
-      console.log('🔧 Datos de mantenimiento recibidos en backend:', {
+      console.log('🔧 [SECURE] Datos de mantenimiento recibidos en backend:', {
         assetId,
         maintenanceType,
         description,
@@ -117,7 +122,7 @@ export function registerMaintenanceRoutes(app: any, apiRouter: Router, isAuthent
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await client.query(query, [
         assetId,
         maintenanceType,
         description,
@@ -145,11 +150,23 @@ export function registerMaintenanceRoutes(app: any, apiRouter: Router, isAuthent
         updatedAt: result.rows[0].updated_at
       };
 
-      console.log('✅ Mantenimiento creado en BD:', maintenance);
+      // 🔒 SECURE: Log maintenance action within the same transaction
+      const userId = (req as any).user?.id || null;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+      
+      await logAssetMaintenance(client, assetId, req.body, userId, ipAddress, userAgent);
+      
+      await client.query('COMMIT');
+      console.log(`🔒 [SECURE] Maintenance created with automatic history logging for asset ${assetId}`);
+      
       res.status(201).json(maintenance);
     } catch (error) {
-      console.error('Error creating maintenance:', error);
+      await client.query('ROLLBACK');
+      console.error('🚨 [SECURE] Error creating maintenance - transaction rolled back:', error);
       res.status(500).json({ error: 'Error al crear el mantenimiento' });
+    } finally {
+      client.release();
     }
   });
 

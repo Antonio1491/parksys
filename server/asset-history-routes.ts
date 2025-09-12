@@ -9,7 +9,7 @@ import { eq, desc, and } from 'drizzle-orm';
 export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
   
   // Obtener historial de un activo específico
-  apiRouter.get('/assets/:id/history', async (req: Request, res: Response) => {
+  apiRouter.get('/assets/:id/history', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const assetId = parseInt(req.params.id);
       const { pool } = await import("./db");
@@ -45,108 +45,27 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
     }
   });
 
-  // Crear nueva entrada de historial
+  // 🔒 SECURITY: RESTRICTED - Direct client history creation is BLOCKED to prevent forged entries
+  // History entries are now automatically created server-side during asset operations
   apiRouter.post('/assets/:id/history', isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const assetId = parseInt(req.params.id);
+      // 🚨 SECURITY BLOCK: Prevent direct client manipulation of asset history
+      console.warn(`🚨 [SECURITY] Blocked attempt to directly create asset history entry from client. IP: ${req.ip}, User: ${(req as any).user?.id}`);
       
-      // Validar datos de entrada con Zod
-      const validationResult = insertAssetHistorySchema.safeParse({
-        assetId,
-        ...req.body
+      res.status(403).json({ 
+        error: 'ACCESO DENEGADO - Las entradas de historial se crean automáticamente',
+        message: 'Por motivos de seguridad, las entradas de historial se crean automáticamente durante las operaciones de activos. No se permite la creación directa desde el cliente.',
+        details: 'History entries are automatically created server-side during asset operations to prevent forged data.',
+        timestamp: new Date().toISOString()
       });
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          error: 'Datos de entrada inválidos',
-          details: validationResult.error.errors 
-        });
-      }
-
-      const {
-        changeType,
-        fieldName,
-        previousValue,
-        newValue,
-        description,
-        notes
-      } = validationResult.data;
-
-      const userId = (req as any).user?.id || null;
-      const ipAddress = req.ip || req.connection.remoteAddress;
-      const userAgent = req.get('User-Agent');
-
-      const { pool } = await import("./db");
-
-      const query = `
-        INSERT INTO asset_history (
-          asset_id, change_type, field_name, previous_value, 
-          new_value, description, user_id, notes, 
-          ip_address, user_agent, timestamp
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-        RETURNING 
-          id,
-          asset_id as "assetId",
-          change_type as "changeType",
-          field_name as "fieldName",
-          previous_value as "previousValue",
-          new_value as "newValue",
-          description,
-          user_id as "userId",
-          notes,
-          timestamp
-      `;
-
-      const result = await pool.query(query, [
-        assetId,
-        changeType,
-        fieldName || null,
-        previousValue || null,
-        newValue || null,
-        description,
-        userId,
-        notes || null,
-        ipAddress || null,
-        userAgent || null
-      ]);
-
-      // Obtener datos del usuario para la respuesta consistente - SIEMPRE incluir campos
-      let createdEntry = result.rows[0];
-      let userName = null;
-      let userUsername = null;
-      
-      if (userId) {
-        const userQuery = `
-          SELECT 
-            u.full_name as "userName",
-            u.username as "userUsername"
-          FROM users u 
-          WHERE u.id = $1
-        `;
-        const userResult = await pool.query(userQuery, [userId]);
-        if (userResult.rows.length > 0) {
-          userName = userResult.rows[0].userName;
-          userUsername = userResult.rows[0].userUsername;
-        }
-      }
-      
-      // ALWAYS include userName and userUsername for consistent response shape
-      createdEntry = {
-        ...createdEntry,
-        userName,
-        userUsername
-      };
-
-      console.log(`✅ Nueva entrada de historial creada para activo ${assetId}: ${changeType}`);
-      res.status(201).json(createdEntry);
     } catch (error) {
-      console.error('Error creating asset history entry:', error);
-      res.status(500).json({ error: 'Error al crear la entrada de historial' });
+      console.error('🚨 [SECURITY] Error in blocked history endpoint:', error);
+      res.status(403).json({ error: 'Acceso denegado' });
     }
   });
 
   // Obtener resumen de historial (últimos cambios)
-  apiRouter.get('/assets/history/recent', async (req: Request, res: Response) => {
+  apiRouter.get('/assets/history/recent', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
       const { pool } = await import("./db");
@@ -178,7 +97,7 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
   });
 
   // Obtener estadísticas de historial
-  apiRouter.get('/assets/history/stats', async (req: Request, res: Response) => {
+  apiRouter.get('/assets/history/stats', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { pool } = await import("./db");
 
@@ -204,100 +123,8 @@ export function registerAssetHistoryRoutes(app: any, apiRouter: Router, isAuthen
   });
 }
 
-/**
- * Función de utilidad para registrar cambios automáticamente
- */
-export async function logAssetChange(
-  assetId: number,
-  changeType: string,
-  description: string,
-  fieldName?: string,
-  previousValue?: any,
-  newValue?: any,
-  userId?: number,
-  notes?: string
-) {
-  try {
-    const { pool } = await import("./db");
+// ⚠️ DEPRECATED: Use server/utils/assetHistoryLogger.ts for secure transactional logging
+// These utility functions have been moved to the secure logger to ensure transactional integrity
 
-    const query = `
-      INSERT INTO asset_history (
-        asset_id, change_type, field_name, previous_value, 
-        new_value, description, user_id, notes, timestamp
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-    `;
-
-    await pool.query(query, [
-      assetId,
-      changeType,
-      fieldName || null,
-      previousValue ? String(previousValue) : null,
-      newValue ? String(newValue) : null,
-      description,
-      userId || null,
-      notes || null
-    ]);
-
-    console.log(`📝 Cambio registrado para activo ${assetId}: ${changeType} - ${description}`);
-    return true;
-  } catch (error) {
-    console.error('Error logging asset change:', error);
-    return false;
-  }
-}
-
-/**
- * Función para comparar objetos y registrar cambios campo por campo
- */
-export async function logAssetUpdate(
-  assetId: number,
-  previousData: any,
-  newData: any,
-  userId?: number
-) {
-  const fieldLabels: { [key: string]: string } = {
-    name: 'Nombre',
-    status: 'Estado',
-    condition: 'Condición',
-    parkId: 'Parque',
-    categoryId: 'Categoría',
-    manufacturer: 'Fabricante',
-    model: 'Modelo',
-    serialNumber: 'Número de Serie',
-    acquisitionCost: 'Costo de Adquisición',
-    currentValue: 'Valor Actual',
-    responsiblePersonId: 'Responsable',
-    locationDescription: 'Ubicación',
-    notes: 'Notas'
-  };
-
-  try {
-    const changes = [];
-    
-    // Comparar cada campo relevante
-    for (const [field, label] of Object.entries(fieldLabels)) {
-      const oldValue = previousData[field];
-      const newValue = newData[field];
-      
-      if (oldValue !== newValue) {
-        await logAssetChange(
-          assetId,
-          'updated',
-          `Campo '${label}' actualizado`,
-          field,
-          oldValue,
-          newValue,
-          userId,
-          `Cambio de '${oldValue || 'N/A'}' a '${newValue || 'N/A'}'`
-        );
-        changes.push({ field, oldValue, newValue });
-      }
-    }
-    
-    console.log(`🔄 Registrados ${changes.length} cambios para activo ${assetId}`);
-    return changes;
-  } catch (error) {
-    console.error('Error logging asset update:', error);
-    return [];
-  }
-}
+// ⚠️ DEPRECATED: Use logAssetUpdate from server/utils/assetHistoryLogger.ts for secure transactional logging
+// This function has been moved to the secure logger to ensure transactional integrity

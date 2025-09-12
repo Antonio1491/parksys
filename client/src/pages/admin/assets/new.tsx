@@ -50,6 +50,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ASSET_CONDITIONS, ASSET_STATUSES, MAINTENANCE_FREQUENCIES } from '@shared/asset-schema';
+// REMOVED: import { logAssetCreation } from '@/utils/assetHistoryHelpers';
+// 🔒 SECURITY: History logging is now handled automatically server-side
 
 // Esquema de validación para crear activo (reorganizado)
 const assetCreateSchema = z.object({
@@ -145,6 +147,9 @@ const CreateAssetPage: React.FC = () => {
   const [mapPosition, setMapPosition] = useState<[number, number] | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null);
   
+  // Estado para almacenar los datos del formulario enviado para el historial
+  const [submittedFormData, setSubmittedFormData] = useState<AssetFormData | null>(null);
+  
   // Formulario para crear activo
   const form = useForm<AssetFormData>({
     resolver: zodResolver(assetCreateSchema),
@@ -211,7 +216,7 @@ const CreateAssetPage: React.FC = () => {
 
   // Aplanar categorías para fácil acceso por ID
   const allCategories = React.useMemo(() => {
-    if (!categoriesTree) return [];
+    if (!categoriesTree || !Array.isArray(categoriesTree)) return [];
     const flattened: any[] = [];
     categoriesTree.forEach((parent: any) => {
       flattened.push(parent);
@@ -313,7 +318,7 @@ const CreateAssetPage: React.FC = () => {
       
       // Find selected park and update map position
       if (parks) {
-        const parksArray = Array.isArray(parks) ? parks : (parks?.data || []);
+        const parksArray = Array.isArray(parks) ? parks : (Array.isArray((parks as any)?.data) ? (parks as any).data : []);
         const selectedPark = parksArray.find((park: any) => park.id === selectedParkId);
         if (selectedPark && selectedPark.latitude && selectedPark.longitude) {
           const parkPosition: [number, number] = [
@@ -363,10 +368,18 @@ const CreateAssetPage: React.FC = () => {
         data: newAsset
       });
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Invalidar todas las queries relacionadas con activos
       queryClient.invalidateQueries({ queryKey: ['/api/assets'] });
       queryClient.invalidateQueries({ queryKey: ['/api/asset-categories'] });
+      
+      // 🔒 SECURITY: History logging is now handled automatically server-side
+      // Asset creation history is automatically logged during server-side creation
+      if (data?.asset?.id) {
+        // Invalidate history queries to refresh the history tab with new server-side entries
+        queryClient.invalidateQueries({ queryKey: [`/api/assets/${data.asset.id}/history`] });
+        console.log('✅ Asset created with automatic server-side history logging');
+      }
       
       toast({
         title: "Activo creado",
@@ -424,6 +437,9 @@ const CreateAssetPage: React.FC = () => {
       use: selectedUseId,
       finalCategoryId: finalData.categoryId
     });
+    
+    // Store the submitted data for history logging
+    setSubmittedFormData(finalData);
     
     createMutation.mutate(finalData);
   };
