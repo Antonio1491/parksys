@@ -725,7 +725,7 @@ const AdminParksContent = () => {
               
               <div className="flex items-center space-x-2">
                 {/* 1. Botón para cambiar los modos de visualización del grid */}
-                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#e3eaee] px-1 py-1 rounded-md">
+                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#ededed] px-1 py-1 rounded-md">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'outline'}
                     size="sm"
@@ -740,7 +740,7 @@ const AdminParksContent = () => {
                     onClick={() => setViewMode('list')}
                     data-testid="button-view-list"
                   >
-                    <List className="h-4 w-4" />
+                    <List className="h-4 w-4 bg-" />
                   </Button>
                 </div>
 

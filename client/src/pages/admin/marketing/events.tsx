@@ -102,7 +102,7 @@ export default function SponsoredEventsPage() {
 
   // Link event with contract mutation
   const linkEventMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/sponsorship-events', {
+    mutationFn: (data: any) => apiRequest('/api/sponsorship-events-links', {
       method: 'POST',
       data
     }),
@@ -127,7 +127,7 @@ export default function SponsoredEventsPage() {
 
   // Unlink event mutation
   const unlinkEventMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/sponsorship-events/${id}`, {
+    mutationFn: (id: number) => apiRequest(`/api/sponsorship-events-links/${id}`, {
       method: 'DELETE'
     }),
     onSuccess: () => {
