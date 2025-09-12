@@ -715,10 +715,10 @@ const AdminParksContent = () => {
                   <Button
                     variant={selectionMode ? 'default' : 'outline'}
                     size="sm"
-                    className="flex items-center"
+                    className="flex items-center bg-[#ededed] h-10 w-10"
                     data-testid="button-selection-toggle"
                   >
-                    <CopyCheck className="h-4 w-4 mr-1 border-gray-300 border" />
+                    <CopyCheck className="h-4 w-4 mr-1" />
                   </Button>
 
                   {/* Dropdown menu con CSS hover */}
