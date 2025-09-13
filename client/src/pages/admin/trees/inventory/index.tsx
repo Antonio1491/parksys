@@ -121,11 +121,11 @@ function TreeInventoryPage() {
   
   const parks = parksResponse?.data || [];
 
-  // Consultar las especies para el filtro
+  // Consultar las especies para el filtro - solicitar todas las especies sin paginación
   const { data: speciesResponse, isLoading: isLoadingSpecies } = useQuery({
     queryKey: ['/api/tree-species'],
     queryFn: async () => {
-      const response = await fetch('/api/tree-species');
+      const response = await fetch('/api/tree-species?limit=100'); // Solicitar hasta 100 especies para cubrir todas
       if (!response.ok) {
         throw new Error('Error al cargar las especies arbóreas');
       }

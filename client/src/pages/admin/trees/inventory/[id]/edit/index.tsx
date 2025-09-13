@@ -126,11 +126,11 @@ function EditTreePage() {
 
   const tree = treeResponse?.data;
 
-  // Cargar lista de especies
-  const { data: species, isLoading: isLoadingSpecies } = useQuery({
+  // Cargar lista de especies - solicitar todas las especies
+  const { data: speciesResponse, isLoading: isLoadingSpecies } = useQuery({
     queryKey: ['/api/tree-species'],
     queryFn: async () => {
-      const response = await fetch('/api/tree-species');
+      const response = await fetch('/api/tree-species?limit=100'); // Solicitar hasta 100 especies
       if (!response.ok) {
         throw new Error('Error al cargar las especies arbóreas');
       }
@@ -138,8 +138,10 @@ function EditTreePage() {
     },
   });
 
+  const species = speciesResponse?.data || [];
+
   // Cargar lista de parques
-  const { data: parks, isLoading: isLoadingParks } = useQuery({
+  const { data: parksResponse, isLoading: isLoadingParks } = useQuery({
     queryKey: ['/api/parks'],
     queryFn: async () => {
       const response = await fetch('/api/parks');
@@ -149,6 +151,11 @@ function EditTreePage() {
       return response.json();
     },
   });
+
+  // Manejar formato de respuesta variable (array directo o {data: array})
+  const parks = Array.isArray(parksResponse) 
+    ? parksResponse 
+    : (parksResponse?.data || []);
 
   // Llenar el formulario con los datos del árbol cuando se carguen
   useEffect(() => {

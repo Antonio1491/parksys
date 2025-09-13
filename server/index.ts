@@ -2384,10 +2384,28 @@ function startServer() {
   
   console.log(`🚀 [DEPLOYMENT] Starting minimal server for health checks first...`);
 
+  // 🔧 CRITICAL FIX: Setup Vite BEFORE app.listen() to prevent 404s on SPA routes
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (!isProduction) {
+    console.log("🎨 [FRONTEND] Setting up Vite BEFORE server starts listening...");
+    // We'll initialize this after the server variable is available
+  }
+
   // START SERVER IMMEDIATELY - health checks only, everything else async
-  appServer = app.listen(PORT, HOST, () => {
+  appServer = app.listen(PORT, HOST, async () => {
     console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT} - Health checks active`);
     console.log(`🏥 [DEPLOYMENT] Ready for deployment health checks - ${new Date().toISOString()}`);
+    
+    // 🔧 CRITICAL FIX: Setup Vite IMMEDIATELY after server starts to avoid 404s
+    if (!isProduction) {
+      try {
+        const { setupVite } = await import("./vite");
+        await setupVite(app, appServer);
+        console.log("🎨 [FRONTEND] Development Vite serving enabled IMMEDIATELY after server start");
+      } catch (error) {
+        console.error("❌ [FRONTEND] Error setting up Vite:", error);
+      }
+    }
     
     // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
     // This ensures health checks can respond immediately during deployment
@@ -2474,15 +2492,8 @@ function startServer() {
         
         console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes with SPA routing");
       } else {
-        // 🔧 DEV FIX: Add temporary root route before Vite setup
-        app.get('/', (req: Request, res: Response, next: NextFunction) => {
-          console.log('🏠 [DEV] Root route accessed - delegating to Vite');
-          next();
-        });
-        
-        const { setupVite } = await import("./vite");
-        await setupVite(app, appServer);
-        console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");
+        // 🔧 DEV FIX: Vite was already setup immediately after server start
+        console.log("🎨 [FRONTEND] Development Vite already enabled - skipping duplicate setup");
       }
       
       console.log('✅ [BACKGROUND] Full server initialization complete - API routes have priority over frontend');

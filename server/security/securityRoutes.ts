@@ -107,7 +107,7 @@ router.post('/validate-password', async (req: Request, res: Response) => {
 // ========== RUTAS ADMINISTRATIVAS (SOLO ADMIN) ==========
 
 // Obtener estadísticas de seguridad
-router.get('/admin/stats', isAdmin, async (req: Request, res: Response) => {
+router.get('/api/admin/stats', isAdmin, async (req: Request, res: Response) => {
   try {
     const days = parseInt(req.query.days as string) || 30;
     const stats = await SecurityService.getSecurityStats(days);
@@ -119,7 +119,7 @@ router.get('/admin/stats', isAdmin, async (req: Request, res: Response) => {
 });
 
 // Obtener actividad sospechosa
-router.get('/admin/suspicious-activity', isAdmin, async (req: Request, res: Response) => {
+router.get('/api/admin/suspicious-activity', isAdmin, async (req: Request, res: Response) => {
   try {
     const hours = parseInt(req.query.hours as string) || 24;
     const activities = await SecurityService.getSuspiciousActivity(hours);
@@ -131,7 +131,7 @@ router.get('/admin/suspicious-activity', isAdmin, async (req: Request, res: Resp
 });
 
 // Desbloquear cuenta
-router.post('/admin/unlock-account', isAdmin, async (req: any, res: Response) => {
+router.post('/api/admin/unlock-account', isAdmin, async (req: any, res: Response) => {
   try {
     // Validar datos de entrada
     const validation = unlockAccountSchema.safeParse(req.body);
@@ -171,7 +171,7 @@ router.post('/admin/unlock-account', isAdmin, async (req: any, res: Response) =>
 });
 
 // Obtener todos los logs de auditoría (para admin)
-router.get('/admin/audit-logs', isAdmin, async (req: Request, res: Response) => {
+router.get('/api/admin/audit-logs', isAdmin, async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 50;
