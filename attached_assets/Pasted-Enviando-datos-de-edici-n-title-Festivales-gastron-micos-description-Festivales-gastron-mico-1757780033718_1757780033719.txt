@@ -1,0 +1,67 @@
+Enviando datos de edición: {title: 'Festivales gastronómicos', description: 'Festivales gastronómicos con puestos variados de cocina internacional y regional.', category: '4', parkId: '90', startDate: '2025-10-23', …}
+Console.js:61 🔍 STATUS ESPECÍFICO enviado: {status: 'activa', statusType: 'string', statusLength: 6}
+Console.js:61 🌐 [QUERY] GET /api/activities/52
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/activities
+Console.js:61 🌐 [QUERY] GET /api/actividades-fotos
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔥 Firebase initialized successfully
+Console.js:61 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+Console.js:61 i18next: languageChanged es
+Console.js:61 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/parks
+Console.js:61 🌐 [QUERY] GET /api/activity-categories
+Console.js:61 🌐 [QUERY] GET /api/instructors
+Console.js:61 🌐 [QUERY] GET /api/activities/52
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}

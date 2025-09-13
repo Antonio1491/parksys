@@ -98,39 +98,6 @@ activityRouter.get("/parks/:id/activities", async (req: Request, res: Response) 
   }
 });
 
-// Obtener una actividad por su ID
-activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
-  try {
-    const activityId = Number(req.params.id);
-    
-    // Usar SQL directo para obtener la actividad con toda la información necesaria
-    const result = await db.execute(
-      sql`SELECT a.id, a.park_id as "parkId", a.title, a.description, 
-               a.start_date as "startDate", a.end_date as "endDate", 
-               a.category, a.category_id as "categoryId", a.location, 
-               a.capacity, a.price, a.is_free as "isFree", 
-               a.instructor_id as "instructorId", a.created_at as "createdAt",
-               a.status,
-               p.name as "parkName",
-               c.name as "categoryName",
-               i.full_name as "instructorName"
-           FROM activities a
-           LEFT JOIN parks p ON a.park_id = p.id
-           LEFT JOIN activity_categories c ON a.category_id = c.id
-           LEFT JOIN instructors i ON a.instructor_id = i.id
-           WHERE a.id = ${activityId}`
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Actividad no encontrada" });
-    }
-    
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error("Error al obtener actividad:", error);
-    res.status(500).json({ message: "Error al obtener detalles de la actividad" });
-  }
-});
 
 // Añadir una actividad a un parque
 activityRouter.post("/activities", async (req: Request, res: Response) => {
