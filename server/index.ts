@@ -2396,12 +2396,23 @@ function startServer() {
     console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT} - Health checks active`);
     console.log(`🏥 [DEPLOYMENT] Ready for deployment health checks - ${new Date().toISOString()}`);
     
-    // 🔧 CRITICAL FIX: Setup Vite IMMEDIATELY after server starts to avoid 404s
+    // 🔧 CRITICAL FIX: Register API routes BEFORE Vite to prevent HTML responses
+    console.log('🔧 [API-PRIORITY] Registering API routes BEFORE Vite setup...');
+    
+    try {
+      // Register main API routes FIRST to ensure they're captured before Vite catch-all
+      await registerRoutes(app);
+      console.log("✅ [API-PRIORITY] Main API routes registered successfully");
+    } catch (error) {
+      console.error("❌ [API-PRIORITY] Error registering main routes:", error);
+    }
+    
+    // NOW setup Vite AFTER API routes are registered
     if (!isProduction) {
       try {
         const { setupVite } = await import("./vite");
         await setupVite(app, appServer);
-        console.log("🎨 [FRONTEND] Development Vite serving enabled IMMEDIATELY after server start");
+        console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");
       } catch (error) {
         console.error("❌ [FRONTEND] Error setting up Vite:", error);
       }
@@ -2431,9 +2442,8 @@ function startServer() {
       // CRITICAL FIX: Register ALL API routes BEFORE express.static and Vite setup
       console.log('🔧 [API-PRIORITY] Registering ALL API routes before static middlewares...');
       
-      // Register main routes immediately BEFORE express.static
-      await registerRoutes(app);
-      console.log("✅ [API-PRIORITY] Main routes registered with priority over static files");
+      // Main routes already registered before Vite - skipping duplicate registration
+      console.log("✅ [API-PRIORITY] Main routes already registered before Vite setup");
       
       // Register role routes
       registerRoleRoutes(app);
