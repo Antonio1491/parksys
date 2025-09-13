@@ -137,6 +137,21 @@ export default function TreeMaintenancePage() {
   // Estado para el campo de código del árbol
   const [treeCode, setTreeCode] = useState('');
   
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  // Estados para modales de acciones
+  const [viewModal, setViewModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedMaintenance, setSelectedMaintenance] = useState<any>(null);
+  
+  // Estados para importar/exportar CSV
+  const [importModal, setImportModal] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -351,6 +366,11 @@ export default function TreeMaintenancePage() {
     }
   }, [treeCode, handleTreeCodeSearch]);
 
+  // Reset pagination when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, filterPark]);
+
   // Filtrar mantenimientos según búsqueda, tipo y parque
   const filteredMaintenances = React.useMemo(() => {
     if (!maintenances) return [];
@@ -536,9 +556,254 @@ export default function TreeMaintenancePage() {
       ...maintenanceData,
       treeId: selectedTreeId,
       maintenanceDate: maintenanceData.maintenanceDate || new Date().toISOString().split('T')[0],
+      // Convert string numbers to actual numbers for API
+      estimatedCost: maintenanceData.estimatedCost ? parseFloat(maintenanceData.estimatedCost) : 0,
+      workHours: maintenanceData.workHours ? parseFloat(maintenanceData.workHours) : 0
     };
 
     addMaintenanceMutation.mutate(newMaintenance);
+  };
+
+  // Funciones de paginación
+  const paginatedMaintenances = useMemo(() => {
+    if (!filteredMaintenances) return [];
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredMaintenances.slice(startIndex, endIndex);
+  }, [filteredMaintenances, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil((filteredMaintenances?.length || 0) / itemsPerPage);
+
+  // Guard against currentPage being greater than totalPages
+  React.useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
+  // Funciones para acciones
+  const handleView = (maintenance: any) => {
+    setSelectedMaintenance(maintenance);
+    setViewModal(true);
+  };
+
+  const handleEdit = (maintenance: any) => {
+    setSelectedMaintenance(maintenance);
+    setMaintenanceData({
+      maintenanceType: maintenance.maintenanceType,
+      notes: maintenance.notes,
+      performedBy: maintenance.performedBy,
+      urgency: 'normal',
+      estimatedCost: '',
+      nextMaintenanceDate: maintenance.nextMaintenanceDate || '',
+      maintenanceDate: maintenance.maintenanceDate,
+      materialsUsed: '',
+      workHours: '',
+      weatherConditions: '',
+      beforeCondition: '',
+      afterCondition: '',
+      followUpRequired: false,
+      recommendations: '',
+    });
+    setEditModal(true);
+  };
+
+  const handleDelete = (maintenance: any) => {
+    setSelectedMaintenance(maintenance);
+    setDeleteModal(true);
+  };
+
+  // Función para borrar mantenimiento
+  const deleteMaintenanceMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/trees/maintenances/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Error al eliminar el mantenimiento');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trees/maintenances'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/trees/maintenances/stats'] });
+      toast({
+        title: "✅ Mantenimiento eliminado",
+        description: "El registro de mantenimiento ha sido eliminado exitosamente.",
+      });
+      setDeleteModal(false);
+      setSelectedMaintenance(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "❌ Error al eliminar",
+        description: error.message || "No se pudo eliminar el mantenimiento.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Función para exportar CSV
+  const exportToCSV = async () => {
+    if (!filteredMaintenances || filteredMaintenances.length === 0) {
+      toast({
+        title: "⚠️ Sin datos",
+        description: "No hay registros para exportar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Remove headers since Papa.unparse with header: true will generate them automatically
+
+    const csvData = filteredMaintenances.map(maintenance => ({
+      codigo_arbol: maintenance.treeCode || '',
+      parque: maintenance.parkName || '',
+      especie: maintenance.speciesName || '',
+      tipo_mantenimiento: maintenance.maintenanceType || '',
+      fecha_mantenimiento: maintenance.maintenanceDate || '',
+      realizado_por: maintenance.performedBy || '',
+      notas: maintenance.notes || '',
+      fecha_proximo_mantenimiento: maintenance.nextMaintenanceDate || ''
+    }));
+
+    // Use Papa.unparse for proper CSV generation with escaping
+    const Papa = (await import('papaparse')).default;
+    const csvContent = Papa.unparse(csvData, {
+      delimiter: ',',
+      header: true,
+      quotes: true
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `mantenimientos_arboles_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+
+    toast({
+      title: "📊 Exportación exitosa",
+      description: `Se exportaron ${filteredMaintenances.length} registros a CSV.`,
+    });
+  };
+
+  // Función para descargar plantilla CSV
+  const downloadTemplate = async () => {
+    const templateData = [{
+      codigo_arbol: 'AHU-CHA-001',
+      tipo_mantenimiento: 'Poda',
+      fecha_mantenimiento: '2025-09-13',
+      realizado_por: 'Juan Pérez',
+      notas: 'Trabajo realizado correctamente',
+      fecha_proximo_mantenimiento: '2025-12-13'
+    }];
+
+    // Use Papa.unparse for proper CSV template generation
+    const Papa = (await import('papaparse')).default;
+    const csvContent = Papa.unparse(templateData, {
+      delimiter: ',',
+      header: true,
+      quotes: true
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'plantilla_mantenimientos_arboles.csv';
+    link.click();
+
+    toast({
+      title: "📄 Plantilla descargada",
+      description: "Plantilla CSV descargada exitosamente.",
+    });
+  };
+
+  // Función para importar CSV
+  const handleImportCSV = async () => {
+    if (!csvFile) {
+      toast({
+        title: "⚠️ Sin archivo",
+        description: "Por favor selecciona un archivo CSV.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const text = await csvFile.text();
+      const Papa = (await import('papaparse')).default;
+      
+      const result = Papa.parse(text, {
+        header: true,
+        skipEmptyLines: true,
+      });
+
+      if (result.errors.length > 0) {
+        throw new Error('Error al parsear el archivo CSV');
+      }
+
+      const validData = [];
+      for (const row of result.data as any[]) {
+        if (!row.codigo_arbol || !row.tipo_mantenimiento || !row.fecha_mantenimiento || !row.realizado_por) {
+          continue;
+        }
+
+        // Buscar el árbol por código
+        const tree = trees.find((t: any) => t.code === row.codigo_arbol);
+        if (!tree) {
+          toast({
+            title: "⚠️ Árbol no encontrado",
+            description: `No se encontró el árbol con código: ${row.codigo_arbol}`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        validData.push({
+          treeId: tree.id,
+          maintenanceType: row.tipo_mantenimiento,
+          maintenanceDate: row.fecha_mantenimiento,
+          performedBy: row.realizado_por,
+          notes: row.notas || '',
+          nextMaintenanceDate: row.fecha_proximo_mantenimiento || '',
+        });
+      }
+
+      if (validData.length === 0) {
+        throw new Error('No se encontraron datos válidos para importar');
+      }
+
+      // Importar los datos
+      const response = await fetch('/api/trees/maintenances/bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ maintenances: validData }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al importar los datos');
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['/api/trees/maintenances'] });
+      toast({
+        title: "📥 Importación exitosa",
+        description: `Se importaron ${validData.length} registros de mantenimiento.`,
+      });
+
+      setImportModal(false);
+      setCsvFile(null);
+    } catch (error: any) {
+      toast({
+        title: "❌ Error en importación",
+        description: error.message || "Error al importar el archivo CSV.",
+        variant: "destructive",
+      });
+    } finally {
+      setImporting(false);
+    }
   };
 
   return (
@@ -650,9 +915,9 @@ export default function TreeMaintenancePage() {
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Código o nombre..."
-                    className="pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
                   />
                 </div>
               </div>
@@ -751,10 +1016,44 @@ export default function TreeMaintenancePage() {
         {/* Tabla de mantenimientos */}
         <Card>
           <CardHeader>
-            <CardTitle>Registros de Mantenimiento</CardTitle>
-            <CardDescription>
-              {filteredMaintenances?.length} {filteredMaintenances?.length === 1 ? 'registro' : 'registros'} de mantenimiento
-            </CardDescription>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle>Registros de Mantenimiento</CardTitle>
+                <CardDescription>
+                  {filteredMaintenances?.length} {filteredMaintenances?.length === 1 ? 'registro' : 'registros'} de mantenimiento
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={downloadTemplate}
+                  data-testid="button-download-template"
+                >
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Plantilla
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={exportToCSV}
+                  disabled={!filteredMaintenances || filteredMaintenances.length === 0}
+                  data-testid="button-export-csv"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar CSV
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setImportModal(true)}
+                  data-testid="button-import-csv"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importar CSV
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {loadingMaintenances ? (
@@ -774,50 +1073,120 @@ export default function TreeMaintenancePage() {
                 </p>
               </div>
             ) : (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Código</TableHead>
-                      <TableHead>Parque</TableHead>
-                      <TableHead>Especie</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Fecha</TableHead>
-                      <TableHead>Realizado por</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredMaintenances?.map((maintenance) => (
-                      <TableRow key={maintenance.id}>
-                        <TableCell className="font-medium">{maintenance.treeCode}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3 text-muted-foreground" />
-                            {maintenance.parkName}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Leaf className="h-3 w-3 text-green-600" />
-                            {maintenance.speciesName}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="bg-green-50 text-green-700">
-                            {maintenance.maintenanceType}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3 text-muted-foreground" />
-                            {format(new Date(maintenance.maintenanceDate), 'dd MMM yyyy', { locale: es })}
-                          </div>
-                        </TableCell>
-                        <TableCell>{maintenance.performedByName || 'Usuario ' + maintenance.performedBy}</TableCell>
+              <div className="space-y-4">
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Código</TableHead>
+                        <TableHead>Parque</TableHead>
+                        <TableHead>Especie</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Fecha</TableHead>
+                        <TableHead>Realizado por</TableHead>
+                        <TableHead className="w-[120px]">Acciones</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedMaintenances?.map((maintenance) => (
+                        <TableRow key={maintenance.id}>
+                          <TableCell className="font-medium">{maintenance.treeCode}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              {maintenance.parkName}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Leaf className="h-3 w-3 text-green-600" />
+                              {maintenance.speciesName}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-green-50 text-green-700">
+                              {maintenance.maintenanceType}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3 text-muted-foreground" />
+                              {format(new Date(maintenance.maintenanceDate), 'dd MMM yyyy', { locale: es })}
+                            </div>
+                          </TableCell>
+                          <TableCell>{maintenance.performedByName || 'Usuario ' + maintenance.performedBy}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleView(maintenance)}
+                                className="h-8 w-8"
+                                data-testid={`button-view-maintenance-${maintenance.id}`}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEdit(maintenance)}
+                                className="h-8 w-8"
+                                data-testid={`button-edit-maintenance-${maintenance.id}`}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDelete(maintenance)}
+                                className="h-8 w-8 text-red-600 hover:text-red-700"
+                                data-testid={`button-delete-maintenance-${maintenance.id}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                {/* Paginación */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredMaintenances?.length || 0)} de {filteredMaintenances?.length || 0} registros
+                    </div>
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
@@ -1300,6 +1669,284 @@ export default function TreeMaintenancePage() {
                 <>
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Registrar Mantenimiento
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para Visualizar Mantenimiento */}
+      <Dialog open={viewModal} onOpenChange={setViewModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-blue-600" />
+              Detalles del Mantenimiento
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedMaintenance && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Código del Árbol</Label>
+                  <p className="text-sm font-medium">{selectedMaintenance.treeCode}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Parque</Label>
+                  <p className="text-sm">{selectedMaintenance.parkName}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Especie</Label>
+                  <p className="text-sm">{selectedMaintenance.speciesName}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Tipo de Mantenimiento</Label>
+                  <Badge variant="outline" className="bg-green-50 text-green-700">
+                    {selectedMaintenance.maintenanceType}
+                  </Badge>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Fecha</Label>
+                  <p className="text-sm">{format(new Date(selectedMaintenance.maintenanceDate), 'dd MMM yyyy', { locale: es })}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Realizado por</Label>
+                  <p className="text-sm">{selectedMaintenance.performedByName || selectedMaintenance.performedBy}</p>
+                </div>
+              </div>
+              
+              {selectedMaintenance.description && (
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Descripción</Label>
+                  <p className="text-sm mt-1">{selectedMaintenance.description}</p>
+                </div>
+              )}
+              
+              {selectedMaintenance.notes && (
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Notas</Label>
+                  <p className="text-sm mt-1">{selectedMaintenance.notes}</p>
+                </div>
+              )}
+              
+              {selectedMaintenance.nextMaintenanceDate && (
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Próximo Mantenimiento</Label>
+                  <p className="text-sm mt-1">{format(new Date(selectedMaintenance.nextMaintenanceDate), 'dd MMM yyyy', { locale: es })}</p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewModal(false)}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para Editar Mantenimiento */}
+      <Dialog open={editModal} onOpenChange={setEditModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5 text-blue-600" />
+              Editar Mantenimiento
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-type">Tipo de Mantenimiento</Label>
+                <Select
+                  value={maintenanceData.maintenanceType}
+                  onValueChange={(value) => setMaintenanceData({...maintenanceData, maintenanceType: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Poda">🌿 Poda</SelectItem>
+                    <SelectItem value="Fertilización">🌱 Fertilización</SelectItem>
+                    <SelectItem value="Riego">💧 Riego</SelectItem>
+                    <SelectItem value="Fumigación">🚿 Fumigación</SelectItem>
+                    <SelectItem value="Inspección">🔍 Inspección</SelectItem>
+                    <SelectItem value="Limpieza">🧹 Limpieza</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="edit-date">Fecha de Mantenimiento</Label>
+                <Input
+                  id="edit-date"
+                  type="date"
+                  value={maintenanceData.maintenanceDate}
+                  onChange={(e) => setMaintenanceData({...maintenanceData, maintenanceDate: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="edit-performed-by">Realizado por</Label>
+              <Input
+                id="edit-performed-by"
+                placeholder="Nombre de la persona que realizó el mantenimiento"
+                value={maintenanceData.performedBy}
+                onChange={(e) => setMaintenanceData({...maintenanceData, performedBy: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="edit-notes">Notas</Label>
+              <Textarea
+                id="edit-notes"
+                placeholder="Detalles del mantenimiento realizado..."
+                rows={3}
+                value={maintenanceData.notes}
+                onChange={(e) => setMaintenanceData({...maintenanceData, notes: e.target.value})}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditModal(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => {
+                // TODO: Implementar lógica de actualización
+                setEditModal(false);
+                toast({
+                  title: "✅ Funcionalidad pendiente",
+                  description: "La edición de mantenimientos se implementará en la siguiente fase.",
+                });
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Guardar Cambios
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para Confirmar Borrado */}
+      <Dialog open={deleteModal} onOpenChange={setDeleteModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+              Confirmar Eliminación
+            </DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas eliminar este registro de mantenimiento? Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedMaintenance && (
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-sm"><span className="font-medium">Árbol:</span> {selectedMaintenance.treeCode}</p>
+              <p className="text-sm"><span className="font-medium">Tipo:</span> {selectedMaintenance.maintenanceType}</p>
+              <p className="text-sm"><span className="font-medium">Fecha:</span> {format(new Date(selectedMaintenance.maintenanceDate), 'dd MMM yyyy', { locale: es })}</p>
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteModal(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => selectedMaintenance && deleteMaintenanceMutation.mutate(selectedMaintenance.id)}
+              disabled={deleteMaintenanceMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteMaintenanceMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para Importar CSV */}
+      <Dialog open={importModal} onOpenChange={setImportModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-green-600" />
+              Importar Registros de Mantenimiento
+            </DialogTitle>
+            <DialogDescription>
+              Importa múltiples registros de mantenimiento desde un archivo CSV
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2">Instrucciones:</h4>
+              <ol className="text-sm text-blue-800 space-y-1">
+                <li>1. Descarga la plantilla CSV haciendo clic en el botón "Plantilla"</li>
+                <li>2. Completa la plantilla con los datos de mantenimiento</li>
+                <li>3. Asegúrate de que los códigos de árbol existan en el sistema</li>
+                <li>4. Selecciona el archivo CSV completado y haz clic en "Importar"</li>
+              </ol>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="csv-file">Archivo CSV</Label>
+              <Input
+                id="csv-file"
+                type="file"
+                accept=".csv"
+                onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+              />
+            </div>
+            
+            {csvFile && (
+              <div className="bg-green-50 p-3 rounded-lg">
+                <p className="text-sm text-green-800">
+                  <span className="font-medium">Archivo seleccionado:</span> {csvFile.name}
+                </p>
+                <p className="text-xs text-green-600">
+                  Tamaño: {(csvFile.size / 1024).toFixed(2)} KB
+                </p>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => {
+              setImportModal(false);
+              setCsvFile(null);
+            }}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleImportCSV}
+              disabled={!csvFile || importing}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {importing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Importando...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importar CSV
                 </>
               )}
             </Button>
