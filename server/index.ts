@@ -898,6 +898,45 @@ app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) 
   }
 });
 
+// ENDPOINT BÁSICO PARA OBTENER TODOS LOS PARQUES (NECESARIO PARA FILTROS)
+app.get("/api/parks", async (_req: Request, res: Response) => {
+  try {
+    console.log("🏞️ [CRITICAL] Obteniendo lista básica de parques para filtros...");
+    
+    const { sql } = await import("drizzle-orm");
+    
+    // Consulta para obtener parques básicos
+    const result = await db.execute(
+      sql`SELECT 
+            id,
+            name,
+            address,
+            district,
+            municipality,
+            status
+          FROM parks
+          WHERE status = 'active'
+          ORDER BY name ASC`
+    );
+
+    console.log(`🏞️ [CRITICAL] Returning ${result.rows.length} parks via critical route`);
+    
+    const parks = result.rows.map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      address: row.address,
+      district: row.district,
+      municipality: row.municipality,
+      status: row.status
+    }));
+
+    res.json({ data: parks });
+  } catch (error: any) {
+    console.error("❌ Error al obtener lista de parques:", error);
+    res.status(500).json({ message: "Error al obtener lista de parques" });
+  }
+});
+
 // ENDPOINT PARA OBTENER PROMEDIO GLOBAL DE EVALUACIONES DE ACTIVIDADES
 app.get("/api/activities/average-rating", async (_req: Request, res: Response) => {
   try {
