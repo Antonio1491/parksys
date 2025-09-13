@@ -10,12 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Users, Plus, FileText, TrendingUp, MapPin, Clock, Sun, Cloud, CloudRain, BarChart3, Download, Filter, PieChart, Activity, Grid, List, Upload, ChevronLeft, ChevronRight, ArrowLeft, Grid3X3 } from "lucide-react";
+import { Calendar, Users, Plus, FileText, TrendingUp, MapPin, Clock, Sun, Cloud, CloudRain, BarChart3, Download, Filter, PieChart, Activity, Grid, List, Upload, ChevronLeft, ChevronRight, ArrowLeft, Grid3X3, ChevronDown } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart as RechartsPieChart, Pie, Cell, Legend } from 'recharts';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface VisitorCount {
   id: number;
@@ -1175,15 +1176,34 @@ export default function VisitorCountPage() {
                   <div className="h-6 w-px bg-gray-300 mx-2"></div>
 
                   {/* Botones de acción movidos al mismo nivel */}
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={handleImportCSV}
-                    className="border-blue-200 text-blue-700 hover:bg-blue-50 flex items-center gap-2"
-                  >
-                    <Upload className="h-5 w-5" />
-                    Importar CSV
-                  </Button>
+                  <div className="flex">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handleImportCSV}
+                      className="border-blue-200 text-blue-700 hover:bg-blue-50 flex items-center gap-2 rounded-r-none border-r-0"
+                    >
+                      <Upload className="h-5 w-5" />
+                      Importar CSV
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="border-blue-200 text-blue-700 hover:bg-blue-50 rounded-l-none px-2"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={downloadTemplate}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Descargar Plantilla CSV
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                   <Button
                     variant="outline"
                     size="lg"
