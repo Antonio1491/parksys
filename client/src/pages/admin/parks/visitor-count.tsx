@@ -561,7 +561,7 @@ export default function VisitorCountPage() {
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const csv = e.target?.result as string;
           console.log('📥 [CSV] Procesando archivo...');
@@ -619,13 +619,15 @@ export default function VisitorCountPage() {
             throw new Error('No se encontraron datos válidos para importar');
           }
           
+          // Enviar datos al backend para guardarlos
+          await processImportedData(parsedData);
+          
           toast({
             title: "Importación exitosa",
             description: `Se procesaron ${parsedData.length} registros correctamente`,
           });
           
-          // Aquí se podría enviar los datos al backend
-          // Por ahora solo invalidamos las consultas para refrescar
+          // Actualizar las consultas después de guardar
           queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts/park-summary'] });
           queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts'] });
           
@@ -641,6 +643,110 @@ export default function VisitorCountPage() {
       reader.readAsText(file);
     };
     input.click();
+  };
+
+  // Función para procesar y enviar datos importados al backend
+  const processImportedData = async (parsedData: any[]) => {
+    // Primero obtener la lista de parques para mapear nombres a IDs
+    const parksResponse = await fetch('/api/parks');
+    const parksData = await parksResponse.json();
+    
+    // Crear un mapa de nombre de parque a ID
+    const parkNameToId: Record<string, number> = {};
+    parksData.forEach((park: any) => {
+      parkNameToId[park.name] = park.id;
+    });
+
+    // Mapear métodos y tipos a los valores que espera el backend
+    const methodMap: Record<string, string> = {
+      'Conteo manual': 'counting',
+      'Estimación': 'estimation',
+      'Contador manual': 'manual_counter',
+      'Basado en eventos': 'event_based',
+      'Control de acceso': 'entrance_control'
+    };
+
+    const dayTypeMap: Record<string, string> = {
+      'Día laborable': 'weekday',
+      'Fin de semana': 'weekend', 
+      'Día festivo': 'holiday'
+    };
+
+    const weatherMap: Record<string, string> = {
+      'Soleado': 'sunny',
+      'Nublado': 'cloudy',
+      'Lluvioso': 'rainy',
+      'Otro': 'other'
+    };
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const row of parsedData) {
+      try {
+        // Buscar el park ID
+        const parkId = parkNameToId[row.Parque];
+        if (!parkId) {
+          console.warn(`⚠️ Parque no encontrado: ${row.Parque}`);
+          errorCount++;
+          continue;
+        }
+
+        // Convertir fecha del formato DD/MM/AA a YYYY-MM-DD
+        let formattedDate;
+        if (row.Fecha.includes('/')) {
+          const [day, month, year] = row.Fecha.split('/');
+          const fullYear = year.length === 2 ? `20${year}` : year;
+          formattedDate = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        } else {
+          formattedDate = row.Fecha; // Asumir que ya está en formato correcto
+        }
+
+        // Preparar datos para el backend
+        const visitorCountData = {
+          parkId: parkId,
+          date: formattedDate,
+          adults: parseInt(row.Adultos) || 0,
+          children: parseInt(row.Niños) || 0,
+          seniors: parseInt(row['Adultos Mayores']) || 0,
+          pets: parseInt(row.Mascotas) || 0,
+          groups: parseInt(row.Grupos) || 0,
+          countingMethod: methodMap[row['Método de Conteo']] || 'counting',
+          dayType: dayTypeMap[row['Tipo de Día']] || 'weekday',
+          weather: weatherMap[row.Clima] || 'sunny',
+          notes: row.Notas || ''
+        };
+
+        console.log(`📤 Enviando datos:`, visitorCountData);
+
+        // Enviar al backend
+        const response = await apiRequest('/api/visitor-counts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(visitorCountData),
+        });
+
+        if (response.ok) {
+          successCount++;
+          console.log(`✅ Registro guardado: ${row.Parque} - ${formattedDate}`);
+        } else {
+          errorCount++;
+          console.error(`❌ Error guardando: ${row.Parque} - ${formattedDate}`, response.statusText);
+        }
+
+      } catch (error) {
+        errorCount++;
+        console.error(`❌ Error procesando fila:`, row, error);
+      }
+    }
+
+    console.log(`📊 Importación completada: ${successCount} éxitos, ${errorCount} errores`);
+    
+    if (errorCount > 0) {
+      throw new Error(`Se procesaron ${successCount} registros correctamente, pero ${errorCount} tuvieron errores. Revisa la consola para más detalles.`);
+    }
   };
 
   const exportParkSummaryToCSV = () => {
