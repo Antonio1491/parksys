@@ -555,18 +555,25 @@ export default function TreeMaintenancePage() {
                 </p>
               </div>
             </div>
-            <Button 
-              onClick={() => {
-                console.log('🔥 BOTÓN CLICKED - Estado actual:', { open });
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔥🔥🔥 BOTÓN NATIVO CLICKED!');
+                alert('¡Botón funcionando!');
                 setOpen(true);
-                console.log('🔥 BOTÓN CLICKED - Estado después:', true);
-              }} 
-              className="bg-green-600 hover:bg-green-700"
+              }}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              style={{
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
               data-testid="button-register-maintenance"
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Registrar Mantenimiento
-            </Button>
+              + Registrar Mantenimiento
+            </button>
           </div>
         </Card>
 
