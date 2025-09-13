@@ -1194,43 +1194,6 @@ export default function VisitorCountPage() {
                     Exportar CSV
                   </Button>
                   <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={exportParkSummaryToExcel}
-                    className="border-purple-200 text-purple-700 hover:bg-purple-50 flex items-center gap-2"
-                  >
-                    <svg 
-                      width="48" 
-                      height="48" 
-                      viewBox="0 0 48 48" 
-                      fill="none" 
-                      style={{ width: '24px', height: '24px', minWidth: '24px', minHeight: '24px' }}
-                    >
-                      {/* Nube */}
-                      <path 
-                        d="M36 20C36 16.6863 33.3137 14 30 14C29.2187 14 28.4863 14.1562 27.8125 14.4375C26.6875 11.0625 23.5625 8.5 20 8.5C15.3125 8.5 11.5 12.3125 11.5 17C11.5 17.5 11.5312 18 11.625 18.4687C9.0625 19.4375 7.25 21.9687 7.25 25C7.25 28.8750 10.375 32 14.25 32H35.5C39.6406 32 43 28.6406 43 24.5C43 21.0625 40.1875 18.3125 36.6875 17.875C36.4375 18.9375 36.2188 19.9688 36 20Z" 
-                        stroke="#22c55e" 
-                        strokeWidth="2.5" 
-                        fill="none"
-                      />
-                      {/* Flechas hacia arriba */}
-                      <g stroke="#22c55e" strokeWidth="2.5" fill="none">
-                        {/* Flecha izquierda */}
-                        <path d="M18 38L18 34L16 36M18 34L20 36" />
-                        <path d="M18 38L18 34" />
-                        
-                        {/* Flecha centro */}
-                        <path d="M24 40L24 36L22 38M24 36L26 38" />
-                        <path d="M24 40L24 36" />
-                        
-                        {/* Flecha derecha */}
-                        <path d="M30 38L30 34L28 36M30 34L32 36" />
-                        <path d="M30 38L30 34" />
-                      </g>
-                    </svg>
-                    Excel
-                  </Button>
-                  <Button
                     onClick={() => {
                       // Invalidar cache para actualizar datos
                       queryClient.invalidateQueries({ 
@@ -1984,13 +1947,6 @@ export default function VisitorCountPage() {
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Exportar CSV
-                      </Button>
-                      <Button 
-                        onClick={exportToExcel}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        <FileText className="h-4 w-4 mr-2" />
-                        Exportar Excel
                       </Button>
                     </div>
                   </div>
