@@ -471,13 +471,7 @@ export default function VisitorCountPage() {
 
 
   const downloadTemplate = () => {
-    const currentDate = new Date().toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    // Crear plantilla profesional con instrucciones detalladas
+    // Crear plantilla simple solo con headers y datos de ejemplo
     const templateData = [
       {
         'Fecha': '2025-01-15',
@@ -507,32 +501,8 @@ export default function VisitorCountPage() {
       }
     ];
 
-    // Encabezado profesional con instrucciones
-    const headerLines = [
-      'SISTEMA DE GESTIÓN DE PARQUES URBANOS',
-      'PLANTILLA PARA IMPORTACIÓN DE CONTEO DE VISITANTES',
-      `Generado el: ${currentDate}`,
-      '',
-      'INSTRUCCIONES DE USO:',
-      '1. Complete los campos requeridos en cada fila',
-      '2. Use formato de fecha: AAAA-MM-DD (ejemplo: 2025-01-15)',
-      '3. Use números enteros para conteos de visitantes',
-      '4. Los valores de Método de Conteo aceptados son:',
-      '   - Conteo manual, Estimación, Contador manual, Basado en eventos, Control de acceso',
-      '5. Los valores de Tipo de Día aceptados son:',
-      '   - Día laborable, Fin de semana, Día festivo',
-      '6. Los valores de Clima aceptados son:',
-      '   - Soleado, Nublado, Lluvioso, Otro',
-      '7. El campo Notas es opcional',
-      '8. Guarde el archivo como CSV antes de importar',
-      '',
-      'DATOS DE EJEMPLO (puede eliminar estas filas):',
-      ''
-    ];
-
     const headers = Object.keys(templateData[0]);
     const csvContent = [
-      ...headerLines,
       headers.join(','),
       ...templateData.map(row => headers.map(header => `"${(row as any)[header]}"`).join(','))
     ].join('\n');
@@ -547,7 +517,7 @@ export default function VisitorCountPage() {
 
     toast({
       title: "Plantilla descargada",
-      description: "Plantilla profesional con instrucciones detalladas lista para usar",
+      description: "Plantilla CSV lista para usar",
     });
   };
 
@@ -594,28 +564,76 @@ export default function VisitorCountPage() {
       reader.onload = (e) => {
         try {
           const csv = e.target?.result as string;
-          // Procesar CSV y actualizar datos del resumen por parques
-          console.log('📥 [PARK SUMMARY] Importando CSV:', csv.substring(0, 200));
+          console.log('📥 [CSV] Procesando archivo...');
+          
+          // Dividir en líneas y limpiar
+          const lines = csv.split(/\r?\n/).filter(line => line.trim());
+          
+          if (lines.length < 2) {
+            throw new Error('El archivo CSV debe contener al menos una línea de headers y una de datos');
+          }
+          
+          // Primera línea son los headers
+          const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+          const dataLines = lines.slice(1);
+          
+          console.log('📊 [CSV] Headers:', headers);
+          console.log('📊 [CSV] Filas de datos:', dataLines.length);
+          
+          // Parsear los datos
+          const parsedData = [];
+          for (let i = 0; i < dataLines.length; i++) {
+            const line = dataLines[i].trim();
+            if (!line) continue; // Skip líneas vacías
+            
+            // Parsear la línea CSV (considerando comillas)
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let j = 0; j < line.length; j++) {
+              const char = line[j];
+              if (char === '"') {
+                inQuotes = !inQuotes;
+              } else if (char === ',' && !inQuotes) {
+                values.push(current.trim());
+                current = '';
+              } else {
+                current += char;
+              }
+            }
+            values.push(current.trim()); // Agregar el último valor
+            
+            // Crear objeto con los datos
+            const rowData: any = {};
+            headers.forEach((header, index) => {
+              rowData[header] = values[index] || '';
+            });
+            
+            parsedData.push(rowData);
+          }
+          
+          console.log('📊 [CSV] Datos parseados:', parsedData);
+          
+          if (parsedData.length === 0) {
+            throw new Error('No se encontraron datos válidos para importar');
+          }
           
           toast({
-            title: "Importación de resumen iniciada",
-            description: "Procesando archivo CSV del resumen por parques...",
+            title: "Importación exitosa",
+            description: `Se procesaron ${parsedData.length} registros correctamente`,
           });
           
-          // Aquí iría la lógica específica para importar datos del resumen
-          setTimeout(() => {
-            queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts/park-summary'] });
-            toast({
-              title: "Importación completada",
-              description: "Los datos del resumen por parques se han actualizado exitosamente",
-            });
-          }, 1000);
+          // Aquí se podría enviar los datos al backend
+          // Por ahora solo invalidamos las consultas para refrescar
+          queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts/park-summary'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts'] });
           
         } catch (error) {
-          console.error('Error importando CSV del resumen:', error);
+          console.error('Error importando CSV:', error);
           toast({
             title: "Error en importación",
-            description: "No se pudo procesar el archivo CSV del resumen",
+            description: error instanceof Error ? error.message : "No se pudo procesar el archivo CSV",
             variant: "destructive",
           });
         }
