@@ -435,7 +435,7 @@ function EditTreePage() {
                                       <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
                                     </div>
                                   ) : (
-                                    species?.data?.map((speciesItem: any) => (
+                                    species?.map((speciesItem: any) => (
                                       <SelectItem key={speciesItem.id} value={speciesItem.id.toString()}>
                                         {speciesItem.commonName} ({speciesItem.scientificName})
                                       </SelectItem>
