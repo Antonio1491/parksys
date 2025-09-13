@@ -272,7 +272,7 @@ function TreeInventoryPage() {
   // Función para descargar plantilla CSV
   const handleDownloadTemplate = () => {
     const headers = [
-      'codigo',
+      'código',
       'especie_id',
       'parque_id',
       'latitud',
@@ -281,45 +281,66 @@ function TreeInventoryPage() {
       'etapa_desarrollo',
       'edad_estimada',
       'altura',
-      'diametro',
+      'diámetro',
       'cobertura_copa',
       'estado_salud',
+      'condicion_fisica',
+      'tiene_huecos',
+      'tiene_raices_expuestas',
+      'tiene_plagas',
+      'fecha_ultima_inspeccion',
+      'esta_protegido',
+      'url_imagen',
       'descripcion_ubicacion',
-      'notas'
+      'observaciones'
     ];
     
     const examples = [
       [
-        'AHU-BOS-001',
+        'AHU-CHA-001',
         '1',
-        '5',
-        '20.6597',
-        '-103.3496',
+        '90',
+        '19.4200',
+        '-99.1300',
         '2020-03-15',
-        'adulto',
-        '5',
-        '8.5',
-        '45',
-        '6.2',
+        'Maduro',
+        '25',
+        '12.5',
+        '65.8',
+        '8.2',
         'Bueno',
-        'Entrada principal del parque',
-        'Árbol emblemático en buen estado'
+        'Excelente',
+        'no',
+        'no',
+        'no',
+        '2024-11-15',
+        'sí',
+        'https://ejemplo.com/ahuehuete.jpg',
+        'Entrada principal del Bosque de Chapultepec',
+        'Árbol emblemático, patrimonio histórico nacional'
       ],
       [
         'JAC-PAR-002',
         '2',
-        '7',
-        '20.6612',
-        '-103.3510',
-        '2019-11-20',
-        'juvenil',
-        '3',
-        '5.2',
-        '25',
-        '3.8',
+        '91',
+        '19.4210',
+        '-99.1320',
+        '2021-04-20',
+        'Juvenil',
+        '4',
+        '5.8',
+        '22.5',
+        '4.1',
         'Regular',
-        'Área de juegos infantiles',
-        'Requiere poda de mantenimiento'
+        'Bueno',
+        'no',
+        'sí',
+        'no',
+        '2024-10-10',
+        'no',
+        'https://ejemplo.com/jacaranda.jpg',
+        'Área recreativa, cerca de juegos infantiles',
+        'Floración abundante en primavera, requiere poda menor'
       ]
     ];
     
@@ -356,7 +377,7 @@ function TreeInventoryPage() {
       }
       
       const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-      const requiredHeaders = ['codigo', 'especie_id', 'parque_id', 'estado_salud'];
+      const requiredHeaders = ['código', 'especie_id', 'parque_id', 'estado_salud'];
       
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
       if (missingHeaders.length > 0) {
