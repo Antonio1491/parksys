@@ -555,7 +555,15 @@ export default function TreeMaintenancePage() {
                 </p>
               </div>
             </div>
-            <Button onClick={() => setOpen(true)} className="bg-green-600 hover:bg-green-700">
+            <Button 
+              onClick={() => {
+                console.log('🔥 BOTÓN CLICKED - Estado actual:', { open });
+                setOpen(true);
+                console.log('🔥 BOTÓN CLICKED - Estado después:', true);
+              }} 
+              className="bg-green-600 hover:bg-green-700"
+              data-testid="button-register-maintenance"
+            >
               <PlusCircle className="mr-2 h-4 w-4" />
               Registrar Mantenimiento
             </Button>
@@ -1345,7 +1353,7 @@ export default function TreeMaintenancePage() {
                     <Checkbox 
                       id="followUpRequired"
                       checked={maintenanceData.followUpRequired}
-                      onCheckedChange={(checked) => setMaintenanceData({...maintenanceData, followUpRequired: checked})}
+                      onCheckedChange={(checked) => setMaintenanceData({...maintenanceData, followUpRequired: Boolean(checked)})}
                     />
                     <Label htmlFor="followUpRequired" className="text-sm">
                       Requiere seguimiento adicional
