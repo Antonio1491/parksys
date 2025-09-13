@@ -40,6 +40,16 @@ import {
 } from '@/components/ui/table';
 
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 function TreeDetailPage() {
   const [match, params] = useRoute('/admin/trees/inventory/:id');
@@ -47,6 +57,19 @@ function TreeDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const treeId = params?.id;
+  
+  // Estados locales
+  const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
+  const [newMaintenance, setNewMaintenance] = useState({
+    maintenanceType: '',
+    maintenanceDate: '',
+    performedBy: '',
+    notes: '',
+  });
+  const [employeeSearch, setEmployeeSearch] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
+  const [showEmployeeList, setShowEmployeeList] = useState(false);
+  const [isSubmittingMaintenance, setIsSubmittingMaintenance] = useState(false);
 
   
   // Verificar que se obtiene el ID correctamente
@@ -121,6 +144,48 @@ function TreeDetailPage() {
         description: 'No se pudo eliminar el árbol. Por favor, intenta nuevamente.',
         variant: 'destructive',
       });
+    }
+  };
+
+  // Manejar el envío del formulario de mantenimiento
+  const handleSubmitMaintenance = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmittingMaintenance(true);
+    
+    try {
+      await apiRequest(`/api/trees/${treeId}/maintenances`, {
+        method: 'POST',
+        data: {
+          type: newMaintenance.maintenanceType,
+          description: newMaintenance.notes,
+          performedBy: newMaintenance.performedBy,
+          date: newMaintenance.maintenanceDate,
+        },
+      });
+
+      toast({
+        title: 'Mantenimiento registrado',
+        description: 'El mantenimiento ha sido registrado correctamente.',
+      });
+
+      // Cerrar modal, limpiar formulario y refrescar datos
+      setIsMaintenanceModalOpen(false);
+      setNewMaintenance({
+        maintenanceType: '',
+        maintenanceDate: '',
+        performedBy: '',
+        notes: '',
+      });
+      refetchMaintenances();
+    } catch (error) {
+      console.error('Error al registrar mantenimiento:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo registrar el mantenimiento. Por favor, intenta nuevamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmittingMaintenance(false);
     }
   };
 
@@ -930,9 +995,9 @@ function TreeDetailPage() {
                 <Button 
                   type="submit" 
                   className="bg-green-600 hover:bg-green-700"
-                  disabled={createMaintenanceMutation.isPending}
+                  disabled={isSubmittingMaintenance}
                 >
-                  {createMaintenanceMutation.isPending ? 'Registrando...' : 'Registrar Mantenimiento'}
+                  {isSubmittingMaintenance ? 'Registrando...' : 'Registrar Mantenimiento'}
                 </Button>
               </DialogFooter>
             </form>

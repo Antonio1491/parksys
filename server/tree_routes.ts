@@ -150,13 +150,9 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
           tm.performed_by, 
           tm.notes, 
           tm.next_maintenance_date,
-          tm.created_at,
-          u.username AS performed_by_username,
-          u.full_name AS performed_by_name
+          tm.created_at
         FROM 
           tree_maintenances tm
-        LEFT JOIN 
-          users u ON tm.performed_by = u.id
         WHERE 
           tm.tree_id = ${treeId}
         ORDER BY 
@@ -171,7 +167,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         maintenanceDate: m.maintenance_date,
         description: m.description,
         performedBy: m.performed_by,
-        performedByName: m.performed_by_name || m.performed_by_username || 'No asignado',
+        performedByName: m.performed_by || 'No asignado',
         notes: m.notes || '',
         nextMaintenanceDate: m.next_maintenance_date,
         createdAt: m.created_at
@@ -423,13 +419,9 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
           tm.performed_by, 
           tm.notes, 
           tm.next_maintenance_date,
-          tm.created_at,
-          u.username AS performed_by_username,
-          u.full_name AS performed_by_name
+          tm.created_at
         FROM 
           tree_maintenances tm
-        LEFT JOIN 
-          users u ON tm.performed_by = u.id
         WHERE 
           tm.tree_id = ${treeId}
         ORDER BY 
@@ -444,7 +436,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         maintenanceDate: m.maintenance_date,
         description: m.description,
         performedBy: m.performed_by,
-        performedByName: m.performed_by_name || m.performed_by_username || 'No asignado',
+        performedByName: m.performed_by || 'No asignado',
         notes: m.notes || '',
         nextMaintenanceDate: m.next_maintenance_date,
         createdAt: m.created_at
