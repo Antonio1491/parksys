@@ -852,7 +852,7 @@ function TreeDetailPage() {
                   <CardContent className="min-h-[400px]">
                     <div className="h-[400px] bg-gray-100 rounded-lg overflow-hidden">
                       <iframe
-                        src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOVTAuHiigloWU&center=${tree.latitude},${tree.longitude}&zoom=18&maptype=satellite`}
+                        src={`https://www.google.com/maps/embed/v1/view?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&center=${tree.latitude},${tree.longitude}&zoom=18&maptype=satellite`}
                         width="100%"
                         height="100%"
                         style={{ border: 0 }}
