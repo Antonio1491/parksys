@@ -1998,83 +1998,238 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         return res.status(400).json({ message: "Datos de árboles inválidos" });
       }
 
+      // Mapeo de headers (soporta español e inglés)
+      const fieldMapping: Record<string, string[]> = {
+        code: ["code", "codigo", "código"],
+        species_id: ["species_id", "especie_id"],
+        park_id: ["park_id", "parque_id"],
+        latitude: ["latitude", "lat", "latitud"],
+        longitude: ["longitude", "lng", "long", "longitud"],
+        planting_date: ["planting_date", "fecha_plantacion", "fecha_plantación"],
+        development_stage: ["development_stage", "etapa_desarrollo"],
+        age_estimate: ["age_estimate", "edad_estimada"],
+        height: ["height", "altura"],
+        trunk_diameter: ["trunk_diameter", "diameter", "diametro", "diámetro"],
+        canopy_coverage: ["canopy_coverage", "cobertura_copa"],
+        health_status: ["health_status", "estado_salud"],
+        condition: ["condition", "condicion", "condición"],
+        has_hollows: ["has_hollows", "tiene_huecos"],
+        has_exposed_roots: ["has_exposed_roots", "tiene_raices_expuestas"],
+        has_pests: ["has_pests", "tiene_plagas"],
+        is_protected: ["is_protected", "esta_protegido"],
+        image_url: ["image_url", "url_imagen"],
+        location_description: ["location_description", "descripcion_ubicacion", "descripción_ubicación"],
+        notes: ["notes", "observaciones", "notas"]
+      };
+
+      // Funciones de normalización
+      const normalizeNumber = (value: any): number | null => {
+        if (!value || value === '') return null;
+        const str = String(value).trim().replace(',', '.');
+        const num = parseFloat(str);
+        return isNaN(num) ? null : num;
+      };
+
+      const normalizeInt = (value: any): number | null => {
+        if (!value || value === '') return null;
+        const num = parseInt(String(value).trim());
+        return isNaN(num) ? null : num;
+      };
+
+      const normalizeDate = (value: any): string | null => {
+        if (!value || value === '') return null;
+        const str = String(value).trim();
+        // Convertir dd/mm/yyyy a yyyy-mm-dd
+        const ddmmyyyy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(str);
+        if (ddmmyyyy) {
+          const [, day, month, year] = ddmmyyyy;
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        // Ya está en formato yyyy-mm-dd
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+          return str;
+        }
+        return null;
+      };
+
+      const normalizeBoolean = (value: any): boolean => {
+        if (!value || value === '') return false;
+        const str = String(value).toLowerCase().trim();
+        return ['true', '1', 'sí', 'si', 'yes', 'verdadero'].includes(str);
+      };
+
+      // Función para mapear datos usando aliases
+      const mapRowData = (rowData: any): Record<string, any> => {
+        const mapped: Record<string, any> = {};
+        
+        for (const [dbField, aliases] of Object.entries(fieldMapping)) {
+          for (const alias of aliases) {
+            if (rowData[alias] !== undefined) {
+              mapped[dbField] = rowData[alias];
+              break;
+            }
+          }
+        }
+        
+        return mapped;
+      };
+
+      // Resolver especies por nombre si no hay ID
+      const resolveSpeciesId = async (speciesData: any, speciesName: any): Promise<number | null> => {
+        if (speciesData) return normalizeInt(speciesData);
+        
+        if (speciesName) {
+          const result = await db.execute(sql`
+            SELECT id FROM tree_species WHERE name ILIKE ${`%${String(speciesName).trim()}%`} LIMIT 1
+          `);
+          return (result.rows[0] as any)?.id || null;
+        }
+        
+        return null;
+      };
+
+      // Resolver parques por nombre si no hay ID  
+      const resolveParkId = async (parkData: any, parkName: any): Promise<number | null> => {
+        if (parkData) return normalizeInt(parkData);
+        
+        if (parkName) {
+          const result = await db.execute(sql`
+            SELECT id FROM parks WHERE name ILIKE ${`%${String(parkName).trim()}%`} LIMIT 1
+          `);
+          return (result.rows[0] as any)?.id || null;
+        }
+        
+        return null;
+      };
+
       let successCount = 0;
       let errorCount = 0;
-      const errors: string[] = [];
+      const errors: Array<{row: number, code?: string, reason: string}> = [];
 
-      for (const treeData of importTrees) {
+      // Procesar cada fila
+      for (let i = 0; i < importTrees.length; i++) {
+        const rowIndex = i + 1;
+        
         try {
-          // Validar campos requeridos
-          if (!treeData.codigo) {
-            errors.push(`Árbol sin código válido`);
-            errorCount++;
-            continue;
+          const rawData = importTrees[i];
+          const mappedData = mapRowData(rawData);
+          
+          // Generar código si no existe
+          let treeCode = mappedData.code;
+          if (!treeCode) {
+            const parkId = await resolveParkId(mappedData.park_id, rawData.parque_nombre || rawData.park_name);
+            treeCode = `TREE-${parkId || 'UNK'}-${Date.now()}-${rowIndex}`;
           }
 
-          // Verificar si ya existe un árbol con el mismo código
-          const existingTree = await db.execute(sql`
-            SELECT id FROM trees WHERE code = ${treeData.codigo}
-          `);
+          // Resolver IDs
+          const speciesId = await resolveSpeciesId(
+            mappedData.species_id, 
+            rawData.especie_nombre || rawData.species_name
+          );
+          
+          const parkId = await resolveParkId(
+            mappedData.park_id,
+            rawData.parque_nombre || rawData.park_name  
+          );
 
-          if (existingTree.rows.length > 0) {
-            errors.push(`El árbol con código ${treeData.codigo} ya existe`);
-            errorCount++;
-            continue;
-          }
+          // Preparar datos normalizados
+          const normalizedData = {
+            code: treeCode,
+            species_id: speciesId,
+            park_id: parkId,
+            latitude: normalizeNumber(mappedData.latitude),
+            longitude: normalizeNumber(mappedData.longitude),
+            planting_date: normalizeDate(mappedData.planting_date),
+            development_stage: mappedData.development_stage || null,
+            age_estimate: normalizeInt(mappedData.age_estimate),
+            height: normalizeNumber(mappedData.height),
+            trunk_diameter: normalizeNumber(mappedData.trunk_diameter),
+            canopy_coverage: normalizeNumber(mappedData.canopy_coverage),
+            health_status: mappedData.health_status || null,
+            condition: mappedData.condition || null,
+            has_hollows: normalizeBoolean(mappedData.has_hollows),
+            has_exposed_roots: normalizeBoolean(mappedData.has_exposed_roots),
+            has_pests: normalizeBoolean(mappedData.has_pests),
+            is_protected: normalizeBoolean(mappedData.is_protected),
+            image_url: mappedData.image_url || null,
+            location_description: mappedData.location_description || null,
+            notes: mappedData.notes || null
+          };
 
-          // Insertar árbol
+          // Upsert (insertar o actualizar)
           await db.execute(sql`
             INSERT INTO trees (
-              code,
-              species_id,
-              park_id,
-              latitude,
-              longitude,
-              planting_date,
-              age_estimate,
-              height,
-              trunk_diameter,
-              canopy_coverage,
-              location_description,
-              notes,
-              created_at,
-              updated_at
+              code, species_id, park_id, latitude, longitude, planting_date,
+              development_stage, age_estimate, height, trunk_diameter, canopy_coverage,
+              health_status, condition, has_hollows, has_exposed_roots, has_pests,
+              is_protected, image_url, location_description, notes,
+              created_at, updated_at
             ) VALUES (
-              ${treeData.codigo},
-              ${treeData.especie_id ? parseInt(treeData.especie_id) : null},
-              ${treeData.parque_id ? parseInt(treeData.parque_id) : null},
-              ${treeData.latitud ? parseFloat(treeData.latitud) : null},
-              ${treeData.longitud ? parseFloat(treeData.longitud) : null},
-              ${treeData.fecha_plantacion || null},
-              ${treeData.edad_estimada ? parseInt(treeData.edad_estimada) : null},
-              ${treeData.altura ? parseFloat(treeData.altura) : null},
-              ${treeData.diametro ? parseFloat(treeData.diametro) : null},
-              ${treeData.cobertura_copa ? parseFloat(treeData.cobertura_copa) : null},
-              ${treeData.descripcion_ubicacion || null},
-              ${treeData.observaciones || null},
-              NOW(),
-              NOW()
+              ${normalizedData.code}, ${normalizedData.species_id}, ${normalizedData.park_id},
+              ${normalizedData.latitude}, ${normalizedData.longitude}, ${normalizedData.planting_date},
+              ${normalizedData.development_stage}, ${normalizedData.age_estimate}, ${normalizedData.height},
+              ${normalizedData.trunk_diameter}, ${normalizedData.canopy_coverage}, ${normalizedData.health_status},
+              ${normalizedData.condition}, ${normalizedData.has_hollows}, ${normalizedData.has_exposed_roots},
+              ${normalizedData.has_pests}, ${normalizedData.is_protected}, ${normalizedData.image_url},
+              ${normalizedData.location_description}, ${normalizedData.notes},
+              NOW(), NOW()
             )
+            ON CONFLICT (code) DO UPDATE SET
+              species_id = EXCLUDED.species_id,
+              park_id = EXCLUDED.park_id,
+              latitude = EXCLUDED.latitude,
+              longitude = EXCLUDED.longitude,
+              planting_date = EXCLUDED.planting_date,
+              development_stage = EXCLUDED.development_stage,
+              age_estimate = EXCLUDED.age_estimate,
+              height = EXCLUDED.height,
+              trunk_diameter = EXCLUDED.trunk_diameter,
+              canopy_coverage = EXCLUDED.canopy_coverage,
+              health_status = EXCLUDED.health_status,
+              condition = EXCLUDED.condition,
+              has_hollows = EXCLUDED.has_hollows,
+              has_exposed_roots = EXCLUDED.has_exposed_roots,
+              has_pests = EXCLUDED.has_pests,
+              is_protected = EXCLUDED.is_protected,
+              image_url = EXCLUDED.image_url,
+              location_description = EXCLUDED.location_description,
+              notes = EXCLUDED.notes,
+              updated_at = NOW()
           `);
 
           successCount++;
+          
         } catch (error) {
-          console.error(`Error importando árbol ${treeData.codigo}:`, error);
-          errors.push(`Error importando árbol ${treeData.codigo}: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+          const treeCode = importTrees[i]?.codigo || importTrees[i]?.code || `Fila ${rowIndex}`;
+          console.error(`Error importando árbol ${treeCode}:`, error);
+          errors.push({
+            row: rowIndex,
+            code: treeCode,
+            reason: error instanceof Error ? error.message : 'Error desconocido'
+          });
           errorCount++;
         }
       }
 
       res.json({
-        message: `Importación completada. ${successCount} árboles importados exitosamente, ${errorCount} errores.`,
-        successCount,
-        errorCount,
-        errors: errors.slice(0, 10) // Limitar errores mostrados
+        success: true,
+        message: `Importación completada. ${successCount} árboles procesados exitosamente, ${errorCount} errores.`,
+        inserted: successCount,
+        errors: errorCount,
+        details: {
+          successCount,
+          errorCount,
+          errorDetails: errors.slice(0, 20) // Mostrar hasta 20 errores
+        }
       });
 
     } catch (error) {
       console.error("Error en importación CSV:", error);
-      res.status(500).json({ message: "Error al importar CSV" });
+      res.status(500).json({ 
+        success: false,
+        message: "Error interno al procesar importación",
+        error: error instanceof Error ? error.message : 'Error desconocido'
+      });
     }
   });
 }
