@@ -730,7 +730,7 @@ export default function VisitorCountPage() {
         // Enviar al backend usando apiRequest correctamente
         const response = await apiRequest('/api/visitor-counts', {
           method: 'POST',
-          body: visitorCountData, // apiRequest se encarga del JSON.stringify y headers
+          data: visitorCountData, // apiRequest se encarga del JSON.stringify y headers
         });
 
         successCount++;
