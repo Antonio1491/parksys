@@ -64,7 +64,10 @@ const Home: React.FC = () => {
     queryKey: ['/public-api/instructors/public'],
   });
   
-  const allParks = parksResponse || [];
+  // Manejar formato de respuesta variable (array directo o {data: array})
+  const allParks = Array.isArray(parksResponse) 
+    ? parksResponse 
+    : (parksResponse?.data || []);
   
   // Filtrar parques sin nombre o marcados como eliminados
   const featuredParks = allParks.filter(park => 

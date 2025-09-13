@@ -911,11 +911,10 @@ app.get("/api/parks", async (_req: Request, res: Response) => {
             id,
             name,
             address,
-            district,
-            municipality,
-            status
+            municipality_text,
+            conservation_status
           FROM parks
-          WHERE status = 'active'
+          WHERE is_deleted = false
           ORDER BY name ASC`
     );
 
@@ -925,9 +924,8 @@ app.get("/api/parks", async (_req: Request, res: Response) => {
       id: row.id,
       name: row.name,
       address: row.address,
-      district: row.district,
-      municipality: row.municipality,
-      status: row.status
+      municipality: row.municipality_text,
+      conservationStatus: row.conservation_status
     }));
 
     res.json({ data: parks });
