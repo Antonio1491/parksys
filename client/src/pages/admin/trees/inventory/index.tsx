@@ -116,14 +116,13 @@ function TreeInventoryPage() {
       }
       return response.json();
     },
-    suspense: false,
     retry: 1,
   });
   
   const parks = parksResponse?.data || [];
 
   // Consultar las especies para el filtro
-  const { data: species, isLoading: isLoadingSpecies } = useQuery({
+  const { data: speciesResponse, isLoading: isLoadingSpecies } = useQuery({
     queryKey: ['/api/tree-species'],
     queryFn: async () => {
       const response = await fetch('/api/tree-species');
@@ -132,9 +131,10 @@ function TreeInventoryPage() {
       }
       return response.json();
     },
-    suspense: false,
     retry: 1,
   });
+  
+  const species = speciesResponse?.data || [];
 
   // Consultar el inventario de árboles con paginación de 10 registros por página
   const {
@@ -170,7 +170,6 @@ function TreeInventoryPage() {
       
       return response.json();
     },
-    suspense: false,
     retry: 1,
   });
 
@@ -721,9 +720,9 @@ function TreeInventoryPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas las especies</SelectItem>
-                    {!isLoadingSpecies && species?.data?.map((species: any) => (
-                      <SelectItem key={species.id} value={species.id.toString()}>
-                        {species.commonName}
+                    {!isLoadingSpecies && species?.map((speciesItem: any) => (
+                      <SelectItem key={speciesItem.id} value={speciesItem.id.toString()}>
+                        {speciesItem.commonName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -855,8 +854,8 @@ function TreeInventoryPage() {
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious 
-                            onClick={() => handlePageChange(Math.max(1, page - 1))}
-                            disabled={page === 1}
+                            onClick={() => setPage(Math.max(1, page - 1))}
+                            style={{ opacity: page === 1 ? 0.5 : 1, pointerEvents: page === 1 ? 'none' : 'auto' }}
                           />
                         </PaginationItem>
                         
@@ -919,8 +918,8 @@ function TreeInventoryPage() {
                         
                         <PaginationItem>
                           <PaginationNext 
-                            onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                            disabled={page === totalPages}
+                            onClick={() => setPage(Math.min(totalPages, page + 1))}
+                            style={{ opacity: page === totalPages ? 0.5 : 1, pointerEvents: page === totalPages ? 'none' : 'auto' }}
                           />
                         </PaginationItem>
                       </PaginationContent>
