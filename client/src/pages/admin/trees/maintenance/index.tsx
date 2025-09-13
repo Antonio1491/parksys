@@ -541,8 +541,11 @@ export default function TreeMaintenancePage() {
     addMaintenanceMutation.mutate(newMaintenance);
   };
 
+  console.log('🔧 COMPONENTE RENDERIZANDO - Estado open:', open);
+
   return (
     <AdminLayout>
+      
       <div className="container mx-auto py-6">
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex justify-between items-center">
@@ -563,12 +566,21 @@ export default function TreeMaintenancePage() {
                 alert('¡Botón funcionando!');
                 setOpen(true);
               }}
+              onPointerDown={(e) => {
+                console.log('👆 POINTER DOWN DETECTED!');
+              }}
+              onMouseDown={(e) => {
+                console.log('🖱️ MOUSE DOWN DETECTED!');
+              }}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
               style={{
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '14px',
-                fontWeight: '500'
+                fontWeight: '500',
+                position: 'relative',
+                zIndex: 9999,
+                pointerEvents: 'auto'
               }}
               data-testid="button-register-maintenance"
             >
