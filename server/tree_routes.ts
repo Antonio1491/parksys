@@ -2156,46 +2156,58 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
             notes: mappedData.notes || null
           };
 
-          // Upsert (insertar o actualizar)
-          await db.execute(sql`
-            INSERT INTO trees (
-              code, species_id, park_id, latitude, longitude, planting_date,
-              development_stage, age_estimate, height, trunk_diameter, canopy_coverage,
-              health_status, condition, has_hollows, has_exposed_roots, has_pests,
-              is_protected, image_url, location_description, notes,
-              created_at, updated_at
-            ) VALUES (
-              ${normalizedData.code}, ${normalizedData.species_id}, ${normalizedData.park_id},
-              ${normalizedData.latitude}, ${normalizedData.longitude}, ${normalizedData.planting_date},
-              ${normalizedData.development_stage}, ${normalizedData.age_estimate}, ${normalizedData.height},
-              ${normalizedData.trunk_diameter}, ${normalizedData.canopy_coverage}, ${normalizedData.health_status},
-              ${normalizedData.condition}, ${normalizedData.has_hollows}, ${normalizedData.has_exposed_roots},
-              ${normalizedData.has_pests}, ${normalizedData.is_protected}, ${normalizedData.image_url},
-              ${normalizedData.location_description}, ${normalizedData.notes},
-              NOW(), NOW()
-            )
-            ON CONFLICT (code) DO UPDATE SET
-              species_id = EXCLUDED.species_id,
-              park_id = EXCLUDED.park_id,
-              latitude = EXCLUDED.latitude,
-              longitude = EXCLUDED.longitude,
-              planting_date = EXCLUDED.planting_date,
-              development_stage = EXCLUDED.development_stage,
-              age_estimate = EXCLUDED.age_estimate,
-              height = EXCLUDED.height,
-              trunk_diameter = EXCLUDED.trunk_diameter,
-              canopy_coverage = EXCLUDED.canopy_coverage,
-              health_status = EXCLUDED.health_status,
-              condition = EXCLUDED.condition,
-              has_hollows = EXCLUDED.has_hollows,
-              has_exposed_roots = EXCLUDED.has_exposed_roots,
-              has_pests = EXCLUDED.has_pests,
-              is_protected = EXCLUDED.is_protected,
-              image_url = EXCLUDED.image_url,
-              location_description = EXCLUDED.location_description,
-              notes = EXCLUDED.notes,
-              updated_at = NOW()
+          // Verificar si ya existe un árbol con el mismo código
+          const existingTreeCheck = await db.execute(sql`
+            SELECT id FROM trees WHERE code = ${normalizedData.code} LIMIT 1
           `);
+
+          if (existingTreeCheck.rows.length > 0) {
+            // Actualizar árbol existente
+            await db.execute(sql`
+              UPDATE trees SET
+                species_id = ${normalizedData.species_id},
+                park_id = ${normalizedData.park_id},
+                latitude = ${normalizedData.latitude},
+                longitude = ${normalizedData.longitude},
+                planting_date = ${normalizedData.planting_date},
+                development_stage = ${normalizedData.development_stage},
+                age_estimate = ${normalizedData.age_estimate},
+                height = ${normalizedData.height},
+                trunk_diameter = ${normalizedData.trunk_diameter},
+                canopy_coverage = ${normalizedData.canopy_coverage},
+                health_status = ${normalizedData.health_status},
+                condition = ${normalizedData.condition},
+                has_hollows = ${normalizedData.has_hollows},
+                has_exposed_roots = ${normalizedData.has_exposed_roots},
+                has_pests = ${normalizedData.has_pests},
+                is_protected = ${normalizedData.is_protected},
+                image_url = ${normalizedData.image_url},
+                location_description = ${normalizedData.location_description},
+                notes = ${normalizedData.notes},
+                updated_at = NOW()
+              WHERE code = ${normalizedData.code}
+            `);
+          } else {
+            // Insertar nuevo árbol
+            await db.execute(sql`
+              INSERT INTO trees (
+                code, species_id, park_id, latitude, longitude, planting_date,
+                development_stage, age_estimate, height, trunk_diameter, canopy_coverage,
+                health_status, condition, has_hollows, has_exposed_roots, has_pests,
+                is_protected, image_url, location_description, notes,
+                created_at, updated_at
+              ) VALUES (
+                ${normalizedData.code}, ${normalizedData.species_id}, ${normalizedData.park_id},
+                ${normalizedData.latitude}, ${normalizedData.longitude}, ${normalizedData.planting_date},
+                ${normalizedData.development_stage}, ${normalizedData.age_estimate}, ${normalizedData.height},
+                ${normalizedData.trunk_diameter}, ${normalizedData.canopy_coverage}, ${normalizedData.health_status},
+                ${normalizedData.condition}, ${normalizedData.has_hollows}, ${normalizedData.has_exposed_roots},
+                ${normalizedData.has_pests}, ${normalizedData.is_protected}, ${normalizedData.image_url},
+                ${normalizedData.location_description}, ${normalizedData.notes},
+                NOW(), NOW()
+              )
+            `);
+          }
 
           successCount++;
           
