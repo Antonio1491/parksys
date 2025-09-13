@@ -1,0 +1,285 @@
+🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '26/09/25', Parque: 'Parque Las Ribieras', Adultos: '850', Niños: '425', Adultos Mayores: '170', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 100, date: '2025-09-27', adults: 900, children: 450, seniors: 180, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Jardín Botánico de Culiacán - 2025-09-27
+Console.js:61 📤 Enviando datos: {parkId: 103, date: '2025-09-28', adults: 950, children: 475, seniors: 190, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '28/09/25', Parque: 'Parque Flor del Bosque', Adultos: '950', Niños: '475', Adultos Mayores: '190', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ⚠️ Parque no encontrado: Parque Cultural Higalguense
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:697
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this warning
+Console.js:61 📤 Enviando datos: {parkId: 86, date: '2025-09-30', adults: 1050, children: 525, seniors: 210, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '30/09/25', Parque: 'Parque Ecológico Explora', Adultos: '1050', Niños: '525', Adultos Mayores: '210', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 94, date: '2025-10-01', adults: 1100, children: 550, seniors: 220, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Fundidora - 2025-10-01
+Console.js:61 📤 Enviando datos: {parkId: 90, date: '2025-10-02', adults: 1150, children: 575, seniors: 230, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '02/10/25', Parque: 'Bosque de Chapultepec', Adultos: '1150', Niños: '575', Adultos Mayores: '230', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 93, date: '2025-10-03', adults: 1200, children: 600, seniors: 240, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Tangamanga I - 2025-10-03
+Console.js:61 📤 Enviando datos: {parkId: 92, date: '2025-10-04', adults: 1250, children: 625, seniors: 250, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '04/10/25', Parque: 'Parque Metropolitano de Guadalajara', Adultos: '1250', Niños: '625', Adultos Mayores: '250', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 91, date: '2025-10-05', adults: 1300, children: 650, seniors: 260, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Bicentenario - 2025-10-05
+Console.js:61 📤 Enviando datos: {parkId: 95, date: '2025-10-06', adults: 1350, children: 675, seniors: 270, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '06/10/25', Parque: 'Parque La Mexicana', Adultos: '1350', Niños: '675', Adultos Mayores: '270', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 97, date: '2025-10-07', adults: 1400, children: 700, seniors: 280, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Rufino Tamayo - 2025-10-07
+Console.js:61 📤 Enviando datos: {parkId: 98, date: '2025-10-08', adults: 1450, children: 725, seniors: 290, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '08/10/25', Parque: 'Parque Central Ciudad Juárez', Adultos: '1450', Niños: '725', Adultos Mayores: '290', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 96, date: '2025-10-09', adults: 1500, children: 750, seniors: 300, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Guanajuato Bicentenario - 2025-10-09
+Console.js:61 📤 Enviando datos: {parkId: 87, date: '2025-10-10', adults: 1550, children: 775, seniors: 310, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '10/10/25', Parque: 'Parque el Capitán', Adultos: '1550', Niños: '775', Adultos Mayores: '310', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 88, date: '2025-10-11', adults: 1600, children: 800, seniors: 320, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Metropolitano de León - 2025-10-11
+Console.js:61 📤 Enviando datos: {parkId: 89, date: '2025-10-12', adults: 1650, children: 825, seniors: 330, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '12/10/25', Parque: 'Gran Parque La Plancha', Adultos: '1650', Niños: '825', Adultos Mayores: '330', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 99, date: '2025-10-13', adults: 1700, children: 850, seniors: 340, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Bosque Los Colomos - 2025-10-13
+Console.js:61 📤 Enviando datos: {parkId: 101, date: '2025-10-14', adults: 1750, children: 875, seniors: 350, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '14/10/25', Parque: 'Parque Las Ribieras', Adultos: '1750', Niños: '875', Adultos Mayores: '350', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 100, date: '2025-10-15', adults: 1800, children: 900, seniors: 360, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Jardín Botánico de Culiacán - 2025-10-15
+Console.js:61 📤 Enviando datos: {parkId: 103, date: '2025-10-16', adults: 1850, children: 925, seniors: 370, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '16/10/25', Parque: 'Parque Flor del Bosque', Adultos: '1850', Niños: '925', Adultos Mayores: '370', …} Error: 500: {"error":"Error interno del servidor"}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ⚠️ Parque no encontrado: Parque Cultural Higalguense
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:697
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this warning
+Console.js:61 📊 Importación completada: 16 éxitos, 22 errores
+Console.js:61 Error importando CSV: Error: Se procesaron 16 registros correctamente, pero 22 tuvieron errores. Revisa la consola para más detalles.
+    at processImportedData (visitor-count.tsx:748:13)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+reader.onload @ visitor-count.tsx:635
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
