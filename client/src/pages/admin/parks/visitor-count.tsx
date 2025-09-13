@@ -651,11 +651,18 @@ export default function VisitorCountPage() {
     const parksResponse = await fetch('/api/parks');
     const parksData = await parksResponse.json();
     
+    console.log('🏞️ [DEBUG] Datos de parques recibidos:', parksData);
+    
     // Crear un mapa de nombre de parque a ID
     const parkNameToId: Record<string, number> = {};
-    parksData.forEach((park: any) => {
-      parkNameToId[park.name] = park.id;
-    });
+    // La API devuelve { data: [...] }, no un array directo
+    if (parksData.data && Array.isArray(parksData.data)) {
+      parksData.data.forEach((park: any) => {
+        parkNameToId[park.name] = park.id;
+      });
+    } else {
+      throw new Error('No se pudieron obtener los datos de parques');
+    }
 
     // Mapear métodos y tipos a los valores que espera el backend
     const methodMap: Record<string, string> = {
