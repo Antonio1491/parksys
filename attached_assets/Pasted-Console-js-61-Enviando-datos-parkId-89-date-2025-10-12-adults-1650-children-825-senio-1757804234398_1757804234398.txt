@@ -1,0 +1,73 @@
+Console.js:61 📤 Enviando datos: {parkId: 89, date: '2025-10-12', adults: 1650, children: 825, seniors: 330, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Gran Parque La Plancha - 2025-10-12
+Console.js:61 📤 Enviando datos: {parkId: 99, date: '2025-10-13', adults: 1700, children: 850, seniors: 340, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 409 (Conflict)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '13/10/25', Parque: 'Bosque Los Colomos', Adultos: '1700', Niños: '850', Adultos Mayores: '340', …} Error: 409: {"error":"Ya existe un registro para esta fecha y parque","existingRecord":{"id":32,"parkId":99,"date":"2025-10-13","adults":1700,"children":850,"seniors":340,"pets":175,"groups":98,"countingMethod":"estimation","dayType":"weekend","weather":"cloudy","notes":"Fin de semana, mucha actividad","registeredBy":1,"createdAt":"2025-09-13T22:27:21.569Z","updatedAt":"2025-09-13T22:27:21.569Z"}}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 101, date: '2025-10-14', adults: 1750, children: 875, seniors: 350, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Las Ribieras - 2025-10-14
+Console.js:61 📤 Enviando datos: {parkId: 100, date: '2025-10-15', adults: 1800, children: 900, seniors: 360, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/visitor-counts 409 (Conflict)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:129
+processImportedData @ visitor-count.tsx:731
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 ❌ Error procesando fila: {Fecha: '15/10/25', Parque: 'Jardín Botánico de Culiacán', Adultos: '1800', Niños: '900', Adultos Mayores: '360', …} Error: 409: {"error":"Ya existe un registro para esta fecha y parque","existingRecord":{"id":34,"parkId":100,"date":"2025-10-15","adults":1800,"children":900,"seniors":360,"pets":185,"groups":104,"countingMethod":"estimation","dayType":"weekend","weather":"cloudy","notes":"Fin de semana, mucha actividad","registeredBy":1,"createdAt":"2025-09-13T22:27:22.185Z","updatedAt":"2025-09-13T22:27:22.185Z"}}
+    at apiRequest (queryClient.ts:162:11)
+    at async processImportedData (visitor-count.tsx:731:26)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:741
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 📤 Enviando datos: {parkId: 103, date: '2025-10-16', adults: 1850, children: 925, seniors: 370, …}
+Console.js:61 🌐 [API REQUEST] POST /api/visitor-counts
+Console.js:61 ✅ Registro guardado: Parque Flor del Bosque - 2025-10-16
+Console.js:61 ⚠️ Parque no encontrado: Parque Cultural Higalguense
+Mt.forEach.n.<computed> @ Console.js:61
+processImportedData @ visitor-count.tsx:697
+await in processImportedData
+reader.onload @ visitor-count.tsx:623
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this warning
+Console.js:61 📊 Importación completada: 19 éxitos, 19 errores
+Console.js:61 Error importando CSV: Error: Se procesaron 19 registros correctamente, pero 19 tuvieron errores. Revisa la consola para más detalles.
+    at processImportedData (visitor-count.tsx:748:13)
+    at async reader.onload (visitor-count.tsx:623:11)
+Mt.forEach.n.<computed> @ Console.js:61
+reader.onload @ visitor-count.tsx:635
+FileReader
+input.onchange @ visitor-count.tsx:643Understand this error
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
