@@ -215,6 +215,12 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
                a.max_registrations as "maxRegistrations", 
                a.registration_deadline as "registrationDeadline",
                a.requires_approval as "requiresApproval",
+               a.discount_seniors as "discountSeniors",
+               a.discount_students as "discountStudents",
+               a.discount_families as "discountFamilies",
+               a.discount_disability as "discountDisability",
+               a.discount_early_bird as "discountEarlyBird",
+               a.discount_early_bird_deadline as "discountEarlyBirdDeadline",
                p.name as "parkName", i.first_name || ' ' || i.last_name as "instructorName"
            FROM activities a
            LEFT JOIN parks p ON a.park_id = p.id
@@ -296,7 +302,10 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
       materials, requirements, isRecurring, recurringDays, targetMarket, specialNeeds,
       instructorId, instructorName, instructorContact,
       allowsPublicRegistration, maxRegistrations, registrationDeadline, requiresApproval,
-      status
+      status,
+      // Campos de descuentos
+      discountSeniors, discountStudents, discountFamilies, discountDisability, 
+      discountEarlyBird, discountEarlyBirdDeadline
     } = req.body;
     
     // Mapear los valores correctos
@@ -377,7 +386,13 @@ activityRouter.put("/activities/:id", isAuthenticated, async (req: Request, res:
                 requires_approval = ${Boolean(requiresApproval)},
                 target_market = ${targetMarket ? JSON.stringify(targetMarket) : null},
                 special_needs = ${specialNeeds ? JSON.stringify(specialNeeds) : null},
-                status = ${status || 'programada'}
+                status = ${status || 'programada'},
+                discount_seniors = ${discountSeniors ? Number(discountSeniors) : 0},
+                discount_students = ${discountStudents ? Number(discountStudents) : 0},
+                discount_families = ${discountFamilies ? Number(discountFamilies) : 0},
+                discount_disability = ${discountDisability ? Number(discountDisability) : 0},
+                discount_early_bird = ${discountEarlyBird ? Number(discountEarlyBird) : 0},
+                discount_early_bird_deadline = ${discountEarlyBirdDeadline ? new Date(discountEarlyBirdDeadline) : null}
             WHERE id = ${activityId}
             RETURNING id, title, description, park_id as "parkId", start_date as "startDate", 
                      end_date as "endDate", category_id as "categoryId", location, status, created_at as "createdAt"`
