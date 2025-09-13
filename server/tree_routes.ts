@@ -2025,20 +2025,20 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
           // Insertar árbol
           await db.execute(sql`
             INSERT INTO trees (
-              code,
-              species_id,
-              park_id,
-              latitude,
-              longitude,
-              planting_date,
-              development_stage,
-              estimated_age,
-              height,
-              trunk_diameter,
-              canopy_coverage,
-              health_status,
-              location_description,
-              notes,
+              codigo,
+              especie_id,
+              parque_id,
+              latitud,
+              longitud,
+              fecha_plantacion,
+              etapa_desarrollo,
+              edad_estimada,
+              altura,
+              diametro_tronco,
+              cobertura_copa,
+              estado_salud,
+              descripcion_ubicacion,
+              observaciones,
               created_at,
               updated_at
             ) VALUES (
@@ -2055,7 +2055,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
               ${treeData.cobertura_copa ? parseFloat(treeData.cobertura_copa) : null},
               ${treeData.estado_salud || 'Regular'},
               ${treeData.descripcion_ubicacion || null},
-              ${treeData.notas || null},
+              ${treeData.observaciones || null},
               NOW(),
               NOW()
             )
