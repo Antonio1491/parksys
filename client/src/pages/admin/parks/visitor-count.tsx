@@ -666,7 +666,7 @@ export default function VisitorCountPage() {
 
     // Mapear métodos y tipos a los valores que espera el backend
     const methodMap: Record<string, string> = {
-      'Conteo manual': 'counting',
+      'Conteo manual': 'manual_counter',
       'Estimación': 'estimation',
       'Contador manual': 'manual_counter',
       'Basado en eventos': 'event_based',
