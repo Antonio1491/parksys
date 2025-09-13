@@ -1075,6 +1075,12 @@ app.get("/api/activities/:id", async (req: Request, res: Response) => {
         a.category_id,
         a.status,
         a.created_at,
+        a.discount_seniors,
+        a.discount_students,
+        a.discount_families,
+        a.discount_disability,
+        a.discount_early_bird,
+        a.discount_early_bird_deadline,
         ac.name as category_name,
         ac.id as category_id,
         p.name as park_name,
@@ -1211,7 +1217,14 @@ app.get("/api/activities/:id", async (req: Request, res: Response) => {
       requiresApproval: activity.requires_approval || false,
       ageRestrictions: activity.age_restrictions || "",
       healthRequirements: activity.health_requirements || "",
-      status: activity.status || "programada"
+      status: activity.status || "programada",
+      // Campos de descuentos
+      discountSeniors: activity.discount_seniors || 0,
+      discountStudents: activity.discount_students || 0,
+      discountFamilies: activity.discount_families || 0,
+      discountDisability: activity.discount_disability || 0,
+      discountEarlyBird: activity.discount_early_bird || 0,
+      discountEarlyBirdDeadline: activity.discount_early_bird_deadline || null
     };
 
     console.log("🎯 STATUS EN ACTIVIDAD:", activity.status);
