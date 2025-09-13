@@ -209,11 +209,11 @@ const CrearActividadPage = () => {
       isFree: false,
       
       // Valores por defecto para descuentos
-      discountSeniors: 0,
-      discountStudents: 0,
-      discountFamilies: 0,
-      discountDisability: 0,
-      discountEarlyBird: 0,
+      discountSeniors: undefined,
+      discountStudents: undefined,
+      discountFamilies: undefined,
+      discountDisability: undefined,
+      discountEarlyBird: undefined,
       discountEarlyBirdDeadline: "",
       materials: "",
       requirements: "",
@@ -1040,7 +1040,7 @@ const CrearActividadPage = () => {
                                   min="0" 
                                   max="100" 
                                   step="1"
-                                  placeholder="0" 
+                                  placeholder="" 
                                   {...field}
                                   className="w-20"
                                 />
@@ -1068,7 +1068,7 @@ const CrearActividadPage = () => {
                                   min="0" 
                                   max="100" 
                                   step="1"
-                                  placeholder="0" 
+                                  placeholder="" 
                                   {...field}
                                   className="w-20"
                                 />
@@ -1096,7 +1096,7 @@ const CrearActividadPage = () => {
                                   min="0" 
                                   max="100" 
                                   step="1"
-                                  placeholder="0" 
+                                  placeholder="" 
                                   {...field}
                                   className="w-20"
                                 />
@@ -1124,7 +1124,7 @@ const CrearActividadPage = () => {
                                   min="0" 
                                   max="100" 
                                   step="1"
-                                  placeholder="0" 
+                                  placeholder="" 
                                   {...field}
                                   className="w-20"
                                 />
@@ -1154,7 +1154,7 @@ const CrearActividadPage = () => {
                                   min="0" 
                                   max="100" 
                                   step="1"
-                                  placeholder="0" 
+                                  placeholder="" 
                                   {...field}
                                   className="w-20"
                                 />
