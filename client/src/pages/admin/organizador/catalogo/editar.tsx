@@ -207,11 +207,11 @@ const EditarActividadPage = () => {
       isFree: false,
       
       // Valores por defecto para descuentos
-      discountSeniors: 0,
-      discountStudents: 0,
-      discountFamilies: 0,
-      discountDisability: 0,
-      discountEarlyBird: 0,
+      discountSeniors: undefined,
+      discountStudents: undefined,
+      discountFamilies: undefined,
+      discountDisability: undefined,
+      discountEarlyBird: undefined,
       discountEarlyBirdDeadline: "",
       materials: "",
       requirements: "",
@@ -319,12 +319,12 @@ const EditarActividadPage = () => {
         isPriceRandom: data.isPriceRandom || data.is_price_random || false,
         isFree: data.isFree || data.is_free || (data.price === null || data.price === 0 || data.price === "0"),
         
-        // Cargar valores de descuentos
-        discountSeniors: data.discountSeniors || data.discount_seniors || 0,
-        discountStudents: data.discountStudents || data.discount_students || 0,
-        discountFamilies: data.discountFamilies || data.discount_families || 0,
-        discountDisability: data.discountDisability || data.discount_disability || 0,
-        discountEarlyBird: data.discountEarlyBird || data.discount_early_bird || 0,
+        // Cargar valores de descuentos (preservar valores reales, incluso si son 0)
+        discountSeniors: data.discountSeniors ?? data.discount_seniors ?? undefined,
+        discountStudents: data.discountStudents ?? data.discount_students ?? undefined,
+        discountFamilies: data.discountFamilies ?? data.discount_families ?? undefined,
+        discountDisability: data.discountDisability ?? data.discount_disability ?? undefined,
+        discountEarlyBird: data.discountEarlyBird ?? data.discount_early_bird ?? undefined,
         discountEarlyBirdDeadline: data.discountEarlyBirdDeadline || data.discount_early_bird_deadline || "",
         materials: data.materials || "",
         requirements: data.requirements || "",
@@ -398,12 +398,12 @@ const EditarActividadPage = () => {
         isPriceRandom: values.isPriceRandom,
         isFree: values.isFree,
         
-        // Campos de descuentos
-        discountSeniors: values.discountSeniors || 0,
-        discountStudents: values.discountStudents || 0,
-        discountFamilies: values.discountFamilies || 0,
-        discountDisability: values.discountDisability || 0,
-        discountEarlyBird: values.discountEarlyBird || 0,
+        // Campos de descuentos (preservar 0 como valor válido)
+        discountSeniors: values.discountSeniors ?? 0,
+        discountStudents: values.discountStudents ?? 0,
+        discountFamilies: values.discountFamilies ?? 0,
+        discountDisability: values.discountDisability ?? 0,
+        discountEarlyBird: values.discountEarlyBird ?? 0,
         discountEarlyBirdDeadline: values.discountEarlyBirdDeadline || null,
         materials: values.materials,
         requirements: values.requirements,
@@ -1201,7 +1201,7 @@ const EditarActividadPage = () => {
                                     min="0" 
                                     max="100" 
                                     step="1"
-                                    placeholder="0" 
+                                    placeholder="" 
                                     {...field}
                                     className="w-20"
                                   />
@@ -1229,7 +1229,7 @@ const EditarActividadPage = () => {
                                     min="0" 
                                     max="100" 
                                     step="1"
-                                    placeholder="0" 
+                                    placeholder="" 
                                     {...field}
                                     className="w-20"
                                   />
@@ -1257,7 +1257,7 @@ const EditarActividadPage = () => {
                                     min="0" 
                                     max="100" 
                                     step="1"
-                                    placeholder="0" 
+                                    placeholder="" 
                                     {...field}
                                     className="w-20"
                                   />
@@ -1285,7 +1285,7 @@ const EditarActividadPage = () => {
                                     min="0" 
                                     max="100" 
                                     step="1"
-                                    placeholder="0" 
+                                    placeholder="" 
                                     {...field}
                                     className="w-20"
                                   />
@@ -1315,7 +1315,7 @@ const EditarActividadPage = () => {
                                     min="0" 
                                     max="100" 
                                     step="1"
-                                    placeholder="0" 
+                                    placeholder="" 
                                     {...field}
                                     className="w-20"
                                   />
