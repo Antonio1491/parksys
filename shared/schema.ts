@@ -694,6 +694,11 @@ export const activityRegistrations = pgTable("activity_registrations", {
   stripeSessionId: varchar("stripe_session_id", { length: 100 }),
   paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }),
   paymentDate: timestamp("payment_date"),
+  // Campos de descuentos aplicados (para auditoría y conciliación)
+  appliedDiscountType: varchar("applied_discount_type", { length: 50 }), // seniors, students, families, disability, early_bird
+  appliedDiscountPercentage: integer("applied_discount_percentage"), // porcentaje de descuento aplicado
+  originalAmount: decimal("original_amount", { precision: 10, scale: 2 }), // precio original antes del descuento
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }), // monto del descuento aplicado
   // Consentimientos
   acceptsTerms: boolean("accepts_terms").default(false),
   acceptsPhotos: boolean("accepts_photos").default(false), // autoriza fotos durante la actividad

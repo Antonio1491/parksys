@@ -71,6 +71,13 @@ interface ActivityData {
   ageRestrictions?: string;
   healthRequirements?: string;
   status?: 'activa' | 'programada' | 'cancelada' | 'finalizada' | 'en_pausa';
+  // Campos de descuentos
+  discountSeniors?: number;
+  discountStudents?: number;
+  discountFamilies?: number;
+  discountDisability?: number;
+  discountEarlyBird?: number;
+  discountEarlyBirdDeadline?: string;
 }
 
 interface InstructorDetails {
@@ -826,6 +833,57 @@ function ActivityDetailPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Descuentos disponibles */}
+                {activity && !activity.isFree && activity.price > 0 && (
+                  (activity.discountSeniors || 0) > 0 || (activity.discountStudents || 0) > 0 || 
+                  (activity.discountFamilies || 0) > 0 || (activity.discountDisability || 0) > 0 || 
+                  ((activity.discountEarlyBird || 0) > 0 && activity.discountEarlyBirdDeadline)
+                ) && (
+                  <div className="flex items-start gap-3">
+                    <Tag className="h-5 w-5 text-green-600 mt-1" />
+                    <div className="flex-1">
+                      <p className="font-medium">Descuentos disponibles</p>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        {(activity.discountSeniors || 0) > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span>🧓 Adultos mayores (65+)</span>
+                            <span className="font-medium text-green-600">{activity.discountSeniors}% descuento</span>
+                          </div>
+                        )}
+                        {(activity.discountStudents || 0) > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span>🎓 Estudiantes</span>
+                            <span className="font-medium text-green-600">{activity.discountStudents}% descuento</span>
+                          </div>
+                        )}
+                        {(activity.discountFamilies || 0) > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span>👨‍👩‍👧‍👦 Familias (3+ hijos)</span>
+                            <span className="font-medium text-green-600">{activity.discountFamilies}% descuento</span>
+                          </div>
+                        )}
+                        {(activity.discountDisability || 0) > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span>♿ Personas con discapacidad</span>
+                            <span className="font-medium text-green-600">{activity.discountDisability}% descuento</span>
+                          </div>
+                        )}
+                        {(activity.discountEarlyBird || 0) > 0 && activity.discountEarlyBirdDeadline && (
+                          <div className="flex items-center justify-between">
+                            <span>⏰ Inscripción temprana</span>
+                            <span className="font-medium text-green-600">{activity.discountEarlyBird}% descuento</span>
+                          </div>
+                        )}
+                        {(activity.discountEarlyBird || 0) > 0 && activity.discountEarlyBirdDeadline && (
+                          <div className="text-xs text-amber-600 mt-2">
+                            * Descuento por inscripción temprana válido hasta: {format(new Date(activity.discountEarlyBirdDeadline), "dd 'de' MMMM yyyy", { locale: es })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Público (Segmentación) */}
                 {activity?.targetMarket && activity.targetMarket.length > 0 && (

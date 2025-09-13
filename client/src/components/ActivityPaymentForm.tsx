@@ -21,6 +21,13 @@ interface ActivityPaymentFormProps {
     isFree?: boolean;
     isPriceRandom?: boolean;
     parkName?: string;
+    // Campos de descuentos
+    discountSeniors?: number;
+    discountStudents?: number;
+    discountFamilies?: number;
+    discountDisability?: number;
+    discountEarlyBird?: number;
+    discountEarlyBirdDeadline?: string;
   };
   participantData: {
     fullName: string;
@@ -46,10 +53,102 @@ export function ActivityPaymentForm({
   const [customAmount, setCustomAmount] = useState('');
   const [processing, setProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [selectedDiscount, setSelectedDiscount] = useState<string>('none');
+  const [discountPercentage, setDiscountPercentage] = useState(0);
 
   // Determine if this is a suggested price (random pricing)
   const isPriceRandom = activity?.isPriceRandom || false;
   const basePrice = parseFloat(activity?.price?.toString() || '0');
+
+  // Función para obtener descuentos disponibles
+  const getAvailableDiscounts = () => {
+    const discounts = [];
+    
+    if ((activity?.discountSeniors || 0) > 0) {
+      discounts.push({
+        id: 'seniors',
+        label: '🧓 Adultos mayores (65+)',
+        percentage: activity.discountSeniors || 0,
+        description: 'Descuento para personas de 65 años en adelante'
+      });
+    }
+    
+    if ((activity?.discountStudents || 0) > 0) {
+      discounts.push({
+        id: 'students',
+        label: '🎓 Estudiantes',
+        percentage: activity.discountStudents || 0,
+        description: 'Descuento para estudiantes con credencial válida'
+      });
+    }
+    
+    if ((activity?.discountFamilies || 0) > 0) {
+      discounts.push({
+        id: 'families',
+        label: '👨‍👩‍👧‍👦 Familias numerosas',
+        percentage: activity.discountFamilies || 0,
+        description: 'Descuento para familias con 3 o más hijos'
+      });
+    }
+    
+    if ((activity?.discountDisability || 0) > 0) {
+      discounts.push({
+        id: 'disability',
+        label: '♿ Personas con discapacidad',
+        percentage: activity.discountDisability || 0,
+        description: 'Descuento para personas con discapacidad'
+      });
+    }
+    
+    // Verificar si el descuento early bird está disponible
+    if ((activity?.discountEarlyBird || 0) > 0 && activity?.discountEarlyBirdDeadline) {
+      const deadlineDate = new Date(activity.discountEarlyBirdDeadline);
+      const currentDate = new Date();
+      
+      if (currentDate <= deadlineDate) {
+        discounts.push({
+          id: 'early_bird',
+          label: '⏰ Inscripción temprana',
+          percentage: activity.discountEarlyBird || 0,
+          description: `Válido hasta ${deadlineDate.toLocaleDateString('es-ES')}`
+        });
+      }
+    }
+    
+    return discounts;
+  };
+
+  const availableDiscounts = getAvailableDiscounts();
+
+  // Función para calcular el precio con descuento
+  const calculateDiscountedPrice = (originalPrice: number, discount: number) => {
+    return originalPrice * (1 - discount / 100);
+  };
+
+  // Precio final con descuentos aplicados
+  const getFinalPrice = () => {
+    const originalPrice = isPriceRandom && customAmount 
+      ? parseFloat(customAmount) 
+      : basePrice;
+      
+    if (selectedDiscount === 'none' || discountPercentage === 0) {
+      return originalPrice;
+    }
+    
+    return calculateDiscountedPrice(originalPrice, discountPercentage);
+  };
+
+  // Manejar cambio de descuento
+  const handleDiscountChange = (discountId: string) => {
+    setSelectedDiscount(discountId);
+    
+    if (discountId === 'none') {
+      setDiscountPercentage(0);
+    } else {
+      const discount = availableDiscounts.find(d => d.id === discountId);
+      setDiscountPercentage(discount?.percentage || 0);
+    }
+  };
 
   // Payment processing mutation
   const createPaymentIntentMutation = useMutation({
@@ -94,10 +193,8 @@ export function ActivityPaymentForm({
       return;
     }
 
-    // Determine final amount
-    const finalAmount = isPriceRandom && customAmount 
-      ? parseFloat(customAmount) 
-      : basePrice;
+    // Determine final amount (with discounts applied)
+    const finalAmount = getFinalPrice();
 
     if (finalAmount <= 0) {
       setPaymentError('El monto debe ser mayor a $0');
@@ -113,7 +210,9 @@ export function ActivityPaymentForm({
           email: participantData.email,
           phone: participantData.phone,
         },
-        amount: finalAmount,
+        baseAmount: isPriceRandom && customAmount ? parseFloat(customAmount) : basePrice,
+        selectedDiscount: selectedDiscount !== 'none' ? selectedDiscount : null,
+        customAmount: isPriceRandom && customAmount ? parseFloat(customAmount) : null,
       });
 
       // Step 2: Confirm payment with Stripe
@@ -140,7 +239,9 @@ export function ActivityPaymentForm({
         body: JSON.stringify({
           paymentIntentId: result.paymentIntent?.id,
           customerData: participantData,
-          amount: finalAmount,
+          baseAmount: isPriceRandom && customAmount ? parseFloat(customAmount) : basePrice,
+          selectedDiscount: selectedDiscount !== 'none' ? selectedDiscount : null,
+          finalAmount: paymentIntentData.amount, // Usar el monto calculado por el servidor
         }),
       });
 
@@ -181,15 +282,66 @@ export function ActivityPaymentForm({
 
   return (
     <div className="w-full space-y-4">
+      {/* Selección de descuentos */}
+      {availableDiscounts.length > 0 && (
+        <div className="bg-blue-50 p-3 rounded-lg text-sm">
+          <Label className="text-sm font-medium mb-2 block">💰 Descuentos disponibles</Label>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="radio"
+                id="no-discount"
+                name="discount"
+                value="none"
+                checked={selectedDiscount === 'none'}
+                onChange={(e) => handleDiscountChange(e.target.value)}
+                className="text-blue-600"
+              />
+              <label htmlFor="no-discount" className="text-sm">Sin descuento</label>
+            </div>
+            {availableDiscounts.map((discount) => (
+              <div key={discount.id} className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id={discount.id}
+                  name="discount"
+                  value={discount.id}
+                  checked={selectedDiscount === discount.id}
+                  onChange={(e) => handleDiscountChange(e.target.value)}
+                  className="text-blue-600"
+                />
+                <label htmlFor={discount.id} className="flex-1">
+                  <div className="text-sm">
+                    {discount.label} <Badge variant="secondary">{discount.percentage}%</Badge>
+                  </div>
+                  <div className="text-xs text-gray-600">{discount.description}</div>
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Resumen compacto */}
       <div className="bg-gray-50 p-3 rounded-lg text-sm">
+        {discountPercentage > 0 && (
+          <div className="flex justify-between items-center mb-1 text-gray-600">
+            <span>Precio original:</span>
+            <span className="line-through">
+              {formatPrice(isPriceRandom && customAmount ? parseFloat(customAmount) : basePrice)}
+            </span>
+          </div>
+        )}
+        {discountPercentage > 0 && (
+          <div className="flex justify-between items-center mb-1 text-green-600">
+            <span>Descuento ({discountPercentage}%):</span>
+            <span>-{formatPrice((isPriceRandom && customAmount ? parseFloat(customAmount) : basePrice) * discountPercentage / 100)}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center mb-2">
           <span className="font-medium">Total a pagar:</span>
           <span className="text-lg font-bold text-green-600">
-            {formatPrice(isPriceRandom && customAmount 
-              ? parseFloat(customAmount) 
-              : basePrice
-            )}
+            {formatPrice(getFinalPrice())}
           </span>
         </div>
         {isPriceRandom && (
@@ -266,10 +418,7 @@ export function ActivityPaymentForm({
                 Procesando...
               </>
             ) : (
-              `Pagar ${formatPrice(isPriceRandom && customAmount 
-                ? parseFloat(customAmount) 
-                : basePrice
-              )}`
+              `Pagar ${formatPrice(getFinalPrice())}`
             )}
           </Button>
         </div>
