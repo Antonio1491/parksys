@@ -721,27 +721,20 @@ export default function VisitorCountPage() {
           countingMethod: methodMap[row['Método de Conteo']] || 'counting',
           dayType: dayTypeMap[row['Tipo de Día']] || 'weekday',
           weather: weatherMap[row.Clima] || 'sunny',
-          notes: row.Notas || ''
+          notes: row.Notas || '',
+          registeredBy: 1 // ID del usuario actual - TODO: obtener dinámicamente
         };
 
         console.log(`📤 Enviando datos:`, visitorCountData);
 
-        // Enviar al backend
+        // Enviar al backend usando apiRequest correctamente
         const response = await apiRequest('/api/visitor-counts', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(visitorCountData),
+          body: visitorCountData, // apiRequest se encarga del JSON.stringify y headers
         });
 
-        if (response.ok) {
-          successCount++;
-          console.log(`✅ Registro guardado: ${row.Parque} - ${formattedDate}`);
-        } else {
-          errorCount++;
-          console.error(`❌ Error guardando: ${row.Parque} - ${formattedDate}`, response.statusText);
-        }
+        successCount++;
+        console.log(`✅ Registro guardado: ${row.Parque} - ${formattedDate}`);
 
       } catch (error) {
         errorCount++;
