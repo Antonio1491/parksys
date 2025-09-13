@@ -84,6 +84,14 @@ const formSchema = z.object({
   isPriceRandom: z.boolean().default(false),
   isFree: z.boolean().default(false),
   
+  // Campos para descuentos aplicables
+  discountSeniors: z.coerce.number().min(0).max(100).optional(),
+  discountStudents: z.coerce.number().min(0).max(100).optional(),
+  discountFamilies: z.coerce.number().min(0).max(100).optional(),
+  discountDisability: z.coerce.number().min(0).max(100).optional(),
+  discountEarlyBird: z.coerce.number().min(0).max(100).optional(),
+  discountEarlyBirdDeadline: z.string().optional(),
+  
   materials: z.string().optional(),
   requirements: z.string().optional(),
   isRecurring: z.boolean().default(false),
@@ -197,6 +205,14 @@ const EditarActividadPage = () => {
       price: 0,
       isPriceRandom: false,
       isFree: false,
+      
+      // Valores por defecto para descuentos
+      discountSeniors: 0,
+      discountStudents: 0,
+      discountFamilies: 0,
+      discountDisability: 0,
+      discountEarlyBird: 0,
+      discountEarlyBirdDeadline: "",
       materials: "",
       requirements: "",
       isRecurring: false,
@@ -302,6 +318,14 @@ const EditarActividadPage = () => {
         price: data.price ? parseFloat(data.price) : 0,
         isPriceRandom: data.isPriceRandom || data.is_price_random || false,
         isFree: data.isFree || data.is_free || (data.price === null || data.price === 0 || data.price === "0"),
+        
+        // Cargar valores de descuentos
+        discountSeniors: data.discountSeniors || data.discount_seniors || 0,
+        discountStudents: data.discountStudents || data.discount_students || 0,
+        discountFamilies: data.discountFamilies || data.discount_families || 0,
+        discountDisability: data.discountDisability || data.discount_disability || 0,
+        discountEarlyBird: data.discountEarlyBird || data.discount_early_bird || 0,
+        discountEarlyBirdDeadline: data.discountEarlyBirdDeadline || data.discount_early_bird_deadline || "",
         materials: data.materials || "",
         requirements: data.requirements || "",
         isRecurring: data.isRecurring || data.is_recurring || false,
@@ -373,6 +397,14 @@ const EditarActividadPage = () => {
         price: values.price,
         isPriceRandom: values.isPriceRandom,
         isFree: values.isFree,
+        
+        // Campos de descuentos
+        discountSeniors: values.discountSeniors || 0,
+        discountStudents: values.discountStudents || 0,
+        discountFamilies: values.discountFamilies || 0,
+        discountDisability: values.discountDisability || 0,
+        discountEarlyBird: values.discountEarlyBird || 0,
+        discountEarlyBirdDeadline: values.discountEarlyBirdDeadline || null,
         materials: values.materials,
         requirements: values.requirements,
         isRecurring: values.isRecurring,
@@ -1140,6 +1172,214 @@ const EditarActividadPage = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Sección de descuentos aplicables */}
+                  {!form.watch("isFree") && (
+                    <div className="space-y-4 pt-4 border-t">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-md font-medium">🎫 Descuentos Aplicables</h4>
+                        <span className="text-sm text-muted-foreground">(Opcional)</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Configure descuentos especiales para diferentes grupos de beneficiarios
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Descuento para Adultos Mayores */}
+                        <FormField
+                          control={form.control}
+                          name="discountSeniors"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2">
+                                👴 Adultos Mayores (65+)
+                              </FormLabel>
+                              <FormControl>
+                                <div className="flex items-center gap-2">
+                                  <Input 
+                                    type="number" 
+                                    min="0" 
+                                    max="100" 
+                                    step="1"
+                                    placeholder="0" 
+                                    {...field}
+                                    className="w-20"
+                                  />
+                                  <span className="text-sm text-muted-foreground">% de descuento</span>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Descuento para Estudiantes */}
+                        <FormField
+                          control={form.control}
+                          name="discountStudents"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2">
+                                👨‍🎓 Estudiantes con Credencial
+                              </FormLabel>
+                              <FormControl>
+                                <div className="flex items-center gap-2">
+                                  <Input 
+                                    type="number" 
+                                    min="0" 
+                                    max="100" 
+                                    step="1"
+                                    placeholder="0" 
+                                    {...field}
+                                    className="w-20"
+                                  />
+                                  <span className="text-sm text-muted-foreground">% de descuento</span>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Descuento para Familias Numerosas */}
+                        <FormField
+                          control={form.control}
+                          name="discountFamilies"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2">
+                                👨‍👩‍👧‍👦 Familias Numerosas (3+ hijos)
+                              </FormLabel>
+                              <FormControl>
+                                <div className="flex items-center gap-2">
+                                  <Input 
+                                    type="number" 
+                                    min="0" 
+                                    max="100" 
+                                    step="1"
+                                    placeholder="0" 
+                                    {...field}
+                                    className="w-20"
+                                  />
+                                  <span className="text-sm text-muted-foreground">% de descuento</span>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Descuento por Discapacidad */}
+                        <FormField
+                          control={form.control}
+                          name="discountDisability"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2">
+                                ♿ Personas con Discapacidad
+                              </FormLabel>
+                              <FormControl>
+                                <div className="flex items-center gap-2">
+                                  <Input 
+                                    type="number" 
+                                    min="0" 
+                                    max="100" 
+                                    step="1"
+                                    placeholder="0" 
+                                    {...field}
+                                    className="w-20"
+                                  />
+                                  <span className="text-sm text-muted-foreground">% de descuento</span>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Descuento por Inscripción Temprana */}
+                      <div className="space-y-3 pt-2 border-t">
+                        <FormField
+                          control={form.control}
+                          name="discountEarlyBird"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2">
+                                🏅 Inscripciones Tempranas
+                              </FormLabel>
+                              <FormControl>
+                                <div className="flex items-center gap-2">
+                                  <Input 
+                                    type="number" 
+                                    min="0" 
+                                    max="100" 
+                                    step="1"
+                                    placeholder="0" 
+                                    {...field}
+                                    className="w-20"
+                                  />
+                                  <span className="text-sm text-muted-foreground">% de descuento</span>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        {form.watch("discountEarlyBird") && Number(form.watch("discountEarlyBird")) > 0 && (
+                          <FormField
+                            control={form.control}
+                            name="discountEarlyBirdDeadline"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Fecha límite para inscripción temprana</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="date" 
+                                    {...field}
+                                    min={new Date().toISOString().split('T')[0]}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Hasta esta fecha aplicará el descuento por inscripción temprana
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                      </div>
+
+                      {/* Resumen de descuentos */}
+                      {(form.watch("discountSeniors") || form.watch("discountStudents") || 
+                        form.watch("discountFamilies") || form.watch("discountDisability") || 
+                        form.watch("discountEarlyBird")) && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <h5 className="text-sm font-medium text-blue-800 mb-2">Descuentos Configurados:</h5>
+                          <div className="text-xs text-blue-700 space-y-1">
+                            {form.watch("discountSeniors") && Number(form.watch("discountSeniors")) > 0 && (
+                              <p>• Adultos mayores: {form.watch("discountSeniors")}% de descuento</p>
+                            )}
+                            {form.watch("discountStudents") && Number(form.watch("discountStudents")) > 0 && (
+                              <p>• Estudiantes: {form.watch("discountStudents")}% de descuento</p>
+                            )}
+                            {form.watch("discountFamilies") && Number(form.watch("discountFamilies")) > 0 && (
+                              <p>• Familias numerosas: {form.watch("discountFamilies")}% de descuento</p>
+                            )}
+                            {form.watch("discountDisability") && Number(form.watch("discountDisability")) > 0 && (
+                              <p>• Personas con discapacidad: {form.watch("discountDisability")}% de descuento</p>
+                            )}
+                            {form.watch("discountEarlyBird") && Number(form.watch("discountEarlyBird")) > 0 && (
+                              <p>• Inscripción temprana: {form.watch("discountEarlyBird")}% de descuento
+                                {form.watch("discountEarlyBirdDeadline") && ` (hasta ${form.watch("discountEarlyBirdDeadline")})`}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <FormField
                     control={form.control}
