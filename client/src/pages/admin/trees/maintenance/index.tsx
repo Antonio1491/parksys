@@ -148,46 +148,38 @@ export default function TreeMaintenancePage() {
   
   const trees = (treesResponse as any)?.data || [];
 
-  // Cargar especies para filtros
+  // Cargar especies para filtros - solicitar todas las especies
   const { data: speciesResponse } = useQuery({
     queryKey: ['/api/tree-species'],
+    queryFn: async () => {
+      const response = await fetch('/api/tree-species?limit=100'); // Solicitar hasta 100 especies
+      if (!response.ok) {
+        throw new Error('Error al cargar las especies arbóreas');
+      }
+      return response.json();
+    },
     retry: 1,
   });
   
-  const species = (speciesResponse as any)?.data || [];
+  const species = speciesResponse?.data || [];
 
-  // Estado para parques
-  const [parks, setParks] = React.useState([]);
-  const [loadingParks, setLoadingParks] = React.useState(true);
-
-  // Cargar parques directamente con fetch
-  React.useEffect(() => {
-    const loadParks = async () => {
-      try {
-        setLoadingParks(true);
-        const token = localStorage.getItem('token');
-        
-        const response = await fetch('/api/parks', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        
-        const data = await response.json();
-        
-        // Manejar tanto array directo como objeto con data
-        const parksArray = Array.isArray(data) ? data : (data?.data || []);
-        setParks(parksArray);
-      } catch (error) {
-        console.error('Error loading parks:', error);
-        setParks([]);
-      } finally {
-        setLoadingParks(false);
+  // Cargar parques usando useQuery
+  const { data: parksResponse, isLoading: loadingParks } = useQuery({
+    queryKey: ['/api/parks'],
+    queryFn: async () => {
+      const response = await fetch('/api/parks');
+      if (!response.ok) {
+        throw new Error('Error al cargar los parques');
       }
-    };
+      return response.json();
+    },
+    retry: 1,
+  });
 
-    loadParks();
-  }, []);
+  // Manejar formato de respuesta variable (array directo o {data: array})
+  const parks = Array.isArray(parksResponse) 
+    ? parksResponse 
+    : (parksResponse?.data || []);
 
   // Reset estados cuando cambian los filtros
   React.useEffect(() => {
