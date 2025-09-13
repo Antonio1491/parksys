@@ -272,7 +272,7 @@ function TreeInventoryPage() {
   // Función para descargar plantilla CSV
   const handleDownloadTemplate = () => {
     const headers = [
-      'código',
+      'codigo',
       'especie_id',
       'parque_id',
       'latitud',
@@ -281,7 +281,7 @@ function TreeInventoryPage() {
       'etapa_desarrollo',
       'edad_estimada',
       'altura',
-      'diámetro',
+      'diametro',
       'cobertura_copa',
       'estado_salud',
       'condicion_fisica',
@@ -377,7 +377,7 @@ function TreeInventoryPage() {
       }
       
       const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-      const requiredHeaders = ['código', 'especie_id', 'parque_id', 'estado_salud'];
+      const requiredHeaders = ['codigo', 'especie_id', 'parque_id', 'estado_salud'];
       
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
       if (missingHeaders.length > 0) {
