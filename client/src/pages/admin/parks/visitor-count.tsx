@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Users, Plus, FileText, TrendingUp, MapPin, Clock, Sun, Cloud, CloudRain, BarChart3, Download, Filter, PieChart, Activity, Grid, List, Upload, ChevronLeft, ChevronRight, ArrowLeft, Grid3X3, ChevronDown } from "lucide-react";
+import { Calendar, Users, Plus, FileText, TrendingUp, MapPin, Clock, Sun, Cloud, CloudRain, BarChart3, Download, Filter, PieChart, Activity, Grid, List, Upload, ChevronLeft, ChevronRight, ArrowLeft, Grid3X3, ChevronDown, Eye, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -96,7 +96,7 @@ export default function VisitorCountPage() {
   const [dateFilter, setDateFilter] = useState('');
   const [methodFilter, setMethodFilter] = useState('all');
   const [showImportDialog, setShowImportDialog] = useState(false);
-  const recordsPerPage = 10;
+  const recordsPerPage = 9;
   
   // Estados para la nueva navegación jerárquica
   const [selectedParkForDetail, setSelectedParkForDetail] = useState<number | null>(null);
@@ -180,7 +180,7 @@ export default function VisitorCountPage() {
       params.set('limit', recordsPerPage.toString());
       params.set('offset', ((currentPage - 1) * recordsPerPage).toString());
       if (searchTerm) params.set('search', searchTerm);
-      if (methodFilter) params.set('method', methodFilter);
+      if (methodFilter && methodFilter !== 'all') params.set('method', methodFilter);
       
       // Priorizar filtro de período de reportes sobre dateFilter manual
       if (reportPeriod !== 'all') {
@@ -1131,6 +1131,36 @@ export default function VisitorCountPage() {
     }
   });
 
+  // Estados para modal de visualización y borrado
+  const [selectedRecord, setSelectedRecord] = useState<VisitorCount | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // Mutación para borrar registros
+  const deleteVisitorCount = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/visitor-counts/${id}`, {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Registro eliminado",
+        description: "El registro de visitantes se eliminó correctamente",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts'] });
+      setShowDeleteDialog(false);
+      setSelectedRecord(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error al eliminar",
+        description: "No se pudo eliminar el registro",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('🔍 Datos del formulario antes de enviar:', formData);
@@ -1678,6 +1708,33 @@ export default function VisitorCountPage() {
                                       <span className="font-medium">Notas:</span> {record.notes}
                                     </div>
                                   )}
+
+                                  {/* Botones de acción */}
+                                  <div className="flex justify-end gap-2 pt-2 border-t">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedRecord(record);
+                                        setShowDetailModal(true);
+                                      }}
+                                      data-testid={`button-view-${record.id}`}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedRecord(record);
+                                        setShowDeleteDialog(true);
+                                      }}
+                                      data-testid={`button-delete-${record.id}`}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
                                 </div>
                               </CardContent>
                             </Card>
@@ -1702,6 +1759,7 @@ export default function VisitorCountPage() {
                                     <th className="text-center p-3 text-sm font-medium text-gray-700">Total</th>
                                     <th className="text-left p-3 text-sm font-medium text-gray-700">Clima</th>
                                     <th className="text-left p-3 text-sm font-medium text-gray-700">Tipo Día</th>
+                                    <th className="text-center p-3 text-sm font-medium text-gray-700">Acciones</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1732,6 +1790,33 @@ export default function VisitorCountPage() {
                                         <Badge variant="secondary" className="text-xs">
                                           {getDayTypeLabel(record.dayType)}
                                         </Badge>
+                                      </td>
+                                      <td className="p-3">
+                                        <div className="flex justify-center gap-2">
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                              setSelectedRecord(record);
+                                              setShowDetailModal(true);
+                                            }}
+                                            data-testid={`button-view-${record.id}`}
+                                          >
+                                            <Eye className="h-4 w-4" />
+                                          </Button>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                              setSelectedRecord(record);
+                                              setShowDeleteDialog(true);
+                                            }}
+                                            data-testid={`button-delete-${record.id}`}
+                                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        </div>
                                       </td>
                                     </tr>
                                   ))}
@@ -2407,6 +2492,117 @@ export default function VisitorCountPage() {
           </div>
         )}
       </div>
+
+      {/* Modal de detalles */}
+      <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Detalles del Registro de Visitantes</DialogTitle>
+          </DialogHeader>
+          {selectedRecord && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <strong>Parque:</strong> {selectedRecord.parkName}
+                </div>
+                <div>
+                  <strong>Fecha:</strong> {format(new Date(selectedRecord.date), 'dd/MM/yyyy', { locale: es })}
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center p-3 bg-blue-50 rounded">
+                  <div className="text-2xl font-bold text-blue-700">{selectedRecord.adults}</div>
+                  <div className="text-sm text-blue-600">Adultos</div>
+                </div>
+                <div className="text-center p-3 bg-green-50 rounded">
+                  <div className="text-2xl font-bold text-green-700">{selectedRecord.children}</div>
+                  <div className="text-sm text-green-600">Niños</div>
+                </div>
+                <div className="text-center p-3 bg-amber-50 rounded">
+                  <div className="text-2xl font-bold text-amber-700">{selectedRecord.seniors}</div>
+                  <div className="text-sm text-amber-600">Adultos Mayores</div>
+                </div>
+                <div className="text-center p-3 bg-pink-50 rounded">
+                  <div className="text-2xl font-bold text-pink-700">{selectedRecord.pets}</div>
+                  <div className="text-sm text-pink-600">Mascotas</div>
+                </div>
+              </div>
+              
+              <div className="text-center p-3 bg-emerald-50 rounded border-2 border-emerald-200">
+                <div className="text-3xl font-bold text-emerald-700">
+                  {selectedRecord.totalVisitors.toLocaleString()}
+                </div>
+                <div className="text-sm text-emerald-600">Total de Visitantes</div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <strong>Método de Conteo:</strong> {getMethodLabel(selectedRecord.countingMethod)}
+                </div>
+                <div>
+                  <strong>Tipo de Día:</strong> {getDayTypeLabel(selectedRecord.dayType)}
+                </div>
+                <div className="flex items-center gap-2">
+                  <strong>Clima:</strong>
+                  {getWeatherIcon(selectedRecord.weather)}
+                  {getWeatherLabel(selectedRecord.weather)}
+                </div>
+                <div>
+                  <strong>Grupos:</strong> {selectedRecord.groups}
+                </div>
+              </div>
+              
+              {selectedRecord.notes && (
+                <div>
+                  <strong>Notas:</strong>
+                  <div className="mt-2 p-3 bg-gray-50 rounded text-sm">
+                    {selectedRecord.notes}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de confirmación de borrado */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Eliminación</DialogTitle>
+          </DialogHeader>
+          {selectedRecord && (
+            <div className="space-y-4">
+              <p>¿Estás seguro de que deseas eliminar este registro de visitantes?</p>
+              <div className="bg-gray-50 p-4 rounded">
+                <div><strong>Parque:</strong> {selectedRecord.parkName}</div>
+                <div><strong>Fecha:</strong> {format(new Date(selectedRecord.date), 'dd/MM/yyyy', { locale: es })}</div>
+                <div><strong>Total Visitantes:</strong> {selectedRecord.totalVisitors}</div>
+              </div>
+              <p className="text-red-600 text-sm">Esta acción no se puede deshacer.</p>
+              
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteDialog(false)}
+                  disabled={deleteVisitorCount.isPending}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteVisitorCount.mutate(selectedRecord.id)}
+                  disabled={deleteVisitorCount.isPending}
+                  data-testid="confirm-delete-button"
+                >
+                  {deleteVisitorCount.isPending ? 'Eliminando...' : 'Eliminar'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
