@@ -91,7 +91,9 @@ export default function VisitorCountPage() {
   // Estados para paginación y vista
   const [currentPage, setCurrentPage] = useState(1);
   const [detailCurrentPage, setDetailCurrentPage] = useState(1);
+  const [summaryCurrentPage, setSummaryCurrentPage] = useState(1); // Nueva paginación para resumen
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [summaryViewMode, setSummaryViewMode] = useState<'grid' | 'list'>('grid'); // Nueva vista para resumen
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [methodFilter, setMethodFilter] = useState('all');
@@ -340,6 +342,22 @@ export default function VisitorCountPage() {
     setMethodFilter('all');
     setCurrentPage(1);
   };
+
+  // Reset de paginación cuando cambie el período
+  useEffect(() => {
+    setSummaryCurrentPage(1);
+  }, [quickDateRange, customStartDate, customEndDate]);
+
+  // Datos paginados para resumen por parques
+  const paginatedSummary = useMemo(() => {
+    if (!parkSummaryData?.data) return [];
+    const startIndex = (summaryCurrentPage - 1) * recordsPerPage;
+    const endIndex = summaryCurrentPage * recordsPerPage;
+    return parkSummaryData.data.slice(startIndex, endIndex);
+  }, [parkSummaryData?.data, summaryCurrentPage, recordsPerPage]);
+
+  // Calcular total de páginas para resumen
+  const summaryTotalPages = Math.ceil((parkSummaryData?.data?.length || 0) / recordsPerPage);
 
   // Calcular paginación
   const totalPages = Math.ceil((visitorCounts?.pagination?.total || 0) / recordsPerPage);
@@ -1427,25 +1445,55 @@ export default function VisitorCountPage() {
               </CardContent>
             </Card>
 
-            {/* Tarjetas Resumen por Parque */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {!parkSummaryData ? (
-                <div className="text-center py-8 col-span-full">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Cargando resumen por parques...</p>
+            {/* Controles de Vista y Paginación para Resumen */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-600">
+                    {parkSummaryData?.data ? `${parkSummaryData.data.length} parques encontrados` : 'Cargando parques...'}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={summaryViewMode === 'grid' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSummaryViewMode('grid')}
+                      data-testid="summary-grid-view-button"
+                    >
+                      <Grid className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={summaryViewMode === 'list' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSummaryViewMode('list')}
+                      data-testid="summary-list-view-button"
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              ) : parkSummaryData?.data?.length === 0 ? (
-                <Card className="col-span-full">
-                  <CardContent className="text-center py-8">
-                    <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">No hay datos para el período seleccionado</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Selecciona un período diferente o registra conteos de visitantes
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                parkSummaryData?.data?.map((parkSummary: any) => (
+              </CardContent>
+            </Card>
+
+            {/* Tarjetas Resumen por Parque */}
+            {summaryViewMode === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {!parkSummaryData ? (
+                  <div className="text-center py-8 col-span-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Cargando resumen por parques...</p>
+                  </div>
+                ) : parkSummaryData?.data?.length === 0 ? (
+                  <Card className="col-span-full">
+                    <CardContent className="text-center py-8">
+                      <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">No hay datos para el período seleccionado</p>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Selecciona un período diferente o registra conteos de visitantes
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  paginatedSummary.map((parkSummary: any) => (
                   <Card 
                     key={parkSummary.parkId} 
                     className="hover:shadow-lg transition-all duration-200 cursor-pointer hover:border-emerald-200" 
@@ -1537,13 +1585,182 @@ export default function VisitorCountPage() {
                             Click para ver detalles
                           </Badge>
                         </div>
+
+                        {/* Botones de acción */}
+                        <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedParkForDetail(parkSummary.parkId);
+                              setActiveTab('detalle');
+                            }}
+                            data-testid={`button-view-park-${parkSummary.parkId}`}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm('¿Estás seguro de que quieres eliminar todos los registros de este parque?')) {
+                                // TODO: Implementar eliminación
+                                toast({
+                                  title: "Funcionalidad pendiente",
+                                  description: "La eliminación masiva por parque se implementará próximamente",
+                                  variant: "destructive",
+                                });
+                                // Invalidar cache cuando se implemente
+                                queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts'] });
+                                queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts/park-summary'] });
+                              }
+                            }}
+                            data-testid={`button-delete-park-${parkSummary.parkId}`}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
-                ))
-              )}
-            </div>
+                  ))
+                )}
+              </div>
+            ) : (
+              /* Vista Lista */
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b">
+                        <tr>
+                          <th className="text-left p-3 text-sm font-medium text-gray-700">Parque</th>
+                          <th className="text-center p-3 text-sm font-medium text-gray-700">Total Visitantes</th>
+                          <th className="text-center p-3 text-sm font-medium text-gray-700">Promedio Diario</th>
+                          <th className="text-center p-3 text-sm font-medium text-gray-700">Máximo</th>
+                          <th className="text-center p-3 text-sm font-medium text-gray-700">Mínimo</th>
+                          <th className="text-center p-3 text-sm font-medium text-gray-700">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {!parkSummaryData ? (
+                          <tr>
+                            <td colSpan={6} className="text-center py-8">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
+                              <p className="mt-2 text-gray-600">Cargando...</p>
+                            </td>
+                          </tr>
+                        ) : parkSummaryData?.data?.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="text-center py-8">
+                              <p className="text-gray-600">No hay datos para el período seleccionado</p>
+                            </td>
+                          </tr>
+                        ) : (
+                          paginatedSummary.map((parkSummary: any, index: number) => (
+                            <tr key={parkSummary.parkId} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                              <td className="p-3 text-sm font-medium">
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="h-4 w-4 text-emerald-600" />
+                                  {parkSummary.parkName}
+                                </div>
+                              </td>
+                              <td className="p-3 text-sm text-center font-bold text-emerald-700">
+                                {Number(parkSummary.totalVisitors || 0).toLocaleString()}
+                              </td>
+                              <td className="p-3 text-sm text-center">
+                                {Number(parkSummary.avgDaily || 0).toLocaleString()}
+                              </td>
+                              <td className="p-3 text-sm text-center">
+                                {Number(parkSummary.maxDaily || 0).toLocaleString()}
+                              </td>
+                              <td className="p-3 text-sm text-center">
+                                {Number(parkSummary.minDaily || 0).toLocaleString()}
+                              </td>
+                              <td className="p-3">
+                                <div className="flex justify-center gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedParkForDetail(parkSummary.parkId);
+                                      setActiveTab('detalle');
+                                    }}
+                                    data-testid={`button-view-park-${parkSummary.parkId}`}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      if (window.confirm('¿Estás seguro de que quieres eliminar todos los registros de este parque?')) {
+                                        // TODO: Implementar eliminación
+                                        toast({
+                                          title: "Funcionalidad pendiente",
+                                          description: "La eliminación masiva por parque se implementará próximamente",
+                                          variant: "destructive",
+                                        });
+                                        // Invalidar cache cuando se implemente
+                                        queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts'] });
+                                        queryClient.invalidateQueries({ queryKey: ['/api/visitor-counts/park-summary'] });
+                                      }
+                                    }}
+                                    data-testid={`button-delete-park-${parkSummary.parkId}`}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
+            {/* Paginación para resumen */}
+            {parkSummaryData?.data && parkSummaryData.data.length > recordsPerPage && (
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-600">
+                      Mostrando {((summaryCurrentPage - 1) * recordsPerPage) + 1} a {Math.min(summaryCurrentPage * recordsPerPage, parkSummaryData.data.length)} de {parkSummaryData.data.length} parques
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={summaryCurrentPage === 1}
+                        onClick={() => setSummaryCurrentPage(summaryCurrentPage - 1)}
+                        data-testid="button-summary-prev"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm">
+                        Página {summaryCurrentPage} de {summaryTotalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={summaryCurrentPage >= summaryTotalPages}
+                        onClick={() => setSummaryCurrentPage(summaryCurrentPage + 1)}
+                        data-testid="button-summary-next"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
           </TabsContent>
 
