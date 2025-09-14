@@ -22,6 +22,7 @@ import { registerPublicRoutes } from "./publicRoutes";
 import { registerAssetRoutes } from "./asset_routes";
 import { registerAssetImageRoutes } from "./asset-image-routes";
 import { registerAssetCategoriesRoutes } from "./asset-categories-routes";
+import { registerWarehouseRoutes } from "./warehouse-routes";
 import activityImageRouter from "./activity-image-routes";
 import { registerMaintenanceRoutes } from "./maintenance_routes_fixed";
 import { registerAssetAssignmentRoutes } from "./asset_assignment_routes";
@@ -300,6 +301,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAssetRoutes(app, apiRouter, isAuthenticated); // RESTAURADO - rutas POST de mantenimientos están comentadas en asset_routes.ts
   registerMaintenanceRoutes(app, apiRouter, isAuthenticated); // DESCOMENTADO - usado maintenance_routes_fixed.ts
   registerAssetAssignmentRoutes(app, apiRouter, isAuthenticated);
+  
+  // Registramos las rutas del módulo de almacén
+  registerWarehouseRoutes(app, apiRouter, isAuthenticated);
   registerSpaceReservationRoutes(app, apiRouter, isAuthenticated);
   registerReservableSpacesRoutes(app);
   registerSpacePaymentRoutes(app);

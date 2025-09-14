@@ -981,7 +981,7 @@ export const insertActivityRegistrationSchema = createInsertSchema(activityRegis
   phone: z.string().min(10, "Teléfono debe tener al menos 10 dígitos").optional(),
   age: z.number().min(1).max(120).optional(),
   emergencyPhone: z.string().min(10, "Teléfono de emergencia debe tener al menos 10 dígitos").optional(),
-  acceptsTerms: z.boolean().refine(val => val === true, "Debe aceptar los términos y condiciones")
+  acceptsTerms: z.literal(true, { errorMap: () => ({ message: "Debe aceptar los términos y condiciones" }) })
 });
 
 export type ActivityRegistrationHistory = typeof activityRegistrationHistory.$inferSelect;
@@ -2489,6 +2489,379 @@ export const assetAssignmentsRelations = relations(assetAssignments, ({ one }) =
   activity: one(activities, {
     fields: [assetAssignments.activityId],
     references: [activities.id]
+  })
+}));
+
+// ============ MÓDULO DE ALMACÉN ============
+
+// Tabla de categorías de consumibles
+export const consumableCategories = pgTable("consumable_categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  icon: varchar("icon", { length: 50 }), // Nombre del icono lucide-react
+  color: varchar("color", { length: 20 }), // Color hex para visualización
+  parentId: integer("parent_id"), // Para categorías jerárquicas
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabla principal de consumibles (catálogo)
+export const consumables = pgTable("consumables", {
+  id: serial("id").primaryKey(),
+  // IDENTIFICACIÓN
+  code: varchar("code", { length: 50 }).notNull().unique(), // Código interno único
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  categoryId: integer("category_id").notNull(),
+  
+  // ESPECIFICACIONES
+  brand: varchar("brand", { length: 100 }),
+  model: varchar("model", { length: 100 }),
+  unitOfMeasure: varchar("unit_of_measure", { length: 20 }).notNull(), // pieza, litro, kilo, metro, etc.
+  presentation: varchar("presentation", { length: 100 }), // Presentación (ej: "Botella 1L", "Caja 12 piezas")
+  
+  // GESTIÓN DE INVENTARIO
+  minimumStock: integer("minimum_stock").default(0), // Stock mínimo para alertas
+  maximumStock: integer("maximum_stock"), // Stock máximo recomendado
+  reorderPoint: integer("reorder_point"), // Punto de reorden
+  
+  // COSTOS
+  unitCost: decimal("unit_cost", { precision: 10, scale: 2 }), // Costo unitario promedio
+  lastPurchasePrice: decimal("last_purchase_price", { precision: 10, scale: 2 }),
+  
+  // PROVEEDOR Y COMPRAS
+  preferredSupplierId: integer("preferred_supplier_id"),
+  supplierCode: varchar("supplier_code", { length: 50 }), // Código del proveedor
+  
+  // CARACTERÍSTICAS ESPECIALES
+  requiresExpiration: boolean("requires_expiration").default(false), // Si requiere control de vencimiento
+  perishable: boolean("perishable").default(false), // Si es perecedero
+  hazardous: boolean("hazardous").default(false), // Si es material peligroso
+  storageRequirements: text("storage_requirements"), // Requisitos de almacenamiento
+  
+  // METADATOS
+  tags: text("tags").array(), // Etiquetas para búsqueda
+  notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabla de stock por ubicación
+export const inventoryStock = pgTable("inventory_stock", {
+  id: serial("id").primaryKey(),
+  consumableId: integer("consumable_id").notNull(),
+  parkId: integer("park_id").notNull(), // Ubicación del stock
+  warehouseLocation: varchar("warehouse_location", { length: 100 }), // Ubicación específica en almacén
+  
+  // CANTIDADES
+  quantity: integer("quantity").notNull().default(0), // Cantidad actual
+  reservedQuantity: integer("reserved_quantity").default(0), // Cantidad reservada
+  availableQuantity: integer("available_quantity").default(0), // Cantidad disponible
+  
+  // CONTROL DE LOTES (opcional)
+  batchNumber: varchar("batch_number", { length: 50 }),
+  expirationDate: date("expiration_date"),
+  
+  // UBICACIÓN FÍSICA
+  zone: varchar("zone", { length: 50 }), // Zona del almacén
+  shelf: varchar("shelf", { length: 50 }), // Estante
+  position: varchar("position", { length: 50 }), // Posición específica
+  
+  // METADATOS
+  lastCountDate: date("last_count_date"), // Última fecha de conteo físico
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tipos de movimiento de inventario
+export const inventoryMovementTypeEnum = pgEnum("inventory_movement_type", [
+  "entrada_compra", // Entrada por compra
+  "entrada_donacion", // Entrada por donación
+  "entrada_transferencia", // Entrada por transferencia
+  "entrada_devolucion", // Entrada por devolución
+  "salida_consumo", // Salida por consumo/uso
+  "salida_transferencia", // Salida por transferencia
+  "salida_merma", // Salida por merma/deterioro
+  "salida_robo", // Salida por robo/pérdida
+  "ajuste_positivo", // Ajuste de inventario positivo
+  "ajuste_negativo", // Ajuste de inventario negativo
+  "conteo_fisico" // Ajuste por conteo físico
+]);
+
+// Tabla de movimientos de inventario
+export const inventoryMovements = pgTable("inventory_movements", {
+  id: serial("id").primaryKey(),
+  // BÁSICOS
+  consumableId: integer("consumable_id").notNull(),
+  stockId: integer("stock_id").notNull(), // Referencia al stock afectado
+  movementType: inventoryMovementTypeEnum("movement_type").notNull(),
+  
+  // CANTIDADES
+  quantity: integer("quantity").notNull(), // Cantidad (positiva o negativa)
+  unitCost: decimal("unit_cost", { precision: 10, scale: 2 }), // Costo unitario en este movimiento
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }), // Costo total del movimiento
+  
+  // ORIGEN Y DESTINO
+  originType: varchar("origin_type", { length: 50 }), // compra, transferencia, devolucion, etc.
+  originId: integer("origin_id"), // ID del documento origen (orden de compra, transferencia, etc.)
+  destinationType: varchar("destination_type", { length: 50 }),
+  destinationId: integer("destination_id"),
+  
+  // REFERENCIAS EXTERNAS
+  workOrderId: integer("work_order_id"), // Orden de trabajo que generó el movimiento
+  purchaseOrderId: integer("purchase_order_id"), // Orden de compra
+  transferRequestId: integer("transfer_request_id"), // Solicitud de transferencia
+  
+  // METADATOS
+  description: text("description").notNull(),
+  reference: varchar("reference", { length: 100 }), // Número de factura, guía, etc.
+  performedById: integer("performed_by_id").notNull(), // Usuario que realizó el movimiento
+  approvedById: integer("approved_by_id"), // Usuario que aprobó (si aplica)
+  
+  // CONTROL DE LOTES
+  batchNumber: varchar("batch_number", { length: 50 }),
+  expirationDate: date("expiration_date"),
+  
+  // FECHA Y ESTADO
+  movementDate: timestamp("movement_date").defaultNow(),
+  status: varchar("status", { length: 20 }).default("completed"), // pending, completed, cancelled
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Estados de requisición
+export const requisitionStatusEnum = pgEnum("requisition_status", [
+  "draft", // Borrador
+  "submitted", // Enviada
+  "approved", // Aprobada
+  "rejected", // Rechazada
+  "in_progress", // En progreso
+  "completed", // Completada
+  "cancelled" // Cancelada
+]);
+
+// Tabla de requisiciones de materiales
+export const requisitions = pgTable("requisitions", {
+  id: serial("id").primaryKey(),
+  // IDENTIFICACIÓN
+  requisitionNumber: varchar("requisition_number", { length: 50 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  
+  // ORIGEN
+  requestedById: integer("requested_by_id").notNull(), // Usuario solicitante
+  departmentId: integer("department_id"), // Departamento solicitante
+  parkId: integer("park_id"), // Parque solicitante
+  priority: varchar("priority", { length: 20 }).default("normal"), // low, normal, high, urgent
+  
+  // JUSTIFICACIÓN
+  purpose: text("purpose").notNull(), // Propósito de la requisición
+  workOrderId: integer("work_order_id"), // Orden de trabajo relacionada (si aplica)
+  projectId: integer("project_id"), // Proyecto relacionado (si aplica)
+  
+  // FECHAS
+  requestDate: timestamp("request_date").defaultNow(),
+  requiredDate: date("required_date"), // Fecha requerida
+  
+  // ESTADO Y APROBACIÓN
+  status: requisitionStatusEnum("status").default("draft"),
+  reviewedById: integer("reviewed_by_id"), // Usuario que revisó
+  approvedById: integer("approved_by_id"), // Usuario que aprobó
+  rejectionReason: text("rejection_reason"),
+  reviewDate: timestamp("review_date"),
+  approvalDate: timestamp("approval_date"),
+  
+  // COSTOS
+  estimatedTotal: decimal("estimated_total", { precision: 12, scale: 2 }), // Costo estimado total
+  actualTotal: decimal("actual_total", { precision: 12, scale: 2 }), // Costo real total
+  
+  // METADATOS
+  notes: text("notes"),
+  attachments: text("attachments").array(), // URLs de archivos adjuntos
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabla de items de requisiciones
+export const requisitionItems = pgTable("requisition_items", {
+  id: serial("id").primaryKey(),
+  requisitionId: integer("requisition_id").notNull(),
+  consumableId: integer("consumable_id").notNull(),
+  
+  // CANTIDADES
+  requestedQuantity: integer("requested_quantity").notNull(),
+  approvedQuantity: integer("approved_quantity"), // Cantidad aprobada (puede ser diferente)
+  deliveredQuantity: integer("delivered_quantity").default(0), // Cantidad entregada
+  
+  // COSTOS
+  estimatedUnitCost: decimal("estimated_unit_cost", { precision: 10, scale: 2 }),
+  actualUnitCost: decimal("actual_unit_cost", { precision: 10, scale: 2 }),
+  
+  // JUSTIFICACIÓN ESPECÍFICA
+  justification: text("justification"), // Justificación para este item específico
+  notes: text("notes"),
+  
+  // ESTADO
+  status: varchar("status", { length: 20 }).default("pending"), // pending, approved, rejected, delivered
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tipos exportados para almacén
+export type ConsumableCategory = typeof consumableCategories.$inferSelect;
+export type InsertConsumableCategory = typeof consumableCategories.$inferInsert;
+
+export type Consumable = typeof consumables.$inferSelect;
+export type InsertConsumable = typeof consumables.$inferInsert;
+
+export type InventoryStock = typeof inventoryStock.$inferSelect;
+export type InsertInventoryStock = typeof inventoryStock.$inferInsert;
+
+export type InventoryMovement = typeof inventoryMovements.$inferSelect;
+export type InsertInventoryMovement = typeof inventoryMovements.$inferInsert;
+
+export type Requisition = typeof requisitions.$inferSelect;
+export type InsertRequisition = typeof requisitions.$inferInsert;
+
+export type RequisitionItem = typeof requisitionItems.$inferSelect;
+export type InsertRequisitionItem = typeof requisitionItems.$inferInsert;
+
+// Esquemas de inserción para almacén
+export const insertConsumableCategorySchema = createInsertSchema(consumableCategories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertConsumableSchema = createInsertSchema(consumables).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+}).extend({
+  code: z.string().min(1, "Código es requerido"),
+  name: z.string().min(1, "Nombre es requerido"),
+  unitOfMeasure: z.string().min(1, "Unidad de medida es requerida")
+});
+
+export const insertInventoryStockSchema = createInsertSchema(inventoryStock).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertInventoryMovementSchema = createInsertSchema(inventoryMovements).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+}).extend({
+  description: z.string().min(1, "Descripción es requerida")
+});
+
+export const insertRequisitionSchema = createInsertSchema(requisitions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+}).extend({
+  title: z.string().min(1, "Título es requerido"),
+  purpose: z.string().min(1, "Propósito es requerido")
+});
+
+export const insertRequisitionItemSchema = createInsertSchema(requisitionItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+}).extend({
+  requestedQuantity: z.number().min(1, "Cantidad debe ser mayor a 0")
+});
+
+// Relaciones para almacén
+export const consumableCategoriesRelations = relations(consumableCategories, ({ many, one }) => ({
+  consumables: many(consumables),
+  parent: one(consumableCategories, {
+    fields: [consumableCategories.parentId],
+    references: [consumableCategories.id]
+  }),
+  children: many(consumableCategories)
+}));
+
+export const consumablesRelations = relations(consumables, ({ one, many }) => ({
+  category: one(consumableCategories, {
+    fields: [consumables.categoryId],
+    references: [consumableCategories.id]
+  }),
+  stocks: many(inventoryStock),
+  movements: many(inventoryMovements),
+  requisitionItems: many(requisitionItems)
+}));
+
+export const inventoryStockRelations = relations(inventoryStock, ({ one, many }) => ({
+  consumable: one(consumables, {
+    fields: [inventoryStock.consumableId],
+    references: [consumables.id]
+  }),
+  park: one(parks, {
+    fields: [inventoryStock.parkId],
+    references: [parks.id]
+  }),
+  movements: many(inventoryMovements)
+}));
+
+export const inventoryMovementsRelations = relations(inventoryMovements, ({ one }) => ({
+  consumable: one(consumables, {
+    fields: [inventoryMovements.consumableId],
+    references: [consumables.id]
+  }),
+  stock: one(inventoryStock, {
+    fields: [inventoryMovements.stockId],
+    references: [inventoryStock.id]
+  }),
+  performedBy: one(users, {
+    fields: [inventoryMovements.performedById],
+    references: [users.id]
+  }),
+  approvedBy: one(users, {
+    fields: [inventoryMovements.approvedById],
+    references: [users.id]
+  })
+}));
+
+export const requisitionsRelations = relations(requisitions, ({ one, many }) => ({
+  requestedBy: one(users, {
+    fields: [requisitions.requestedById],
+    references: [users.id]
+  }),
+  reviewedBy: one(users, {
+    fields: [requisitions.reviewedById],
+    references: [users.id]
+  }),
+  approvedBy: one(users, {
+    fields: [requisitions.approvedById],
+    references: [users.id]
+  }),
+  park: one(parks, {
+    fields: [requisitions.parkId],
+    references: [parks.id]
+  }),
+  items: many(requisitionItems)
+}));
+
+export const requisitionItemsRelations = relations(requisitionItems, ({ one }) => ({
+  requisition: one(requisitions, {
+    fields: [requisitionItems.requisitionId],
+    references: [requisitions.id]
+  }),
+  consumable: one(consumables, {
+    fields: [requisitionItems.consumableId],
+    references: [consumables.id]
   })
 }));
 

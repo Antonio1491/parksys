@@ -389,6 +389,7 @@ const AdminSidebarComplete: React.FC = () => {
     if (location.startsWith('/admin/roles') || location.startsWith('/admin/permissions') || location.startsWith('/admin/role-')) return 'roles-sistema';
     if (location.startsWith('/admin/assets')) return 'activos';
     if (location.startsWith('/admin/incidents')) return 'incidencias';
+    if (location.startsWith('/admin/warehouse')) return 'almacen';
     if (location.startsWith('/admin/volunteers')) return 'voluntarios';
     if (location.startsWith('/admin/finance')) return 'finanzas';
     if (location.startsWith('/admin/accounting')) return 'contabilidad';
@@ -416,6 +417,7 @@ const AdminSidebarComplete: React.FC = () => {
       'reservas': ['/admin/space-reservations', '/admin/dashboard-reservas'],
       'activos': ['/admin/assets'],
       'incidencias': ['/admin/incidents'],
+      'almacen': ['/admin/warehouse'],
       'voluntarios': ['/admin/volunteers'],
       'finanzas': ['/admin/finance'],
       'contabilidad': ['/admin/accounting'],
@@ -478,7 +480,7 @@ const AdminSidebarComplete: React.FC = () => {
     }
     
     // Rutas que pertenecen al módulo "O & M"
-    if (location.startsWith('/admin/assets') || location.startsWith('/admin/incidents') || location.startsWith('/admin/volunteers')) {
+    if (location.startsWith('/admin/assets') || location.startsWith('/admin/incidents') || location.startsWith('/admin/warehouse') || location.startsWith('/admin/volunteers')) {
       return ['operations'];
     }
     
@@ -906,6 +908,52 @@ const AdminSidebarComplete: React.FC = () => {
                 active={location.startsWith('/admin/incidents/categories')}
               >
                 {t('navigation.categories')}
+              </NavItem>
+            </CollapsibleSubmenu>
+
+            {/* ALMACÉN */}
+            <CollapsibleSubmenu
+              id="almacen"
+              title="Almacén"
+              icon={<Archive className="h-4 w-4" />}
+              isExpanded={expandedSubmenus.includes('almacen')}
+              onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('almacen')}
+            >
+              <NavItem 
+                href="/admin/warehouse/dashboard" 
+                icon={<BarChart3 className="h-4 w-4" />}
+                active={location.startsWith('/admin/warehouse/dashboard')}
+              >
+                Dashboard
+              </NavItem>
+              <NavItem 
+                href="/admin/warehouse/consumables" 
+                icon={<Package className="h-4 w-4" />}
+                active={location.startsWith('/admin/warehouse/consumables')}
+              >
+                Consumibles
+              </NavItem>
+              <NavItem 
+                href="/admin/warehouse/stock" 
+                icon={<Boxes className="h-4 w-4" />}
+                active={location.startsWith('/admin/warehouse/stock')}
+              >
+                Inventario
+              </NavItem>
+              <NavItem 
+                href="/admin/warehouse/movements" 
+                icon={<ArrowRightLeft className="h-4 w-4" />}
+                active={location.startsWith('/admin/warehouse/movements')}
+              >
+                Movimientos
+              </NavItem>
+              <NavItem 
+                href="/admin/warehouse/requisitions" 
+                icon={<ClipboardCheck className="h-4 w-4" />}
+                active={location.startsWith('/admin/warehouse/requisitions')}
+              >
+                Requisiciones
               </NavItem>
             </CollapsibleSubmenu>
 
