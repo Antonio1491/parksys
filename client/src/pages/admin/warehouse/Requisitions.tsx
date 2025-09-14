@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AdminLayout from "@/components/AdminLayout";
 import type { Requisition, RequisitionItem, User, Park } from "@shared/schema";
 
 export default function RequisitionsPage() {
@@ -71,7 +72,8 @@ export default function RequisitionsPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="requisitions-page">
+    <AdminLayout title="Requisiciones de Material" subtitle="Gestiona las solicitudes de materiales y suministros">
+      <div className="space-y-6" data-testid="requisitions-page">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Requisiciones</h1>
@@ -296,6 +298,7 @@ export default function RequisitionsPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

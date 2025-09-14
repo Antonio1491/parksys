@@ -412,7 +412,7 @@ function Router() {
           </Suspense>
         </Route>
 
-        {/* Rutas del módulo de Almacén */}
+        {/* Rutas del módulo de Almacén - Fixed imports */}
         <Route path="/admin/warehouse/dashboard">
           <Suspense fallback={<div className="p-8 text-center">Cargando dashboard del almacén...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Dashboard')))}

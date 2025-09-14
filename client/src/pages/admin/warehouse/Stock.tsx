@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AdminLayout from "@/components/AdminLayout";
 import type { InventoryStock, Consumable, Park } from "@shared/schema";
 
 export default function StockPage() {
@@ -44,7 +45,8 @@ export default function StockPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="stock-page">
+    <AdminLayout title="Inventario de Stock" subtitle="Consulta y monitorea el stock disponible en cada parque">
+      <div className="space-y-6" data-testid="stock-page">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Inventario</h1>
@@ -75,11 +77,11 @@ export default function StockPage() {
           data-testid="select-park-filter"
         >
           <option value="">Todos los parques</option>
-          {parks?.map((park: Park) => (
+          {Array.isArray(parks) ? parks.map((park: Park) => (
             <option key={park.id} value={park.id}>
               {park.name}
             </option>
-          ))}
+          )) : []}
         </select>
 
         <Button
@@ -225,6 +227,7 @@ export default function StockPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

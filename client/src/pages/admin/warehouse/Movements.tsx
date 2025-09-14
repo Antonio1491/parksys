@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AdminLayout from "@/components/AdminLayout";
 import type { InventoryMovement, Consumable, User } from "@shared/schema";
 
 export default function MovementsPage() {
@@ -33,14 +34,16 @@ export default function MovementsPage() {
   });
 
   const getMovementIcon = (type: string) => {
-    if (type.includes('entrada')) return <TrendingUp className="h-4 w-4 text-green-600" />;
-    if (type.includes('salida')) return <TrendingDown className="h-4 w-4 text-red-600" />;
+    const typeStr = type || '';
+    if (typeStr.includes('entrada')) return <TrendingUp className="h-4 w-4 text-green-600" />;
+    if (typeStr.includes('salida')) return <TrendingDown className="h-4 w-4 text-red-600" />;
     return <ArrowUpDown className="h-4 w-4 text-blue-600" />;
   };
 
   const getMovementVariant = (type: string) => {
-    if (type.includes('entrada')) return 'default' as const;
-    if (type.includes('salida')) return 'secondary' as const;
+    const typeStr = type || '';
+    if (typeStr.includes('entrada')) return 'default' as const;
+    if (typeStr.includes('salida')) return 'secondary' as const;
     return 'outline' as const;
   };
 
@@ -62,7 +65,8 @@ export default function MovementsPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="movements-page">
+    <AdminLayout title="Movimientos de Inventario" subtitle="Historial de entradas y salidas del almacén">
+      <div className="space-y-6" data-testid="movements-page">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Movimientos de Inventario</h1>
@@ -191,7 +195,7 @@ export default function MovementsPage() {
                         <div>
                           <span className="text-muted-foreground">Fecha:</span>
                           <p className="font-medium">
-                            {new Date(movement.movementDate).toLocaleDateString('es-MX')}
+                            {movement.movementDate ? new Date(movement.movementDate).toLocaleDateString('es-MX') : 'N/A'}
                           </p>
                         </div>
                       </div>
@@ -220,7 +224,7 @@ export default function MovementsPage() {
                   </div>
                   
                   <div className="text-right text-sm text-muted-foreground">
-                    {new Date(movement.createdAt).toLocaleString('es-MX')}
+                    {movement.createdAt ? new Date(movement.createdAt).toLocaleString('es-MX') : 'N/A'}
                   </div>
                 </div>
               </CardContent>
@@ -247,6 +251,7 @@ export default function MovementsPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

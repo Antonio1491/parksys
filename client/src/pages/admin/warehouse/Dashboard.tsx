@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Package, TrendingUp, TrendingDown } from "lucide-react";
+import AdminLayout from "@/components/AdminLayout";
 
 export default function WarehouseDashboard() {
   const { data: dashboardData, isLoading } = useQuery({
@@ -14,7 +15,8 @@ export default function WarehouseDashboard() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <AdminLayout title="Dashboard del Almacén" subtitle="Vista general del inventario y movimientos">
+        <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard del Almacén</h1>
           <p className="text-muted-foreground">Vista general del inventario y movimientos</p>
@@ -31,14 +33,16 @@ export default function WarehouseDashboard() {
             </Card>
           ))}
         </div>
-      </div>
+        </div>
+      </AdminLayout>
     );
   }
 
   const summary = dashboardData?.summary || {};
 
   return (
-    <div className="space-y-6" data-testid="warehouse-dashboard">
+    <AdminLayout title="Dashboard del Almacén" subtitle="Vista general del inventario y movimientos">
+      <div className="space-y-6" data-testid="warehouse-dashboard">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard del Almacén</h1>
         <p className="text-muted-foreground">Vista general del inventario y movimientos</p>
@@ -131,6 +135,7 @@ export default function WarehouseDashboard() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

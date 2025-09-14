@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
+import AdminLayout from "@/components/AdminLayout";
 import type { Consumable, ConsumableCategory } from "@shared/schema";
 
 export default function ConsumablesPage() {
@@ -53,7 +54,8 @@ export default function ConsumablesPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="consumables-page">
+    <AdminLayout title="Gestión de Consumibles" subtitle="Administra los materiales y suministros del almacén">
+      <div className="space-y-6" data-testid="consumables-page">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Consumibles</h1>
@@ -158,7 +160,7 @@ export default function ConsumablesPage() {
                     {consumable.unitCost && (
                       <div className="col-span-2">
                         <span className="text-muted-foreground">Costo:</span>
-                        <p className="font-medium">{formatCurrency(consumable.unitCost)}</p>
+                        <p className="font-medium">{formatCurrency(consumable.unitCost || 0)}</p>
                       </div>
                     )}
                   </div>
@@ -198,7 +200,8 @@ export default function ConsumablesPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
 
