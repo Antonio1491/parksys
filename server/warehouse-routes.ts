@@ -109,6 +109,63 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
     }
   });
 
+  // GET /api/warehouse/categories/parents - Obtener categorías principales
+  apiRouter.get("/warehouse/categories/parents", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parentCategories = await db
+        .select()
+        .from(consumableCategories)
+        .where(and(
+          eq(consumableCategories.isActive, true),
+          isNull(consumableCategories.parentId)
+        ))
+        .orderBy(consumableCategories.name);
+
+      res.json(parentCategories);
+    } catch (error) {
+      console.error("Error obteniendo categorías padre:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // GET /api/warehouse/categories/tree/structure - Obtener estructura jerárquica
+  apiRouter.get("/warehouse/categories/tree/structure", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Obtener todas las categorías activas
+      const allCategories = await db
+        .select({
+          id: consumableCategories.id,
+          name: consumableCategories.name,
+          description: consumableCategories.description,
+          icon: consumableCategories.icon,
+          color: consumableCategories.color,
+          parentId: consumableCategories.parentId,
+          isActive: consumableCategories.isActive,
+          createdAt: consumableCategories.createdAt,
+          updatedAt: consumableCategories.updatedAt
+        })
+        .from(consumableCategories)
+        .where(eq(consumableCategories.isActive, true))
+        .orderBy(consumableCategories.name);
+
+      // Construir estructura de árbol
+      const treeStructure = allCategories.map(category => {
+        const children = allCategories.filter(c => c.parentId === category.id);
+        return {
+          ...category,
+          hasChildren: children.length > 0,
+          childrenCount: children.length,
+          level: category.parentId ? 1 : 0
+        };
+      });
+
+      res.json(treeStructure);
+    } catch (error) {
+      console.error("Error obteniendo estructura de árbol:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // =============== CONSUMIBLES ===============
   
   // GET /api/warehouse/consumables - Obtener todos los consumibles
@@ -179,7 +236,7 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
       }
 
       if (conditions.length > 0) {
-        query = query.where(and(...conditions));
+        query = query.where(and(...conditions)) as typeof query;
       }
 
       const result = await query.orderBy(consumables.name);
@@ -370,7 +427,7 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
       }
 
       if (conditions.length > 0) {
-        query = query.where(and(...conditions));
+        query = query.where(and(...conditions)) as typeof query;
       }
 
       const result = await query.orderBy(parks.name, consumables.name);
@@ -387,7 +444,8 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
       const validatedData = insertInventoryStockSchema.parse(req.body);
       
       // Calcular cantidad disponible
-      const availableQuantity = validatedData.quantity - (validatedData.reservedQuantity || 0);
+      const quantity = validatedData.quantity ?? 0;
+      const availableQuantity = quantity - (validatedData.reservedQuantity || 0);
       
       const [newStock] = await db
         .insert(inventoryStock)
@@ -414,7 +472,8 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
       const validatedData = insertInventoryStockSchema.parse(req.body);
       
       // Calcular cantidad disponible
-      const availableQuantity = validatedData.quantity - (validatedData.reservedQuantity || 0);
+      const quantity = validatedData.quantity ?? 0;
+      const availableQuantity = quantity - (validatedData.reservedQuantity || 0);
       
       const [updatedStock] = await db
         .update(inventoryStock)
@@ -510,7 +569,7 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
       }
 
       if (movementType) {
-        conditions.push(eq(inventoryMovements.movementType, movementType as string));
+        conditions.push(eq(inventoryMovements.movementType, movementType as any));
       }
 
       if (startDate) {
@@ -522,7 +581,7 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
       }
 
       if (conditions.length > 0) {
-        query = query.where(and(...conditions));
+        query = query.where(and(...conditions)) as typeof query;
       }
 
       const result = await query
