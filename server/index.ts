@@ -2374,6 +2374,19 @@ function startServer() {
     }
   });
 
+  // ✅ CRITICAL FIX: Register Firebase Auth routes BEFORE Vite setup
+  try {
+    // Use static import to avoid async/await context issue
+    import('./firebaseAuthRoutes').then(({ registerFirebaseAuthRoutes }) => {
+      registerFirebaseAuthRoutes(app);
+      console.log("✅ [CRITICAL] Firebase auth routes registered BEFORE Vite");
+    }).catch(error => {
+      console.error("❌ [CRITICAL] Error registering Firebase auth routes:", error);
+    });
+  } catch (error) {
+    console.error("❌ [CRITICAL] Error registering Firebase auth routes:", error);
+  }
+
   // Mount critical API router immediately
   app.use('/api', criticalApiRouter);
   console.log("🚀 [IMMEDIATE] Critical API routes (including storage) registered");
@@ -2467,10 +2480,8 @@ function startServer() {
       registerActivityPaymentRoutes(app);
       console.log("✅ [API-PRIORITY] Activity payment routes registered");
 
-      // Register Firebase auth routes
-      const { registerFirebaseAuthRoutes } = await import("./firebaseAuthRoutes");
-      registerFirebaseAuthRoutes(app);
-      console.log("✅ [API-PRIORITY] Firebase auth routes registered");
+      // Firebase auth routes already registered BEFORE Vite setup
+      console.log("✅ [API-PRIORITY] Firebase auth routes already registered (skipping duplicate)");
 
 
       // Register all other routes BEFORE Vite
