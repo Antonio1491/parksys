@@ -160,8 +160,8 @@ export default function RequisitionsPage() {
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
-                    <Badge variant={getStatusVariant(requisition.status)}>
-                      {formatStatus(requisition.status)}
+                    <Badge variant={getStatusVariant(requisition.status || 'draft')}>
+                      {formatStatus(requisition.status || 'draft')}
                     </Badge>
                     {requisition.priority && (
                       <Badge variant={getPriorityVariant(requisition.priority)}>
@@ -184,14 +184,14 @@ export default function RequisitionsPage() {
                     <div>
                       <span className="text-muted-foreground">Solicitante:</span>
                       <p className="font-medium">
-                        {requisition.requestedBy?.fullName || 'N/A'}
+                        {requisition.requestedBy?.fullName ?? 'N/A'}
                       </p>
                     </div>
                     
                     <div>
                       <span className="text-muted-foreground">Destino:</span>
                       <p className="font-medium">
-                        {requisition.destinationPark?.name || 'N/A'}
+                        {requisition.destinationPark?.name ?? 'N/A'}
                       </p>
                     </div>
                     
@@ -199,7 +199,7 @@ export default function RequisitionsPage() {
                       <span className="text-muted-foreground">Fecha necesaria:</span>
                       <p className="font-medium">
                         {requisition.requiredDate 
-                          ? new Date(requisition.requiredDate).toLocaleDateString('es-MX')
+                          ? new Date(requisition.requiredDate.toString()).toLocaleDateString('es-MX')
                           : 'No especificada'
                         }
                       </p>
@@ -208,7 +208,7 @@ export default function RequisitionsPage() {
                     <div>
                       <span className="text-muted-foreground">Creada:</span>
                       <p className="font-medium">
-                        {new Date(requisition.requestDate).toLocaleDateString('es-MX')}
+                        {requisition.requestDate ? new Date(requisition.requestDate.toString()).toLocaleDateString('es-MX') : 'N/A'}
                       </p>
                     </div>
                   </div>
@@ -236,10 +236,10 @@ export default function RequisitionsPage() {
                   {requisition.approvedBy && (
                     <div className="text-sm">
                       <span className="text-muted-foreground">Aprobada por:</span>
-                      <p className="font-medium">{requisition.approvedBy.fullName}</p>
+                      <p className="font-medium">{requisition.approvedBy.fullName ?? 'N/A'}</p>
                       {requisition.approvalDate && (
                         <p className="text-xs text-muted-foreground">
-                          {new Date(requisition.approvalDate).toLocaleString('es-MX')}
+                          {new Date(requisition.approvalDate.toString()).toLocaleString('es-MX')}
                         </p>
                       )}
                     </div>
@@ -258,7 +258,7 @@ export default function RequisitionsPage() {
                       Ver Detalles
                     </Button>
                     
-                    {requisition.status === 'pendiente' && (
+                    {requisition.status === 'submitted' && (
                       <>
                         <Button variant="outline" size="sm" className="text-green-600" data-testid={`button-approve-${requisition.id}`}>
                           <CheckCircle className="h-4 w-4 mr-1" />

@@ -45,7 +45,7 @@ export default function ConsumablesPage() {
   });
 
   const formatCurrency = (amount: number | null) => {
-    if (!amount) return 'N/A';
+    if (!amount || amount === 0) return 'N/A';
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
       currency: 'MXN'

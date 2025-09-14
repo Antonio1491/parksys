@@ -643,7 +643,12 @@ export function registerWarehouseRoutes(app: Express, apiRouter: any, isAuthenti
         .where(
           and(
             sql`${inventoryMovements.movementDate} >= NOW() - INTERVAL '30 days'`,
-            sql`${inventoryMovements.movementType} LIKE 'salida_%'`
+            or(
+              eq(inventoryMovements.movementType, 'salida_consumo'),
+              eq(inventoryMovements.movementType, 'salida_transferencia'),
+              eq(inventoryMovements.movementType, 'salida_merma'),
+              eq(inventoryMovements.movementType, 'salida_robo')
+            )
           )
         )
         .groupBy(inventoryMovements.consumableId, consumables.name, consumables.code)

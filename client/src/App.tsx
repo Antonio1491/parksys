@@ -411,6 +411,34 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/dashboard-incidencias')))}
           </Suspense>
         </Route>
+
+        {/* Rutas del módulo de Almacén */}
+        <Route path="/admin/warehouse/dashboard">
+          <Suspense fallback={<div className="p-8 text-center">Cargando dashboard del almacén...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Dashboard')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/warehouse/consumables">
+          <Suspense fallback={<div className="p-8 text-center">Cargando gestión de consumibles...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Consumables')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/warehouse/stock">
+          <Suspense fallback={<div className="p-8 text-center">Cargando inventario...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Stock')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/warehouse/movements">
+          <Suspense fallback={<div className="p-8 text-center">Cargando movimientos de inventario...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Movements')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/warehouse/requisitions">
+          <Suspense fallback={<div className="p-8 text-center">Cargando requisiciones...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Requisitions')))}
+          </Suspense>
+        </Route>
+
         <Route path="/admin/users">
           <Suspense fallback={<div className="p-8 text-center">Cargando gestión de usuarios...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/users')))}
