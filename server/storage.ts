@@ -1526,110 +1526,118 @@ export class DatabaseStorage implements IStorage {
   }
 
   // ============= PERMISSION SYSTEM IMPLEMENTATION =============
-  // Usando memoria debido a problemas de conexión con la BD
-  private permissionModules: Map<number, any> = new Map();
-  private permissionSubmodules: Map<number, any> = new Map();
-  private permissionPages: Map<number, any> = new Map();
-  private permissionActions: Map<number, any> = new Map();
-  private permissions: Map<number, any> = new Map();
-  private rolePermissions: Map<string, any> = new Map(); // key: `${roleId}-${permissionId}`
-  private permissionsInitialized: boolean = false;
+  // Usando base de datos real - sistema jerárquico completo
 
   async initializePermissions(): Promise<void> {
-    if (this.permissionsInitialized) return;
-    
-    try {
-      // Importar datos del seeder
-      const { PERMISSIONS_SEED_DATA } = await import('./permissions-seeder');
-      
-      // Cargar módulos
-      for (const module of PERMISSIONS_SEED_DATA.modules) {
-        this.permissionModules.set(module.id, module);
-      }
-      
-      // Cargar submódulos
-      for (const submodule of PERMISSIONS_SEED_DATA.submodules) {
-        this.permissionSubmodules.set(submodule.id, submodule);
-      }
-      
-      // Cargar páginas
-      for (const page of PERMISSIONS_SEED_DATA.pages) {
-        this.permissionPages.set(page.id, page);
-      }
-      
-      // Cargar acciones
-      for (const action of PERMISSIONS_SEED_DATA.actions) {
-        this.permissionActions.set(action.id, action);
-      }
-      
-      // Cargar permisos
-      for (const permission of PERMISSIONS_SEED_DATA.permissions) {
-        this.permissions.set(permission.id, permission);
-      }
-      
-      // Cargar permisos de roles
-      for (const rp of PERMISSIONS_SEED_DATA.rolePermissions) {
-        const key = `${rp.roleId}-${rp.permissionId}`;
-        this.rolePermissions.set(key, rp);
-      }
-      
-      this.permissionsInitialized = true;
-      console.log('✅ Sistema de permisos inicializado con:', {
-        modules: this.permissionModules.size,
-        submodules: this.permissionSubmodules.size,
-        pages: this.permissionPages.size,
-        actions: this.permissionActions.size,
-        permissions: this.permissions.size,
-        rolePermissions: this.rolePermissions.size
-      });
-    } catch (error) {
-      console.error('Error inicializando permisos:', error);
-      throw error;
-    }
+    // No hay necesidad de inicialización especial - usamos BD directamente
+    console.log('✅ Sistema de permisos usando base de datos real');
   }
 
   async getPermissionModules(): Promise<any[]> {
-    await this.initializePermissions();
-    return Array.from(this.permissionModules.values()).sort((a, b) => a.order - b.order);
+    try {
+      const result = await db.execute(sql`
+        SELECT * FROM permission_modules 
+        WHERE is_active = true 
+        ORDER BY "order" ASC
+      `);
+      return result.rows;
+    } catch (error) {
+      console.error('Error obteniendo módulos de permisos:', error);
+      return [];
+    }
   }
 
   async getPermissionSubmodules(moduleId?: number): Promise<any[]> {
-    await this.initializePermissions();
-    const submodules = Array.from(this.permissionSubmodules.values());
-    if (moduleId) {
-      return submodules.filter(s => s.moduleId === moduleId).sort((a, b) => a.order - b.order);
+    try {
+      let query = sql`
+        SELECT * FROM permission_submodules 
+        WHERE is_active = true
+      `;
+      
+      if (moduleId) {
+        query = sql`
+          SELECT * FROM permission_submodules 
+          WHERE is_active = true AND module_id = ${moduleId}
+        `;
+      }
+      
+      query = sql`${query} ORDER BY "order" ASC`;
+      
+      const result = await db.execute(query);
+      return result.rows;
+    } catch (error) {
+      console.error('Error obteniendo submódulos de permisos:', error);
+      return [];
     }
-    return submodules.sort((a, b) => a.order - b.order);
   }
 
   async getPermissionPages(submoduleId?: number): Promise<any[]> {
-    await this.initializePermissions();
-    const pages = Array.from(this.permissionPages.values());
-    if (submoduleId) {
-      return pages.filter(p => p.submoduleId === submoduleId).sort((a, b) => a.order - b.order);
+    try {
+      let query = sql`
+        SELECT * FROM permission_pages 
+        WHERE is_active = true
+      `;
+      
+      if (submoduleId) {
+        query = sql`
+          SELECT * FROM permission_pages 
+          WHERE is_active = true AND submodule_id = ${submoduleId}
+        `;
+      }
+      
+      query = sql`${query} ORDER BY "order" ASC`;
+      
+      const result = await db.execute(query);
+      return result.rows;
+    } catch (error) {
+      console.error('Error obteniendo páginas de permisos:', error);
+      return [];
     }
-    return pages.sort((a, b) => a.order - b.order);
   }
 
   async getPermissionActions(): Promise<any[]> {
-    await this.initializePermissions();
-    return Array.from(this.permissionActions.values());
+    try {
+      const result = await db.execute(sql`
+        SELECT * FROM permission_actions 
+        WHERE is_active = true 
+        ORDER BY name ASC
+      `);
+      return result.rows;
+    } catch (error) {
+      console.error('Error obteniendo acciones de permisos:', error);
+      return [];
+    }
   }
 
   async getPermissions(): Promise<any[]> {
-    await this.initializePermissions();
-    return Array.from(this.permissions.values());
+    try {
+      const result = await db.execute(sql`
+        SELECT * FROM system_permissions 
+        WHERE is_active = true 
+        ORDER BY permission_key ASC
+      `);
+      return result.rows;
+    } catch (error) {
+      console.error('Error obteniendo permisos del sistema:', error);
+      return [];
+    }
   }
 
   async getPermissionByKey(key: string): Promise<any> {
-    await this.initializePermissions();
-    const permissions = Array.from(this.permissions.values());
-    return permissions.find(p => p.key === key) || null;
+    try {
+      const result = await db.execute(sql`
+        SELECT * FROM system_permissions 
+        WHERE permission_key = ${key} AND is_active = true
+        LIMIT 1
+      `);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error('Error obteniendo permiso por clave:', error);
+      return null;
+    }
   }
 
   async getUserPermissions(userId: number): Promise<string[]> {
-    await this.initializePermissions();
-    
     try {
       // Obtener el usuario y su rol
       const user = await this.getUser(userId);
@@ -1637,23 +1645,22 @@ export class DatabaseStorage implements IStorage {
         return [];
       }
 
-      // Si es Super Admin (rol 1), devolver todos los permisos
+      // Si es Super Admin (rol 1), devolver permiso especial "all"
       if (user.roleId === 1) {
-        const allPermissions = Array.from(this.permissions.values());
-        return allPermissions.map(p => p.key);
+        return ['all'];
       }
 
-      // Obtener permisos del rol
-      const rolePerms = await this.getRolePermissions(user.roleId);
-      const allowedPermissions = rolePerms
-        .filter(rp => rp.allow)
-        .map(rp => {
-          const permission = this.permissions.get(rp.permissionId);
-          return permission ? permission.key : null;
-        })
-        .filter(key => key !== null);
+      // Obtener permisos específicos del rol desde la BD
+      const result = await db.execute(sql`
+        SELECT sp.permission_key 
+        FROM role_permissions rp
+        JOIN system_permissions sp ON rp.permission_id = sp.id
+        WHERE rp.role_id = ${user.roleId} 
+          AND rp.is_active = true 
+          AND sp.is_active = true
+      `);
 
-      return allowedPermissions;
+      return result.rows.map((row: any) => row.permission_key);
     } catch (error) {
       console.error('Error obteniendo permisos del usuario:', error);
       return [];
@@ -1661,51 +1668,55 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRolePermissions(roleId: number): Promise<any[]> {
-    await this.initializePermissions();
-    const rolePerms: any[] = [];
-    
-    this.rolePermissions.forEach((value, key) => {
-      if (key.startsWith(`${roleId}-`)) {
-        rolePerms.push(value);
-      }
-    });
-    
-    return rolePerms;
+    try {
+      const result = await db.execute(sql`
+        SELECT rp.*, sp.permission_key 
+        FROM role_permissions rp
+        JOIN system_permissions sp ON rp.permission_id = sp.id
+        WHERE rp.role_id = ${roleId} AND rp.is_active = true
+      `);
+      return result.rows;
+    } catch (error) {
+      console.error('Error obteniendo permisos del rol:', error);
+      return [];
+    }
   }
 
   async assignPermissionToRole(roleId: number, permissionId: number, allow: boolean): Promise<any> {
-    await this.initializePermissions();
-    
-    const key = `${roleId}-${permissionId}`;
-    const rolePermission = {
-      roleId,
-      permissionId,
-      allow,
-      createdAt: new Date().toISOString()
-    };
-    
-    this.rolePermissions.set(key, rolePermission);
-    
-    console.log(`✅ Permiso ${permissionId} ${allow ? 'asignado' : 'denegado'} al rol ${roleId}`);
-    return rolePermission;
+    try {
+      const result = await db.execute(sql`
+        INSERT INTO role_permissions (role_id, permission_id, granted_by, is_active)
+        VALUES (${roleId}, ${permissionId}, 1, ${allow})
+        ON CONFLICT (role_id, permission_id) 
+        DO UPDATE SET is_active = ${allow}, granted_at = CURRENT_TIMESTAMP
+        RETURNING *
+      `);
+      
+      console.log(`✅ Permiso ${permissionId} ${allow ? 'asignado' : 'denegado'} al rol ${roleId}`);
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error asignando permiso al rol:', error);
+      throw error;
+    }
   }
 
   async removePermissionFromRole(roleId: number, permissionId: number): Promise<boolean> {
-    await this.initializePermissions();
-    
-    const key = `${roleId}-${permissionId}`;
-    const deleted = this.rolePermissions.delete(key);
-    
-    if (deleted) {
+    try {
+      const result = await db.execute(sql`
+        UPDATE role_permissions 
+        SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = 1
+        WHERE role_id = ${roleId} AND permission_id = ${permissionId}
+      `);
+      
       console.log(`✅ Permiso ${permissionId} removido del rol ${roleId}`);
+      return true;
+    } catch (error) {
+      console.error('Error removiendo permiso del rol:', error);
+      return false;
     }
-    
-    return deleted;
   }
 
   async checkUserPermission(userId: number, permissionKey: string): Promise<boolean> {
-    await this.initializePermissions();
-    
     try {
       // Obtener el usuario
       const user = await this.getUser(userId);
@@ -1718,7 +1729,7 @@ export class DatabaseStorage implements IStorage {
         return true;
       }
 
-      // Obtener permisos del usuario
+      // Obtener permisos del usuario desde la BD
       const userPermissions = await this.getUserPermissions(userId);
       
       // Verificar permiso exacto
@@ -1738,7 +1749,7 @@ export class DatabaseStorage implements IStorage {
 
       return false;
     } catch (error) {
-      console.error('Error verificando permiso:', error);
+      console.error('Error verificando permiso del usuario:', error);
       return false;
     }
   }

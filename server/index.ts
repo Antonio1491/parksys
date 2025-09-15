@@ -2423,6 +2423,7 @@ function startServer() {
     // Inicializar sistema de permisos en memoria
     try {
       console.log('🔐 [PERMISSIONS] Inicializando sistema de permisos...');
+      const { storage } = await import("./storage");
       await storage.initializePermissions();
       console.log('✅ [PERMISSIONS] Sistema de permisos inicializado correctamente');
     } catch (error) {
@@ -2440,8 +2441,41 @@ function startServer() {
       console.error("❌ [API-PRIORITY] Error registering main routes:", error);
     }
     
-    // NOW setup Vite AFTER API routes are registered
-    if (!isProduction) {
+    // 🔧 [FRONTEND-FIX] Environment-controlled static SPA fallback
+    const useStaticFrontend = process.env.USE_PROD_FRONTEND === '1';
+    
+    if (useStaticFrontend) {
+      console.log("🔧 [STATIC-FALLBACK] Using static frontend to bypass Vite issues");
+      try {
+        // Programmatic build
+        const { build } = await import('vite');
+        console.log("🔧 [BUILD] Building frontend...");
+        await build();
+        console.log("✅ [BUILD] Frontend build completed");
+        
+        // Serve static files
+        const distPath = path.join(process.cwd(), 'dist', 'public');
+        app.use(express.static(distPath));
+        console.log("✅ [STATIC] Static files enabled from dist/public");
+        
+        // SPA catch-all (after all API routes)
+        app.get('*', (req, res) => {
+          const indexPath = path.join(distPath, 'index.html');
+          if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+          } else {
+            res.status(404).send('Frontend build not found');
+          }
+        });
+        console.log("✅ [SPA] SPA catch-all route registered");
+        
+      } catch (error) {
+        console.error("❌ [STATIC-FALLBACK] Error setting up static frontend:", error);
+      }
+    }
+    
+    // NOW setup Vite AFTER API routes are registered (only if not using static fallback)
+    if (!isProduction && !useStaticFrontend) {
       try {
         const { setupVite } = await import("./vite");
         await setupVite(app, appServer);
