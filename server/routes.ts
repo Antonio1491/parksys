@@ -1473,7 +1473,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json(simplifiedParks);
       } else {
         // Para la administración, devolver datos completos
-        res.json(parks);
+        res.json({ data: parks });
       }
     } catch (error) {
       console.error("Error al obtener parques:", error);

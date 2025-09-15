@@ -2242,7 +2242,7 @@ function startServer() {
       
       const parks = await getParksDirectly(filters);
       console.log(`🏞️ [CRITICAL] Returning ${parks?.length || 0} parks via critical route`);
-      res.json(parks || []);
+      res.json({ data: parks || [] });
     } catch (error) {
       console.error('❌ [CRITICAL] Error in parks route:', error);
       res.status(500).json({ message: "Error fetching parks" });
