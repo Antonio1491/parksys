@@ -428,11 +428,13 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/ConsumableForm')))}
           </Suspense>
         </Route>
+        {/* Temporalmente comentado debido a errores TypeScript 
         <Route path="/admin/warehouse/consumables/:id/edit">
           <Suspense fallback={<div className="p-8 text-center">Cargando edición de consumible...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/ConsumableEdit')))}
           </Suspense>
         </Route>
+        */}
         <Route path="/admin/warehouse/stock">
           <Suspense fallback={<div className="p-8 text-center">Cargando inventario...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Stock')))}
@@ -441,11 +443,6 @@ function Router() {
         <Route path="/admin/warehouse/stock/new">
           <Suspense fallback={<div className="p-8 text-center">Cargando formulario de stock...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/StockForm')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/warehouse/stock/test">
-          <Suspense fallback={<div className="p-8 text-center">Cargando test de stock...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/StockFormTest')))}
           </Suspense>
         </Route>
         <Route path="/admin/warehouse/stock/:id/edit">

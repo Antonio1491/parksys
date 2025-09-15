@@ -55,18 +55,21 @@ export default function StockForm() {
   // Queries para datos de referencia - Fixed to ensure proper execution
   const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = useQuery<ConsumableCategory[]>({
     queryKey: ['/api/warehouse/categories'],
+    queryFn: () => apiRequest('/api/warehouse/categories'),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
   
   const { data: consumables = [], isLoading: consumablesLoading, error: consumablesError } = useQuery<Consumable[]>({
     queryKey: ['/api/warehouse/consumables'],
+    queryFn: () => apiRequest('/api/warehouse/consumables'),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
   
   const { data: parks = [], isLoading: parksLoading, error: parksError } = useQuery<Park[]>({
     queryKey: ['/api/parks'],
+    queryFn: () => apiRequest('/api/parks'),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
