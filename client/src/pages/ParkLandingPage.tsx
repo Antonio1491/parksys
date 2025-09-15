@@ -1133,8 +1133,8 @@ function ParkLandingPage() {
               {park.concessions && park.concessions.length > 0 ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {park.concessions.map((concession) => (
-                      <Link key={concession.id} href={`/concession/${concession.id}`}>
+                    {park.concessions.map((concession, index) => (
+                      <Link key={`concession-${concession.id}-${index}`} href={`/concession/${concession.id}`}>
                         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-blue-300 group">
                           {/* Imagen de la concesión */}
                           <div className="relative h-48 overflow-hidden">

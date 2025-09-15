@@ -1,0 +1,752 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:22 🔥 Firebase initialized successfully
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 0
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 0
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 0
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 0 Activities: 0 Events: 0
+queryClient.ts:219 🌐 [QUERY] GET /api/activities
+queryClient.ts:219 🌐 [QUERY] GET /api/events
+queryClient.ts:219 🌐 [QUERY] GET /api/activity-categories
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 0
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 0
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 0
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 25 Activities: 25 Events: 0
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 2
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 1: {id: 8, title: 'Otra prueba', status: 'published', startDate: '2025-09-10T00:00:00.000Z', startDateType: 'string', …}
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 2: {id: 7, title: 'Observación de aves', status: 'published', startDate: '2025-09-10T00:00:00.000Z', startDateType: 'string', …}
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 2
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 2
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 27 Activities: 25 Events: 2
+chunk-RPCDYKBN.js?v=14eab8c0:18625 [Violation] 'setTimeout' handler took 59ms
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 2
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 1: {id: 8, title: 'Otra prueba', status: 'published', startDate: '2025-09-10T00:00:00.000Z', startDateType: 'string', …}
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 2: {id: 7, title: 'Observación de aves', status: 'published', startDate: '2025-09-10T00:00:00.000Z', startDateType: 'string', …}
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 2
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 2
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 27 Activities: 25 Events: 2
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ConcessionsList.tsx:63 🏪 CONCESSIONS DEBUG: {concessionsLength: 0, concessionsResponse: undefined, firstConcession: undefined, parksLength: 0}
+queryClient.ts:219 🌐 [QUERY] GET /api/active-concessions
+queryClient.ts:219 🌐 [QUERY] GET /api/parks
+ConcessionsList.tsx:63 🏪 CONCESSIONS DEBUG: {concessionsLength: 4, concessionsResponse: Array(4), firstConcession: {…}, parksLength: 0}
+ConcessionsList.tsx:63 🏪 CONCESSIONS DEBUG: {concessionsLength: 4, concessionsResponse: Array(4), firstConcession: {…}, parksLength: 19}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+AdSpaceIntelligent.tsx:376 ⚠️ No space mapping found for parks:footer
+AdSpaceIntelligent @ AdSpaceIntelligent.tsx:376
+renderWithHooks @ chunk-RPCDYKBN.js?v=14eab8c0:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14582
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=14eab8c0:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=14eab8c0:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=14eab8c0:552
+flush @ @tanstack_react-query.js?v=14eab8c0:576
+batch @ @tanstack_react-query.js?v=14eab8c0:594
+dispatch_fn @ @tanstack_react-query.js?v=14eab8c0:1007
+onError @ @tanstack_react-query.js?v=14eab8c0:872
+reject @ @tanstack_react-query.js?v=14eab8c0:471
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:514
+Promise.catch
+run @ @tanstack_react-query.js?v=14eab8c0:504
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/parks/95/extended
+chunk-RPCDYKBN.js?v=14eab8c0:521 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14290
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=14eab8c0:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=14eab8c0:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=14eab8c0:552
+flush @ @tanstack_react-query.js?v=14eab8c0:576
+batch @ @tanstack_react-query.js?v=14eab8c0:594
+dispatch_fn @ @tanstack_react-query.js?v=14eab8c0:1007
+setData @ @tanstack_react-query.js?v=14eab8c0:705
+onSuccess @ @tanstack_react-query.js?v=14eab8c0:908
+resolve @ @tanstack_react-query.js?v=14eab8c0:462
+Promise.then
+run @ @tanstack_react-query.js?v=14eab8c0:504
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:19328
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+chunk-RPCDYKBN.js?v=14eab8c0:521 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14290
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=14eab8c0:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=14eab8c0:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=14eab8c0:552
+flush @ @tanstack_react-query.js?v=14eab8c0:576
+batch @ @tanstack_react-query.js?v=14eab8c0:594
+dispatch_fn @ @tanstack_react-query.js?v=14eab8c0:1007
+setData @ @tanstack_react-query.js?v=14eab8c0:705
+onSuccess @ @tanstack_react-query.js?v=14eab8c0:908
+resolve @ @tanstack_react-query.js?v=14eab8c0:462
+Promise.then
+run @ @tanstack_react-query.js?v=14eab8c0:504
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:19328
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+queryClient.ts:32 🌐 [SAFE API] GET /api/parks/95/evaluation-stats
+parque/parque-la-mexicana-95:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+uploads/volunteers/volunteer-1757957376766-540847789.jpg:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/volunteers/volunteer-1757957376766-540847789.jpg 404 (Not Found)
+Image
+commitMount @ chunk-RPCDYKBN.js?v=14eab8c0:8412
+commitLayoutEffectOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:17102
+commitLayoutMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:17980
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:17969
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:17950
+commitLayoutEffects @ chunk-RPCDYKBN.js?v=14eab8c0:17920
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19353
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=14eab8c0:552
+flush @ @tanstack_react-query.js?v=14eab8c0:576
+batch @ @tanstack_react-query.js?v=14eab8c0:594
+dispatch_fn @ @tanstack_react-query.js?v=14eab8c0:1007
+setData @ @tanstack_react-query.js?v=14eab8c0:705
+onSuccess @ @tanstack_react-query.js?v=14eab8c0:908
+resolve @ @tanstack_react-query.js?v=14eab8c0:462
+Promise.then
+run @ @tanstack_react-query.js?v=14eab8c0:504
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:19328
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+main.js:312  GET https://maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true net::ERR_BLOCKED_BY_CLIENT
+_.z.send @ main.js:312
+$ca @ main.js:291
+bda @ main.js:283
+await in bda
+google.maps.Load @ js?client=google-maps-embed&paint_origin=&libraries=geometry,search&v=weekly&loading=async&language=es_ES&callback=onApiLoad:38
+(anonymous) @ main.js:553
+(anonymous) @ main.js:553
+init_embed.js:286 Search endpoint requested!
+client:64 [vite] invalidate /src/components/ui/button.tsx: Could not Fast Refresh ("buttonVariants" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+client:223 [vite] hot updated: /src/components/ui/button.tsx
+client:223 [vite] hot updated: /src/index.css?v=DPBq4TvocaXV3cjQyuH2i
+client:223 [vite] hot updated: /src/pages/admin/parks.tsx
+client:223 [vite] hot updated: /src/index.css?v=DPBq4TvocaXV3cjQyuH2i
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+client:223 [vite] hot updated: /src/index.css?v=DPBq4TvocaXV3cjQyuH2i
+client:223 [vite] hot updated: /src/pages/park-detail.tsx
+client:223 [vite] hot updated: /src/pages/parks.tsx
+client:223 [vite] hot updated: /src/pages/home.tsx
+client:223 [vite] hot updated: /src/pages/ParksModuleShowcase.tsx
+client:223 [vite] hot updated: /src/pages/ParkEvaluationForm.tsx
+client:223 [vite] hot updated: /src/pages/admin/amenities.tsx
+client:223 [vite] hot updated: /src/pages/activity-detail.tsx
+client:223 [vite] hot updated: /src/pages/Landing.tsx
+client:223 [vite] hot updated: /src/pages/admin/index.tsx
+client:223 [vite] hot updated: /src/pages/admin/parks-import.tsx
+client:223 [vite] hot updated: /src/pages/admin/parks.tsx
+client:223 [vite] hot updated: /src/pages/admin/comments.tsx
+client:223 [vite] hot updated: /src/pages/admin/documents.tsx
+client:223 [vite] hot updated: /src/pages/admin/park-view.tsx
+client:223 [vite] hot updated: /src/pages/admin/park-edit.tsx
+client:223 [vite] hot updated: /src/pages/admin/activities.tsx
+client:223 [vite] hot updated: /src/pages/admin/analytics.tsx
+client:223 [vite] hot updated: /src/pages/public/instructor-registration.tsx
+client:223 [vite] hot updated: /src/pages/admin/pending-users.tsx
+client:223 [vite] hot updated: /src/pages/admin/settings.tsx
+client:223 [vite] hot updated: /src/pages/admin/payments.tsx
+client:223 [vite] hot updated: /src/pages/admin/volunteers/participations/edit.tsx
+client:223 [vite] hot updated: /src/pages/admin/volunteers/participations.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/index.tsx
+client:223 [vite] hot updated: /src/components/Header.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/new-fixed.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/categories.tsx
+client:223 [vite] hot updated: /src/components/IncidentReportForm.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/registrations/index.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/edit.tsx
+client:223 [vite] hot updated: /src/pages/admin/configuracion-seguridad/access/users.tsx
+client:223 [vite] hot updated: /src/pages/admin/evaluaciones/parques.tsx
+client:223 [vite] hot updated: /src/components/ParkQuickActions.tsx
+client:223 [vite] hot updated: /src/components/ParkDetail.tsx
+client:223 [vite] hot updated: /src/components/ParkImageManager.tsx
+client:223 [vite] hot updated: /src/components/ui/alert-dialog.tsx
+client:223 [vite] hot updated: /src/components/ActivityPaymentForm.tsx
+client:223 [vite] hot updated: /src/components/PublicInstructorEvaluationForm.tsx
+client:223 [vite] hot updated: /src/components/ui/export-button.tsx
+client:223 [vite] hot updated: /src/components/ParkIncidentsInventory.tsx
+client:223 [vite] hot updated: /src/components/FirebaseLoginForm.tsx
+client:223 [vite] hot updated: /src/components/ui/pagination.tsx
+client:223 [vite] hot updated: /src/components/ui/dashboard-layout.tsx
+client:223 [vite] hot updated: /src/components/ui/calendar.tsx
+client:223 [vite] hot updated: /src/components/NotificationBell.tsx
+client:223 [vite] hot updated: /src/components/LanguageSelector.tsx
+client:223 [vite] hot updated: /src/components/HelpCenter.tsx
+client:223 [vite] hot updated: /src/components/EventImageUploader.tsx
+client:223 [vite] hot updated: /src/components/AdminSidebarComplete.tsx
+client:223 [vite] hot updated: /src/components/ui/export-config-form.tsx
+client:223 [vite] hot updated: /src/pages/calendar.tsx
+client:223 [vite] hot updated: /src/pages/ConcessionsList.tsx
+client:223 [vite] hot updated: /src/pages/ParkLandingPage.tsx
+client:223 [vite] hot updated: /src/components/ParkEvaluationsSectionSimple.tsx
+@react-refresh:267 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx?t=1757962848936:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14292
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=14eab8c0:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=14eab8c0:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+flushSync @ chunk-RPCDYKBN.js?v=14eab8c0:18959
+scheduleRefresh @ chunk-RPCDYKBN.js?v=14eab8c0:20004
+(anonymous) @ @react-refresh:267
+performReactRefresh @ @react-refresh:256
+(anonymous) @ @react-refresh:677
+setTimeout
+(anonymous) @ @react-refresh:666
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:728
+(anonymous) @ ParkEvaluationsSectionSimple.tsx:46
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:642
+handleMessage @ client:640
+(anonymous) @ client:550
+@react-refresh:267 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx?t=1757962848936:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14292
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=14eab8c0:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=14eab8c0:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+flushSync @ chunk-RPCDYKBN.js?v=14eab8c0:18959
+scheduleRefresh @ chunk-RPCDYKBN.js?v=14eab8c0:20004
+(anonymous) @ @react-refresh:267
+performReactRefresh @ @react-refresh:256
+(anonymous) @ @react-refresh:677
+setTimeout
+(anonymous) @ @react-refresh:666
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:728
+(anonymous) @ ParkEvaluationsSectionSimple.tsx:46
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:642
+handleMessage @ client:640
+(anonymous) @ client:550
+queryClient.ts:32 🌐 [SAFE API] GET /api/parks/95/evaluation-stats
+client:64 [vite] invalidate /src/components/ui/button.tsx: Could not Fast Refresh ("buttonVariants" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+client:223 [vite] hot updated: /src/components/ui/button.tsx
+client:223 [vite] hot updated: /src/index.css?v=DPBq4TvocaXV3cjQyuH2i
+client:223 [vite] hot updated: /src/index.css?v=DPBq4TvocaXV3cjQyuH2i
+client:223 [vite] hot updated: /src/pages/park-detail.tsx
+client:223 [vite] hot updated: /src/pages/parks.tsx
+client:223 [vite] hot updated: /src/pages/home.tsx
+client:223 [vite] hot updated: /src/pages/ParksModuleShowcase.tsx
+client:223 [vite] hot updated: /src/pages/ParkEvaluationForm.tsx
+client:223 [vite] hot updated: /src/pages/admin/amenities.tsx
+client:223 [vite] hot updated: /src/pages/activity-detail.tsx
+client:223 [vite] hot updated: /src/pages/Landing.tsx
+client:223 [vite] hot updated: /src/pages/admin/index.tsx
+client:223 [vite] hot updated: /src/pages/admin/parks-import.tsx
+client:223 [vite] hot updated: /src/pages/admin/parks.tsx
+client:223 [vite] hot updated: /src/pages/admin/comments.tsx
+client:223 [vite] hot updated: /src/pages/admin/documents.tsx
+client:223 [vite] hot updated: /src/pages/admin/park-view.tsx
+client:223 [vite] hot updated: /src/pages/admin/park-edit.tsx
+client:223 [vite] hot updated: /src/pages/admin/activities.tsx
+client:223 [vite] hot updated: /src/pages/admin/analytics.tsx
+client:223 [vite] hot updated: /src/pages/public/instructor-registration.tsx
+client:223 [vite] hot updated: /src/pages/admin/pending-users.tsx
+client:223 [vite] hot updated: /src/pages/admin/settings.tsx
+client:223 [vite] hot updated: /src/pages/admin/payments.tsx
+client:223 [vite] hot updated: /src/pages/admin/volunteers/participations/edit.tsx
+client:223 [vite] hot updated: /src/pages/admin/volunteers/participations.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/index.tsx
+client:223 [vite] hot updated: /src/components/Header.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/new-fixed.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/categories.tsx
+client:223 [vite] hot updated: /src/components/IncidentReportForm.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/registrations/index.tsx
+client:223 [vite] hot updated: /src/pages/admin/events/edit.tsx
+client:223 [vite] hot updated: /src/pages/admin/configuracion-seguridad/access/users.tsx
+client:223 [vite] hot updated: /src/pages/admin/evaluaciones/parques.tsx
+client:223 [vite] hot updated: /src/components/ParkQuickActions.tsx
+client:223 [vite] hot updated: /src/components/ParkDetail.tsx
+client:223 [vite] hot updated: /src/components/ParkImageManager.tsx
+client:223 [vite] hot updated: /src/components/ui/alert-dialog.tsx
+client:223 [vite] hot updated: /src/components/ActivityPaymentForm.tsx
+client:223 [vite] hot updated: /src/components/PublicInstructorEvaluationForm.tsx
+client:223 [vite] hot updated: /src/components/ui/export-button.tsx
+client:223 [vite] hot updated: /src/components/ParkIncidentsInventory.tsx
+client:223 [vite] hot updated: /src/components/FirebaseLoginForm.tsx
+client:223 [vite] hot updated: /src/components/ui/pagination.tsx
+client:223 [vite] hot updated: /src/components/ui/dashboard-layout.tsx
+client:223 [vite] hot updated: /src/components/ui/calendar.tsx
+client:223 [vite] hot updated: /src/components/NotificationBell.tsx
+client:223 [vite] hot updated: /src/components/LanguageSelector.tsx
+client:223 [vite] hot updated: /src/components/HelpCenter.tsx
+client:223 [vite] hot updated: /src/components/EventImageUploader.tsx
+client:223 [vite] hot updated: /src/components/AdminSidebarComplete.tsx
+client:223 [vite] hot updated: /src/components/ui/export-config-form.tsx
+client:223 [vite] hot updated: /src/pages/calendar.tsx
+client:223 [vite] hot updated: /src/pages/ConcessionsList.tsx
+client:223 [vite] hot updated: /src/pages/ParkLandingPage.tsx
+client:223 [vite] hot updated: /src/components/ParkEvaluationsSectionSimple.tsx
+@react-refresh:267 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx?t=1757962859666:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14292
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=14eab8c0:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=14eab8c0:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+flushSync @ chunk-RPCDYKBN.js?v=14eab8c0:18959
+scheduleRefresh @ chunk-RPCDYKBN.js?v=14eab8c0:20004
+(anonymous) @ @react-refresh:267
+performReactRefresh @ @react-refresh:256
+(anonymous) @ @react-refresh:677
+setTimeout
+(anonymous) @ @react-refresh:666
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:728
+(anonymous) @ ParkEvaluationsSectionSimple.tsx:46
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:642
+handleMessage @ client:640
+(anonymous) @ client:550
+@react-refresh:267 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx?t=1757962859666:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14292
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=14eab8c0:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=14eab8c0:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+flushSync @ chunk-RPCDYKBN.js?v=14eab8c0:18959
+scheduleRefresh @ chunk-RPCDYKBN.js?v=14eab8c0:20004
+(anonymous) @ @react-refresh:267
+performReactRefresh @ @react-refresh:256
+(anonymous) @ @react-refresh:677
+setTimeout
+(anonymous) @ @react-refresh:666
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:728
+(anonymous) @ ParkEvaluationsSectionSimple.tsx:46
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:642
+handleMessage @ client:640
+(anonymous) @ client:550
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:32 🌐 [SAFE API] GET /api/parks/95/evaluation-stats
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ConcessionsList.tsx:63 🏪 CONCESSIONS DEBUG: {concessionsLength: 4, concessionsResponse: Array(4), firstConcession: {…}, parksLength: 19}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+chunk-RPCDYKBN.js?v=14eab8c0:521 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx?t=1757962859666:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14290
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopConcurrent @ chunk-RPCDYKBN.js?v=14eab8c0:19189
+renderRootConcurrent @ chunk-RPCDYKBN.js?v=14eab8c0:19164
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18678
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+chunk-RPCDYKBN.js?v=14eab8c0:521 Warning: Encountered two children with the same key, `8`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at _c9 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx?t=1757962859666:60:20)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=nnrViShAqkYfvV2LuLtAV:62:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+printWarning @ chunk-RPCDYKBN.js?v=14eab8c0:521
+error @ chunk-RPCDYKBN.js?v=14eab8c0:505
+warnOnInvalidKey @ chunk-RPCDYKBN.js?v=14eab8c0:10219
+reconcileChildrenArray @ chunk-RPCDYKBN.js?v=14eab8c0:10235
+reconcileChildFibers2 @ chunk-RPCDYKBN.js?v=14eab8c0:10559
+reconcileChildren @ chunk-RPCDYKBN.js?v=14eab8c0:14290
+updateHostComponent @ chunk-RPCDYKBN.js?v=14eab8c0:14807
+beginWork @ chunk-RPCDYKBN.js?v=14eab8c0:15935
+beginWork$1 @ chunk-RPCDYKBN.js?v=14eab8c0:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19198
+workLoopConcurrent @ chunk-RPCDYKBN.js?v=14eab8c0:19189
+renderRootConcurrent @ chunk-RPCDYKBN.js?v=14eab8c0:19164
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18678
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+queryClient.ts:32 🌐 [SAFE API] GET /api/parks/95/evaluation-stats
+volunteer-1757957376766-540847789.jpg:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/volunteers/volunteer-1757957376766-540847789.jpg 404 (Not Found)
+Image
+setValueForProperty @ chunk-RPCDYKBN.js?v=14eab8c0:1270
+setInitialDOMProperties @ chunk-RPCDYKBN.js?v=14eab8c0:7462
+setInitialProperties @ chunk-RPCDYKBN.js?v=14eab8c0:7595
+finalizeInitialChildren @ chunk-RPCDYKBN.js?v=14eab8c0:8345
+completeWork @ chunk-RPCDYKBN.js?v=14eab8c0:16293
+completeUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19224
+performUnitOfWork @ chunk-RPCDYKBN.js?v=14eab8c0:19206
+workLoopConcurrent @ chunk-RPCDYKBN.js?v=14eab8c0:19189
+renderRootConcurrent @ chunk-RPCDYKBN.js?v=14eab8c0:19164
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18678
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+main.js:312  GET https://maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true net::ERR_BLOCKED_BY_CLIENT
+_.z.send @ main.js:312
+$ca @ main.js:291
+bda @ main.js:283
+await in bda
+google.maps.Load @ js?client=google-maps-embed&paint_origin=&libraries=geometry,search&v=weekly&loading=async&language=es_ES&callback=onApiLoad:38
+(anonymous) @ main.js:553
+(anonymous) @ main.js:553
+init_embed.js:286 Search endpoint requested!
