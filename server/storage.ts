@@ -97,6 +97,20 @@ export interface IStorage {
   getActivityById(id: number): Promise<any>;
   getActivityRegistrationById(id: number): Promise<any>;
   updateActivityRegistration(id: number, data: any): Promise<any>;
+  
+  // Permission System methods
+  getPermissionModules(): Promise<any[]>;
+  getPermissionSubmodules(moduleId?: number): Promise<any[]>;
+  getPermissionPages(submoduleId?: number): Promise<any[]>;
+  getPermissionActions(): Promise<any[]>;
+  getPermissions(): Promise<any[]>;
+  getPermissionByKey(key: string): Promise<any>;
+  getUserPermissions(userId: number): Promise<string[]>;
+  getRolePermissions(roleId: number): Promise<any[]>;
+  assignPermissionToRole(roleId: number, permissionId: number, allow: boolean): Promise<any>;
+  removePermissionFromRole(roleId: number, permissionId: number): Promise<boolean>;
+  checkUserPermission(userId: number, permissionKey: string): Promise<boolean>;
+  initializePermissions(): Promise<void>;
 }
 
 // Implementación simplificada
@@ -1508,6 +1522,224 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error al crear parque:", error);
       throw error;
+    }
+  }
+
+  // ============= PERMISSION SYSTEM IMPLEMENTATION =============
+  // Usando memoria debido a problemas de conexión con la BD
+  private permissionModules: Map<number, any> = new Map();
+  private permissionSubmodules: Map<number, any> = new Map();
+  private permissionPages: Map<number, any> = new Map();
+  private permissionActions: Map<number, any> = new Map();
+  private permissions: Map<number, any> = new Map();
+  private rolePermissions: Map<string, any> = new Map(); // key: `${roleId}-${permissionId}`
+  private permissionsInitialized: boolean = false;
+
+  async initializePermissions(): Promise<void> {
+    if (this.permissionsInitialized) return;
+    
+    try {
+      // Importar datos del seeder
+      const { PERMISSIONS_SEED_DATA } = await import('./permissions-seeder');
+      
+      // Cargar módulos
+      for (const module of PERMISSIONS_SEED_DATA.modules) {
+        this.permissionModules.set(module.id, module);
+      }
+      
+      // Cargar submódulos
+      for (const submodule of PERMISSIONS_SEED_DATA.submodules) {
+        this.permissionSubmodules.set(submodule.id, submodule);
+      }
+      
+      // Cargar páginas
+      for (const page of PERMISSIONS_SEED_DATA.pages) {
+        this.permissionPages.set(page.id, page);
+      }
+      
+      // Cargar acciones
+      for (const action of PERMISSIONS_SEED_DATA.actions) {
+        this.permissionActions.set(action.id, action);
+      }
+      
+      // Cargar permisos
+      for (const permission of PERMISSIONS_SEED_DATA.permissions) {
+        this.permissions.set(permission.id, permission);
+      }
+      
+      // Cargar permisos de roles
+      for (const rp of PERMISSIONS_SEED_DATA.rolePermissions) {
+        const key = `${rp.roleId}-${rp.permissionId}`;
+        this.rolePermissions.set(key, rp);
+      }
+      
+      this.permissionsInitialized = true;
+      console.log('✅ Sistema de permisos inicializado con:', {
+        modules: this.permissionModules.size,
+        submodules: this.permissionSubmodules.size,
+        pages: this.permissionPages.size,
+        actions: this.permissionActions.size,
+        permissions: this.permissions.size,
+        rolePermissions: this.rolePermissions.size
+      });
+    } catch (error) {
+      console.error('Error inicializando permisos:', error);
+      throw error;
+    }
+  }
+
+  async getPermissionModules(): Promise<any[]> {
+    await this.initializePermissions();
+    return Array.from(this.permissionModules.values()).sort((a, b) => a.order - b.order);
+  }
+
+  async getPermissionSubmodules(moduleId?: number): Promise<any[]> {
+    await this.initializePermissions();
+    const submodules = Array.from(this.permissionSubmodules.values());
+    if (moduleId) {
+      return submodules.filter(s => s.moduleId === moduleId).sort((a, b) => a.order - b.order);
+    }
+    return submodules.sort((a, b) => a.order - b.order);
+  }
+
+  async getPermissionPages(submoduleId?: number): Promise<any[]> {
+    await this.initializePermissions();
+    const pages = Array.from(this.permissionPages.values());
+    if (submoduleId) {
+      return pages.filter(p => p.submoduleId === submoduleId).sort((a, b) => a.order - b.order);
+    }
+    return pages.sort((a, b) => a.order - b.order);
+  }
+
+  async getPermissionActions(): Promise<any[]> {
+    await this.initializePermissions();
+    return Array.from(this.permissionActions.values());
+  }
+
+  async getPermissions(): Promise<any[]> {
+    await this.initializePermissions();
+    return Array.from(this.permissions.values());
+  }
+
+  async getPermissionByKey(key: string): Promise<any> {
+    await this.initializePermissions();
+    const permissions = Array.from(this.permissions.values());
+    return permissions.find(p => p.key === key) || null;
+  }
+
+  async getUserPermissions(userId: number): Promise<string[]> {
+    await this.initializePermissions();
+    
+    try {
+      // Obtener el usuario y su rol
+      const user = await this.getUser(userId);
+      if (!user || !user.roleId) {
+        return [];
+      }
+
+      // Si es Super Admin (rol 1), devolver todos los permisos
+      if (user.roleId === 1) {
+        const allPermissions = Array.from(this.permissions.values());
+        return allPermissions.map(p => p.key);
+      }
+
+      // Obtener permisos del rol
+      const rolePerms = await this.getRolePermissions(user.roleId);
+      const allowedPermissions = rolePerms
+        .filter(rp => rp.allow)
+        .map(rp => {
+          const permission = this.permissions.get(rp.permissionId);
+          return permission ? permission.key : null;
+        })
+        .filter(key => key !== null);
+
+      return allowedPermissions;
+    } catch (error) {
+      console.error('Error obteniendo permisos del usuario:', error);
+      return [];
+    }
+  }
+
+  async getRolePermissions(roleId: number): Promise<any[]> {
+    await this.initializePermissions();
+    const rolePerms: any[] = [];
+    
+    this.rolePermissions.forEach((value, key) => {
+      if (key.startsWith(`${roleId}-`)) {
+        rolePerms.push(value);
+      }
+    });
+    
+    return rolePerms;
+  }
+
+  async assignPermissionToRole(roleId: number, permissionId: number, allow: boolean): Promise<any> {
+    await this.initializePermissions();
+    
+    const key = `${roleId}-${permissionId}`;
+    const rolePermission = {
+      roleId,
+      permissionId,
+      allow,
+      createdAt: new Date().toISOString()
+    };
+    
+    this.rolePermissions.set(key, rolePermission);
+    
+    console.log(`✅ Permiso ${permissionId} ${allow ? 'asignado' : 'denegado'} al rol ${roleId}`);
+    return rolePermission;
+  }
+
+  async removePermissionFromRole(roleId: number, permissionId: number): Promise<boolean> {
+    await this.initializePermissions();
+    
+    const key = `${roleId}-${permissionId}`;
+    const deleted = this.rolePermissions.delete(key);
+    
+    if (deleted) {
+      console.log(`✅ Permiso ${permissionId} removido del rol ${roleId}`);
+    }
+    
+    return deleted;
+  }
+
+  async checkUserPermission(userId: number, permissionKey: string): Promise<boolean> {
+    await this.initializePermissions();
+    
+    try {
+      // Obtener el usuario
+      const user = await this.getUser(userId);
+      if (!user || !user.roleId) {
+        return false;
+      }
+
+      // Super Admin siempre tiene todos los permisos
+      if (user.roleId === 1) {
+        return true;
+      }
+
+      // Obtener permisos del usuario
+      const userPermissions = await this.getUserPermissions(userId);
+      
+      // Verificar permiso exacto
+      if (userPermissions.includes(permissionKey)) {
+        return true;
+      }
+
+      // Verificar permisos jerárquicos
+      // Por ejemplo, si tiene 'parks:admin', también tiene 'parks:admin:list:view'
+      const keyParts = permissionKey.split(':');
+      for (let i = keyParts.length - 1; i > 0; i--) {
+        const parentKey = keyParts.slice(0, i).join(':');
+        if (userPermissions.includes(parentKey)) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Error verificando permiso:', error);
+      return false;
     }
   }
 }

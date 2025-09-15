@@ -252,25 +252,7 @@ export const payrollDetails = pgTable("payroll_details", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Actualizar la tabla existente de gastos para incluir campos de nómina
-export const actualExpensesWithPayroll = pgTable("actual_expenses", {
-  id: serial("id").primaryKey(),
-  parkId: integer("park_id").notNull(),
-  categoryId: integer("category_id").references(() => expenseCategories.id),
-  concept: varchar("concept", { length: 200 }).notNull(),
-  amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
-  date: date("date").notNull(),
-  month: integer("month").notNull(),
-  year: integer("year").notNull(),
-  supplier: varchar("supplier", { length: 200 }),
-  description: text("description"),
-  referenceNumber: varchar("reference_number", { length: 50 }),
-  isPaid: boolean("is_paid").default(false),
-  // Campos adicionales para integración con nómina
-  payrollPeriodId: integer("payroll_period_id").references(() => payrollPeriods.id),
-  isPayrollGenerated: boolean("is_payroll_generated").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+// Nota: Los campos de nómina están integrados en la tabla actualExpenses principal
 
 // Relaciones HR
 export const employeesRelations = relations(employees, ({ many }) => ({
@@ -955,8 +937,7 @@ export type InsertActivity = typeof activities.$inferInsert;
 
 export const insertActivitySchema = createInsertSchema(activities).omit({ 
   id: true,
-  createdAt: true,
-  updatedAt: true
+  createdAt: true
 });
 
 export type ActivityImage = typeof activityImages.$inferSelect;
