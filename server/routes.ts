@@ -8057,7 +8057,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`⚠️ [HYBRID-STORAGE] Archivo no existe en Object Storage, intentando filesystem: ${filename}`);
       }
       
-      // PASO 2: Fallback al filesystem local
+      // PASO 2: Fallback al filesystem local (public)
       const filesystemPath = path.join(process.cwd(), 'public', filename);
       console.log(`🔍 [HYBRID-STORAGE] Verificando filesystem: ${filesystemPath}`);
         
@@ -8090,6 +8090,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return;
         } else {
           console.log(`❌ [HYBRID-STORAGE] Archivo no encontrado en filesystem: ${filesystemPath}`);
+        }
+        
+        // PASO 2.5: Fallback adicional al workspace raíz (para event-images, etc.)
+        const workspaceFilesystemPath = path.join(process.cwd(), filename);
+        console.log(`🔍 [HYBRID-STORAGE] Verificando workspace filesystem: ${workspaceFilesystemPath}`);
+        
+        if (fs.existsSync(workspaceFilesystemPath)) {
+          console.log(`✅ [HYBRID-STORAGE] Archivo encontrado en workspace filesystem: ${workspaceFilesystemPath}`);
+          
+          // Determinar Content-Type
+          let contentType = 'application/octet-stream';
+          const ext = path.extname(filename).toLowerCase();
+          
+          if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+          else if (ext === '.png') contentType = 'image/png';
+          else if (ext === '.gif') contentType = 'image/gif';
+          else if (ext === '.webp') contentType = 'image/webp';
+          else if (ext === '.svg') contentType = 'image/svg+xml';
+          
+          const stat = fs.statSync(workspaceFilesystemPath);
+          
+          res.set({
+            'Content-Type': contentType,
+            'Content-Length': stat.size.toString(),
+            'Cache-Control': 'public, max-age=3600'
+          });
+          
+          // Enviar archivo desde workspace filesystem
+          const stream = fs.createReadStream(workspaceFilesystemPath);
+          stream.pipe(res);
+          
+          console.log(`✅ [HYBRID-STORAGE] Archivo servido desde workspace filesystem: ${filename}`);
+          return;
+        } else {
+          console.log(`❌ [HYBRID-STORAGE] Archivo no encontrado en workspace filesystem: ${workspaceFilesystemPath}`);
         }
       
       // PASO 3: Si ambos fallan
