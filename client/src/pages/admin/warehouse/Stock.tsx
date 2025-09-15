@@ -73,15 +73,19 @@ export default function StockPage() {
   };
 
   // ===== QUERIES =====
-  const { data: parks = [], isLoading: parksLoading } = useQuery<Park[]>({
+  const { data: parksResponse, isLoading: parksLoading } = useQuery<{data: Park[]}>({
     queryKey: ['/api/parks'],
     queryFn: () => apiRequest('/api/parks'),
   });
+  
+  const parks = parksResponse?.data || [];
 
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery<ConsumableCategory[]>({
+  const { data: categoriesResponse, isLoading: categoriesLoading } = useQuery<{data: ConsumableCategory[]}>({
     queryKey: ['/api/warehouse/categories'],
     queryFn: () => apiRequest('/api/warehouse/categories'),
   });
+  
+  const categories = categoriesResponse?.data || [];
 
   const { data: stockResponse, isLoading: stockLoading } = useQuery<{
     data: StockWithRelations[];
