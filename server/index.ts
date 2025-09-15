@@ -2393,12 +2393,29 @@ function startServer() {
         await setupVite(app, appServer);
         console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");
         
-        // Vite's built-in SPA handler will manage all non-API routes
-        console.log("🎨 [SPA-DEV] SPA routing delegated to Vite middleware");
+        // 🎨 Vite's built-in "*" handler already handles SPA routing in development
+        console.log("🎨 [SPA-DEV] SPA routing delegated to Vite middleware with built-in '*' handler");
         
       } catch (error) {
         console.error("❌ [FRONTEND] Error setting up Vite:", error);
       }
+    } else {
+      // 🔧 PRODUCTION SPA FALLBACK: Serve index.html for all non-API routes
+      const path = require('path');
+      const fs = require('fs');
+      const indexPath = path.join(__dirname, '../dist/public/index.html');
+      
+      app.get(/^\/(?!api|uploads|public|public-objects|liveness|readiness|health|cloudrun-health|ping|ready).*/, (req, res) => {
+        if (fs.existsSync(indexPath)) {
+          console.log(`🎨 [SPA-PROD] Serving index.html for route: ${req.path}`);
+          res.sendFile(indexPath);
+        } else {
+          console.error(`❌ [SPA-PROD] index.html not found at: ${indexPath}`);
+          res.status(404).send('Application not built');
+        }
+      });
+      
+      console.log("🎨 [SPA-PROD] Production SPA fallback registered");
     }
     
     // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
