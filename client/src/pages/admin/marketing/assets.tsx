@@ -74,7 +74,11 @@ export default function SponsoredAssetsPage() {
   // Fetch all physical assets
   const { data: physicalAssets = [] } = useQuery({
     queryKey: ['/api/assets'],
-    queryFn: () => apiRequest('/api/assets').then(res => res.data || [])
+    queryFn: () => apiRequest('/api/assets').then(res => {
+      console.log('🔍 [DEBUG] Raw assets response:', res);
+      console.log('🔍 [DEBUG] Assets data:', res.data || res || []);
+      return res.data || res || [];
+    })
   });
 
   // Fetch sponsorship asset links
@@ -153,8 +157,10 @@ export default function SponsoredAssetsPage() {
 
   const getActiveContracts = () => {
     console.log('🔍 [DEBUG] All contracts before filter:', contracts);
+    console.log('🔍 [DEBUG] First contract structure:', contracts[0]);
     const filtered = contracts.filter((contract: Contract) => contract.status === 'activo');
     console.log('🔍 [DEBUG] Active contracts after filter:', filtered);
+    console.log('🔍 [DEBUG] First filtered contract fields:', filtered[0] ? Object.keys(filtered[0]) : 'No contracts');
     return filtered;
   };
 
