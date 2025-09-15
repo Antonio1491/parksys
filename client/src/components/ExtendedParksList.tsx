@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { ExtendedPark, Amenity } from '@shared/schema';
@@ -99,32 +99,30 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
     );
   }
 
-  // Función para renderizar una tarjeta de parque
-  const renderParkCard = (park: ExtendedPark, size: 'normal' | 'large' | 'wide' = 'normal') => {
+  // Componente de tarjeta de parque con manejo de estado
+  const ParkCard = ({ park, size = 'normal' }: { park: ExtendedPark; size?: 'normal' | 'large' | 'wide' }) => {
+    const [imageError, setImageError] = useState(false);
     const aspectRatio = size === 'wide' ? 'aspect-[16/6]' : size === 'large' ? 'aspect-[3/2]' : 'aspect-[3/2]';
     const textSize = size === 'wide' ? 'text-xl md:text-2xl' : size === 'large' ? 'text-lg' : 'text-base md:text-lg';
     
     return (
       <Link 
-        key={park.id}
         href={`/parque/${generateParkSlug(park.name, park.id)}`}
         className="group cursor-pointer"
       >
         <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
           <div className={`relative ${aspectRatio} overflow-hidden`}>
-            {park.primaryImage ? (
+            {park.primaryImage && !imageError ? (
               <img
                 src={park.primaryImage}
                 alt={park.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60';
-                }}
+                onError={() => setImageError(true)}
+                data-testid={`img-park-${park.id}`}
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
-                <MapPin className={`text-primary-600 ${size === 'wide' ? 'h-16 w-16' : 'h-12 w-12'}`} />
+              <div className="w-full h-full bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
+                <MapPin className={`text-green-600 ${size === 'wide' ? 'h-16 w-16' : 'h-12 w-12'}`} />
               </div>
             )}
             
@@ -166,42 +164,42 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
       {/* Fila 1: 2 tarjetas grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {parks.slice(0, 2).map((park) => (
-          <div key={park.id}>{renderParkCard(park, 'large')}</div>
+          <ParkCard key={park.id} park={park} size="large" />
         ))}
       </div>
 
       {/* Fila 2: 3 tarjetas normales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {parks.slice(2, 5).map((park) => (
-          <div key={park.id}>{renderParkCard(park, 'normal')}</div>
+          <ParkCard key={park.id} park={park} size="normal" />
         ))}
       </div>
 
       {/* Fila 3: 1 tarjeta ancha */}
       <div className="grid grid-cols-1 gap-4">
         {parks.slice(5, 6).map((park) => (
-          <div key={park.id}>{renderParkCard(park, 'wide')}</div>
+          <ParkCard key={park.id} park={park} size="wide" />
         ))}
       </div>
 
       {/* Fila 4: 2 tarjetas grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {parks.slice(6, 8).map((park) => (
-          <div key={park.id}>{renderParkCard(park, 'large')}</div>
+          <ParkCard key={park.id} park={park} size="large" />
         ))}
       </div>
 
       {/* Fila 5: 3 tarjetas normales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {parks.slice(8, 11).map((park) => (
-          <div key={park.id}>{renderParkCard(park, 'normal')}</div>
+          <ParkCard key={park.id} park={park} size="normal" />
         ))}
       </div>
 
       {/* Fila 6: 2 tarjetas grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {parks.slice(11, 13).map((park) => (
-          <div key={park.id}>{renderParkCard(park, 'large')}</div>
+          <ParkCard key={park.id} park={park} size="large" />
         ))}
       </div>
 
@@ -211,7 +209,7 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
           <h4 className="text-lg font-semibold text-gray-700 mb-4">Más Parques</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {parks.slice(13).map((park) => (
-              <div key={park.id}>{renderParkCard(park, 'normal')}</div>
+              <ParkCard key={park.id} park={park} size="normal" />
             ))}
           </div>
         </div>
