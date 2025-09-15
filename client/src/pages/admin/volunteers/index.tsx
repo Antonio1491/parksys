@@ -747,6 +747,11 @@ export default function VolunteersPage() {
                             src={volunteer.profileImageUrl || volunteer.profile_image_url} 
                             alt={volunteer.full_name || `${volunteer.firstName || ''} ${volunteer.lastName || ''}`.trim()}
                             className="w-16 h-16 rounded-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://i.pravatar.cc/150?img=11'; // Volunteer placeholder
+                              target.onerror = null; // Evitar loop infinito
+                            }}
                           />
                         ) : (
                           <Users className="h-8 w-8 text-green-600" />

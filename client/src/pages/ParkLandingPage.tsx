@@ -936,6 +936,11 @@ function ParkLandingPage() {
                             src={volunteer.profileImageUrl} 
                             alt={volunteer.fullName}
                             className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://i.pravatar.cc/150?img=11'; // Volunteer placeholder
+                              target.onerror = null; // Evitar loop infinito
+                            }}
                           />
                         ) : (
                           <div className="w-12 h-12 bg-pink-200 rounded-full flex items-center justify-center flex-shrink-0">

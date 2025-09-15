@@ -161,9 +161,12 @@ export default function EditEventPage() {
   }, [event, form]);
 
   // Obtener parques para el selector
-  const { data: parks } = useQuery({
+  const { data: parksResponse } = useQuery({
     queryKey: ['/api/parks']
   });
+  
+  // Normalizar respuesta de parks (puede ser array directo o { data: Park[] })
+  const parks = Array.isArray(parksResponse) ? parksResponse : ((parksResponse as any)?.data || []);
 
   // Obtener categorías de eventos
   const { data: eventCategories } = useQuery({
@@ -338,7 +341,7 @@ export default function EditEventPage() {
                           <SelectValue placeholder="Seleccionar parque" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(parks as any[])?.map((park: any) => (
+                          {parks?.map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>

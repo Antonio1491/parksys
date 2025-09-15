@@ -431,6 +431,11 @@ export default function VolunteersList() {
                                 src={volunteer.profileImageUrl} 
                                 alt={volunteer.fullName}
                                 className="w-24 h-24 rounded-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = 'https://i.pravatar.cc/150?img=11'; // Volunteer placeholder
+                                  target.onerror = null; // Evitar loop infinito
+                                }}
                               />
                             ) : (
                               <span className="text-white font-semibold text-xl">
@@ -496,6 +501,11 @@ export default function VolunteersList() {
                             src={volunteer.profileImageUrl} 
                             alt={volunteer.fullName}
                             className="w-16 h-16 rounded-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://i.pravatar.cc/150?img=12'; // Volunteer placeholder
+                              target.onerror = null; // Evitar loop infinito
+                            }}
                           />
                         ) : (
                           <span className="text-white font-semibold text-lg">
