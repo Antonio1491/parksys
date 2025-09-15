@@ -59,6 +59,20 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       
       const eventsList = await query;
       
+      // 🎯 LOG DE DEBUGGING: Ver qué datos retorna la consulta
+      console.log('📅 [EVENTS-DEBUG] Raw events from DB:', eventsList.length);
+      if (eventsList.length > 0) {
+        console.log('📅 [EVENTS-DEBUG] First event from DB:', JSON.stringify({
+          id: eventsList[0].id,
+          title: eventsList[0].title,
+          status: eventsList[0].status,
+          startDate: eventsList[0].startDate,
+          endDate: eventsList[0].endDate,
+          startTime: eventsList[0].startTime,
+          endTime: eventsList[0].endTime
+        }, null, 2));
+      }
+      
       // Si se solicitó filtrar por parque, hacemos un filtrado adicional
       if (parkId) {
         // Obtener relaciones evento-parque para el parque especificado
@@ -89,7 +103,12 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       const eventsWithNormalizedImages = eventsList.map(event => ({
         ...event,
         imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
-        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
+        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
+        // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
+        startDate: event.startDate ? event.startDate.toString() : null,
+        endDate: event.endDate ? event.endDate.toString() : null,
+        startTime: event.startTime ? event.startTime.toString() : null,
+        endTime: event.endTime ? event.endTime.toString() : null
       }));
 
       return res.json({ data: eventsWithNormalizedImages });
@@ -141,6 +160,11 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         ...event,
         imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
         featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
+        // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
+        startDate: event.startDate ? event.startDate.toString() : null,
+        endDate: event.endDate ? event.endDate.toString() : null,
+        startTime: event.startTime ? event.startTime.toString() : null,
+        endTime: event.endTime ? event.endTime.toString() : null,
         parks: parksInfo
       };
 
@@ -393,7 +417,12 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       const eventsWithNormalizedImages = eventsList.map(event => ({
         ...event,
         imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
-        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
+        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
+        // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
+        startDate: event.startDate ? event.startDate.toString() : null,
+        endDate: event.endDate ? event.endDate.toString() : null,
+        startTime: event.startTime ? event.startTime.toString() : null,
+        endTime: event.endTime ? event.endTime.toString() : null
       }));
 
       return res.json({ data: eventsWithNormalizedImages });
