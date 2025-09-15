@@ -57,7 +57,54 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       // Ordenar por fecha de inicio descendente
       query = query.orderBy(desc(events.startDate), asc(events.title));
       
-      const eventsList = await query;
+      // 🎯 USAR SQL DIRECTO PARA EVITAR PROBLEMAS DE TIPOS
+      let sqlQuery = `
+        SELECT id, title, description, event_type as "eventType", target_audience as "targetAudience", 
+               status, featured_image_url as "featuredImageUrl", start_date as "startDate", 
+               end_date as "endDate", start_time as "startTime", end_time as "endTime",
+               is_recurring as "isRecurring", recurrence_pattern as "recurrencePattern",
+               location, capacity, registration_type as "registrationType", 
+               organizer_name as "organizerName", organizer_email as "organizerEmail",
+               organizer_phone as "organizerPhone", organizer_organization as "organizerOrganization",
+               geolocation, created_at as "createdAt", updated_at as "updatedAt",
+               created_by_id as "createdById", price, is_free as "isFree",
+               requires_approval as "requiresApproval"
+        FROM events 
+        WHERE 1=1
+      `;
+      
+      const queryParams: any[] = [];
+      let paramIndex = 1;
+      
+      if (status) {
+        sqlQuery += ` AND status = $${paramIndex++}`;
+        queryParams.push(status);
+      }
+      
+      if (targetAudience) {
+        sqlQuery += ` AND target_audience = $${paramIndex++}`;
+        queryParams.push(targetAudience);
+      }
+      
+      if (startDateFrom) {
+        sqlQuery += ` AND start_date >= $${paramIndex++}`;
+        queryParams.push(startDateFrom);
+      }
+      
+      if (startDateTo) {
+        sqlQuery += ` AND start_date <= $${paramIndex++}`;
+        queryParams.push(startDateTo);
+      }
+      
+      if (search) {
+        sqlQuery += ` AND title ILIKE $${paramIndex++}`;
+        queryParams.push(`%${search}%`);
+      }
+      
+      sqlQuery += ` ORDER BY start_date DESC, title ASC`;
+      
+      const result = await db.execute(sqlQuery, queryParams);
+      const eventsList = result.rows;
       
       // 🎯 LOG DE DEBUGGING: Ver qué datos retorna la consulta
       console.log('📅 [EVENTS-DEBUG] Raw events from DB:', eventsList.length);
