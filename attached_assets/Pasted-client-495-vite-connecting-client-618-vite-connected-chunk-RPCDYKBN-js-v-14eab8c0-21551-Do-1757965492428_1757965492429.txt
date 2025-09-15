@@ -1,0 +1,107 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:22 🔥 Firebase initialized successfully
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/parks
+queryClient.ts:219 🌐 [QUERY] GET /api/sponsors
+queryClient.ts:219 🌐 [QUERY] GET /api/events
+queryClient.ts:219 🌐 [QUERY] GET /api/activities-summary-data
+queryClient.ts:219 🌐 [QUERY] GET /public-api/instructors/public
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+event-images-1757348515867-555209083.jpg:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/event-images/event-images-1757348515867-555209083.jpg 404 (Not Found)
+Image
+commitMount @ chunk-RPCDYKBN.js?v=14eab8c0:8412
+commitLayoutEffectOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:17102
+commitLayoutMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:17980
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:17969
+commitLayoutEffects @ chunk-RPCDYKBN.js?v=14eab8c0:17920
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19353
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=14eab8c0:552
+flush @ @tanstack_react-query.js?v=14eab8c0:576
+batch @ @tanstack_react-query.js?v=14eab8c0:594
+dispatch_fn @ @tanstack_react-query.js?v=14eab8c0:1007
+setData @ @tanstack_react-query.js?v=14eab8c0:705
+onSuccess @ @tanstack_react-query.js?v=14eab8c0:908
+resolve @ @tanstack_react-query.js?v=14eab8c0:462
+Promise.then
+run @ @tanstack_react-query.js?v=14eab8c0:504
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+event-images-1757349662123-700729037.jpg:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/uploads/event-images/event-images-1757349662123-700729037.jpg 404 (Not Found)
+Image
+commitMount @ chunk-RPCDYKBN.js?v=14eab8c0:8412
+commitLayoutEffectOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:17102
+commitLayoutMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:17980
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:17969
+commitLayoutEffects @ chunk-RPCDYKBN.js?v=14eab8c0:17920
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19353
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+defaultScheduler @ @tanstack_react-query.js?v=14eab8c0:552
+flush @ @tanstack_react-query.js?v=14eab8c0:576
+batch @ @tanstack_react-query.js?v=14eab8c0:594
+dispatch_fn @ @tanstack_react-query.js?v=14eab8c0:1007
+setData @ @tanstack_react-query.js?v=14eab8c0:705
+onSuccess @ @tanstack_react-query.js?v=14eab8c0:908
+resolve @ @tanstack_react-query.js?v=14eab8c0:462
+Promise.then
+run @ @tanstack_react-query.js?v=14eab8c0:504
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
