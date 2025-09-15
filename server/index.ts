@@ -2532,16 +2532,26 @@ function startServer() {
       // NOW setup frontend serving - this will establish the catch-all route AFTER all API routes
       const isProduction = process.env.NODE_ENV === 'production';
       if (isProduction) {
-        // CRITICAL FIX: Servir archivos estáticos desde la ubicación correcta ANTES de vite
+        // CRITICAL FIX: Servir archivos estáticos CORRECTAMENTE sin usar serveStatic()
         const path = require('path');
         const distPath = path.join(process.cwd(), 'dist', 'public');
-        app.use(express.static(distPath));
-        console.log(`📁 [PROD] Archivos estáticos servidos desde: ${distPath}`);
         
-        const { serveStatic } = await import("./vite");
-        serveStatic(app);
+        // Verificar que el directorio existe
+        const fs = require('fs');
+        if (!fs.existsSync(distPath)) {
+          console.error(`❌ [PROD] Build directory not found: ${distPath}`);
+          console.error(`❌ [PROD] Please run 'npm run build' first`);
+        } else {
+          // Servir archivos estáticos desde dist/public
+          app.use(express.static(distPath));
+          console.log(`✅ [PROD] Static files served from: ${distPath}`);
+        }
         
-        // ✅ CRITICAL FIX: SPA catch-all for production mode
+        // NO LLAMAR A serveStatic() porque tiene la ruta incorrecta
+        // const { serveStatic } = await import("./vite");
+        // serveStatic(app);
+        
+        // ✅ CRITICAL FIX: SPA catch-all for production mode - debe ir AL FINAL
         app.get('*', (req: Request, res: Response) => {
           try {
             const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
