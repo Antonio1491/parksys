@@ -4891,5 +4891,191 @@ export const insertRoleAuditLogSchema = createInsertSchema(roleAuditLogs).omit({
   createdAt: true
 });
 
+// ===== SISTEMA ROBUSTO DE PERMISOS =====
+
+// Tabla de módulos del sistema
+export const permissionModules = pgTable("permission_modules", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  slug: varchar("slug", { length: 50 }).notNull().unique(),
+  description: text("description"),
+  icon: varchar("icon", { length: 50 }),
+  orderIndex: integer("order_index").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Tabla de submódulos
+export const permissionSubmodules = pgTable("permission_submodules", {
+  id: serial("id").primaryKey(),
+  moduleId: integer("module_id").references(() => permissionModules.id).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  slug: varchar("slug", { length: 50 }).notNull(),
+  description: text("description"),
+  icon: varchar("icon", { length: 50 }),
+  orderIndex: integer("order_index").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Tabla de páginas/componentes
+export const permissionPages = pgTable("permission_pages", {
+  id: serial("id").primaryKey(),
+  submoduleId: integer("submodule_id").references(() => permissionSubmodules.id).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  slug: varchar("slug", { length: 50 }).notNull(),
+  route: varchar("route", { length: 200 }),
+  description: text("description"),
+  component: varchar("component", { length: 100 }),
+  orderIndex: integer("order_index").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Tabla de acciones estándar
+export const permissionActions = pgTable("permission_actions", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 50 }).notNull(),
+  slug: varchar("slug", { length: 50 }).notNull().unique(),
+  description: text("description"),
+  icon: varchar("icon", { length: 50 }),
+  orderIndex: integer("order_index").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Tabla de permisos jerárquicos
+export const systemPermissions = pgTable("system_permissions", {
+  id: serial("id").primaryKey(),
+  permissionKey: varchar("permission_key", { length: 200 }).notNull().unique(), // formato: modulo:submodulo:pagina:accion
+  moduleSlug: varchar("module_slug", { length: 50 }).notNull(),
+  submoduleSlug: varchar("submodule_slug", { length: 50 }),
+  pageSlug: varchar("page_slug", { length: 50 }),
+  actionSlug: varchar("action_slug", { length: 50 }).notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  isWildcard: boolean("is_wildcard").default(false), // para permisos como modulo:*:*:*
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Tabla de relación roles-permisos
+export const rolePermissions = pgTable("role_permissions", {
+  id: serial("id").primaryKey(),
+  roleId: integer("role_id").references(() => roles.id).notNull(),
+  permissionId: integer("permission_id").references(() => systemPermissions.id).notNull(),
+  granted: boolean("granted").default(true),
+  grantedAt: timestamp("granted_at").defaultNow(),
+  grantedBy: integer("granted_by").references(() => users.id),
+  revokedAt: timestamp("revoked_at"),
+  revokedBy: integer("revoked_by").references(() => users.id),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Relaciones para sistema de permisos
+export const permissionModulesRelations = relations(permissionModules, ({ many }) => ({
+  submodules: many(permissionSubmodules)
+}));
+
+export const permissionSubmodulesRelations = relations(permissionSubmodules, ({ one, many }) => ({
+  module: one(permissionModules, {
+    fields: [permissionSubmodules.moduleId],
+    references: [permissionModules.id]
+  }),
+  pages: many(permissionPages)
+}));
+
+export const permissionPagesRelations = relations(permissionPages, ({ one }) => ({
+  submodule: one(permissionSubmodules, {
+    fields: [permissionPages.submoduleId],
+    references: [permissionSubmodules.id]
+  })
+}));
+
+export const systemPermissionsRelations = relations(systemPermissions, ({ many }) => ({
+  rolePermissions: many(rolePermissions)
+}));
+
+export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => ({
+  role: one(roles, {
+    fields: [rolePermissions.roleId],
+    references: [roles.id]
+  }),
+  permission: one(systemPermissions, {
+    fields: [rolePermissions.permissionId],
+    references: [systemPermissions.id]
+  }),
+  grantedByUser: one(users, {
+    fields: [rolePermissions.grantedBy],
+    references: [users.id]
+  }),
+  revokedByUser: one(users, {
+    fields: [rolePermissions.revokedBy],
+    references: [users.id]
+  })
+}));
+
+// Schemas de validación para sistema de permisos
+export const insertPermissionModuleSchema = createInsertSchema(permissionModules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertPermissionSubmoduleSchema = createInsertSchema(permissionSubmodules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertPermissionPageSchema = createInsertSchema(permissionPages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertPermissionActionSchema = createInsertSchema(permissionActions).omit({
+  id: true,
+  createdAt: true
+});
+
+export const insertSystemPermissionSchema = createInsertSchema(systemPermissions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertRolePermissionSchema = createInsertSchema(rolePermissions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  grantedAt: true
+});
+
+// Tipos TypeScript para sistema de permisos
+export type PermissionModule = typeof permissionModules.$inferSelect;
+export type InsertPermissionModule = z.infer<typeof insertPermissionModuleSchema>;
+
+export type PermissionSubmodule = typeof permissionSubmodules.$inferSelect;
+export type InsertPermissionSubmodule = z.infer<typeof insertPermissionSubmoduleSchema>;
+
+export type PermissionPage = typeof permissionPages.$inferSelect;
+export type InsertPermissionPage = z.infer<typeof insertPermissionPageSchema>;
+
+export type PermissionAction = typeof permissionActions.$inferSelect;
+export type InsertPermissionAction = z.infer<typeof insertPermissionActionSchema>;
+
+export type SystemPermission = typeof systemPermissions.$inferSelect;
+export type InsertSystemPermission = z.infer<typeof insertSystemPermissionSchema>;
+
+export type RolePermission = typeof rolePermissions.$inferSelect;
+export type InsertRolePermission = z.infer<typeof insertRolePermissionSchema>;
+
 
 
