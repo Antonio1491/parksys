@@ -236,8 +236,8 @@ export default function StockPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-testid="stock-page">
+    <AdminLayout title="Inventario de Stock" subtitle="Gestiona y monitorea el stock disponible en cada ubicación">
+      <div className="max-w-7xl mx-auto" data-testid="stock-page">
         {/* HEADER */}
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -750,6 +750,6 @@ export default function StockPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
