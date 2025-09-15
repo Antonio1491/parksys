@@ -438,6 +438,16 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Stock')))}
           </Suspense>
         </Route>
+        <Route path="/admin/warehouse/stock/new">
+          <Suspense fallback={<div className="p-8 text-center">Cargando formulario de stock...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/StockForm')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/warehouse/stock/:id/edit">
+          <Suspense fallback={<div className="p-8 text-center">Cargando edición de stock...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/StockEdit')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/warehouse/movements">
           <Suspense fallback={<div className="p-8 text-center">Cargando movimientos de inventario...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/Movements')))}
