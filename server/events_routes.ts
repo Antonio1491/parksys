@@ -82,7 +82,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
           featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
         }));
         
-        return res.json(filteredEventsWithNormalizedImages);
+        return res.json({ data: filteredEventsWithNormalizedImages });
       }
       
       // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
@@ -92,7 +92,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
       }));
 
-      return res.json(eventsWithNormalizedImages);
+      return res.json({ data: eventsWithNormalizedImages });
     } catch (error) {
       console.error("Error al obtener eventos:", error);
       return res.status(500).json({ 
@@ -396,7 +396,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
       }));
 
-      return res.json(eventsWithNormalizedImages);
+      return res.json({ data: eventsWithNormalizedImages });
     } catch (error) {
       console.error(`Error al obtener eventos del parque ${req.params.id}:`, error);
       return res.status(500).json({ 
