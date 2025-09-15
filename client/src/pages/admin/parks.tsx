@@ -728,9 +728,9 @@ const AdminParksContent = () => {
               
               <div className="flex items-center space-x-2">
                 {/* 1. Botón para cambiar los modos de visualización del grid */}
-                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#ededed] px-1 py-1 rounded-md">
+                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#ededed] px-1 py-1 rounded-lg">
                   <Button
-                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    variant={viewMode === 'grid' ? 'default' : 'hover:white hover:text-accent-foreground'}
                     size="sm"
                     onClick={() => setViewMode('grid')}
                     data-testid="button-view-grid"
@@ -738,7 +738,7 @@ const AdminParksContent = () => {
                     <Grid className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    variant={viewMode === 'list' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('list')}
                     data-testid="button-view-list"
