@@ -13,51 +13,11 @@ const roleAvatarConfig: Record<string, { bgColor: string, textColor: string }> =
   user: { bgColor: 'bg-gray-500', textColor: 'text-white' },
 };
 
-// Imágenes aleatorias para cada rol (simuladas)
-const randomProfileImages: Record<string, string[]> = {
-  admin: [
-    'https://i.pravatar.cc/150?img=1',
-    'https://i.pravatar.cc/150?img=2',
-  ],
-  director: [
-    'https://i.pravatar.cc/150?img=3',
-    'https://i.pravatar.cc/150?img=4',
-  ],
-  manager: [
-    'https://i.pravatar.cc/150?img=5',
-    'https://i.pravatar.cc/150?img=6',
-  ],
-  supervisor: [
-    'https://i.pravatar.cc/150?img=7',
-    'https://i.pravatar.cc/150?img=8',
-  ],
-  instructor: [
-    'https://i.pravatar.cc/150?img=9',
-    'https://i.pravatar.cc/150?img=10',
-  ],
-  volunteer: [
-    'https://i.pravatar.cc/150?img=11',
-    'https://i.pravatar.cc/150?img=12',
-  ],
-  citizen: [
-    'https://i.pravatar.cc/150?img=13',
-    'https://i.pravatar.cc/150?img=14',
-  ],
-  user: [
-    'https://i.pravatar.cc/150?img=15',
-    'https://i.pravatar.cc/150?img=16',
-  ],
-};
-
-// Función para obtener una imagen aleatoria basada en el ID del usuario y su rol
-const getRandomAvatarUrl = (userId: number, role: string): string => {
-  // Si el rol no existe en el mapeo, usar 'user' como fallback
-  const avatarSet = randomProfileImages[role] || randomProfileImages.user;
-  
-  // Usar el ID del usuario como semilla para hacer consistente la selección
-  const index = userId % avatarSet.length;
-  
-  return avatarSet[index];
+// Función para determinar si una URL de imagen es válida/confiable
+const isValidImageUrl = (url?: string): boolean => {
+  if (!url) return false;
+  // Solo permitir URLs que empiecen con rutas relativas o HTTPS de dominio conocido
+  return url.startsWith('/') || url.startsWith('/api/') || url.startsWith('https://');
 };
 
 // Obtener iniciales del nombre
@@ -95,8 +55,8 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     xl: 'h-20 w-20 text-lg',
   }[size];
   
-  // Generar la URL del avatar basada en el usuario
-  const avatarUrl = imageUrl || getRandomAvatarUrl(userId, role);
+  // Solo usar imageUrl si es válida, sino fallback a iniciales
+  const avatarUrl = isValidImageUrl(imageUrl) ? imageUrl : undefined;
   
   // Configuración visual basada en el rol
   const avatarConfig = roleAvatarConfig[role] || roleAvatarConfig.user;
