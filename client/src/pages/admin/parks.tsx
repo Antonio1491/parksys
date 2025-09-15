@@ -629,10 +629,8 @@ const AdminParksContent = () => {
       <AdminLayout>
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <MapPin className="w-8 h-8" />
-            Parques
           </h1>
-          <p className="text-gray-600 mt-2 mb-8">Gestión General del Sistema</p>
+          <p className="text-gray-600 mt-2 mb-8"> </p>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">

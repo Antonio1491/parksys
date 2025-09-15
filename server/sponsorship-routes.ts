@@ -1696,7 +1696,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         return res.status(404).json({ error: 'Contrato no encontrado' });
       }
       
-      if (contractExists[0].status !== 'active') {
+      if (contractExists[0].status !== 'activo' && contractExists[0].status !== 'active') {
         return res.status(400).json({ error: 'Solo se pueden vincular activos a contratos activos' });
       }
 
