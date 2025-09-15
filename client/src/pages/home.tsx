@@ -74,8 +74,13 @@ const Home: React.FC = () => {
     park.name.trim() !== '' && !park.isDeleted
   );
   
+  // Manejar formato de respuesta de eventos (array directo o {data: array})
+  const allEvents = Array.isArray(eventsResponse) 
+    ? eventsResponse 
+    : (eventsResponse?.data || []);
+  
   // Obtener eventos destacados (máximo 3 para la página de inicio)
-  const featuredEvents = (eventsResponse || [])
+  const featuredEvents = allEvents
     .filter((event: any) => event.featuredImageUrl) // Solo eventos con imagen
     .slice(0, 3); // Limitar a 3 eventos
 

@@ -2276,7 +2276,7 @@ function startServer() {
         LIMIT 50
       `);
       console.log(`📅 [CRITICAL] Returning ${result.rows.length} events via critical route`);
-      res.json(result.rows);
+      res.json({ data: result.rows });
     } catch (error) {
       console.error('❌ [CRITICAL] Error in events route:', error);
       res.json([]);
