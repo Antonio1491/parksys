@@ -3137,7 +3137,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/amenities", isAuthenticated, async (req: Request, res: Response) => {
     try {
       // Verificar que el usuario sea administrador
-      if (req.user?.role !== "admin" && req.user?.role !== "super_admin") {
+      if (req.user?.role !== "admin" && req.user?.role !== "super-admin") {
         return res.status(403).json({ message: "Solo administradores pueden gestionar amenidades" });
       }
       
@@ -3170,7 +3170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.put("/amenities/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
       // Verificar que el usuario sea administrador
-      if (req.user?.role !== "admin" && req.user?.role !== "super_admin") {
+      if (req.user?.role !== "admin" && req.user?.role !== "super-admin") {
         return res.status(403).json({ message: "Solo administradores pueden gestionar amenidades" });
       }
       
@@ -3210,7 +3210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/upload/icon", isAuthenticated, async (req: Request, res: Response) => {
     try {
       // Verificar que el usuario sea administrador
-      if (req.user?.role !== "admin" && req.user?.role !== "super_admin") {
+      if (req.user?.role !== "admin" && req.user?.role !== "super-admin") {
         return res.status(403).json({ message: "Solo administradores pueden subir iconos" });
       }
       
@@ -4228,7 +4228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const imageId = Number(req.params.imageId);
       
       // Verificamos primero que el usuario tenga acceso al parque
-      if (req.user.role !== 'super_admin') {
+      if (req.user.role !== 'super-admin') {
         const park = await storage.getPark(parkId);
         if (!park) {
           return res.status(404).json({ message: "Park not found" });
@@ -4542,7 +4542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📋 Documento encontrado:`, { id: document.id, parkId: document.parkId, title: document.title });
       
       // Verificamos que el usuario tenga acceso al parque del documento
-      if (req.user.role !== 'super_admin') {
+      if (req.user.role !== 'super-admin') {
         const park = await storage.getPark(document.parkId);
         if (!park) {
           console.log(`❌ Parque ${document.parkId} no encontrado`);
@@ -4582,7 +4582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentId = Number(req.params.documentId);
       
       // Verificamos primero que el usuario tenga acceso al parque
-      if (req.user.role !== 'super_admin') {
+      if (req.user.role !== 'super-admin') {
         const park = await storage.getPark(parkId);
         if (!park) {
           return res.status(404).json({ message: "Park not found" });
@@ -4829,7 +4829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🎬 Video encontrado:`, { id: video.id, parkId: video.park_id, title: video.title });
       
       // Check permissions (unless super admin or admin in development)
-      if (req.user.role !== 'super_admin' && req.user.role !== 'admin') {
+      if (req.user.role !== 'super-admin' && req.user.role !== 'admin') {
         console.log(`🏛️ Verificando permisos: usuario municipio ${req.user.municipalityId}, parque municipio ${video.municipality_id}`);
         
         if (video.municipality_id !== req.user.municipalityId) {
@@ -5525,7 +5525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let autoApprove = false;
       
       if (req.user) {
-        if (req.user.role === 'super_admin') {
+        if (req.user.role === 'super-admin') {
           autoApprove = true;
         } else {
           const park = await storage.getPark(parkId);
@@ -6489,7 +6489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const parkId = Number(req.params.id);
       
       // Verificamos que el usuario tenga acceso al parque si no es super_admin
-      if (req.user.role !== 'super_admin') {
+      if (req.user.role !== 'super-admin') {
         const park = await storage.getPark(parkId);
         if (!park) {
           return res.status(404).json({ message: "Park not found" });
