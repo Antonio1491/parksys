@@ -46,7 +46,7 @@ const Parks: React.FC = () => {
   };
   
   // Fetch parks with filters
-  const { data: parksResponse, isLoading } = useQuery<ExtendedPark[]>({
+  const { data: parksResponse, isLoading } = useQuery<{data: ExtendedPark[]}>({
     queryKey: [`/api/parks${buildQueryString()}`],
     queryFn: () => apiRequest(`/api/parks${buildQueryString()}`),
   });

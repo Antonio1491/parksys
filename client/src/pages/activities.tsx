@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { 
@@ -201,7 +202,10 @@ function CarouselActivityCard({ activity, isCenter = false }: { activity: Activi
   const categoryColor = categoryColors[activity.category as keyof typeof categoryColors] || 'bg-gray-100 text-gray-800 border-gray-200';
   const statusColor = statusColors[activity.status as keyof typeof statusColors] || 'bg-gray-500 text-white border-gray-600';
   const statusLabel = statusLabels[activity.status as keyof typeof statusLabels] || 'Sin estado';
-  const parksResponse = useQuery({ queryKey: ['/api/parks'] });
+  const parksResponse = useQuery({ 
+    queryKey: ['/api/parks'],
+    queryFn: () => apiRequest('/api/parks')
+  });
   const parksData = parksResponse.data || [];
   
   return (
@@ -519,10 +523,11 @@ function ActivitiesPage() {
   });
 
   // Obtener parques para filtros
-  const { data: parksResponse } = useQuery<any[]>({
+  const { data: parksResponse } = useQuery<any>({
     queryKey: ['/api/parks'],
+    queryFn: () => apiRequest('/api/parks'),
   });
-  const parksData = parksResponse || [];
+  const parksData = parksResponse?.data || [];
 
   const filteredActivities = useMemo(() => {
     if (!Array.isArray(activitiesData)) return [];
