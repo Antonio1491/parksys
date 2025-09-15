@@ -4542,6 +4542,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📋 Documento encontrado:`, { id: document.id, parkId: document.parkId, title: document.title });
       
       // Verificamos que el usuario tenga acceso al parque del documento
+      console.log(`🔍 DEBUG: Comparando roles - Usuario: '${req.user.role}', Tipo: ${typeof req.user.role}, Longitud: ${req.user.role?.length}`);
+      console.log(`🔍 DEBUG: Comparación !== 'super-admin': ${req.user.role !== 'super-admin'}`);
+      console.log(`🔍 DEBUG: Comparación === 'super-admin': ${req.user.role === 'super-admin'}`);
+      
       if (req.user.role !== 'super-admin') {
         const park = await storage.getPark(document.parkId);
         if (!park) {
