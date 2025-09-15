@@ -2311,12 +2311,12 @@ function startServer() {
         console.log('🎯 [CRITICAL-EVENTS-DEBUG] First event raw:', result.rows[0]);
       }
       
-      // 🎯 NORMALIZAR URLs de imágenes Y asegurar que startDate sea string
+      // 🎯 NORMALIZAR URLs de imágenes Y asegurar que startDate sea en formato ISO
       const eventsWithNormalizedImages = result.rows.map(event => ({
         ...event,
         imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
-        startDate: event.startDate ? String(event.startDate) : null,
-        endDate: event.endDate ? String(event.endDate) : null
+        startDate: event.startDate ? new Date(event.startDate).toISOString() : null,
+        endDate: event.endDate ? new Date(event.endDate).toISOString() : null
       }));
       
       console.log('🎯 [CRITICAL-EVENTS-DEBUG] After mapping, first event:', eventsWithNormalizedImages[0]);
