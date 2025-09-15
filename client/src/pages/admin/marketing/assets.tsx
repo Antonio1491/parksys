@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Trash2, Package, MapPin, Users, DollarSign, Star, Clock, Building, Link2, Unlink, Settings } from 'lucide-react';
+import { Plus, Search, Package, Unlink, Settings } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/AdminLayout';
 import PageHeader from '@/components/ui/page-header';
@@ -70,7 +70,6 @@ export default function SponsoredAssetsPage() {
     queryFn: () => apiRequest('/api/sponsorship-assets').then(res => res.data || [])
   });
 
-
   // Unlink asset from contract mutation
   const unlinkAssetMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/sponsorship-assets/${id}`, {
@@ -89,14 +88,11 @@ export default function SponsoredAssetsPage() {
     }
   });
 
-
-
   const handleUnlinkAsset = (linkId: number) => {
     if (confirm('¿Estás seguro de que deseas desvincular este activo del contrato?')) {
       unlinkAssetMutation.mutate(linkId);
     }
   };
-
 
   const filteredLinks = sponsorshipAssetLinks.filter((link: SponsorshipAssetLink) => {
     if (!searchTerm.trim()) return true;

@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 import { toast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
-import { PageHeader } from '@/components/ui/page-header';
+import PageHeader from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
