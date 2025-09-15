@@ -2268,9 +2268,37 @@ function startServer() {
       const { pool } = await import("./db");
       const { replitObjectStorage } = await import('./objectStorage-replit');
       
+      console.log('🎯 [CRITICAL-EVENTS-DEBUG] Starting events critical route');
+      
       const result = await pool.query(`
         SELECT 
-          e.*,
+          e.id,
+          e.title,
+          e.description,
+          e.event_type as "eventType",
+          e.target_audience as "targetAudience",
+          e.status,
+          e.featured_image_url as "featuredImageUrl",
+          e.start_date as "startDate",
+          e.end_date as "endDate", 
+          e.start_time as "startTime",
+          e.end_time as "endTime",
+          e.is_recurring as "isRecurring",
+          e.recurrence_pattern as "recurrencePattern",
+          e.location,
+          e.capacity,
+          e.registration_type as "registrationType",
+          e.organizer_name as "organizerName",
+          e.organizer_email as "organizerEmail",
+          e.organizer_phone as "organizerPhone", 
+          e.organizer_organization as "organizerOrganization",
+          e.geolocation,
+          e.created_at as "createdAt",
+          e.updated_at as "updatedAt",
+          e.created_by_id as "createdById",
+          e.price,
+          e.is_free as "isFree",
+          e.requires_approval as "requiresApproval",
           ei.image_url as "imageUrl"
         FROM events e
         LEFT JOIN event_images ei ON e.id = ei.event_id AND ei.is_primary = true
@@ -2278,12 +2306,20 @@ function startServer() {
         LIMIT 50
       `);
       
-      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente (igual que otros endpoints)
+      console.log('🎯 [CRITICAL-EVENTS-DEBUG] Raw events from DB:', result.rows.length);
+      if (result.rows.length > 0) {
+        console.log('🎯 [CRITICAL-EVENTS-DEBUG] First event raw:', result.rows[0]);
+      }
+      
+      // 🎯 NORMALIZAR URLs de imágenes Y asegurar que startDate sea string
       const eventsWithNormalizedImages = result.rows.map(event => ({
         ...event,
-        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl
+        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+        startDate: event.startDate ? String(event.startDate) : null,
+        endDate: event.endDate ? String(event.endDate) : null
       }));
       
+      console.log('🎯 [CRITICAL-EVENTS-DEBUG] After mapping, first event:', eventsWithNormalizedImages[0]);
       console.log(`📅 [CRITICAL] Returning ${result.rows.length} events via critical route`);
       res.json({ data: eventsWithNormalizedImages });
     } catch (error) {
