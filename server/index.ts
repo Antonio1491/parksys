@@ -2426,6 +2426,28 @@ function startServer() {
         const { setupVite } = await import("./vite");
         await setupVite(app, appServer);
         console.log("🎨 [FRONTEND] Development Vite serving enabled AFTER API routes");
+        
+        // ✅ CRITICAL FIX: SPA catch-all for development mode
+        app.get('*', (req: Request, res: Response, next: NextFunction) => {
+          // Skip API routes and static files
+          if (req.path.startsWith('/api') || 
+              req.path.startsWith('/public-objects') || 
+              req.path.startsWith('/uploads') || 
+              req.path.startsWith('/server-status') || 
+              req.path.match(/^\/health/)) {
+            return next();
+          }
+          
+          // For HTML requests, let Vite handle the SPA routing
+          if (req.accepts('html')) {
+            console.log(`📁 [SPA-DEV] Vite serving SPA route: ${req.path}`);
+            req.url = '/';
+            return next();
+          }
+          
+          next();
+        });
+        
       } catch (error) {
         console.error("❌ [FRONTEND] Error setting up Vite:", error);
       }

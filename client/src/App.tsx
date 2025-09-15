@@ -1257,6 +1257,12 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/marketing/assets')))}
           </Suspense>
         </Route>
+        
+        <Route path="/admin/marketing/assets/new">
+          <Suspense fallback={<div className="p-8 text-center">Cargando formulario...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/marketing/AssetsForm')))}
+          </Suspense>
+        </Route>
 
         {/* Rutas del Centro de Ayuda */}
         <Route path="/help/visitantes-manual">
