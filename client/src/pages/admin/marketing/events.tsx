@@ -74,7 +74,7 @@ export default function SponsoredEventsPage() {
         console.log('✅ [DEBUG] Contracts full response:', res);
         console.log('✅ [DEBUG] Contracts response.data:', res.data);
         console.log('✅ [DEBUG] Contracts direct response:', res);
-        return res || [];
+        return res.data || [];
       });
     }
   });
@@ -88,7 +88,7 @@ export default function SponsoredEventsPage() {
         console.log('✅ [DEBUG] Events full response:', res);
         console.log('✅ [DEBUG] Events response.data:', res.data);
         console.log('✅ [DEBUG] Events direct response:', res);
-        return res || [];
+        return res.data || [];
       });
     }
   });
