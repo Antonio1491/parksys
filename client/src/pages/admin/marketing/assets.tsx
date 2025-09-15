@@ -166,9 +166,13 @@ export default function SponsoredAssetsPage() {
 
   const getAvailableAssets = () => {
     // Filter assets that are active and not already linked to the selected contract
+    console.log('🔍 [DEBUG] All assets:', physicalAssets.length);
+    console.log('🔍 [DEBUG] First asset structure:', physicalAssets[0]);
     const selectedContractId = parseInt(linkFormData.contractId);
     if (!selectedContractId) {
-      return physicalAssets.filter((asset: PhysicalAsset) => asset.status === 'active');
+      const activeAssets = physicalAssets.filter((asset: PhysicalAsset) => asset.status === 'active');
+      console.log('🔍 [DEBUG] Active assets filtered:', activeAssets.length);
+      return activeAssets;
     }
     
     const linkedAssetIds = sponsorshipAssetLinks
@@ -226,7 +230,7 @@ export default function SponsoredAssetsPage() {
                       <SelectContent>
                         {getActiveContracts().map((contract: Contract) => (
                           <SelectItem key={contract.id} value={contract.id.toString()}>
-                            Contrato #{contract.id} - {contract.sponsor?.name}
+                            {contract.number} - {contract.sponsor_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
