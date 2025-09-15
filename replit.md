@@ -7,6 +7,7 @@ ParkSys is a comprehensive municipal parks management system designed to streaml
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
+**2025-09-15:** Implementado sistema robusto de permisos jerárquicos - Estructura module:submodule:page:action con 7 módulos, 27 submódulos, 19 páginas y 8 acciones estándar. Implementación en memoria con seeder completo, storage CRUD, middleware de validación y inicialización automática al arranque del servidor.
 **2025-09-12:** Fixed React Query v5 compatibility issues in marketing module - Added missing queryFn implementations to sponsors.tsx, packages.tsx, and benefits.tsx pages. All marketing module queries now properly display existing data from database (sponsors, contracts, packages, benefits).
 **2025-09-05:** Sistema de permisos múltiples roles completamente funcional - Resolved critical useAdaptivePermissions hook bug, fixed hardcoded permission checks, implemented proper Super Administrator functionality, cleaned obsolete files and routes. All permission validation now works through unified userHasPermission hook with {"all": true} recognition for Super Admin role.
 

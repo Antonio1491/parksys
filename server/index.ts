@@ -2420,6 +2420,15 @@ function startServer() {
     console.log(`✅ [DEPLOYMENT] Server listening on ${HOST}:${PORT} - Health checks active`);
     console.log(`🏥 [DEPLOYMENT] Ready for deployment health checks - ${new Date().toISOString()}`);
     
+    // Inicializar sistema de permisos en memoria
+    try {
+      console.log('🔐 [PERMISSIONS] Inicializando sistema de permisos...');
+      await storage.initializePermissions();
+      console.log('✅ [PERMISSIONS] Sistema de permisos inicializado correctamente');
+    } catch (error) {
+      console.error('❌ [PERMISSIONS] Error inicializando sistema de permisos:', error);
+    }
+    
     // 🔧 CRITICAL FIX: Register API routes BEFORE Vite to prevent HTML responses
     console.log('🔧 [API-PRIORITY] Registering API routes BEFORE Vite setup...');
     
