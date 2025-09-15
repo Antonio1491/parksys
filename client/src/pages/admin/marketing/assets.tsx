@@ -40,7 +40,7 @@ interface SponsorshipAssetLink {
   updatedAt: string;
   contractStatus?: string;
   sponsorName?: string;
-  sponsorTier?: number;
+  sponsorSector?: string;
   assetName?: string;
   assetCategory?: number;
   assetParkId?: number;
@@ -168,9 +168,9 @@ export default function SponsoredAssetsPage() {
                         <td className="p-2">
                           <div className="flex items-center gap-2">
                             {link.sponsorName || 'Sin nombre'}
-                            {link.sponsorTier && (
+                            {link.sponsorSector && (
                               <Badge className="text-xs">
-                                Tier {link.sponsorTier}
+                                {link.sponsorSector}
                               </Badge>
                             )}
                           </div>

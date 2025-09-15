@@ -1579,9 +1579,10 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
           contractStatus: sponsorshipContracts.status,
           contractStartDate: sponsorshipContracts.startDate,
           contractEndDate: sponsorshipContracts.endDate,
-          // Info del patrocinador
+          contractNumber: sponsorshipContracts.number,
+          // Info del patrocinador (usando campos correctos)
           sponsorName: sponsors.name,
-          sponsorTier: sponsors.tier,
+          sponsorSector: sponsors.sector,
           sponsorId: sponsors.id,
           // Info del activo
           assetName: assets.name,
