@@ -169,8 +169,9 @@ export default function SponsoredAssetsPage() {
   };
 
   const filteredLinks = sponsorshipAssetLinks.filter((link: SponsorshipAssetLink) => {
-    const matchesSearch = link.assetName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         link.sponsorName?.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!searchTerm.trim()) return true;
+    const matchesSearch = (link.assetName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (link.sponsorName || '').toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -205,6 +206,7 @@ export default function SponsoredAssetsPage() {
                       value={linkFormData.contractId} 
                       onValueChange={(value) => setLinkFormData({ ...linkFormData, contractId: value, assetId: '' })}
                       data-testid="select-contract"
+                      required
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar contrato activo" />
@@ -225,6 +227,7 @@ export default function SponsoredAssetsPage() {
                       value={linkFormData.assetId} 
                       onValueChange={(value) => setLinkFormData({ ...linkFormData, assetId: value })}
                       data-testid="select-asset"
+                      required
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar activo disponible" />
@@ -256,7 +259,11 @@ export default function SponsoredAssetsPage() {
                     <Button type="button" variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
                       Cancelar
                     </Button>
-                    <Button type="submit" disabled={linkAssetMutation.isPending} data-testid="button-submit-link">
+                    <Button 
+                      type="submit" 
+                      disabled={linkAssetMutation.isPending || !linkFormData.contractId || !linkFormData.assetId || !linkFormData.branding} 
+                      data-testid="button-submit-link"
+                    >
                       {linkAssetMutation.isPending ? 'Vinculando...' : 'Vincular Activo'}
                     </Button>
                   </div>
@@ -327,7 +334,7 @@ export default function SponsoredAssetsPage() {
                           </div>
                         </td>
                         <td className="p-2 text-sm text-gray-500">
-                          {new Date(link.createdAt).toLocaleDateString('es-ES')}
+                          {link.createdAt ? new Date(link.createdAt).toLocaleDateString('es-ES') : '—'}
                         </td>
                         <td className="p-2">
                           <Button
