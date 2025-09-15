@@ -852,7 +852,7 @@ export default function ConsumablesPage() {
                     <SelectValue placeholder="Filtrar por categoría" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" data-testid="category-filter-all">Todas las categorías</SelectItem>
+                    <SelectItem value="all" data-testid="category-filter-all">Todas las categorías</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id.toString()} data-testid={`category-filter-${category.id}`}>
                         <div className="flex items-center gap-2">
@@ -869,7 +869,7 @@ export default function ConsumablesPage() {
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" data-testid="status-filter-all">Todos</SelectItem>
+                    <SelectItem value="all" data-testid="status-filter-all">Todos</SelectItem>
                     <SelectItem value="true" data-testid="status-filter-active">Activos</SelectItem>
                     <SelectItem value="false" data-testid="status-filter-inactive">Inactivos</SelectItem>
                   </SelectContent>
@@ -880,7 +880,7 @@ export default function ConsumablesPage() {
                     <SelectValue placeholder="Nivel de stock" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" data-testid="stock-filter-all">Todos los niveles</SelectItem>
+                    <SelectItem value="all" data-testid="stock-filter-all">Todos los niveles</SelectItem>
                     <SelectItem value="low" data-testid="stock-filter-low">Stock bajo</SelectItem>
                     <SelectItem value="normal" data-testid="stock-filter-normal">Stock normal</SelectItem>
                     <SelectItem value="high" data-testid="stock-filter-high">Stock alto</SelectItem>
@@ -892,7 +892,7 @@ export default function ConsumablesPage() {
                     <SelectValue placeholder="Proveedor" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" data-testid="supplier-filter-all">Todos los proveedores</SelectItem>
+                    <SelectItem value="all" data-testid="supplier-filter-all">Todos los proveedores</SelectItem>
                     <SelectItem value="with-supplier" data-testid="supplier-filter-with">Con proveedor asignado</SelectItem>
                     <SelectItem value="without-supplier" data-testid="supplier-filter-without">Sin proveedor asignado</SelectItem>
                   </SelectContent>
