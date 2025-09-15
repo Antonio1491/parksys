@@ -2458,8 +2458,21 @@ function startServer() {
         app.use(express.static(distPath));
         console.log("✅ [STATIC] Static files enabled from dist/public");
         
-        // SPA catch-all (after all API routes)
+        // SPA catch-all (serve index.html for all non-static routes)
         app.get('*', (req, res) => {
+          // Skip static asset paths
+          if (req.path.startsWith('/api') || 
+              req.path.startsWith('/uploads') || 
+              req.path.startsWith('/public') || 
+              req.path.startsWith('/public-objects') || 
+              req.path.startsWith('/assets') || 
+              req.path.startsWith('/fonts') || 
+              req.path.startsWith('/images') ||
+              req.path.includes('/health') ||
+              req.path.includes('/ready')) {
+            return res.status(404).send('Not found');
+          }
+          
           const indexPath = path.join(distPath, 'index.html');
           if (fs.existsSync(indexPath)) {
             res.sendFile(indexPath);
