@@ -1568,26 +1568,8 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
   apiRouter.get('/sponsorship-assets', async (req: Request, res: Response) => {
     try {
       const linksResult = await db
-        .select({
-          id: sponsorshipAssets.id,
-          contractId: sponsorshipAssets.contractId,
-          assetId: sponsorshipAssets.assetId,
-          branding: sponsorshipAssets.branding,
-          createdAt: sponsorshipAssets.createdAt,
-          updatedAt: sponsorshipAssets.updatedAt,
-          // Info del contrato
-          contractStatus: sponsorshipContracts.status,
-          sponsorName: sponsors.name,
-          sponsorTier: sponsors.tier,
-          // Info del activo
-          assetName: assets.name,
-          assetCategory: assets.categoryId,
-          assetParkId: assets.parkId
-        })
+        .select()
         .from(sponsorshipAssets)
-        .leftJoin(sponsorshipContracts, eq(sponsorshipAssets.contractId, sponsorshipContracts.id))
-        .leftJoin(sponsors, eq(sponsorshipContracts.sponsorId, sponsors.id))
-        .leftJoin(assets, eq(sponsorshipAssets.assetId, assets.id))
         .orderBy(desc(sponsorshipAssets.createdAt));
 
       res.json({ data: linksResult });

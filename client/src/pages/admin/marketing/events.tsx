@@ -157,7 +157,7 @@ export default function SponsoredEventsPage() {
     console.log('🔍 [DEBUG] getActiveContracts called. Total contracts:', contracts.length);
     console.log('🔍 [DEBUG] Contracts data:', contracts);
     const filtered = contracts.filter((contract: Contract) => 
-      contract && (contract.status === 'active' || contract.status === 'en_negociacion')
+      contract && contract.status === 'activo'
     );
     console.log('✅ [DEBUG] Filtered active contracts:', filtered.length, filtered);
     return filtered;

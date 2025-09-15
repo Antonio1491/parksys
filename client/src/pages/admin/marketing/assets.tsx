@@ -149,10 +149,7 @@ export default function SponsoredAssetsPage() {
   };
 
   const getActiveContracts = () => {
-    // Incluir contratos activos y en negociación
-    return contracts.filter((contract: Contract) => 
-      contract.status === 'active' || contract.status === 'en_negociacion'
-    );
+    return contracts.filter((contract: Contract) => contract.status === 'activo');
   };
 
   const getAvailableAssets = () => {
