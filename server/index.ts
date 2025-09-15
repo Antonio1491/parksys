@@ -2266,6 +2266,8 @@ function startServer() {
   criticalApiRouter.get("/events", async (req: any, res: any) => {
     try {
       const { pool } = await import("./db");
+      const { replitObjectStorage } = await import('./objectStorage-replit');
+      
       const result = await pool.query(`
         SELECT 
           e.*,
@@ -2275,8 +2277,15 @@ function startServer() {
         ORDER BY e.start_date DESC 
         LIMIT 50
       `);
+      
+      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente (igual que otros endpoints)
+      const eventsWithNormalizedImages = result.rows.map(event => ({
+        ...event,
+        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl
+      }));
+      
       console.log(`📅 [CRITICAL] Returning ${result.rows.length} events via critical route`);
-      res.json({ data: result.rows });
+      res.json({ data: eventsWithNormalizedImages });
     } catch (error) {
       console.error('❌ [CRITICAL] Error in events route:', error);
       res.json([]);
