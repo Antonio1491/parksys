@@ -113,38 +113,53 @@ const CalendarPage: React.FC = () => {
   const events = eventsResponse?.data || [];
 
   // Obtener las categorías reales desde la API
-  const { data: activityCategoriesData = [] } = useQuery({
+  const { data: activityCategoriesResponse } = useQuery<{data: any[]}>({
     queryKey: ['/api/activity-categories'],
   });
+  const activityCategoriesData = activityCategoriesResponse?.data || [];
   
   // Procesar datos de eventos para el formato unificado
   const processedEvents: CalendarItem[] = events
     .filter(event => event.status === 'published')
-    .map(event => ({
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      category: event.eventType,
-      startDate: event.startDate,
-      endDate: event.endDate,
-      startTime: event.startTime,
-      endTime: event.endTime,
-      location: event.location,
-      capacity: event.capacity,
-      price: undefined,
-      parkName: event.parks?.[0]?.name || 'Sin parque',
-      type: 'event' as const,
-      isFree: event.registrationType === 'free',
-      organizerName: event.organizerName,
-      targetAudience: event.targetAudience,
-      status: event.status
-    }));
+    .map(event => {
+      console.log('🗓️ [CALENDAR-DEBUG] Procesando evento:', {
+        id: event.id,
+        title: event.title,
+        startDate: event.startDate,
+        startDateType: typeof event.startDate
+      });
+      return {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        category: event.eventType,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        location: event.location,
+        capacity: event.capacity,
+        price: undefined,
+        parkName: event.parks?.[0]?.name || 'Sin parque',
+        type: 'event' as const,
+        isFree: event.registrationType === 'free',
+        organizerName: event.organizerName,
+        targetAudience: event.targetAudience,
+        status: event.status
+      };
+    });
   
   // Procesar datos de actividades para el formato unificado
   const processedActivities: CalendarItem[] = activities.map(activity => {
+    console.log('🗓️ [CALENDAR-DEBUG] Procesando actividad:', {
+      id: activity.id,
+      title: activity.title,
+      startDate: activity.startDate,
+      startDateType: typeof activity.startDate
+    });
     // Mapear categoryId a nombre de categoría
     const categoryName = activity.categoryId 
-      ? activityCategoriesData.find((cat: any) => cat.id === activity.categoryId)?.name || 'Sin categoría'
+      ? activityCategoriesData.find((cat) => cat.id === activity.categoryId)?.name || 'Sin categoría'
       : activity.category || 'Sin categoría';
     
     return {
@@ -169,9 +184,10 @@ const CalendarPage: React.FC = () => {
   
   // Combinar actividades y eventos
   const allItems = [...processedActivities, ...processedEvents];
+  console.log('🗓️ [CALENDAR-DEBUG] Total items:', allItems.length, 'Activities:', processedActivities.length, 'Events:', processedEvents.length);
   
   // Usar las categorías reales de la API de actividades
-  const activityCategories = activityCategoriesData.map((cat: any) => cat.name);
+  const activityCategories = activityCategoriesData.map((cat) => cat.name);
   const eventCategories = Array.from(new Set(events.map(e => e.eventType || 'Sin categoría')));
   const allParks = Array.from(new Set([
     ...activities.map(a => a.parkName || 'Sin parque'),
@@ -236,7 +252,14 @@ const CalendarPage: React.FC = () => {
   // Obtener elementos del calendario por fecha
   const getItemsForDate = (date: Date) => {
     return filteredItems.filter(item => {
-      if (!item.startDate || !isValid(parseISO(item.startDate))) return false;
+      if (!item.startDate) {
+        console.log('🗓️ [CALENDAR-DEBUG] Item sin startDate:', item.title);
+        return false;
+      }
+      if (!isValid(parseISO(item.startDate))) {
+        console.log('🗓️ [CALENDAR-DEBUG] Fecha inválida para item:', item.title, item.startDate);
+        return false;
+      }
       const itemDate = parseISO(item.startDate);
       return isSameDay(date, itemDate);
     });
