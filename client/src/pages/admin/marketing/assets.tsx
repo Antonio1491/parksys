@@ -65,7 +65,10 @@ export default function SponsoredAssetsPage() {
   // Fetch contracts
   const { data: contracts = [] } = useQuery({
     queryKey: ['/api/sponsorship-contracts'],
-    queryFn: () => apiRequest('/api/sponsorship-contracts').then(res => res.data || [])
+    queryFn: () => apiRequest('/api/sponsorship-contracts').then(res => {
+      console.log('🔍 [DEBUG] Raw contracts response:', res);
+      return res.data || res || [];
+    })
   });
 
   // Fetch all physical assets
@@ -149,7 +152,10 @@ export default function SponsoredAssetsPage() {
   };
 
   const getActiveContracts = () => {
-    return contracts.filter((contract: Contract) => contract.status === 'activo');
+    console.log('🔍 [DEBUG] All contracts before filter:', contracts);
+    const filtered = contracts.filter((contract: Contract) => contract.status === 'activo');
+    console.log('🔍 [DEBUG] Active contracts after filter:', filtered);
+    return filtered;
   };
 
   const getAvailableAssets = () => {
