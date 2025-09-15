@@ -61,7 +61,7 @@ import {
 } from "./api/parksImport";
 import { registerUserRoutes } from "./userRoutes";
 import { updateSkillsRouter } from "./updateSkills";
-import { registerEventRoutes } from "./events-routes";
+import { registerEventRoutes } from "./events_routes";
 import { eventImageRouter } from "./events-image-routes";
 import { registerActivityRoutes } from "./activitiesRoutes";
 import advertisingRoutes from "./advertising-routes";
