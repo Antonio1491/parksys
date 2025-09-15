@@ -526,9 +526,9 @@ export default function StockPage() {
                               <p className="text-2xl font-bold text-green-600" data-testid={`available-quantity-${item.id}`}>
                                 {availableQty.toLocaleString()}
                               </p>
-                              {item.reservedQuantity > 0 && (
+                              {(item.reservedQuantity ?? 0) > 0 && (
                                 <p className="text-xs text-orange-600">
-                                  -{item.reservedQuantity} reservado
+                                  -{item.reservedQuantity ?? 0} reservado
                                 </p>
                               )}
                             </div>
@@ -696,11 +696,11 @@ export default function StockPage() {
                                   <span className="font-bold text-green-600">
                                     {availableQty.toLocaleString()}
                                   </span>
-                                  {item.reservedQuantity > 0 && (
+                                  {(item.reservedQuantity ?? 0) > 0 && (
                                     <>
                                       <br />
                                       <span className="text-xs text-orange-600">
-                                        -{item.reservedQuantity} res.
+                                        -{item.reservedQuantity ?? 0} res.
                                       </span>
                                     </>
                                   )}

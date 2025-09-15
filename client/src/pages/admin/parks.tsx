@@ -119,18 +119,21 @@ const AdminParksContent = () => {
 
   // Fetch all parks with auto-refresh configuration
   const { 
-    data: parks = [], 
+    data: parksResponse, 
     isLoading: isLoadingParks,
     isError: isErrorParks,
     refetch: refetchParks
-  } = useQuery<Park[]>({
+  } = useQuery<{data: Park[]}>({
     queryKey: ['/api/parks'],
+    queryFn: () => apiRequest('/api/parks'),
     refetchOnWindowFocus: true,    // ✅ Actualizar al volver a la ventana
     refetchInterval: 30000,        // ✅ Actualizar cada 30 segundos automáticamente
     staleTime: 10000,              // ✅ Datos frescos por 10 segundos
     retry: 1,
 
   });
+  
+  const parks = parksResponse?.data || [];
 
 
 
