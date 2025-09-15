@@ -102,13 +102,15 @@ const CalendarPage: React.FC = () => {
   const [priceFilter, setPriceFilter] = useState('all');
   
   // Consultar actividades, eventos y categorías desde las APIs
-  const { data: activities = [], isLoading: loadingActivities } = useQuery<Activity[]>({
+  const { data: activitiesResponse, isLoading: loadingActivities } = useQuery<{data: Activity[]}>({
     queryKey: ['/api/activities'],
   });
+  const activities = activitiesResponse?.data || [];
   
-  const { data: events = [], isLoading: loadingEvents } = useQuery<Event[]>({
+  const { data: eventsResponse, isLoading: loadingEvents } = useQuery<{data: Event[]}>({
     queryKey: ['/api/events'],
   });
+  const events = eventsResponse?.data || [];
 
   // Obtener las categorías reales desde la API
   const { data: activityCategoriesData = [] } = useQuery({
