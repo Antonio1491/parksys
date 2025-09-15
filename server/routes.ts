@@ -2311,7 +2311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Obtener concesiones activas del parque
       console.log('Paso 7.5: Consultando concesiones del parque...');
       const concessionsResult = await pool.query(`
-        SELECT 
+        SELECT DISTINCT
           ac.id,
           ac.name as "vendorName",
           con.name as "vendorContact", 
