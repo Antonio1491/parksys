@@ -1,25 +1,83 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Package, Search, AlertTriangle, MapPin } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import AdminLayout from "@/components/AdminLayout";
-import type { InventoryStock, Consumable, Park } from "@shared/schema";
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import {
+  Package,
+  Search,
+  AlertTriangle,
+  MapPin,
+  Plus,
+  Grid3X3,
+  List,
+  Filter,
+  X,
+  Download,
+  Upload,
+  BarChart3,
+  Eye,
+  Edit,
+  Trash2
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageHeader } from '@/components/ui/page-header';
+import { AdminLayout } from '@/components/AdminLayout';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
+import type {
+  InventoryStock,
+  Consumable,
+  Park,
+  ConsumableCategory
+} from '@shared/schema';
+
+// Tipos extendidos para el componente
+type StockWithRelations = InventoryStock & {
+  consumable?: Consumable & {
+    category?: ConsumableCategory;
+  };
+  park?: Park;
+};
 
 export default function StockPage() {
-  const [search, setSearch] = useState("");
-  const [selectedPark, setSelectedPark] = useState<string>("");
-  const [showLowStock, setShowLowStock] = useState(false);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const { data: parks } = useQuery({
+  // ===== ESTADO DE FILTROS =====
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPark, setSelectedPark] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [stockFilter, setStockFilter] = useState<string>('all'); // all, low, out, normal
+  const [statusFilter, setStatusFilter] = useState<string>('all'); // all, available, reserved
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(12);
+
+  // ===== NAVEGACIÓN =====
+  const handleNew = () => {
+    setLocation('/admin/warehouse/stock/new');
+  };
+
+  const handleEdit = (stock: StockWithRelations) => {
+    setLocation(`/admin/warehouse/stock/${stock.id}/edit`);
+  };
+
+  const handleView = (stock: StockWithRelations) => {
+    setLocation(`/admin/warehouse/stock/${stock.id}`);
+  };
+
+  // ===== QUERIES =====
+  const { data: parks = [], isLoading: parksLoading } = useQuery<Park[]>({
     queryKey: ['/api/parks'],
-    queryFn: async () => {
-      const response = await fetch('/api/parks');
-      if (!response.ok) throw new Error('Error al cargar parques');
-      return response.json();
-    }
+  });
+
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery<ConsumableCategory[]>({
+    queryKey: ['/api/warehouse/categories'],
   });
 
   const { data: stock, isLoading } = useQuery({
