@@ -305,10 +305,10 @@ function ReservationsPage() {
   });
 
   // Obtener parques para filtros
-  const { data: parksResponse } = useQuery<any[]>({
+  const { data: parksResponse } = useQuery<{data: any[]}>({
     queryKey: ['/api/parks'],
   });
-  const parksData = parksResponse || [];
+  const parksData = parksResponse?.data || [];
 
   const filteredSpaces = useMemo(() => {
     if (!Array.isArray(spacesData)) return [];
