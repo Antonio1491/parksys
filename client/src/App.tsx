@@ -443,6 +443,11 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/StockForm')))}
           </Suspense>
         </Route>
+        <Route path="/admin/warehouse/stock/test">
+          <Suspense fallback={<div className="p-8 text-center">Cargando test de stock...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/StockFormTest')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/warehouse/stock/:id/edit">
           <Suspense fallback={<div className="p-8 text-center">Cargando edición de stock...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/warehouse/StockEdit')))}

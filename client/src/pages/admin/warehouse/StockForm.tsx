@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
@@ -52,21 +52,60 @@ export default function StockForm() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Queries para datos de referencia
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery<ConsumableCategory[]>({
+  // Queries para datos de referencia - Fixed to ensure proper execution
+  const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = useQuery<ConsumableCategory[]>({
     queryKey: ['/api/warehouse/categories'],
-    queryFn: () => apiRequest('/api/warehouse/categories'),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
   
-  const { data: consumables = [], isLoading: consumablesLoading } = useQuery<Consumable[]>({
+  const { data: consumables = [], isLoading: consumablesLoading, error: consumablesError } = useQuery<Consumable[]>({
     queryKey: ['/api/warehouse/consumables'],
-    queryFn: () => apiRequest('/api/warehouse/consumables'),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
   
-  const { data: parks = [], isLoading: parksLoading } = useQuery<Park[]>({
+  const { data: parks = [], isLoading: parksLoading, error: parksError } = useQuery<Park[]>({
     queryKey: ['/api/parks'],
-    queryFn: () => apiRequest('/api/parks'),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
+
+  // Enhanced debug logging for troubleshooting
+  useEffect(() => {
+    console.log('🏞️ [STOCK-FORM] Parks query status:', { 
+      parks, 
+      isLoading: parksLoading, 
+      error: parksError, 
+      parksLength: parks?.length,
+      parksArray: Array.isArray(parks),
+      queryKey: '[\'/api/parks\']'
+    });
+    console.log('🧪 [STOCK-FORM] Consumables query status:', { 
+      consumables, 
+      isLoading: consumablesLoading, 
+      error: consumablesError,
+      consumablesLength: consumables?.length,
+      consumablesArray: Array.isArray(consumables),
+      queryKey: '[\'/api/warehouse/consumables\']'
+    });
+    console.log('📁 [STOCK-FORM] Categories query status:', { 
+      categories, 
+      isLoading: categoriesLoading, 
+      error: categoriesError,
+      categoriesLength: categories?.length,
+      categoriesArray: Array.isArray(categories),
+      queryKey: '[\'/api/warehouse/categories\']'
+    });
+  }, [parks, parksLoading, parksError, consumables, consumablesLoading, consumablesError, categories, categoriesLoading, categoriesError]);
+
+  // Force queries to execute on component mount
+  useEffect(() => {
+    console.log('🚀 [STOCK-FORM] Component mounted, forcing query execution');
+    queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/warehouse/consumables'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/warehouse/categories'] });
+  }, []);
 
   // Form setup
   const form = useForm<StockFormValues>({
@@ -201,15 +240,27 @@ export default function StockForm() {
                               <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()} disabled={parksLoading}>
                                 <FormControl>
                                   <SelectTrigger data-testid="select-park">
-                                    <SelectValue placeholder="Selecciona un parque" />
+                                    <SelectValue placeholder={parksLoading ? "Cargando parques..." : "Selecciona un parque"} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {Array.isArray(parks) && parks.map((park) => (
-                                    <SelectItem key={park.id} value={park.id.toString()} data-testid={`park-option-${park.id}`}>
-                                      {park.name}
-                                    </SelectItem>
-                                  ))}
+                                  {parksLoading && (
+                                    <SelectItem value="loading" disabled>Cargando parques...</SelectItem>
+                                  )}
+                                  {parksError && (
+                                    <SelectItem value="error" disabled>Error: {parksError.message}</SelectItem>
+                                  )}
+                                  {!parksLoading && !parksError && Array.isArray(parks) && parks.length === 0 && (
+                                    <SelectItem value="empty" disabled>No hay parques disponibles</SelectItem>
+                                  )}
+                                  {!parksLoading && !parksError && Array.isArray(parks) && parks.length > 0 && parks.map((park) => {
+                                    console.log('🏞️ [PARK-OPTION] Rendering park:', park);
+                                    return (
+                                      <SelectItem key={park.id} value={park.id.toString()} data-testid={`park-option-${park.id}`}>
+                                        {park.name}
+                                      </SelectItem>
+                                    );
+                                  })}
                                 </SelectContent>
                               </Select>
                               <FormDescription>
