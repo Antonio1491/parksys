@@ -55,14 +55,17 @@ export default function StockForm() {
   // Queries para datos de referencia
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<ConsumableCategory[]>({
     queryKey: ['/api/warehouse/categories'],
+    queryFn: () => apiRequest('/api/warehouse/categories'),
   });
   
   const { data: consumables = [], isLoading: consumablesLoading } = useQuery<Consumable[]>({
     queryKey: ['/api/warehouse/consumables'],
+    queryFn: () => apiRequest('/api/warehouse/consumables'),
   });
   
   const { data: parks = [], isLoading: parksLoading } = useQuery<Park[]>({
     queryKey: ['/api/parks'],
+    queryFn: () => apiRequest('/api/parks'),
   });
 
   // Form setup
@@ -175,7 +178,7 @@ export default function StockForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {consumables.map((consumable) => (
+                                  {Array.isArray(consumables) && consumables.map((consumable) => (
                                     <SelectItem key={consumable.id} value={consumable.id.toString()} data-testid={`consumable-option-${consumable.id}`}>
                                       {consumable.name} {consumable.code && `(${consumable.code})`}
                                     </SelectItem>
@@ -202,7 +205,7 @@ export default function StockForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {parks.map((park) => (
+                                  {Array.isArray(parks) && parks.map((park) => (
                                     <SelectItem key={park.id} value={park.id.toString()} data-testid={`park-option-${park.id}`}>
                                       {park.name}
                                     </SelectItem>
