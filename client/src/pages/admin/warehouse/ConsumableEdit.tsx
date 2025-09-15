@@ -36,7 +36,6 @@ import {
   type ConsumableCategory
 } from '@shared/schema';
 import { z } from 'zod';
-import { getIconComponent } from '@/lib/icon-utils';
 
 // Unidades de medida
 const UNITS_OF_MEASURE = [
@@ -58,7 +57,7 @@ const UNITS_OF_MEASURE = [
 const consumableFormSchema = insertConsumableSchema.extend({
   categoryId: z.number({ required_error: "La categoría es obligatoria" }),
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  unit: z.string().min(1, "La unidad es obligatoria"),
+  unitOfMeasure: z.string().min(1, "La unidad es obligatoria"),
 });
 
 type ConsumableFormValues = z.infer<typeof consumableFormSchema>;
@@ -91,12 +90,12 @@ export default function ConsumableEdit() {
       description: '',
       code: '',
       categoryId: undefined,
-      unit: '',
-      cost: 0,
-      price: 0,
+      unitOfMeasure: '',
+      unitCost: undefined,
+      lastPurchasePrice: undefined,
       minimumStock: 0,
-      currentStock: 0,
-      maxStock: undefined,
+      maximumStock: undefined,
+      reorderPoint: undefined,
       brand: '',
       model: '',
       presentation: '',
@@ -118,12 +117,12 @@ export default function ConsumableEdit() {
         description: consumable.description || '',
         code: consumable.code || '',
         categoryId: consumable.categoryId || undefined,
-        unit: consumable.unit || '',
-        cost: consumable.cost || 0,
-        price: consumable.price || 0,
+        unitOfMeasure: consumable.unitOfMeasure || '',
+        unitCost: consumable.unitCost || undefined,
+        lastPurchasePrice: consumable.lastPurchasePrice || undefined,
         minimumStock: consumable.minimumStock || 0,
-        currentStock: consumable.currentStock || 0,
-        maxStock: consumable.maxStock || undefined,
+        maximumStock: consumable.maximumStock || undefined,
+        reorderPoint: consumable.reorderPoint || undefined,
         brand: consumable.brand || '',
         model: consumable.model || '',
         presentation: consumable.presentation || '',
@@ -341,10 +340,7 @@ export default function ConsumableEdit() {
                               <SelectContent>
                                 {categories.map((category) => (
                                   <SelectItem key={category.id} value={category.id.toString()} data-testid={`category-option-${category.id}`}>
-                                    <div className="flex items-center gap-2">
-                                      {category.icon && React.createElement(getIconComponent(category.icon), { className: "h-4 w-4" })}
-                                      <span style={{ color: category.color || '#666666' }}>{category.name}</span>
-                                    </div>
+                                    <span style={{ color: category.color || '#666666' }}>{category.name}</span>
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -355,7 +351,7 @@ export default function ConsumableEdit() {
                       />
                       <FormField
                         control={form.control}
-                        name="unit"
+                        name="unitOfMeasure"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Unidad de Medida *</FormLabel>
@@ -452,25 +448,6 @@ export default function ConsumableEdit() {
                     <div className="grid grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
-                        name="currentStock"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Stock Actual</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder="0"
-                                data-testid="input-current-stock"
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
                         name="minimumStock"
                         render={({ field }) => (
                           <FormItem>
@@ -490,7 +467,7 @@ export default function ConsumableEdit() {
                       />
                       <FormField
                         control={form.control}
-                        name="maxStock"
+                        name="maximumStock"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Stock Máximo</FormLabel>
@@ -499,6 +476,25 @@ export default function ConsumableEdit() {
                                 type="number"
                                 placeholder="Opcional"
                                 data-testid="input-max-stock"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="reorderPoint"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Punto de Reorden</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="Opcional"
+                                data-testid="input-reorder-point"
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                               />
@@ -547,7 +543,7 @@ export default function ConsumableEdit() {
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
-                        name="cost"
+                        name="unitCost"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Costo Unitario</FormLabel>
@@ -558,7 +554,7 @@ export default function ConsumableEdit() {
                                 placeholder="0.00"
                                 data-testid="input-cost"
                                 {...field}
-                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                               />
                             </FormControl>
                             <FormDescription>
@@ -570,10 +566,10 @@ export default function ConsumableEdit() {
                       />
                       <FormField
                         control={form.control}
-                        name="price"
+                        name="lastPurchasePrice"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Precio de Venta</FormLabel>
+                            <FormLabel>Último Precio de Compra</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -581,11 +577,11 @@ export default function ConsumableEdit() {
                                 placeholder="0.00"
                                 data-testid="input-price"
                                 {...field}
-                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                               />
                             </FormControl>
                             <FormDescription>
-                              Precio de venta al público (si aplica)
+                              Último precio de compra registrado
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
