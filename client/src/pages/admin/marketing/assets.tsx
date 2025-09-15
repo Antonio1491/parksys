@@ -39,6 +39,7 @@ interface SponsorshipAssetLink {
   createdAt: string;
   updatedAt: string;
   contractStatus?: string;
+  contractNumber?: string;
   sponsorName?: string;
   sponsorSector?: string;
   assetName?: string;
@@ -163,7 +164,7 @@ export default function SponsoredAssetsPage() {
                           <div className="font-medium">{link.assetName || `Activo #${link.assetId}`}</div>
                         </td>
                         <td className="p-2">
-                          <Badge variant="outline">Contrato #{link.contractId}</Badge>
+                          <Badge variant="outline">{link.contractNumber || `Contrato #${link.contractId}`}</Badge>
                         </td>
                         <td className="p-2">
                           <div className="flex items-center gap-2">
