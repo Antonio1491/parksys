@@ -178,10 +178,12 @@ export default function ConsumableEdit() {
   if (!match) {
     return (
       <AdminLayout>
-        <div className="container max-w-4xl mx-auto p-6">
-          <div className="text-center py-8">
-            <p className="text-red-600">ID de consumible no válido</p>
-            <Button onClick={handleCancel} className="mt-4">Volver a consumibles</Button>
+        <div className="p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center py-8">
+              <p className="text-red-600">ID de consumible no válido</p>
+              <Button onClick={handleCancel} className="mt-4">Volver a consumibles</Button>
+            </div>
           </div>
         </div>
       </AdminLayout>
@@ -191,10 +193,12 @@ export default function ConsumableEdit() {
   if (consumableLoading) {
     return (
       <AdminLayout>
-        <div className="container max-w-4xl mx-auto p-6">
-          <div className="text-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-            <p>Cargando consumible...</p>
+        <div className="p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+              <p>Cargando consumible...</p>
+            </div>
           </div>
         </div>
       </AdminLayout>
@@ -204,10 +208,12 @@ export default function ConsumableEdit() {
   if (consumableError || !consumable) {
     return (
       <AdminLayout>
-        <div className="container max-w-4xl mx-auto p-6">
-          <div className="text-center py-8">
-            <p className="text-red-600 mb-4">Error al cargar el consumible</p>
-            <Button onClick={handleCancel}>Volver a consumibles</Button>
+        <div className="p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center py-8">
+              <p className="text-red-600 mb-4">Error al cargar el consumible</p>
+              <Button onClick={handleCancel}>Volver a consumibles</Button>
+            </div>
           </div>
         </div>
       </AdminLayout>
@@ -216,9 +222,10 @@ export default function ConsumableEdit() {
 
   return (
     <AdminLayout>
-      <div className="container max-w-4xl mx-auto p-6">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-6">
           <Button
             variant="outline"
             size="icon"
@@ -754,7 +761,8 @@ export default function ConsumableEdit() {
               </Button>
             </div>
           </form>
-        </Form>
+          </Form>
+        </div>
       </div>
     </AdminLayout>
   );

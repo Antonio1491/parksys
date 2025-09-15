@@ -137,10 +137,11 @@ export default function ConsumableForm() {
 
   return (
     <AdminLayout>
-      <div className="container max-w-4xl mx-auto p-6">
+      <div className="p-6">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Button
             variant="outline"
             size="icon"
             onClick={handleCancel}
@@ -152,10 +153,10 @@ export default function ConsumableForm() {
             <h1 className="text-2xl font-bold text-gray-900">Nuevo Consumible</h1>
             <p className="text-gray-600">Agrega un nuevo consumible al inventario</p>
           </div>
-        </div>
+          </div>
 
-        {/* Form */}
-        <Form {...form}>
+          {/* Form */}
+          <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
@@ -675,7 +676,8 @@ export default function ConsumableForm() {
               </Button>
             </div>
           </form>
-        </Form>
+          </Form>
+        </div>
       </div>
     </AdminLayout>
   );
