@@ -119,27 +119,41 @@ const CalendarPage: React.FC = () => {
   const activityCategoriesData = activityCategoriesResponse?.data || [];
   
   // Procesar datos de eventos para el formato unificado
-  const processedEvents: CalendarItem[] = events
-    .filter(event => event.status === 'published')
-    .map(event => ({
+  console.log('🎉 [EVENTS-DEBUG] Total events received:', events.length);
+  events.forEach((event, index) => {
+    console.log(`🎉 [EVENTS-DEBUG] Event ${index + 1}:`, {
       id: event.id,
       title: event.title,
-      description: event.description,
-      category: event.eventType,
+      status: event.status,
       startDate: event.startDate,
-      endDate: event.endDate,
-      startTime: event.startTime,
-      endTime: event.endTime,
-      location: event.location,
-      capacity: event.capacity,
-      price: undefined,
-      parkName: event.parks?.[0]?.name || 'Sin parque',
-      type: 'event' as const,
-      isFree: event.registrationType === 'free',
-      organizerName: event.organizerName,
-      targetAudience: event.targetAudience,
-      status: event.status
-    }));
+      parks: event.parks
+    });
+  });
+  
+  const filteredEvents = events.filter(event => event.status === 'published');
+  console.log('🎉 [EVENTS-DEBUG] After status filter:', filteredEvents.length);
+  
+  const processedEvents: CalendarItem[] = filteredEvents.map(event => ({
+    id: event.id,
+    title: event.title,
+    description: event.description,
+    category: event.eventType,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    startTime: event.startTime,
+    endTime: event.endTime,
+    location: event.location,
+    capacity: event.capacity,
+    price: undefined,
+    parkName: event.parks?.[0]?.name || 'Sin parque',
+    type: 'event' as const,
+    isFree: event.registrationType === 'free',
+    organizerName: event.organizerName,
+    targetAudience: event.targetAudience,
+    status: event.status
+  }));
+  
+  console.log('🎉 [EVENTS-DEBUG] Processed events:', processedEvents.length);
   
   // Procesar datos de actividades para el formato unificado
   const processedActivities: CalendarItem[] = activities.map(activity => {
