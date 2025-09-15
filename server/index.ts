@@ -2460,19 +2460,8 @@ function startServer() {
         
         // SPA catch-all (serve index.html for all non-static routes)
         app.get('*', (req, res) => {
-          // Skip static asset paths
-          if (req.path.startsWith('/api') || 
-              req.path.startsWith('/uploads') || 
-              req.path.startsWith('/public') || 
-              req.path.startsWith('/public-objects') || 
-              req.path.startsWith('/assets') || 
-              req.path.startsWith('/fonts') || 
-              req.path.startsWith('/images') ||
-              req.path.includes('/health') ||
-              req.path.includes('/ready')) {
-            return res.status(404).send('Not found');
-          }
-          
+          // CRITICAL: Do NOT intercept static assets - let express.static handle them
+          // Static assets should be handled by express.static middleware above this
           const indexPath = path.join(distPath, 'index.html');
           if (fs.existsSync(indexPath)) {
             res.sendFile(indexPath);
