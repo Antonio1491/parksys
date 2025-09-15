@@ -98,6 +98,7 @@ export async function getAllEvents(req: Request, res: Response) {
         requiresApproval: events.requiresApproval,
         createdAt: events.createdAt,
         updatedAt: events.updatedAt,
+        featuredImageUrl: events.featuredImageUrl,
         imageUrl: eventImages.imageUrl
       })
       .from(events)
