@@ -2532,6 +2532,12 @@ function startServer() {
       // NOW setup frontend serving - this will establish the catch-all route AFTER all API routes
       const isProduction = process.env.NODE_ENV === 'production';
       if (isProduction) {
+        // CRITICAL FIX: Servir archivos estáticos desde la ubicación correcta ANTES de vite
+        const path = require('path');
+        const distPath = path.join(process.cwd(), 'dist', 'public');
+        app.use(express.static(distPath));
+        console.log(`📁 [PROD] Archivos estáticos servidos desde: ${distPath}`);
+        
         const { serveStatic } = await import("./vite");
         serveStatic(app);
         
