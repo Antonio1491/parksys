@@ -46,7 +46,7 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         .from(sponsorshipPackages)
         .orderBy(sponsorshipPackages.id); // Ordenar por ID ascendente (1 al 10)
       
-      res.json(packages);
+      res.json({ data: packages });
     } catch (error) {
       console.error('Error al obtener paquetes de patrocinio:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
@@ -640,10 +640,10 @@ export function registerSponsorshipRoutes(app: any, apiRouter: any, isAuthentica
         
         console.log('✅ Contratos con sponsors:', contractsWithSponsors.length);
         console.log('📋 Primer contrato:', contractsWithSponsors[0]);
-        res.json(contractsWithSponsors);
+        res.json({ data: contractsWithSponsors });
       } else {
         console.log('⚠️ No hay contratos en la base de datos');
-        res.json([]);
+        res.json({ data: [] });
       }
     } catch (error: unknown) {
       console.error('❌ Error al obtener contratos:', error);

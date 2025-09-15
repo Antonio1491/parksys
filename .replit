@@ -49,16 +49,16 @@ localPort = 40729
 externalPort = 3002
 
 [[ports]]
-localPort = 43583
-externalPort = 5000
-
-[[ports]]
 localPort = 44041
 externalPort = 3000
 
 [[ports]]
 localPort = 46301
 externalPort = 4200
+
+[[ports]]
+localPort = 46387
+externalPort = 5000
 
 [agent]
 integrations = ["javascript_object_storage:1.0.0"]
