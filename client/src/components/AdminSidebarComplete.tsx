@@ -928,6 +928,13 @@ const AdminSidebarComplete: React.FC = () => {
                 Dashboard
               </NavItem>
               <NavItem 
+                href="/admin/warehouse/categories" 
+                icon={<Tag className="h-4 w-4" />}
+                active={location.startsWith('/admin/warehouse/categories')}
+              >
+                Categorías
+              </NavItem>
+              <NavItem 
                 href="/admin/warehouse/consumables" 
                 icon={<Package className="h-4 w-4" />}
                 active={location.startsWith('/admin/warehouse/consumables')}
