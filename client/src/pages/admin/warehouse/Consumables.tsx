@@ -53,9 +53,9 @@ const formatCurrency = (amount: number | null) => {
 // ===== COMPONENTE PRINCIPAL =====
 export default function ConsumablesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [stockFilter, setStockFilter] = useState<string>(''); // low, normal, high
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [stockFilter, setStockFilter] = useState<string>('all'); // low, normal, high, all
   const [supplierFilter, setSupplierFilter] = useState<string>('');
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,9 +74,9 @@ export default function ConsumablesPage() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchTerm) params.append('search', searchTerm);
-      if (selectedCategory) params.append('categoryId', selectedCategory);
-      if (statusFilter) params.append('active', statusFilter);
-      if (stockFilter) params.append('stock', stockFilter);
+      if (selectedCategory && selectedCategory !== 'all') params.append('categoryId', selectedCategory);
+      if (statusFilter && statusFilter !== 'all') params.append('active', statusFilter);
+      if (stockFilter && stockFilter !== 'all') params.append('stock', stockFilter);
       if (supplierFilter) params.append('supplier', supplierFilter);
       
       return apiRequest(`/api/warehouse/consumables?${params}`);
@@ -130,9 +130,9 @@ export default function ConsumablesPage() {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedCategory('');
-    setStatusFilter('');
-    setStockFilter('');
+    setSelectedCategory('all');
+    setStatusFilter('all');
+    setStockFilter('all');
     setSupplierFilter('');
     setCurrentPage(1);
   };
@@ -226,7 +226,7 @@ export default function ConsumablesPage() {
                 <Filter className="h-5 w-5" />
                 Filtros
               </CardTitle>
-              {(searchTerm || selectedCategory || statusFilter || stockFilter || supplierFilter) && (
+              {(searchTerm || (selectedCategory && selectedCategory !== 'all') || (statusFilter && statusFilter !== 'all') || (stockFilter && stockFilter !== 'all') || supplierFilter) && (
                 <Button variant="outline" size="sm" onClick={clearFilters} data-testid="button-clear-filters">
                   <X className="h-4 w-4 mr-2" />
                   Limpiar
@@ -257,7 +257,7 @@ export default function ConsumablesPage() {
                     <SelectValue placeholder="Todas las categorías" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" data-testid="category-filter-all">Todas las categorías</SelectItem>
+                    <SelectItem value="all" data-testid="category-filter-all">Todas las categorías</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id.toString()} data-testid={`category-filter-${category.id}`}>
                         <div className="flex items-center gap-2">
@@ -277,7 +277,7 @@ export default function ConsumablesPage() {
                     <SelectValue placeholder="Todos los estados" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" data-testid="status-filter-all">Todos los estados</SelectItem>
+                    <SelectItem value="all" data-testid="status-filter-all">Todos los estados</SelectItem>
                     <SelectItem value="true" data-testid="status-filter-active">Activos</SelectItem>
                     <SelectItem value="false" data-testid="status-filter-inactive">Inactivos</SelectItem>
                   </SelectContent>
@@ -291,7 +291,7 @@ export default function ConsumablesPage() {
                     <SelectValue placeholder="Todos los niveles" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" data-testid="stock-filter-all">Todos los niveles</SelectItem>
+                    <SelectItem value="all" data-testid="stock-filter-all">Todos los niveles</SelectItem>
                     <SelectItem value="low" data-testid="stock-filter-low">Stock bajo</SelectItem>
                     <SelectItem value="normal" data-testid="stock-filter-normal">Stock normal</SelectItem>
                     <SelectItem value="high" data-testid="stock-filter-high">Stock alto</SelectItem>
