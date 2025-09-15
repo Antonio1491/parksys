@@ -53,26 +53,32 @@ export default function StockForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Queries para datos de referencia - Fixed to ensure proper execution
-  const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = useQuery<ConsumableCategory[]>({
+  const { data: categoriesResponse, isLoading: categoriesLoading, error: categoriesError } = useQuery<{data: ConsumableCategory[]}>({
     queryKey: ['/api/warehouse/categories'],
     queryFn: () => apiRequest('/api/warehouse/categories'),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
   
-  const { data: consumables = [], isLoading: consumablesLoading, error: consumablesError } = useQuery<Consumable[]>({
+  const categories = categoriesResponse?.data || [];
+  
+  const { data: consumablesResponse, isLoading: consumablesLoading, error: consumablesError } = useQuery<{data: Consumable[]}>({
     queryKey: ['/api/warehouse/consumables'],
     queryFn: () => apiRequest('/api/warehouse/consumables'),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
   
-  const { data: parks = [], isLoading: parksLoading, error: parksError } = useQuery<Park[]>({
+  const consumables = consumablesResponse?.data || [];
+  
+  const { data: parksResponse, isLoading: parksLoading, error: parksError } = useQuery<{data: Park[]}>({
     queryKey: ['/api/parks'],
     queryFn: () => apiRequest('/api/parks'),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
+  
+  const parks = parksResponse?.data || [];
 
   // Enhanced debug logging for troubleshooting
   useEffect(() => {
