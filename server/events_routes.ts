@@ -92,7 +92,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
         const filteredEventsWithNormalizedImages = filteredEvents.map(event => ({
           ...event,
-          imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+          // Los eventos solo tienen featuredImageUrl, no imageUrl
           featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl
         }));
         
@@ -102,7 +102,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
       const eventsWithNormalizedImages = eventsList.map(event => ({
         ...event,
-        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+        // Los eventos solo tienen featuredImageUrl, no imageUrl
         featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
         // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
         startDate: event.startDate ? event.startDate.toString() : null,
@@ -158,7 +158,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       // 🎯 NORMALIZAR URLs de imágenes y devolver evento con parques asociados
       const eventWithNormalizedImages = {
         ...event,
-        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+        // Los eventos solo tienen featuredImageUrl, no imageUrl
         featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
         // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
         startDate: event.startDate ? event.startDate.toString() : null,
@@ -416,7 +416,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
       const eventsWithNormalizedImages = eventsList.map(event => ({
         ...event,
-        imageUrl: event.imageUrl ? replitObjectStorage.normalizeUrl(event.imageUrl) : event.imageUrl,
+        // Los eventos solo tienen featuredImageUrl, no imageUrl
         featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
         // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
         startDate: event.startDate ? event.startDate.toString() : null,

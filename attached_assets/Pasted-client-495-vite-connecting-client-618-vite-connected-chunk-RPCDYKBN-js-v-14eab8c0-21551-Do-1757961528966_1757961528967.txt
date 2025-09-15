@@ -1,0 +1,40 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:22 🔥 Firebase initialized successfully
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 0
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 0
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 0
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 0 Activities: 0 Events: 0
+queryClient.ts:219 🌐 [QUERY] GET /api/activities
+queryClient.ts:219 🌐 [QUERY] GET /api/events
+queryClient.ts:219 🌐 [QUERY] GET /api/activity-categories
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 0
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 0
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 0
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 25 Activities: 25 Events: 0
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 2
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 1: {id: 8, title: 'Otra prueba', status: 'published', startDate: undefined, startDateType: 'undefined', …}
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 2: {id: 7, title: 'Observación de aves', status: 'published', startDate: undefined, startDateType: 'undefined', …}
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 2
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 2
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 27 Activities: 25 Events: 2
+chunk-RPCDYKBN.js?v=14eab8c0:18625 [Violation] 'setTimeout' handler took 57ms
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/parks
+Events.tsx:285 Image loaded successfully: /api/storage/file/uploads/event-images/event-images-1757346067803-833091497.jpg
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 2
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 1: {id: 8, title: 'Otra prueba', status: 'published', startDate: undefined, startDateType: 'undefined', …}
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 2: {id: 7, title: 'Observación de aves', status: 'published', startDate: undefined, startDateType: 'undefined', …}
+calendar.tsx:136 🎉 [EVENTS-DEBUG] After status filter: 2
+calendar.tsx:158 🎉 [EVENTS-DEBUG] Processed events: 2
+calendar.tsx:189 🎉 [CALENDAR-DEBUG] Combined items: 27 Activities: 25 Events: 2
