@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ExtendedPark } from '@shared/schema';
+import { apiRequest } from '@/lib/queryClient';
 // Filtros completamente eliminados para simplificar interfaz
 import ParksMap from '@/components/ParksMap';
 import ParksList from '@/components/ParksList';
@@ -47,14 +48,15 @@ const Parks: React.FC = () => {
   // Fetch parks with filters
   const { data: parksResponse, isLoading } = useQuery<ExtendedPark[]>({
     queryKey: [`/api/parks${buildQueryString()}`],
+    queryFn: () => apiRequest(`/api/parks${buildQueryString()}`),
   });
   
-  const allParks = parksResponse || [];
+  const allParks = parksResponse?.data || [];
   
-  // Filtrar parques sin nombre o marcados como eliminados
-  const filteredParks = allParks.filter(park => 
+  // Filtrar parques sin nombre o marcados como eliminados - agregar programación defensiva
+  const filteredParks = Array.isArray(allParks) ? allParks.filter(park => 
     park.name.trim() !== '' && !park.isDeleted
-  );
+  ) : [];
 
   // Mostrar todos los parques sin paginación
   const totalParks = filteredParks.length;
@@ -73,6 +75,7 @@ const Parks: React.FC = () => {
   // Fetch detailed park data when selected
   const { data: selectedPark, isLoading: isLoadingPark } = useQuery<ExtendedPark>({
     queryKey: [selectedParkId ? `/api/parks/${selectedParkId}` : ''],
+    queryFn: () => apiRequest(`/api/parks/${selectedParkId}`),
     enabled: !!selectedParkId,
   });
   
