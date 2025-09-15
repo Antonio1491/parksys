@@ -1,0 +1,34 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:22 🔥 Firebase initialized successfully
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es Object
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized Object
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 0
+calendar.tsx:134 🎉 [EVENTS-DEBUG] After status filter: 0
+calendar.tsx:156 🎉 [EVENTS-DEBUG] Processed events: 0
+queryClient.ts:219 🌐 [QUERY] GET /api/activities
+queryClient.ts:219 🌐 [QUERY] GET /api/events
+queryClient.ts:219 🌐 [QUERY] GET /api/activity-categories
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 2
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 1: Object
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 2: Object
+calendar.tsx:134 🎉 [EVENTS-DEBUG] After status filter: 2
+calendar.tsx:156 🎉 [EVENTS-DEBUG] Processed events: 2
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 2
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 1: Object
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 2: Object
+calendar.tsx:134 🎉 [EVENTS-DEBUG] After status filter: 2
+calendar.tsx:156 🎉 [EVENTS-DEBUG] Processed events: 2
+calendar.tsx:122 🎉 [EVENTS-DEBUG] Total events received: 2
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 1: Object
+calendar.tsx:124 🎉 [EVENTS-DEBUG] Event 2: Object
+calendar.tsx:134 🎉 [EVENTS-DEBUG] After status filter: 2
+calendar.tsx:156 🎉 [EVENTS-DEBUG] Processed events: 2
+useUnifiedAuth.ts:140 🔧 [UNIFIED AUTH] Estado: Object
+calendar:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received

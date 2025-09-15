@@ -126,6 +126,8 @@ const CalendarPage: React.FC = () => {
       title: event.title,
       status: event.status,
       startDate: event.startDate,
+      startDateType: typeof event.startDate,
+      startDateValid: event.startDate ? isValid(parseISO(event.startDate)) : false,
       parks: event.parks
     });
   });
@@ -184,6 +186,7 @@ const CalendarPage: React.FC = () => {
   
   // Combinar actividades y eventos
   const allItems = [...processedActivities, ...processedEvents];
+  console.log('🎉 [CALENDAR-DEBUG] Combined items:', allItems.length, 'Activities:', processedActivities.length, 'Events:', processedEvents.length);
   
   // Usar las categorías reales de la API de actividades
   const activityCategories = activityCategoriesData.map((cat) => cat.name);
