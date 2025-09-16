@@ -2442,7 +2442,8 @@ function startServer() {
     }
     
     // 🔧 [FRONTEND-FIX] Environment-controlled static SPA fallback
-    const useStaticFrontend = process.env.USE_PROD_FRONTEND === '1' || process.env.NODE_ENV === 'production';
+    // Force development to use Vite, regardless of USE_PROD_FRONTEND
+    const useStaticFrontend = process.env.NODE_ENV === 'production';
     
     if (useStaticFrontend) {
       console.log("🔧 [STATIC-FALLBACK] Using static frontend to bypass Vite issues");
@@ -2581,24 +2582,10 @@ function startServer() {
         // const { serveStatic } = await import("./vite");
         // serveStatic(app);
         
-        // ✅ CRITICAL FIX: SPA catch-all for production mode - debe ir AL FINAL
-        app.get('*', (req: Request, res: Response) => {
-          try {
-            const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
-            if (fs.existsSync(indexPath)) {
-              console.log(`📁 [SPA] Serving index.html for route: ${req.path}`);
-              res.sendFile(indexPath);
-            } else {
-              console.log(`❌ [SPA] index.html not found for route: ${req.path}`);
-              res.status(404).send('Application not built. Please run npm run build first.');
-            }
-          } catch (error) {
-            console.error(`🚫 [SPA] Error serving ${req.path}:`, error);
-            res.status(500).send('Server error');
-          }
-        });
+        // ✅ ELIMINATED: Duplicate catch-all route removed - already handled in useStaticFrontend block
+        // The SPA catch-all is properly configured above with correct middleware ordering
         
-        console.log("🎨 [FRONTEND] Production static serving enabled AFTER API routes with SPA routing");
+        console.log("🎨 [FRONTEND] Production static serving already configured in useStaticFrontend block");
       } else {
         // 🔧 DEV FIX: Vite was already setup immediately after server start
         console.log("🎨 [FRONTEND] Development Vite already enabled - skipping duplicate setup");
