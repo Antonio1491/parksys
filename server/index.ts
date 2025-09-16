@@ -2442,21 +2442,34 @@ function startServer() {
     }
     
     // 🔧 [FRONTEND-FIX] Environment-controlled static SPA fallback
-    // Force development to use Vite, regardless of USE_PROD_FRONTEND
-    const useStaticFrontend = process.env.NODE_ENV === 'production';
+    // 🎯 CRITICAL FIX: Detect built assets presence, not NODE_ENV (correct Vite structure)
+    const distDir = path.join(process.cwd(), 'dist', 'public');
+    const hasBuild = fs.existsSync(path.join(distDir, 'index.html')) && 
+                     fs.existsSync(path.join(distDir, 'assets'));
+    const useStaticFrontend = hasBuild || 
+                              process.env.FORCE_STATIC === 'true' || 
+                              !!process.env.REPLIT_DEPLOYMENT_ID;
+    
+    console.log(`🔍 [BUILD-CHECK] Checking for build at ${distDir}`);
+    console.log(`🔍 [BUILD-CHECK] index.html exists: ${fs.existsSync(path.join(distDir, 'index.html'))}`);
+    console.log(`🔍 [BUILD-CHECK] assets/ exists: ${fs.existsSync(path.join(distDir, 'assets'))}`);
+    console.log(`🔍 [BUILD-CHECK] useStaticFrontend: ${useStaticFrontend}`);
     
     if (useStaticFrontend) {
-      console.log("🔧 [STATIC-FALLBACK] Using static frontend to bypass Vite issues");
+      console.log("🔧 [STATIC-FALLBACK] Using static frontend (build detected or forced)");
       try {
-        // Programmatic build
-        const { build } = await import('vite');
-        console.log("🔧 [BUILD] Building frontend...");
-        await build();
-        console.log("✅ [BUILD] Frontend build completed");
+        // Only build if no existing build found
+        if (!hasBuild) {
+          const { build } = await import('vite');
+          console.log("🔧 [BUILD] Building frontend...");
+          await build();
+          console.log("✅ [BUILD] Frontend build completed");
+        } else {
+          console.log("✅ [BUILD] Existing build detected, skipping rebuild");
+        }
         
-        // 🎯 CRITICAL FIX: Serve from dist/public (correct Vite build path)
-        const distPath = path.join(process.cwd(), 'dist', 'public');
-        app.use('/assets', express.static(path.join(distPath, 'assets'), { 
+        // 🎯 CRITICAL FIX: Serve from dist/public/assets (correct Vite output structure)
+        app.use('/assets', express.static(path.join(distDir, 'assets'), { 
           immutable: true, 
           maxAge: '1y',
           fallthrough: false,  // CRITICAL: Do not pass to next middleware on 404
@@ -2467,45 +2480,38 @@ function startServer() {
           }
         }));
         
-        // 🎯 General static files from dist/public (allow fallthrough for SPA routing)
-        app.use(express.static(distPath, { 
+        // 🎯 Root handler for index.html
+        app.get('/', (req, res) => {
+          const indexPath = path.join(distDir, 'index.html');
+          console.log(`📁 [ROOT] Serving index.html from: ${indexPath}`);
+          res.sendFile(indexPath);
+        });
+        
+        // 🎯 General static files from dist root (for other assets like images, fonts)
+        app.use(express.static(distDir, { 
           maxAge: '1h',
-          fallthrough: true,  // Allow fallthrough so SPA catch-all can handle /admin routes
+          fallthrough: true,
           setHeaders: (res, filePath) => {
             // Ensure CSS files have correct MIME type
             if (filePath.endsWith('.css')) res.type('text/css');
           }
         }));
-        console.log("✅ [STATIC] Static files enabled from dist/public with proper caching");
         
-        // 🎯 EXTENSION-GUARDED SPA catch-all (only for extensionless routes)
-        app.get('*', (req, res, next) => {
-          // Skip non-GET requests
-          if (req.method !== 'GET') return next();
-          
-          // Skip API and object storage paths
-          if (req.path.startsWith('/api') || req.path.startsWith('/public-objects')) {
+        // 🎯 REGEX-BASED SPA catch-all (exclude files with extensions)
+        app.get(/^\/(?!api|objects|uploads|public-objects|health.*).*/, (req, res, next) => {
+          // Skip files with extensions (real files)
+          if (/\.[^/]+$/.test(req.path)) {
+            console.log(`📁 [SPA] Skipping file with extension: ${req.path}`);
             return next();
           }
           
-          // CRITICAL: Skip any request with file extension (.css, .js, .png, etc)
-          if (/\.[a-z0-9]+$/i.test(req.path)) {
-            console.log(`📁 [SPA] Skipping file with extension: ${req.path}`);
-            return res.status(404).end();
-          }
-          
-          // Serve index.html for extensionless routes only
-          const indexPath = path.join(distPath, 'index.html');
-          if (fs.existsSync(indexPath)) {
-            res.setHeader('Cache-Control', 'no-cache');
-            console.log(`📁 [SPA] Serving index.html for route: ${req.path}`);
-            res.sendFile(indexPath);
-          } else {
-            console.error("❌ [SPA] index.html not found at:", indexPath);
-            res.status(404).send('Frontend build not found');
-          }
+          // Serve index.html for SPA routes
+          const indexPath = path.join(distDir, 'index.html');
+          console.log(`📁 [SPA] Serving index.html for SPA route: ${req.path}`);
+          res.sendFile(indexPath);
         });
-        console.log("✅ [SPA] SPA catch-all route registered with proper cache headers");
+        
+        console.log("✅ [STATIC] Static files enabled from dist/public with proper asset handling");
         
       } catch (error) {
         console.error("❌ [STATIC-FALLBACK] Error setting up static frontend:", error);
