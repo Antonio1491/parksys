@@ -26,9 +26,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, Package, DollarSign, Settings, Archive } from 'lucide-react';
-import AdminLayout from '@/components/AdminLayout';
+import { AdminLayout } from '@/components/AdminLayout';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest, queryClient } from '@/lib/queryClient';
+import { apiRequest } from '@/lib/queryClient';
 import { 
   insertConsumableSchema, 
   type InsertConsumable,
@@ -66,6 +66,7 @@ export default function ConsumableForm() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
   // Query para obtener categorías
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<ConsumableCategory[]>({
@@ -380,6 +381,7 @@ export default function ConsumableForm() {
                                 placeholder="0"
                                 data-testid="input-minimum-stock"
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                               />
                             </FormControl>
@@ -399,6 +401,7 @@ export default function ConsumableForm() {
                                 placeholder="Opcional"
                                 data-testid="input-max-stock"
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                               />
                             </FormControl>
@@ -418,6 +421,7 @@ export default function ConsumableForm() {
                                 placeholder="Opcional"
                                 data-testid="input-reorder-point"
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                               />
                             </FormControl>
@@ -476,6 +480,7 @@ export default function ConsumableForm() {
                                 placeholder="0.00"
                                 data-testid="input-cost"
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                               />
                             </FormControl>
@@ -499,6 +504,7 @@ export default function ConsumableForm() {
                                 placeholder="0.00"
                                 data-testid="input-price"
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                               />
                             </FormControl>
