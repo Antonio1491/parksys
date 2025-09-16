@@ -2442,7 +2442,7 @@ function startServer() {
     }
     
     // 🔧 [FRONTEND-FIX] Environment-controlled static SPA fallback
-    const useStaticFrontend = process.env.USE_PROD_FRONTEND === '1';
+    const useStaticFrontend = process.env.USE_PROD_FRONTEND === '1' || process.env.NODE_ENV === 'production';
     
     if (useStaticFrontend) {
       console.log("🔧 [STATIC-FALLBACK] Using static frontend to bypass Vite issues");
