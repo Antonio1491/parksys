@@ -2454,7 +2454,7 @@ function startServer() {
         await build();
         console.log("✅ [BUILD] Frontend build completed");
         
-        // 🎯 DEFINITIVE FIX: Assets with explicit mount and NO fallthrough
+        // 🎯 CRITICAL FIX: Serve from dist/public (correct Vite build path)
         const distPath = path.join(process.cwd(), 'dist', 'public');
         app.use('/assets', express.static(path.join(distPath, 'assets'), { 
           immutable: true, 
@@ -2462,34 +2462,39 @@ function startServer() {
           fallthrough: false,  // CRITICAL: Do not pass to next middleware on 404
           setHeaders: (res, filePath) => {
             console.log(`📁 [ASSETS] Serving: ${filePath}`);
+            // Belt-and-suspenders MIME type fix
+            if (filePath.endsWith('.css')) res.type('text/css');
           }
         }));
         
-        // 🎯 General static files with fallthrough for other resources
+        // 🎯 General static files from dist/public (allow fallthrough for SPA routing)
         app.use(express.static(distPath, { 
           maxAge: '1h',
-          fallthrough: true  // Allow fallthrough for SPA routes
+          fallthrough: true,  // Allow fallthrough so SPA catch-all can handle /admin routes
+          setHeaders: (res, filePath) => {
+            // Ensure CSS files have correct MIME type
+            if (filePath.endsWith('.css')) res.type('text/css');
+          }
         }));
         console.log("✅ [STATIC] Static files enabled from dist/public with proper caching");
         
-        // 🎯 ROBUST SPA catch-all with path exclusions and Accept header validation
+        // 🎯 EXTENSION-GUARDED SPA catch-all (only for extensionless routes)
         app.get('*', (req, res, next) => {
           // Skip non-GET requests
           if (req.method !== 'GET') return next();
           
-          // Skip API and static asset paths
-          const excludedPaths = ['/api', '/assets', '/uploads', '/public-objects', '/attached_assets'];
-          if (excludedPaths.some(path => req.path.startsWith(path))) {
+          // Skip API and object storage paths
+          if (req.path.startsWith('/api') || req.path.startsWith('/public-objects')) {
             return next();
           }
           
-          // Only serve HTML for requests that accept HTML
-          const accept = req.headers.accept || '';
-          if (!accept.includes('text/html')) {
-            return next();
+          // CRITICAL: Skip any request with file extension (.css, .js, .png, etc)
+          if (/\.[a-z0-9]+$/i.test(req.path)) {
+            console.log(`📁 [SPA] Skipping file with extension: ${req.path}`);
+            return res.status(404).end();
           }
           
-          // Serve index.html for all other routes
+          // Serve index.html for extensionless routes only
           const indexPath = path.join(distPath, 'index.html');
           if (fs.existsSync(indexPath)) {
             res.setHeader('Cache-Control', 'no-cache');
