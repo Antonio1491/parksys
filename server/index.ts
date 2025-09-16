@@ -2453,23 +2453,33 @@ function startServer() {
         await build();
         console.log("✅ [BUILD] Frontend build completed");
         
-        // Serve static files
+        // 🎯 CRITICAL FIX: Assets FIRST with long cache
         const distPath = path.join(process.cwd(), 'dist', 'public');
-        app.use(express.static(distPath));
-        console.log("✅ [STATIC] Static files enabled from dist/public");
+        app.use('/assets', express.static(path.join(distPath, 'assets'), { 
+          immutable: true, 
+          maxAge: '1y',
+          setHeaders: (res, filePath) => {
+            console.log(`📁 [ASSETS] Serving: ${filePath}`);
+          }
+        }));
         
-        // SPA catch-all (serve index.html for all non-static routes)
+        // 🎯 General static files with moderate cache
+        app.use(express.static(distPath, { maxAge: '1h' }));
+        console.log("✅ [STATIC] Static files enabled from dist/public with proper caching");
+        
+        // 🎯 SPA catch-all LAST (serve index.html for all non-static routes)
         app.get('*', (req, res) => {
-          // CRITICAL: Do NOT intercept static assets - let express.static handle them
-          // Static assets should be handled by express.static middleware above this
           const indexPath = path.join(distPath, 'index.html');
           if (fs.existsSync(indexPath)) {
+            res.setHeader('Cache-Control', 'no-cache');
+            console.log(`📁 [SPA] Serving index.html for route: ${req.path}`);
             res.sendFile(indexPath);
           } else {
+            console.error("❌ [SPA] index.html not found at:", indexPath);
             res.status(404).send('Frontend build not found');
           }
         });
-        console.log("✅ [SPA] SPA catch-all route registered");
+        console.log("✅ [SPA] SPA catch-all route registered with proper cache headers");
         
       } catch (error) {
         console.error("❌ [STATIC-FALLBACK] Error setting up static frontend:", error);
@@ -2489,24 +2499,8 @@ function startServer() {
       } catch (error) {
         console.error("❌ [FRONTEND] Error setting up Vite:", error);
       }
-    } else {
-      // 🔧 PRODUCTION SPA FALLBACK: Serve index.html for all non-API routes
-      const path = require('path');
-      const fs = require('fs');
-      const indexPath = path.join(__dirname, '../dist/public/index.html');
-      
-      app.get(/^\/(?!api|uploads|public|public-objects|liveness|readiness|health|cloudrun-health|ping|ready).*/, (req, res) => {
-        if (fs.existsSync(indexPath)) {
-          console.log(`🎨 [SPA-PROD] Serving index.html for route: ${req.path}`);
-          res.sendFile(indexPath);
-        } else {
-          console.error(`❌ [SPA-PROD] index.html not found at: ${indexPath}`);
-          res.status(404).send('Application not built');
-        }
-      });
-      
-      console.log("🎨 [SPA-PROD] Production SPA fallback registered");
     }
+    // 🎯 REMOVED DUPLICATE CATCH-ALL: SPA routing is now handled in the useStaticFrontend block above
     
     // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
     // This ensures health checks can respond immediately during deployment
