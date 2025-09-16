@@ -2454,22 +2454,42 @@ function startServer() {
         await build();
         console.log("✅ [BUILD] Frontend build completed");
         
-        // 🎯 CRITICAL FIX: Assets FIRST with long cache
+        // 🎯 DEFINITIVE FIX: Assets with explicit mount and NO fallthrough
         const distPath = path.join(process.cwd(), 'dist', 'public');
         app.use('/assets', express.static(path.join(distPath, 'assets'), { 
           immutable: true, 
           maxAge: '1y',
+          fallthrough: false,  // CRITICAL: Do not pass to next middleware on 404
           setHeaders: (res, filePath) => {
             console.log(`📁 [ASSETS] Serving: ${filePath}`);
           }
         }));
         
-        // 🎯 General static files with moderate cache
-        app.use(express.static(distPath, { maxAge: '1h' }));
+        // 🎯 General static files with fallthrough for other resources
+        app.use(express.static(distPath, { 
+          maxAge: '1h',
+          fallthrough: true  // Allow fallthrough for SPA routes
+        }));
         console.log("✅ [STATIC] Static files enabled from dist/public with proper caching");
         
-        // 🎯 SPA catch-all LAST (serve index.html for all non-static routes)
-        app.get('*', (req, res) => {
+        // 🎯 ROBUST SPA catch-all with path exclusions and Accept header validation
+        app.get('*', (req, res, next) => {
+          // Skip non-GET requests
+          if (req.method !== 'GET') return next();
+          
+          // Skip API and static asset paths
+          const excludedPaths = ['/api', '/assets', '/uploads', '/public-objects', '/attached_assets'];
+          if (excludedPaths.some(path => req.path.startsWith(path))) {
+            return next();
+          }
+          
+          // Only serve HTML for requests that accept HTML
+          const accept = req.headers.accept || '';
+          if (!accept.includes('text/html')) {
+            return next();
+          }
+          
+          // Serve index.html for all other routes
           const indexPath = path.join(distPath, 'index.html');
           if (fs.existsSync(indexPath)) {
             res.setHeader('Cache-Control', 'no-cache');
