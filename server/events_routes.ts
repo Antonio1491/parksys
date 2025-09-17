@@ -1,6 +1,8 @@
 import { Request, Response, Router } from "express";
 import { db } from "./db";
 import { EventTypes, TargetAudiences, EventStatuses } from "@shared/events-schema";
+import { events } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import { replitObjectStorage } from './objectStorage-replit';
 
 /**
@@ -388,10 +390,10 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         return res.status(404).json({ message: "Evento no encontrado" });
       }
       
-      // Eliminar relaciones de parques primero
-      await db
-        .delete(eventParks)
-        .where(eq(eventParks.eventId, eventId));
+      // TODO: Eliminar relaciones de parques primero (tabla eventParks no definida)
+      // await db
+      //   .delete(eventParks)
+      //   .where(eq(eventParks.eventId, eventId));
       
       // Eliminar el evento
       const [deletedEvent] = await db
@@ -417,11 +419,14 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
     try {
       const parkId = parseInt(req.params.id);
       
-      // Obtener relaciones evento-parque para el parque especificado
-      const eventParkRelations = await db
-        .select()
-        .from(eventParks)
-        .where(eq(eventParks.parkId, parkId));
+      // TODO: Obtener relaciones evento-parque para el parque especificado (tabla eventParks no definida)
+      // const eventParkRelations = await db
+      //   .select()
+      //   .from(eventParks)
+      //   .where(eq(eventParks.parkId, parkId));
+      
+      // Retornar array vacío temporalmente
+      return res.json([]);
       
       // Extraer los IDs de eventos asociados a este parque
       const eventIds = eventParkRelations.map(rel => rel.eventId);
