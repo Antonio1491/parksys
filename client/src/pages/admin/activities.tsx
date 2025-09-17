@@ -693,9 +693,20 @@ const AdminActivities = () => {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: es });
+      return format(new Date(dateString), "dd/MM/yyyy", { locale: es });
     } catch {
       return "Fecha inválida";
+    }
+  };
+
+  const formatTime = (dateString: string, timeString?: string) => {
+    try {
+      if (timeString) {
+        return timeString;
+      }
+      return format(new Date(dateString), "HH:mm", { locale: es });
+    } catch {
+      return "Hora inválida";
     }
   };
 
@@ -1237,8 +1248,12 @@ const AdminActivities = () => {
                             </div>
                             <div className="flex items-center gap-4 text-sm text-gray-500">
                               <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                                <Calendar className="h-4 w-4 mr-2 text-gray-400" />
                                 <span>{formatDate(activity.startDate)}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                                <span>{formatTime(activity.startDate, activity.startTime)}</span>
                               </div>
                               {activity.capacity && (
                                 <div className="flex items-center">
