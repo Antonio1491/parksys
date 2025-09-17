@@ -153,7 +153,7 @@ const ActivityRegistrationsPage = () => {
 
   const registrations = registrationsData?.registrations || [];
   const totalPages = registrationsData?.pagination?.totalPages || 1;
-  const activities = activitiesData || [];
+  const activities = Array.isArray(activitiesData) ? activitiesData : [];
 
   // Paginación para el resumen de actividades
   const totalSummaryActivities = activitiesSummaryData?.length || 0;
