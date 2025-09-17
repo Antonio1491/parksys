@@ -1266,26 +1266,26 @@ const AdminActivities = () => {
                           
                           {/* Botones de acción */}
                           <div className="flex justify-between items-center pt-3 border-t">
-                            <div className="flex space-x-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="text-blue-600 hover:text-blue-700"
-                                onClick={() => handleEdit(activity)}
-                                title="Editar"
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="text-red-600 hover:text-red-700"
-                                onClick={() => handleDelete(activity)}
-                                title="Eliminar"
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                              onClick={() => handleEdit(activity)}
+                              title="Editar"
+                            >
+                              <Pencil className="h-4 w-4" />
+                              <span>Editar</span>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-red-600 hover:text-red-700 flex items-center gap-1"
+                              onClick={() => handleDelete(activity)}
+                              title="Eliminar"
+                            >
+                              <Trash className="h-4 w-4" />
+                              <span>Eliminar</span>
+                            </Button>
                           </div>
                         </div>
                       </div>
