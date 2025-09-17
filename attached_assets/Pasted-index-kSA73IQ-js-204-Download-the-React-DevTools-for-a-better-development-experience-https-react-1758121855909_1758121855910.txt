@@ -1,0 +1,151 @@
+index-kSA73IQ_.js:204 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+index-kSA73IQ_.js:2607 🔥 Firebase initialized successfully
+index-kSA73IQ_.js:1034 i18next::backendConnector: loaded namespace common for language es Object
+index-kSA73IQ_.js:1034 i18next: languageChanged es
+index-kSA73IQ_.js:1034 i18next: initialized Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+/parksys-logo.png:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/roles
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/roles/permissions
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+/favicon.ico:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+/admin/configuracion-seguridad/access/permissions:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/notifications/count
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/activities
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/actividades-fotos
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/parks
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/activity-categories
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/instructors
+index-kSA73IQ_.js:234 🌐 [QUERY] GET /api/activities/53
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:234 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+index-kSA73IQ_.js:2607 🔧 [UNIFIED AUTH] Estado: Object
+editar-B3QOS32V.js:1 Uncaught TypeError: k.map is not a function
+    at Object.render (editar-B3QOS32V.js:1:26679)
+    at TEe (index-kSA73IQ_.js:1078:142587)
+    at ug (index-kSA73IQ_.js:144:383)
+    at ahe (index-kSA73IQ_.js:160:10005)
+    at LO (index-kSA73IQ_.js:162:12017)
+    at HTMLUnknownElement.ba (index-kSA73IQ_.js:79:33028)
+    at Object.Ts (index-kSA73IQ_.js:79:33376)
+    at Iv (index-kSA73IQ_.js:79:34348)
+    at $V (index-kSA73IQ_.js:179:2299)
+    at xR (index-kSA73IQ_.js:175:22418)
+editar-B3QOS32V.js:1 Uncaught TypeError: k.map is not a function
+    at Object.render (editar-B3QOS32V.js:1:26679)
+    at TEe (index-kSA73IQ_.js:1078:142587)
+    at ug (index-kSA73IQ_.js:144:383)
+    at ahe (index-kSA73IQ_.js:160:10005)
+    at LO (index-kSA73IQ_.js:162:12017)
+    at HTMLUnknownElement.ba (index-kSA73IQ_.js:79:33028)
+    at Object.Ts (index-kSA73IQ_.js:79:33376)
+    at Iv (index-kSA73IQ_.js:79:34348)
+    at $V (index-kSA73IQ_.js:179:2299)
+    at xR (index-kSA73IQ_.js:175:22418)
+index-kSA73IQ_.js:160 The above error occurred in the <TEe> component:
+
+    at TEe (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:1078:142587)
+    at St (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:1078:366681)
+    at div
+    at form
+    at VEe (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:1078:139439)
+    at div
+    at https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:1034:136593
+    at div
+    at https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:1034:135109
+    at div
+    at main
+    at div
+    at div
+    at _n (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:2607:90936)
+    at ba (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/editar-B3QOS32V.js:1:3565)
+    at Suspense
+    at ye (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:213:4459)
+    at dxe (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:213:5275)
+    at div
+    at div
+    at cct (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:3034:95639)
+    at u (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:234:9544)
+    at bZ (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:1034:54076)
+    at $1e (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:1034:69257)
+    at Pxe (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:234:434)
+    at lct
+    at fct (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:3034:287493)
+    at uct (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/assets/index-kSA73IQ_.js:3034:287366)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+iV @ index-kSA73IQ_.js:160
+index-kSA73IQ_.js:92 Uncaught TypeError: k.map is not a function
+    at Object.render (editar-B3QOS32V.js:1:26679)
+    at TEe (index-kSA73IQ_.js:1078:142587)
+    at ug (index-kSA73IQ_.js:144:383)
+    at ahe (index-kSA73IQ_.js:160:10005)
+    at LO (index-kSA73IQ_.js:162:12017)
+    at $V (index-kSA73IQ_.js:179:2160)
+    at xR (index-kSA73IQ_.js:175:22418)
+    at jve (index-kSA73IQ_.js:175:21995)
+    at N2 (index-kSA73IQ_.js:175:21745)
+    at RV (index-kSA73IQ_.js:175:18237)
