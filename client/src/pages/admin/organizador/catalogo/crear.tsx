@@ -53,6 +53,15 @@ const CAPACIDADES_DIFERENTES = [
   { id: "temporal", label: "Temporal" }
 ];
 
+// Opciones de estado de actividad
+const ESTADOS_ACTIVIDAD = [
+  { id: "activa", label: "🟢 Activa", emoji: "🟢" },
+  { id: "programada", label: "🟡 Programada", emoji: "🟡" },
+  { id: "cancelada", label: "🔴 Cancelada", emoji: "🔴" },
+  { id: "finalizada", label: "⚫ Finalizada", emoji: "⚫" },
+  { id: "en_pausa", label: "🟠 En Pausa", emoji: "🟠" }
+];
+
 // Esquema de validación para el formulario
 const formSchema = z.object({
   title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
@@ -107,6 +116,9 @@ const formSchema = z.object({
   requiresApproval: z.boolean().default(false),
   ageRestrictions: z.string().optional(),
   healthRequirements: z.string().optional(),
+  
+  // Campo para el estado de la actividad
+  status: z.string().default('programada'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -230,6 +242,7 @@ const CrearActividadPage = () => {
       requiresApproval: false,
       ageRestrictions: "",
       healthRequirements: "",
+      status: "programada",
     },
   });
 
@@ -305,6 +318,9 @@ const CrearActividadPage = () => {
         healthRequirements: values.healthRequirements || "",
         registrationStatus: values.allowsPublicRegistration ? "open" : "closed",
         currentRegistrations: 0,
+        
+        // Estado de la actividad
+        status: values.status,
         ...instructorData
       };
       
@@ -388,12 +404,12 @@ const CrearActividadPage = () => {
               {/* Sección de información básica */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Información Básica</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="title"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="md:col-span-2">
                         <FormLabel>Título *</FormLabel>
                         <FormControl>
                           <Input placeholder="Ej: Taller de Pintura" {...field} />
@@ -403,6 +419,33 @@ const CrearActividadPage = () => {
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value || undefined}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona estado" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {ESTADOS_ACTIVIDAD.map((estado) => (
+                              <SelectItem key={estado.id} value={estado.id}>
+                                {estado.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
                     name="category"
