@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import { useAdaptivePermissions } from '@/hooks/useAdaptivePermissions';
 
 // Tipos para permisos de múltiples roles
 interface UserPermissionsResponse {
@@ -74,26 +76,30 @@ export const useDynamicRoles = () => {
   });
 };
 
-// Hook para obtener permisos de usuario
-export const useUserPermissions = (userId?: number) => {
-  return useQuery<UserPermissions>({
-    queryKey: [`/api/users/${userId}/permissions`],
-    enabled: !!userId,
+// Hook para obtener permisos de rol (usando sistema híbrido FK)
+export const useRolePermissions = (roleId?: number) => {
+  return useQuery<Record<string, string[]>>({
+    queryKey: [`/api/roles/${roleId}/permissions`],
+    enabled: !!roleId,
     staleTime: 2 * 60 * 1000, // Cache por 2 minutos
   });
 };
 
-// Hook para verificar permiso específico de módulo
-export const useModulePermission = (
-  userId?: number, 
+// Hook que usa el sistema adaptativo para verificar permisos de módulo
+export const useModulePermissionAdaptive = (
+  roleId?: number, 
   module?: string, 
   permission?: string
 ) => {
-  return useQuery<{ hasPermission: boolean }>({
-    queryKey: [`/api/users/${userId}/module-permission/${module}/${permission}`],
-    enabled: !!(userId && module && permission),
-    staleTime: 2 * 60 * 1000,
-  });
+  const adaptivePermissions = useAdaptivePermissions(roleId);
+  
+  return {
+    data: {
+      hasPermission: adaptivePermissions.hasPermission ? 
+        adaptivePermissions.hasPermission(module || '', permission as any) : false
+    },
+    isLoading: adaptivePermissions.isLoading
+  };
 };
 
 export const DynamicRoleGuard: React.FC<DynamicRoleGuardProps> = ({
@@ -103,30 +109,36 @@ export const DynamicRoleGuard: React.FC<DynamicRoleGuardProps> = ({
   requiredModule,
   requiredPermission = 'read',
   fallback = null,
-  userId = 1 // Default para desarrollo - en producción vendría del contexto de auth
+  userId // Deprecated - se obtiene del contexto
 }) => {
+  // Usar auth unificado para obtener usuario real
+  const { user: unifiedUser, isAuthenticated, isLoading: authLoading } = useUnifiedAuth();
   const { data: roles, isLoading: rolesLoading } = useDynamicRoles();
-  const { data: userPermissions, isLoading: permissionsLoading } = useUserPermissions(userId);
-  const { data: modulePermission, isLoading: modulePermissionLoading } = useModulePermission(
-    requiredModule ? userId : undefined,
+  const { data: rolePermissions, isLoading: permissionsLoading } = useRolePermissions(unifiedUser?.roleId);
+  const modulePermissionCheck = useModulePermissionAdaptive(
+    requiredModule ? unifiedUser?.roleId : undefined,
     requiredModule,
     requiredModule ? requiredPermission : undefined
   );
 
   // Mostrar loading mientras se cargan los datos
-  if (rolesLoading || permissionsLoading || (requiredModule && modulePermissionLoading)) {
+  if (authLoading || rolesLoading || permissionsLoading || (requiredModule && modulePermissionCheck.isLoading)) {
     return <div className="animate-pulse bg-gray-200 rounded h-4 w-16"></div>;
   }
 
-  // Si no se pudieron cargar los datos, denegar acceso
-  if (!roles || !userPermissions) {
-    console.warn('[DynamicRoleGuard] No se pudieron cargar roles o permisos del usuario');
+  // Si no está autenticado, denegar acceso
+  if (!isAuthenticated || !unifiedUser) {
     return <>{fallback}</>;
   }
 
-  // Obtener el rol del usuario (simulado por ahora - en producción vendría del contexto)
-  // Por ahora asumimos que el usuario tiene el rol de Super Admin
-  const userRole = roles.find(r => r.level === 1); // Super Admin por defecto para desarrollo
+  // Si no se pudieron cargar los datos, denegar acceso
+  if (!roles) {
+    console.warn('[DynamicRoleGuard] No se pudieron cargar roles');
+    return <>{fallback}</>;
+  }
+
+  // Obtener el rol del usuario desde el contexto unificado
+  const userRole = roles.find(r => r.id === unifiedUser.roleId) || roles.find(r => r.slug === unifiedUser.role);
 
   if (!userRole) {
     console.warn('[DynamicRoleGuard] No se encontró rol para el usuario');
@@ -143,47 +155,55 @@ export const DynamicRoleGuard: React.FC<DynamicRoleGuardProps> = ({
     return <>{fallback}</>;
   }
 
-  // Verificar permisos de módulo usando la API
-  if (requiredModule && modulePermission && !modulePermission.hasPermission) {
+  // Verificar permisos de módulo usando sistema adaptativo
+  if (requiredModule && modulePermissionCheck.data && !modulePermissionCheck.data.hasPermission) {
     return <>{fallback}</>;
   }
 
   return <>{children}</>;
 };
 
-// Hook mejorado para verificar permisos con datos dinámicos (ACTUALIZADO para múltiples roles)
-export const useDynamicPermissions = (userId: number = 1) => {
+// Hook mejorado para verificar permisos con datos dinámicos (integrado con sistema híbrido FK)
+export const useDynamicPermissions = (roleId?: number) => {
   const { data: roles } = useDynamicRoles();
+  const { user: unifiedUser } = useUnifiedAuth();
   
-  // Obtener permisos comprehensivos del usuario (múltiples roles)
-  const { data: userPermissions } = useQuery<UserPermissionsResponse>({
-    queryKey: ['/api/users/permissions', userId],
-    enabled: !!userId
-  });
+  // Usar roleId del parámetro o del usuario autenticado
+  const effectiveRoleId = roleId || unifiedUser?.roleId;
+  
+  // Obtener permisos del rol usando sistema híbrido FK
+  const adaptivePermissions = useAdaptivePermissions(effectiveRoleId);
+  const { data: rolePermissions } = useRolePermissions(effectiveRoleId);
 
   const hasPermission = (module: SystemModule, permission: PermissionType): boolean => {
-    if (!userPermissions) return false;
+    // Usar sistema adaptativo como principal
+    if (adaptivePermissions.hasPermission) {
+      return adaptivePermissions.hasPermission(module, permission as any);
+    }
     
-    // Para múltiples roles, usar combinedPermissions
-    const permissions = userPermissions.combinedPermissions || userPermissions.permissions || {};
+    // Fallback usando permisos del rol
+    if (!rolePermissions) return false;
     
-    // Si tiene permisos totales
-    if ((permissions as any).all === true) return true;
+    // Si tiene permisos totales (Super Admin)
+    if ((rolePermissions as any).all === true) return true;
     
-    const modulePermissions = permissions[module];
+    const modulePermissions = rolePermissions[module];
     return modulePermissions ? modulePermissions.includes(permission) : false;
   };
 
   const hasModuleAccess = (module: SystemModule): boolean => {
-    if (!userPermissions) return false;
+    // Usar sistema adaptativo como principal
+    if (adaptivePermissions.hasAnyPermission) {
+      return adaptivePermissions.hasAnyPermission(module);
+    }
     
-    // Para múltiples roles, usar combinedPermissions
-    const permissions = userPermissions.combinedPermissions || userPermissions.permissions || {};
+    // Fallback usando permisos del rol
+    if (!rolePermissions) return false;
     
-    // Si tiene permisos totales
-    if ((permissions as any).all === true) return true;
+    // Si tiene permisos totales (Super Admin)
+    if ((rolePermissions as any).all === true) return true;
     
-    const modulePermissions = permissions[module];
+    const modulePermissions = rolePermissions[module];
     return modulePermissions && modulePermissions.length > 0;
   };
 
@@ -192,39 +212,23 @@ export const useDynamicPermissions = (userId: number = 1) => {
   const canAdmin = (module: SystemModule) => hasPermission(module, 'admin');
 
   const getUserRoleLevel = (): number | null => {
-    if (!userPermissions) return null;
+    if (!unifiedUser || !roles) return null;
     
-    // Para múltiples roles, devolver el nivel más alto (menor número)
-    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length) {
-      return Math.min(...userPermissions.roles.map((role: any) => role.level));
-    }
-    
-    // Para rol único, devolver el nivel del rol
-    return userPermissions.role?.level || null;
+    const userRole = roles.find(r => r.id === unifiedUser.roleId);
+    return userRole?.level || null;
   };
 
   const getUserRoles = () => {
-    if (!userPermissions) return [];
+    if (!unifiedUser || !roles) return [];
     
-    // Para múltiples roles
-    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.roles?.length) {
-      return userPermissions.roles;
-    }
-    
-    // Para rol único
-    return userPermissions.role ? [userPermissions.role] : [];
+    const userRole = roles.find(r => r.id === unifiedUser.roleId);
+    return userRole ? [userRole] : [];
   };
 
   const getPrimaryRole = () => {
-    if (!userPermissions) return null;
+    if (!unifiedUser || !roles) return null;
     
-    // Para múltiples roles, devolver el rol primario
-    if (userPermissions.metadata?.hasMultipleRoles && userPermissions.primaryRole) {
-      return userPermissions.primaryRole;
-    }
-    
-    // Para rol único
-    return userPermissions.role || null;
+    return roles.find(r => r.id === unifiedUser.roleId) || null;
   };
 
   return {
@@ -236,12 +240,14 @@ export const useDynamicPermissions = (userId: number = 1) => {
     getUserRoleLevel,
     getUserRoles,
     getPrimaryRole,
-    hasMultipleRoles: userPermissions?.metadata?.hasMultipleRoles || false,
+    hasMultipleRoles: false, // Sistema actual usa rol único
     userRole: getPrimaryRole(), // Compatibilidad con código existente
     roleLevel: getUserRoleLevel() || 0,
     roles,
-    userPermissions,
-    isLoading: !roles || !userPermissions
+    rolePermissions,
+    adaptivePermissions,
+    unifiedUser,
+    isLoading: !roles || adaptivePermissions.isLoading
   };
 };
 

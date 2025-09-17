@@ -1,5 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import { useAdaptivePermissions } from '@/hooks/useAdaptivePermissions';
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -21,7 +23,7 @@ interface CurrentUser {
   roles: UserRole[];
 }
 
-// Componente para proteger rutas basado en roles y permisos
+// Componente para proteger rutas basado en roles y permisos (con sistema híbrido FK)
 export function RoleGuard({ 
   children, 
   requiredRole, 
@@ -29,26 +31,32 @@ export function RoleGuard({
   requiredPermission,
   fallback 
 }: RoleGuardProps) {
-  // Query para obtener usuario actual (simulado)
-  const { data: currentUser } = useQuery<CurrentUser>({
-    queryKey: ['/api/current-user'],
-    enabled: false // Deshabilitado para desarrollo
-  });
+  // Usar auth unificado con sistema híbrido FK
+  const { user: unifiedUser, isAuthenticated, isLoading } = useUnifiedAuth();
+  const adaptivePermissions = useAdaptivePermissions(unifiedUser?.roleId);
 
-  // Usuario simulado para desarrollo
-  const mockUser: CurrentUser = {
-    id: 1,
+  // Si está cargando, mostrar indicador
+  if (isLoading || adaptivePermissions.isLoading) {
+    return <div className="animate-pulse bg-gray-200 rounded h-4 w-16"></div>;
+  }
+  
+  // Si no está autenticado, denegar acceso
+  if (!isAuthenticated || !unifiedUser) {
+    return <>{fallback}</>;
+  }
+
+  // Convertir usuario unificado a formato CurrentUser para compatibilidad
+  const user: CurrentUser = {
+    id: unifiedUser.id || 0,
     roles: [
       {
-        id: 'super-admin',
-        name: 'Super Administrador',
-        level: 10,
-        permissions: ['*'] // Todos los permisos
+        id: unifiedUser.role || 'usuario',
+        name: getRoleName(unifiedUser.role || 'usuario'),
+        level: getRoleLevel(unifiedUser.roleId || 0),
+        permissions: unifiedUser.role === 'super-admin' ? ['*'] : getPermissionsFromRole(unifiedUser.role || 'usuario')
       }
     ]
   };
-
-  const user = currentUser || mockUser;
 
   // Verificar si el usuario tiene el rol requerido
   const hasRequiredRole = (role: string): boolean => {
@@ -60,8 +68,15 @@ export function RoleGuard({
     return user.roles.some(userRole => userRole.level >= level);
   };
 
-  // Verificar si el usuario tiene el permiso requerido
+  // Verificar si el usuario tiene el permiso requerido usando sistema híbrido FK
   const hasRequiredPermission = (permission: string): boolean => {
+    // Usar adaptive permissions si está disponible
+    if (adaptivePermissions.hasPermission && permission.includes('.')) {
+      const [moduleId, action] = permission.split('.');
+      return adaptivePermissions.hasPermission(moduleId, action as 'create' | 'read' | 'update' | 'delete' | 'admin');
+    }
+    
+    // Fallback para permisos legacy
     return user.roles.some(userRole => 
       userRole.permissions.includes('*') || 
       userRole.permissions.includes(permission)
@@ -112,27 +127,23 @@ export function RoleGuard({
   return <>{children}</>;
 }
 
-// Hook para verificar permisos
+// Hook para verificar permisos (integrado con sistema híbrido FK)
 export function usePermissions() {
-  const { data: currentUser } = useQuery<CurrentUser>({
-    queryKey: ['/api/current-user'],
-    enabled: false
-  });
+  const { user: unifiedUser, isAuthenticated } = useUnifiedAuth();
+  const adaptivePermissions = useAdaptivePermissions(unifiedUser?.roleId);
 
-  // Usuario simulado
-  const mockUser: CurrentUser = {
-    id: 1,
-    roles: [
+  // Convertir usuario unificado para compatibilidad
+  const user: CurrentUser = {
+    id: unifiedUser?.id || 0,
+    roles: unifiedUser ? [
       {
-        id: 'super-admin',
-        name: 'Super Administrador',
-        level: 10,
-        permissions: ['*']
+        id: unifiedUser.role || 'usuario',
+        name: getRoleName(unifiedUser.role || 'usuario'),
+        level: getRoleLevel(unifiedUser.roleId || 0),
+        permissions: unifiedUser.role === 'super-admin' ? ['*'] : getPermissionsFromRole(unifiedUser.role || 'usuario')
       }
-    ]
+    ] : []
   };
-
-  const user = currentUser || mockUser;
 
   const hasRole = (role: string): boolean => {
     return user.roles.some(userRole => userRole.name === role || userRole.id === role);
@@ -143,6 +154,13 @@ export function usePermissions() {
   };
 
   const hasPermission = (permission: string): boolean => {
+    // Usar adaptive permissions para permisos modulares
+    if (adaptivePermissions.hasPermission && permission.includes('.')) {
+      const [moduleId, action] = permission.split('.');
+      return adaptivePermissions.hasPermission(moduleId, action as 'create' | 'read' | 'update' | 'delete' | 'admin');
+    }
+    
+    // Fallback para permisos legacy
     return user.roles.some(userRole => 
       userRole.permissions.includes('*') || 
       userRole.permissions.includes(permission)
@@ -165,4 +183,44 @@ export function usePermissions() {
     getHighestLevel,
     currentUser: user
   };
+}
+
+// Funciones auxiliares para mapeo de roles
+function getRoleName(role: string): string {
+  const roleNames: Record<string, string> = {
+    'super-admin': 'Super Administrador',
+    'admin': 'Administrador General',
+    'coordinador': 'Coordinador',
+    'gerente': 'Gerente',
+    'supervisor': 'Supervisor',
+    'empleado': 'Empleado',
+    'invitado': 'Invitado'
+  };
+  return roleNames[role] || 'Usuario';
+}
+
+function getRoleLevel(roleId: number): number {
+  const roleLevels: Record<number, number> = {
+    1: 10,  // Super Administrador - Mayor nivel
+    2: 8,   // Administrador General
+    3: 6,   // Coordinador
+    4: 5,   // Gerente
+    5: 4,   // Supervisor
+    6: 2,   // Empleado
+    7: 1    // Invitado
+  };
+  return roleLevels[roleId] || 0;
+}
+
+function getPermissionsFromRole(role: string): string[] {
+  const rolePermissions: Record<string, string[]> = {
+    'super-admin': ['*'],
+    'admin': ['read', 'create', 'update', 'admin'],
+    'coordinador': ['read', 'create', 'update'],
+    'gerente': ['read', 'create'],
+    'supervisor': ['read'],
+    'empleado': ['read'],
+    'invitado': ['read']
+  };
+  return rolePermissions[role] || ['read'];
 }

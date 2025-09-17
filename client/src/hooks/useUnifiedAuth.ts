@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useFirebaseAuth } from './useFirebaseAuth';
-import { useAuth } from './useAuth';
+import { useAuth, User } from './useAuth';
+import { useAdaptivePermissions } from './useAdaptivePermissions';
 
 // Tipos unificados para el sistema de autenticación
 export interface UnifiedUser {
@@ -50,6 +51,20 @@ export function useUnifiedAuth(): UnifiedAuthState {
   const firebaseAuth = useFirebaseAuth();
   const localAuth = useAuth();
   
+  // Obtener roleId del usuario para permisos adaptativos
+  const userRoleId = useMemo(() => {
+    if (firebaseAuth.userStatus.localUser?.roleId) {
+      return firebaseAuth.userStatus.localUser.roleId;
+    }
+    if (localAuth.user && typeof localAuth.user === 'object' && 'roleId' in localAuth.user) {
+      return (localAuth.user as User).roleId;
+    }
+    return undefined;
+  }, [firebaseAuth.userStatus.localUser, localAuth.user]);
+  
+  // Hook para permisos adaptativos híbridos FK
+  const adaptivePermissions = useAdaptivePermissions(userRoleId);
+  
   // Estado unificado del usuario
   const unifiedUser = useMemo((): UnifiedUser | null => {
     // Priorizar datos de Firebase si el usuario está autenticado y aprobado
@@ -79,15 +94,13 @@ export function useUnifiedAuth(): UnifiedAuthState {
     }
     
     // Fallback al sistema local si Firebase no está disponible pero hay usuario local
-    if (localAuth.user) {
+    if (localAuth.user && typeof localAuth.user === 'object' && 'id' in localAuth.user) {
+      const typedUser = localAuth.user as User;
       return {
-        id: localAuth.user.id,
-        username: localAuth.user.username,
-        email: localAuth.user.email,
-        fullName: localAuth.user.fullName,
-        role: localAuth.user.role,
-        roleId: localAuth.user.roleId,
-        ...localAuth.user
+        ...typedUser,
+        // Asegurar campos estándar para compatibilidad
+        email: typedUser.email || '',
+        fullName: typedUser.fullName || typedUser.username
       };
     }
     
@@ -108,20 +121,22 @@ export function useUnifiedAuth(): UnifiedAuthState {
   };
   const resetPassword = firebaseAuth.resetPassword;
 
-  // Métodos de verificación de permisos
+  // Métodos de verificación de permisos usando sistema híbrido FK
   const hasRole = (role: string): boolean => {
     return unifiedUser?.role === role;
   };
 
   const hasPermission = (moduleId: string, action: 'create' | 'read' | 'update' | 'delete' | 'admin'): boolean => {
-    // Super Admin tiene todos los permisos
+    // Usar sistema híbrido FK para verificación de permisos
+    if (adaptivePermissions.hasPermission) {
+      return adaptivePermissions.hasPermission(moduleId, action);
+    }
+    
+    // Fallback: Super Admin tiene todos los permisos
     if (unifiedUser?.role === 'super-admin') return true;
     
     // Admin General tiene permisos administrativos
     if (unifiedUser?.role === 'admin' && ['read', 'create', 'update', 'admin'].includes(action)) return true;
-    
-    // Aquí se puede expandir la lógica según el sistema de permisos específico
-    // Por ahora, delegamos a la lógica existente de useAdaptivePermissions
     
     return false;
   };
