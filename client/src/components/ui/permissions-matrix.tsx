@@ -369,7 +369,7 @@ export function PermissionsMatrix({
           </div>
           <p className="text-sm text-blue-700">
             Sistema granular: <code>módulo:submódulo:página:acción</code>. 
-            Cada página tiene acciones específicas que pueden configurarse por rol.
+            Cada página tiene 8 acciones específicas que pueden configurarse por rol.
           </p>
         </div>
         
@@ -498,10 +498,6 @@ export function PermissionsMatrix({
           <div className="space-y-2">
             <div className="font-semibold text-gray-700">⚙️ Acciones Avanzadas:</div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-teal-600 text-xs">MANAGE</Badge>
-              <span>Gestionar</span>
-            </div>
-            <div className="flex items-center gap-2">
               <Badge variant="outline" className="text-indigo-600 text-xs">APPROVE</Badge>
               <span>Aprobar</span>
             </div>
@@ -510,8 +506,8 @@ export function PermissionsMatrix({
               <span>Publicar</span>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-cyan-600 text-xs">PROCESS</Badge>
-              <span>Procesar</span>
+              <Badge variant="outline" className="text-cyan-600 text-xs">IMPORT</Badge>
+              <span>Importar</span>
             </div>
           </div>
         </div>
