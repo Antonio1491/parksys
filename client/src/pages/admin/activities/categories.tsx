@@ -229,7 +229,7 @@ const ActivityCategoriesPage: React.FC = () => {
   };
 
   // Contar actividades por categoría (usar la misma lógica que activities.tsx)
-  const categoryCounts = (activities as any[]).reduce((acc: any, activity: any) => {
+  const categoryCounts = Array.isArray(activities) ? activities.reduce((acc: any, activity: any) => {
     // Usar la misma lógica de obtención de categoría que activities.tsx
     let categoryName = 'Sin categoría';
     
@@ -241,7 +241,7 @@ const ActivityCategoriesPage: React.FC = () => {
     
     acc[categoryName] = (acc[categoryName] || 0) + 1;
     return acc;
-  }, {});
+  }, {}) : {};
 
   // Función para obtener los colores de las categorías (igual que en activities.tsx)
   const getCategoryColors = (categoryName: string) => {
