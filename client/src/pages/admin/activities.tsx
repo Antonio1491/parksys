@@ -977,7 +977,7 @@ const AdminActivities = () => {
                   className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
                   data-testid="button-view-cards"
                 >
-                  <Grid className="h-4 w-4" />
+                  <Grid className="h-6 w-6" />
                 </Button>
                 <Button
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
@@ -986,7 +986,7 @@ const AdminActivities = () => {
                   className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
                   data-testid="button-view-table"
                 >
-                  <List className="h-4 w-4" />
+                  <List className="h-6 w-6" />
                 </Button>
               </div>
             </div>
@@ -996,7 +996,7 @@ const AdminActivities = () => {
               <Button
                 variant={selectionMode ? 'default' : 'outline'}
                 size="sm"
-                className={`flex items-center h-10 w-10 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed] hover:bg-gray-200'}`}
+                className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed] hover:bg-gray-200'}`}
                 data-testid="button-selection-toggle"
               >
                 <CopyCheck className="h-4 w-4" />
@@ -1167,9 +1167,9 @@ const AdminActivities = () => {
               ) : (
                 // Vista de fichas
                 <div className="p-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     {currentActivities.map((activity: any) => (
-                      <div key={activity.id} className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                      <div key={activity.id} className="bg-white border border-teal-500 rounded-2xl hover:shadow-md hover:border-[#00444f] transition-shadow duration-200 overflow-hidden">
                         {/* Imagen de la actividad */}
                         <div className="relative h-48 bg-gray-100">
                           {selectionMode && (
@@ -1196,28 +1196,25 @@ const AdminActivities = () => {
                               </div>
                             </div>
                           )}
-                          {/* ID de la actividad */}
-                          <div className="absolute top-2 left-2">
-                            <span className="text-xs text-white bg-black/60 px-2 py-1 rounded">
-                              #{activity.id}
-                            </span>
-                          </div>
                         </div>
                         
                         {/* Header de la ficha */}
-                        <div className="p-4 border-b">
-                          <div className="mb-2">
-                            <h3 className="font-semibold text-gray-900 line-clamp-2">{activity.title}</h3>
+                        <div className="p-4">
+                          <div className="mb-3 flex items-start justify-between">
+                            <h3 className="font-poppins font-bold text-gray-900 line-clamp-2 flex-1 mr-2">{activity.title}</h3>
+                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
+                              #{activity.id}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColors(getCategoryName(activity))}`}>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${getCategoryColors(getCategoryName(activity))}`}>
                               {getCategoryName(activity)}
                             </span>
                             {(() => {
                               const statusInfo = getStatusDisplay(activity.status || 'programada');
                               return (
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.color}`}>
-                                  <span className="mr-1">{statusInfo.emoji}</span>
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${statusInfo.color}`}>
+                                  <span className="mr-1"></span>
                                   {statusInfo.label}
                                 </span>
                               );
@@ -1228,7 +1225,7 @@ const AdminActivities = () => {
                         {/* Contenido de la ficha */}
                         <div className="p-4">
                           {activity.description && (
-                            <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                            <p className="text-sm text-gray-800 font-poppins mb-3 line-clamp-3">
                               {activity.description}
                             </p>
                           )}
