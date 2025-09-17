@@ -9,8 +9,18 @@ export async function safeApiRequest(url: string, options: any = {}) {
     ...customHeaders,
   };
 
-  // Añadir token de autenticación
-  const storedToken = localStorage.getItem('token');
+  // Obtener Firebase ID Token real
+  let firebaseIdToken = null;
+  try {
+    const { auth } = await import('@/lib/firebase');
+    if (auth.currentUser) {
+      firebaseIdToken = await auth.currentUser.getIdToken();
+    }
+  } catch (error) {
+    console.warn('Error getting Firebase ID token for safe API request:', error);
+  }
+
+  // Obtener información de usuario almacenada
   const storedUser = localStorage.getItem('user');
   let userId = "1";
   let userRole = "super_admin";
@@ -25,7 +35,10 @@ export async function safeApiRequest(url: string, options: any = {}) {
     }
   }
   
-  requestHeaders["Authorization"] = storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1754063087518";
+  // Solo añadir Authorization si tenemos Firebase ID Token
+  if (firebaseIdToken) {
+    requestHeaders["Authorization"] = `Bearer ${firebaseIdToken}`;
+  }
   requestHeaders["X-User-Id"] = userId;
   requestHeaders["X-User-Role"] = userRole;
 
@@ -79,13 +92,22 @@ export async function apiRequest(
   
   // Solo agregamos las cabeceras de autorización si no es una petición de login
   if (!isLoginRequest) {
-    // Intentar usar el token almacenado, o usar el token directo como respaldo
-    const storedToken = localStorage.getItem('token');
+    // Obtener Firebase ID Token real
+    let firebaseIdToken = null;
+    try {
+      const { auth } = await import('@/lib/firebase');
+      if (auth.currentUser) {
+        firebaseIdToken = await auth.currentUser.getIdToken();
+      }
+    } catch (error) {
+      console.warn('Error getting Firebase ID token for API request:', error);
+    }
+
+    // Obtener información de usuario almacenada
     const storedUser = localStorage.getItem('user');
     let userId = "1";
     let userRole = "super_admin";
     
-    // Si hay un usuario almacenado, usamos su información
     if (storedUser) {
       try {
         const userObj = JSON.parse(storedUser);
@@ -96,7 +118,10 @@ export async function apiRequest(
       }
     }
     
-    headers["Authorization"] = storedToken ? `Bearer ${storedToken}` : `Bearer direct-token-${Date.now()}`;
+    // Solo añadir Authorization si tenemos Firebase ID Token
+    if (firebaseIdToken) {
+      headers["Authorization"] = `Bearer ${firebaseIdToken}`;
+    }
     headers["X-User-Id"] = userId;
     headers["X-User-Role"] = userRole;
   }
@@ -178,13 +203,22 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    // Obtener información de autenticación almacenada
-    const storedToken = localStorage.getItem('token');
+    // Obtener Firebase ID Token real
+    let firebaseIdToken = null;
+    try {
+      const { auth } = await import('@/lib/firebase');
+      if (auth.currentUser) {
+        firebaseIdToken = await auth.currentUser.getIdToken();
+      }
+    } catch (error) {
+      console.warn('Error getting Firebase ID token:', error);
+    }
+
+    // Obtener información de usuario almacenada
     const storedUser = localStorage.getItem('user');
     let userId = "1";
     let userRole = "super_admin";
     
-    // Si hay un usuario almacenado, usamos su información
     if (storedUser) {
       try {
         const userObj = JSON.parse(storedUser);
@@ -197,10 +231,14 @@ export const getQueryFn: <T>(options: {
     
     // Añadimos encabezados de autenticación
     const headers: Record<string, string> = {
-      "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1750522117022",
       "X-User-Id": userId,
       "X-User-Role": userRole
     };
+
+    // Solo añadir Authorization si tenemos Firebase ID Token
+    if (firebaseIdToken) {
+      headers["Authorization"] = `Bearer ${firebaseIdToken}`;
+    }
 
     try {
       // Construir la URL correctamente concatenando todos los elementos del queryKey
