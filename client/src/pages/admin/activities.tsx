@@ -737,6 +737,15 @@ const AdminActivities = () => {
     }, {});
   }, [categoriesData]);
 
+  // Crear mapeo de parques por ID
+  const parksMap = useMemo(() => {
+    if (!Array.isArray(parksData)) return {};
+    return parksData.reduce((acc: any, park: any) => {
+      acc[park.id] = park;
+      return acc;
+    }, {});
+  }, [parksData]);
+
   const categoryStringMap: any = {
     'deportivo': 'Deportivo',
     'artecultura': 'Arte y Cultura',
@@ -763,6 +772,20 @@ const AdminActivities = () => {
       return activity.categoryName;
     }
     return 'Sin categoría';
+  };
+
+  // Función para obtener el nombre del parque
+  const getParkName = (activity: any) => {
+    // Primero intentar con el nombre directo si existe
+    if (activity.parkName) {
+      return activity.parkName;
+    }
+    // Luego mapear por ID usando parksMap
+    const parkId = activity.parkId || activity.park_id;
+    if (parkId && parksMap[parkId]) {
+      return parksMap[parkId].name;
+    }
+    return `Parque ${parkId}`;
   };
 
   // Función para obtener los colores de las categorías (igual que en organizador)
@@ -1149,7 +1172,7 @@ const AdminActivities = () => {
                             {getCategoryName(activity)}
                           </span>
                         </TableCell>
-                        <TableCell>{activity.parkName || `Parque ${activity.parkId}`}</TableCell>
+                        <TableCell>{getParkName(activity)}</TableCell>
                         <TableCell>{formatDate(activity.startDate)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
@@ -1244,7 +1267,7 @@ const AdminActivities = () => {
                           <div className="space-y-2 mb-4">
                             <div className="flex items-center text-sm text-gray-500">
                               <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                              <span>{activity.parkName || `Parque ${activity.parkId}`}</span>
+                              <span>{getParkName(activity)}</span>
                             </div>
                             <div className="flex items-center gap-4 text-sm text-gray-500">
                               <div className="flex items-center">
