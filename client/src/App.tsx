@@ -1357,6 +1357,11 @@ function Router() {
         </Route>
 
         {/* COMPATIBILIDAD: Rutas antigas con redirección */}
+        <Route path="/admin/permissions/dashboard">
+          <Suspense fallback={<div className="p-8 text-center">Cargando dashboard de permisos...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/permissions/dashboard')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/permissions/matrix">
           <Suspense fallback={<div className="p-8 text-center">Cargando matriz de permisos...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/permissions/matrix')))}
