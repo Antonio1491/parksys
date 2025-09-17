@@ -967,6 +967,30 @@ const AdminActivities = () => {
               </Button>
             </div>
 
+            {/* Toggle de vista */}
+            <div className="ml-auto">
+              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('cards')}
+                  className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                  data-testid="button-view-cards"
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                  className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                  data-testid="button-view-table"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
             {/* Botón de selección con menú desplegable */}
             <div className="relative group">
               <Button
@@ -1029,30 +1053,6 @@ const AdminActivities = () => {
               <Trash2 className="h-4 w-4 mr-1" />
               {selectedActivities.size > 0 ? ` (${selectedActivities.size})` : ''}
             </Button>
-
-            {/* Toggle de vista */}
-            <div className="ml-auto">
-              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                <Button
-                  variant={viewMode === 'cards' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('cards')}
-                  className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
-                  data-testid="button-view-cards"
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'table' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('table')}
-                  className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
-                  data-testid="button-view-table"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
           </div>
         </div>
 
