@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import admin from 'firebase-admin';
 import { db } from '../db';
 import { users, userRoles } from '../../shared/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 // Configurar Firebase Admin SDK si no está configurado
 if (!admin.apps.length) {
@@ -94,26 +94,31 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       return res.status(401).json({ message: 'Token de autenticación requerido' });
     }
 
-    // 5. Buscar usuario en base de datos local por Firebase UID
-    const [localUser] = await db.select()
-      .from(users)
-      .where(eq(users.firebaseUid, firebaseUid))
-      .limit(1);
+    // 5. Buscar usuario en base de datos local por Firebase UID (usando SQL crudo para evitar JOINs)
+    console.log(`🔧 [AUTH-DEBUG] Buscando usuario con Firebase UID: ${firebaseUid}`);
+    const userResult = await db.execute(sql`
+      SELECT id, firebase_uid, email, username, full_name, role_id, is_active, needs_password_reset
+      FROM users 
+      WHERE firebase_uid = ${firebaseUid}
+      LIMIT 1
+    `);
+    const localUser = userResult.rows[0] as any;
 
     if (!localUser) {
       console.log(`❌ [AUTH] Usuario no encontrado para Firebase UID: ${firebaseUid}`);
       return res.status(401).json({ message: 'Usuario no autorizado en el sistema' });
     }
 
-    if (!localUser.isActive) {
+    console.log(`🔍 [AUTH-DEBUG] is_active value: "${localUser.is_active}", type: ${typeof localUser.is_active}`);
+    if (!localUser.is_active) {
       console.log(`❌ [AUTH] Usuario inactivo: ${localUser.email}`);
       return res.status(401).json({ message: 'Cuenta desactivada' });
     }
 
-    // 6. Obtener roles del usuario
-    const userRolesList = await db.select()
-      .from(userRoles)
-      .where(eq(userRoles.userId, localUser.id));
+    // 6. Obtener roles del usuario (BYPASS TEMPORAL DURANTE MIGRACIÓN)
+    // Durante la migración Firebase, usar directamente el roleId legacy para evitar errores de tabla user_roles
+    console.log(`🚨 [AUTH-BYPASS] Usando rol legacy directo durante migración Firebase`);
+    const userRolesList = localUser.roleId ? [{ roleId: localUser.roleId }] : [];
 
     // 7. Configurar objeto usuario en request con rol normalizado
     // Normalizar rol desde DB - usar roleId como fuente de verdad principal
