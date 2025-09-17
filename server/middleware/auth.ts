@@ -49,16 +49,28 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       }
     }
 
-    // 2. DESARROLLO: Permitir x-firebase-uid header SOLO en desarrollo con flag explícito
-    const isDevelopment = process.env.NODE_ENV === 'development';
+    // 2. TEMPORAL: Permitir x-firebase-uid header para usuarios aprobados durante migración
     const allowHeaderAuth = process.env.ALLOW_HEADER_AUTH === 'true';
     
-    if (!firebaseUid && req.headers['x-firebase-uid'] && isDevelopment && allowHeaderAuth) {
-      firebaseUid = req.headers['x-firebase-uid'] as string;
-      console.log(`🔗 [AUTH-DEV] Using Firebase UID from header (dev only): ${firebaseUid}`);
+    if (!firebaseUid && req.headers['x-firebase-uid'] && allowHeaderAuth) {
+      const headerUid = req.headers['x-firebase-uid'] as string;
+      
+      // Whitelist de usuarios aprobados durante la migración
+      const approvedUids = [
+        'AgDictDqdqUOo9hKUYlXPT3t5Bv1', // Luis
+        'QAo7RspJkFY1KDQmAnN0L4M3vsS2'  // Olivia
+      ];
+      
+      if (approvedUids.includes(headerUid)) {
+        firebaseUid = headerUid;
+        console.log(`🔗 [AUTH-TEMP] Using approved Firebase UID from header: ${firebaseUid}`);
+      } else {
+        console.log(`❌ [AUTH-TEMP] UID not in approved list: ${headerUid}`);
+      }
     }
 
     // 3. MODO DESARROLLO ESTRICTO: Solo permitir usuario fijo en desarrollo explícito
+    const isDevelopment = process.env.NODE_ENV === 'development';
     const allowDevFallback = process.env.ALLOW_DEV_ADMIN_FALLBACK === 'true';
     
     if (!firebaseUid && isDevelopment && allowDevFallback) {

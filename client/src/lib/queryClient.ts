@@ -41,6 +41,18 @@ export async function safeApiRequest(url: string, options: any = {}) {
   }
   requestHeaders["X-User-Id"] = userId;
   requestHeaders["X-User-Role"] = userRole;
+  
+  // TEMPORAL: Agregar Firebase UID header para bypass durante migración
+  if (storedUser) {
+    try {
+      const userObj = JSON.parse(storedUser);
+      if (userObj.firebaseUid) {
+        requestHeaders["x-firebase-uid"] = userObj.firebaseUid;
+      }
+    } catch (e) {
+      console.error("Error parsing stored user for Firebase UID:", e);
+    }
+  }
 
   console.log(`🌐 [SAFE API] ${method} ${url}`);
   
@@ -124,6 +136,18 @@ export async function apiRequest(
     }
     headers["X-User-Id"] = userId;
     headers["X-User-Role"] = userRole;
+    
+    // TEMPORAL: Agregar Firebase UID header para bypass durante migración
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        if (userObj.firebaseUid) {
+          headers["x-firebase-uid"] = userObj.firebaseUid;
+        }
+      } catch (e) {
+        console.error("Error parsing stored user for Firebase UID:", e);
+      }
+    }
   }
   
   // Solo añadimos Content-Type JSON si no es FormData
@@ -238,6 +262,18 @@ export const getQueryFn: <T>(options: {
     // Solo añadir Authorization si tenemos Firebase ID Token
     if (firebaseIdToken) {
       headers["Authorization"] = `Bearer ${firebaseIdToken}`;
+    }
+    
+    // TEMPORAL: Agregar Firebase UID header para bypass durante migración
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        if (userObj.firebaseUid) {
+          headers["x-firebase-uid"] = userObj.firebaseUid;
+        }
+      } catch (e) {
+        console.error("Error parsing stored user for Firebase UID:", e);
+      }
     }
 
     try {
