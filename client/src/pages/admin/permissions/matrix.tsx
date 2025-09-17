@@ -10,7 +10,11 @@ const MatrixPage: React.FC = () => {
     <AdminLayout>
       <PermissionsMatrix
         editable={true}
-        currentUser={user}
+        currentUser={user ? { 
+          id: user.id, 
+          roleId: user.roleId, 
+          role: user.role 
+        } : undefined}
         title="Matriz de Permisos del Sistema"
         description="Gestiona permisos granulares para cada rol y módulo. Los cambios se aplican inmediatamente al sistema."
         showFilters={true}
