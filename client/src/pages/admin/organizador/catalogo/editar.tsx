@@ -161,17 +161,17 @@ const EditarActividadPage = () => {
   const activityId = params?.id;
 
   // Consulta para obtener la lista de parques
-  const { data: parques = [], isLoading: isLoadingParques } = useQuery({
+  const { data: parques = [], isLoading: isLoadingParques } = useQuery<any[]>({
     queryKey: ['/api/parks'],
   });
 
   // Consulta para obtener la lista de categorías
-  const { data: categorias = [], isLoading: isLoadingCategorias } = useQuery({
+  const { data: categorias = [], isLoading: isLoadingCategorias } = useQuery<any[]>({
     queryKey: ['/api/activity-categories'],
   });
 
   // Consulta para obtener la lista de instructores
-  const { data: instructores = [], isLoading: isLoadingInstructores } = useQuery({
+  const { data: instructores = [], isLoading: isLoadingInstructores } = useQuery<any[]>({
     queryKey: ['/api/instructors']
   });
 
