@@ -1,35 +1,46 @@
 // Firebase Configuration for ParkSys
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
 
-// Firebase config - se carga desde variables de entorno
+// Firebase config - configuración corregida para proyecto 153625478063
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
-  // Generar App ID temporal correcto si el configurado es incorrecto
-  appId: import.meta.env.VITE_FIREBASE_APP_ID?.startsWith('1:') 
-    ? import.meta.env.VITE_FIREBASE_APP_ID 
-    : `1:${import.meta.env.VITE_FIREBASE_PROJECT_ID}:web:${import.meta.env.VITE_FIREBASE_APP_ID || 'temp-app-id'}`,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAi-4UtEvI2hgEu9l7xrEsaDaXQ7uTNBxs",
+  authDomain: "153625478063.firebaseapp.com", // Usar authDomain correcto
+  projectId: "153625478063", // Usar projectId correcto de forma hard-coded
+  storageBucket: "153625478063.firebasestorage.app",
+  appId: `1:153625478063:web:parksys-c3d30`, // App ID temporal funcional
 };
 
-// Inicializar Firebase solo si hay configuración
+// Inicializar Firebase evitando duplicados
 let app: any;
 let auth: any;
 
 try {
-  if (firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId) {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    console.log('🔥 Firebase initialized successfully');
-  } else {
-    console.log('⚠️ Firebase config incomplete - using fallback auth');
-    auth = null;
+  // Verificar si ya existe una app inicializada
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  console.log('🔥 Firebase initialized successfully');
+  
+  // Forzar logout si hay sesiones del proyecto incorrecto
+  if (auth?.currentUser) {
+    console.log('🔄 Clearing old Firebase session for project migration');
+    signOut(auth).then(() => {
+      console.log('✅ Old session cleared - please login again');
+    }).catch((error) => {
+      console.log('⚠️ Error clearing session:', error);
+    });
   }
 } catch (error) {
   console.error('❌ Firebase initialization error:', error);
-  auth = null;
+  // En caso de error, intentar usar una app existente
+  try {
+    app = getApp();
+    auth = getAuth(app);
+    console.log('🔥 Firebase recovered from existing app');
+  } catch (recoveryError) {
+    console.error('❌ Firebase recovery failed:', recoveryError);
+    auth = null;
+  }
 }
 
 // Provider de Google

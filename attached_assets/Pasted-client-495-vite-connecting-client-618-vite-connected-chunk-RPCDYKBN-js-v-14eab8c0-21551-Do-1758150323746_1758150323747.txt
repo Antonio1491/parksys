@@ -1,0 +1,79 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:25 🔥 Firebase initialized successfully
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es Object
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:257 🌐 [QUERY] GET /api/roles
+queryClient.ts:257 🌐 [QUERY] GET /api/roles/1/permissions
+queryClient.ts:257 🌐 [QUERY] GET /api/users/all-with-multiple-roles
+queryClient.ts:257 🌐 [QUERY] GET /api/users-with-roles
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:144 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:144 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+/api/roles/1/permissions:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+queryClient.ts:287 Query failed for: /api/roles/1/permissions Error: Token de autenticación requerido
+    at queryClient.ts:283:15
+(anonymous) @ queryClient.ts:287
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+/api/users/all-with-multiple-roles:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+queryClient.ts:287 Query failed for: /api/users/all-with-multiple-roles Error: ID de usuario inválido
+    at queryClient.ts:283:15
+(anonymous) @ queryClient.ts:287
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:144 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:257 🌐 [QUERY] GET /api/roles/1/permissions
+queryClient.ts:144 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:257 🌐 [QUERY] GET /api/notifications/count
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+/api/roles/1/permissions:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+queryClient.ts:287 Query failed for: /api/roles/1/permissions Error: Token de autenticación requerido
+    at queryClient.ts:283:15
+(anonymous) @ queryClient.ts:287
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+/api/notifications/count:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+queryClient.ts:287 Query failed for: /api/notifications/count Error: Token de autenticación requerido
+    at queryClient.ts:283:15
+(anonymous) @ queryClient.ts:287
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:257 🌐 [QUERY] GET /api/notifications/count
+/api/notifications/count:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+queryClient.ts:287 Query failed for: /api/notifications/count Error: Token de autenticación requerido
+    at queryClient.ts:283:15
+(anonymous) @ queryClient.ts:287
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:144 🌐 [API REQUEST] POST /api/roles
+/api/roles:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
