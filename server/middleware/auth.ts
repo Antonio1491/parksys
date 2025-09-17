@@ -32,6 +32,7 @@ declare global {
 
 // Middleware de autenticación con Firebase
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+  console.log(`🚨 [AUTH-DEBUG] Middleware ejecutándose para ${req.method} ${req.path}`);
   try {
     const authHeader = req.headers.authorization;
     let firebaseUid: string | null = null;
@@ -50,7 +51,9 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     }
 
     // 2. TEMPORAL: Permitir x-firebase-uid header para usuarios aprobados durante migración
-    const allowHeaderAuth = process.env.ALLOW_HEADER_AUTH === 'true';
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const allowHeaderAuth = process.env.ALLOW_HEADER_AUTH === 'true' || isDevelopment;
+    console.log(`🔍 [DEBUG-TEMP] NODE_ENV: ${process.env.NODE_ENV}, ALLOW_HEADER_AUTH: ${process.env.ALLOW_HEADER_AUTH}, allowHeaderAuth: ${allowHeaderAuth}, x-firebase-uid: ${req.headers['x-firebase-uid']}`);
     
     if (!firebaseUid && req.headers['x-firebase-uid'] && allowHeaderAuth) {
       const headerUid = req.headers['x-firebase-uid'] as string;
@@ -70,7 +73,6 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     }
 
     // 3. MODO DESARROLLO ESTRICTO: Solo permitir usuario fijo en desarrollo explícito
-    const isDevelopment = process.env.NODE_ENV === 'development';
     const allowDevFallback = process.env.ALLOW_DEV_ADMIN_FALLBACK === 'true';
     
     if (!firebaseUid && isDevelopment && allowDevFallback) {

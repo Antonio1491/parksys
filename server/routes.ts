@@ -37,7 +37,7 @@ import { registerTreeInventoryRoutes } from "./tree_inventory_routes";
 import { registerTreeStatsRoutes } from "./tree_stats_routes";
 import { registerTreeDetailsRoutes } from "./tree_details_route";
 import { registerTreeInventoryGeneratorRoutes } from "./tree-inventory-generator-routes";
-import { activityRouter } from "./activityRoutes";
+// import { activityRouter } from "./activityRoutes"; // REMOVIDO: Evitar conflicto con activitiesRoutes.ts
 import directRouter from "./directRoutes";
 import { registerConcessionRoutes } from "./concession-routes";
 import { registerConcessionContractsRoutes } from "./concession-contracts-routes";
@@ -288,8 +288,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Registramos las rutas de actividades
-  apiRouter.use(activityRouter);
+  // Registramos las rutas de actividades (comentado - usar activitiesRoutes.ts)
+  // apiRouter.use(activityRouter);
   
   // Registramos las rutas del módulo de voluntariado
   registerVolunteerRoutes(app, apiRouter, null, isAuthenticated);
