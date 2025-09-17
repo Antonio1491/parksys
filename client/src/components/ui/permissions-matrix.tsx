@@ -232,10 +232,43 @@ export function PermissionsMatrix({
     selectedModule === 'all' || module.slug === selectedModule
   );
 
-  // Agrupar permisos del sistema por módulo
+  // ✅ NUEVA ESTRUCTURA: Agrupar permisos del sistema granularmente
   const getPermissionsForModule = (moduleSlug: string): SystemPermission[] => {
     return (systemPermissions as SystemPermission[]).filter((perm: SystemPermission) => 
       perm.permissionKey.startsWith(`${moduleSlug}:`) || perm.permissionKey === 'all'
+    );
+  };
+
+  // ✅ NUEVA FUNCIÓN: Obtener páginas únicas del sistema (para filas)
+  const getUniquePages = (): Array<{ key: string, label: string, module: string }> => {
+    const pages = new Map<string, { key: string, label: string, module: string }>();
+    
+    (systemPermissions as SystemPermission[]).forEach((perm: SystemPermission) => {
+      if (perm.permissionKey === 'all') return; // Skip special permission
+      
+      const parts = perm.permissionKey.split(':');
+      if (parts.length >= 3) {
+        const [module, submodule, page] = parts;
+        const pageKey = `${module}:${submodule}:${page}`;
+        
+        if (!pages.has(pageKey)) {
+          const moduleInfo = (permissionModules as PermissionModule[]).find(m => m.slug === module);
+          pages.set(pageKey, {
+            key: pageKey,
+            label: `${moduleInfo?.name || module} › ${submodule} › ${page}`,
+            module: module
+          });
+        }
+      }
+    });
+    
+    return Array.from(pages.values());
+  };
+
+  // ✅ NUEVA FUNCIÓN: Obtener acciones disponibles para una página específica  
+  const getActionsForPage = (pageKey: string): SystemPermission[] => {
+    return (systemPermissions as SystemPermission[]).filter((perm: SystemPermission) => 
+      perm.permissionKey.startsWith(`${pageKey}:`) && perm.permissionKey !== 'all'
     );
   };
 
@@ -327,87 +360,167 @@ export function PermissionsMatrix({
         </div>
       )}
 
-      {/* Matriz de permisos */}
+      {/* ✅ NUEVA MATRIZ GRANULAR: Páginas como filas, acciones como columnas */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Info className="h-4 w-4 text-blue-600" />
+            <span className="font-semibold text-blue-800">Matriz Granular de Permisos</span>
+          </div>
+          <p className="text-sm text-blue-700">
+            Sistema granular: <code>módulo:submódulo:página:acción</code>. 
+            Cada página tiene acciones específicas que pueden configurarse por rol.
+          </p>
+        </div>
+        
+        <table className="w-full border-collapse bg-white rounded-lg overflow-hidden">
+          <thead className="bg-gray-100">
             <tr>
-              <th className="text-left p-3 border-b font-semibold">Rol</th>
-              {filteredModules.map((module: PermissionModule) => (
-                <th key={module.slug} className="text-center p-3 border-b font-semibold min-w-32">
-                  {module.name}
+              <th className="text-left p-3 border-b font-semibold">Página del Sistema</th>
+              {filteredRoles.map((role: Role) => (
+                <th key={role.slug} className="text-center p-3 border-b font-semibold min-w-40">
+                  <div className="flex flex-col items-center gap-1">
+                    <RoleBadge roleId={role.slug} />
+                    <span className="text-xs text-gray-500">Nivel {role.level}</span>
+                  </div>
                 </th>
               ))}
-              <th className="text-center p-3 border-b font-semibold">Total</th>
+              <th className="text-center p-3 border-b font-semibold">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filteredRoles.map((role: Role) => (
-              <tr key={role.id} className="hover:bg-gray-50">
-                <td className="p-3 border-b">
-                  <div className="flex items-center gap-3">
-                    <RoleBadgeWithText roleId={role.slug} />
-                    <div className="text-xs text-gray-500">
-                      Nivel {role.level}
-                    </div>
-                  </div>
-                </td>
-                {filteredModules.map((module: PermissionModule) => {
-                  const modulePermissions = getPermissionsForModule(module.slug);
-                  
-                  return (
-                    <td key={`${role.slug}-${module.slug}`} className="p-3 border-b text-center">
-                      {role.slug === 'super-admin' ? (
-                        <div className="flex items-center justify-center">
-                          <Star className="h-5 w-5 text-yellow-500" />
-                          <span className="text-xs ml-1 font-semibold text-yellow-600">ALL</span>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-2 gap-1 text-xs">
-                          {modulePermissions.slice(0, 4).map((perm: SystemPermission) => (
-                            <div key={perm.permissionKey} className="flex flex-col items-center gap-1">
-                              <Checkbox
-                                checked={hasPermission(role.slug, perm.permissionKey)}
-                                onCheckedChange={(checked) => updatePermission(role.slug, perm.permissionKey, !!checked)}
-                                disabled={!editable || !canEditPermissions()}
-                                className="h-3 w-3"
-                              />
-                              <span className="text-xs text-gray-500 truncate w-8" title={perm.description}>
-                                {perm.permissionKey.split(':').pop()?.substring(0, 3).toUpperCase()}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+            {getUniquePages()
+              .filter(page => selectedModule === 'all' || page.module === selectedModule)
+              .map((page) => {
+                const pageActions = getActionsForPage(page.key);
+                
+                return (
+                  <tr key={page.key} className="hover:bg-gray-50 border-b">
+                    <td className="p-3">
+                      <div className="text-sm font-medium">{page.label}</div>
+                      <div className="text-xs text-gray-500 font-mono">{page.key}</div>
                     </td>
-                  );
-                })}
-                <td className="p-3 border-b text-center">
-                  <Badge variant="outline" className="font-mono">
+                    {filteredRoles.map((role: Role) => (
+                      <td key={`${role.slug}-${page.key}`} className="p-3 text-center">
+                        {role.slug === 'super-admin' ? (
+                          <div className="flex items-center justify-center">
+                            <Star className="h-5 w-5 text-yellow-500" />
+                            <span className="text-xs ml-1 font-semibold text-yellow-600">ALL</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap gap-1 justify-center max-w-48">
+                            {pageActions.map((action: SystemPermission) => (
+                              <div key={action.permissionKey} className="flex flex-col items-center gap-1">
+                                <Checkbox
+                                  checked={hasPermission(role.slug, action.permissionKey)}
+                                  onCheckedChange={(checked) => updatePermission(role.slug, action.permissionKey, !!checked)}
+                                  disabled={!editable || !canEditPermissions()}
+                                  className="h-3 w-3"
+                                />
+                                <span className="text-[10px] text-gray-500 truncate max-w-12" title={action.description}>
+                                  {action.permissionKey.split(':').pop()?.toUpperCase()}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    ))}
+                    <td className="p-3 text-center">
+                      <Badge variant="outline" className="text-xs">
+                        {pageActions.length}
+                      </Badge>
+                    </td>
+                  </tr>
+                );
+              })}
+            
+            {/* Fila de totales */}
+            <tr className="bg-gray-50 font-semibold border-t-2">
+              <td className="p-3">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  <span>Total de Permisos</span>
+                </div>
+              </td>
+              {filteredRoles.map((role: Role) => (
+                <td key={`total-${role.slug}`} className="p-3 text-center">
+                  <Badge variant="outline" className="font-mono bg-white">
                     {getPermissionCount(role.slug)}
                   </Badge>
                 </td>
-              </tr>
-            ))}
+              ))}
+              <td className="p-3 text-center">
+                <Badge variant="outline" className="bg-blue-100">
+                  {(systemPermissions as SystemPermission[]).filter(p => p.permissionKey !== 'all').length}
+                </Badge>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      {/* Leyenda */}
+      {/* ✅ NUEVA LEYENDA GRANULAR */}
       <div className="p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-semibold mb-2">Leyenda de Permisos:</h4>
-        <div className="grid grid-cols-3 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-green-600">R</Badge>
-            <span>Read - Solo lectura</span>
+        <h4 className="font-semibold mb-3 flex items-center gap-2">
+          <Info className="h-4 w-4" />
+          Sistema de Permisos Granulares:
+        </h4>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          <div className="space-y-2">
+            <div className="font-semibold text-gray-700">📖 Acciones de Lectura:</div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-green-600 text-xs">VIEW</Badge>
+              <span>Ver contenido</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-blue-600 text-xs">EXPORT</Badge>
+              <span>Exportar datos</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-blue-600">W</Badge>
-            <span>Write - Lectura y escritura</span>
+          
+          <div className="space-y-2">
+            <div className="font-semibold text-gray-700">✏️ Acciones de Escritura:</div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-orange-600 text-xs">CREATE</Badge>
+              <span>Crear nuevos</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-purple-600 text-xs">EDIT</Badge>
+              <span>Editar existentes</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-red-600 text-xs">DELETE</Badge>
+              <span>Eliminar</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-red-600">A</Badge>
-            <span>Admin - Control total</span>
+          
+          <div className="space-y-2">
+            <div className="font-semibold text-gray-700">⚙️ Acciones Avanzadas:</div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-teal-600 text-xs">MANAGE</Badge>
+              <span>Gestionar</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-indigo-600 text-xs">APPROVE</Badge>
+              <span>Aprobar</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-pink-600 text-xs">PUBLISH</Badge>
+              <span>Publicar</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-cyan-600 text-xs">PROCESS</Badge>
+              <span>Procesar</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <div className="flex items-center gap-2 text-sm">
+            <Star className="h-4 w-4 text-yellow-500" />
+            <span className="font-semibold">Super Administrador:</span>
+            <span className="text-gray-600">Tiene acceso completo a todas las acciones (ALL)</span>
           </div>
         </div>
       </div>

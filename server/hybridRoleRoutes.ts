@@ -24,7 +24,7 @@ export function registerHybridRoleRoutes(app: Express) {
   // ===== RUTAS ESPECÍFICAS PRIMERO (antes de rutas con parámetros) =====
 
   // Obtener matriz completa de permisos (DEBE IR ANTES QUE CUALQUIER RUTA CON PARÁMETROS)
-  app.get("/api/roles/permissions", async (req, res) => {
+  app.get("/api/roles/permissions", requireSuperAdmin(), async (req, res) => {
     try {
       console.log("🔧 [HYBRID] Obteniendo matriz completa de permisos...");
       const permissionsMatrix = await roleService.getAllRolePermissions();
@@ -38,7 +38,7 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Obtener estructura de módulos adaptativos (para frontend)
-  app.get("/api/roles/adaptive-modules", async (req, res) => {
+  app.get("/api/roles/adaptive-modules", requireSuperAdmin(), async (req, res) => {
     try {
       // Este endpoint devuelve los módulos detectados dinámicamente
       // En una implementación completa, esto vendría del AdminSidebarComplete
@@ -85,7 +85,7 @@ export function registerHybridRoleRoutes(app: Express) {
 
 
   // Guardar permisos de matriz (para PermissionsMatrix)
-  app.post("/api/roles/permissions/save-matrix", async (req, res) => {
+  app.post("/api/roles/permissions/save-matrix", requireSuperAdmin(), async (req, res) => {
     try {
       const { rolePermissions } = req.body;
       
@@ -134,7 +134,7 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Obtener estadísticas de permisos por módulo (para dashboard administrativo)
-  app.get("/api/roles/permissions-stats", async (req, res) => {
+  app.get("/api/roles/permissions-stats", requireSuperAdmin(), async (req, res) => {
     try {
       const roles = await roleService.getAllRoles();
       const stats: Record<string, any> = {};
@@ -185,7 +185,7 @@ export function registerHybridRoleRoutes(app: Express) {
   // ===== RUTAS CON PARÁMETROS AL FINAL =====
 
   // Obtener permisos específicos de un rol (para PermissionsMatrix)
-  app.get("/api/roles/:id/permissions", async (req, res) => {
+  app.get("/api/roles/:id/permissions", requireSuperAdmin(), async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -204,59 +204,8 @@ export function registerHybridRoleRoutes(app: Express) {
     }
   });
 
-
-
-  // Guardar permisos de matriz (para PermissionsMatrix)
-  app.post("/api/roles/permissions/save-matrix", async (req, res) => {
-    try {
-      const { rolePermissions } = req.body;
-      
-      if (!rolePermissions || typeof rolePermissions !== 'object') {
-        return res.status(400).json({ error: "Datos de permisos inválidos" });
-      }
-
-      const results = [];
-      const errors = [];
-
-      // Actualizar permisos para cada rol
-      for (const [roleIdStr, permissions] of Object.entries(rolePermissions)) {
-        const roleId = parseInt(roleIdStr);
-        if (isNaN(roleId)) {
-          errors.push(`ID de rol inválido: ${roleIdStr}`);
-          continue;
-        }
-
-        try {
-          const success = await roleService.updateRolePermissions(roleId, permissions);
-          if (success) {
-            results.push({ roleId, status: 'updated' });
-          } else {
-            errors.push(`Error actualizando rol ${roleId}`);
-          }
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-          errors.push(`Error actualizando rol ${roleId}: ${errorMessage}`);
-        }
-      }
-
-      if (errors.length > 0 && results.length === 0) {
-        return res.status(400).json({ error: "No se pudieron actualizar los permisos", errors });
-      }
-
-      res.json({ 
-        success: true,
-        message: "Permisos actualizados correctamente",
-        results,
-        errors: errors.length > 0 ? errors : undefined
-      });
-    } catch (error) {
-      console.error("Error guardando matriz de permisos:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
-
   // Verificar múltiples permisos de un usuario (para hooks adaptativos)
-  app.post("/api/users/:userId/check-permissions", async (req, res) => {
+  app.post("/api/users/:userId/check-permissions", requireSuperAdmin(), async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const { checks } = req.body;
@@ -282,55 +231,6 @@ export function registerHybridRoleRoutes(app: Express) {
       res.json({ results });
     } catch (error) {
       console.error("Error verificando múltiples permisos:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
-
-  // Obtener estadísticas de permisos por módulo (para dashboard administrativo)
-  app.get("/api/roles/permissions-stats", async (req, res) => {
-    try {
-      const roles = await roleService.getAllRoles();
-      const stats: Record<string, any> = {};
-
-      roles.forEach(role => {
-        const permissions = role.permissions as Record<string, string[]> || {};
-        Object.keys(permissions).forEach(moduleId => {
-          if (!stats[moduleId]) {
-            stats[moduleId] = {
-              moduleId,
-              totalRoles: roles.length,
-              rolesWithAccess: 0,
-              permissionBreakdown: {
-                read: 0,
-                create: 0,
-                update: 0,
-                delete: 0,
-                admin: 0
-              }
-            };
-          }
-
-          const modulePermissions = permissions[moduleId];
-          if (modulePermissions && modulePermissions.length > 0) {
-            stats[moduleId].rolesWithAccess++;
-            
-            modulePermissions.forEach(permission => {
-              if (stats[moduleId].permissionBreakdown[permission] !== undefined) {
-                stats[moduleId].permissionBreakdown[permission]++;
-              }
-            });
-          }
-        });
-      });
-
-      // Calcular porcentajes
-      Object.values(stats).forEach((stat: any) => {
-        stat.accessPercentage = Math.round((stat.rolesWithAccess / stat.totalRoles) * 100);
-      });
-
-      res.json(stats);
-    } catch (error) {
-      console.error("Error obteniendo estadísticas de permisos:", error);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });
