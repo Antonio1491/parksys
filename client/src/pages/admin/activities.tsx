@@ -1180,7 +1180,7 @@ const AdminActivities = () => {
                 <div className="p-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     {currentActivities.map((activity: any) => (
-                      <div key={activity.id} className="bg-white border border-teal-500 rounded-2xl hover:shadow-md hover:border-[#00444f] transition-shadow duration-200 overflow-hidden">
+                      <div key={activity.id} className="bg-white border rounded-2xl hover:shadow-md hover:border-[#00444f] transition-shadow duration-200 overflow-hidden">
                         {/* Imagen de la actividad */}
                         <div className="relative h-48 bg-gray-100">
                           {selectionMode && (
@@ -1266,26 +1266,26 @@ const AdminActivities = () => {
                           
                           {/* Botones de acción */}
                           <div className="flex justify-between items-center pt-3 border-t">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
-                              onClick={() => handleEdit(activity)}
-                              title="Editar"
-                            >
-                              <Pencil className="h-4 w-4" />
-                              <span>Editar</span>
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="text-red-600 hover:text-red-700 flex items-center gap-1"
-                              onClick={() => handleDelete(activity)}
-                              title="Eliminar"
-                            >
-                              <Trash className="h-4 w-4" />
-                              <span>Eliminar</span>
-                            </Button>
+                            <div className="flex space-x-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-blue-600 hover:text-blue-700"
+                                onClick={() => handleEdit(activity)}
+                                title="Editar"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => handleDelete(activity)}
+                                title="Eliminar"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { roleService } from "./roleService";
 import { requireSuperAdmin } from "./permissions-middleware";
+import { isAuthenticated } from "./middleware/auth";
+import { storage } from "./storage";
 import { z } from "zod";
 import { db } from "./db";
 import { roles, systemPermissions, rolePermissions } from "../shared/schema";
@@ -24,7 +26,7 @@ export function registerHybridRoleRoutes(app: Express) {
   // ===== RUTAS ESPECÍFICAS PRIMERO (antes de rutas con parámetros) =====
 
   // Obtener matriz completa de permisos (DEBE IR ANTES QUE CUALQUIER RUTA CON PARÁMETROS)
-  app.get("/api/roles/permissions", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/roles/permissions", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
       console.log("🔧 [HYBRID] Obteniendo matriz completa de permisos...");
       const permissionsMatrix = await roleService.getAllRolePermissions();
@@ -38,7 +40,7 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Obtener estructura de módulos adaptativos (para frontend)
-  app.get("/api/roles/adaptive-modules", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/roles/adaptive-modules", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
       // Este endpoint devuelve los módulos detectados dinámicamente
       // En una implementación completa, esto vendría del AdminSidebarComplete
@@ -85,7 +87,7 @@ export function registerHybridRoleRoutes(app: Express) {
 
 
   // Guardar permisos de matriz (para PermissionsMatrix)
-  app.post("/api/roles/permissions/save-matrix", requireSuperAdmin(), async (req, res) => {
+  app.post("/api/roles/permissions/save-matrix", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
       const { rolePermissions } = req.body;
       
@@ -134,7 +136,7 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Obtener estadísticas de permisos por módulo (para dashboard administrativo)
-  app.get("/api/roles/permissions-stats", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/roles/permissions-stats", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
       const roles = await roleService.getAllRoles();
       const stats: Record<string, any> = {};
@@ -185,7 +187,7 @@ export function registerHybridRoleRoutes(app: Express) {
   // ===== RUTAS CON PARÁMETROS AL FINAL =====
 
   // Obtener permisos específicos de un rol (para PermissionsMatrix)
-  app.get("/api/roles/:id/permissions", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/roles/:id/permissions", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -205,7 +207,7 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Verificar múltiples permisos de un usuario (para hooks adaptativos)
-  app.post("/api/users/:userId/check-permissions", requireSuperAdmin(), async (req, res) => {
+  app.post("/api/users/:userId/check-permissions", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const { checks } = req.body;
@@ -238,10 +240,9 @@ export function registerHybridRoleRoutes(app: Express) {
   // ===== NUEVOS ENDPOINTS PARA MATRIZ DE PERMISOS GRANULARES =====
   
   // Obtener módulos de permisos (SOLO SUPER ADMIN)
-  app.get("/api/permissions/modules", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/permissions/modules", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
-      const storage = (global as any).storage;
-      const modules = await storage.db.select().from(storage.schema.permissionModules);
+      const modules = await storage.getPermissionModules();
       res.json(modules);
     } catch (error) {
       console.error("❌ Error obteniendo módulos de permisos:", error);
@@ -250,10 +251,9 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Obtener acciones de permisos (SOLO SUPER ADMIN)
-  app.get("/api/permissions/actions", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/permissions/actions", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
-      const storage = (global as any).storage;
-      const actions = await storage.db.select().from(storage.schema.permissionActions);
+      const actions = await storage.getPermissionActions();
       res.json(actions);
     } catch (error) {
       console.error("❌ Error obteniendo acciones de permisos:", error);
@@ -262,10 +262,9 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Obtener permisos del sistema (SOLO SUPER ADMIN)
-  app.get("/api/permissions/system", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/permissions/system", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
-      const storage = (global as any).storage;
-      const permissions = await storage.db.select().from(storage.schema.systemPermissions);
+      const permissions = await storage.getPermissions();
       res.json(permissions);
     } catch (error) {
       console.error("❌ Error obteniendo permisos del sistema:", error);
@@ -274,32 +273,27 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Obtener matriz de permisos por rol (versión granular) (SOLO SUPER ADMIN)
-  app.get("/api/roles/permissions/matrix", requireSuperAdmin(), async (req, res) => {
+  app.get("/api/roles/permissions/matrix", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
-      const storage = (global as any).storage;
-      
       // Obtener todos los roles
-      const roles = await storage.db.select().from(storage.schema.roles);
+      const allRoles = await db.select().from(roles);
       const result: Record<string, string[]> = {};
       
       // Para cada rol, obtener sus permisos asignados
-      for (const role of roles) {
-        const rolePermissions = await storage.db
+      for (const role of allRoles) {
+        const rolePermissionsList = await db
           .select({
-            permissionKey: storage.schema.systemPermissions.permissionKey
+            permissionKey: systemPermissions.permissionKey
           })
-          .from(storage.schema.rolePermissions)
-          .innerJoin(storage.schema.systemPermissions, 
-            storage.eq(storage.schema.rolePermissions.permissionId, storage.schema.systemPermissions.id)
+          .from(rolePermissions)
+          .innerJoin(systemPermissions, 
+            eq(rolePermissions.permissionId, systemPermissions.id)
           )
           .where(
-            storage.and(
-              storage.eq(storage.schema.rolePermissions.roleId, role.id),
-              storage.eq(storage.schema.rolePermissions.isActive, true)
-            )
+            eq(rolePermissions.roleId, role.id)
           );
         
-        result[role.slug] = rolePermissions.map(p => p.permissionKey);
+        result[role.slug] = rolePermissionsList.map(p => p.permissionKey);
       }
       
       res.json(result);
@@ -310,7 +304,7 @@ export function registerHybridRoleRoutes(app: Express) {
   });
 
   // Actualizar permisos granulares (SOLO SUPER ADMIN)
-  app.post("/api/permissions/roles/update", requireSuperAdmin(), async (req, res) => {
+  app.post("/api/permissions/roles/update", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
       // Validar entrada con Zod
       const validationResult = updatePermissionsSchema.safeParse(req.body);
