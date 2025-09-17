@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Boxes, Download, Upload, FileText, Brush } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Boxes, Download, Upload, FileText, Brush, CopyCheck, CheckSquare, Square, Trash2 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -41,6 +41,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { BlockList } from 'net';
@@ -56,6 +57,11 @@ const AdminActivities = () => {
   // States for delete functionality
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  // Bulk selection and delete states
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedActivities, setSelectedActivities] = useState<Set<number>>(new Set());
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   
   // States for CSV import functionality
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -108,6 +114,66 @@ const AdminActivities = () => {
       });
     },
   });
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (activityIds: number[]) => {
+      return await apiRequest('/api/activities/bulk-delete', {
+        method: 'POST',
+        data: { activityIds },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Actividades eliminadas",
+        description: `Se eliminaron ${selectedActivities.size} actividades exitosamente.`,
+      });
+      setShowBulkDeleteDialog(false);
+      setSelectedActivities(new Set());
+      setSelectionMode(false);
+      refetch();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "No se pudieron eliminar las actividades seleccionadas.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Selection handlers
+  const handleSelectActivity = (activityId: number, checked: boolean) => {
+    const newSelected = new Set(selectedActivities);
+    if (checked) {
+      newSelected.add(activityId);
+    } else {
+      newSelected.delete(activityId);
+    }
+    setSelectedActivities(newSelected);
+  };
+
+  const handleSelectAllActivities = () => {
+    const allActivityIds = new Set(currentActivities.map(activity => activity.id));
+    setSelectedActivities(allActivityIds);
+  };
+
+  const handleDeselectAllActivities = () => {
+    setSelectedActivities(new Set());
+  };
+
+  const handleBulkDeleteClick = () => {
+    if (selectedActivities.size === 0) return;
+    setShowBulkDeleteDialog(true);
+  };
+
+  const handleBulkDeleteConfirm = () => {
+    const activityIds = Array.from(selectedActivities);
+    bulkDeleteMutation.mutate(activityIds);
+  };
 
   // CSV Export function
   const handleExportCSV = () => {
@@ -901,6 +967,69 @@ const AdminActivities = () => {
               </Button>
             </div>
 
+            {/* Botón de selección con menú desplegable */}
+            <div className="relative group">
+              <Button
+                variant={selectionMode ? 'default' : 'outline'}
+                size="sm"
+                className={`flex items-center h-10 w-10 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed] hover:bg-gray-200'}`}
+                data-testid="button-selection-toggle"
+              >
+                <CopyCheck className="h-4 w-4" />
+              </Button>
+
+              {/* Dropdown menu con CSS hover */}
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-1">
+                  <button
+                    onClick={() => setSelectionMode(true)}
+                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                    data-testid="menu-enable-selection"
+                  >
+                    <CopyCheck className="h-4 w-4 mr-2" />
+                    Selección múltiple
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!selectionMode) {
+                        setSelectionMode(true);
+                      }
+                      handleSelectAllActivities();
+                    }}
+                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                    data-testid="menu-select-all"
+                  >
+                    <CheckSquare className="h-5 w-5 mr-2" />
+                    Seleccionar todo
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDeselectAllActivities();
+                      setSelectionMode(false);
+                    }}
+                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                    data-testid="menu-deselect-all"
+                  >
+                    <Square className="h-4 w-4 mr-2" />
+                    Deseleccionar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Botón para eliminar elementos independiente */}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDeleteClick}
+              className="flex items-center"
+              disabled={selectedActivities.size === 0}
+              data-testid="button-delete-selected"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              {selectedActivities.size > 0 ? ` (${selectedActivities.size})` : ''}
+            </Button>
+
             {/* Toggle de vista */}
             <div className="ml-auto">
               <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
@@ -928,7 +1057,7 @@ const AdminActivities = () => {
         </div>
 
         {/* Activities content */}
-        <div className="rounded-lg shadow overflow-hidden">
+        <div className="rounded-xl overflow-hidden">
           {filteredActivities.length === 0 ? (
             <div className="py-16 flex justify-center">
               <div className="text-center">
@@ -946,6 +1075,21 @@ const AdminActivities = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      {selectionMode && (
+                        <TableHead className="w-[50px]">
+                          <Checkbox
+                            checked={currentActivities.length > 0 && currentActivities.every(activity => selectedActivities.has(activity.id))}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                handleSelectAllActivities();
+                              } else {
+                                handleDeselectAllActivities();
+                              }
+                            }}
+                            data-testid="checkbox-select-all-table"
+                          />
+                        </TableHead>
+                      )}
                       <TableHead className="w-[50px]">ID</TableHead>
                       <TableHead>Título</TableHead>
                       <TableHead>Estado</TableHead>
@@ -958,6 +1102,15 @@ const AdminActivities = () => {
                   <TableBody>
                     {currentActivities.map((activity: any) => (
                       <TableRow key={activity.id}>
+                        {selectionMode && (
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedActivities.has(activity.id)}
+                              onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
+                              data-testid={`checkbox-activity-table-${activity.id}`}
+                            />
+                          </TableCell>
+                        )}
                         <TableCell className="font-medium">#{activity.id}</TableCell>
                         <TableCell>
                           <div>
@@ -1019,6 +1172,16 @@ const AdminActivities = () => {
                       <div key={activity.id} className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                         {/* Imagen de la actividad */}
                         <div className="relative h-48 bg-gray-100">
+                          {selectionMode && (
+                            <div className="absolute top-2 right-2 z-10">
+                              <Checkbox
+                                checked={selectedActivities.has(activity.id)}
+                                onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
+                                className="bg-white/80 data-[state=checked]:bg-blue-600"
+                                data-testid={`checkbox-activity-card-${activity.id}`}
+                              />
+                            </div>
+                          )}
                           {activity.imageUrl ? (
                             <img 
                               src={activity.imageUrl} 
@@ -1252,6 +1415,29 @@ const AdminActivities = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Eliminar actividades seleccionadas?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta acción eliminará permanentemente {selectedActivities.size} actividad{selectedActivities.size !== 1 ? 'es' : ''} seleccionada{selectedActivities.size !== 1 ? 's' : ''}. 
+                Esta acción no se puede deshacer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleBulkDeleteConfirm}
+                className="bg-red-600 hover:bg-red-700 text-white"
+                disabled={bulkDeleteMutation.isPending}
+              >
+                {bulkDeleteMutation.isPending ? "Eliminando..." : "Eliminar"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
