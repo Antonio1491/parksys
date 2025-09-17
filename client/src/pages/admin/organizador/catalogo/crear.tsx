@@ -172,7 +172,7 @@ const CrearActividadPage = () => {
 
   // Consulta para obtener la lista de parques
   const { data: parquesResponse, isLoading: parquesLoading } = useQuery({
-    queryKey: ['/api/parks'],
+    queryKey: ['/api/parks/filter'],
   });
   
   const parques = Array.isArray(parquesResponse) ? parquesResponse : [];

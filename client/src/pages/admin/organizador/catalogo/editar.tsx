@@ -164,7 +164,7 @@ const EditarActividadPage = () => {
 
   // Consulta para obtener la lista de parques
   const { data: parques = [], isLoading: isLoadingParques } = useQuery<any[]>({
-    queryKey: ['/api/parks'],
+    queryKey: ['/api/parks/filter'],
   });
 
   // Consulta para obtener la lista de categorías

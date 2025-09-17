@@ -29,7 +29,7 @@ const OrganizadorPage: React.FC = () => {
 
   // Obtener parques
   const { data: parksResponse, isLoading: isLoadingParks } = useQuery({
-    queryKey: ['/api/parks'],
+    queryKey: ['/api/parks/filter'],
     retry: 1,
   });
   const parks = Array.isArray(parksResponse) ? parksResponse : (parksResponse as any)?.data || [];

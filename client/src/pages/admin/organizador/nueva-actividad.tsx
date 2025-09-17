@@ -215,7 +215,7 @@ const NuevaActividadPage = () => {
   
   // Obtener la lista de parques
   const { data: parques = [] } = useQuery<{ id: number, name: string }[]>({
-    queryKey: ['/api/parks'],
+    queryKey: ['/api/parks/filter'],
   });
 
   // Obtener las categorías de actividades desde la API
