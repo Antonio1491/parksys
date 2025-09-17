@@ -1269,11 +1269,11 @@ const AdminActivities = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="text-blue-600 hover:text-blue-700"
+                              className="text-gray-800 hover:text-blue-700"
                               onClick={() => handleEdit(activity)}
-                              title="Editar"
+                              data-testid={`button-edit-${activity.id}`}
                             >
-                              <Pencil className="h-4 w-4 mr-1" />
+                              <Pencil className="h-4 w-4 mr-2" />
                               Editar
                             </Button>
                             <Button 
@@ -1281,9 +1281,9 @@ const AdminActivities = () => {
                               size="sm" 
                               className="text-red-600 hover:text-red-700"
                               onClick={() => handleDelete(activity)}
-                              title="Eliminar"
+                              data-testid={`button-delete-${activity.id}`}
                             >
-                              <Trash className="h-4 w-4 mr-1" />
+                              <Trash className="h-4 w-4 mr-2" />
                               Eliminar
                             </Button>
                           </div>
