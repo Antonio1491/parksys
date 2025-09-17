@@ -47,8 +47,8 @@ export function requirePermission(permissionKey: string, allowSelf: boolean = fa
         }
       }
 
-      // Verificar el permiso
-      const hasPermission = await storage.checkUserPermission(userId, permissionKey);
+      // Verificar el permiso usando el nuevo método híbrido (FK + legacy)
+      const hasPermission = await storage.checkUserPermissionHybrid(userId, permissionKey);
       
       if (!hasPermission) {
         console.log(`⛔ Acceso denegado: Usuario ${userId} no tiene permiso ${permissionKey}`);
@@ -94,9 +94,9 @@ export function requireAnyPermission(permissionKeys: string[]) {
         });
       }
 
-      // Verificar si tiene al menos uno de los permisos
+      // Verificar si tiene al menos uno de los permisos usando método híbrido
       for (const permissionKey of permissionKeys) {
-        const hasPermission = await storage.checkUserPermission(userId, permissionKey);
+        const hasPermission = await storage.checkUserPermissionHybrid(userId, permissionKey);
         if (hasPermission) {
           console.log(`✅ Acceso permitido: Usuario ${userId} tiene permiso ${permissionKey}`);
           return next();
@@ -142,11 +142,11 @@ export function requireAllPermissions(permissionKeys: string[]) {
         });
       }
 
-      // Verificar que tenga todos los permisos
+      // Verificar que tenga todos los permisos usando método híbrido
       const missingPermissions: string[] = [];
       
       for (const permissionKey of permissionKeys) {
-        const hasPermission = await storage.checkUserPermission(userId, permissionKey);
+        const hasPermission = await storage.checkUserPermissionHybrid(userId, permissionKey);
         if (!hasPermission) {
           missingPermissions.push(permissionKey);
         }

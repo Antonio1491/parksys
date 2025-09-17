@@ -111,6 +111,9 @@ export interface IStorage {
   assignPermissionToRole(roleId: number, permissionId: number, allow: boolean): Promise<any>;
   removePermissionFromRole(roleId: number, permissionId: number): Promise<boolean>;
   checkUserPermission(userId: number, permissionKey: string): Promise<boolean>;
+  checkUserPermissionByFK(userId: number, moduleId?: number | null, submoduleId?: number | null, pageId?: number | null, actionId?: number | null): Promise<boolean>;
+  convertPermissionKeyToFK(permissionKey: string): Promise<{moduleId: number; submoduleId: number | null; pageId: number | null; actionId: number;} | null>;
+  checkUserPermissionHybrid(userId: number, permissionKey: string): Promise<boolean>;
   initializePermissions(): Promise<void>;
 }
 
@@ -1772,6 +1775,142 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error obteniendo permisos del usuario:', error);
       return [];
+    }
+  }
+
+  // ============= NEW FK-BASED PERMISSION METHODS =============
+  
+  /**
+   * Nuevo método que verifica permisos usando foreign keys en lugar de strings
+   * @param userId - ID del usuario
+   * @param moduleId - ID del módulo (optional, null para wildcard)
+   * @param submoduleId - ID del submódulo (optional, null para wildcard)
+   * @param pageId - ID de la página (optional, null para wildcard)
+   * @param actionId - ID de la acción (optional, null para wildcard)
+   * @returns boolean indicating if user has permission
+   */
+  async checkUserPermissionByFK(
+    userId: number, 
+    moduleId?: number | null, 
+    submoduleId?: number | null, 
+    pageId?: number | null, 
+    actionId?: number | null
+  ): Promise<boolean> {
+    try {
+      // Obtener el usuario y su rol
+      const user = await this.getUser(userId);
+      if (!user || !user.roleId) {
+        return false;
+      }
+
+      // Super Admin siempre tiene todos los permisos
+      if (user.roleId === 1) {
+        return true;
+      }
+
+      // Construir consulta con foreign keys - SECURITY FIX: Agregar rp.allow = true y reemplazar wildcard peligroso
+      const result = await db.execute(sql`
+        SELECT COUNT(*) as count
+        FROM role_permissions rp
+        JOIN system_permissions sp ON rp.permission_id = sp.id
+        WHERE rp.role_id = ${user.roleId} 
+          AND rp.is_active = true 
+          AND rp.allow = true
+          AND sp.is_active = true
+          AND (
+            -- Super permission flag (explicit all permissions)
+            sp.is_all = true OR
+            -- Exact match (no null-based wildcards for security)
+            (
+              sp.module_id = ${moduleId || null} AND
+              sp.submodule_id = ${submoduleId || null} AND
+              sp.page_id = ${pageId || null} AND
+              sp.action_id = ${actionId || null}
+            )
+          )
+      `);
+
+      return parseInt(result.rows[0]?.count || '0') > 0;
+    } catch (error) {
+      console.error('Error verificando permiso por FK:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Convertir un permission key (string) a foreign keys para retrocompatibilidad
+   * @param permissionKey - String como 'parks:admin:list:view'
+   * @returns Object con foreign keys o null si no se encuentra
+   */
+  async convertPermissionKeyToFK(permissionKey: string): Promise<{
+    moduleId: number;
+    submoduleId: number | null;
+    pageId: number | null;
+    actionId: number;
+  } | null> {
+    try {
+      // Obtener el permiso por su key para extraer los FK
+      const result = await db.execute(sql`
+        SELECT module_id, submodule_id, page_id, action_id
+        FROM system_permissions 
+        WHERE permission_key = ${permissionKey} AND is_active = true
+        LIMIT 1
+      `);
+
+      const permission = result.rows[0];
+      if (!permission) {
+        return null;
+      }
+
+      return {
+        moduleId: permission.module_id,
+        submoduleId: permission.submodule_id,
+        pageId: permission.page_id,
+        actionId: permission.action_id
+      };
+    } catch (error) {
+      console.error('Error convirtiendo permission key a FK:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Método híbrido que funciona con strings (legacy) y FK (nuevo)
+   * Eventualmente reemplazará a checkUserPermission
+   * SECURITY FIX: Fallback completo a legacy cuando FK falla por cualquier razón
+   */
+  async checkUserPermissionHybrid(userId: number, permissionKey: string): Promise<boolean> {
+    try {
+      // Primero intentar con el método FK nuevo
+      const fkData = await this.convertPermissionKeyToFK(permissionKey);
+      if (fkData) {
+        try {
+          // SECURITY FIX: Try FK method with proper error handling
+          return await this.checkUserPermissionByFK(
+            userId, 
+            fkData.moduleId, 
+            fkData.submoduleId, 
+            fkData.pageId, 
+            fkData.actionId
+          );
+        } catch (fkError) {
+          console.warn(`FK permission check failed for ${permissionKey}, falling back to legacy:`, fkError);
+          // Fallback to legacy if FK method fails for any reason
+          return await this.checkUserPermission(userId, permissionKey);
+        }
+      }
+
+      // Fallback al método original si no se encuentra el FK
+      return await this.checkUserPermission(userId, permissionKey);
+    } catch (error) {
+      console.error('Error en verificación híbrida de permisos:', error);
+      // Final fallback to legacy method if everything else fails
+      try {
+        return await this.checkUserPermission(userId, permissionKey);
+      } catch (legacyError) {
+        console.error('Legacy permission check also failed:', legacyError);
+        return false;
+      }
     }
   }
 
