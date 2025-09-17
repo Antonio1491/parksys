@@ -49,20 +49,24 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       }
     }
 
-    // 2. Verificar localStorage token (para compatibilidad con sistema existente)
-    if (!firebaseUid && req.headers['x-firebase-uid']) {
+    // 2. DESARROLLO: Permitir x-firebase-uid header SOLO en desarrollo con flag explícito
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const allowHeaderAuth = process.env.ALLOW_HEADER_AUTH === 'true';
+    
+    if (!firebaseUid && req.headers['x-firebase-uid'] && isDevelopment && allowHeaderAuth) {
       firebaseUid = req.headers['x-firebase-uid'] as string;
-      console.log(`🔗 [AUTH] Using Firebase UID from header: ${firebaseUid}`);
+      console.log(`🔗 [AUTH-DEV] Using Firebase UID from header (dev only): ${firebaseUid}`);
     }
 
-    // 3. MODO DESARROLLO: permitir acceso con usuario fijo si no hay Firebase configurado
-    // TAMBIÉN permitir en producción para funcionalidad completa del sistema
-    if (!firebaseUid) {
-      console.log('🛠️ [AUTH] Usando usuario administrador fijo para compatibilidad completa');
+    // 3. MODO DESARROLLO ESTRICTO: Solo permitir usuario fijo en desarrollo explícito
+    const allowDevFallback = process.env.ALLOW_DEV_ADMIN_FALLBACK === 'true';
+    
+    if (!firebaseUid && isDevelopment && allowDevFallback) {
+      console.log('🛠️ [AUTH] DESARROLLO: Usando usuario administrador fijo (solo en dev)');
       req.user = {
         id: 1,
         username: 'Luis Romahn',
-        role: 'super-admin',
+        role: 'super_admin',  // ✅ CORREGIDO: usar underscore consistente
         isActive: true,
         roleId: 1,
         firebaseUid: 'AgDictDqdqUOo9hKUYlXPT3t5Bv1',
@@ -97,13 +101,25 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       .from(userRoles)
       .where(eq(userRoles.userId, localUser.id));
 
-    // 7. Configurar objeto usuario en request
+    // 7. Configurar objeto usuario en request con rol normalizado
+    // Normalizar rol desde DB - usar roleId como fuente de verdad principal
+    const roleMapping: Record<number, string> = {
+      1: 'super_admin',  // ✅ UNIFICADO: usar underscore consistentemente
+      2: 'admin', 
+      3: 'director',
+      4: 'manager',
+      5: 'supervisor',
+      6: 'user'
+    };
+    const normalizedRole = roleMapping[localUser.roleId ?? 0] || 'user'; // ✅ SIEMPRE usar roleId como fuente principal, manejar null
+    
     req.user = {
       id: localUser.id,
       firebaseUid: localUser.firebaseUid,
       username: localUser.username,
       email: localUser.email,
       fullName: localUser.fullName,
+      role: normalizedRole, // ✅ AGREGADO: rol normalizado como string
       roleId: localUser.roleId,
       isActive: localUser.isActive,
       roles: userRolesList,
@@ -127,10 +143,11 @@ export const hasMunicipalityAccess = (municipalityId?: number) => {
       return res.status(401).json({ message: 'No autorizado' });
     }
 
-    // MODO DESARROLLO: Permitir acceso a todos los usuarios autenticados
-    const isDevelopment = process.env.NODE_ENV !== 'production';
-    if (isDevelopment && req.user.role === 'admin') {
-      console.log('🛠️ Modo desarrollo - Permitiendo acceso municipal para admin');
+    // DESARROLLO: Permitir acceso SOLO con flag explícito
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const allowMunicipalBypass = process.env.ALLOW_MUNICIPAL_ACCESS_BYPASS === 'true';
+    if (isDevelopment && allowMunicipalBypass && req.user.role === 'admin') {
+      console.log('🛠️ [DEV] Modo desarrollo - Permitiendo acceso municipal para admin');
       return next();
     }
 
@@ -169,12 +186,27 @@ export const hasParkAccess = async (req: Request, res: Response, next: NextFunct
     return res.status(401).json({ message: 'No autorizado' });
   }
 
-  // MODO DESARROLLO: Permitir acceso a todos los usuarios autenticados
-  // En producción, se implementaría la verificación completa
-  console.log("Permitiendo acceso al parque para desarrollo - Usuario:", req.user);
-  return next();
+  // DESARROLLO: Permitir acceso SOLO con flags explícitos
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const allowParkBypass = process.env.ALLOW_PARK_ACCESS_BYPASS === 'true';
   
-  /* Verificación normal de permisos (desactivada para desarrollo)
+  if (isDevelopment && allowParkBypass) {
+    console.log("🛠️ [DEV] Permitiendo acceso al parque (solo desarrollo)");
+    return next();
+  }
+  
+  // ✅ PRODUCCIÓN: Implementar verificación real de permisos
+  // Si el usuario es super admin, tiene acceso a todos los parques
+  if (req.user.role === 'super_admin' || req.user.role === 'admin') {
+    return next();
+  }
+  
+  // ✅ SEGURIDAD: Solo admin/super_admin tienen acceso hasta implementar verificación específica
+  return res.status(403).json({ 
+    message: 'No tiene permisos para acceder a este parque' 
+  });
+  
+  /* TODO: Implementar verificación completa de municipio y parque específicos
   // Si el usuario es super admin o admin, tiene acceso a todos los parques
   if (req.user.role === 'super_admin' || req.user.role === 'admin') {
     return next();
@@ -218,8 +250,8 @@ export const requirePermission = (module: string, action: string) => {
       return res.status(401).json({ message: 'No autorizado' });
     }
 
-    // Si es admin, permitir todo (rol especial)
-    if (req.user.role === 'admin') {
+    // Si es super admin o admin, permitir todo (roles especiales)
+    if (req.user.role === 'super_admin' || req.user.role === 'admin') {
       return next();
     }
 
@@ -230,6 +262,7 @@ export const requirePermission = (module: string, action: string) => {
       
       // Definir permisos básicos por rol
       const basicPermissions: any = {
+        'super_admin': ['*'], // ✅ Super Admin tiene todos los permisos
         'admin': ['*'], // Admin tiene todos los permisos
         'director': ['users-view', 'users-create', 'users-edit', 'parks-view', 'parks-create', 'parks-edit'],
         'manager': ['parks-view', 'parks-edit', 'activities-view', 'activities-create'],

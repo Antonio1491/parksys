@@ -109,7 +109,7 @@ if (isProductionMode) {
       console.log(`🌐 [ROOT] Browser request detected, serving React app`);
       
       // Serve the React app for browser requests (only when not health check)
-      const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
+      const indexPath = path.join(process.cwd(), 'dist', 'index.html');
       console.log(`📁 [ROOT] Looking for index.html at: ${indexPath}`);
       
       if (fs.existsSync(indexPath)) {
@@ -118,8 +118,8 @@ if (isProductionMode) {
       } else {
         console.log(`❌ [ROOT] index.html not found at ${indexPath}`);
         console.log(`📂 [ROOT] Current working directory: ${process.cwd()}`);
-        console.log(`📂 [ROOT] Checking if dist/public directory exists: ${fs.existsSync(path.join(process.cwd(), 'dist', 'public'))}`);
-        console.log(`📂 [ROOT] Available files in dist/public:`, fs.existsSync(path.join(process.cwd(), 'dist', 'public')) ? fs.readdirSync(path.join(process.cwd(), 'dist', 'public')) : 'directory does not exist');
+        console.log(`📂 [ROOT] Checking if dist directory exists: ${fs.existsSync(path.join(process.cwd(), 'dist'))}`);
+        console.log(`📂 [ROOT] Available files in dist:`, fs.existsSync(path.join(process.cwd(), 'dist')) ? fs.readdirSync(path.join(process.cwd(), 'dist')) : 'directory does not exist');
         res.status(503).send('Application not built. Please run npm run build first.');
       }
     } catch (error) {
@@ -2441,9 +2441,9 @@ function startServer() {
       console.error("❌ [API-PRIORITY] Error registering main routes:", error);
     }
     
-    // 🔧 [FRONTEND-FIX] Environment-controlled static SPA fallback
-    // 🎯 CRITICAL FIX: Detect built assets presence, not NODE_ENV (correct Vite structure)
-    const distDir = path.join(process.cwd(), 'dist', 'public');
+    // 🔧 [FRONTEND-FIX] Build-presence-controlled static SPA fallback
+    // ✅ FIXED: Detect built assets presence using correct Vite dist structure
+    const distDir = path.join(process.cwd(), 'dist');
     const hasBuild = fs.existsSync(path.join(distDir, 'index.html')) && 
                      fs.existsSync(path.join(distDir, 'assets'));
     const useStaticFrontend = hasBuild || 
@@ -2468,7 +2468,7 @@ function startServer() {
           console.log("✅ [BUILD] Existing build detected, skipping rebuild");
         }
         
-        // 🎯 CRITICAL FIX: Serve from dist/public/assets (correct Vite output structure)
+        // ✅ FIXED: Serve from dist/assets (correct Vite output structure)
         app.use('/assets', express.static(path.join(distDir, 'assets'), { 
           immutable: true, 
           maxAge: '1y',
@@ -2511,7 +2511,7 @@ function startServer() {
           res.sendFile(indexPath);
         });
         
-        console.log("✅ [STATIC] Static files enabled from dist/public with proper asset handling");
+        console.log("✅ [STATIC] Static files enabled from dist with proper asset handling");
         
       } catch (error) {
         console.error("❌ [STATIC-FALLBACK] Error setting up static frontend:", error);
@@ -2594,9 +2594,9 @@ function startServer() {
       // NOW setup frontend serving - this will establish the catch-all route AFTER all API routes
       const isProduction = process.env.NODE_ENV === 'production';
       if (isProduction) {
-        // CRITICAL FIX: Servir archivos estáticos CORRECTAMENTE sin usar serveStatic()
+        // ✅ FIXED: Servir archivos estáticos desde dist (estructura Vite correcta)
         const path = require('path');
-        const distPath = path.join(process.cwd(), 'dist', 'public');
+        const distPath = path.join(process.cwd(), 'dist');
         
         // Verificar que el directorio existe
         const fs = require('fs');
@@ -2604,19 +2604,19 @@ function startServer() {
           console.error(`❌ [PROD] Build directory not found: ${distPath}`);
           console.error(`❌ [PROD] Please run 'npm run build' first`);
         } else {
-          // Servir archivos estáticos desde dist/public
+          // Servir archivos estáticos desde dist
           app.use(express.static(distPath));
           console.log(`✅ [PROD] Static files served from: ${distPath}`);
         }
         
-        // NO LLAMAR A serveStatic() porque tiene la ruta incorrecta
+        // NO LLAMAR A serveStatic() porque ya manejamos las rutas estáticas arriba
         // const { serveStatic } = await import("./vite");
         // serveStatic(app);
         
         // ✅ ELIMINATED: Duplicate catch-all route removed - already handled in useStaticFrontend block
         // The SPA catch-all is properly configured above with correct middleware ordering
         
-        console.log("🎨 [FRONTEND] Production static serving already configured in useStaticFrontend block");
+        console.log("🎨 [FRONTEND] Production static serving configured with correct dist paths");
       } else {
         // 🔧 DEV FIX: Vite was already setup immediately after server start
         console.log("🎨 [FRONTEND] Development Vite already enabled - skipping duplicate setup");

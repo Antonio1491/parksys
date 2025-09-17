@@ -893,7 +893,7 @@ const AdminActivities = () => {
                 variant="outline" 
                 size="default"
                 onClick={handleClearFilters} 
-                className="h-10 w-10 p-0 flex items-center justify-center"
+                className="h-9 w-10 p-0 flex items-center justify-center"
                 data-testid="button-clear-filters"
                 title="Limpiar filtros"
               >
@@ -928,7 +928,7 @@ const AdminActivities = () => {
         </div>
 
         {/* Activities content */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="rounded-lg shadow overflow-hidden">
           {filteredActivities.length === 0 ? (
             <div className="py-16 flex justify-center">
               <div className="text-center">
@@ -1013,7 +1013,7 @@ const AdminActivities = () => {
                 </Table>
               ) : (
                 // Vista de fichas
-                <div className="p-6">
+                <div className="p-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {currentActivities.map((activity: any) => (
                       <div key={activity.id} className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
@@ -1033,16 +1033,6 @@ const AdminActivities = () => {
                               </div>
                             </div>
                           )}
-                          {/* Badge de estado de imagen */}
-                          <div className="absolute top-2 right-2">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              activity.imageUrl 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-orange-100 text-orange-800'
-                            }`}>
-                              {activity.imageUrl ? 'Con imagen' : 'Sin imagen'}
-                            </span>
-                          </div>
                           {/* ID de la actividad */}
                           <div className="absolute top-2 left-2">
                             <span className="text-xs text-white bg-black/60 px-2 py-1 rounded">
