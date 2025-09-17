@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Boxes, Download, Upload, FileText, BrushCleaning, Brush } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Boxes, Download, Upload, FileText, Brush } from 'lucide-react';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -897,7 +897,7 @@ const AdminActivities = () => {
                 data-testid="button-clear-filters"
                 title="Limpiar filtros"
               >
-                <BrushCleaning className="h-4 w-4" />
+                <Brush className="h-4 w-4" />
               </Button>
             </div>
 
