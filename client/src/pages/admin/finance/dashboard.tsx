@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import AdminLayout from "@/components/AdminLayout";
+import { DynamicRoleGuard } from "@/components/DynamicRoleGuard";
 import { useState } from "react";
 
 const FinanceDashboard = () => {
@@ -134,6 +135,21 @@ const FinanceDashboard = () => {
 
   return (
     <AdminLayout>
+      <DynamicRoleGuard 
+        requiredModule="Finanzas" 
+        requiredPermission="read"
+        fallback={
+          <div className="p-8 text-center">
+            <div className="text-6xl mb-4">🔒</div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Acceso Restringido
+            </h2>
+            <p className="text-gray-600">
+              No tienes permisos para acceder al módulo de finanzas.
+            </p>
+          </div>
+        }
+      >
       <div className="space-y-6">
         {/* Header con fondo coloreado */}
         <div 
@@ -342,6 +358,7 @@ const FinanceDashboard = () => {
           </CardContent>
         </Card>
       </div>
+      </DynamicRoleGuard>
     </AdminLayout>
   );
 };
