@@ -4932,11 +4932,10 @@ export const permissionActions = pgTable("permission_actions", {
 export const systemPermissions = pgTable("system_permissions", {
   id: serial("id").primaryKey(),
   permissionKey: varchar("permission_key", { length: 200 }).notNull().unique(), // formato: modulo:submodulo:pagina:accion
-  moduleSlug: varchar("module_slug", { length: 50 }).notNull(),
-  submoduleSlug: varchar("submodule_slug", { length: 50 }),
-  pageSlug: varchar("page_slug", { length: 50 }),
-  actionSlug: varchar("action_slug", { length: 50 }).notNull(),
-  name: varchar("name", { length: 200 }).notNull(),
+  moduleId: integer("module_id").references(() => permissionModules.id), // nullable para wildcard 'all'
+  submoduleId: integer("submodule_id").references(() => permissionSubmodules.id),
+  pageId: integer("page_id").references(() => permissionPages.id),
+  actionId: integer("action_id").references(() => permissionActions.id), // nullable para wildcard 'all'
   description: text("description"),
   isWildcard: boolean("is_wildcard").default(false), // para permisos como modulo:*:*:*
   isActive: boolean("is_active").default(true),
@@ -4979,7 +4978,23 @@ export const permissionPagesRelations = relations(permissionPages, ({ one }) => 
   })
 }));
 
-export const systemPermissionsRelations = relations(systemPermissions, ({ many }) => ({
+export const systemPermissionsRelations = relations(systemPermissions, ({ one, many }) => ({
+  module: one(permissionModules, {
+    fields: [systemPermissions.moduleId],
+    references: [permissionModules.id]
+  }),
+  submodule: one(permissionSubmodules, {
+    fields: [systemPermissions.submoduleId],
+    references: [permissionSubmodules.id]
+  }),
+  page: one(permissionPages, {
+    fields: [systemPermissions.pageId],
+    references: [permissionPages.id]
+  }),
+  action: one(permissionActions, {
+    fields: [systemPermissions.actionId],
+    references: [permissionActions.id]
+  }),
   rolePermissions: many(rolePermissions)
 }));
 
