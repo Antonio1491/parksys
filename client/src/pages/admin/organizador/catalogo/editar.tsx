@@ -361,9 +361,9 @@ const EditarActividadPage = () => {
       let instructorData = {};
       
       if (values.instructorId) {
-        const selectedInstructor = instructores.find(
+        const selectedInstructor = Array.isArray(instructores) ? instructores.find(
           (instructor: any) => instructor.id.toString() === values.instructorId
-        );
+        ) : null;
         
         if (selectedInstructor) {
           instructorData = {
@@ -572,7 +572,7 @@ const EditarActividadPage = () => {
                       control={form.control}
                       name="category"
                       render={({ field }) => {
-                        const selectedCategory = categorias.find((c: any) => c.id.toString() === field.value);
+                        const selectedCategory = Array.isArray(categorias) ? categorias.find((c: any) => c.id.toString() === field.value) : null;
                         return (
                           <FormItem>
                             <FormLabel>Categoría *</FormLabel>
@@ -583,7 +583,7 @@ const EditarActividadPage = () => {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {categorias.map((categoria: any) => (
+                                {Array.isArray(categorias) && categorias.map((categoria: any) => (
                                   <SelectItem key={categoria.id} value={categoria.id.toString()}>
                                     {categoria.name || categoria.nombre}
                                   </SelectItem>
@@ -633,7 +633,7 @@ const EditarActividadPage = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {parques.map((parque: any) => (
+                            {Array.isArray(parques) && parques.map((parque: any) => (
                               <SelectItem key={parque.id} value={parque.id.toString()}>
                                 {parque.nombre || parque.name}
                               </SelectItem>
@@ -1603,7 +1603,7 @@ const EditarActividadPage = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {instructores.length === 0 ? (
+                            {!Array.isArray(instructores) || instructores.length === 0 ? (
                               <SelectItem value="no-instructors" disabled>
                                 No hay instructores disponibles
                               </SelectItem>
