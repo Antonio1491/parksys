@@ -400,9 +400,10 @@ export default function Auditoria() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <DatePicker
-                    date={selectedDate}
-                    onDateChange={setSelectedDate}
+                  <Input
+                    type="date"
+                    value={selectedDate ? selectedDate.toISOString().split('T')[0] : ''}
+                    onChange={(e) => setSelectedDate(e.target.value ? new Date(e.target.value) : undefined)}
                   />
                   <Button variant="outline" size="icon">
                     <Filter className="h-4 w-4" />

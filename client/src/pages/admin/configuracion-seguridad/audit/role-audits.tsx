@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RoleBadge, RoleBadgeWithText } from '@/components/RoleBadge';
-import { usePermissions } from '@/components/RoleGuard';
+import { useAdaptivePermissions } from '@/hooks/useAdaptivePermissions';
 import { Link } from 'wouter';
 import { 
   Activity, Shield, Clock, User, Eye, Download, Filter, Search,
@@ -103,7 +103,7 @@ const RoleAuditsPage = () => {
     setFilters(prev => ({
       ...prev,
       [key]: value,
-      offset: key !== 'offset' ? 0 : value // Reset offset when changing other filters
+      offset: key !== 'offset' ? 0 : (typeof value === 'number' ? value : 0) // Reset offset when changing other filters
     }));
   };
 
