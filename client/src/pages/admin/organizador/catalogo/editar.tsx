@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,11 +13,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { Checkbox } from '@/components/ui/checkbox';
 import LocationSelector from '@/components/LocationSelector';
-import { Edit } from 'lucide-react';
+import ActivityImageManagerSimple from '@/components/ActivityImageManagerSimple';
+import { Edit, FileText, Image } from 'lucide-react';
 
 // Días de la semana para actividades recurrentes
 const DIAS_SEMANA = [
@@ -514,10 +516,23 @@ const EditarActividadPage = () => {
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-6">
-            <Form {...form}>
+          <CardContent>
+            <Tabs defaultValue="informacion" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="informacion" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Información
+                </TabsTrigger>
+                <TabsTrigger value="multimedia" className="flex items-center gap-2">
+                  <Image className="h-4 w-4" />
+                  Multimedia
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="informacion" className="space-y-6">
+                <Form {...form}>
               <form 
-                key={actividad?.data?.id} 
+                key={activityId} 
                 onSubmit={form.handleSubmit(onSubmit)} 
                 className="space-y-6"
               >
@@ -1651,7 +1666,27 @@ const EditarActividadPage = () => {
                   </div>
                 </div>
               </form>
-            </Form>
+                </Form>
+              </TabsContent>
+              
+              <TabsContent value="multimedia" className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Gestión de Imágenes</h3>
+                  <p className="text-sm text-gray-600">
+                    Administra las imágenes de esta actividad
+                  </p>
+                  {activityId > 0 ? (
+                    <ActivityImageManagerSimple 
+                      activityId={activityId} 
+                    />
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Cargando gestor de imágenes...</p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>

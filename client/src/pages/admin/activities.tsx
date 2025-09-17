@@ -992,15 +992,6 @@ const AdminActivities = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="text-green-600 hover:text-green-700"
-                              onClick={() => setLocation(`/admin/activities/${activity.id}/images`)}
-                              title="Gestionar imágenes"
-                            >
-                              <ImageIcon className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
                               className="text-blue-600 hover:text-blue-700"
                               onClick={() => handleEdit(activity)}
                             >
@@ -1109,15 +1100,6 @@ const AdminActivities = () => {
                           {/* Botones de acción */}
                           <div className="flex justify-between items-center pt-3 border-t">
                             <div className="flex space-x-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="text-green-600 hover:text-green-700"
-                                onClick={() => setLocation(`/admin/activities/${activity.id}/images`)}
-                                title="Gestionar imágenes"
-                              >
-                                <ImageIcon className="h-4 w-4" />
-                              </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm" 
