@@ -1235,16 +1235,18 @@ const AdminActivities = () => {
                               <MapPin className="h-4 w-4 mr-2 text-gray-400" />
                               <span>{activity.parkName || `Parque ${activity.parkId}`}</span>
                             </div>
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                              <span>{formatDate(activity.startDate)}</span>
-                            </div>
-                            {activity.capacity && (
-                              <div className="flex items-center text-sm text-gray-500">
-                                <Users className="h-4 w-4 mr-2 text-gray-400" />
-                                <span>{activity.capacity} personas</span>
+                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                              <div className="flex items-center">
+                                <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                                <span>{formatDate(activity.startDate)}</span>
                               </div>
-                            )}
+                              {activity.capacity && (
+                                <div className="flex items-center">
+                                  <Users className="h-4 w-4 mr-2 text-gray-400" />
+                                  <span>{activity.capacity} personas</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           
                           {/* Botones de acción */}
