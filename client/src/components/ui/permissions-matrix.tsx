@@ -235,7 +235,7 @@ export function PermissionsMatrix({
   // ✅ NUEVA ESTRUCTURA: Agrupar permisos del sistema granularmente
   const getPermissionsForModule = (moduleSlug: string): SystemPermission[] => {
     return (systemPermissions as SystemPermission[]).filter((perm: SystemPermission) => 
-      perm.permissionKey.startsWith(`${moduleSlug}:`) || perm.permissionKey === 'all'
+      perm.permissionKey && (perm.permissionKey.startsWith(`${moduleSlug}:`) || perm.permissionKey === 'all')
     );
   };
 
@@ -244,7 +244,7 @@ export function PermissionsMatrix({
     const pages = new Map<string, { key: string, label: string, module: string }>();
     
     (systemPermissions as SystemPermission[]).forEach((perm: SystemPermission) => {
-      if (perm.permissionKey === 'all') return; // Skip special permission
+      if (!perm.permissionKey || perm.permissionKey === 'all') return; // Skip special permission or undefined
       
       const parts = perm.permissionKey.split(':');
       if (parts.length >= 3) {
@@ -268,7 +268,7 @@ export function PermissionsMatrix({
   // ✅ NUEVA FUNCIÓN: Obtener acciones disponibles para una página específica  
   const getActionsForPage = (pageKey: string): SystemPermission[] => {
     return (systemPermissions as SystemPermission[]).filter((perm: SystemPermission) => 
-      perm.permissionKey.startsWith(`${pageKey}:`) && perm.permissionKey !== 'all'
+      perm.permissionKey && perm.permissionKey.startsWith(`${pageKey}:`) && perm.permissionKey !== 'all'
     );
   };
 
