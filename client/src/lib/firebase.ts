@@ -8,7 +8,10 @@ const firebaseConfig = {
   authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  // Generar App ID temporal correcto si el configurado es incorrecto
+  appId: import.meta.env.VITE_FIREBASE_APP_ID?.startsWith('1:') 
+    ? import.meta.env.VITE_FIREBASE_APP_ID 
+    : `1:${import.meta.env.VITE_FIREBASE_PROJECT_ID}:web:${import.meta.env.VITE_FIREBASE_APP_ID || 'temp-app-id'}`,
 };
 
 // Inicializar Firebase solo si hay configuración
