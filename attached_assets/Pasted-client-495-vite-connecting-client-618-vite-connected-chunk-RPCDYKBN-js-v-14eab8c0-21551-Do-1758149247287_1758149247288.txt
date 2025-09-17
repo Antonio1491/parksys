@@ -1,0 +1,196 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:22 🔥 Firebase initialized successfully
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/roles/1/permissions
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:221  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/roles/1/permissions 401 (Unauthorized)
+(anonymous) @ queryClient.ts:221
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+setOptions @ @tanstack_react-query.js?v=14eab8c0:2005
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3103
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:19328
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+queryClient.ts:249 Query failed for: /api/roles/1/permissions Error: Token de autenticación requerido
+    at queryClient.ts:245:15
+(anonymous) @ queryClient.ts:249
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+setOptions @ @tanstack_react-query.js?v=14eab8c0:2005
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3103
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:19328
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/roles
+queryClient.ts:219 🌐 [QUERY] GET /api/permissions/modules
+queryClient.ts:219 🌐 [QUERY] GET /api/permissions/actions
+queryClient.ts:219 🌐 [QUERY] GET /api/permissions/system
+queryClient.ts:219 🌐 [QUERY] GET /api/roles/permissions/matrix
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/roles/1/permissions
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:119 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:219 🌐 [QUERY] GET /api/notifications/count
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:221  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/roles/1/permissions 401 (Unauthorized)
+(anonymous) @ queryClient.ts:221
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+setOptions @ @tanstack_react-query.js?v=14eab8c0:2005
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3103
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+queryClient.ts:249 Query failed for: /api/roles/1/permissions Error: Token de autenticación requerido
+    at queryClient.ts:245:15
+(anonymous) @ queryClient.ts:249
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+setOptions @ @tanstack_react-query.js?v=14eab8c0:2005
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3103
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+chunk-RPCDYKBN.js?v=14eab8c0:18625 [Violation] 'setTimeout' handler took 85ms
+queryClient.ts:221  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/notifications/count 401 (Unauthorized)
+(anonymous) @ queryClient.ts:221
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+setOptions @ @tanstack_react-query.js?v=14eab8c0:2005
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3103
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+queryClient.ts:249 Query failed for: /api/notifications/count Error: Token de autenticación requerido
+    at queryClient.ts:245:15
+(anonymous) @ queryClient.ts:249
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+setOptions @ @tanstack_react-query.js?v=14eab8c0:2005
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3103
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+chunk-RPCDYKBN.js?v=14eab8c0:18625 [Violation] 'setTimeout' handler took 102ms
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
