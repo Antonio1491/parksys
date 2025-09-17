@@ -1,5 +1,18 @@
 import type { Express } from "express";
 import { roleService } from "./roleService";
+import { requireSuperAdmin } from "./permissions-middleware";
+import { z } from "zod";
+import { db } from "./db";
+import { roles, systemPermissions, rolePermissions } from "../shared/schema";
+import { eq, and, inArray } from "drizzle-orm";
+
+// ===== ESQUEMAS DE VALIDACIÓN =====
+const updatePermissionsSchema = z.object({
+  permissions: z.record(
+    z.string(), // role slug
+    z.array(z.string()) // array of permission keys
+  )
+});
 
 /**
  * Endpoints adicionales para el sistema híbrido adaptativo de roles
@@ -69,56 +82,7 @@ export function registerHybridRoleRoutes(app: Express) {
     }
   });
 
-  // Validar jerarquía de permisos (para sistema adaptativo)
-  app.post("/api/roles/permissions/validate-hierarchy", async (req, res) => {
-    try {
-      const { permissions } = req.body;
-      
-      if (!permissions || typeof permissions !== 'object') {
-        return res.status(400).json({ error: "Permisos inválidos" });
-      }
 
-      // Función para validar jerarquía CRUD: admin > delete > update > create > read
-      const validatePermissionHierarchy = (actions: string[]): string[] => {
-        const hierarchy = ['read', 'create', 'update', 'delete', 'admin'];
-        const validActions = new Set<string>();
-        
-        actions.forEach(action => {
-          if (hierarchy.includes(action)) {
-            const actionIndex = hierarchy.indexOf(action);
-            // Agregar la acción y todas las de menor nivel
-            for (let i = 0; i <= actionIndex; i++) {
-              validActions.add(hierarchy[i]);
-            }
-          }
-        });
-        
-        return Array.from(validActions).sort((a, b) => 
-          hierarchy.indexOf(a) - hierarchy.indexOf(b)
-        );
-      };
-
-      // Validar cada módulo
-      const validatedPermissions: Record<string, string[]> = {};
-      Object.keys(permissions).forEach(moduleId => {
-        const actions = permissions[moduleId];
-        if (Array.isArray(actions)) {
-          validatedPermissions[moduleId] = validatePermissionHierarchy(actions);
-        }
-      });
-
-      res.json({ 
-        validatedPermissions,
-        hierarchyRules: {
-          order: ['read', 'create', 'update', 'delete', 'admin'],
-          description: 'Permisos superiores incluyen automáticamente los inferiores'
-        }
-      });
-    } catch (error) {
-      console.error("Error validando jerarquía:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
 
   // Guardar permisos de matriz (para PermissionsMatrix)
   app.post("/api/roles/permissions/save-matrix", async (req, res) => {
@@ -148,7 +112,8 @@ export function registerHybridRoleRoutes(app: Express) {
             errors.push(`Error actualizando rol ${roleId}`);
           }
         } catch (error) {
-          errors.push(`Error actualizando rol ${roleId}: ${error.message}`);
+          const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+          errors.push(`Error actualizando rol ${roleId}: ${errorMessage}`);
         }
       }
 
@@ -239,56 +204,7 @@ export function registerHybridRoleRoutes(app: Express) {
     }
   });
 
-  // Validar jerarquía de permisos (para sistema adaptativo)
-  app.post("/api/roles/permissions/validate-hierarchy", async (req, res) => {
-    try {
-      const { permissions } = req.body;
-      
-      if (!permissions || typeof permissions !== 'object') {
-        return res.status(400).json({ error: "Permisos inválidos" });
-      }
 
-      // Función para validar jerarquía CRUD: admin > delete > update > create > read
-      const validatePermissionHierarchy = (actions: string[]): string[] => {
-        const hierarchy = ['read', 'create', 'update', 'delete', 'admin'];
-        const validActions = new Set<string>();
-        
-        actions.forEach(action => {
-          if (hierarchy.includes(action)) {
-            const actionIndex = hierarchy.indexOf(action);
-            // Agregar la acción y todas las de menor nivel
-            for (let i = 0; i <= actionIndex; i++) {
-              validActions.add(hierarchy[i]);
-            }
-          }
-        });
-        
-        return Array.from(validActions).sort((a, b) => 
-          hierarchy.indexOf(a) - hierarchy.indexOf(b)
-        );
-      };
-
-      // Validar cada módulo
-      const validatedPermissions: Record<string, string[]> = {};
-      Object.keys(permissions).forEach(moduleId => {
-        const actions = permissions[moduleId];
-        if (Array.isArray(actions)) {
-          validatedPermissions[moduleId] = validatePermissionHierarchy(actions);
-        }
-      });
-
-      res.json({ 
-        validatedPermissions,
-        hierarchyRules: {
-          order: ['read', 'create', 'update', 'delete', 'admin'],
-          description: 'Permisos superiores incluyen automáticamente los inferiores'
-        }
-      });
-    } catch (error) {
-      console.error("Error validando jerarquía:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
 
   // Guardar permisos de matriz (para PermissionsMatrix)
   app.post("/api/roles/permissions/save-matrix", async (req, res) => {
@@ -318,7 +234,8 @@ export function registerHybridRoleRoutes(app: Express) {
             errors.push(`Error actualizando rol ${roleId}`);
           }
         } catch (error) {
-          errors.push(`Error actualizando rol ${roleId}: ${error.message}`);
+          const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+          errors.push(`Error actualizando rol ${roleId}: ${errorMessage}`);
         }
       }
 
@@ -415,6 +332,205 @@ export function registerHybridRoleRoutes(app: Express) {
     } catch (error) {
       console.error("Error obteniendo estadísticas de permisos:", error);
       res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // ===== NUEVOS ENDPOINTS PARA MATRIZ DE PERMISOS GRANULARES =====
+  
+  // Obtener módulos de permisos (SOLO SUPER ADMIN)
+  app.get("/api/permissions/modules", requireSuperAdmin(), async (req, res) => {
+    try {
+      const storage = (global as any).storage;
+      const modules = await storage.db.select().from(storage.schema.permissionModules);
+      res.json(modules);
+    } catch (error) {
+      console.error("❌ Error obteniendo módulos de permisos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Obtener acciones de permisos (SOLO SUPER ADMIN)
+  app.get("/api/permissions/actions", requireSuperAdmin(), async (req, res) => {
+    try {
+      const storage = (global as any).storage;
+      const actions = await storage.db.select().from(storage.schema.permissionActions);
+      res.json(actions);
+    } catch (error) {
+      console.error("❌ Error obteniendo acciones de permisos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Obtener permisos del sistema (SOLO SUPER ADMIN)
+  app.get("/api/permissions/system", requireSuperAdmin(), async (req, res) => {
+    try {
+      const storage = (global as any).storage;
+      const permissions = await storage.db.select().from(storage.schema.systemPermissions);
+      res.json(permissions);
+    } catch (error) {
+      console.error("❌ Error obteniendo permisos del sistema:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Obtener matriz de permisos por rol (versión granular) (SOLO SUPER ADMIN)
+  app.get("/api/roles/permissions/matrix", requireSuperAdmin(), async (req, res) => {
+    try {
+      const storage = (global as any).storage;
+      
+      // Obtener todos los roles
+      const roles = await storage.db.select().from(storage.schema.roles);
+      const result: Record<string, string[]> = {};
+      
+      // Para cada rol, obtener sus permisos asignados
+      for (const role of roles) {
+        const rolePermissions = await storage.db
+          .select({
+            permissionKey: storage.schema.systemPermissions.permissionKey
+          })
+          .from(storage.schema.rolePermissions)
+          .innerJoin(storage.schema.systemPermissions, 
+            storage.eq(storage.schema.rolePermissions.permissionId, storage.schema.systemPermissions.id)
+          )
+          .where(
+            storage.and(
+              storage.eq(storage.schema.rolePermissions.roleId, role.id),
+              storage.eq(storage.schema.rolePermissions.isActive, true)
+            )
+          );
+        
+        result[role.slug] = rolePermissions.map(p => p.permissionKey);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error("❌ Error obteniendo matriz granular de permisos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Actualizar permisos granulares (SOLO SUPER ADMIN)
+  app.post("/api/permissions/roles/update", requireSuperAdmin(), async (req, res) => {
+    try {
+      // Validar entrada con Zod
+      const validationResult = updatePermissionsSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        console.error("❌ [PERMISSIONS] Validación fallida:", validationResult.error);
+        return res.status(400).json({ 
+          error: "Datos de permisos inválidos",
+          details: validationResult.error.issues 
+        });
+      }
+
+      const { permissions } = validationResult.data;
+      console.log("🔧 [PERMISSIONS] Iniciando actualización de permisos granulares para", Object.keys(permissions).length, "roles");
+
+      // Usar transacción para operación atómica
+      const result = await db.transaction(async (tx) => {
+        const updates = [];
+        const errors = [];
+
+        for (const [roleSlug, permissionKeys] of Object.entries(permissions)) {
+          try {
+            // 1. Obtener el rol por slug
+            const roleResult = await tx.select().from(roles).where(eq(roles.slug, roleSlug)).limit(1);
+            if (roleResult.length === 0) {
+              errors.push(`Rol no encontrado: ${roleSlug}`);
+              continue;
+            }
+            const role = roleResult[0];
+
+            // 2. Limpiar permisos existentes para este rol
+            await tx.delete(rolePermissions).where(eq(rolePermissions.roleId, role.id));
+
+            if (permissionKeys.length > 0) {
+              // 3. Obtener IDs de permisos basados en las claves
+              const permissionResults = await tx
+                .select({ id: systemPermissions.id, permissionKey: systemPermissions.permissionKey })
+                .from(systemPermissions)
+                .where(
+                  and(
+                    inArray(systemPermissions.permissionKey, permissionKeys),
+                    eq(systemPermissions.isActive, true)
+                  )
+                );
+
+              // 4. Verificar que todos los permisos existan
+              const foundPermissionKeys = permissionResults.map((p: { permissionKey: string }) => p.permissionKey);
+              const missingPermissions = permissionKeys.filter(key => !foundPermissionKeys.includes(key));
+              
+              if (missingPermissions.length > 0) {
+                console.warn(`⚠️ [PERMISSIONS] Permisos no encontrados para rol ${roleSlug}:`, missingPermissions);
+              }
+
+              // 5. Insertar nuevos permisos para el rol
+              if (permissionResults.length > 0) {
+                const rolePermissionInserts = permissionResults.map(permission => ({
+                  roleId: role.id,
+                  permissionId: permission.id,
+                  isActive: true,
+                  assignedAt: new Date(),
+                  assignedBy: null // TODO: obtener del req.user si está disponible
+                }));
+
+                await tx.insert(rolePermissions).values(rolePermissionInserts);
+                updates.push({ 
+                  roleSlug, 
+                  roleId: role.id,
+                  permissionsAssigned: permissionResults.length,
+                  missingPermissions: missingPermissions.length 
+                });
+              }
+            } else {
+              // Sin permisos asignados (rol sin permisos)
+              updates.push({ 
+                roleSlug, 
+                roleId: role.id,
+                permissionsAssigned: 0,
+                missingPermissions: 0
+              });
+            }
+
+            console.log(`✅ [PERMISSIONS] Rol ${roleSlug} actualizado: ${permissionKeys.length} permisos asignados`);
+          } catch (roleError) {
+            console.error(`❌ [PERMISSIONS] Error actualizando rol ${roleSlug}:`, roleError);
+            const errorMessage = roleError instanceof Error ? roleError.message : 'Error desconocido';
+            errors.push(`Error actualizando rol ${roleSlug}: ${errorMessage}`);
+          }
+        }
+
+        return { updates, errors };
+      });
+
+      // Preparar respuesta
+      if (result.errors.length > 0 && result.updates.length === 0) {
+        return res.status(400).json({ 
+          error: "No se pudieron actualizar los permisos", 
+          errors: result.errors 
+        });
+      }
+
+      console.log(`✅ [PERMISSIONS] Actualización completada: ${result.updates.length} roles actualizados`);
+      
+      res.json({ 
+        success: true,
+        message: `Permisos granulares actualizados correctamente para ${result.updates.length} roles`,
+        updates: result.updates,
+        errors: result.errors.length > 0 ? result.errors : undefined,
+        summary: {
+          rolesUpdated: result.updates.length,
+          totalErrors: result.errors.length,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error("❌ [PERMISSIONS] Error grave actualizando permisos granulares:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      res.status(500).json({ 
+        error: "Error interno del servidor",
+        message: "Error al actualizar permisos granulares",
+        details: errorMessage 
+      });
     }
   });
 

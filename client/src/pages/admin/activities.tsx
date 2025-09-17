@@ -1236,7 +1236,7 @@ const AdminActivities = () => {
                         {/* Contenido de la ficha */}
                         <div className="p-4">
                           {activity.description && (
-                            <p className="text-sm text-gray-800 font-poppins mb-3 line-clamp-3">
+                            <p className="text-sm text-gray-800 font-poppins mb-3">
                               {activity.description}
                             </p>
                           )}

@@ -5,10 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RoleBadge, RoleBadgeWithText } from '@/components/RoleBadge';
-import { useAdaptiveModules } from "@/hooks/useAdaptiveModules";
 import { 
   Grid, Shield, Lock, Unlock, Save, RotateCcw, Eye, Edit, Settings,
-  CheckCircle, AlertCircle, Info, Filter, Download, Upload
+  CheckCircle, AlertCircle, Info, Filter, Download, Upload, Star
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -20,6 +19,45 @@ interface Role {
   slug: string;
   name: string;
   level: number;
+}
+
+interface PermissionModule {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+}
+
+interface PermissionSubmodule {
+  id: number;
+  name: string;
+  slug: string;
+  moduleId: number;
+  orderIndex: number;
+}
+
+interface PermissionPage {
+  id: number;
+  name: string;
+  slug: string;
+  submoduleId: number;
+}
+
+interface PermissionAction {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+}
+
+interface SystemPermission {
+  id: number;
+  permissionKey: string;
+  description: string;
+  moduleId?: number;
+  submoduleId?: number;
+  pageId?: number;
+  actionId?: number;
 }
 
 interface PermissionsMatrixProps {
@@ -54,9 +92,8 @@ export function PermissionsMatrix({
 }: PermissionsMatrixProps) {
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [selectedModule, setSelectedModule] = useState<string>('all');
-  const [permissions, setPermissions] = useState<Record<string, Record<string, string[]>>>({});
+  const [permissions, setPermissions] = useState<Record<string, string[]>>({});
   const [hasChanges, setHasChanges] = useState(false);
-  const { modules, moduleMap, subModuleMap, flatModules } = useAdaptiveModules();
   const queryClient = useQueryClient();
   
   // ✅ DETERMINAR SI PUEDE EDITAR - Corrige el problema de checkboxes deshabilitados
@@ -81,43 +118,49 @@ export function PermissionsMatrix({
     refetchOnWindowFocus: false,
   });
 
-  // Cargar matriz de permisos desde API
-  const { data: apiPermissions, isLoading } = useQuery({
-    queryKey: ['/api/roles/permissions'],
+  // Cargar estructura de permisos granulares
+  const { data: permissionModules = [] } = useQuery({
+    queryKey: ['/api/permissions/modules'],
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: permissionActions = [] } = useQuery({
+    queryKey: ['/api/permissions/actions'],
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: systemPermissions = [] } = useQuery({
+    queryKey: ['/api/permissions/system'],
+    refetchOnWindowFocus: false,
+  });
+
+  // Cargar permisos asignados por rol
+  const { data: rolePermissions, isLoading } = useQuery({
+    queryKey: ['/api/roles/permissions/matrix'],
     refetchOnWindowFocus: false,
   });
 
   // Mutation para guardar cambios
   const saveMutation = useMutation({
     mutationFn: (newPermissions: typeof permissions) => {
-      // Convertir slugs de roles a IDs numéricos
-      const rolePermissionsWithIds: Record<string, Record<string, string[]>> = {};
-      
-      Object.entries(newPermissions).forEach(([roleSlug, modulePermissions]) => {
-        const role = (roles as Role[]).find((r: Role) => r.slug === roleSlug);
-        if (role?.id) {
-          rolePermissionsWithIds[role.id.toString()] = modulePermissions;
-        }
-      });
-
-      return apiRequest('/api/roles/permissions/save-matrix', {
+      return apiRequest('/api/permissions/roles/update', {
         method: 'POST',
-        data: { rolePermissions: rolePermissionsWithIds },
+        data: { permissions: newPermissions },
       });
     },
     onSuccess: () => {
       setHasChanges(false);
       toast({
         title: "Permisos actualizados",
-        description: "Los cambios se guardaron correctamente en la base de datos",
+        description: "Los cambios se guardaron correctamente en el sistema granular",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/roles/permissions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/roles/permissions/matrix'] });
     },
     onError: (error: any) => {
       console.error('Error al guardar permisos:', error);
       toast({
         title: "Error al guardar",
-        description: error.message || "Error de conexión con el servidor. Verifica que la ruta existe.",
+        description: error.message || "Error al actualizar permisos granulares",
         variant: "destructive",
       });
     }
@@ -125,45 +168,48 @@ export function PermissionsMatrix({
 
   // Cargar permisos al inicializar
   useEffect(() => {
-    if (apiPermissions) {
-      setPermissions(apiPermissions as Record<string, Record<string, string[]>>);
+    if (rolePermissions) {
+      setPermissions(rolePermissions as Record<string, string[]>);
     } else {
-      // Solo inicializar con roles reales si no hay datos
-      const defaultPermissions: Record<string, Record<string, string[]>> = {};
+      // Inicializar con estructura vacía
+      const defaultPermissions: Record<string, string[]> = {};
       (roles as Role[]).forEach(role => {
-        defaultPermissions[role.slug] = {};
+        defaultPermissions[role.slug] = [];
       });
       setPermissions(defaultPermissions);
     }
-  }, [apiPermissions, flatModules, roles]);
+  }, [rolePermissions, roles]);
 
   // Funciones de utilidad
-  const hasPermission = (roleSlug: string, moduleId: string, action: string): boolean => {
-    return permissions[roleSlug]?.[moduleId]?.includes(action) || false;
+  const hasPermission = (roleSlug: string, permissionKey: string): boolean => {
+    if (roleSlug === 'super-admin' && permissions[roleSlug]?.includes('all')) {
+      return true; // Super Admin tiene todos los permisos
+    }
+    return permissions[roleSlug]?.includes(permissionKey) || false;
   };
 
-  const updatePermission = (roleSlug: string, moduleId: string, action: string, checked: boolean) => {
+  const updatePermission = (roleSlug: string, permissionKey: string, checked: boolean) => {
     if (!canEditPermissions()) return;
+    if (roleSlug === 'super-admin') return; // Super Admin no se puede modificar
 
     setPermissions(prev => {
       const newPermissions = { ...prev };
-      if (!newPermissions[roleSlug]) newPermissions[roleSlug] = {};
-      if (!newPermissions[roleSlug][moduleId]) newPermissions[roleSlug][moduleId] = [];
+      if (!newPermissions[roleSlug]) newPermissions[roleSlug] = [];
 
-      const currentPermissions = [...newPermissions[roleSlug][moduleId]];
+      const currentPermissions = [...newPermissions[roleSlug]];
       
       if (checked) {
-        if (!currentPermissions.includes(action)) {
-          currentPermissions.push(action);
+        if (!currentPermissions.includes(permissionKey)) {
+          currentPermissions.push(permissionKey);
         }
       } else {
-        const index = currentPermissions.indexOf(action);
+        const index = currentPermissions.indexOf(permissionKey);
         if (index > -1) {
           currentPermissions.splice(index, 1);
         }
       }
 
-      newPermissions[roleSlug][moduleId] = currentPermissions;
+      newPermissions[roleSlug] = currentPermissions;
       return newPermissions;
     });
     
@@ -171,8 +217,10 @@ export function PermissionsMatrix({
   };
 
   const getPermissionCount = (roleSlug: string): number => {
-    const rolePermissions = permissions[roleSlug] || {};
-    return Object.values(rolePermissions).reduce((total, modulePerms) => total + modulePerms.length, 0);
+    if (roleSlug === 'super-admin' && permissions[roleSlug]?.includes('all')) {
+      return (systemPermissions as SystemPermission[]).length; // Todos los permisos
+    }
+    return permissions[roleSlug]?.length || 0;
   };
 
   // Filtros aplicados
@@ -180,9 +228,16 @@ export function PermissionsMatrix({
     selectedRole === 'all' || role.slug === selectedRole
   );
 
-  const filteredModules = flatModules.filter(moduleId => 
-    selectedModule === 'all' || moduleId === selectedModule
+  const filteredModules = (permissionModules as PermissionModule[]).filter((module: PermissionModule) => 
+    selectedModule === 'all' || module.slug === selectedModule
   );
+
+  // Agrupar permisos del sistema por módulo
+  const getPermissionsForModule = (moduleSlug: string): SystemPermission[] => {
+    return (systemPermissions as SystemPermission[]).filter((perm: SystemPermission) => 
+      perm.permissionKey.startsWith(`${moduleSlug}:`) || perm.permissionKey === 'all'
+    );
+  };
 
   const handleSave = () => {
     if (hasChanges) {
@@ -191,8 +246,8 @@ export function PermissionsMatrix({
   };
 
   const handleReset = () => {
-    if (apiPermissions) {
-      setPermissions(apiPermissions as Record<string, Record<string, string[]>>);
+    if (rolePermissions) {
+      setPermissions(rolePermissions as Record<string, string[]>);
       setHasChanges(false);
     }
   };
@@ -226,9 +281,9 @@ export function PermissionsMatrix({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los módulos</SelectItem>
-                {flatModules.map(moduleId => (
-                  <SelectItem key={moduleId} value={moduleId}>
-                    {subModuleMap[moduleId]?.name || moduleId}
+                {(permissionModules as PermissionModule[]).map((module: PermissionModule) => (
+                  <SelectItem key={module.slug} value={module.slug}>
+                    {module.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -278,9 +333,9 @@ export function PermissionsMatrix({
           <thead>
             <tr>
               <th className="text-left p-3 border-b font-semibold">Rol</th>
-              {filteredModules.map(moduleId => (
-                <th key={moduleId} className="text-center p-3 border-b font-semibold min-w-32">
-                  {subModuleMap[moduleId]?.name || moduleId}
+              {filteredModules.map((module: PermissionModule) => (
+                <th key={module.slug} className="text-center p-3 border-b font-semibold min-w-32">
+                  {module.name}
                 </th>
               ))}
               <th className="text-center p-3 border-b font-semibold">Total</th>
@@ -297,41 +352,36 @@ export function PermissionsMatrix({
                     </div>
                   </div>
                 </td>
-                {filteredModules.map(module => (
-                  <td key={`${role.slug}-${module}`} className="p-3 border-b text-center">
-                    <div className="flex flex-col gap-2">
-                      {/* Read Permission */}
-                      <div className="flex items-center justify-center gap-1">
-                        <Checkbox
-                          checked={hasPermission(role.slug, module, 'read')}
-                          onCheckedChange={(checked) => updatePermission(role.slug, module, 'read', !!checked)}
-                          disabled={!editable || !canEditPermissions()}
-                        />
-                        <span className="text-xs text-gray-600">R</span>
-                      </div>
-                      
-                      {/* Write Permission */}
-                      <div className="flex items-center justify-center gap-1">
-                        <Checkbox
-                          checked={hasPermission(role.slug, module, 'write')}
-                          onCheckedChange={(checked) => updatePermission(role.slug, module, 'write', !!checked)}
-                          disabled={!editable || !canEditPermissions()}
-                        />
-                        <span className="text-xs text-gray-600">W</span>
-                      </div>
-                      
-                      {/* Admin Permission */}
-                      <div className="flex items-center justify-center gap-1">
-                        <Checkbox
-                          checked={hasPermission(role.slug, module, 'admin')}
-                          onCheckedChange={(checked) => updatePermission(role.slug, module, 'admin', !!checked)}
-                          disabled={!editable || !canEditPermissions()}
-                        />
-                        <span className="text-xs text-gray-600">A</span>
-                      </div>
-                    </div>
-                  </td>
-                ))}
+                {filteredModules.map((module: PermissionModule) => {
+                  const modulePermissions = getPermissionsForModule(module.slug);
+                  
+                  return (
+                    <td key={`${role.slug}-${module.slug}`} className="p-3 border-b text-center">
+                      {role.slug === 'super-admin' ? (
+                        <div className="flex items-center justify-center">
+                          <Star className="h-5 w-5 text-yellow-500" />
+                          <span className="text-xs ml-1 font-semibold text-yellow-600">ALL</span>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-1 text-xs">
+                          {modulePermissions.slice(0, 4).map((perm: SystemPermission) => (
+                            <div key={perm.permissionKey} className="flex flex-col items-center gap-1">
+                              <Checkbox
+                                checked={hasPermission(role.slug, perm.permissionKey)}
+                                onCheckedChange={(checked) => updatePermission(role.slug, perm.permissionKey, !!checked)}
+                                disabled={!editable || !canEditPermissions()}
+                                className="h-3 w-3"
+                              />
+                              <span className="text-xs text-gray-500 truncate w-8" title={perm.description}>
+                                {perm.permissionKey.split(':').pop()?.substring(0, 3).toUpperCase()}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  );
+                })}
                 <td className="p-3 border-b text-center">
                   <Badge variant="outline" className="font-mono">
                     {getPermissionCount(role.slug)}
