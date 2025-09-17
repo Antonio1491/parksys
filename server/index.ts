@@ -2249,6 +2249,31 @@ function startServer() {
     }
   });
 
+  // Register critical parks filter API route (public endpoint for filters)
+  criticalApiRouter.get("/parks/filter", async (req: any, res: any) => {
+    try {
+      const { getParksDirectly } = await import('./direct-park-queries');
+      const filters: any = {};
+      
+      if (req.query.municipalityId) {
+        filters.municipalityId = Number(req.query.municipalityId);
+      }
+      
+      const parks = await getParksDirectly(filters);
+      // Return simple array for filter dropdown (id, name only)
+      const parksList = parks?.map((park: any) => ({
+        id: park.id,
+        name: park.name
+      })) || [];
+      
+      console.log(`🏞️ [CRITICAL-FILTER] Returning ${parksList.length} parks for filter dropdown`);
+      res.json(parksList);
+    } catch (error) {
+      console.error('❌ [CRITICAL-FILTER] Error in parks filter route:', error);
+      res.status(500).json({ message: "Error fetching parks for filter" });
+    }
+  });
+
   // Register critical sponsors API route
   criticalApiRouter.get("/sponsors", async (req: any, res: any) => {
     try {

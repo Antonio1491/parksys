@@ -82,7 +82,7 @@ const AdminActivities = () => {
   });
 
   const { data: parksData = [] } = useQuery<any[]>({
-    queryKey: ['/api/parks'],
+    queryKey: ['/api/parks/filter'],
   });
 
   const { data: categoriesData = [] } = useQuery<any[]>({
