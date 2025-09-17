@@ -1,6 +1,7 @@
 import { db, pool } from './db';
 import { eq, sql, desc } from "drizzle-orm";
 import * as schema from "@shared/schema";
+import { getParksDirectly, getAmenitiesDirectly } from './direct-park-queries';
 
 const {
   users,
@@ -205,6 +206,127 @@ export class DatabaseStorage implements IStorage {
     return getAmenitiesDirectly();
   }
 
+  async getPark(id: number): Promise<any> {
+    try {
+      const result = await pool.query(`
+        SELECT 
+          p.id, p.name, p.municipality_id as "municipalityId", 
+          p.municipality_text as "municipalityText",
+          p.park_type as "parkType", p.description, p.address, 
+          p.postal_code as "postalCode", p.latitude, p.longitude, 
+          p.area, p.foundation_year as "foundationYear",
+          p.administrator, p.conservation_status as "conservationStatus",
+          p.regulation_url as "regulationUrl", p.opening_hours as "openingHours", 
+          p.contact_email as "contactEmail", p.contact_phone as "contactPhone",
+          p.video_url as "videoUrl", p.certificaciones
+        FROM parks p
+        WHERE p.id = $1
+      `, [id]);
+      
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error(`Error getting park ${id}:`, error);
+      return null;
+    }
+  }
+
+  async getParkTrees(parkId: number): Promise<any> {
+    try {
+      const result = await pool.query(`
+        SELECT 
+          COUNT(*) as total,
+          COUNT(*) FILTER (WHERE health_status = 'Bueno') as good,
+          COUNT(*) FILTER (WHERE health_status = 'Regular') as regular,
+          COUNT(*) FILTER (WHERE health_status = 'Malo') as bad
+        FROM trees 
+        WHERE park_id = $1
+      `, [parkId]);
+      
+      const row = result.rows[0] || { total: 0, good: 0, regular: 0, bad: 0 };
+      return {
+        total: parseInt(row.total) || 0,
+        bySpecies: {},
+        byHealth: {
+          'Bueno': parseInt(row.good) || 0,
+          'Regular': parseInt(row.regular) || 0,
+          'Malo': parseInt(row.bad) || 0,
+          'Desconocido': (parseInt(row.total) || 0) - (parseInt(row.good) || 0) - (parseInt(row.regular) || 0) - (parseInt(row.bad) || 0)
+        }
+      };
+    } catch (error) {
+      console.error(`Error getting park trees ${parkId}:`, error);
+      return {
+        total: 0,
+        bySpecies: {},
+        byHealth: { 'Bueno': 0, 'Regular': 0, 'Malo': 0, 'Desconocido': 0 }
+      };
+    }
+  }
+
+  async getParkAssets(parkId: number): Promise<any[]> {
+    try {
+      const result = await pool.query(`
+        SELECT 
+          a.id, a.name, a.serial_number as "serialNumber",
+          a.category_id as "categoryId", a.status, a.condition,
+          ac.name as "categoryName"
+        FROM assets a
+        LEFT JOIN asset_categories ac ON a.category_id = ac.id
+        WHERE a.park_id = $1
+        ORDER BY a.name
+      `, [parkId]);
+      
+      return result.rows || [];
+    } catch (error) {
+      console.error(`Error getting park assets ${parkId}:`, error);
+      return [];
+    }
+  }
+
+  async getAssetCategories(): Promise<any[]> {
+    try {
+      const result = await pool.query(`
+        SELECT id, name, description, icon, color, parent_id as "parentId"
+        FROM asset_categories
+        ORDER BY name
+      `);
+      return result.rows || [];
+    } catch (error) {
+      console.error("Error getting asset categories:", error);
+      return [];
+    }
+  }
+
+  async getAssetCategory(id: number): Promise<any> {
+    try {
+      const result = await pool.query(`
+        SELECT id, name, description, icon, color, parent_id as "parentId"
+        FROM asset_categories
+        WHERE id = $1
+      `, [id]);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error(`Error getting asset category ${id}:`, error);
+      return null;
+    }
+  }
+
+  async getCategoryAssets(categoryId: number): Promise<any[]> {
+    try {
+      const result = await pool.query(`
+        SELECT a.*, p.name as "parkName"
+        FROM assets a
+        LEFT JOIN parks p ON a.park_id = p.id
+        WHERE a.category_id = $1
+        ORDER BY a.name
+      `, [categoryId]);
+      return result.rows || [];
+    } catch (error) {
+      console.error(`Error getting assets for category ${categoryId}:`, error);
+      return [];
+    }
+  }
+
   async getParkDependencies(parkId: number): Promise<{
     trees: number;
     treeMaintenances: number;
@@ -384,7 +506,7 @@ export class DatabaseStorage implements IStorage {
       
     } catch (error) {
       console.error("[STORAGE] Error completo:", error);
-      console.error("[STORAGE] Stack trace:", error.stack);
+      console.error("[STORAGE] Stack trace:", (error as Error).stack);
       return false;
     }
   }
@@ -466,7 +588,7 @@ export class DatabaseStorage implements IStorage {
         municipalityId: userData.municipalityId,
         phone: userData.phone || null,
         gender: userData.gender || null,
-        birthDate: userData.birthDate ? new Date(userData.birthDate) : null,
+        birthDate: userData.birthDate || null,
         bio: userData.bio || null,
         profileImageUrl: userData.profileImageUrl || null,
         isActive: true // Por defecto activo
@@ -594,20 +716,6 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getParkImage(id: number): Promise<any> {
-    try {
-      const result = await db
-        .select()
-        .from(parkImages)
-        .where(eq(parkImages.id, id))
-        .limit(1);
-      
-      return result[0] || null;
-    } catch (error) {
-      console.error("Error al obtener imagen individual:", error);
-      return null;
-    }
-  }
 
   async createParkImage(imageData: any): Promise<any> {
     try {
@@ -1753,6 +1861,524 @@ export class DatabaseStorage implements IStorage {
       return false;
     }
   }
+
+  // Document methods
+  async getParkDocuments(parkId: number): Promise<any[]> {
+    try {
+      console.log(`📋 STORAGE: Consultando documentos para parque ${parkId}`);
+      const result = await pool.query(`
+        SELECT 
+          id,
+          park_id as "parkId",
+          title,
+          file_url as "fileUrl",
+          file_size as "fileSize",
+          file_type as "fileType",
+          description,
+          uploaded_by_id as "uploadedById",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+        FROM documents 
+        WHERE park_id = $1
+        ORDER BY created_at DESC
+      `, [parkId]);
+      
+      console.log(`📋 STORAGE: Documentos encontrados para parque ${parkId}: ${result.rows.length}`);
+      return result.rows;
+    } catch (error) {
+      console.error(`❌ STORAGE: Error consultando documentos del parque ${parkId}:`, error);
+      return [];
+    }
+  }
+
+  async createDocument(documentData: any): Promise<any> {
+    try {
+      console.log(`📝 STORAGE: Creando documento:`, documentData);
+      const result = await pool.query(`
+        INSERT INTO documents (
+          park_id, title, file_url, file_type, description, uploaded_by_id, created_at, updated_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, NOW(), NOW()
+        ) RETURNING 
+          id,
+          park_id as "parkId",
+          title,
+          file_url as "fileUrl",
+          file_size as "fileSize",
+          file_type as "fileType",
+          description,
+          uploaded_by_id as "uploadedById",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+      `, [
+        documentData.parkId,
+        documentData.title,
+        documentData.fileUrl,
+        documentData.fileType,
+        documentData.description || '',
+        documentData.uploadedById || null
+      ]);
+      
+      const document = result.rows[0];
+      console.log(`✅ STORAGE: Documento creado con ID ${document.id}`);
+      return document;
+    } catch (error) {
+      console.error(`❌ STORAGE: Error creando documento:`, error);
+      throw error;
+    }
+  }
+
+  async getDocument(id: number): Promise<any> {
+    try {
+      console.log(`📋 STORAGE: Consultando documento con ID ${id}`);
+      const result = await pool.query(`
+        SELECT 
+          id,
+          park_id as "parkId",
+          title,
+          file_url as "fileUrl",
+          file_size as "fileSize",
+          file_type as "fileType",
+          description,
+          uploaded_by_id as "uploadedById",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+        FROM documents 
+        WHERE id = $1
+      `, [id]);
+      
+      const document = result.rows[0] || null;
+      console.log(`📋 STORAGE: Documento ${id} ${document ? 'encontrado' : 'no encontrado'}`);
+      return document;
+    } catch (error) {
+      console.error(`❌ STORAGE: Error consultando documento ${id}:`, error);
+      return null;
+    }
+  }
+
+  async deleteDocument(id: number): Promise<boolean> {
+    try {
+      console.log(`🗑️ STORAGE: Eliminando documento con ID ${id}`);
+      const result = await pool.query('DELETE FROM documents WHERE id = $1', [id]);
+      const deleted = (result.rowCount || 0) > 0;
+      console.log(`🗑️ STORAGE: Documento ${id} ${deleted ? 'eliminado' : 'no encontrado'}, filas afectadas: ${result.rowCount}`);
+      return deleted;
+    } catch (error) {
+      console.error(`❌ STORAGE: Error eliminando documento ${id}:`, error);
+      return false;
+    }
+  }
+
+  async getAllDocuments(): Promise<any[]> {
+    return [];
+  }
+
+  // Activity methods
+  async getAllActivities(): Promise<any[]> {
+    try {
+      const result = await pool.query(`
+        SELECT 
+          a.id,
+          a.title,
+          a.description,
+          a.start_date as "startDate",
+          a.end_date as "endDate",
+          a.category,
+          a.category_id as "categoryId",
+          a.park_id as "parkId",
+          a.location,
+          a.capacity,
+          a.price,
+          a.instructor_id as "instructorId",
+          a.created_at as "createdAt",
+          p.name as "parkName",
+          c.name as "categoryName",
+          i.full_name as "instructorName",
+          img.image_url as "imageUrl",
+          img.caption as "imageCaption"
+        FROM activities a
+        LEFT JOIN parks p ON a.park_id = p.id
+        LEFT JOIN activity_categories c ON a.category_id = c.id
+        LEFT JOIN instructors i ON a.instructor_id = i.id
+        LEFT JOIN activity_images img ON a.id = img.activity_id AND img.is_primary = true
+        ORDER BY a.created_at DESC
+      `);
+      
+      return result.rows.map(row => ({
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        startDate: row.startDate,
+        endDate: row.endDate,
+        category: row.categoryName || row.category,
+        categoryId: row.categoryId,
+        parkId: row.parkId,
+        parkName: row.parkName,
+        location: row.location,
+        capacity: row.capacity || 0,
+        price: row.price || 0,
+        instructorId: row.instructorId,
+        instructorName: row.instructorName,
+        imageUrl: row.imageUrl,
+        imageCaption: row.imageCaption
+      }));
+    } catch (error) {
+      console.error("Error al obtener todas las actividades:", error);
+      return [];
+    }
+  }
+
+  async getParkActivities(parkId: number): Promise<any[]> {
+    console.log("🎯 GET PARK ACTIVITIES - Park ID:", parkId);
+    
+    try {
+      const result = await pool.query(`
+        SELECT 
+          a.id,
+          a.title,
+          a.description,
+          a.start_date as "startDate",
+          a.end_date as "endDate", 
+          a.start_time as "startTime",
+          a.end_time as "endTime",
+          a.category,
+          a.category_id as "categoryId",
+          a.park_id as "parkId",
+          a.location,
+          a.capacity,
+          a.duration,
+          a.price,
+          a.is_free as "isFree",
+          a.materials,
+          a.requirements,
+          a.is_recurring as "isRecurring",
+          a.recurring_days as "recurringDays",
+          a.target_market as "targetMarket",
+          a.special_needs as "specialNeeds",
+          a.instructor_id as "instructorId",
+          a.created_at as "createdAt",
+          p.name as "parkName",
+          ac.name as "categoryName",
+          i.full_name as "instructorName",
+          ai.image_url
+        FROM activities a
+        LEFT JOIN parks p ON a.park_id = p.id
+        LEFT JOIN activity_categories ac ON a.category_id = ac.id
+        LEFT JOIN instructors i ON a.instructor_id = i.id
+        LEFT JOIN activity_images ai ON a.id = ai.activity_id AND ai.is_primary = true
+        WHERE a.park_id = $1
+        ORDER BY a.start_date DESC
+      `, [parkId]);
+
+      console.log("🎯 GET PARK ACTIVITIES - Activities found for park", parkId, ":", result.rows.length);
+      if (result.rows.length > 0) {
+        console.log("🎯 GET PARK ACTIVITIES - Sample activity:", result.rows[0]);
+      }
+      
+      return result.rows.map(row => ({
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        startDate: row.startDate,
+        endDate: row.endDate,
+        startTime: row.startTime,
+        endTime: row.endTime,
+        category: row.categoryName || row.category,
+        categoryId: row.categoryId,
+        parkId: row.parkId,
+        parkName: row.parkName,
+        location: row.location,
+        capacity: row.capacity,
+        duration: row.duration,
+        price: row.price,
+        isFree: row.isFree,
+        materials: row.materials,
+        requirements: row.requirements,
+        isRecurring: row.isRecurring,
+        recurringDays: row.recurringDays,
+        targetMarket: row.targetMarket,
+        specialNeeds: row.specialNeeds,
+        instructorId: row.instructorId,
+        instructorName: row.instructorName,
+        imageUrl: row.image_url,
+        createdAt: row.createdAt
+      }));
+    } catch (error) {
+      console.error("Error al obtener actividades del parque:", error);
+      return [];
+    }
+  }
+
+  async createActivity(activityData: any): Promise<any> {
+    console.log("🔥 CREANDO ACTIVIDAD - Datos recibidos:", activityData);
+    
+    try {
+      const [newActivity] = await db.insert(activities).values(activityData).returning();
+      
+      console.log("✅ Actividad creada exitosamente:", newActivity);
+      return newActivity;
+    } catch (error) {
+      console.error("❌ Error al crear actividad en la base de datos:", error);
+      throw error;
+    }
+  }
+
+  async getActivity(id: number): Promise<any> {
+    console.log("🎯 GET ACTIVITY ENDPOINT - ID:", id);
+    
+    try {
+      const result = await pool.query(`
+        SELECT 
+          a.id,
+          a.title,
+          a.description,
+          a.start_date as "startDate",
+          a.end_date as "endDate", 
+          a.start_time as "startTime",
+          a.end_time as "endTime",
+          a.category,
+          a.category_id as "categoryId",
+          a.park_id as "parkId",
+          a.location,
+          a.capacity,
+          a.duration,
+          a.price,
+          a.is_free as "isFree",
+          a.materials,
+          a.requirements,
+          a.is_recurring as "isRecurring",
+          a.recurring_days as "recurringDays",
+          a.target_market as "targetMarket",
+          a.special_needs as "specialNeeds",
+          a.instructor_id as "instructorId",
+          a.registration_enabled as "registrationEnabled",
+          a.max_registrations as "maxRegistrations",
+          a.registration_deadline as "registrationDeadline",
+          a.requires_approval as "requiresApproval",
+          a.created_at as "createdAt",
+          p.name as "parkName",
+          ac.name as "category",
+          i.full_name as "instructorName"
+        FROM activities a
+        LEFT JOIN parks p ON a.park_id = p.id
+        LEFT JOIN activity_categories ac ON a.category_id = ac.id
+        LEFT JOIN instructors i ON a.instructor_id = i.id
+        WHERE a.id = $1
+      `, [id]);
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const activity = result.rows[0];
+      
+      // Parsear campos JSON
+      console.log("🔍 targetMarket raw:", activity.targetMarket);
+      console.log("🔍 specialNeeds raw:", activity.specialNeeds);
+      
+      if (activity.targetMarket) {
+        if (Array.isArray(activity.targetMarket)) {
+          // Ya es un array, usarlo directamente
+          console.log("✅ targetMarket is already array:", activity.targetMarket);
+        } else if (typeof activity.targetMarket === 'string') {
+          try {
+            activity.targetMarket = JSON.parse(activity.targetMarket);
+            console.log("✅ targetMarket parsed:", activity.targetMarket);
+          } catch (e) {
+            // Si falla el parsing, tratarlo como string separado por comas
+            activity.targetMarket = activity.targetMarket.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+            console.log("✅ targetMarket parsed as CSV:", activity.targetMarket);
+          }
+        } else {
+          console.log("❌ Error parsing targetMarket:", typeof activity.targetMarket);
+          activity.targetMarket = [];
+        }
+      } else {
+        console.log("⚠️ targetMarket is null/undefined");
+        activity.targetMarket = [];
+      }
+      
+      if (activity.specialNeeds) {
+        if (Array.isArray(activity.specialNeeds)) {
+          // Ya es un array, usarlo directamente
+          console.log("✅ specialNeeds is already array:", activity.specialNeeds);
+        } else if (typeof activity.specialNeeds === 'string') {
+          try {
+            activity.specialNeeds = JSON.parse(activity.specialNeeds);
+            console.log("✅ specialNeeds parsed:", activity.specialNeeds);
+          } catch (e) {
+            // Si falla el parsing, tratarlo como string separado por comas
+            activity.specialNeeds = activity.specialNeeds.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+            console.log("✅ specialNeeds parsed as CSV:", activity.specialNeeds);
+          }
+        } else {
+          console.log("❌ Error parsing specialNeeds:", typeof activity.specialNeeds);
+          activity.specialNeeds = [];
+        }
+      } else {
+        console.log("⚠️ specialNeeds is null/undefined");
+        activity.specialNeeds = [];
+      }
+
+      console.log("🎯 Actividad encontrada:", activity);
+      return activity;
+    } catch (error) {
+      console.error("Error obteniendo actividad:", error);
+      return null;
+    }
+  }
+
+  async updateActivity(id: number, activityData: any): Promise<any> {
+    console.log("🔄 Actualizando actividad:", id, "con datos:", activityData);
+    
+    try {
+      // Mapear los campos del frontend al schema de la base de datos
+      const updateData: any = {};
+      
+      if (activityData.title) updateData.title = activityData.title;
+      if (activityData.description) updateData.description = activityData.description;
+      if (activityData.parkId) updateData.park_id = Number(activityData.parkId);
+      if (activityData.startDate) updateData.start_date = activityData.startDate;
+      if (activityData.endDate) updateData.end_date = activityData.endDate;
+      if (activityData.startTime) updateData.start_time = activityData.startTime;
+      if (activityData.endTime) updateData.end_time = activityData.endTime;
+      if (activityData.location) updateData.location = activityData.location;
+      if (activityData.capacity) updateData.capacity = Number(activityData.capacity);
+      if (activityData.duration !== undefined) updateData.duration = Number(activityData.duration);
+      if (activityData.price !== undefined) updateData.price = Number(activityData.price);
+      if (activityData.isFree !== undefined) updateData.is_free = Boolean(activityData.isFree);
+      if (activityData.isPriceRandom !== undefined) updateData.is_price_random = Boolean(activityData.isPriceRandom);
+      if (activityData.materials) updateData.materials = activityData.materials;
+      if (activityData.requirements) updateData.requirements = activityData.requirements;
+      if (activityData.isRecurring !== undefined) updateData.is_recurring = Boolean(activityData.isRecurring);
+      if (activityData.recurringDays !== undefined) updateData.recurring_days = Array.isArray(activityData.recurringDays) ? JSON.stringify(activityData.recurringDays) : activityData.recurringDays;
+      if (activityData.targetMarket !== undefined) updateData.target_market = Array.isArray(activityData.targetMarket) ? JSON.stringify(activityData.targetMarket) : activityData.targetMarket;
+      if (activityData.specialNeeds !== undefined) updateData.special_needs = Array.isArray(activityData.specialNeeds) ? JSON.stringify(activityData.specialNeeds) : activityData.specialNeeds;
+      
+      // Campos de inscripciones - usando nombres correctos de la base de datos
+      if (activityData.registrationEnabled !== undefined || activityData.allowsPublicRegistration !== undefined) {
+        updateData.registration_enabled = Boolean(activityData.allowsPublicRegistration || activityData.registrationEnabled);
+      }
+      if (activityData.maxRegistrations !== undefined) updateData.max_registrations = activityData.maxRegistrations ? Number(activityData.maxRegistrations) : null;
+      if (activityData.registrationDeadline !== undefined) updateData.registration_deadline = activityData.registrationDeadline;
+      if (activityData.registrationInstructions !== undefined) updateData.registration_instructions = activityData.registrationInstructions;
+      if (activityData.requiresApproval !== undefined) updateData.requires_approval = Boolean(activityData.requiresApproval);
+      if (activityData.ageRestrictions !== undefined) updateData.age_restrictions = activityData.ageRestrictions;
+      if (activityData.healthRequirements !== undefined) updateData.health_requirements = activityData.healthRequirements;
+      
+      // Campos específicos que necesitan mapeo especial
+      if (activityData.categoryId || activityData.category_id) {
+        updateData.category_id = Number(activityData.categoryId || activityData.category_id);
+        updateData.category = null; // Limpiar el campo legacy
+      }
+      
+      if (activityData.instructorId) {
+        updateData.instructor_id = Number(activityData.instructorId);
+      }
+      
+      console.log("📝 Datos mapeados para actualizar:", updateData);
+      
+      // Realizar la actualización usando Drizzle ORM
+      const result = await db
+        .update(activities)
+        .set(updateData)
+        .where(eq(activities.id, id))
+        .returning();
+      
+      console.log("✅ Actividad actualizada:", result[0]);
+      
+      if (result.length === 0) {
+        throw new Error("No se pudo actualizar la actividad");
+      }
+      
+      return result[0];
+    } catch (error) {
+      console.error("❌ Error actualizando actividad:", error);
+      throw error;
+    }
+  }
+
+  async deleteActivity(id: number): Promise<boolean> {
+    return true;
+  }
+
+  // Comment methods - Simple stubs
+  async getParkComments(parkId: number): Promise<any[]> {
+    return [];
+  }
+
+  async createComment(commentData: any): Promise<any> {
+    return { id: Date.now(), ...commentData };
+  }
+
+  async getAllComments(): Promise<any[]> {
+    return [];
+  }
+
+  async getComment(id: number): Promise<any> {
+    return null;
+  }
+
+  async approveComment(id: number): Promise<any> {
+    return { id, approved: true };
+  }
+
+  async deleteComment(id: number): Promise<boolean> {
+    return true;
+  }
+
+  // Incident methods - Simple stubs  
+  async createIncident(incidentData: any): Promise<any> {
+    return { id: Date.now(), ...incidentData };
+  }
+
+  async getIncident(id: number): Promise<any> {
+    return null;
+  }
+
+  async updateIncidentStatus(id: number, status: string): Promise<any> {
+    return { id, status };
+  }
+
+  async getParkIncidents(parkId: number): Promise<any[]> {
+    return [];
+  }
+
+  // Activity Registration methods
+  async getActivityById(id: number): Promise<any> {
+    try {
+      const result = await db.select().from(activities).where(eq(activities.id, id));
+      return result[0] || null;
+    } catch (error) {
+      console.error("Error getting activity by ID:", error);
+      return null;
+    }
+  }
+
+  async getActivityRegistrationById(id: number): Promise<any> {
+    try {
+      const { activityRegistrations } = schema;
+      const result = await db.select().from(activityRegistrations).where(eq(activityRegistrations.id, id));
+      return result[0] || null;
+    } catch (error) {
+      console.error("Error getting activity registration by ID:", error);
+      return null;
+    }
+  }
+
+  async updateActivityRegistration(id: number, data: any): Promise<any> {
+    try {
+      const { activityRegistrations } = schema;
+      const result = await db.update(activityRegistrations)
+        .set(data)
+        .where(eq(activityRegistrations.id, id))
+        .returning();
+      return result[0] || null;
+    } catch (error) {
+      console.error("Error updating activity registration:", error);
+      throw error;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();
@@ -1868,523 +2494,4 @@ export async function getAmenitiesDirectly() {
   }
 }
 
-// Métodos adicionales implementados en la clase DatabaseStorage
-DatabaseStorage.prototype.getParkDocuments = async function(parkId: number): Promise<any[]> {
-  try {
-    console.log(`📋 STORAGE: Consultando documentos para parque ${parkId}`);
-    const result = await pool.query(`
-      SELECT 
-        id,
-        park_id as "parkId",
-        title,
-        file_url as "fileUrl",
-        file_size as "fileSize",
-        file_type as "fileType",
-        description,
-        uploaded_by_id as "uploadedById",
-        created_at as "createdAt",
-        updated_at as "updatedAt"
-      FROM documents 
-      WHERE park_id = $1
-      ORDER BY created_at DESC
-    `, [parkId]);
-    
-    console.log(`📋 STORAGE: Documentos encontrados para parque ${parkId}: ${result.rows.length}`);
-    return result.rows;
-  } catch (error) {
-    console.error(`❌ STORAGE: Error consultando documentos del parque ${parkId}:`, error);
-    return [];
-  }
-};
 
-DatabaseStorage.prototype.createDocument = async function(documentData: any): Promise<any> {
-  try {
-    console.log(`📝 STORAGE: Creando documento:`, documentData);
-    const result = await pool.query(`
-      INSERT INTO documents (
-        park_id, title, file_url, file_type, description, uploaded_by_id, created_at, updated_at
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, NOW(), NOW()
-      ) RETURNING 
-        id,
-        park_id as "parkId",
-        title,
-        file_url as "fileUrl",
-        file_size as "fileSize",
-        file_type as "fileType",
-        description,
-        uploaded_by_id as "uploadedById",
-        created_at as "createdAt",
-        updated_at as "updatedAt"
-    `, [
-      documentData.parkId,
-      documentData.title,
-      documentData.fileUrl,
-      documentData.fileType,
-      documentData.description || '',
-      documentData.uploadedById || null
-    ]);
-    
-    const document = result.rows[0];
-    console.log(`✅ STORAGE: Documento creado con ID ${document.id}`);
-    return document;
-  } catch (error) {
-    console.error(`❌ STORAGE: Error creando documento:`, error);
-    throw error;
-  }
-};
-
-DatabaseStorage.prototype.getDocument = async function(id: number): Promise<any> {
-  try {
-    console.log(`📋 STORAGE: Consultando documento con ID ${id}`);
-    const result = await pool.query(`
-      SELECT 
-        id,
-        park_id as "parkId",
-        title,
-        file_url as "fileUrl",
-        file_size as "fileSize",
-        file_type as "fileType",
-        description,
-        uploaded_by_id as "uploadedById",
-        created_at as "createdAt",
-        updated_at as "updatedAt"
-      FROM documents 
-      WHERE id = $1
-    `, [id]);
-    
-    const document = result.rows[0] || null;
-    console.log(`📋 STORAGE: Documento ${id} ${document ? 'encontrado' : 'no encontrado'}`);
-    return document;
-  } catch (error) {
-    console.error(`❌ STORAGE: Error consultando documento ${id}:`, error);
-    return null;
-  }
-};
-
-DatabaseStorage.prototype.deleteDocument = async function(id: number): Promise<boolean> {
-  try {
-    console.log(`🗑️ STORAGE: Eliminando documento con ID ${id}`);
-    const result = await pool.query('DELETE FROM documents WHERE id = $1', [id]);
-    const deleted = (result.rowCount || 0) > 0;
-    console.log(`🗑️ STORAGE: Documento ${id} ${deleted ? 'eliminado' : 'no encontrado'}, filas afectadas: ${result.rowCount}`);
-    return deleted;
-  } catch (error) {
-    console.error(`❌ STORAGE: Error eliminando documento ${id}:`, error);
-    return false;
-  }
-};
-
-DatabaseStorage.prototype.getAllDocuments = async function(): Promise<any[]> {
-  return [];
-};
-
-DatabaseStorage.prototype.getAllActivities = async function(): Promise<any[]> {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        a.id,
-        a.title,
-        a.description,
-        a.start_date as "startDate",
-        a.end_date as "endDate",
-        a.category,
-        a.category_id as "categoryId",
-        a.park_id as "parkId",
-        a.location,
-        a.capacity,
-        a.price,
-        a.instructor_id as "instructorId",
-        a.created_at as "createdAt",
-        p.name as "parkName",
-        c.name as "categoryName",
-        i.full_name as "instructorName",
-        img.image_url as "imageUrl",
-        img.caption as "imageCaption"
-      FROM activities a
-      LEFT JOIN parks p ON a.park_id = p.id
-      LEFT JOIN activity_categories c ON a.category_id = c.id
-      LEFT JOIN instructors i ON a.instructor_id = i.id
-      LEFT JOIN activity_images img ON a.id = img.activity_id AND img.is_primary = true
-      ORDER BY a.created_at DESC
-    `);
-    
-    return result.rows.map(row => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      startDate: row.startDate,
-      endDate: row.endDate,
-      category: row.categoryName || row.category,
-      categoryId: row.categoryId,
-      parkId: row.parkId,
-      parkName: row.parkName,
-      location: row.location,
-      capacity: row.capacity || 0,
-      price: row.price || 0,
-      instructorId: row.instructorId,
-      instructorName: row.instructorName,
-      imageUrl: row.imageUrl,
-      imageCaption: row.imageCaption
-    }));
-  } catch (error) {
-    console.error("Error al obtener todas las actividades:", error);
-    return [];
-  }
-};
-
-DatabaseStorage.prototype.getParkActivities = async function(parkId: number): Promise<any[]> {
-  console.log("🎯 GET PARK ACTIVITIES - Park ID:", parkId);
-  
-  try {
-    const result = await pool.query(`
-      SELECT 
-        a.id,
-        a.title,
-        a.description,
-        a.start_date as "startDate",
-        a.end_date as "endDate", 
-        a.start_time as "startTime",
-        a.end_time as "endTime",
-        a.category,
-        a.category_id as "categoryId",
-        a.park_id as "parkId",
-        a.location,
-        a.capacity,
-        a.duration,
-        a.price,
-        a.is_free as "isFree",
-        a.materials,
-        a.requirements,
-        a.is_recurring as "isRecurring",
-        a.recurring_days as "recurringDays",
-        a.target_market as "targetMarket",
-        a.special_needs as "specialNeeds",
-        a.instructor_id as "instructorId",
-        a.created_at as "createdAt",
-        p.name as "parkName",
-        ac.name as "categoryName",
-        i.full_name as "instructorName",
-        ai.image_url
-      FROM activities a
-      LEFT JOIN parks p ON a.park_id = p.id
-      LEFT JOIN activity_categories ac ON a.category_id = ac.id
-      LEFT JOIN instructors i ON a.instructor_id = i.id
-      LEFT JOIN activity_images ai ON a.id = ai.activity_id AND ai.is_primary = true
-      WHERE a.park_id = $1
-      ORDER BY a.start_date DESC
-    `, [parkId]);
-
-    console.log("🎯 GET PARK ACTIVITIES - Activities found for park", parkId, ":", result.rows.length);
-    if (result.rows.length > 0) {
-      console.log("🎯 GET PARK ACTIVITIES - Sample activity:", result.rows[0]);
-    }
-    
-    return result.rows.map(row => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      startDate: row.startDate,
-      endDate: row.endDate,
-      startTime: row.startTime,
-      endTime: row.endTime,
-      category: row.categoryName || row.category,
-      categoryId: row.categoryId,
-      parkId: row.parkId,
-      parkName: row.parkName,
-      location: row.location,
-      capacity: row.capacity,
-      duration: row.duration,
-      price: row.price,
-      isFree: row.isFree,
-      materials: row.materials,
-      requirements: row.requirements,
-      isRecurring: row.isRecurring,
-      recurringDays: row.recurringDays,
-      targetMarket: row.targetMarket,
-      specialNeeds: row.specialNeeds,
-      instructorId: row.instructorId,
-      instructorName: row.instructorName,
-      imageUrl: row.image_url,
-      createdAt: row.createdAt
-    }));
-  } catch (error) {
-    console.error("Error al obtener actividades del parque:", error);
-    return [];
-  }
-};
-
-DatabaseStorage.prototype.createActivity = async function(activityData: any): Promise<any> {
-  console.log("🔥 CREANDO ACTIVIDAD - Datos recibidos:", activityData);
-  
-  try {
-    const [newActivity] = await db.insert(activities).values(activityData).returning();
-    
-    console.log("✅ Actividad creada exitosamente:", newActivity);
-    return newActivity;
-  } catch (error) {
-    console.error("❌ Error al crear actividad en la base de datos:", error);
-    throw error;
-  }
-};
-
-DatabaseStorage.prototype.getActivity = async function(id: number): Promise<any> {
-  console.log("🎯 GET ACTIVITY ENDPOINT - ID:", id);
-  
-  try {
-    const result = await pool.query(`
-      SELECT 
-        a.id,
-        a.title,
-        a.description,
-        a.start_date as "startDate",
-        a.end_date as "endDate", 
-        a.start_time as "startTime",
-        a.end_time as "endTime",
-        a.category,
-        a.category_id as "categoryId",
-        a.park_id as "parkId",
-        a.location,
-        a.capacity,
-        a.duration,
-        a.price,
-        a.is_free as "isFree",
-        a.materials,
-        a.requirements,
-        a.is_recurring as "isRecurring",
-        a.recurring_days as "recurringDays",
-        a.target_market as "targetMarket",
-        a.special_needs as "specialNeeds",
-        a.instructor_id as "instructorId",
-        a.registration_enabled as "registrationEnabled",
-        a.max_registrations as "maxRegistrations",
-        a.registration_deadline as "registrationDeadline",
-        a.requires_approval as "requiresApproval",
-        a.created_at as "createdAt",
-        p.name as "parkName",
-        ac.name as "category",
-        i.full_name as "instructorName"
-      FROM activities a
-      LEFT JOIN parks p ON a.park_id = p.id
-      LEFT JOIN activity_categories ac ON a.category_id = ac.id
-      LEFT JOIN instructors i ON a.instructor_id = i.id
-      WHERE a.id = $1
-    `, [id]);
-
-    if (result.rows.length === 0) {
-      return null;
-    }
-
-    const activity = result.rows[0];
-    
-    // Parsear campos JSON
-    console.log("🔍 targetMarket raw:", activity.targetMarket);
-    console.log("🔍 specialNeeds raw:", activity.specialNeeds);
-    
-    if (activity.targetMarket) {
-      if (Array.isArray(activity.targetMarket)) {
-        // Ya es un array, usarlo directamente
-        console.log("✅ targetMarket is already array:", activity.targetMarket);
-      } else if (typeof activity.targetMarket === 'string') {
-        try {
-          activity.targetMarket = JSON.parse(activity.targetMarket);
-          console.log("✅ targetMarket parsed:", activity.targetMarket);
-        } catch (e) {
-          // Si falla el parsing, tratarlo como string separado por comas
-          activity.targetMarket = activity.targetMarket.split(',').map(s => s.trim()).filter(s => s.length > 0);
-          console.log("✅ targetMarket parsed as CSV:", activity.targetMarket);
-        }
-      } else {
-        console.log("❌ Error parsing targetMarket:", typeof activity.targetMarket);
-        activity.targetMarket = [];
-      }
-    } else {
-      console.log("⚠️ targetMarket is null/undefined");
-      activity.targetMarket = [];
-    }
-    
-    if (activity.specialNeeds) {
-      if (Array.isArray(activity.specialNeeds)) {
-        // Ya es un array, usarlo directamente
-        console.log("✅ specialNeeds is already array:", activity.specialNeeds);
-      } else if (typeof activity.specialNeeds === 'string') {
-        try {
-          activity.specialNeeds = JSON.parse(activity.specialNeeds);
-          console.log("✅ specialNeeds parsed:", activity.specialNeeds);
-        } catch (e) {
-          // Si falla el parsing, tratarlo como string separado por comas
-          activity.specialNeeds = activity.specialNeeds.split(',').map(s => s.trim()).filter(s => s.length > 0);
-          console.log("✅ specialNeeds parsed as CSV:", activity.specialNeeds);
-        }
-      } else {
-        console.log("❌ Error parsing specialNeeds:", typeof activity.specialNeeds);
-        activity.specialNeeds = [];
-      }
-    } else {
-      console.log("⚠️ specialNeeds is null/undefined");
-      activity.specialNeeds = [];
-    }
-
-    console.log("🎯 Actividad encontrada:", activity);
-    return activity;
-  } catch (error) {
-    console.error("Error obteniendo actividad:", error);
-    return null;
-  }
-};
-
-DatabaseStorage.prototype.updateActivity = async function(id: number, activityData: any): Promise<any> {
-  console.log("🔄 Actualizando actividad:", id, "con datos:", activityData);
-  
-  try {
-    // Mapear los campos del frontend al schema de la base de datos
-    const updateData: any = {};
-    
-    if (activityData.title) updateData.title = activityData.title;
-    if (activityData.description) updateData.description = activityData.description;
-    if (activityData.parkId) updateData.park_id = Number(activityData.parkId);
-    if (activityData.startDate) updateData.start_date = activityData.startDate;
-    if (activityData.endDate) updateData.end_date = activityData.endDate;
-    if (activityData.startTime) updateData.start_time = activityData.startTime;
-    if (activityData.endTime) updateData.end_time = activityData.endTime;
-    if (activityData.location) updateData.location = activityData.location;
-    if (activityData.capacity) updateData.capacity = Number(activityData.capacity);
-    if (activityData.duration !== undefined) updateData.duration = Number(activityData.duration);
-    if (activityData.price !== undefined) updateData.price = Number(activityData.price);
-    if (activityData.isFree !== undefined) updateData.is_free = Boolean(activityData.isFree);
-    if (activityData.isPriceRandom !== undefined) updateData.is_price_random = Boolean(activityData.isPriceRandom);
-    if (activityData.materials) updateData.materials = activityData.materials;
-    if (activityData.requirements) updateData.requirements = activityData.requirements;
-    if (activityData.isRecurring !== undefined) updateData.is_recurring = Boolean(activityData.isRecurring);
-    if (activityData.recurringDays !== undefined) updateData.recurring_days = Array.isArray(activityData.recurringDays) ? JSON.stringify(activityData.recurringDays) : activityData.recurringDays;
-    if (activityData.targetMarket !== undefined) updateData.target_market = Array.isArray(activityData.targetMarket) ? JSON.stringify(activityData.targetMarket) : activityData.targetMarket;
-    if (activityData.specialNeeds !== undefined) updateData.special_needs = Array.isArray(activityData.specialNeeds) ? JSON.stringify(activityData.specialNeeds) : activityData.specialNeeds;
-    
-    // Campos de inscripciones - usando nombres correctos de la base de datos
-    if (activityData.registrationEnabled !== undefined || activityData.allowsPublicRegistration !== undefined) {
-      updateData.registration_enabled = Boolean(activityData.allowsPublicRegistration || activityData.registrationEnabled);
-    }
-    if (activityData.maxRegistrations !== undefined) updateData.max_registrations = activityData.maxRegistrations ? Number(activityData.maxRegistrations) : null;
-    if (activityData.registrationDeadline !== undefined) updateData.registration_deadline = activityData.registrationDeadline;
-    if (activityData.registrationInstructions !== undefined) updateData.registration_instructions = activityData.registrationInstructions;
-    if (activityData.requiresApproval !== undefined) updateData.requires_approval = Boolean(activityData.requiresApproval);
-    if (activityData.ageRestrictions !== undefined) updateData.age_restrictions = activityData.ageRestrictions;
-    if (activityData.healthRequirements !== undefined) updateData.health_requirements = activityData.healthRequirements;
-    
-    // Campos específicos que necesitan mapeo especial
-    if (activityData.categoryId || activityData.category_id) {
-      updateData.category_id = Number(activityData.categoryId || activityData.category_id);
-      updateData.category = null; // Limpiar el campo legacy
-    }
-    
-    if (activityData.instructorId) {
-      updateData.instructor_id = Number(activityData.instructorId);
-    }
-    
-    console.log("📝 Datos mapeados para actualizar:", updateData);
-    console.log("🔍 Valores específicos a verificar:", {
-      category_id: updateData.category_id,
-      registration_enabled: updateData.registration_enabled,
-      categoryIdFromFrontend: activityData.categoryId,
-      allowsPublicRegistrationFromFrontend: activityData.allowsPublicRegistration
-    });
-    
-    // Realizar la actualización usando Drizzle ORM
-    const result = await db
-      .update(activities)
-      .set(updateData)
-      .where(eq(activities.id, id))
-      .returning();
-    
-    console.log("✅ Actividad actualizada:", result[0]);
-    
-    if (result.length === 0) {
-      throw new Error("No se pudo actualizar la actividad");
-    }
-    
-    return result[0];
-  } catch (error) {
-    console.error("❌ Error actualizando actividad:", error);
-    throw error;
-  }
-};
-
-DatabaseStorage.prototype.deleteActivity = async function(id: number): Promise<boolean> {
-  return true;
-};
-
-DatabaseStorage.prototype.getParkComments = async function(parkId: number): Promise<any[]> {
-  return [];
-};
-
-DatabaseStorage.prototype.createComment = async function(commentData: any): Promise<any> {
-  return { id: Date.now(), ...commentData };
-};
-
-DatabaseStorage.prototype.getAllComments = async function(): Promise<any[]> {
-  return [];
-};
-
-DatabaseStorage.prototype.getComment = async function(id: number): Promise<any> {
-  return null;
-};
-
-DatabaseStorage.prototype.approveComment = async function(id: number): Promise<any> {
-  return { id, approved: true };
-};
-
-DatabaseStorage.prototype.deleteComment = async function(id: number): Promise<boolean> {
-  return true;
-};
-
-DatabaseStorage.prototype.createIncident = async function(incidentData: any): Promise<any> {
-  return { id: Date.now(), ...incidentData };
-};
-
-DatabaseStorage.prototype.getIncident = async function(id: number): Promise<any> {
-  return null;
-};
-
-DatabaseStorage.prototype.updateIncidentStatus = async function(id: number, status: string): Promise<any> {
-  return { id, status };
-};
-
-DatabaseStorage.prototype.getParkIncidents = async function(parkId: number): Promise<any[]> {
-  return [];
-};
-
-// Activity Registration implementations
-DatabaseStorage.prototype.getActivityById = async function(id: number): Promise<any> {
-  try {
-    const result = await db.select().from(activities).where(eq(activities.id, id));
-    return result[0] || null;
-  } catch (error) {
-    console.error("Error getting activity by ID:", error);
-    return null;
-  }
-};
-
-DatabaseStorage.prototype.getActivityRegistrationById = async function(id: number): Promise<any> {
-  try {
-    const { activityRegistrations } = schema;
-    const result = await db.select().from(activityRegistrations).where(eq(activityRegistrations.id, id));
-    return result[0] || null;
-  } catch (error) {
-    console.error("Error getting activity registration by ID:", error);
-    return null;
-  }
-};
-
-DatabaseStorage.prototype.updateActivityRegistration = async function(id: number, data: any): Promise<any> {
-  try {
-    const { activityRegistrations } = schema;
-    const result = await db.update(activityRegistrations)
-      .set(data)
-      .where(eq(activityRegistrations.id, id))
-      .returning();
-    return result[0] || null;
-  } catch (error) {
-    console.error("Error updating activity registration:", error);
-    throw error;
-  }
-};

@@ -9,6 +9,15 @@ export class RoleService {
   
   // Obtener todos los roles de un usuario
   async getUserRoles(userId: number, includeInactive = false): Promise<(UserRole & { role: Role })[]> {
+    // Build where conditions based on includeInactive flag
+    const whereConditions = includeInactive
+      ? eq(userRoles.userId, userId)
+      : and(
+          eq(userRoles.userId, userId),
+          eq(userRoles.isActive, true),
+          eq(roles.isActive, true)
+        );
+
     const query = db
       .select({
         id: userRoles.id,
@@ -25,15 +34,7 @@ export class RoleService {
       })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
-      .where(eq(userRoles.userId, userId));
-      
-    if (!includeInactive) {
-      query.where(and(
-        eq(userRoles.userId, userId),
-        eq(userRoles.isActive, true),
-        eq(roles.isActive, true)
-      ));
-    }
+      .where(whereConditions);
     
     return await query.orderBy(asc(roles.level));
   }
@@ -291,7 +292,7 @@ export class RoleService {
         if (!target[key]) {
           target[key] = [...value];
         } else if (Array.isArray(target[key])) {
-          target[key] = [...new Set([...target[key], ...value])];
+          target[key] = Array.from(new Set([...target[key], ...value]));
         } else {
           target[key] = [...value];
         }
@@ -385,11 +386,6 @@ export class RoleService {
 
   // ===== NUEVAS FUNCIONES PARA SISTEMA DINÁMICO =====
 
-  // Crear rol
-  async createRole(roleData: InsertRole): Promise<Role> {
-    const result = await db.insert(roles).values(roleData).returning();
-    return result[0];
-  }
 
   // Actualizar rol
   async updateRole(id: number, roleData: Partial<InsertRole>): Promise<Role | null> {
@@ -576,8 +572,8 @@ export class RoleService {
     };
   }
 
-  // Crear nuevo rol (método actualizado)
-  async createRole(roleData: any): Promise<Role> {
+  // Crear nuevo rol
+  async createRole(roleData: InsertRole): Promise<Role> {
     const [newRole] = await db
       .insert(roles)
       .values({
