@@ -1838,7 +1838,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   /**
-   * Convertir un permission key (string) a foreign keys para retrocompatibilidad
+   * ✅ CRÍTICO: Convertir permission key con fallback inteligente para FK y legacy
    * @param permissionKey - String como 'parks:admin:list:view'
    * @returns Object con foreign keys o null si no se encuentra
    */
@@ -1849,25 +1849,52 @@ export class DatabaseStorage implements IStorage {
     actionId: number;
   } | null> {
     try {
-      // Obtener el permiso por su key para extraer los FK
-      const result = await db.execute(sql`
+      // ✅ FIX: Intentar búsqueda exacta primero
+      const exactResult = await db.execute(sql`
         SELECT module_id, submodule_id, page_id, action_id
         FROM system_permissions 
         WHERE permission_key = ${permissionKey} AND is_active = true
         LIMIT 1
       `);
 
-      const permission = result.rows[0];
-      if (!permission) {
-        return null;
+      if (exactResult.rows[0]) {
+        const permission = exactResult.rows[0];
+        return {
+          moduleId: permission.module_id,
+          submoduleId: permission.submodule_id,
+          pageId: permission.page_id,
+          actionId: permission.action_id
+        };
       }
 
-      return {
-        moduleId: permission.module_id,
-        submoduleId: permission.submodule_id,
-        pageId: permission.page_id,
-        actionId: permission.action_id
-      };
+      // ✅ FIX: Si no encuentra, intentar fallback con normalización inteligente
+      const parts = permissionKey.split(':');
+      if (parts.length >= 2) {
+        // Intentar construir permisos más específicos si la clave es muy general
+        const fallbackKeys = this.generateFallbackPermissionKeys(permissionKey, parts);
+        
+        for (const fallbackKey of fallbackKeys) {
+          const fallbackResult = await db.execute(sql`
+            SELECT module_id, submodule_id, page_id, action_id
+            FROM system_permissions 
+            WHERE permission_key = ${fallbackKey} AND is_active = true
+            LIMIT 1
+          `);
+          
+          if (fallbackResult.rows[0]) {
+            const permission = fallbackResult.rows[0];
+            console.log(`✅ [FK-FALLBACK] Found permission: ${fallbackKey} for original: ${permissionKey}`);
+            return {
+              moduleId: permission.module_id,
+              submoduleId: permission.submodule_id,
+              pageId: permission.page_id,
+              actionId: permission.action_id
+            };
+          }
+        }
+      }
+
+      return null;
     } catch (error) {
       console.error('Error convirtiendo permission key a FK:', error);
       return null;
@@ -1875,43 +1902,138 @@ export class DatabaseStorage implements IStorage {
   }
 
   /**
-   * Método híbrido que funciona con strings (legacy) y FK (nuevo)
-   * Eventualmente reemplazará a checkUserPermission
+   * ✅ NUEVO: Generar claves de fallback inteligentes para resolución FK
+   */
+  private generateFallbackPermissionKeys(originalKey: string, parts: string[]): string[] {
+    const fallbackKeys: string[] = [];
+    const [module, submodule, page, action] = parts;
+
+    if (parts.length === 4 && module && submodule && page && action) {
+      // Si tiene todos los componentes, intentar variaciones
+      fallbackKeys.push(
+        `${module}:${submodule}:list:${action}`,    // Usar 'list' como página por defecto
+        `${module}:${submodule}:${action}`,         // Sin página específica
+        `${module}:${action}`,                      // Solo módulo y acción
+        `${module}:admin:list:${action}`,           // Usar submódulo 'admin' por defecto
+        `${module}:admin:${action}`                 // Submódulo admin sin página
+      );
+    } else if (parts.length === 3) {
+      // Module:submodule:action o module:page:action
+      fallbackKeys.push(
+        `${module}:${submodule}:list:${page}`,      // Asumir que page es action
+        `${module}:admin:${submodule}:${page}`,     // Asumir admin como submódulo
+        `${module}:${submodule}:${page}`            // Mantener original
+      );
+    } else if (parts.length === 2) {
+      // Module:action
+      fallbackKeys.push(
+        `${module}:admin:list:${submodule}`,        // Expandir con admin/list
+        `${module}:admin:${submodule}`,             // Expandir con admin
+        `${module}:${submodule}`                    // Mantener original
+      );
+    }
+
+    // Filtrar duplicados y clave original
+    return [...new Set(fallbackKeys)].filter(key => key !== originalKey);
+  }
+
+  /**
+   * ✅ CRÍTICO: Método híbrido mejorado con normalización y fallbacks inteligentes
+   * Funciona con strings (legacy) y FK (nuevo) con resolución inteligente
    * SECURITY FIX: Fallback completo a legacy cuando FK falla por cualquier razón
    */
   async checkUserPermissionHybrid(userId: number, permissionKey: string): Promise<boolean> {
     try {
-      // Primero intentar con el método FK nuevo
+      // ✅ FIX: Super admin bypass (seguridad crítica)
+      const user = await this.getUser(userId);
+      if (user?.roleId === 1) {
+        console.log(`✅ [SUPER-ADMIN] User ${userId} has super admin access for ${permissionKey}`);
+        return true;
+      }
+
+      // ✅ FIX: Intentar método FK mejorado con normalización
       const fkData = await this.convertPermissionKeyToFK(permissionKey);
       if (fkData) {
         try {
-          // SECURITY FIX: Try FK method with proper error handling
-          return await this.checkUserPermissionByFK(
+          const hasPermission = await this.checkUserPermissionByFK(
             userId, 
             fkData.moduleId, 
             fkData.submoduleId, 
             fkData.pageId, 
             fkData.actionId
           );
+          
+          if (hasPermission) {
+            console.log(`✅ [FK-SUCCESS] Permission granted via FK: ${permissionKey}`);
+            return true;
+          }
         } catch (fkError) {
-          console.warn(`FK permission check failed for ${permissionKey}, falling back to legacy:`, fkError);
-          // Fallback to legacy if FK method fails for any reason
-          return await this.checkUserPermission(userId, permissionKey);
+          console.warn(`⚠️ [FK-ERROR] FK check failed for ${permissionKey}:`, fkError);
         }
       }
 
-      // Fallback al método original si no se encuentra el FK
-      return await this.checkUserPermission(userId, permissionKey);
+      // ✅ FIX: Fallback con normalización de acciones legacy
+      const normalizedKey = this.normalizePermissionKeyForLegacy(permissionKey);
+      if (normalizedKey !== permissionKey) {
+        try {
+          const hasNormalizedPermission = await this.checkUserPermission(userId, normalizedKey);
+          if (hasNormalizedPermission) {
+            console.log(`✅ [LEGACY-NORMALIZED] Permission granted: ${normalizedKey} for ${permissionKey}`);
+            return true;
+          }
+        } catch (normalizeError) {
+          console.warn(`⚠️ [LEGACY-NORMALIZE] Normalization failed for ${normalizedKey}:`, normalizeError);
+        }
+      }
+
+      // ✅ FIX: Fallback al método legacy original
+      try {
+        const hasLegacyPermission = await this.checkUserPermission(userId, permissionKey);
+        if (hasLegacyPermission) {
+          console.log(`✅ [LEGACY-SUCCESS] Permission granted via legacy: ${permissionKey}`);
+          return true;
+        }
+      } catch (legacyError) {
+        console.warn(`⚠️ [LEGACY-ERROR] Legacy check failed for ${permissionKey}:`, legacyError);
+      }
+
+      console.log(`❌ [PERMISSION-DENIED] All methods failed for user ${userId}, permission ${permissionKey}`);
+      return false;
     } catch (error) {
-      console.error('Error en verificación híbrida de permisos:', error);
-      // Final fallback to legacy method if everything else fails
+      console.error('❌ [HYBRID-CRITICAL] Critical error in hybrid permission check:', error);
+      // Final safety fallback
       try {
         return await this.checkUserPermission(userId, permissionKey);
-      } catch (legacyError) {
-        console.error('Legacy permission check also failed:', legacyError);
+      } catch (finalError) {
+        console.error('❌ [FINAL-FALLBACK] Final fallback also failed:', finalError);
         return false;
       }
     }
+  }
+
+  /**
+   * ✅ NUEVO: Normalizar claves de permisos para compatibilidad legacy
+   */
+  private normalizePermissionKeyForLegacy(permissionKey: string): string {
+    // Mapear acciones FK a legacy donde sea necesario
+    const actionMapping: Record<string, string> = {
+      'view': 'read',
+      'edit': 'update',
+      'delete': 'delete',
+      'create': 'create'
+    };
+
+    let normalized = permissionKey;
+    
+    // Aplicar mapeo de acciones si es necesario
+    for (const [fkAction, legacyAction] of Object.entries(actionMapping)) {
+      if (normalized.endsWith(`:${fkAction}`)) {
+        normalized = normalized.replace(`:${fkAction}`, `:${legacyAction}`);
+        break;
+      }
+    }
+
+    return normalized;
   }
 
   async getRolePermissions(roleId: number): Promise<any[]> {

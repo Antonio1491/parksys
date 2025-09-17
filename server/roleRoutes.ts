@@ -273,11 +273,17 @@ export function registerRoleRoutes(app: Express) {
         return res.status(400).json({ error: "Permiso inválido. Debe ser: create, read, update, delete, admin" });
       }
 
-      const hasPermission = await roleService.hasModulePermission(
-        userId, 
-        module, 
-        permission as 'create' | 'read' | 'update' | 'delete' | 'admin'
-      );
+      // ✅ ACTUALIZAR: Mapear permisos a tipos compatibles con hasModulePermission
+      const permissionMap: Record<string, 'admin' | 'read' | 'write'> = {
+        'admin': 'admin',
+        'read': 'read', 
+        'create': 'write',
+        'update': 'write',
+        'delete': 'write'
+      };
+      
+      const mappedPermission = permissionMap[permission] || 'read';
+      const hasPermission = await roleService.hasModulePermission(userId, module, mappedPermission);
       
       res.json({ hasPermission });
     } catch (error) {
@@ -482,7 +488,7 @@ export function registerRoleRoutes(app: Express) {
           const newUserRole = await roleService.assignRoleToUser(userId, roleId, assignedBy, isPrimary);
           results.push({ success: true, roleId, userRole: newUserRole });
         } catch (error) {
-          results.push({ success: false, roleId, error: error.message });
+          results.push({ success: false, roleId, error: (error as Error).message });
         }
       }
 

@@ -1,4 +1,5 @@
 import { db } from './db';
+import { storage } from './storage';
 import { roles, users, userRoles } from '../shared/schema';
 import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { Role, User, InsertRole, UserRole, InsertUserRole } from '../shared/schema';
@@ -418,13 +419,68 @@ export class RoleService {
     }
   }
 
-  // Verificar permisos de módulo específico (ACTUALIZADO para múltiples roles)
+  // ✅ CRÍTICO: Verificar permisos usando sistema híbrido FK normalizado
   async hasModulePermission(
     userId: number, 
     module: string, 
     permission: 'read' | 'write' | 'admin'
   ): Promise<boolean> {
-    // Primero intentar con múltiples roles
+    try {
+      // ✅ FIX: Normalizar acciones a sistema FK real (view/create/edit/delete)
+      const permissionActions: Record<string, string[]> = {
+        'read': ['view'],                          // FK real: view
+        'write': ['create', 'edit', 'delete'],     // FK real: create, edit, delete
+        'admin': ['create', 'edit', 'delete', 'view', 'approve', 'publish'] // Todos los permisos administrativos
+      };
+      
+      const actions = permissionActions[permission] || ['view'];
+      
+      // ✅ FIX: Intentar páginas específicas FK antes de fallback
+      const moduleKey = module.replace('.', ':');
+      const commonPages = ['list', 'create', 'edit', 'details', 'manage', 'directory', 'assign'];
+      
+      // Verificar permisos en páginas específicas FK primero
+      for (const action of actions) {
+        for (const page of commonPages) {
+          const permissionKey = `${moduleKey}:${page}:${action}`;
+          const hasPermission = await storage.checkUserPermissionHybrid(userId, permissionKey);
+          if (hasPermission) {
+            console.log(`✅ [FK] Permission granted: ${permissionKey}`);
+            return true;
+          }
+        }
+      }
+      
+      // ✅ FALLBACK: Intentar permisos de submódulo general
+      for (const action of actions) {
+        // Determinar submódulo basado en módulo
+        const submoduleKey = this.getSubmoduleForModule(moduleKey);
+        if (submoduleKey) {
+          const permissionKey = `${moduleKey}:${submoduleKey}:${action}`;
+          const hasPermission = await storage.checkUserPermissionHybrid(userId, permissionKey);
+          if (hasPermission) {
+            console.log(`✅ [FK-SUBMODULE] Permission granted: ${permissionKey}`);
+            return true;
+          }
+        }
+      }
+      
+      // ✅ FALLBACK: Intentar permiso de módulo nivel superior
+      for (const action of actions) {
+        const permissionKey = `${moduleKey}:${action}`;
+        const hasPermission = await storage.checkUserPermissionHybrid(userId, permissionKey);
+        if (hasPermission) {
+          console.log(`✅ [FK-MODULE] Permission granted: ${permissionKey}`);
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (error) {
+      console.warn('⚠️ [HYBRID] Error en hasModulePermission FK, fallback a legacy:', error as Error);
+    }
+
+    // ✅ FALLBACK: Sistema múltiples roles (legacy pero funcional)
     const multiRoleResult = await db
       .select({ permissions: roles.permissions })
       .from(userRoles)
@@ -452,7 +508,7 @@ export class RoleService {
       return false;
     }
     
-    // Fallback: sistema legacy
+    // Fallback final: sistema legacy  
     const legacyResult = await db
       .select({ permissions: roles.permissions })
       .from(users)
@@ -473,9 +529,77 @@ export class RoleService {
     return modulePermissions.includes(permission);
   }
 
-  // Obtener permisos completos de un usuario (ACTUALIZADO para múltiples roles)
+  // ✅ HELPER: Determinar submódulo por defecto basado en módulo para FK fallback
+  private getSubmoduleForModule(moduleKey: string): string | null {
+    const moduleToSubmodule: Record<string, string> = {
+      'parks': 'admin',           // parks:admin:*
+      'activities': 'catalog',    // activities:catalog:*
+      'hr': 'employees',          // hr:employees:*
+      'finance': 'income',        // finance:income:*
+      'marketing': 'sponsors',    // marketing:sponsors:*
+      'config': 'system',         // config:system:*
+      'security': 'audit'         // security:audit:*
+    };
+    
+    return moduleToSubmodule[moduleKey] || null;
+  }
+
+  // Obtener permisos completos de un usuario (ACTUALIZADO para sistema híbrido FK)
   async getUserPermissions(userId: number): Promise<Record<string, any>> {
-    // Primero intentar con múltiples roles
+    try {
+      // ✅ NUEVO: Usar sistema híbrido FK primero
+      const hybridPermissions = await storage.getUserPermissions(userId);
+      
+      if (hybridPermissions && hybridPermissions.length > 0) {
+        // Si el usuario es Super Admin, devolver estructura especial
+        if (hybridPermissions.includes('all')) {
+          return {
+            userId,
+            all: true, // ✅ CRÍTICO: Marca para frontend que es Super Admin
+            source: 'hybrid_fk_super_admin',
+            metadata: {
+              source: 'hybrid_fk_system',
+              isSuperAdmin: true,
+              timestamp: new Date().toISOString()
+            }
+          };
+        }
+
+        // Convertir array de permisos FK a estructura de objeto para compatibilidad
+        const permissionsStructure: Record<string, string[]> = {};
+        
+        // Agrupar permisos por módulo usando la key string
+        for (const permissionKey of hybridPermissions) {
+          const parts = permissionKey.split(':');
+          if (parts.length >= 4) {
+            const module = `${parts[0]}.${parts[1] || 'general'}`;
+            const action = parts[3];
+            
+            if (!permissionsStructure[module]) {
+              permissionsStructure[module] = [];
+            }
+            if (!permissionsStructure[module].includes(action)) {
+              permissionsStructure[module].push(action);
+            }
+          }
+        }
+
+        return {
+          userId,
+          source: 'hybrid_fk',
+          ...permissionsStructure,
+          metadata: {
+            source: 'hybrid_fk_system',
+            permissionCount: hybridPermissions.length,
+            timestamp: new Date().toISOString()
+          }
+        };
+      }
+    } catch (error) {
+      console.warn('⚠️ [HYBRID] Error usando sistema FK, fallback a múltiples roles:', error as Error);
+    }
+
+    // ✅ FALLBACK: Sistema múltiples roles (legacy pero funcional)
     const multiRoleResult = await db
       .select({ 
         permissions: roles.permissions,
@@ -518,7 +642,7 @@ export class RoleService {
         combinedPermissions,
         // Metadata adicional
         metadata: {
-          source: 'multiple_roles',
+          source: 'multiple_roles_fallback',
           roleCount: multiRoleResult.length,
           hasMultipleRoles: multiRoleResult.length > 1,
           timestamp: new Date().toISOString()
