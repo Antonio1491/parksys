@@ -843,7 +843,7 @@ const AdminParksContent = () => {
                   disabled={selectedParks.size === 0}
                   data-testid="button-delete-selected"
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
+                  <Trash2 className="h-4 w-4" />
                   {selectedParks.size > 0 ? ` (${selectedParks.size})` : ''}
                 </Button>
               </div>

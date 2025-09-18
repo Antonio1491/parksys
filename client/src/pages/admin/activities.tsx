@@ -1084,7 +1084,7 @@ const AdminActivities = () => {
               disabled={selectedActivities.size === 0}
               data-testid="button-delete-selected"
             >
-              <Trash2 className="h-4 w-4 mr-1" />
+              <Trash2 className="h-4 w-4" />
               {selectedActivities.size > 0 ? ` (${selectedActivities.size})` : ''}
             </Button>
           </div>

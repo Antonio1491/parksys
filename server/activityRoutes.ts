@@ -67,7 +67,7 @@ activityRouter.get("/activities", async (_req: Request, res: Response) => {
       });
     }
     
-    res.json({ data: activities });
+    res.json(activities);
   } catch (error) {
     console.error("Error al obtener actividades:", error);
     res.status(500).json({ message: "Error al obtener actividades" });
