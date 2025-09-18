@@ -143,9 +143,17 @@ export function HierarchicalPermissionsMatrix({
   // Mutation para guardar
   const saveMutation = useMutation({
     mutationFn: (newPermissions: typeof permissions) => {
-      return apiRequest('/api/permissions/roles/update', {
+      // Convertir de slugs a IDs para el backend
+      const rolePermissionsById: Record<string, string[]> = {};
+      (roles as Role[]).forEach(role => {
+        if (newPermissions[role.slug]) {
+          rolePermissionsById[role.id.toString()] = newPermissions[role.slug];
+        }
+      });
+      
+      return apiRequest('/api/roles/permissions/save-matrix', {
         method: 'POST',
-        data: { permissions: newPermissions },
+        data: { rolePermissions: rolePermissionsById },
       });
     },
     onSuccess: () => {
@@ -178,57 +186,52 @@ export function HierarchicalPermissionsMatrix({
     }
   }, [rolePermissions, roles]);
 
-  // Crear mapeos dinámicos desde los datos de la BD con información completa
-  const moduleMap: Record<string, any> = {};
-  (permissionModules as any[]).forEach((module: any) => {
-    if (module.slug) {
-      moduleMap[module.slug] = module;
-    }
-  });
+  // Crear mapeos optimizados con useMemo
+  const moduleMap = useMemo(() => {
+    const map: Record<string, any> = {};
+    (permissionModules as any[]).forEach((module: any) => {
+      if (module.slug) {
+        map[module.slug] = module;
+      }
+    });
+    return map;
+  }, [permissionModules]);
 
-  const submoduleMap: Record<string, any> = {};
-  (permissionSubmodules as any[]).forEach((submodule: any) => {
-    if (submodule.slug) {
-      submoduleMap[submodule.slug] = submodule;
-    }
-  });
+  const submoduleMap = useMemo(() => {
+    const map: Record<string, any> = {};
+    (permissionSubmodules as any[]).forEach((submodule: any) => {
+      if (submodule.slug) {
+        map[submodule.slug] = submodule;
+      }
+    });
+    return map;
+  }, [permissionSubmodules]);
 
-  const pageMap: Record<string, any> = {};
-  (permissionPages as any[]).forEach((page: any) => {
-    if (page.slug) {
-      pageMap[page.slug] = page;
-    }
-  });
+  const pageMap = useMemo(() => {
+    const map: Record<string, any> = {};
+    (permissionPages as any[]).forEach((page: any) => {
+      if (page.slug) {
+        map[page.slug] = page;
+      }
+    });
+    return map;
+  }, [permissionPages]);
 
-  // Mantener compatibilidad con mapeos de nombres
-  const moduleNames: Record<string, string> = {};
-  const submoduleNames: Record<string, string> = {};
-  const pageNames: Record<string, string> = {};
-  
-  Object.values(moduleMap).forEach((module: any) => {
-    moduleNames[module.slug] = module.name || module.slug.charAt(0).toUpperCase() + module.slug.slice(1);
-  });
-  
-  Object.values(submoduleMap).forEach((submodule: any) => {
-    submoduleNames[submodule.slug] = submodule.name || submodule.slug.charAt(0).toUpperCase() + submodule.slug.slice(1);
-  });
-  
-  Object.values(pageMap).forEach((page: any) => {
-    pageNames[page.slug] = page.name || page.slug.charAt(0).toUpperCase() + page.slug.slice(1);
-  });
-
-  // Crear mapeo dinámico de acciones desde la BD
-  const actionMap: Record<string, any> = {};
-  const actionNames: Record<string, string> = {};
-  (permissionActions as any[]).forEach((action: any) => {
-    if (action.slug) {
-      actionMap[action.slug] = action;
-      actionNames[action.slug] = action.name || action.slug.charAt(0).toUpperCase() + action.slug.slice(1);
-    }
-  });
+  const actionMap = useMemo(() => {
+    const map: Record<string, any> = {};
+    const names: Record<string, string> = {};
+    (permissionActions as any[]).forEach((action: any) => {
+      if (action.slug) {
+        map[action.slug] = action;
+        names[action.slug] = action.name || action.slug.charAt(0).toUpperCase() + action.slug.slice(1);
+      }
+    });
+    return { map, names };
+  }, [permissionActions]);
 
   // Organizar datos jerárquicamente usando el ordenamiento de la BD (con useMemo para optimización)
   const organizeHierarchically = useMemo(() => {
+    const actionNames = actionMap.names;
     // Primero, crear un mapa de todos los permisos disponibles
     const permissionMap: Record<string, SystemPermission> = {};
     (systemPermissions as SystemPermission[]).forEach(perm => {
@@ -322,17 +325,7 @@ export function HierarchicalPermissionsMatrix({
     });
     
     return hierarchy;
-  }, [
-    systemPermissions, 
-    moduleMap, 
-    submoduleMap, 
-    pageMap, 
-    actionNames, 
-    JSON.stringify(permissionModules),
-    JSON.stringify(permissionSubmodules), 
-    JSON.stringify(permissionPages),
-    JSON.stringify(permissionActions)
-  ]);
+  }, [systemPermissions, moduleMap, submoduleMap, pageMap, actionMap]);
 
   const hierarchicalData = organizeHierarchically;
 
