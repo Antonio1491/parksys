@@ -1114,18 +1114,16 @@ function Router() {
           </Suspense>
         </Route>
         
+        {/* Redirección de compatibilidad - rutas antiguas apuntan a calculadora unificada */}
         <Route path="/admin/finance/calculator">
-          <Suspense fallback={<div className="p-8 text-center">Cargando calculadora avanzada...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/finance/AdvancedCalculator')))}
+          <Suspense fallback={<div className="p-8 text-center">Cargando calculadora financiera...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/finance/CalculadoraFinanciera')))}
           </Suspense>
         </Route>
         
-
-        
-        {/* Redirección de compatibilidad para la calculadora avanzada */}
         <Route path="/admin/finance/advanced-calculator">
-          <Suspense fallback={<div className="p-8 text-center">Cargando calculadora avanzada...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/finance/AdvancedCalculator')))}
+          <Suspense fallback={<div className="p-8 text-center">Cargando calculadora financiera...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/finance/CalculadoraFinanciera')))}
           </Suspense>
         </Route>
         
@@ -1147,6 +1145,11 @@ function Router() {
           </Suspense>
         </Route>
         
+        <Route path="/admin/finance/calculadora-financiera">
+          <Suspense fallback={<div className="p-8 text-center">Cargando calculadora financiera...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/finance/CalculadoraFinanciera')))}
+          </Suspense>
+        </Route>
 
 
         {/* Rutas del módulo de Recursos Humanos */}

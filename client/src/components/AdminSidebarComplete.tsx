@@ -1034,11 +1034,11 @@ const AdminSidebarComplete: React.FC = () => {
                 {t('navigation.cashFlow')}
               </NavItem>
               <NavItem 
-                href="/admin/finance/calculator" 
+                href="/admin/finance/calculadora-financiera" 
                 icon={<Calculator className="h-4 w-4" />}
-                active={location.startsWith('/admin/finance/calculator')}
+                active={location.startsWith('/admin/finance/calculadora-financiera')}
               >
-                Calculadora
+                Calculadora Financiera
               </NavItem>
               <NavItem 
                 href="/admin/finance/pending-approval" 

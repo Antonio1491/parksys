@@ -26,10 +26,10 @@ import {
   FileText,
   Target,
   Filter,
-  Eye
+  Eye,
+  Copy,
+  Lightbulb
 } from "lucide-react";
-import CostRecoveryCalculator from "./CostRecoveryCalculator";
-import AdvancedCalculator from "./AdvancedCalculator";
 
 interface PendingActivity {
   id: number;
@@ -81,9 +81,7 @@ const PendingActivitiesApproval = () => {
   const [rejectionComment, setRejectionComment] = useState("");
   const [newCostRecovery, setNewCostRecovery] = useState("");
   
-  // Calculator integration states
-  const [showCalculators, setShowCalculators] = useState(false);
-  const [calculatorTab, setCalculatorTab] = useState("recovery");
+  // Calculator integration state - simplified
   const [calculatorResults, setCalculatorResults] = useState<any>(null);
 
   // Fetch pending activities
@@ -493,58 +491,66 @@ const PendingActivitiesApproval = () => {
                                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                     <div className="flex items-center gap-2 mb-2">
                                       <Calculator className="h-5 w-5 text-blue-600" />
-                                      <h3 className="font-semibold text-blue-900">Calculadoras Financieras</h3>
+                                      <h3 className="font-semibold text-blue-900">Calculadora Financiera</h3>
                                     </div>
-                                    <p className="text-sm text-blue-700">
-                                      Use las calculadoras especializadas para analizar la viabilidad financiera de esta actividad.
-                                      Los resultados se pueden usar para ajustar el porcentaje de recuperación de costos.
+                                    <p className="text-sm text-blue-700 mb-4">
+                                      Utilice la calculadora financiera unificada para realizar un análisis completo de viabilidad financiera.
+                                      La calculadora incluye plantillas, gráficos avanzados y análisis de escenarios.
                                     </p>
+                                    
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                      <Button
+                                        onClick={() => {
+                                          const params = new URLSearchParams({
+                                            title: selectedActivity?.title || '',
+                                            duration: (selectedActivity?.duration || 60).toString(),
+                                            capacity: (selectedActivity?.capacity || 20).toString(),
+                                            price: (selectedActivity?.price || '150').toString()
+                                          });
+                                          const url = `/admin/finance/calculadora-financiera?${params.toString()}`;
+                                          window.open(url, '_blank');
+                                        }}
+                                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+                                        data-testid="button-open-calculator"
+                                      >
+                                        <Calculator className="h-4 w-4" />
+                                        Abrir Calculadora Financiera
+                                      </Button>
+                                      
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(window.location.origin + '/admin/finance/calculadora-financiera');
+                                          toast({
+                                            title: "Enlace copiado",
+                                            description: "El enlace a la calculadora se ha copiado al portapapeles"
+                                          });
+                                        }}
+                                        className="flex items-center gap-2"
+                                        data-testid="button-copy-calculator-link"
+                                      >
+                                        <Copy className="h-4 w-4" />
+                                        Copiar Enlace
+                                      </Button>
+                                    </div>
                                   </div>
 
-                                  <Tabs value={calculatorTab} onValueChange={setCalculatorTab} className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2">
-                                      <TabsTrigger value="recovery">Recuperación de Costos</TabsTrigger>
-                                      <TabsTrigger value="advanced">Calculadora Avanzada</TabsTrigger>
-                                    </TabsList>
-
-                                    <TabsContent value="recovery" className="space-y-4">
-                                      <CostRecoveryCalculator
-                                        initialData={{
-                                          activityTitle: selectedActivity?.title || '',
-                                          duration: selectedActivity?.duration || 60,
-                                          capacity: selectedActivity?.capacity || 0,
-                                          price: parseFloat(selectedActivity?.price || '0'),
-                                          isFree: selectedActivity?.isFree || false,
-                                          materials: selectedActivity?.materials || '',
-                                          requirements: selectedActivity?.requirements || ''
-                                        }}
-                                        onCalculationComplete={(results) => {
-                                          setCalculatorResults(results);
-                                          setNewCostRecovery(results.costRecoveryPercentage?.toString() || '30');
-                                        }}
-                                      />
-                                    </TabsContent>
-
-                                    <TabsContent value="advanced" className="space-y-4">
-                                      <AdvancedCalculator
-                                        initialData={{
-                                          activityTitle: selectedActivity?.title || '',
-                                          duration: selectedActivity?.duration || 60,
-                                          capacity: selectedActivity?.capacity || 0,
-                                          price: parseFloat(selectedActivity?.price || '0'),
-                                          isFree: selectedActivity?.isFree || false,
-                                          materials: selectedActivity?.materials || '',
-                                          requirements: selectedActivity?.requirements || ''
-                                        }}
-                                        onCalculationComplete={(results) => {
-                                          setCalculatorResults(results);
-                                          if (results.recommendedPrice) {
-                                            setNewCostRecovery(results.costRecoveryPercentage?.toString() || '30');
-                                          }
-                                        }}
-                                      />
-                                    </TabsContent>
-                                  </Tabs>
+                                  <Card className="bg-orange-50 border-orange-200">
+                                    <CardContent className="p-4">
+                                      <div className="flex items-start gap-3">
+                                        <Lightbulb className="h-5 w-5 text-orange-600 mt-1 flex-shrink-0" />
+                                        <div className="text-sm text-orange-800">
+                                          <p className="font-medium mb-1">💡 Consejos para el análisis:</p>
+                                          <ul className="space-y-1 text-orange-700">
+                                            <li>• La calculadora pre-cargará los datos de esta actividad automáticamente</li>
+                                            <li>• Use las plantillas para comparar con actividades similares</li>
+                                            <li>• Revise los gráficos de análisis de precios para optimización</li>
+                                            <li>• Copie los resultados finales para incluir en los comentarios de aprobación</li>
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
 
                                   {calculatorResults && (
                                     <Card className="bg-green-50 border-green-200">
