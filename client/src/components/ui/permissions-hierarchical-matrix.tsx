@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -135,6 +135,11 @@ export function HierarchicalPermissionsMatrix({
     refetchOnWindowFocus: false,
   });
 
+  const { data: permissionActions = [] } = useQuery({
+    queryKey: ['/api/permissions/actions'],
+    refetchOnWindowFocus: false,
+  });
+
   // Mutation para guardar
   const saveMutation = useMutation({
     mutationFn: (newPermissions: typeof permissions) => {
@@ -212,20 +217,18 @@ export function HierarchicalPermissionsMatrix({
     pageNames[page.slug] = page.name || page.slug.charAt(0).toUpperCase() + page.slug.slice(1);
   });
 
-  const actionNames: Record<string, string> = {
-    'view': 'Ver',
-    'create': 'Crear',
-    'edit': 'Editar',
-    'delete': 'Eliminar',
-    'approve': 'Aprobar',
-    'publish': 'Publicar',
-    'export': 'Exportar',
-    'manage': 'Gestionar',
-    'process': 'Procesar',
-  };
+  // Crear mapeo dinámico de acciones desde la BD
+  const actionMap: Record<string, any> = {};
+  const actionNames: Record<string, string> = {};
+  (permissionActions as any[]).forEach((action: any) => {
+    if (action.slug) {
+      actionMap[action.slug] = action;
+      actionNames[action.slug] = action.name || action.slug.charAt(0).toUpperCase() + action.slug.slice(1);
+    }
+  });
 
-  // Organizar datos jerárquicamente usando el ordenamiento de la BD
-  const organizeHierarchically = () => {
+  // Organizar datos jerárquicamente usando el ordenamiento de la BD (con useMemo para optimización)
+  const organizeHierarchically = useMemo(() => {
     // Primero, crear un mapa de todos los permisos disponibles
     const permissionMap: Record<string, SystemPermission> = {};
     (systemPermissions as SystemPermission[]).forEach(perm => {
@@ -245,8 +248,22 @@ export function HierarchicalPermissionsMatrix({
         slug: module.slug,
         name: module.name || module.slug.charAt(0).toUpperCase() + module.slug.slice(1),
         order: module.order || 0,
+        actions: [], // Acciones de nivel módulo
         submodules: {}
       };
+
+      // Agregar acciones de nivel módulo (module:action)
+      Object.keys(actionNames).forEach((actionSlug) => {
+        const permissionKey = `${module.slug}:${actionSlug}`;
+        if (permissionMap[permissionKey]) {
+          hierarchy[module.slug].actions.push({
+            slug: actionSlug,
+            name: actionNames[actionSlug] || actionSlug.charAt(0).toUpperCase() + actionSlug.slice(1),
+            permissionKey,
+            description: permissionMap[permissionKey].description
+          });
+        }
+      });
 
       // Obtener submódulos ordenados para este módulo
       const orderedSubmodules = Object.values(submoduleMap)
@@ -258,8 +275,22 @@ export function HierarchicalPermissionsMatrix({
           slug: submodule.slug,
           name: submodule.name || submodule.slug.charAt(0).toUpperCase() + submodule.slug.slice(1),
           order: submodule.order || 0,
+          actions: [], // Acciones de nivel submódulo
           pages: {}
         };
+
+        // Agregar acciones de nivel submódulo (module:submodule:action)
+        Object.keys(actionNames).forEach((actionSlug) => {
+          const permissionKey = `${module.slug}:${submodule.slug}:${actionSlug}`;
+          if (permissionMap[permissionKey]) {
+            hierarchy[module.slug].submodules[submodule.slug].actions.push({
+              slug: actionSlug,
+              name: actionNames[actionSlug] || actionSlug.charAt(0).toUpperCase() + actionSlug.slice(1),
+              permissionKey,
+              description: permissionMap[permissionKey].description
+            });
+          }
+        });
 
         // Obtener páginas ordenadas para este submódulo
         const orderedPages = Object.values(pageMap)
@@ -291,9 +322,19 @@ export function HierarchicalPermissionsMatrix({
     });
     
     return hierarchy;
-  };
+  }, [
+    systemPermissions, 
+    moduleMap, 
+    submoduleMap, 
+    pageMap, 
+    actionNames, 
+    JSON.stringify(permissionModules),
+    JSON.stringify(permissionSubmodules), 
+    JSON.stringify(permissionPages),
+    JSON.stringify(permissionActions)
+  ]);
 
-  const hierarchicalData = organizeHierarchically();
+  const hierarchicalData = organizeHierarchically;
 
   // Filtros aplicados
   const filteredRoles = (roles as Role[]).filter((role: Role) => 
