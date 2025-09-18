@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { queryClient } from '@/lib/queryClient';
+import { queryClient, apiRequest } from '@/lib/queryClient';
 import { Checkbox } from '@/components/ui/checkbox';
 import LocationSelector from '@/components/LocationSelector';
 import ActivityImageManagerSimple from '@/components/ActivityImageManagerSimple';
@@ -430,18 +430,10 @@ const EditarActividadPage = () => {
         status: values.status,
       };
 
-      const response = await fetch(`/api/activities/${activityId}`, {
+      return await apiRequest(`/api/activities/${activityId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSend),
+        data: dataToSend
       });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Error ${response.status}: ${error}`);
-      }
-
-      return response.json();
     },
     onSuccess: () => {
       toast({
