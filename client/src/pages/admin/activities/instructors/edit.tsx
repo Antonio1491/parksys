@@ -590,11 +590,11 @@ export default function EditInstructorPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="no-preference">Sin preferencia</SelectItem>
-                        {parks.map((park: any) => (
+                        {Array.isArray(parks) ? parks.map((park: any) => (
                           <SelectItem key={park.id} value={park.id.toString()}>
                             {park.name}
                           </SelectItem>
-                        ))}
+                        )) : null}
                       </SelectContent>
                     </Select>
                   </div>
