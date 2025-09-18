@@ -116,11 +116,12 @@ export default function InstructorsManagementPage() {
   const [isProcessingCsv, setIsProcessingCsv] = useState(false);
 
   // Obtener lista de instructores
-  const { data: instructors = [], isLoading, isError, refetch } = useQuery({
+  const { data: instructorsResponse, isLoading, isError, refetch } = useQuery({
     queryKey: ['/api/instructors'],
     retry: 1,
     enabled: true,
   });
+  const instructors = Array.isArray(instructorsResponse?.data) ? instructorsResponse.data : [];
 
   // Mutación para eliminar instructor individual
   const deleteInstructorMutation = useMutation({

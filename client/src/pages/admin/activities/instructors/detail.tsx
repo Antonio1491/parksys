@@ -368,7 +368,7 @@ export default function InstructorDetailPage() {
                       </div>
                     </CardContent>
                   </Card>
-                ) : !instructorActivities || instructorActivities.length === 0 ? (
+                ) : !Array.isArray(instructorActivities) || instructorActivities.length === 0 ? (
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center py-6">
@@ -425,7 +425,7 @@ export default function InstructorDetailPage() {
                       </div>
                     </CardContent>
                   </Card>
-                ) : !evaluations || evaluations.length === 0 ? (
+                ) : !Array.isArray(evaluations) || evaluations.length === 0 ? (
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center py-6">
