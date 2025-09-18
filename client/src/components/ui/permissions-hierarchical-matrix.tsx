@@ -300,6 +300,13 @@ export function HierarchicalPermissionsMatrix({
           .filter((page: any) => page.submodule_id === submodule.id)
           .sort((a, b) => (a.order || 0) - (b.order || 0));
 
+        // Debug temporal - eliminar después
+        if (submodule.slug === 'parques') {
+          console.log('🐛 [DEBUG] Submodule parques:', submodule);
+          console.log('🐛 [DEBUG] All pages in pageMap:', Object.values(pageMap));
+          console.log('🐛 [DEBUG] Filtered pages for submodule parques:', orderedPages);
+        }
+
         orderedPages.forEach((page: any) => {
           hierarchy[module.slug].submodules[submodule.slug].pages[page.slug] = {
             slug: page.slug,
