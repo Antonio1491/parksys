@@ -640,8 +640,47 @@ export const activities = pgTable("activities", {
   calculationSavedAt: timestamp("calculation_saved_at"), // fecha cuando se guardó el cálculo
   calculationVersion: text("calculation_version").default("1.0"), // versión del cálculo para compatibilidad
   
+  // Campos de decisión financiera ampliados
+  financialDecision: text("financial_decision"), // "approved", "rejected", "requires_revision"
+  financialDecisionReason: text("financial_decision_reason"), // justificación detallada de la decisión
+  financialDecisionDate: timestamp("financial_decision_date"), // fecha de la decisión final
+  financialDecisionBy: integer("financial_decision_by").references(() => users.id), // usuario que tomó la decisión final
+  
   // Imagen simple (estandarizado como otros módulos)
   imageUrl: text("image_url"),
+});
+
+// Tabla de historial de decisiones financieras para actividades
+export const activityFinancialDecisions = pgTable("activity_financial_decisions", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activity_id").notNull().references(() => activities.id, { onDelete: "cascade" }),
+  decision: text("decision").notNull(), // "approved", "rejected", "requires_revision", "pending_review"
+  reason: text("reason").notNull(), // justificación obligatoria de la decisión
+  decisionBy: integer("decision_by").notNull().references(() => users.id), // usuario que tomó la decisión
+  decisionDate: timestamp("decision_date").notNull().defaultNow(),
+  
+  // Contexto adicional de la decisión
+  previousStatus: text("previous_status"), // estado anterior para trazabilidad
+  financialAnalysis: jsonb("financial_analysis"), // análisis financiero asociado (referencia al cálculo usado)
+  budgetImpact: decimal("budget_impact", { precision: 12, scale: 2 }), // impacto presupuestal estimado
+  riskAssessment: text("risk_assessment"), // evaluación de riesgos financieros
+  
+  // Metadatos
+  departmentReview: boolean("department_review").default(false), // requiere revisión adicional del departamento
+  urgencyLevel: text("urgency_level").default("normal"), // "low", "normal", "high", "critical"
+  approvalLevel: text("approval_level").default("financial"), // "financial", "management", "executive"
+  
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
+export type ActivityFinancialDecision = typeof activityFinancialDecisions.$inferSelect;
+export type InsertActivityFinancialDecision = typeof activityFinancialDecisions.$inferInsert;
+
+export const insertActivityFinancialDecisionSchema = createInsertSchema(activityFinancialDecisions).omit({ 
+  id: true,
+  createdAt: true,
+  updatedAt: true
 });
 
 // Tabla de imágenes de actividades

@@ -73,8 +73,9 @@ const PendingActivitiesApproval = () => {
   const [filterStatus, setFilterStatus] = useState("por_costear");
   const [analysisData, setAnalysisData] = useState<FinancialAnalysis | null>(null);
   
-  // Check for write permissions for approval actions - simplified for Super Admin
-  const canApprove = true; // Temporary fix - Super Admin has all permissions
+  // Check for write permissions for approval actions using permissions system
+  const { hasPermission } = useAdaptivePermissions();
+  const canApprove = hasPermission('Finanzas', 'approve');
   
   // Form states for approval/rejection
   const [approvalComment, setApprovalComment] = useState("");
@@ -95,29 +96,29 @@ const PendingActivitiesApproval = () => {
     }
   });
 
-  // Approval mutation
-  const approvalMutation = useMutation({
-    mutationFn: async ({ activityId, action, comment, costRecovery }: {
+  // Financial Decision mutation (new system)
+  const financialDecisionMutation = useMutation({
+    mutationFn: async ({ activityId, decision, reason, urgencyLevel }: {
       activityId: number;
-      action: 'approve' | 'reject';
-      comment: string;
-      costRecovery?: string;
+      decision: 'approved' | 'rejected' | 'requires_revision';
+      reason: string;
+      urgencyLevel?: 'low' | 'normal' | 'high' | 'critical';
     }) => {
-      return await apiRequest(`/api/activities/${activityId}/financial-approval`, {
+      return await apiRequest(`/api/activities/${activityId}/financial-decision`, {
         method: 'POST',
         data: {
-          action,
-          comment,
-          costRecoveryPercentage: costRecovery
+          decision,
+          reason,
+          urgencyLevel: urgencyLevel || 'normal'
         }
       });
     },
     onSuccess: (data, variables) => {
       toast({
-        title: variables.action === 'approve' ? "Actividad Aprobada" : "Actividad Rechazada",
-        description: variables.action === 'approve' 
+        title: variables.decision === 'approved' ? "Actividad Aprobada" : "Actividad Rechazada",
+        description: variables.decision === 'approved' 
           ? "La actividad ha sido aprobada exitosamente."
-          : "La actividad ha sido rechazada con comentarios.",
+          : "La actividad ha sido rechazada con justificación.",
         variant: "default"
       });
       
@@ -595,28 +596,42 @@ const PendingActivitiesApproval = () => {
                                         />
                                       </div>
                                       <div>
-                                        <Label htmlFor="approval-comment">Comentarios</Label>
+                                        <Label htmlFor="approval-comment">Comentarios * (mínimo 10 caracteres)</Label>
                                         <Textarea
                                           id="approval-comment"
                                           value={approvalComment}
                                           onChange={(e) => setApprovalComment(e.target.value)}
-                                          placeholder="Comentarios sobre la aprobación..."
+                                          placeholder="Comentarios sobre la aprobación (mínimo 10 caracteres)..."
                                           rows={3}
+                                          required
                                         />
+                                        {approvalComment.trim().length > 0 && approvalComment.trim().length < 10 && (
+                                          <p className="text-sm text-red-600">
+                                            Faltan {10 - approvalComment.trim().length} caracteres
+                                          </p>
+                                        )}
                                       </div>
                                       <Button
                                         onClick={() => {
-                                          approvalMutation.mutate({
+                                          if (!approvalComment.trim() || approvalComment.trim().length < 10) {
+                                            toast({
+                                              title: "Justificación Insuficiente",
+                                              description: "La justificación debe tener al menos 10 caracteres.",
+                                              variant: "destructive"
+                                            });
+                                            return;
+                                          }
+                                          financialDecisionMutation.mutate({
                                             activityId: selectedActivity.id,
-                                            action: 'approve',
-                                            comment: approvalComment,
-                                            costRecovery: newCostRecovery || selectedActivity.costRecoveryPercentage
+                                            decision: 'approved',
+                                            reason: approvalComment,
+                                            urgencyLevel: 'normal'
                                           });
                                         }}
-                                        disabled={approvalMutation.isPending}
+                                        disabled={financialDecisionMutation.isPending || approvalComment.trim().length < 10}
                                         className="w-full bg-green-600 hover:bg-green-700"
                                       >
-                                        {approvalMutation.isPending ? 'Aprobando...' : 'Aprobar Actividad'}
+                                        {financialDecisionMutation.isPending ? 'Aprobando...' : 'Aprobar Actividad'}
                                       </Button>
                                     </CardContent>
                                   </Card>
@@ -631,15 +646,20 @@ const PendingActivitiesApproval = () => {
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                       <div>
-                                        <Label htmlFor="rejection-comment">Motivo del Rechazo *</Label>
+                                        <Label htmlFor="rejection-comment">Motivo del Rechazo * (mínimo 10 caracteres)</Label>
                                         <Textarea
                                           id="rejection-comment"
                                           value={rejectionComment}
                                           onChange={(e) => setRejectionComment(e.target.value)}
-                                          placeholder="Explique los motivos del rechazo y sugerencias..."
+                                          placeholder="Explique los motivos del rechazo y sugerencias (mínimo 10 caracteres)..."
                                           rows={5}
                                           required
                                         />
+                                        {rejectionComment.trim().length > 0 && rejectionComment.trim().length < 10 && (
+                                          <p className="text-sm text-red-600">
+                                            Faltan {10 - rejectionComment.trim().length} caracteres
+                                          </p>
+                                        )}
                                       </div>
                                       <Button
                                         onClick={() => {
@@ -651,17 +671,18 @@ const PendingActivitiesApproval = () => {
                                             });
                                             return;
                                           }
-                                          approvalMutation.mutate({
+                                          financialDecisionMutation.mutate({
                                             activityId: selectedActivity.id,
-                                            action: 'reject',
-                                            comment: rejectionComment
+                                            decision: 'rejected',
+                                            reason: rejectionComment,
+                                            urgencyLevel: 'normal'
                                           });
                                         }}
-                                        disabled={approvalMutation.isPending}
+                                        disabled={financialDecisionMutation.isPending || rejectionComment.trim().length < 10}
                                         variant="destructive"
                                         className="w-full"
                                       >
-                                        {approvalMutation.isPending ? 'Rechazando...' : 'Rechazar Actividad'}
+                                        {financialDecisionMutation.isPending ? 'Rechazando...' : 'Rechazar Actividad'}
                                       </Button>
                                     </CardContent>
                                   </Card>
@@ -672,21 +693,21 @@ const PendingActivitiesApproval = () => {
                         </DialogContent>
                       </Dialog>
 
-                      {activity.status === 'por_costear' && (
+                      {activity.status === 'por_costear' && canApprove && (
                         <div className="flex gap-1">
                           <Button
                             size="sm"
                             variant="default"
                             className="bg-green-600 hover:bg-green-700"
                             onClick={() => {
-                              approvalMutation.mutate({
+                              financialDecisionMutation.mutate({
                                 activityId: activity.id,
-                                action: 'approve',
-                                comment: 'Aprobación rápida',
-                                costRecovery: activity.costRecoveryPercentage
+                                decision: 'approved',
+                                reason: 'Aprobación rápida sin observaciones adicionales',
+                                urgencyLevel: 'normal'
                               });
                             }}
-                            disabled={approvalMutation.isPending}
+                            disabled={financialDecisionMutation.isPending || !canApprove}
                           >
                             <CheckCircle className="h-4 w-4" />
                           </Button>
@@ -694,16 +715,23 @@ const PendingActivitiesApproval = () => {
                             size="sm"
                             variant="destructive"
                             onClick={() => {
-                              const comment = prompt('Motivo del rechazo:');
-                              if (comment) {
-                                approvalMutation.mutate({
+                              const reason = prompt('Motivo del rechazo (obligatorio):');
+                              if (reason && reason.trim().length >= 10) {
+                                financialDecisionMutation.mutate({
                                   activityId: activity.id,
-                                  action: 'reject',
-                                  comment
+                                  decision: 'rejected',
+                                  reason: reason.trim(),
+                                  urgencyLevel: 'normal'
+                                });
+                              } else {
+                                toast({
+                                  title: "Justificación Insuficiente",
+                                  description: "El motivo del rechazo debe tener al menos 10 caracteres.",
+                                  variant: "destructive"
                                 });
                               }
                             }}
-                            disabled={approvalMutation.isPending}
+                            disabled={financialDecisionMutation.isPending}
                           >
                             <XCircle className="h-4 w-4" />
                           </Button>

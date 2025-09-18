@@ -5,6 +5,7 @@ import { sql, eq } from 'drizzle-orm';
 import { insertActivitySchema, activityCategories, insertActivityCategorySchema, activities } from '@shared/schema';
 import { storage } from './storage';
 import { db } from './db';
+import { isAuthenticated, requirePermission, hasParkAccess } from './middleware/auth';
 
 // Schema para validar cálculos financieros - preserva todos los campos para fidelidad completa
 const financialCalculationSchema = z.object({
@@ -624,6 +625,204 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
     } catch (error) {
       console.error("Error al obtener actividades con cálculos:", error);
       res.status(500).json({ message: "Error al obtener actividades con cálculos financieros" });
+    }
+  });
+
+  // ============= SISTEMA DE DECISIONES FINANCIERAS =============
+
+  // Schema para validar decisiones financieras
+  const financialDecisionSchema = z.object({
+    decision: z.enum(["approved", "rejected", "requires_revision"]),
+    reason: z.string().min(10, "La justificación debe tener al menos 10 caracteres"),
+    budgetImpact: z.number().optional(),
+    riskAssessment: z.string().optional(),
+    urgencyLevel: z.enum(["low", "normal", "high", "critical"]).default("normal")
+  });
+
+  // Tomar decisión financiera sobre una actividad
+  apiRouter.post("/activities/:id/financial-decision", isAuthenticated, requirePermission('Finanzas', 'approve'), async (req: Request, res: Response) => {
+    try {
+      const activityId = Number(req.params.id);
+      const decisionData = req.body;
+
+      // Validar la estructura de la decisión usando Zod
+      const validatedDecision = financialDecisionSchema.parse(decisionData);
+
+      console.log(`💰 [DECISION] Procesando decisión financiera para actividad ${activityId}:`, validatedDecision.decision);
+
+      // Verificar que la actividad existe
+      const [existingActivity] = await db
+        .select()
+        .from(activities)
+        .where(eq(activities.id, activityId))
+        .limit(1);
+
+      if (!existingActivity) {
+        return res.status(404).json({ message: "Actividad no encontrada" });
+      }
+
+      // CRITICAL: Verificar autorización a nivel de recurso - acceso al parque
+      if (existingActivity.parkId) {
+        // Verificar si el usuario tiene acceso al parque de la actividad
+        const user = (req as any).user;
+        const userCanAccessPark = user.roles?.some((role: any) => 
+          role.permissions?.includes('all') || 
+          role.municipalityIds?.includes(existingActivity.municipalityId) ||
+          role.parkIds?.includes(existingActivity.parkId)
+        ) || user.isSuper || user.permissions?.includes('all');
+        
+        if (!userCanAccessPark) {
+          console.log(`🚫 [SECURITY] Usuario ${user.id} intentó aprobar actividad del parque ${existingActivity.parkId} sin acceso`);
+          return res.status(403).json({ 
+            message: "No tienes autorización para tomar decisiones financieras sobre actividades de este parque" 
+          });
+        }
+        console.log(`✅ [SECURITY] Usuario ${user.id} autorizado para parque ${existingActivity.parkId}`);
+      }
+
+      // Actualizar el estado de la actividad con la decisión
+      const newStatus = validatedDecision.decision === "approved" ? "aprobada" : 
+                       validatedDecision.decision === "rejected" ? "rechazada" : "por_costear";
+
+      const [updatedActivity] = await db
+        .update(activities)
+        .set({
+          financialDecision: validatedDecision.decision,
+          financialDecisionReason: validatedDecision.reason,
+          financialDecisionDate: new Date(),
+          financialDecisionBy: (req as any).user.id, // Usuario autenticado
+          financialStatus: newStatus as any,
+          reviewedBy: (req as any).user.id,
+          reviewedAt: new Date(),
+          financialNotes: validatedDecision.reason // Mantener también en el campo legacy
+        })
+        .where(eq(activities.id, activityId))
+        .returning();
+
+      console.log(`✅ [DECISION] Decisión "${validatedDecision.decision}" aplicada a actividad "${updatedActivity.title}"`);
+
+      res.json({ 
+        message: "Decisión financiera registrada exitosamente",
+        decision: validatedDecision,
+        activity: {
+          id: updatedActivity.id,
+          title: updatedActivity.title,
+          status: updatedActivity.status,
+          financialStatus: updatedActivity.financialStatus,
+          financialDecision: updatedActivity.financialDecision,
+          decidedAt: updatedActivity.financialDecisionDate
+        }
+      });
+
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      console.error("Error al procesar decisión financiera:", error);
+      res.status(500).json({ message: "Error al procesar decisión financiera" });
+    }
+  });
+
+  // Obtener historial de decisiones de una actividad
+  apiRouter.get("/activities/:id/financial-decisions", isAuthenticated, requirePermission('Finanzas', 'read'), async (req: Request, res: Response) => {
+    try {
+      const activityId = Number(req.params.id);
+
+      // Obtener la actividad con su decisión actual
+      const [activity] = await db
+        .select({
+          id: activities.id,
+          title: activities.title,
+          financialDecision: activities.financialDecision,
+          financialDecisionReason: activities.financialDecisionReason,
+          financialDecisionDate: activities.financialDecisionDate,
+          financialDecisionBy: activities.financialDecisionBy,
+          financialStatus: activities.financialStatus,
+          financialNotes: activities.financialNotes,
+          reviewedBy: activities.reviewedBy,
+          reviewedAt: activities.reviewedAt
+        })
+        .from(activities)
+        .where(eq(activities.id, activityId))
+        .limit(1);
+
+      if (!activity) {
+        return res.status(404).json({ message: "Actividad no encontrada" });
+      }
+
+      // Por ahora devolvemos la decisión actual - en el futuro se puede implementar tabla de historial
+      const decisions = [];
+      if (activity.financialDecision) {
+        decisions.push({
+          id: 1,
+          decision: activity.financialDecision,
+          reason: activity.financialDecisionReason,
+          decisionDate: activity.financialDecisionDate,
+          decisionBy: activity.financialDecisionBy,
+          status: activity.financialStatus
+        });
+      }
+
+      res.json({
+        activityId: activity.id,
+        activityTitle: activity.title,
+        currentDecision: activity.financialDecision,
+        currentStatus: activity.financialStatus,
+        decisions: decisions,
+        total: decisions.length
+      });
+
+    } catch (error) {
+      console.error("Error al obtener historial de decisiones:", error);
+      res.status(500).json({ message: "Error al obtener historial de decisiones financieras" });
+    }
+  });
+
+  // Obtener actividades pendientes de decisión financiera
+  apiRouter.get("/activities/pending-financial-decision", isAuthenticated, requirePermission('Finanzas', 'read'), async (req: Request, res: Response) => {
+    try {
+      const { urgency, limit } = req.query;
+
+      let query = db
+        .select({
+          id: activities.id,
+          title: activities.title,
+          description: activities.description,
+          startDate: activities.startDate,
+          endDate: activities.endDate,
+          price: activities.price,
+          capacity: activities.capacity,
+          financialStatus: activities.financialStatus,
+          status: activities.status,
+          financialCalculation: activities.financialCalculation,
+          calculationSavedAt: activities.calculationSavedAt,
+          financialNotes: activities.financialNotes,
+          reviewedBy: activities.reviewedBy,
+          reviewedAt: activities.reviewedAt
+        })
+        .from(activities)
+        .where(sql`${activities.financialDecision} IS NULL AND ${activities.financialCalculation} IS NOT NULL`);
+
+      // Ordenar por fecha de cálculo guardado (más recientes primero)
+      query = query.orderBy(sql`${activities.calculationSavedAt} DESC`);
+
+      // Limitar resultados si se especifica
+      if (limit && !isNaN(Number(limit))) {
+        query = query.limit(Number(limit));
+      }
+
+      const pendingActivities = await query;
+
+      res.json({
+        activities: pendingActivities,
+        total: pendingActivities.length,
+        message: "Actividades pendientes de decisión financiera obtenidas exitosamente"
+      });
+
+    } catch (error) {
+      console.error("Error al obtener actividades pendientes de decisión:", error);
+      res.status(500).json({ message: "Error al obtener actividades pendientes de decisión financiera" });
     }
   });
 }
