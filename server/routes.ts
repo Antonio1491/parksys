@@ -3460,28 +3460,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all parks
-  apiRouter.get("/parks", async (req: Request, res: Response) => {
-    try {
-      const result = await pool.query(`
-        SELECT id, name, address, description, area, hours, contact_phone, contact_email
-        FROM parks 
-        ORDER BY name ASC
-      `);
-      
-      res.json({
-        status: 'success',
-        data: result.rows,
-        count: result.rows.length
-      });
-    } catch (error) {
-      console.error('Error al obtener parques:', error);
-      res.status(500).json({
-        status: 'error',
-        message: 'Error al obtener parques'
-      });
-    }
-  });
+  // NOTA: Endpoint duplicado eliminado - usando el endpoint principal de línea 1423
+  // que incluye certificaciones y todos los campos necesarios
 
   // Bulk delete parks
   apiRouter.post("/parks/bulk-delete", async (req: Request, res: Response) => {
