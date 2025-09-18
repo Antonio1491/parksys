@@ -34,10 +34,10 @@ const ParkCard: React.FC<ParkCardProps> = ({ park, onClick }) => {
   console.log(`ParkCard rendered for: ${park.name} (ID: ${park.id})`);
   
   // Función para verificar si el parque debe mostrar el Green Flag Award
-  const shouldShowGreenFlag = (parkId: number) => {
-    // Bosque Los Colomos (ID: 5), Parque Metropolitano (ID: 2), Parque Alcalde (ID: 4), Bosque Urbano Tlaquepaque (ID: 18)
-    const shouldShow = parkId === 5 || parkId === 2 || parkId === 4 || parkId === 18;
-    console.log(`Green Flag check for park ID ${parkId}: ${shouldShow}`);
+  const shouldShowGreenFlag = (park: ExtendedPark) => {
+    // Verificar si el parque tiene la certificación Green Flag Award
+    const shouldShow = park.certificaciones?.includes('Green Flag Award') || false;
+    console.log(`Green Flag check for ${park.name} (ID: ${park.id}): ${shouldShow}, Certificaciones: ${park.certificaciones}`);
     return shouldShow;
   };
 
@@ -96,7 +96,7 @@ const ParkCard: React.FC<ParkCardProps> = ({ park, onClick }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           
           {/* Green Flag Award Logo - Integrado en la esquina superior derecha */}
-          {shouldShowGreenFlag(park.id) && (
+          {shouldShowGreenFlag(park) && (
             <div className="absolute top-3 right-3 z-10">
               <img 
                 src={greenFlagLogo} 

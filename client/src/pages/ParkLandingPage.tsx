@@ -440,9 +440,9 @@ function ParkLandingPage() {
   };
 
   // Check if park should show Green Flag Award logo
-  const shouldShowGreenFlag = (parkId: number) => {
-    // Bosque Los Colomos (ID: 5), Parque Metropolitano (ID: 2), Parque Alcalde (ID: 4), Bosque Urbano Tlaquepaque (ID: 18)
-    return parkId === 5 || parkId === 2 || parkId === 4 || parkId === 18;
+  const shouldShowGreenFlag = (park: ExtendedPark) => {
+    // Verificar si el parque tiene la certificación Green Flag Award
+    return park.certificaciones?.includes('Green Flag Award') || false;
   };
 
   return (
@@ -485,7 +485,7 @@ function ParkLandingPage() {
                 </p>
                 
                 {/* Green Flag Award Logo - Solo para parques certificados */}
-                {shouldShowGreenFlag(park.id) && (
+                {shouldShowGreenFlag(park) && (
                   <div className="flex justify-center">
                     <img 
                       src={greenFlagLogo} 

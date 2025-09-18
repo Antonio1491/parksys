@@ -714,17 +714,17 @@ const AdminActivities = () => {
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'activa':
-        return { emoji: '🟢', label: 'Activa', color: 'bg-green-100 text-green-800' };
+        return { label: 'Activa', color: 'bg-[#95dba1] text-white' };
       case 'programada':
-        return { emoji: '🟡', label: 'Programada', color: 'bg-yellow-100 text-yellow-800' };
+        return { label: 'Programada', color: 'bg-[#e5b76e] text-white' };
       case 'cancelada':
-        return { emoji: '🔴', label: 'Cancelada', color: 'bg-red-100 text-red-800' };
+        return { label: 'Cancelada', color: 'bg-[#f7bbbb] text-white' };
       case 'finalizada':
-        return { emoji: '⚫', label: 'Finalizada', color: 'bg-gray-100 text-gray-800' };
+        return { label: 'Finalizada', color: 'bg-gray-400 text-white' };
       case 'en_pausa':
-        return { emoji: '🟠', label: 'En Pausa', color: 'bg-orange-100 text-orange-800' };
+        return { label: 'En Pausa', color: 'bg-[#a5d9ee] text-white' };
       default:
-        return { emoji: '🟡', label: 'Programada', color: 'bg-yellow-100 text-yellow-800' };
+        return { label: 'Por Costear', color: 'bg-[#959ce8] text-white' };
     }
   };
 
