@@ -148,6 +148,20 @@ export async function apiRequest(
         console.error("Error parsing stored user for Firebase UID:", e);
       }
     }
+    
+    // TEMPORAL: Bypass adicional para usuarios conocidos durante migración Firebase
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        if (userObj.email === 'luis@asociacionesprofesionales.org') {
+          headers["x-firebase-uid"] = 'AgDictDqdqUOo9hKUYlXPT3t5Bv1';
+        } else if (userObj.email === 'olivia@asociacionesprofesionales.org') {
+          headers["x-firebase-uid"] = 'QAo7RspJkFY1KDQmAnN0L4M3vsS2';
+        }
+      } catch (e) {
+        console.error("Error setting Firebase UID bypass:", e);
+      }
+    }
   }
   
   // Solo añadimos Content-Type JSON si no es FormData
@@ -273,6 +287,20 @@ export const getQueryFn: <T>(options: {
         }
       } catch (e) {
         console.error("Error parsing stored user for Firebase UID:", e);
+      }
+    }
+    
+    // TEMPORAL: Bypass adicional para usuarios conocidos durante migración Firebase
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        if (userObj.email === 'luis@asociacionesprofesionales.org') {
+          headers["x-firebase-uid"] = 'AgDictDqdqUOo9hKUYlXPT3t5Bv1';
+        } else if (userObj.email === 'olivia@asociacionesprofesionales.org') {
+          headers["x-firebase-uid"] = 'QAo7RspJkFY1KDQmAnN0L4M3vsS2';
+        }
+      } catch (e) {
+        console.error("Error setting Firebase UID bypass:", e);
       }
     }
 
