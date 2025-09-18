@@ -279,7 +279,7 @@ export function registerHybridRoleRoutes(app: Express) {
       const allRoles = await db.select().from(roles);
       const result: Record<string, string[]> = {};
       
-      // Para cada rol, obtener sus permisos asignados
+      // Para cada rol, obtener sus permisos asignados activos
       for (const role of allRoles) {
         const rolePermissionsList = await db
           .select({
@@ -290,7 +290,10 @@ export function registerHybridRoleRoutes(app: Express) {
             eq(rolePermissions.permissionId, systemPermissions.id)
           )
           .where(
-            eq(rolePermissions.roleId, role.id)
+            and(
+              eq(rolePermissions.roleId, role.id),
+              eq(rolePermissions.isActive, true)
+            )
           );
         
         result[role.slug] = rolePermissionsList.map(p => p.permissionKey);
@@ -367,8 +370,8 @@ export function registerHybridRoleRoutes(app: Express) {
                   roleId: role.id,
                   permissionId: permission.id,
                   isActive: true,
-                  assignedAt: new Date(),
-                  assignedBy: null
+                  grantedAt: new Date(),
+                  grantedBy: null
                 }));
 
                 await tx.insert(rolePermissions).values(rolePermissionInserts);

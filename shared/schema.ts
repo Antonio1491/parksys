@@ -5003,14 +5003,11 @@ export const rolePermissions = pgTable("role_permissions", {
   id: serial("id").primaryKey(),
   roleId: integer("role_id").references(() => roles.id).notNull(),
   permissionId: integer("permission_id").references(() => systemPermissions.id).notNull(),
-  granted: boolean("granted").default(true),
-  grantedAt: timestamp("granted_at").defaultNow(),
   grantedBy: integer("granted_by").references(() => users.id),
-  revokedAt: timestamp("revoked_at"),
   revokedBy: integer("revoked_by").references(() => users.id),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
+  grantedAt: timestamp("granted_at").defaultNow(),
+  revokedAt: timestamp("revoked_at"),
+  isActive: boolean("is_active").default(true)
 });
 
 // Relaciones para sistema de permisos
@@ -5104,8 +5101,6 @@ export const insertSystemPermissionSchema = createInsertSchema(systemPermissions
 
 export const insertRolePermissionSchema = createInsertSchema(rolePermissions).omit({
   id: true,
-  createdAt: true,
-  updatedAt: true,
   grantedAt: true
 });
 

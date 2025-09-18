@@ -390,14 +390,15 @@ export function HierarchicalPermissionsMatrix({
     });
   };
 
-  const bulkUpdateAction = (roleSlug: string, actionSlug: string, checked: boolean) => {
+  // Actualización masiva de acciones específicas por módulo  
+  const bulkUpdateActionForModule = (roleSlug: string, moduleSlug: string, actionSlug: string, checked: boolean) => {
     if (!canEditPermissions() || roleSlug === 'super-admin') return;
 
-    const actionPermissions = (systemPermissions as SystemPermission[])
-      .filter(perm => perm.permissionKey?.endsWith(`:${actionSlug}`))
+    const moduleActionPermissions = (systemPermissions as SystemPermission[])
+      .filter(perm => perm.permissionKey?.startsWith(`${moduleSlug}:`) && perm.permissionKey?.endsWith(`:${actionSlug}`))
       .map(perm => perm.permissionKey);
 
-    actionPermissions.forEach(permKey => {
+    moduleActionPermissions.forEach(permKey => {
       if (permKey) updatePermission(roleSlug, permKey, checked);
     });
   };
@@ -428,15 +429,15 @@ export function HierarchicalPermissionsMatrix({
     );
   };
 
-  // Verificar si todos los permisos de solo vista están activados para un rol
-  const isViewOnlyActive = (roleSlug: string): boolean => {
+  // Verificar si todos los permisos de solo vista están activados para un rol en un módulo específico
+  const isViewOnlyActiveForModule = (roleSlug: string, moduleSlug: string): boolean => {
     if (roleSlug === 'super-admin') return true;
 
-    const viewPermissions = (systemPermissions as SystemPermission[])
-      .filter(perm => perm.permissionKey?.endsWith(':view'))
+    const moduleViewPermissions = (systemPermissions as SystemPermission[])
+      .filter(perm => perm.permissionKey?.startsWith(`${moduleSlug}:`) && perm.permissionKey?.endsWith(':view'))
       .map(perm => perm.permissionKey);
 
-    return viewPermissions.length > 0 && viewPermissions.every(permKey => 
+    return moduleViewPermissions.length > 0 && moduleViewPermissions.every(permKey => 
       permKey && hasPermission(roleSlug, permKey)
     );
   };
@@ -666,15 +667,15 @@ export function HierarchicalPermissionsMatrix({
                             </Button>
                             <div className="flex gap-1">
                               <Button
-                                variant={isViewOnlyActive(role.slug) ? "default" : "outline"}
+                                variant={isViewOnlyActiveForModule(role.slug, moduleSlug) ? "default" : "outline"}
                                 size="sm"
-                                onClick={() => bulkUpdateAction(role.slug, 'view', !isViewOnlyActive(role.slug))}
-                                className={`h-5 text-[10px] px-1 flex-1 ${isViewOnlyActive(role.slug) ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''}`}
+                                onClick={() => bulkUpdateActionForModule(role.slug, moduleSlug, 'view', !isViewOnlyActiveForModule(role.slug, moduleSlug))}
+                                className={`h-5 text-[10px] px-1 flex-1 ${isViewOnlyActiveForModule(role.slug, moduleSlug) ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''}`}
                                 disabled={!editable || !canEditPermissions()}
-                                title={isViewOnlyActive(role.slug) ? "Permisos de vista activos - Clic para desactivar" : "Activar solo permisos de vista"}
+                                title={isViewOnlyActiveForModule(role.slug, moduleSlug) ? "Permisos de vista del módulo activos - Clic para desactivar" : "Activar solo permisos de vista del módulo"}
                               >
-                                <Eye className={`h-3 w-3 ${isViewOnlyActive(role.slug) ? 'text-white' : ''}`} />
-                                {isViewOnlyActive(role.slug) ? '✓' : ''}
+                                <Eye className={`h-3 w-3 ${isViewOnlyActiveForModule(role.slug, moduleSlug) ? 'text-white' : ''}`} />
+                                {isViewOnlyActiveForModule(role.slug, moduleSlug) ? '✓' : ''}
                               </Button>
                               <Button
                                 variant={!hasAnyModulePermission(role.slug, moduleSlug) ? "default" : "outline"}
