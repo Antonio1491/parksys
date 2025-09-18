@@ -119,7 +119,7 @@ const formSchema = z.object({
   healthRequirements: z.string().optional(),
   
   // Campo para el estado de la actividad
-  status: z.string().default('programada'),
+  status: z.string().default('por_costear'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -243,7 +243,7 @@ const CrearActividadPage = () => {
       requiresApproval: false,
       ageRestrictions: "",
       healthRequirements: "",
-      status: "programada",
+      status: "por_costear",
     },
   });
 
