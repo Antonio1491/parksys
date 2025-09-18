@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import AdminLayout from "@/components/AdminLayout";
 import { DynamicRoleGuard } from "@/components/DynamicRoleGuard";
+import { useAdaptivePermissions } from "@/hooks/useAdaptivePermissions";
 import { 
   CheckCircle, 
   XCircle, 
@@ -71,6 +72,10 @@ const PendingActivitiesApproval = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [filterStatus, setFilterStatus] = useState("por_costear");
   const [analysisData, setAnalysisData] = useState<FinancialAnalysis | null>(null);
+  
+  // Check for write permissions for approval actions
+  const { hasPermission } = useAdaptivePermissions(1); // Using roleId 1 for Super Admin
+  const canApprove = hasPermission("Finanzas", "update");
   
   // Form states for approval/rejection
   const [approvalComment, setApprovalComment] = useState("");
@@ -213,7 +218,7 @@ const PendingActivitiesApproval = () => {
     <AdminLayout>
       <DynamicRoleGuard 
         requiredModule="Finanzas" 
-        requiredPermission="write"
+        requiredPermission="view"
         fallback={
           <div className="p-8 text-center">
             <div className="text-6xl mb-4">🔒</div>

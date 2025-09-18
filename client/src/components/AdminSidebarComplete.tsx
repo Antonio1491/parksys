@@ -1041,6 +1041,13 @@ const AdminSidebarComplete: React.FC = () => {
                 Calculadora
               </NavItem>
               <NavItem 
+                href="/admin/finance/pending-approval" 
+                icon={<ClipboardCheck className="h-4 w-4" />}
+                active={location.startsWith('/admin/finance/pending-approval')}
+              >
+                Aprobación de Actividades
+              </NavItem>
+              <NavItem 
                 href="/admin/payments" 
                 icon={<CreditCard className="h-4 w-4" />}
                 active={location.startsWith('/admin/payments')}
