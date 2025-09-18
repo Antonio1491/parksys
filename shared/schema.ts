@@ -401,7 +401,6 @@ export const roles = pgTable("roles", {
   description: text("description"),
   level: integer("level").notNull(), // 1 = Super-admin, 2 = Admin, 3 = User
   color: varchar("color", { length: 7 }).default("#6366f1"), // Color para badges
-  permissions: jsonb("permissions").$type<Record<string, any>>().default({}),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()

@@ -1,6 +1,6 @@
 import { db } from './db';
 import { storage } from './storage';
-import { roles, users, userRoles } from '../shared/schema';
+import { roles, users, userRoles, systemPermissions } from '../shared/schema';
 import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { Role, User, InsertRole, UserRole, InsertUserRole } from '../shared/schema';
 
@@ -710,35 +710,64 @@ export class RoleService {
     return newRole;
   }
 
-  // Actualizar permisos de rol
+  // Actualizar permisos de rol usando sistema robusto role_permissions
   async updateRolePermissions(roleId: number, permissions: Record<string, any>): Promise<boolean> {
     try {
-      // ✅ CRÍTICO: Para super-admin, mantener el formato {"all": true}
+      // ✅ CRÍTICO: Para super-admin, mantener todos los permisos activos
       const role = await this.getRoleById(roleId);
       if (role?.slug === 'super-admin') {
-        // Super admin siempre mantiene {"all": true}
-        await db
-          .update(roles)
-          .set({ permissions: { all: true }, updatedAt: new Date() })
-          .where(eq(roles.id, roleId));
-      } else {
-        // Si se recibe un array de permission keys, convertir a formato estructurado
-        let processedPermissions: Record<string, string[]>;
-        if (Array.isArray(permissions)) {
-          processedPermissions = this.convertPermissionKeysToStructured(permissions);
-        } else {
-          processedPermissions = permissions;
+        // Super admin tiene todos los permisos del sistema
+        const allSystemPermissions = await db.select({ id: systemPermissions.id }).from(systemPermissions);
+        
+        for (const perm of allSystemPermissions) {
+          await storage.assignPermissionToRole(roleId, perm.id, true);
         }
-        
-        // ✅ CRÍTICO: Para otros roles, convertir de módulos modernos a formato legacy
-        const legacyPermissions = this.mapToLegacyPermissions(processedPermissions);
-        
-        await db
-          .update(roles)
-          .set({ permissions: legacyPermissions, updatedAt: new Date() })
-          .where(eq(roles.id, roleId));
+        return true;
+      } else {
+        // Procesar permisos para roles regulares
+        let permissionKeys: string[];
+        if (Array.isArray(permissions)) {
+          permissionKeys = permissions;
+        } else {
+          // Si viene en formato estructurado, extraer todas las keys
+          permissionKeys = Object.values(permissions).flat();
+        }
+
+        // Obtener todos los permission_ids correspondientes a los permission_keys
+        const permissionIds = new Set<number>();
+        for (const key of permissionKeys) {
+          try {
+            const permission = await db.select({ id: systemPermissions.id })
+              .from(systemPermissions)
+              .where(eq(systemPermissions.permissionKey, key))
+              .limit(1);
+            
+            if (permission.length > 0) {
+              permissionIds.add(permission[0].id);
+            }
+          } catch (error) {
+            console.warn(`Permiso no encontrado: ${key}`);
+          }
+        }
+
+        // Obtener permisos actuales del rol
+        const currentPermissions = await storage.getRolePermissions(roleId);
+        const currentPermissionIds = new Set(currentPermissions.map(p => p.permission_id));
+
+        // Desactivar permisos que ya no están en la lista
+        for (const currentId of currentPermissionIds) {
+          if (!permissionIds.has(currentId)) {
+            await storage.removePermissionFromRole(roleId, currentId);
+          }
+        }
+
+        // Activar permisos nuevos o reactivar existentes
+        for (const permissionId of permissionIds) {
+          await storage.assignPermissionToRole(roleId, permissionId, true);
+        }
+
+        return true;
       }
-      return true;
     } catch (error) {
       console.error('Error actualizando permisos:', error);
       return false;

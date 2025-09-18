@@ -501,31 +501,6 @@ const AdminParksContent = () => {
               <div className="space-y-2">
                 <div className="flex items-center font-poppins text-sm text-gray-600">
                 </div>
-                
-                {park.municipalityText && (
-                  <div className="flex items-center text-sm text-emerald-700 font-medium">
-                    <Map className="h-4 w-4 mr-2" />
-                    <span>{park.municipalityText}</span>
-                  </div>
-                )}
-                
-                <div className="flex items-center text-sm text-gray-600">
-                  <Package className="h-4 w-4 mr-2" />
-                  <span>
-                    {park.area
-                      ? `${(park.area / 10000).toLocaleString(undefined, {
-                          minimumFractionDigits: 1,
-                          maximumFractionDigits: 1,
-                        })} ha`
-                      : 'N/A'}
-                  </span>
-                </div>
-                
-                {park.description && (
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {park.description}
-                  </p>
-                )}
               </div>
               
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
