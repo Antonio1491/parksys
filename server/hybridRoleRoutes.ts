@@ -89,9 +89,13 @@ export function registerHybridRoleRoutes(app: Express) {
   // Guardar permisos de matriz (para PermissionsMatrix)
   app.post("/api/roles/permissions/save-matrix", isAuthenticated, requireSuperAdmin(), async (req, res) => {
     try {
+      console.log("🔧 [SAVE-MATRIX] Iniciando guardado de matriz de permisos...");
       const { rolePermissions } = req.body;
       
+      console.log("🔍 [SAVE-MATRIX] Payload recibido:", JSON.stringify(rolePermissions, null, 2));
+      
       if (!rolePermissions || typeof rolePermissions !== 'object') {
+        console.log("❌ [SAVE-MATRIX] Datos de permisos inválidos");
         return res.status(400).json({ error: "Datos de permisos inválidos" });
       }
 
@@ -100,29 +104,41 @@ export function registerHybridRoleRoutes(app: Express) {
 
       // Actualizar permisos para cada rol
       for (const [roleIdStr, permissions] of Object.entries(rolePermissions)) {
+        console.log(`🔄 [SAVE-MATRIX] Procesando rol ${roleIdStr}:`, permissions);
+        
         const roleId = parseInt(roleIdStr);
         if (isNaN(roleId)) {
+          console.log(`❌ [SAVE-MATRIX] ID de rol inválido: ${roleIdStr}`);
           errors.push(`ID de rol inválido: ${roleIdStr}`);
           continue;
         }
 
         try {
+          console.log(`🔧 [SAVE-MATRIX] Llamando updateRolePermissions para rol ${roleId}...`);
           const success = await roleService.updateRolePermissions(roleId, permissions as Record<string, any>);
+          console.log(`✅ [SAVE-MATRIX] Resultado updateRolePermissions para rol ${roleId}:`, success);
+          
           if (success) {
             results.push({ roleId, status: 'updated' });
           } else {
+            console.log(`❌ [SAVE-MATRIX] Error actualizando rol ${roleId} - success=false`);
             errors.push(`Error actualizando rol ${roleId}`);
           }
         } catch (error) {
+          console.error(`💥 [SAVE-MATRIX] Exception al actualizar rol ${roleId}:`, error);
           const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
           errors.push(`Error actualizando rol ${roleId}: ${errorMessage}`);
         }
       }
 
+      console.log(`📊 [SAVE-MATRIX] Resultados: ${results.length} éxitos, ${errors.length} errores`);
+
       if (errors.length > 0 && results.length === 0) {
+        console.log("❌ [SAVE-MATRIX] Todos los updates fallaron");
         return res.status(400).json({ error: "No se pudieron actualizar los permisos", errors });
       }
 
+      console.log("✅ [SAVE-MATRIX] Guardado completado exitosamente");
       res.json({ 
         success: true,
         message: "Permisos actualizados correctamente",
@@ -130,7 +146,7 @@ export function registerHybridRoleRoutes(app: Express) {
         errors: errors.length > 0 ? errors : undefined
       });
     } catch (error) {
-      console.error("Error guardando matriz de permisos:", error);
+      console.error("💥 [SAVE-MATRIX] Error guardando matriz de permisos:", error);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });
