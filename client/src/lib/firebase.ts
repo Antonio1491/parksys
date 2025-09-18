@@ -2,13 +2,14 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
 
-// Firebase config - configuración corregida para proyecto 153625478063
+// Firebase config - usar variables de entorno para consistencia
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAi-4UtEvI2hgEu9l7xrEsaDaXQ7uTNBxs",
-  authDomain: "153625478063.firebaseapp.com", // Usar authDomain correcto
-  projectId: "153625478063", // Usar projectId correcto de forma hard-coded
-  storageBucket: "153625478063.firebasestorage.app",
-  appId: `1:153625478063:web:parksys-c3d30`, // App ID temporal funcional
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "parksys-c3d30.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "parksys-c3d30",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "parksys-c3d30.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "153625478063",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:153625478063:web:5d8c5f3a6b7c9d0e1f2345",
 };
 
 // Inicializar Firebase evitando duplicados

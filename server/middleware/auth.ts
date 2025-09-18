@@ -6,7 +6,8 @@ import { eq, sql } from 'drizzle-orm';
 
 // Configurar Firebase Admin SDK si no está configurado
 if (!admin.apps.length) {
-  const projectId = process.env.VITE_FIREBASE_PROJECT_ID;
+  // Usar variable de entorno específica del backend y limpiar espacios
+  const projectId = (process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || process.env.VITE_FIREBASE_PROJECT_ID || '').trim();
   
   if (projectId) {
     try {
@@ -61,7 +62,8 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       // Whitelist de usuarios aprobados durante la migración
       const approvedUids = [
         'AgDictDqdqUOo9hKUYlXPT3t5Bv1', // Luis
-        'QAo7RspJkFY1KDQmAnN0L4M3vsS2'  // Olivia
+        'QAo7RspJkFY1KDQmAnN0L4M3vsS2', // Olivia
+        'CHJYA3H9cMUslOBuxMbG7nkLxsE3'  // Joaquin - Super Admin
       ];
       
       if (approvedUids.includes(headerUid)) {
