@@ -6,18 +6,25 @@ import { eq, sql } from 'drizzle-orm';
 
 // Configurar Firebase Admin SDK si no está configurado
 if (!admin.apps.length) {
-  // Usar variable de entorno específica del backend y limpiar espacios
-  const projectId = (process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || process.env.VITE_FIREBASE_PROJECT_ID || '').trim();
+  // USAR PROYECTO CORRECTO: alinear con el frontend
+  const projectId = "parksys-c3d30"; // Proyecto consistente con el frontend
   
-  if (projectId) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+      projectId: projectId
+    });
+    console.log(`🔥 [AUTH-MIDDLEWARE] Firebase Admin SDK inicializado con proyecto: ${projectId}`);
+  } catch (error) {
+    console.warn('⚠️ [AUTH-MIDDLEWARE] Error inicializando Firebase Admin:', error);
+    // Fallback temporal si hay problemas con el proyecto específico
     try {
       admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
-        projectId: projectId
+        credential: admin.credential.applicationDefault()
       });
-      console.log('🔥 [AUTH-MIDDLEWARE] Firebase Admin SDK inicializado');
-    } catch (error) {
-      console.warn('⚠️ [AUTH-MIDDLEWARE] Error inicializando Firebase Admin:', error);
+      console.log('🔥 [AUTH-MIDDLEWARE] Firebase Admin SDK inicializado con proyecto por defecto');
+    } catch (fallbackError) {
+      console.error('❌ [AUTH-MIDDLEWARE] Error crítico en Firebase Admin:', fallbackError);
     }
   }
 }

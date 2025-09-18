@@ -93,6 +93,24 @@ export function registerRoleRoutes(app: Express) {
     }
   });
 
+  // ENDPOINT FALTANTE - Obtener usuarios con múltiples roles
+  app.get("/api/users/all-with-multiple-roles", async (req, res) => {
+    try {
+      console.log("🔍 [MULTIPLE-ROLES] Obteniendo todos los usuarios con múltiples roles...");
+      const users = await roleService.getUsersWithRoles();
+      // Filtrar solo usuarios que tienen múltiples roles
+      const usersWithMultipleRoles = users.filter(user => 
+        user.roles && user.roles.length > 1
+      );
+      
+      console.log(`✅ [MULTIPLE-ROLES] Encontrados ${usersWithMultipleRoles.length} usuarios con múltiples roles`);
+      res.json(usersWithMultipleRoles);
+    } catch (error) {
+      console.error("❌ [MULTIPLE-ROLES] Error obteniendo usuarios con múltiples roles:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // Obtener usuario específico con rol
   app.get("/api/users/:id/with-role", async (req, res) => {
     try {
