@@ -1292,7 +1292,7 @@ const AdminActivities = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="text-gray-800 hover:text-blue-700"
+                              className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                               onClick={() => handleEdit(activity)}
                               data-testid={`button-edit-${activity.id}`}
                             >
@@ -1302,7 +1302,7 @@ const AdminActivities = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="text-red-600 hover:text-red-700"
+                              className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                               onClick={() => handleDelete(activity)}
                               data-testid={`button-delete-${activity.id}`}
                             >

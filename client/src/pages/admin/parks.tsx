@@ -31,6 +31,7 @@ interface Park {
   certificaciones?: string;
   createdAt: string;
   updatedAt: string;
+  primaryImageUrl?: string; // ✅ Imagen principal del parque
   // Nuevo campo
   typology?: {
     id: number;
@@ -130,10 +131,17 @@ const AdminParksContent = () => {
     refetchInterval: 30000,        // ✅ Actualizar cada 30 segundos automáticamente
     staleTime: 10000,              // ✅ Datos frescos por 10 segundos
     retry: 1,
+  });
 
+  // Fetch parks with images for better visual display
+  const { data: parksWithImagesResponse } = useQuery<{data: Park[]}>({
+    queryKey: ['/api/parks-with-images'], 
+    queryFn: () => apiRequest('/api/parks-with-images'),
+    staleTime: 30000, // Cache for 30 seconds
   });
   
   const parks = parksResponse?.data || [];
+  const parksWithImages = parksWithImagesResponse?.data || parks; // Usar datos con imágenes si están disponibles
 
 
 
@@ -211,7 +219,7 @@ const AdminParksContent = () => {
 
   // Search through parks
   const filteredParks = React.useMemo(() => {
-    return (parks as Park[]).filter(park => {
+    return (parksWithImages as Park[]).filter(park => {
       // Apply search criteria only
       const matchesSearch = searchQuery === '' || 
         park.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -219,7 +227,7 @@ const AdminParksContent = () => {
       
       return matchesSearch;
     }).sort((a, b) => a.name.localeCompare(b.name));
-  }, [parks, searchQuery]);
+  }, [parksWithImages, searchQuery]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredParks.length / itemsPerPage);
@@ -430,18 +438,38 @@ const AdminParksContent = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentParks.map((park: Park) => (
-          <Card key={park.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
+          <Card key={park.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+            {/* Imagen del parque */}
+            <div className="relative aspect-video overflow-hidden bg-gray-100">
+              {park.primaryImageUrl ? (
+                <img
+                  src={park.primaryImageUrl}
+                  alt={`Imagen de ${park.name}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-blue-50">
+                  <div className="text-center text-gray-400">
+                    <TreePine className="h-12 w-12 mx-auto mb-2" />
+                    <p className="text-sm">Sin imagen</p>
+                  </div>
+                </div>
+              )}
+              {selectionMode && (
+                <div className="absolute top-2 left-2">
+                  <Checkbox
+                    checked={selectedParks.has(park.id)}
+                    onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                    className="bg-white/90 border-white data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                    data-testid={`checkbox-park-grid-${park.id}`}
+                  />
+                </div>
+              )}
+            </div>
+
+            <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
                 <div className="flex items-start space-x-2 flex-1">
-                  {selectionMode && (
-                    <Checkbox
-                      checked={selectedParks.has(park.id)}
-                      onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
-                      className="mt-1"
-                      data-testid={`checkbox-park-grid-${park.id}`}
-                    />
-                  )}
                   <div className="flex-1">
                     <CardTitle className="text-lg">{park.name}</CardTitle>
                     {isParkCertified(park) && (
