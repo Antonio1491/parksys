@@ -478,15 +478,15 @@ const AdminParksContent = () => {
               )}
             </div>
 
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-start space-x-2 flex-1">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{park.name}</CardTitle>
+                    <CardTitle className="font-poppins font-bold text-gray-900 text-lg">{park.name}</CardTitle>
                     {isParkCertified(park) && (
                       <Badge 
                         variant="secondary" 
-                        className="mt-2 bg-green-100 text-green-800 border-green-200"
+                        className="mt-2 bg-[#a8bd7d] text-white"
                       >
                         <Award className="h-3 w-3 mr-1" />
                         Certificado
