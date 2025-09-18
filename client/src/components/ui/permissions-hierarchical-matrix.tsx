@@ -173,26 +173,43 @@ export function HierarchicalPermissionsMatrix({
     }
   }, [rolePermissions, roles]);
 
-  // Crear mapeos dinámicos desde los datos de la BD
-  const moduleNames: Record<string, string> = {};
+  // Crear mapeos dinámicos desde los datos de la BD con información completa
+  const moduleMap: Record<string, any> = {};
   (permissionModules as any[]).forEach((module: any) => {
-    if (module.slug && module.name) {
-      moduleNames[module.slug] = module.name;
+    if (module.slug) {
+      moduleMap[module.slug] = module;
     }
   });
 
-  const submoduleNames: Record<string, string> = {};
+  const submoduleMap: Record<string, any> = {};
   (permissionSubmodules as any[]).forEach((submodule: any) => {
-    if (submodule.slug && submodule.name) {
-      submoduleNames[submodule.slug] = submodule.name;
+    if (submodule.slug) {
+      submoduleMap[submodule.slug] = submodule;
     }
   });
 
-  const pageNames: Record<string, string> = {};
+  const pageMap: Record<string, any> = {};
   (permissionPages as any[]).forEach((page: any) => {
-    if (page.slug && page.name) {
-      pageNames[page.slug] = page.name;
+    if (page.slug) {
+      pageMap[page.slug] = page;
     }
+  });
+
+  // Mantener compatibilidad con mapeos de nombres
+  const moduleNames: Record<string, string> = {};
+  const submoduleNames: Record<string, string> = {};
+  const pageNames: Record<string, string> = {};
+  
+  Object.values(moduleMap).forEach((module: any) => {
+    moduleNames[module.slug] = module.name || module.slug.charAt(0).toUpperCase() + module.slug.slice(1);
+  });
+  
+  Object.values(submoduleMap).forEach((submodule: any) => {
+    submoduleNames[submodule.slug] = submodule.name || submodule.slug.charAt(0).toUpperCase() + submodule.slug.slice(1);
+  });
+  
+  Object.values(pageMap).forEach((page: any) => {
+    pageNames[page.slug] = page.name || page.slug.charAt(0).toUpperCase() + page.slug.slice(1);
   });
 
   const actionNames: Record<string, string> = {
@@ -207,47 +224,69 @@ export function HierarchicalPermissionsMatrix({
     'process': 'Procesar',
   };
 
-  // Organizar datos jerárquicamente
+  // Organizar datos jerárquicamente usando el ordenamiento de la BD
   const organizeHierarchically = () => {
-    const hierarchy: Record<string, any> = {};
-    
+    // Primero, crear un mapa de todos los permisos disponibles
+    const permissionMap: Record<string, SystemPermission> = {};
     (systemPermissions as SystemPermission[]).forEach(perm => {
-      if (!perm.permissionKey || perm.permissionKey === 'all') return;
-      
-      const parts = perm.permissionKey.split(':');
-      if (parts.length < 4) return;
-      
-      const [moduleSlug, submoduleSlug, pageSlug, actionSlug] = parts;
-      
-      if (!hierarchy[moduleSlug]) {
-        hierarchy[moduleSlug] = {
-          slug: moduleSlug,
-          name: moduleNames[moduleSlug] || moduleSlug.charAt(0).toUpperCase() + moduleSlug.slice(1),
-          submodules: {}
-        };
+      if (perm.permissionKey && perm.permissionKey !== 'all') {
+        permissionMap[perm.permissionKey] = perm;
       }
-      
-      if (!hierarchy[moduleSlug].submodules[submoduleSlug]) {
-        hierarchy[moduleSlug].submodules[submoduleSlug] = {
-          slug: submoduleSlug,
-          name: submoduleNames[submoduleSlug] || submoduleSlug.charAt(0).toUpperCase() + submoduleSlug.slice(1),
+    });
+
+    const hierarchy: Record<string, any> = {};
+
+    // Construir jerarquía respetando el orden de la BD
+    // Obtener módulos ordenados
+    const orderedModules = Object.values(moduleMap).sort((a, b) => (a.order || 0) - (b.order || 0));
+    
+    orderedModules.forEach((module: any) => {
+      hierarchy[module.slug] = {
+        slug: module.slug,
+        name: module.name || module.slug.charAt(0).toUpperCase() + module.slug.slice(1),
+        order: module.order || 0,
+        submodules: {}
+      };
+
+      // Obtener submódulos ordenados para este módulo
+      const orderedSubmodules = Object.values(submoduleMap)
+        .filter((sub: any) => sub.module_id === module.id)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+      orderedSubmodules.forEach((submodule: any) => {
+        hierarchy[module.slug].submodules[submodule.slug] = {
+          slug: submodule.slug,
+          name: submodule.name || submodule.slug.charAt(0).toUpperCase() + submodule.slug.slice(1),
+          order: submodule.order || 0,
           pages: {}
         };
-      }
-      
-      if (!hierarchy[moduleSlug].submodules[submoduleSlug].pages[pageSlug]) {
-        hierarchy[moduleSlug].submodules[submoduleSlug].pages[pageSlug] = {
-          slug: pageSlug,
-          name: pageNames[pageSlug] || pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1),
-          actions: []
-        };
-      }
-      
-      hierarchy[moduleSlug].submodules[submoduleSlug].pages[pageSlug].actions.push({
-        slug: actionSlug,
-        name: actionNames[actionSlug] || actionSlug.charAt(0).toUpperCase() + actionSlug.slice(1),
-        permissionKey: perm.permissionKey,
-        description: perm.description
+
+        // Obtener páginas ordenadas para este submódulo
+        const orderedPages = Object.values(pageMap)
+          .filter((page: any) => page.submodule_id === submodule.id)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        orderedPages.forEach((page: any) => {
+          hierarchy[module.slug].submodules[submodule.slug].pages[page.slug] = {
+            slug: page.slug,
+            name: page.name || page.slug.charAt(0).toUpperCase() + page.slug.slice(1),
+            order: page.order || 0,
+            actions: []
+          };
+
+          // Agregar acciones para esta página basándose en permisos disponibles
+          Object.keys(actionNames).forEach((actionSlug) => {
+            const permissionKey = `${module.slug}:${submodule.slug}:${page.slug}:${actionSlug}`;
+            if (permissionMap[permissionKey]) {
+              hierarchy[module.slug].submodules[submodule.slug].pages[page.slug].actions.push({
+                slug: actionSlug,
+                name: actionNames[actionSlug] || actionSlug.charAt(0).toUpperCase() + actionSlug.slice(1),
+                permissionKey,
+                description: permissionMap[permissionKey].description
+              });
+            }
+          });
+        });
       });
     });
     
