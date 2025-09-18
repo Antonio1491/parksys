@@ -559,7 +559,10 @@ export const documents = pgTable("documents", {
 });
 
 // Enum para estados de actividades
-export const activityStatusEnum = pgEnum('activity_status', ['activa', 'programada', 'cancelada', 'finalizada', 'en_pausa']);
+export const activityStatusEnum = pgEnum('activity_status', ['por_costear', 'activa', 'programada', 'cancelada', 'finalizada', 'en_pausa']);
+
+// Enum para estado financiero de actividades
+export const financialStatusEnum = pgEnum('financial_status', ['por_costear', 'en_revision', 'autorizada', 'rechazada']);
 
 // Categorías de actividades
 export const activityCategories = pgTable("activity_categories", {
@@ -623,7 +626,15 @@ export const activities = pgTable("activities", {
   ageRestrictions: text("age_restrictions"),
   healthRequirements: text("health_requirements"),
   // Estado de la actividad
-  status: activityStatusEnum("status").default("programada"),
+  status: activityStatusEnum("status").default("por_costear"),
+  
+  // Campos de costeo financiero
+  financialStatus: financialStatusEnum("financial_status").default("por_costear"),
+  costRecoveryPercentage: decimal("cost_recovery_percentage", { precision: 5, scale: 2 }).default("30.00"), // % objetivo de recuperación
+  financialNotes: text("financial_notes"), // observaciones del área de finanzas
+  reviewedBy: integer("reviewed_by"), // ID del usuario que revisó (referencias a users)
+  reviewedAt: timestamp("reviewed_at"), // fecha de revisión financiera
+  
   // Imagen simple (estandarizado como otros módulos)
   imageUrl: text("image_url"),
 });
