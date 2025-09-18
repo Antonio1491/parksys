@@ -20,6 +20,7 @@ import { ExportButton } from "@/components/ui/export-button";
 
 // Consolidated hook for parks summary - solves N+1 performance issue
 const useParksMetricsSummary = (parkIds: number[]) => {
+  const sortedIds = parkIds.sort().join(',');
   return useQuery<Record<number, {
     metrics: ParkMetrics | null;
     incidents: PendingIncidents;
@@ -27,7 +28,7 @@ const useParksMetricsSummary = (parkIds: number[]) => {
     reports: PendingReports;
     schedule: UpcomingSchedule;
   }>>({
-    queryKey: ['/api/parks', 'summary', parkIds.sort().join(',')],
+    queryKey: [`/api/parks/summary?ids=${sortedIds}`],
     enabled: parkIds.length > 0,
     staleTime: 3 * 60 * 1000, // 3 minutes
   });
