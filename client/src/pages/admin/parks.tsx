@@ -447,9 +447,9 @@ const AdminParksContent = () => {
   // Render grid view
   const renderGridView = () => {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {currentParks.map((park: Park) => (
-          <Card key={park.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+          <Card key={park.id} className="hover:shadow-md hover:border-[#00444f] transition-shadow overflow-hidden">
             {/* Imagen del parque */}
             <div className="relative aspect-video overflow-hidden bg-gray-100">
               {park.primaryImageUrl ? (

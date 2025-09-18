@@ -714,15 +714,15 @@ const AdminActivities = () => {
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'activa':
-        return { label: 'Activa', color: 'bg-[#95dba1] text-white' };
+        return { label: 'Activa', color: 'bg-[#75cc81] text-white' };
       case 'programada':
         return { label: 'Programada', color: 'bg-[#e5b76e] text-white' };
       case 'cancelada':
-        return { label: 'Cancelada', color: 'bg-[#f7bbbb] text-white' };
+        return { label: 'Cancelada', color: 'bg-[#e29696] text-white' };
       case 'finalizada':
         return { label: 'Finalizada', color: 'bg-gray-400 text-white' };
       case 'en_pausa':
-        return { label: 'En Pausa', color: 'bg-[#a5d9ee] text-white' };
+        return { label: 'En Pausa', color: 'bg-[#63c0d6] text-white' };
       default:
         return { label: 'Por Costear', color: 'bg-[#959ce8] text-white' };
     }
@@ -792,7 +792,7 @@ const AdminActivities = () => {
   const getCategoryColors = (categoryName: string) => {
     switch (categoryName) {
       case 'Arte y Cultura':
-        return 'bg-green-100 text-green-800';
+        return 'bg-[#f1e3ff] text-gray-800';
       case 'Recreación y Bienestar':
         return 'bg-blue-100 text-blue-800';
       case 'Eventos de Temporada':
@@ -800,13 +800,13 @@ const AdminActivities = () => {
       case 'Deportivo':
         return 'bg-red-100 text-red-800';
       case 'Comunidad':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-[#f9cac5] text-gray-800';
       case 'Naturaleza y Ciencia':
-        return 'bg-teal-100 text-teal-800';
+        return 'bg-[#cff9c5] text-gray-800';
       case 'Fitness y Ejercicio':
         return 'bg-indigo-100 text-indigo-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[#c5efff] text-gray-800';
     }
   };
 
@@ -1179,7 +1179,7 @@ const AdminActivities = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="text-blue-600 hover:text-blue-700"
+                              className="border bg-transparent text-gray-800 hover:text-white"
                               onClick={() => handleEdit(activity)}
                             >
                               <Pencil className="h-4 w-4" />
@@ -1187,7 +1187,7 @@ const AdminActivities = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="text-red-600 hover:text-red-700"
+                              className=" border bg-transparent text-red-800 hover:text-white"
                               onClick={() => handleDelete(activity)}
                             >
                               <Trash className="h-4 w-4" />
@@ -1201,7 +1201,7 @@ const AdminActivities = () => {
               ) : (
                 // Vista de fichas
                 <div className="p-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {currentActivities.map((activity: any) => (
                       <div key={activity.id} className="bg-white border rounded-2xl hover:shadow-md hover:border-[#00444f] transition-shadow duration-200 overflow-hidden">
                         {/* Imagen de la actividad */}

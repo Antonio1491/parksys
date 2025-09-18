@@ -480,9 +480,6 @@ function ParkLandingPage() {
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-3 drop-shadow-lg">
                   {park.name}
                 </h1>
-                <p className="text-xl text-white/90 mb-4">
-                  Parque Certificado con el
-                </p>
                 
                 {/* Green Flag Award Logo - Solo para parques certificados */}
                 {shouldShowGreenFlag(park) && (
