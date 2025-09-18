@@ -402,6 +402,58 @@ export function HierarchicalPermissionsMatrix({
     });
   };
 
+  // Verificar si todos los permisos de un módulo están activados para un rol
+  const isModuleFullyActive = (roleSlug: string, moduleSlug: string): boolean => {
+    if (roleSlug === 'super-admin') return true;
+
+    const modulePermissions = (systemPermissions as SystemPermission[])
+      .filter(perm => perm.permissionKey?.startsWith(`${moduleSlug}:`))
+      .map(perm => perm.permissionKey);
+
+    return modulePermissions.length > 0 && modulePermissions.every(permKey => 
+      permKey && hasPermission(roleSlug, permKey)
+    );
+  };
+
+  // Verificar si todos los permisos de un submódulo están activados para un rol
+  const isSubmoduleFullyActive = (roleSlug: string, moduleSlug: string, submoduleSlug: string): boolean => {
+    if (roleSlug === 'super-admin') return true;
+
+    const submodulePermissions = (systemPermissions as SystemPermission[])
+      .filter(perm => perm.permissionKey?.startsWith(`${moduleSlug}:${submoduleSlug}:`))
+      .map(perm => perm.permissionKey);
+
+    return submodulePermissions.length > 0 && submodulePermissions.every(permKey => 
+      permKey && hasPermission(roleSlug, permKey)
+    );
+  };
+
+  // Verificar si todos los permisos de solo vista están activados para un rol
+  const isViewOnlyActive = (roleSlug: string): boolean => {
+    if (roleSlug === 'super-admin') return true;
+
+    const viewPermissions = (systemPermissions as SystemPermission[])
+      .filter(perm => perm.permissionKey?.endsWith(':view'))
+      .map(perm => perm.permissionKey);
+
+    return viewPermissions.length > 0 && viewPermissions.every(permKey => 
+      permKey && hasPermission(roleSlug, permKey)
+    );
+  };
+
+  // Verificar si algún permiso del módulo está activo
+  const hasAnyModulePermission = (roleSlug: string, moduleSlug: string): boolean => {
+    if (roleSlug === 'super-admin') return true;
+
+    const modulePermissions = (systemPermissions as SystemPermission[])
+      .filter(perm => perm.permissionKey?.startsWith(`${moduleSlug}:`))
+      .map(perm => perm.permissionKey);
+
+    return modulePermissions.some(permKey => 
+      permKey && hasPermission(roleSlug, permKey)
+    );
+  };
+
   // Toggle expand/collapse
   const toggleModule = (moduleSlug: string) => {
     setExpandedModules(prev => {
@@ -602,36 +654,38 @@ export function HierarchicalPermissionsMatrix({
                         ) : (
                           <div className="flex flex-col gap-1">
                             <Button
-                              variant="outline"
+                              variant={isModuleFullyActive(role.slug, moduleSlug) ? "default" : "outline"}
                               size="sm"
-                              onClick={() => bulkUpdateModule(role.slug, moduleSlug, true)}
-                              className="h-6 text-xs px-2 w-full"
+                              onClick={() => bulkUpdateModule(role.slug, moduleSlug, !isModuleFullyActive(role.slug, moduleSlug))}
+                              className={`h-6 text-xs px-2 w-full ${isModuleFullyActive(role.slug, moduleSlug) ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
                               disabled={!editable || !canEditPermissions()}
-                              title="Activar todos los permisos de este módulo"
+                              title={isModuleFullyActive(role.slug, moduleSlug) ? "Todos los permisos activos - Clic para desactivar" : "Activar todos los permisos de este módulo"}
                             >
-                              <CheckCheck className="h-3 w-3 mr-1" />
-                              Todos
+                              <CheckCheck className={`h-3 w-3 mr-1 ${isModuleFullyActive(role.slug, moduleSlug) ? 'text-white' : ''}`} />
+                              Todos {isModuleFullyActive(role.slug, moduleSlug) ? '✓' : ''}
                             </Button>
                             <div className="flex gap-1">
                               <Button
-                                variant="outline"
+                                variant={isViewOnlyActive(role.slug) ? "default" : "outline"}
                                 size="sm"
-                                onClick={() => bulkUpdateAction(role.slug, 'view', true)}
-                                className="h-5 text-[10px] px-1 flex-1"
+                                onClick={() => bulkUpdateAction(role.slug, 'view', !isViewOnlyActive(role.slug))}
+                                className={`h-5 text-[10px] px-1 flex-1 ${isViewOnlyActive(role.slug) ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''}`}
                                 disabled={!editable || !canEditPermissions()}
-                                title="Activar solo permisos de vista"
+                                title={isViewOnlyActive(role.slug) ? "Permisos de vista activos - Clic para desactivar" : "Activar solo permisos de vista"}
                               >
-                                <Eye className="h-3 w-3" />
+                                <Eye className={`h-3 w-3 ${isViewOnlyActive(role.slug) ? 'text-white' : ''}`} />
+                                {isViewOnlyActive(role.slug) ? '✓' : ''}
                               </Button>
                               <Button
-                                variant="outline"
+                                variant={!hasAnyModulePermission(role.slug, moduleSlug) ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => bulkUpdateModule(role.slug, moduleSlug, false)}
-                                className="h-5 text-[10px] px-1 flex-1"
+                                className={`h-5 text-[10px] px-1 flex-1 ${!hasAnyModulePermission(role.slug, moduleSlug) ? 'bg-gray-500 hover:bg-gray-600 text-white' : ''}`}
                                 disabled={!editable || !canEditPermissions()}
-                                title="Desactivar todos"
+                                title={!hasAnyModulePermission(role.slug, moduleSlug) ? "Sin permisos activos" : "Desactivar todos los permisos"}
                               >
-                                <X className="h-3 w-3" />
+                                <X className={`h-3 w-3 ${!hasAnyModulePermission(role.slug, moduleSlug) ? 'text-white' : ''}`} />
+                                {!hasAnyModulePermission(role.slug, moduleSlug) ? '✓' : ''}
                               </Button>
                             </div>
                           </div>
@@ -680,14 +734,15 @@ export function HierarchicalPermissionsMatrix({
                                   ) : (
                                     <div className="flex gap-1">
                                       <Button
-                                        variant="outline"
+                                        variant={isSubmoduleFullyActive(role.slug, moduleSlug, submoduleSlug) ? "default" : "outline"}
                                         size="sm"
-                                        onClick={() => bulkUpdateSubmodule(role.slug, moduleSlug, submoduleSlug, true)}
-                                        className="h-5 text-xs px-2"
+                                        onClick={() => bulkUpdateSubmodule(role.slug, moduleSlug, submoduleSlug, !isSubmoduleFullyActive(role.slug, moduleSlug, submoduleSlug))}
+                                        className={`h-5 text-xs px-2 ${isSubmoduleFullyActive(role.slug, moduleSlug, submoduleSlug) ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
                                         disabled={!editable || !canEditPermissions()}
-                                        title="Activar todos los permisos del submódulo"
+                                        title={isSubmoduleFullyActive(role.slug, moduleSlug, submoduleSlug) ? "Todos activos - Clic para desactivar" : "Activar todos los permisos del submódulo"}
                                       >
-                                        <CheckCheck className="h-2 w-2" />
+                                        <CheckCheck className={`h-2 w-2 ${isSubmoduleFullyActive(role.slug, moduleSlug, submoduleSlug) ? 'text-white' : ''}`} />
+                                        {isSubmoduleFullyActive(role.slug, moduleSlug, submoduleSlug) ? ' ✓' : ''}
                                       </Button>
                                       <Button
                                         variant="outline"

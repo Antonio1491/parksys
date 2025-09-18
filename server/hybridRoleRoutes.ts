@@ -319,23 +319,26 @@ export function registerHybridRoleRoutes(app: Express) {
       const { permissions } = validationResult.data;
       console.log("🔧 [PERMISSIONS] Iniciando actualización de permisos granulares para", Object.keys(permissions).length, "roles");
 
-      // Usar transacción para operación atómica
-      const result = await db.transaction(async (tx) => {
-        const updates = [];
-        const errors = [];
+      // Procesar cada rol individualmente para evitar bloqueos de transacción
+      const updates = [];
+      const errors = [];
 
-        for (const [roleSlug, permissionKeys] of Object.entries(permissions)) {
-          try {
+      for (const [roleSlug, permissionKeys] of Object.entries(permissions)) {
+        try {
+          // Usar transacciones individuales para cada rol
+          const roleResult = await db.transaction(async (tx) => {
             // 1. Obtener el rol por slug
-            const roleResult = await tx.select().from(roles).where(eq(roles.slug, roleSlug)).limit(1);
-            if (roleResult.length === 0) {
-              errors.push(`Rol no encontrado: ${roleSlug}`);
-              continue;
+            const roleQuery = await tx.select().from(roles).where(eq(roles.slug, roleSlug)).limit(1);
+            if (roleQuery.length === 0) {
+              throw new Error(`Rol no encontrado: ${roleSlug}`);
             }
-            const role = roleResult[0];
+            const role = roleQuery[0];
 
             // 2. Limpiar permisos existentes para este rol
             await tx.delete(rolePermissions).where(eq(rolePermissions.roleId, role.id));
+
+            let assignedCount = 0;
+            let missingCount = 0;
 
             if (permissionKeys.length > 0) {
               // 3. Obtener IDs de permisos basados en las claves
@@ -352,6 +355,7 @@ export function registerHybridRoleRoutes(app: Express) {
               // 4. Verificar que todos los permisos existan
               const foundPermissionKeys = permissionResults.map((p: { permissionKey: string }) => p.permissionKey);
               const missingPermissions = permissionKeys.filter(key => !foundPermissionKeys.includes(key));
+              missingCount = missingPermissions.length;
               
               if (missingPermissions.length > 0) {
                 console.warn(`⚠️ [PERMISSIONS] Permisos no encontrados para rol ${roleSlug}:`, missingPermissions);
@@ -364,37 +368,32 @@ export function registerHybridRoleRoutes(app: Express) {
                   permissionId: permission.id,
                   isActive: true,
                   assignedAt: new Date(),
-                  assignedBy: null // TODO: obtener del req.user si está disponible
+                  assignedBy: null
                 }));
 
                 await tx.insert(rolePermissions).values(rolePermissionInserts);
-                updates.push({ 
-                  roleSlug, 
-                  roleId: role.id,
-                  permissionsAssigned: permissionResults.length,
-                  missingPermissions: missingPermissions.length 
-                });
+                assignedCount = permissionResults.length;
               }
-            } else {
-              // Sin permisos asignados (rol sin permisos)
-              updates.push({ 
-                roleSlug, 
-                roleId: role.id,
-                permissionsAssigned: 0,
-                missingPermissions: 0
-              });
             }
 
-            console.log(`✅ [PERMISSIONS] Rol ${roleSlug} actualizado: ${permissionKeys.length} permisos asignados`);
-          } catch (roleError) {
-            console.error(`❌ [PERMISSIONS] Error actualizando rol ${roleSlug}:`, roleError);
-            const errorMessage = roleError instanceof Error ? roleError.message : 'Error desconocido';
-            errors.push(`Error actualizando rol ${roleSlug}: ${errorMessage}`);
-          }
-        }
+            return {
+              roleSlug, 
+              roleId: role.id,
+              permissionsAssigned: assignedCount,
+              missingPermissions: missingCount 
+            };
+          });
 
-        return { updates, errors };
-      });
+          updates.push(roleResult);
+          console.log(`✅ [PERMISSIONS] Rol ${roleSlug} actualizado: ${permissionKeys.length} permisos asignados`);
+        } catch (roleError) {
+          console.error(`❌ [PERMISSIONS] Error actualizando rol ${roleSlug}:`, roleError);
+          const errorMessage = roleError instanceof Error ? roleError.message : 'Error desconocido';
+          errors.push(`Error actualizando rol ${roleSlug}: ${errorMessage}`);
+        }
+      }
+
+      const result = { updates, errors };
 
       // Preparar respuesta
       if (result.errors.length > 0 && result.updates.length === 0) {
