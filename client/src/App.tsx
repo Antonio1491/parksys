@@ -1141,6 +1141,12 @@ function Router() {
           </Suspense>
         </Route>
         
+        <Route path="/admin/finance/pending-approval">
+          <Suspense fallback={<div className="p-8 text-center">Cargando aprobación de actividades...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/finance/PendingActivitiesApproval')))}
+          </Suspense>
+        </Route>
+        
 
 
         {/* Rutas del módulo de Recursos Humanos */}

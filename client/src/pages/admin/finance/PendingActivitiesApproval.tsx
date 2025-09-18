@@ -27,8 +27,8 @@ import {
   Filter,
   Eye
 } from "lucide-react";
-import { CostRecoveryCalculator } from "./CostRecoveryCalculator";
-import { AdvancedCalculator } from "./AdvancedCalculator";
+import CostRecoveryCalculator from "./CostRecoveryCalculator";
+import AdvancedCalculator from "./AdvancedCalculator";
 
 interface PendingActivity {
   id: number;
