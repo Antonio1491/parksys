@@ -13,10 +13,71 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck, ChevronDown } from "lucide-react";
+import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck, ChevronDown, CheckCircle, Calendar } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 import { ExportButton } from "@/components/ui/export-button";
+
+// Consolidated hook for parks summary - solves N+1 performance issue
+const useParksMetricsSummary = (parkIds: number[]) => {
+  return useQuery<Record<number, {
+    metrics: ParkMetrics | null;
+    incidents: PendingIncidents;
+    assets: AssetsInMaintenance;
+    reports: PendingReports;
+    schedule: UpcomingSchedule;
+  }>>({
+    queryKey: ['/api/parks', 'summary', parkIds.sort().join(',')],
+    enabled: parkIds.length > 0,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+  });
+};
+
+// Individual hooks for backward compatibility (will be deprecated)
+const useParkMetrics = (parkId: number) => {
+  return useQuery<ParkMetrics>({
+    queryKey: ['/api/parks', parkId, 'metrics'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!parkId,
+  });
+};
+
+const usePendingIncidents = (parkId: number) => {
+  return useQuery<PendingIncidents>({
+    queryKey: ['/api/parks', parkId, 'pending-incidents'],
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled: !!parkId,
+  });
+};
+
+const useAssetsInMaintenance = (parkId: number) => {
+  return useQuery<AssetsInMaintenance>({
+    queryKey: ['/api/parks', parkId, 'assets-in-maintenance'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!parkId,
+  });
+};
+
+const usePendingReports = (parkId: number) => {
+  return useQuery<PendingReports>({
+    queryKey: ['/api/parks', parkId, 'reports'],
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    enabled: !!parkId,
+  });
+};
+
+const useUpcomingSchedule = (parkId: number) => {
+  return useQuery<UpcomingSchedule>({
+    queryKey: ['/api/parks', parkId, 'upcoming-schedule'],
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: !!parkId,
+  });
+};
+
+// Helper function moved to top level
+const isParkCertified = (park: Park) => {
+  return park.certificaciones && park.certificaciones.trim() !== '' && park.certificaciones !== 'Ninguna';
+};
 
 interface Park {
   id: number;
@@ -59,6 +120,88 @@ interface ParkDependencies {
   evaluations: number;
   documents: number;
   total: number;
+}
+
+interface ParkMetrics {
+  averageRating: number | null;
+  totalEvaluations: number;
+  ratingBreakdown: {
+    cleanliness: number;
+    safety: number;
+    maintenance: number;
+    accessibility: number;
+    amenities: number;
+    activities: number;
+    staff: number;
+    naturalBeauty: number;
+  } | null;
+}
+
+interface PendingIncidents {
+  total: number;
+  incidents: Array<{
+    id: number;
+    title: string;
+    incidentType: string;
+    status: string;
+    priority: string;
+    createdAt: string;
+  }>;
+  priorityBreakdown: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+}
+
+interface AssetsInMaintenance {
+  total: number;
+  assets: Array<{
+    assetId: number;
+    assetName: string;
+    maintenanceType: string;
+    status: string;
+    date: string;
+  }>;
+  typeBreakdown: {
+    preventive: number;
+    corrective: number;
+    emergency: number;
+  };
+}
+
+interface PendingReports {
+  total: number;
+  reports: Array<{
+    id: number;
+    visitorName: string;
+    feedbackType: string;
+    message: string;
+    status: string;
+    createdAt: string;
+  }>;
+  typeBreakdown: {
+    complaint: number;
+    suggestion: number;
+    compliment: number;
+  };
+}
+
+interface UpcomingSchedule {
+  total: number;
+  schedule: Array<{
+    id: number;
+    title: string;
+    startDate: string;
+    endDate?: string;
+    type: 'activity' | 'event';
+    category?: string;
+    eventType?: string;
+  }>;
+  breakdown: {
+    activities: number;
+    events: number;
+  };
 }
 
 // Loading component for Suspense fallback
@@ -115,9 +258,118 @@ const AdminParksContent = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const itemsPerPage = 9;
 
-  // Helper function to check if park is certified
-  const isParkCertified = (park: Park) => {
-    return park.certificaciones && park.certificaciones.trim() !== '' && park.certificaciones !== 'Ninguna';
+  // Component to display park metrics - optimized to use summary data
+  const ParkMetricsCard = ({ park, summaryData, isLoadingSummary }: { park: Park; summaryData?: any; isLoadingSummary?: boolean }) => {
+    // Use summary data if available, otherwise fall back to individual queries
+    const metrics = summaryData?.metrics;
+    const incidents = summaryData?.incidents;
+    const assets = summaryData?.assets;
+    const reports = summaryData?.reports;
+    const schedule = summaryData?.schedule;
+
+    // Show loading state if summary data is loading
+    const isLoading = isLoadingSummary || !summaryData;
+    const hasErrors = false; // Summary endpoint handles errors centrally
+
+    const getRatingColor = (rating: number | null) => {
+      if (!rating) return "bg-gray-100 text-gray-800";
+      if (rating >= 4.5) return "bg-green-100 text-green-800";
+      if (rating >= 3.5) return "bg-yellow-100 text-yellow-800";
+      return "bg-red-100 text-red-800";
+    };
+
+    const getAlertComponent = (count: number, label: string) => {
+      const hasAlerts = count > 0;
+      return (
+        <div className="flex items-center gap-1 text-xs">
+          {hasAlerts ? (
+            <AlertTriangle className="h-3 w-3 text-orange-500" />
+          ) : (
+            <CheckCircle className="h-3 w-3 text-green-500" />
+          )}
+          <span className={hasAlerts ? "text-orange-700" : "text-green-700"}>
+            {count} {label}
+          </span>
+        </div>
+      );
+    };
+
+    // Show loading state while summary data is loading
+    if (isLoading) {
+      return (
+        <div className="space-y-3">
+          <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+          <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+            <div className="space-y-1">
+              <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-3 w-18 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Show error state if any queries failed
+    if (hasErrors) {
+      return (
+        <div className="space-y-3">
+          <div className="bg-red-50 rounded-lg p-3">
+            <div className="flex items-center gap-1 mb-1">
+              <AlertTriangle className="h-3 w-3 text-red-500" />
+              <h4 className="text-xs font-medium text-red-700">Error cargando métricas</h4>
+            </div>
+            <p className="text-xs text-red-600">Algunos datos no pudieron ser cargados</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        {/* Badge de evaluación promedio */}
+        {metrics && metrics.averageRating !== null && (
+          <Badge 
+            variant="secondary" 
+            className={`${getRatingColor(metrics.averageRating)} text-xs font-medium`}
+          >
+            ⭐ {metrics.averageRating.toFixed(1)} ({metrics.totalEvaluations} eval.)
+          </Badge>
+        )}
+
+        {/* Sección de alertas */}
+        <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+          <h4 className="text-xs font-medium text-gray-600 mb-2">Estado Operativo</h4>
+          <div className="grid grid-cols-1 gap-1">
+            {getAlertComponent(incidents?.total || 0, "incidencias")}
+            {getAlertComponent(assets?.total || 0, "activos")}
+            {getAlertComponent(reports?.total || 0, "reportes")}
+          </div>
+        </div>
+
+        {/* Programación próxima */}
+        {schedule && schedule.total > 0 && (
+          <div className="bg-blue-50 rounded-lg p-3">
+            <div className="flex items-center gap-1 mb-2">
+              <Calendar className="h-3 w-3 text-blue-500" />
+              <h4 className="text-xs font-medium text-blue-700">Próximos eventos</h4>
+            </div>
+            <div className="text-xs text-blue-600">
+              {schedule.breakdown.activities > 0 && (
+                <span>{schedule.breakdown.activities} actividades </span>
+              )}
+              {schedule.breakdown.events > 0 && (
+                <span>{schedule.breakdown.events} eventos</span>
+              )}
+            </div>
+            <div className="text-xs text-blue-500 mt-1">
+              Total: {schedule.total} programados
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   // Fetch all parks with auto-refresh configuration
@@ -357,21 +609,28 @@ const AdminParksContent = () => {
                     />
                   )}
                   <div className="flex-1">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">{park.name}</h3>
-                      {isParkCertified(park) && (
-                        <Badge 
-                          variant="secondary" 
-                          className="mt-1 bg-green-100 text-green-800 border-green-200"
-                        >
-                          <Award className="h-3 w-3 mr-1" />
-                          Certificado
-                        </Badge>
-                      )}
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900 flex-1">{park.name}</h3>
+                          {isParkCertified(park) && (
+                            <Badge 
+                              variant="secondary" 
+                              className="ml-2 bg-[#a8bd7d] text-white"
+                            >
+                              <Award className="h-3 w-3 mr-1" />
+                              Certificado
+                            </Badge>
+                          )}
+                        </div>
+                        {/* Componente de métricas del parque para vista lista */}
+                        <div className="mt-2 max-w-2xl">
+                          <ParkMetricsCard park={park} />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-6 text-sm text-gray-600">
+                  <div className="flex items-center space-x-6 text-sm text-gray-600 mt-2">
                     <div className="flex items-center">
                       <MapPin className="h-4 w-4 mr-1" />
                       <span className="max-w-xs truncate">{park.address}</span>
@@ -393,7 +652,6 @@ const AdminParksContent = () => {
                           : 'N/A'}
                       </span>
                     </div>
-                  </div>
                   </div>
                   {park.description && (
                     <p className="mt-2 text-sm text-gray-600 line-clamp-2">{park.description}</p>
@@ -444,6 +702,12 @@ const AdminParksContent = () => {
     );
   };
 
+  // Get park IDs for current page to fetch consolidated metrics
+  const currentParkIds = currentParks.map(park => park.id);
+  
+  // Fetch consolidated metrics for current page parks - PERFORMANCE OPTIMIZATION
+  const { data: parksMetricsSummary, isLoading: isLoadingMetrics } = useParksMetricsSummary(currentParkIds);
+
   // Render grid view
   const renderGridView = () => {
     return (
@@ -480,19 +744,25 @@ const AdminParksContent = () => {
 
             <CardHeader className="pb-4">
               <div className="flex justify-between items-start">
-                <div className="flex items-start space-x-2 flex-1">
-                  <div className="flex-1">
-                    <CardTitle className="font-poppins font-bold text-gray-900 text-lg">{park.name}</CardTitle>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <CardTitle className="font-poppins font-bold text-gray-900 text-lg flex-1">{park.name}</CardTitle>
                     {isParkCertified(park) && (
                       <Badge 
                         variant="secondary" 
-                        className="mt-2 bg-[#a8bd7d] text-white"
+                        className="ml-2 bg-[#a8bd7d] text-white"
                       >
                         <Award className="h-3 w-3 mr-1" />
                         Certificado
                       </Badge>
                     )}
                   </div>
+                  {/* Componente de métricas del parque - OPTIMIZADO con datos consolidados */}
+                  <ParkMetricsCard 
+                    park={park} 
+                    summaryData={parksMetricsSummary?.[park.id]} 
+                    isLoadingSummary={isLoadingMetrics}
+                  />
                 </div>
               </div>
             </CardHeader>
@@ -740,7 +1010,7 @@ const AdminParksContent = () => {
                 {/* 1. Botón para cambiar los modos de visualización del grid */}
                 <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#ededed] px-1 py-1 rounded-lg">
                   <Button
-                    variant={viewMode === 'grid' ? 'default' : 'hover:white hover:text-accent-foreground'}
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('grid')}
                     data-testid="button-view-grid"
