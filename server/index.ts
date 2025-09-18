@@ -1172,6 +1172,30 @@ app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) 
   }
 });
 
+// Nuevo endpoint para obtener parques con sus imágenes de galería
+app.get("/api/parks-with-images", async (req: Request, res: Response) => {
+  try {
+    console.log("🏞️ [CRITICAL] Obteniendo parques con imágenes de galería...");
+    
+    const { getParksDirectly } = await import('./direct-park-queries');
+    const parksWithImages = await getParksDirectly();
+    
+    // Formatear los datos para incluir primaryImage en el formato esperado por el frontend
+    const formattedParks = parksWithImages.map((park: any) => ({
+      ...park,
+      primaryImage: park.primaryImage || null,
+      mainImageUrl: park.primaryImage || null // Para compatibilidad
+    }));
+    
+    console.log(`🏞️ [CRITICAL] Returning ${formattedParks.length} parks via critical route`);
+    res.json({ data: formattedParks });
+    
+  } catch (error: any) {
+    console.error("❌ Error al obtener parques con imágenes:", error);
+    res.status(500).json({ message: "Error al obtener parques con imágenes" });
+  }
+});
+
 // NOTA: Ruta /api/parks movida a routes.ts para incluir imágenes
 // La ruta completa que incluye primaryImage está en routes.ts usando getParksDirectly
 
