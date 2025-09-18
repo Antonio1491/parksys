@@ -158,6 +158,110 @@ export function HierarchicalPermissionsMatrix({
     }
   }, [rolePermissions, roles]);
 
+  // Mapeo de nombres legibles para módulos y submódulos
+  const moduleNames: Record<string, string> = {
+    'gestion': 'Gestión',
+    'operations': 'O & M', 
+    'admin-finance': 'Admin & Finanzas',
+    'mkt-comm': 'Mkt & Comm',
+    'hr': 'Recursos Humanos',
+    'config-security': 'Configuración',
+  };
+
+  const submoduleNames: Record<string, string> = {
+    'parques': 'Parques',
+    'actividades': 'Actividades',
+    'amenidades': 'Amenidades',
+    'arbolado': 'Arbolado',
+    'fauna': 'Fauna',
+    'visitantes': 'Visitantes',
+    'eventos': 'Eventos',
+    'reservas': 'Reservas',
+    'evaluaciones': 'Evaluaciones',
+    'activos': 'Activos',
+    'incidencias': 'Incidencias',
+    'almacen': 'Almacén',
+    'voluntarios': 'Voluntarios',
+    'finanzas': 'Finanzas',
+    'contabilidad': 'Contabilidad',
+    'concesiones': 'Concesiones',
+    'patrocinadores': 'Patrocinadores',
+    'contratos': 'Contratos',
+    'activos-mkt': 'Activos',
+    'campañas': 'Campañas',
+    'empleados': 'Empleados',
+    'nomina': 'Nómina',
+    'vacaciones': 'Vacaciones',
+    'usuarios': 'Usuarios',
+    'roles': 'Roles',
+    'permisos': 'Permisos',
+    'auditoria': 'Auditoría',
+    'respaldos': 'Respaldos',
+    'actualizaciones': 'Actualizaciones',
+  };
+
+  const pageNames: Record<string, string> = {
+    'list': 'Listado',
+    'create': 'Crear',
+    'edit': 'Editar',
+    'dashboard': 'Dashboard',
+    'management': 'Gestión',
+    'calendar': 'Calendario',
+    'categories': 'Categorías',
+    'registrations': 'Inscripciones',
+    'instructors': 'Instructores',
+    'inventory': 'Inventario',
+    'species': 'Especies',
+    'maintenance': 'Mantenimiento',
+    'count': 'Conteo',
+    'feedback': 'Retroalimentación',
+    'tabulador': 'Tabulador',
+    'active': 'Activos',
+    'spaces': 'Espacios',
+    'new': 'Nuevo',
+    'assignments': 'Asignaciones',
+    'map': 'Mapa',
+    'movements': 'Movimientos',
+    'requisitions': 'Requisiciones',
+    'consumables': 'Consumibles',
+    'recognitions': 'Reconocimientos',
+    'registry': 'Registro',
+    'budgets': 'Presupuestos',
+    'cash-flow': 'Flujo de Efectivo',
+    'calculator': 'Calculadora',
+    'payments': 'Pagos',
+    'journal': 'Asientos',
+    'balance': 'Balanza',
+    'financials': 'Estados Financieros',
+    'integration': 'Integración',
+    'catalog': 'Catálogo',
+    'locations': 'Ubicaciones',
+    'finance': 'Finanzas',
+    'assets': 'Activos',
+    'campaigns': 'Campañas',
+    'beneficios': 'Beneficios',
+    'paquetes': 'Paquetes',
+    'directory': 'Directorio',
+    'payroll': 'Nómina',
+    'requests': 'Solicitudes',
+    'matrix': 'Matriz',
+    'backups': 'Respaldos',
+    'logs': 'Registros',
+    'updates': 'Actualizaciones',
+  };
+
+  const actionNames: Record<string, string> = {
+    'view': 'Ver',
+    'create': 'Crear',
+    'edit': 'Editar',
+    'delete': 'Eliminar',
+    'approve': 'Aprobar',
+    'publish': 'Publicar',
+    'export': 'Exportar',
+    'manage': 'Gestionar',
+    'process': 'Procesar',
+  };
+
   // Organizar datos jerárquicamente
   const organizeHierarchically = () => {
     const hierarchy: Record<string, any> = {};
@@ -173,7 +277,7 @@ export function HierarchicalPermissionsMatrix({
       if (!hierarchy[moduleSlug]) {
         hierarchy[moduleSlug] = {
           slug: moduleSlug,
-          name: moduleSlug.charAt(0).toUpperCase() + moduleSlug.slice(1).replace('-', ' & '),
+          name: moduleNames[moduleSlug] || moduleSlug.charAt(0).toUpperCase() + moduleSlug.slice(1),
           submodules: {}
         };
       }
@@ -181,7 +285,7 @@ export function HierarchicalPermissionsMatrix({
       if (!hierarchy[moduleSlug].submodules[submoduleSlug]) {
         hierarchy[moduleSlug].submodules[submoduleSlug] = {
           slug: submoduleSlug,
-          name: submoduleSlug.charAt(0).toUpperCase() + submoduleSlug.slice(1),
+          name: submoduleNames[submoduleSlug] || submoduleSlug.charAt(0).toUpperCase() + submoduleSlug.slice(1),
           pages: {}
         };
       }
@@ -189,14 +293,14 @@ export function HierarchicalPermissionsMatrix({
       if (!hierarchy[moduleSlug].submodules[submoduleSlug].pages[pageSlug]) {
         hierarchy[moduleSlug].submodules[submoduleSlug].pages[pageSlug] = {
           slug: pageSlug,
-          name: pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1).replace('-', ' '),
+          name: pageNames[pageSlug] || pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1),
           actions: []
         };
       }
       
       hierarchy[moduleSlug].submodules[submoduleSlug].pages[pageSlug].actions.push({
         slug: actionSlug,
-        name: actionSlug.charAt(0).toUpperCase() + actionSlug.slice(1),
+        name: actionNames[actionSlug] || actionSlug.charAt(0).toUpperCase() + actionSlug.slice(1),
         permissionKey: perm.permissionKey,
         description: perm.description
       });
@@ -443,14 +547,18 @@ export function HierarchicalPermissionsMatrix({
         </div>
 
         {/* Encabezados de roles */}
-        <div className="flex gap-4 items-center mb-4">
-          <div className="w-96"></div>
-          {filteredRoles.map((role: Role) => (
-            <div key={role.slug} className="flex-1 text-center">
-              <RoleBadge roleId={role.slug} />
-              <div className="text-xs text-gray-500 mt-1">Nivel {role.level}</div>
+        <div className="bg-gray-50 border border-gray-200 rounded-t-lg p-3 mb-2">
+          <div className="grid grid-cols-[1fr,auto] gap-4">
+            <div className="font-semibold text-gray-700">Estructura del Sistema</div>
+            <div className="flex gap-4">
+              {filteredRoles.map((role: Role) => (
+                <div key={role.slug} className="min-w-[140px] text-center">
+                  <RoleBadge roleId={role.slug} />
+                  <div className="text-xs text-gray-500 mt-1">Nivel {role.level}</div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
 
         {/* Árbol jerárquico */}
@@ -483,22 +591,50 @@ export function HierarchicalPermissionsMatrix({
                   </div>
                   
                   {/* Bulk actions para módulo */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-4">
                     {filteredRoles.map((role: Role) => (
-                      <div key={role.slug} className="flex items-center gap-1">
+                      <div key={role.slug} className="min-w-[140px] flex flex-col gap-1 items-center">
                         {role.slug === 'super-admin' ? (
-                          <Star className="h-4 w-4 text-yellow-500" />
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 text-yellow-500" />
+                            <span className="text-xs text-yellow-600">TODO</span>
+                          </div>
                         ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => bulkUpdateModule(role.slug, moduleSlug, true)}
-                            className="h-6 text-xs px-2"
-                            disabled={!editable || !canEditPermissions()}
-                          >
-                            <CheckCheck className="h-3 w-3 mr-1" />
-                            Todo
-                          </Button>
+                          <div className="flex flex-col gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => bulkUpdateModule(role.slug, moduleSlug, true)}
+                              className="h-6 text-xs px-2 w-full"
+                              disabled={!editable || !canEditPermissions()}
+                              title="Activar todos los permisos de este módulo"
+                            >
+                              <CheckCheck className="h-3 w-3 mr-1" />
+                              Todos
+                            </Button>
+                            <div className="flex gap-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => bulkUpdateAction(role.slug, 'view', true)}
+                                className="h-5 text-[10px] px-1 flex-1"
+                                disabled={!editable || !canEditPermissions()}
+                                title="Activar solo permisos de vista"
+                              >
+                                <Eye className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => bulkUpdateModule(role.slug, moduleSlug, false)}
+                                className="h-5 text-[10px] px-1 flex-1"
+                                disabled={!editable || !canEditPermissions()}
+                                title="Desactivar todos"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -536,21 +672,34 @@ export function HierarchicalPermissionsMatrix({
                             </div>
 
                             {/* Bulk actions para submódulo */}
-                            <div className="flex gap-2">
+                            <div className="flex gap-4">
                               {filteredRoles.map((role: Role) => (
-                                <div key={role.slug} className="flex items-center">
+                                <div key={role.slug} className="min-w-[140px] flex items-center justify-center">
                                   {role.slug === 'super-admin' ? (
                                     <Star className="h-3 w-3 text-yellow-500" />
                                   ) : (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => bulkUpdateSubmodule(role.slug, moduleSlug, submoduleSlug, true)}
-                                      className="h-5 text-xs px-1"
-                                      disabled={!editable || !canEditPermissions()}
-                                    >
-                                      <CheckCheck className="h-2 w-2" />
-                                    </Button>
+                                    <div className="flex gap-1">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => bulkUpdateSubmodule(role.slug, moduleSlug, submoduleSlug, true)}
+                                        className="h-5 text-xs px-2"
+                                        disabled={!editable || !canEditPermissions()}
+                                        title="Activar todos los permisos del submódulo"
+                                      >
+                                        <CheckCheck className="h-2 w-2" />
+                                      </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => bulkUpdateSubmodule(role.slug, moduleSlug, submoduleSlug, false)}
+                                        className="h-5 text-xs px-1"
+                                        disabled={!editable || !canEditPermissions()}
+                                        title="Desactivar todos"
+                                      >
+                                        <X className="h-2 w-2" />
+                                      </Button>
+                                    </div>
                                   )}
                                 </div>
                               ))}
@@ -561,38 +710,44 @@ export function HierarchicalPermissionsMatrix({
                           {expandedSubmodules.has(`${moduleSlug}:${submoduleSlug}`) && (
                             <div className="mt-3 space-y-2 pl-6">
                               {Object.entries(submoduleData.pages).map(([pageSlug, pageData]: [string, any]) => (
-                                <div key={pageSlug} className="flex items-center gap-3 p-2 bg-white rounded border">
-                                  <FileText className="h-4 w-4 text-gray-500" />
-                                  <div className="flex-1">
-                                    <span className="text-sm font-medium">{pageData.name}</span>
-                                    <div className="text-xs text-gray-500">{moduleSlug}:{submoduleSlug}:{pageSlug}</div>
+                                <div key={pageSlug} className="grid grid-cols-[1fr,auto] gap-4 p-3 bg-white rounded border">
+                                  <div className="flex items-center gap-3">
+                                    <FileText className="h-4 w-4 text-gray-500" />
+                                    <div>
+                                      <span className="text-sm font-medium">{pageData.name}</span>
+                                      <div className="text-xs text-gray-400 font-mono">{pageSlug}</div>
+                                    </div>
                                   </div>
 
-                                  {/* Acciones de la página */}
-                                  <div className="flex gap-2">
-                                    {pageData.actions.map((action: any) => (
-                                      <div key={action.slug} className="text-center">
-                                        <div className="text-xs text-gray-500 mb-1">{action.name}</div>
-                                        <div className="flex gap-1">
-                                          {filteredRoles.map((role: Role) => (
-                                            <div key={`${role.slug}-${action.permissionKey}`}>
-                                              {role.slug === 'super-admin' ? (
-                                                <div className="w-4 h-4 flex items-center justify-center">
-                                                  <Star className="h-3 w-3 text-yellow-500" />
-                                                </div>
-                                              ) : (
+                                  {/* Acciones de la página alineadas con los roles */}
+                                  <div className="flex gap-4">
+                                    {filteredRoles.map((role: Role) => (
+                                      <div key={role.slug} className="min-w-[140px]">
+                                        {role.slug === 'super-admin' ? (
+                                          <div className="flex items-center justify-center gap-1">
+                                            <Star className="h-3 w-3 text-yellow-500" />
+                                            <span className="text-xs text-yellow-600">TODOS</span>
+                                          </div>
+                                        ) : (
+                                          <div className="grid grid-cols-3 gap-1">
+                                            {pageData.actions.map((action: any) => (
+                                              <div key={action.slug} className="text-center">
                                                 <Checkbox
                                                   checked={hasPermission(role.slug, action.permissionKey)}
                                                   onCheckedChange={(checked) => 
                                                     updatePermission(role.slug, action.permissionKey, !!checked)
                                                   }
                                                   disabled={!editable || !canEditPermissions()}
-                                                  className="h-3 w-3"
+                                                  className="h-4 w-4"
+                                                  title={`${action.name} - ${action.description}`}
                                                 />
-                                              )}
-                                            </div>
-                                          ))}
-                                        </div>
+                                                <div className="text-[9px] text-gray-500 mt-1">
+                                                  {action.slug.substring(0, 3).toUpperCase()}
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
                                       </div>
                                     ))}
                                   </div>
