@@ -713,28 +713,83 @@ export class RoleService {
   // Actualizar permisos de rol
   async updateRolePermissions(roleId: number, permissions: Record<string, any>): Promise<boolean> {
     try {
+      console.log('🔍 [ROLE-SERVICE] updateRolePermissions input:', { roleId, permissions, type: typeof permissions, isArray: Array.isArray(permissions) });
+      
       // ✅ CRÍTICO: Para super-admin, mantener el formato {"all": true}
       const role = await this.getRoleById(roleId);
       if (role?.slug === 'super-admin') {
+        console.log('🔧 [ROLE-SERVICE] Super admin detected, saving {"all": true}');
         // Super admin siempre mantiene {"all": true}
         await db
           .update(roles)
           .set({ permissions: { all: true }, updatedAt: new Date() })
           .where(eq(roles.id, roleId));
       } else {
+        console.log('🔧 [ROLE-SERVICE] Regular role detected, processing permissions...');
+        
+        // Si se recibe un array de permission keys, convertir a formato estructurado
+        let processedPermissions: Record<string, string[]>;
+        if (Array.isArray(permissions)) {
+          console.log('🔄 [ROLE-SERVICE] Converting array format to structured format...');
+          processedPermissions = this.convertPermissionKeysToStructured(permissions);
+        } else {
+          console.log('🔄 [ROLE-SERVICE] Already in structured format');
+          processedPermissions = permissions;
+        }
+        
+        console.log('🔍 [ROLE-SERVICE] Processed permissions:', processedPermissions);
+        
         // ✅ CRÍTICO: Para otros roles, convertir de módulos modernos a formato legacy
-        const legacyPermissions = this.mapToLegacyPermissions(permissions);
+        const legacyPermissions = this.mapToLegacyPermissions(processedPermissions);
+        console.log('🔍 [ROLE-SERVICE] Legacy permissions:', legacyPermissions);
         
         await db
           .update(roles)
           .set({ permissions: legacyPermissions, updatedAt: new Date() })
           .where(eq(roles.id, roleId));
+          
+        console.log('✅ [ROLE-SERVICE] Permissions saved to database');
       }
       return true;
     } catch (error) {
-      console.error('Error actualizando permisos:', error);
+      console.error('💥 [ROLE-SERVICE] Error actualizando permisos:', error);
       return false;
     }
+  }
+
+  // Convertir array de permission keys a formato estructurado
+  private convertPermissionKeysToStructured(permissionKeys: string[]): Record<string, string[]> {
+    console.log('🔄 [CONVERT] Input permission keys:', permissionKeys);
+    const structured: Record<string, string[]> = {};
+    
+    permissionKeys.forEach(key => {
+      if (key === 'all') {
+        // Special case for super admin
+        structured['all'] = ['true'];
+        return;
+      }
+      
+      // Parse permission key format: module:submodule:page:action
+      const parts = key.split(':');
+      if (parts.length >= 4) {
+        const [module, submodule, page, action] = parts;
+        const moduleKey = submodule; // Use submodule as the key for grouping
+        
+        if (!structured[moduleKey]) {
+          structured[moduleKey] = [];
+        }
+        
+        // Add the full permission key to preserve exact permissions
+        if (!structured[moduleKey].includes(key)) {
+          structured[moduleKey].push(key);
+        }
+      } else {
+        console.warn('🔔 [CONVERT] Invalid permission key format:', key);
+      }
+    });
+    
+    console.log('🔍 [CONVERT] Output structured permissions:', structured);
+    return structured;
   }
 
   // Mapeo de módulos antiguos a nuevos para migración de datos (SOLO LECTURA)
