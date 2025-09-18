@@ -1,10 +1,61 @@
 import { Request, Response } from 'express';
-import { ZodError } from 'zod';
+import { ZodError, z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { sql, eq } from 'drizzle-orm';
 import { insertActivitySchema, activityCategories, insertActivityCategorySchema, activities } from '@shared/schema';
 import { storage } from './storage';
 import { db } from './db';
+
+// Schema para validar cálculos financieros - preserva todos los campos para fidelidad completa
+const financialCalculationSchema = z.object({
+  data: z.object({
+    title: z.string(),
+    concept: z.string(),
+    audience: z.string(),
+    location: z.string(),
+    durationPerClass: z.number(),
+    minCapacity: z.number(),
+    maxCapacity: z.number(),
+    feePerPerson: z.number(),
+    classesPerMonth: z.number(),
+    desiredMarginPercentage: z.number(),
+    instructorCost: z.number(),
+    materialsCost: z.number(),
+    variableCostPerPerson: z.number(),
+    indirect1: z.number(),
+    indirect2: z.number(),
+    indirect3: z.number(),
+    // Campos adicionales de la calculadora
+    amenityCost: z.number().optional(),
+    otherDirectCosts: z.number().optional(),
+    otherIndirectCosts: z.number().optional()
+  }).passthrough(), // Preserva campos no definidos para compatibilidad futura
+  calculations: z.object({
+    minNetIncomePerClass: z.number(),
+    maxNetIncomePerClass: z.number(),
+    maxTotalCostsPerClass: z.number(),
+    minTotalCostsPerClass: z.number().optional(),
+    minGrossProfitPerClass: z.number(),
+    maxGrossProfitPerClass: z.number(),
+    maxGrossMargin: z.number(),
+    minGrossMargin: z.number().optional(),
+    breakEvenPoint: z.number(),
+    maxMeetsExpectations: z.boolean(),
+    minMeetsExpectations: z.boolean().optional(),
+    monthlyTotalCosts: z.number(),
+    maxMonthlyIncome: z.number(),
+    minMonthlyIncome: z.number().optional(),
+    maxMonthlyGrossProfit: z.number(),
+    minMonthlyGrossProfit: z.number().optional()
+  }).passthrough(), // Preserva métricas adicionales calculadas por la UI
+  recommendations: z.array(z.object({
+    type: z.string(),
+    message: z.string(),
+    priority: z.string()
+  })).optional(), // Opcional en caso de que no haya recomendaciones
+  timestamp: z.string(),
+  calculatorVersion: z.string().default("unified-1.0")
+}).passthrough(); // Preserva campos adicionales a nivel raíz
 
 // Controladores para gestión de actividades
 export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated: any, hasParkAccess: any) {
@@ -444,6 +495,135 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
         message: "Error interno del servidor al importar actividades",
         error: error instanceof Error ? error.message : "Error desconocido"
       });
+    }
+  });
+
+  // ===== ENDPOINTS DE CÁLCULO FINANCIERO =====
+  
+  // Guardar cálculo financiero para una actividad
+  apiRouter.post("/activities/:id/financial-calculation", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const activityId = Number(req.params.id);
+      const calculationData = req.body;
+
+      // Validar la estructura del cálculo usando Zod
+      const validatedCalculation = financialCalculationSchema.parse(calculationData);
+
+      console.log(`💰 Guardando cálculo financiero para actividad ${activityId}`);
+
+      // Actualizar la actividad con el cálculo validado
+      const [updatedActivity] = await db
+        .update(activities)
+        .set({
+          financialCalculation: validatedCalculation,
+          calculationSavedAt: new Date(),
+          calculationVersion: validatedCalculation.calculatorVersion
+        })
+        .where(eq(activities.id, activityId))
+        .returning();
+
+      if (!updatedActivity) {
+        return res.status(404).json({ message: "Actividad no encontrada" });
+      }
+
+      console.log(`✅ Cálculo financiero guardado para actividad "${updatedActivity.title}"`);
+      res.json({ 
+        message: "Cálculo financiero guardado exitosamente",
+        calculation: validatedCalculation,
+        savedAt: updatedActivity.calculationSavedAt
+      });
+
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      console.error("Error al guardar cálculo financiero:", error);
+      res.status(500).json({ message: "Error al guardar cálculo financiero" });
+    }
+  });
+
+  // Obtener cálculo financiero de una actividad
+  apiRouter.get("/activities/:id/financial-calculation", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const activityId = Number(req.params.id);
+
+      const [activity] = await db
+        .select({
+          id: activities.id,
+          title: activities.title,
+          financialCalculation: activities.financialCalculation,
+          calculationSavedAt: activities.calculationSavedAt,
+          calculationVersion: activities.calculationVersion,
+          price: activities.price,
+          capacity: activities.capacity,
+          duration: activities.duration
+        })
+        .from(activities)
+        .where(eq(activities.id, activityId))
+        .limit(1);
+
+      if (!activity) {
+        return res.status(404).json({ message: "Actividad no encontrada" });
+      }
+
+      res.json({
+        activityId: activity.id,
+        title: activity.title,
+        calculation: activity.financialCalculation,
+        savedAt: activity.calculationSavedAt,
+        version: activity.calculationVersion,
+        basicData: {
+          price: activity.price,
+          capacity: activity.capacity,
+          duration: activity.duration
+        }
+      });
+
+    } catch (error) {
+      console.error("Error al obtener cálculo financiero:", error);
+      res.status(500).json({ message: "Error al obtener cálculo financiero" });
+    }
+  });
+
+  // Obtener actividades con cálculos financieros (para dashboard)
+  apiRouter.get("/activities/with-calculations", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { status } = req.query;
+      
+      let query = db
+        .select({
+          id: activities.id,
+          title: activities.title,
+          financialStatus: activities.financialStatus,
+          status: activities.status,
+          price: activities.price,
+          capacity: activities.capacity,
+          duration: activities.duration,
+          calculationSavedAt: activities.calculationSavedAt,
+          financialCalculation: activities.financialCalculation,
+          startDate: activities.startDate,
+          endDate: activities.endDate
+        })
+        .from(activities)
+        .where(sql`${activities.financialCalculation} IS NOT NULL`);
+
+      // Filtrar por estado si se proporciona
+      if (status && typeof status === 'string') {
+        query = query.where(eq(activities.financialStatus, status as any));
+      }
+
+      const activitiesWithCalculations = await query.orderBy(sql`${activities.calculationSavedAt} DESC`);
+
+      res.json({
+        activities: activitiesWithCalculations,
+        total: activitiesWithCalculations.length,
+        message: "Actividades con cálculos financieros obtenidas exitosamente"
+      });
+
+    } catch (error) {
+      console.error("Error al obtener actividades con cálculos:", error);
+      res.status(500).json({ message: "Error al obtener actividades con cálculos financieros" });
     }
   });
 }

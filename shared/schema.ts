@@ -635,6 +635,11 @@ export const activities = pgTable("activities", {
   reviewedBy: integer("reviewed_by"), // ID del usuario que revisó (referencias a users)
   reviewedAt: timestamp("reviewed_at"), // fecha de revisión financiera
   
+  // Cálculo financiero detallado de la calculadora
+  financialCalculation: jsonb("financial_calculation"), // datos completos del cálculo de la calculadora unificada
+  calculationSavedAt: timestamp("calculation_saved_at"), // fecha cuando se guardó el cálculo
+  calculationVersion: text("calculation_version").default("1.0"), // versión del cálculo para compatibilidad
+  
   // Imagen simple (estandarizado como otros módulos)
   imageUrl: text("image_url"),
 });

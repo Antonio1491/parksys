@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,6 +114,10 @@ const CalculadoraFinanciera = () => {
     const search = typeof window !== 'undefined' ? window.location.search : '';
     return new URLSearchParams(search);
   };
+
+  // Estados para guardar cálculos
+  const [activityId, setActivityId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("calculator");
   const [templateName, setTemplateName] = useState("");
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
@@ -198,6 +204,15 @@ const CalculadoraFinanciera = () => {
       }
     }
   ]);
+
+  // Parse URL params on mount
+  useEffect(() => {
+    const searchParams = getSearchParams();
+    const activityIdParam = searchParams.get('activityId');
+    if (activityIdParam) {
+      setActivityId(parseInt(activityIdParam));
+    }
+  }, [location]);
 
   // Datos de la calculadora - inicializar con valores por defecto o de URL params
   const [data, setData] = useState<CalculatorData>(() => {
@@ -413,6 +428,80 @@ INDICADORES:
     });
   };
 
+  // Función para guardar cálculo financiero
+  const saveCalculationMutation = useMutation({
+    mutationFn: async (calcData: any) => {
+      if (!activityId) {
+        throw new Error("No se ha especificado una actividad");
+      }
+      
+      return apiRequest(`/api/activities/${activityId}/financial-calculation`, {
+        method: 'POST',
+        body: calcData
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "¡Cálculo Guardado!",
+        description: "El cálculo financiero se ha guardado correctamente en la actividad",
+      });
+      // Invalidar cache de actividades pendientes
+      queryClient.invalidateQueries({ queryKey: ['/api/activities/pending-approval', 'por_costear'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error al Guardar",
+        description: error instanceof Error ? error.message : "No se pudo guardar el cálculo",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const saveCalculation = () => {
+    if (!activityId) {
+      toast({
+        title: "Sin Actividad",
+        description: "No se puede guardar sin asociar a una actividad específica",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const calculationData = {
+      data: data,
+      calculations: calculations,
+      recommendations: [], // Array vacío por ahora - se puede implementar lógica de recomendaciones más adelante
+      timestamp: new Date().toISOString(),
+      calculatorVersion: "unified-1.0"
+    };
+
+    saveCalculationMutation.mutate(calculationData);
+  };
+
+  const copyResults = () => {
+    const results = `
+Calculadora Financiera - Resumen
+================================
+Actividad: ${data.title}
+Capacidad: ${data.minCapacity} - ${data.maxCapacity} personas
+Precio por persona: ${formatCurrency(data.feePerPerson)}
+
+RESULTADOS PRINCIPALES:
+- Ingresos: ${formatCurrency(calculations.minNetIncomePerClass)} - ${formatCurrency(calculations.maxNetIncomePerClass)}
+- Costos: ${formatCurrency(calculations.maxTotalCostsPerClass)}
+- Utilidad: ${formatCurrency(calculations.minGrossProfitPerClass)} - ${formatCurrency(calculations.maxGrossProfitPerClass)}
+- Margen de Utilidad: ${formatPercentage(calculations.maxGrossMargin)}
+- Punto de Equilibrio: ${calculations.breakEvenPoint} participantes
+- Cumple Expectativas: ${calculations.maxMeetsExpectations ? 'Sí' : 'No'}
+    `;
+    
+    navigator.clipboard.writeText(results.trim());
+    toast({
+      title: "Resultados copiados",
+      description: "Los resultados han sido copiados al portapapeles"
+    });
+  };
+
   return (
     <AdminLayout>
       <DynamicRoleGuard 
@@ -502,6 +591,17 @@ INDICADORES:
                     </DialogContent>
                   </Dialog>
 
+                  {activityId && (
+                    <Button 
+                      onClick={saveCalculation}
+                      disabled={saveCalculationMutation.isPending}
+                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                      data-testid="button-save-calculation"
+                    >
+                      <Save className="h-4 w-4" />
+                      {saveCalculationMutation.isPending ? "Guardando..." : "Guardar en Actividad"}
+                    </Button>
+                  )}
                   <Button onClick={copyResults} variant="outline" className="flex items-center gap-2">
                     <Copy className="h-4 w-4" />
                     Copiar Resultados
