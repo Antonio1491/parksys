@@ -55,6 +55,7 @@ const CAPACIDADES_DIFERENTES = [
 
 // Opciones de estado de actividad
 const ESTADOS_ACTIVIDAD = [
+  { id: "por_costear", label: "🔵 Por Costear", emoji: "🔵" },
   { id: "activa", label: "🟢 Activa", emoji: "🟢" },
   { id: "programada", label: "🟡 Programada", emoji: "🟡" },
   { id: "cancelada", label: "🔴 Cancelada", emoji: "🔴" },
