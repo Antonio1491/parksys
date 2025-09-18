@@ -37,7 +37,7 @@ export function registerRoleRoutes(app: Express) {
     try {
       // Verificar permisos - solo super-admin y admin pueden crear roles
       const userRole = req.user?.role;
-      if (userRole !== 'super-admin' && userRole !== 'admin') {
+      if (userRole !== 'super_admin' && userRole !== 'admin') {
         return res.status(403).json({ 
           error: 'No tienes permisos para crear roles. Solo Super Administradores y Administradores Generales pueden crear roles.' 
         });
