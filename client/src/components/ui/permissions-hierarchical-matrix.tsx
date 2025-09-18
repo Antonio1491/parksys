@@ -120,6 +120,21 @@ export function HierarchicalPermissionsMatrix({
     refetchOnWindowFocus: false,
   });
 
+  const { data: permissionModules = [] } = useQuery({
+    queryKey: ['/api/permissions/modules'],
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: permissionSubmodules = [] } = useQuery({
+    queryKey: ['/api/permissions/submodules'],
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: permissionPages = [] } = useQuery({
+    queryKey: ['/api/permissions/pages'],
+    refetchOnWindowFocus: false,
+  });
+
   // Mutation para guardar
   const saveMutation = useMutation({
     mutationFn: (newPermissions: typeof permissions) => {
@@ -158,97 +173,27 @@ export function HierarchicalPermissionsMatrix({
     }
   }, [rolePermissions, roles]);
 
-  // Mapeo de nombres legibles para módulos y submódulos
-  const moduleNames: Record<string, string> = {
-    'gestion': 'Gestión',
-    'operations': 'O & M', 
-    'admin-finance': 'Admin & Finanzas',
-    'mkt-comm': 'Mkt & Comm',
-    'hr': 'Recursos Humanos',
-    'config-security': 'Configuración',
-  };
+  // Crear mapeos dinámicos desde los datos de la BD
+  const moduleNames: Record<string, string> = {};
+  (permissionModules as any[]).forEach((module: any) => {
+    if (module.slug && module.name) {
+      moduleNames[module.slug] = module.name;
+    }
+  });
 
-  const submoduleNames: Record<string, string> = {
-    'parques': 'Parques',
-    'actividades': 'Actividades',
-    'amenidades': 'Amenidades',
-    'arbolado': 'Arbolado',
-    'fauna': 'Fauna',
-    'visitantes': 'Visitantes',
-    'eventos': 'Eventos',
-    'reservas': 'Reservas',
-    'evaluaciones': 'Evaluaciones',
-    'activos': 'Activos',
-    'incidencias': 'Incidencias',
-    'almacen': 'Almacén',
-    'voluntarios': 'Voluntarios',
-    'finanzas': 'Finanzas',
-    'contabilidad': 'Contabilidad',
-    'concesiones': 'Concesiones',
-    'patrocinadores': 'Patrocinadores',
-    'contratos': 'Contratos',
-    'activos-mkt': 'Activos',
-    'campañas': 'Campañas',
-    'empleados': 'Empleados',
-    'nomina': 'Nómina',
-    'vacaciones': 'Vacaciones',
-    'usuarios': 'Usuarios',
-    'roles': 'Roles',
-    'permisos': 'Permisos',
-    'auditoria': 'Auditoría',
-    'respaldos': 'Respaldos',
-    'actualizaciones': 'Actualizaciones',
-  };
+  const submoduleNames: Record<string, string> = {};
+  (permissionSubmodules as any[]).forEach((submodule: any) => {
+    if (submodule.slug && submodule.name) {
+      submoduleNames[submodule.slug] = submodule.name;
+    }
+  });
 
-  const pageNames: Record<string, string> = {
-    'list': 'Listado',
-    'create': 'Crear',
-    'edit': 'Editar',
-    'dashboard': 'Dashboard',
-    'management': 'Gestión',
-    'calendar': 'Calendario',
-    'categories': 'Categorías',
-    'registrations': 'Inscripciones',
-    'instructors': 'Instructores',
-    'inventory': 'Inventario',
-    'species': 'Especies',
-    'maintenance': 'Mantenimiento',
-    'count': 'Conteo',
-    'feedback': 'Retroalimentación',
-    'tabulador': 'Tabulador',
-    'active': 'Activos',
-    'spaces': 'Espacios',
-    'new': 'Nuevo',
-    'assignments': 'Asignaciones',
-    'map': 'Mapa',
-    'movements': 'Movimientos',
-    'requisitions': 'Requisiciones',
-    'consumables': 'Consumibles',
-    'recognitions': 'Reconocimientos',
-    'registry': 'Registro',
-    'budgets': 'Presupuestos',
-    'cash-flow': 'Flujo de Efectivo',
-    'calculator': 'Calculadora',
-    'payments': 'Pagos',
-    'journal': 'Asientos',
-    'balance': 'Balanza',
-    'financials': 'Estados Financieros',
-    'integration': 'Integración',
-    'catalog': 'Catálogo',
-    'locations': 'Ubicaciones',
-    'finance': 'Finanzas',
-    'assets': 'Activos',
-    'campaigns': 'Campañas',
-    'beneficios': 'Beneficios',
-    'paquetes': 'Paquetes',
-    'directory': 'Directorio',
-    'payroll': 'Nómina',
-    'requests': 'Solicitudes',
-    'matrix': 'Matriz',
-    'backups': 'Respaldos',
-    'logs': 'Registros',
-    'updates': 'Actualizaciones',
-  };
+  const pageNames: Record<string, string> = {};
+  (permissionPages as any[]).forEach((page: any) => {
+    if (page.slug && page.name) {
+      pageNames[page.slug] = page.name;
+    }
+  });
 
   const actionNames: Record<string, string> = {
     'view': 'Ver',
