@@ -155,6 +155,11 @@ export const DynamicRoleGuard: React.FC<DynamicRoleGuardProps> = ({
     return <>{fallback}</>;
   }
 
+  // ✅ TEMPORARY FIX: Allow Super Admin access
+  if (userRole.slug === 'super-admin') {
+    return <>{children}</>;
+  }
+  
   // Verificar permisos de módulo usando sistema adaptativo
   if (requiredModule && modulePermissionCheck.data && !modulePermissionCheck.data.hasPermission) {
     return <>{fallback}</>;

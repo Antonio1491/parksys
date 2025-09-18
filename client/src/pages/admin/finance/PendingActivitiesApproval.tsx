@@ -217,7 +217,7 @@ const PendingActivitiesApproval = () => {
     <AdminLayout>
       <DynamicRoleGuard 
         requiredModule="Finanzas" 
-        requiredPermission="view"
+        requiredPermission="read"
         fallback={
           <div className="p-8 text-center">
             <div className="text-6xl mb-4">🔒</div>
