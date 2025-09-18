@@ -53,13 +53,6 @@ const CAPACIDADES_DIFERENTES = [
   { id: "temporal", label: "Temporal" }
 ];
 
-// Opciones de concepto de costeo
-const CONCEPTOS_COSTEO = [
-  { id: "entretenimiento", label: "Entretenimiento" },
-  { id: "deportivo", label: "Deportivo" },
-  { id: "cultural", label: "Cultural" },
-  { id: "educativo", label: "Educativo" }
-];
 
 // Opciones de estado de actividad
 const ESTADOS_ACTIVIDAD = [
@@ -92,7 +85,6 @@ const formSchema = z.object({
   
   // Campos para precio
   price: z.coerce.number().min(0).optional(),
-  isPriceRandom: z.boolean().default(false),
   isFree: z.boolean().default(false),
   
   // Campos para descuentos aplicables
@@ -115,10 +107,6 @@ const formSchema = z.object({
   specialNeeds: z.array(z.string()).optional(),
   
   // Campos de costeo financiero
-  costingConcept: z.string().min(1, "Debes seleccionar un concepto de costeo").refine(
-    value => ["entretenimiento", "deportivo", "cultural", "educativo"].includes(value),
-    { message: "Concepto de costeo no válido" }
-  ),
   costRecoveryPercentage: z.coerce.number().min(0).max(100).default(30),
   costingNotes: z.string().optional(),
   
@@ -234,7 +222,6 @@ const CrearActividadPage = () => {
       capacity: undefined,
       duration: undefined,
       price: 0,
-      isPriceRandom: false,
       isFree: false,
       
       // Valores por defecto para descuentos
@@ -252,7 +239,6 @@ const CrearActividadPage = () => {
       specialNeeds: [],
       
       // Valores por defecto para costeo financiero
-      costingConcept: "",
       costRecoveryPercentage: 30,
       costingNotes: "",
       
@@ -315,7 +301,6 @@ const CrearActividadPage = () => {
         capacity: values.capacity || null,
         duration: duracion || null,
         price: values.price || 0,
-        isPriceRandom: values.isPriceRandom || false,
         isFree: values.isFree || false,
         
         // Campos de descuentos
@@ -333,7 +318,6 @@ const CrearActividadPage = () => {
         specialNeeds: values.specialNeeds || [],
         
         // Campos de costeo financiero
-        costingConcept: values.costingConcept || null,
         costRecoveryPercentage: values.costRecoveryPercentage || 30,
         costingNotes: values.costingNotes || "",
         
@@ -952,16 +936,69 @@ const CrearActividadPage = () => {
                 )}
               </div>
 
-              {/* Sección de capacidad y materiales */}
+              {/* Sección de costeo y precio */}
               <div className="space-y-4 pt-4 border-t">
-                <h3 className="text-lg font-medium">Capacidad y Materiales</h3>
+                <h3 className="text-lg font-medium">Costeo y Precio</h3>
+                
+                {/* 1. Actividad Gratuita (primero) */}
+                <FormField
+                  control={form.control}
+                  name="isFree"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            if (checked) {
+                              form.setValue("price", 0);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormLabel className="font-medium text-base">
+                        🎫 Actividad Gratuita
+                      </FormLabel>
+                    </FormItem>
+                  )}
+                />
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* 2. Precio (segundo) */}
+                  <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>💰 Precio (MXN)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            step="0.01" 
+                            placeholder="Ej: 50.00" 
+                            {...field} 
+                            disabled={form.watch("isFree")}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          {form.watch("isFree") 
+                            ? "Actividad gratuita" 
+                            : "Precio fijo por persona"}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* 3. Capacidad Máxima (tercero) */}
                   <FormField
                     control={form.control}
                     name="capacity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacidad máxima</FormLabel>
+                        <FormLabel>👥 Capacidad Máxima</FormLabel>
                         <FormControl>
                           <Input type="number" min="0" placeholder="Ej: 20" {...field} />
                         </FormControl>
@@ -972,85 +1009,6 @@ const CrearActividadPage = () => {
                       </FormItem>
                     )}
                   />
-
-                  <div className="space-y-3">
-                    <FormField
-                      control={form.control}
-                      name="price"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Precio (MXN)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              min="0" 
-                              step="0.01" 
-                              placeholder="Ej: 50.00" 
-                              {...field} 
-                              disabled={form.watch("isFree") || form.watch("isPriceRandom")}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            {form.watch("isFree") 
-                              ? "Actividad gratuita" 
-                              : form.watch("isPriceRandom") 
-                                ? "El precio será variable o por donativo" 
-                                : "Precio fijo por persona"}
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="flex flex-col gap-2 mt-2">
-                      <FormField
-                        control={form.control}
-                        name="isFree"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={(checked) => {
-                                  field.onChange(checked);
-                                  if (checked) {
-                                    form.setValue("price", 0);
-                                    form.setValue("isPriceRandom", false);
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-medium">
-                              Actividad Gratuita
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="isPriceRandom"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={(checked) => {
-                                  field.onChange(checked);
-                                  if (checked) {
-                                    form.setValue("isFree", false);
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-medium">
-                              Precio Aleatorio (Donativo/Variable)
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
                 </div>
 
                 {/* Sección de descuentos aplicables */}
@@ -1274,34 +1232,6 @@ const CrearActividadPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="costingConcept"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Concepto de Costeo *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecciona el concepto" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {CONCEPTOS_COSTEO.map((concepto) => (
-                                <SelectItem key={concepto.id} value={concepto.id}>
-                                  {concepto.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormDescription>
-                            Tipo de actividad para análisis financiero
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
                       name="costRecoveryPercentage"
                       render={({ field }) => (
                         <FormItem>
@@ -1350,22 +1280,6 @@ const CrearActividadPage = () => {
                     )}
                   />
 
-                  {/* Resumen de costeo */}
-                  {form.watch("costingConcept") && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <h5 className="text-sm font-medium text-green-800 mb-2">Configuración de Costeo:</h5>
-                      <div className="text-xs text-green-700 space-y-1">
-                        <p>• Concepto: {(() => {
-                          const concepto = CONCEPTOS_COSTEO.find(c => c.id === form.watch("costingConcept"));
-                          return concepto ? concepto.label : "No seleccionado";
-                        })()}</p>
-                        <p>• Meta de recuperación: {form.watch("costRecoveryPercentage") || 30}% de los costos</p>
-                        {form.watch("costingNotes") && (
-                          <p>• Observaciones: {form.watch("costingNotes")?.substring(0, 50)}...</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 <FormField
