@@ -79,9 +79,10 @@ export default function EditInstructorPage() {
   });
 
   // Obtener lista de parques para selector
-  const { data: parks = [] } = useQuery({
+  const { data: parksResponse } = useQuery({
     queryKey: ['/api/parks'],
   });
+  const parks = Array.isArray(parksResponse?.data) ? parksResponse.data : [];
   
   // Debug: Log parks data
   useEffect(() => {
