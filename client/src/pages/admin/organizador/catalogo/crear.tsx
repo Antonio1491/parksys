@@ -53,6 +53,14 @@ const CAPACIDADES_DIFERENTES = [
   { id: "temporal", label: "Temporal" }
 ];
 
+// Opciones de concepto de costeo
+const CONCEPTOS_COSTEO = [
+  { id: "entretenimiento", label: "Entretenimiento" },
+  { id: "deportivo", label: "Deportivo" },
+  { id: "cultural", label: "Cultural" },
+  { id: "educativo", label: "Educativo" }
+];
+
 // Opciones de estado de actividad
 const ESTADOS_ACTIVIDAD = [
   { id: "por_costear", label: "🔵 Por Costear", emoji: "🔵" },
@@ -105,6 +113,14 @@ const formSchema = z.object({
   
   // Campos para capacidades diferentes
   specialNeeds: z.array(z.string()).optional(),
+  
+  // Campos de costeo financiero
+  costingConcept: z.string().min(1, "Debes seleccionar un concepto de costeo").refine(
+    value => ["entretenimiento", "deportivo", "cultural", "educativo"].includes(value),
+    { message: "Concepto de costeo no válido" }
+  ),
+  costRecoveryPercentage: z.coerce.number().min(0).max(100).default(30),
+  costingNotes: z.string().optional(),
   
   // Campo para seleccionar al instructor por su ID
   instructorId: z.string().optional(),
@@ -234,6 +250,12 @@ const CrearActividadPage = () => {
       recurringDays: [],
       targetMarket: [],
       specialNeeds: [],
+      
+      // Valores por defecto para costeo financiero
+      costingConcept: "",
+      costRecoveryPercentage: 30,
+      costingNotes: "",
+      
       instructorId: "",
       // Valores por defecto para registro ciudadano
       allowsPublicRegistration: false,
@@ -309,6 +331,12 @@ const CrearActividadPage = () => {
         recurringDays: values.recurringDays || [],
         targetMarket: values.targetMarket || [],
         specialNeeds: values.specialNeeds || [],
+        
+        // Campos de costeo financiero
+        costingConcept: values.costingConcept || null,
+        costRecoveryPercentage: values.costRecoveryPercentage || 30,
+        costingNotes: values.costingNotes || "",
+        
         // Campos para registro ciudadano
         allowsPublicRegistration: values.allowsPublicRegistration || false,
         maxRegistrations: values.maxRegistrations || null,
@@ -320,29 +348,16 @@ const CrearActividadPage = () => {
         registrationStatus: values.allowsPublicRegistration ? "open" : "closed",
         currentRegistrations: 0,
         
-        // Estado de la actividad
-        status: values.status,
+        // Estado de la actividad (siempre "por_costear" para nuevas actividades)
+        status: "por_costear",
         ...instructorData
       };
       
       console.log("Enviando datos a la API:", data);
-  // Usar directamente fetch para tener más control sobre la petición
-  const response = await fetch('/api/activities', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    },
-    body: JSON.stringify(data)
-  });
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Error en la respuesta:", errorText);
-    throw new Error(`Error al crear actividad: ${response.status} ${errorText}`);
-  }
-  
-  return await response.json();
+      return await apiRequest('/api/activities', {
+        method: 'POST',
+        data: data
+      });
     },
     onSuccess: (data) => {
       toast({
@@ -351,8 +366,9 @@ const CrearActividadPage = () => {
         variant: "default"
       });
       
-      // Invalidar todas las consultas relacionadas con actividades
-      queryClient.invalidateQueries();
+      // Invalidar consultas específicas relacionadas con actividades
+      queryClient.invalidateQueries({ queryKey: ['/api/activities'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/parks/filter'] });
       
       // Redirigir a la página de gestión de imágenes de la nueva actividad
       setTimeout(() => {
@@ -397,6 +413,11 @@ const CrearActividadPage = () => {
             <CardTitle>Formulario de Actividad</CardTitle>
             <CardDescription>
               Ingresa la información completa de la actividad. Los campos marcados con * son obligatorios.
+              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  📋 <strong>Flujo de Aprobación:</strong> Todas las actividades nuevas se crean con estado "Por Costear" y requieren autorización financiera antes de activarse.
+                </p>
+              </div>
             </CardDescription>
           </CardHeader>
         <CardContent>
@@ -420,30 +441,6 @@ const CrearActividadPage = () => {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Estado</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || undefined}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona estado" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {ESTADOS_ACTIVIDAD.map((estado) => (
-                              <SelectItem key={estado.id} value={estado.id}>
-                                {estado.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
@@ -1263,6 +1260,113 @@ const CrearActividadPage = () => {
                     )}
                   </div>
                 )}
+
+                {/* Sección de Costeo Financiero */}
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-md font-medium">💰 Costeo Financiero</h4>
+                    <span className="text-sm text-muted-foreground">(Obligatorio)</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Configure el análisis de costeo para esta actividad que será revisado por el área de finanzas
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="costingConcept"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Concepto de Costeo *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecciona el concepto" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {CONCEPTOS_COSTEO.map((concepto) => (
+                                <SelectItem key={concepto.id} value={concepto.id}>
+                                  {concepto.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Tipo de actividad para análisis financiero
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="costRecoveryPercentage"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>% Recuperación Objetivo</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center gap-2">
+                              <Input 
+                                type="number" 
+                                min="0" 
+                                max="100" 
+                                step="5"
+                                placeholder="30" 
+                                {...field}
+                                className="w-24"
+                              />
+                              <span className="text-sm text-muted-foreground">% de los costos</span>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Meta de recuperación de costos (default: 30%)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="costingNotes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Observaciones de Costeo</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Consideraciones especiales para el análisis de costeo, justificación del porcentaje objetivo, etc."
+                            {...field}
+                            rows={3}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Información adicional para el área de finanzas (opcional)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Resumen de costeo */}
+                  {form.watch("costingConcept") && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <h5 className="text-sm font-medium text-green-800 mb-2">Configuración de Costeo:</h5>
+                      <div className="text-xs text-green-700 space-y-1">
+                        <p>• Concepto: {(() => {
+                          const concepto = CONCEPTOS_COSTEO.find(c => c.id === form.watch("costingConcept"));
+                          return concepto ? concepto.label : "No seleccionado";
+                        })()}</p>
+                        <p>• Meta de recuperación: {form.watch("costRecoveryPercentage") || 30}% de los costos</p>
+                        {form.watch("costingNotes") && (
+                          <p>• Observaciones: {form.watch("costingNotes")?.substring(0, 50)}...</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <FormField
                   control={form.control}

@@ -721,7 +721,12 @@ app.post("/api/activities", async (req: Request, res: Response) => {
       registrationInstructions,
       requiresApproval,
       ageRestrictions,
-      healthRequirements
+      healthRequirements,
+      // Campos de costeo financiero
+      costingConcept,
+      costRecoveryPercentage,
+      costingNotes,
+      status  // Extraído pero será forzado a "por_costear"
     } = req.body;
 
     // Procesar fechas
@@ -730,7 +735,9 @@ app.post("/api/activities", async (req: Request, res: Response) => {
 
     // Importar dependencias dinámicamente
     const { db } = await import("./db");
-    const { activities } = await import("../shared/schema");
+    const { activities, insertActivitySchema } = await import("../shared/schema");
+    const { z } = await import("zod");
+    const { fromZodError } = await import("zod-validation-error");
 
     // Validar y procesar coordenadas GPS
     let validLatitude = null;
@@ -750,6 +757,39 @@ app.post("/api/activities", async (req: Request, res: Response) => {
       } else {
         console.log("⚠️ Coordenadas fuera de rango GPS válido, se omitirán");
       }
+    }
+
+    // VALIDACIÓN ZOD para campos de costeo financiero
+    const costingValidationSchema = z.object({
+      costingConcept: z.string().refine(
+        value => ["entretenimiento", "deportivo", "cultural", "educativo"].includes(value) || !value,
+        { message: "Concepto de costeo no válido" }
+      ).optional(),
+      costRecoveryPercentage: z.coerce.number().min(0).max(100).optional(),
+      costingNotes: z.string().optional()
+    });
+
+    try {
+      costingValidationSchema.parse({ costingConcept, costRecoveryPercentage, costingNotes });
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        const errorMsg = fromZodError(validationError);
+        console.log("🚫 VALIDACIÓN COSTEO FALLIDA:", errorMsg.message);
+        return res.status(400).json({ 
+          message: `Error en campos de costeo: ${errorMsg.message}`,
+          code: "COSTING_VALIDATION_ERROR"
+        });
+      }
+    }
+
+    // VALIDACIÓN FINANCIERA: Bloquear activación sin aprobación
+    if (status === "activa" || status === "programada") {
+      console.log("🚫 WORKFLOW FINANCIERO: Rechazando creación con status '" + status + "'");
+      return res.status(400).json({ 
+        message: "No se pueden crear actividades con estado activo. Todas las actividades nuevas requieren aprobación financiera.",
+        code: "FINANCE_APPROVAL_REQUIRED",
+        allowedStatus: "por_costear"
+      });
     }
 
     // Crear objeto con todos los campos
@@ -783,7 +823,17 @@ app.post("/api/activities", async (req: Request, res: Response) => {
       registrationInstructions: registrationInstructions || null,
       requiresApproval: Boolean(requiresApproval),
       ageRestrictions: ageRestrictions || null,
-      healthRequirements: healthRequirements || null
+      healthRequirements: healthRequirements || null,
+      
+      // WORKFLOW FINANCIERO: Todas las actividades nuevas requieren costeo
+      status: "por_costear",
+      financialStatus: "por_costear",
+      
+      // Campos de costeo financiero (mapeo correcto según schema)
+      costRecoveryPercentage: costRecoveryPercentage ? Number(costRecoveryPercentage) : 30,
+      financialNotes: costingNotes ? 
+        `Concepto: ${costingConcept || 'No especificado'}\n\nObservaciones: ${costingNotes}` : 
+        `Concepto: ${costingConcept || 'No especificado'}`
     };
 
     console.log("🚀 DATOS PROCESADOS PARA INSERCIÓN:", activityData);
