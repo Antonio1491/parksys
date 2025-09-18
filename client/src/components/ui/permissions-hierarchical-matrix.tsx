@@ -210,8 +210,8 @@ export function HierarchicalPermissionsMatrix({
   const pageMap = useMemo(() => {
     const map: Record<string, any> = {};
     (permissionPages as any[]).forEach((page: any) => {
-      if (page.slug) {
-        map[page.slug] = page;
+      if (page.id) {
+        map[page.id] = page;
       }
     });
     return map;
@@ -310,6 +310,10 @@ export function HierarchicalPermissionsMatrix({
               submodule_id: p.submodule_id, 
               submodule_id_type: typeof p.submodule_id
             }))
+          );
+          console.log('🐛 [DEBUG] Total pages loaded:', Object.values(pageMap).length);
+          console.log('🐛 [DEBUG] Page with slug="parques":', 
+            Object.values(pageMap).find((p: any) => p.slug === 'parques')
           );
           console.log('🐛 [DEBUG] Pages with submodule_id = 1:', 
             Object.values(pageMap).filter((p: any) => p.submodule_id === 1)
