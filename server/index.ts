@@ -23,6 +23,8 @@ import { registerAuditRoutes } from "./audit-routes";
 import { ObjectStorageService } from "./objectStorage";
 import faunaRoutes from "./faunaRoutes";
 import evaluacionesRoutes from "./evaluaciones-routes";
+import { z } from "zod";
+import { isAuthenticated } from "./middleware/auth";
 
 const app = express();
 
@@ -851,6 +853,228 @@ app.post("/api/activities", async (req: Request, res: Response) => {
     console.error("❌ ERROR CREANDO ACTIVIDAD:", error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({ message: "Error al crear actividad", error: errorMessage });
+  }
+});
+
+// ======= ENDPOINTS PARA APROBACIÓN FINANCIERA DE ACTIVIDADES =======
+
+// Obtener actividades pendientes de aprobación financiera
+app.get("/api/activities/pending-approval", isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    console.log("🏦 [FINANCE-APPROVAL] Obteniendo actividades pendientes de aprobación...");
+    
+    const status = req.query.status as string || 'por_costear';
+    console.log("🏦 [FINANCE-APPROVAL] Filtro de estado:", status);
+
+    // SEGURIDAD: Validar estados permitidos para prevenir SQL injection
+    const allowedStatuses = ['por_costear', 'activa', 'rechazada', 'all'];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Estado de filtro inválido" });
+    }
+
+    const { sql, eq, inArray } = await import("drizzle-orm");
+    const { activities, parks, activityCategories, instructors } = await import("@shared/schema");
+    
+    // Usar Drizzle query builder para seguridad
+    let query;
+    if (status === 'all') {
+      query = db
+        .select({
+          id: activities.id,
+          title: activities.title,
+          description: activities.description,
+          parkId: activities.parkId,
+          startDate: activities.startDate,
+          endDate: activities.endDate,
+          startTime: activities.startTime,
+          endTime: activities.endTime,
+          capacity: activities.capacity,
+          price: activities.price,
+          isFree: activities.isFree,
+          materials: activities.materials,
+          requirements: activities.requirements,
+          duration: activities.duration,
+          costRecoveryPercentage: activities.costRecoveryPercentage,
+          financialNotes: activities.financialNotes,
+          status: activities.status,
+          financialStatus: activities.financialStatus,
+          createdAt: activities.createdAt,
+          parkName: parks.name,
+          categoryName: activityCategories.name,
+          instructorName: instructors.fullName
+        })
+        .from(activities)
+        .leftJoin(parks, eq(activities.parkId, parks.id))
+        .leftJoin(activityCategories, eq(activities.categoryId, activityCategories.id))
+        .leftJoin(instructors, eq(activities.instructorId, instructors.id))
+        .where(inArray(activities.status, ['por_costear', 'activa', 'rechazada']))
+        .orderBy(activities.createdAt);
+    } else {
+      query = db
+        .select({
+          id: activities.id,
+          title: activities.title,
+          description: activities.description,
+          parkId: activities.parkId,
+          startDate: activities.startDate,
+          endDate: activities.endDate,
+          startTime: activities.startTime,
+          endTime: activities.endTime,
+          capacity: activities.capacity,
+          price: activities.price,
+          isFree: activities.isFree,
+          materials: activities.materials,
+          requirements: activities.requirements,
+          duration: activities.duration,
+          costRecoveryPercentage: activities.costRecoveryPercentage,
+          financialNotes: activities.financialNotes,
+          status: activities.status,
+          financialStatus: activities.financialStatus,
+          createdAt: activities.createdAt,
+          parkName: parks.name,
+          categoryName: activityCategories.name,
+          instructorName: instructors.fullName
+        })
+        .from(activities)
+        .leftJoin(parks, eq(activities.parkId, parks.id))
+        .leftJoin(activityCategories, eq(activities.categoryId, activityCategories.id))
+        .leftJoin(instructors, eq(activities.instructorId, instructors.id))
+        .where(eq(activities.status, status))
+        .orderBy(activities.createdAt);
+    }
+    
+    const result = await query;
+
+    console.log(`🏦 [FINANCE-APPROVAL] Actividades encontradas: ${result.length}`);
+    
+    const formattedActivities = result.map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      parkId: row.parkId,
+      parkName: row.parkName || "Sin parque",
+      startDate: row.startDate,
+      endDate: row.endDate,
+      startTime: row.startTime,
+      endTime: row.endTime,
+      capacity: Number(row.capacity) || 0,
+      price: row.price || "0",
+      isFree: row.isFree,
+      materials: row.materials || "",
+      requirements: row.requirements || "",
+      duration: Number(row.duration) || 60,
+      costRecoveryPercentage: row.costRecoveryPercentage || "30",
+      financialNotes: row.financialNotes || "",
+      status: row.status,
+      financialStatus: row.financialStatus,
+      createdAt: row.createdAt,
+      categoryName: row.categoryName || "Sin categoría",
+      instructorName: row.instructorName || "Sin instructor"
+    }));
+
+    res.json({ data: formattedActivities });
+  } catch (error: any) {
+    console.error("🏦 [FINANCE-APPROVAL] Error al obtener actividades pendientes:", error);
+    res.status(500).json({ message: "Error al obtener actividades pendientes de aprobación" });
+  }
+});
+
+// Schema de validación para aprobación financiera
+const financialApprovalSchema = z.object({
+  action: z.enum(['approve', 'reject'], {
+    required_error: "La acción es requerida",
+    invalid_type_error: "La acción debe ser 'approve' o 'reject'"
+  }),
+  comment: z.string().min(1, "El comentario es requerido").max(1000, "El comentario es muy largo"),
+  costRecoveryPercentage: z.string()
+    .refine((val) => {
+      const num = parseFloat(val);
+      return !isNaN(num) && num >= 0 && num <= 100;
+    }, "El porcentaje debe ser un número entre 0 y 100")
+    .optional()
+});
+
+// Aprobar o rechazar actividad financieramente
+app.post("/api/activities/:id/financial-approval", isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const activityId = Number(req.params.id);
+    
+    if (isNaN(activityId) || activityId <= 0) {
+      return res.status(400).json({ message: "ID de actividad inválido" });
+    }
+
+    // Validar el cuerpo de la petición con Zod
+    const validationResult = financialApprovalSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      const errorMessages = validationResult.error.issues.map(issue => 
+        `${issue.path.join('.')}: ${issue.message}`
+      ).join(', ');
+      return res.status(400).json({ 
+        message: "Datos de entrada inválidos", 
+        errors: errorMessages 
+      });
+    }
+
+    const { action, comment, costRecoveryPercentage } = validationResult.data;
+    
+    console.log(`🏦 [FINANCE-APPROVAL] Procesando ${action} para actividad ${activityId}`);
+    console.log(`🏦 [FINANCE-APPROVAL] Comentario:`, comment);
+    console.log(`🏦 [FINANCE-APPROVAL] Nuevo % recuperación:`, costRecoveryPercentage);
+
+    // Validación adicional para rechazos
+    if (action === 'reject' && !comment?.trim()) {
+      return res.status(400).json({ message: "El comentario es obligatorio para rechazar una actividad" });
+    }
+
+    const { sql } = await import("drizzle-orm");
+    
+    // Determinar el nuevo estado y notas
+    const newStatus = action === 'approve' ? 'activa' : 'rechazada';
+    const newFinancialStatus = action === 'approve' ? 'aprobada' : 'rechazada';
+    
+    // Construir las notas financieras
+    let updatedNotes = comment || '';
+    if (action === 'approve') {
+      updatedNotes = `✅ APROBADA FINANCIERAMENTE\nComentarios: ${comment || 'Sin comentarios adicionales'}\nFecha: ${new Date().toISOString()}`;
+    } else {
+      updatedNotes = `❌ RECHAZADA FINANCIERAMENTE\nMotivo: ${comment}\nFecha: ${new Date().toISOString()}`;
+    }
+
+    // Actualizar la actividad
+    const updateQuery = action === 'approve' 
+      ? sql`UPDATE activities 
+            SET status = ${newStatus},
+                financial_status = ${newFinancialStatus},
+                financial_notes = ${updatedNotes},
+                cost_recovery_percentage = ${costRecoveryPercentage || '30'},
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${activityId}
+            RETURNING *`
+      : sql`UPDATE activities 
+            SET status = ${newStatus},
+                financial_status = ${newFinancialStatus},
+                financial_notes = ${updatedNotes},
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${activityId}
+            RETURNING *`;
+
+    const result = await db.execute(updateQuery);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Actividad no encontrada" });
+    }
+
+    console.log(`🏦 [FINANCE-APPROVAL] Actividad ${activityId} ${action === 'approve' ? 'aprobada' : 'rechazada'} exitosamente`);
+    
+    res.json({ 
+      message: `Actividad ${action === 'approve' ? 'aprobada' : 'rechazada'} exitosamente`,
+      activity: result.rows[0],
+      action,
+      newStatus
+    });
+  } catch (error: any) {
+    console.error(`🏦 [FINANCE-APPROVAL] Error procesando aprobación:`, error);
+    res.status(500).json({ message: "Error al procesar la aprobación financiera" });
   }
 });
 
