@@ -1778,7 +1778,7 @@ export class DatabaseStorage implements IStorage {
         `;
       }
       
-      query = sql`${query} ORDER BY "order" ASC`;
+      query = sql`${query} ORDER BY module_id ASC, "order" ASC`;
       
       const result = await db.execute(query);
       return result.rows;
@@ -1802,7 +1802,7 @@ export class DatabaseStorage implements IStorage {
         `;
       }
       
-      query = sql`${query} ORDER BY "order" ASC`;
+      query = sql`${query} ORDER BY submodule_id ASC, "order" ASC`;
       
       const result = await db.execute(query);
       return result.rows;
