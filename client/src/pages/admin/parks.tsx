@@ -28,7 +28,8 @@ const useParksMetricsSummary = (parkIds: number[]) => {
     reports: PendingReports;
     schedule: UpcomingSchedule;
   }>>({
-    queryKey: [`/api/parks/summary?ids=${sortedIds}`],
+    queryKey: ['parks-summary', sortedIds],
+    queryFn: () => apiRequest(`/api/parks/summary?ids=${sortedIds}`),
     enabled: parkIds.length > 0,
     staleTime: 3 * 60 * 1000, // 3 minutes
   });

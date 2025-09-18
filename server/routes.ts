@@ -1622,6 +1622,193 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/parks/summary?ids=... - Consolidated endpoint to get all metrics for multiple parks (DEBE IR ANTES DE /parks/:id)
+  apiRouter.get('/parks/summary', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      console.log('🔥 [PARKS-SUMMARY] Iniciando endpoint');
+      console.log('🔥 [PARKS-SUMMARY] Query params:', req.query);
+      const idsParam = req.query.ids as string;
+      
+      if (!idsParam) {
+        return res.status(400).json({ message: 'Missing ids parameter' });
+      }
+
+      const parkIds = idsParam.split(',').map(id => Number(id.trim())).filter(id => !isNaN(id));
+      
+      if (parkIds.length === 0) {
+        return res.status(400).json({ message: 'No valid park IDs provided' });
+      }
+
+      // Optimized queries using SQL aggregation for better performance
+      const summary: Record<number, any> = {};
+
+      // Initialize all parks in summary
+      parkIds.forEach(id => {
+        summary[id] = {
+          metrics: null,
+          incidents: { total: 0, priorityBreakdown: { high: 0, medium: 0, low: 0 } },
+          assets: { total: 0, typeBreakdown: { preventive: 0, corrective: 0, emergency: 0 } },
+          reports: { total: 0, typeBreakdown: { complaint: 0, suggestion: 0, compliment: 0 } },
+          schedule: { total: 0, breakdown: { activities: 0, events: 0 } }
+        };
+      });
+
+      // 1. Get metrics (using aggregated query for all parks at once)
+      const metricsQuery = `
+        SELECT 
+          park_id,
+          ROUND(AVG(overall_rating), 1) as average_rating,
+          COUNT(*) as total_evaluations,
+          ROUND(AVG(cleanliness), 1) as avg_cleanliness,
+          ROUND(AVG(safety), 1) as avg_safety,
+          ROUND(AVG(maintenance), 1) as avg_maintenance,
+          ROUND(AVG(accessibility), 1) as avg_accessibility,
+          ROUND(AVG(amenities), 1) as avg_amenities,
+          ROUND(AVG(activities), 1) as avg_activities,
+          ROUND(AVG(staff), 1) as avg_staff,
+          ROUND(AVG(natural_beauty), 1) as avg_natural_beauty
+        FROM park_evaluations 
+        WHERE park_id = ANY($1)
+        GROUP BY park_id
+      `;
+      const metricsResult = await pool.query(metricsQuery, [parkIds]);
+      
+      metricsResult.rows.forEach((row: any) => {
+        summary[row.park_id].metrics = {
+          averageRating: row.average_rating || 0,
+          totalEvaluations: parseInt(row.total_evaluations) || 0,
+          ratingBreakdown: {
+            cleanliness: row.avg_cleanliness || 0,
+            safety: row.avg_safety || 0,
+            maintenance: row.avg_maintenance || 0,
+            accessibility: row.avg_accessibility || 0,
+            amenities: row.avg_amenities || 0,
+            activities: row.avg_activities || 0,
+            staff: row.avg_staff || 0,
+            naturalBeauty: row.avg_natural_beauty || 0
+          }
+        };
+      });
+
+      // 2. Get pending incidents (aggregated by park and priority)
+      const incidentsQuery = `
+        SELECT 
+          park_id,
+          priority,
+          COUNT(*) as count
+        FROM incidents 
+        WHERE park_id = ANY($1) 
+        AND status NOT IN ('resolved', 'closed', 'cancelled')
+        GROUP BY park_id, priority
+      `;
+      const incidentsResult = await pool.query(incidentsQuery, [parkIds]);
+      
+      incidentsResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const priority = row.priority;
+        const count = parseInt(row.count);
+        
+        summary[parkId].incidents.total += count;
+        if (priority === 'high') summary[parkId].incidents.priorityBreakdown.high = count;
+        else if (priority === 'medium') summary[parkId].incidents.priorityBreakdown.medium = count;
+        else if (priority === 'low') summary[parkId].incidents.priorityBreakdown.low = count;
+      });
+
+      // 3. Get assets in maintenance (aggregated by park and type)
+      const assetsQuery = `
+        SELECT 
+          a.park_id,
+          am.maintenance_type,
+          COUNT(*) as count
+        FROM asset_maintenances am
+        INNER JOIN assets a ON am.asset_id = a.id
+        WHERE a.park_id = ANY($1)
+        AND am.status IN ('scheduled', 'in_progress')
+        GROUP BY a.park_id, am.maintenance_type
+      `;
+      const assetsResult = await pool.query(assetsQuery, [parkIds]);
+      
+      assetsResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const maintenanceType = row.maintenance_type;
+        const count = parseInt(row.count);
+        
+        summary[parkId].assets.total += count;
+        if (maintenanceType === 'preventive') summary[parkId].assets.typeBreakdown.preventive = count;
+        else if (maintenanceType === 'corrective') summary[parkId].assets.typeBreakdown.corrective = count;
+        else if (maintenanceType === 'emergency') summary[parkId].assets.typeBreakdown.emergency = count;
+      });
+
+      // 4. Get pending reports (aggregated by park and type)
+      const reportsQuery = `
+        SELECT 
+          park_id,
+          form_type,
+          COUNT(*) as count
+        FROM park_feedback 
+        WHERE park_id = ANY($1)
+        AND status IN ('pending', 'under_review')
+        GROUP BY park_id, form_type
+      `;
+      const reportsResult = await pool.query(reportsQuery, [parkIds]);
+      
+      reportsResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const formType = row.form_type;
+        const count = parseInt(row.count);
+        
+        summary[parkId].reports.total += count;
+        if (formType === 'report_problem') summary[parkId].reports.typeBreakdown.complaint = count;
+        else if (formType === 'suggest_improvement') summary[parkId].reports.typeBreakdown.suggestion = count;
+        else if (formType === 'share') summary[parkId].reports.typeBreakdown.compliment = count;
+      });
+
+      // 5. Get upcoming schedule (aggregated by park and type)
+      const now = new Date();
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(now.getDate() + 30);
+
+      const scheduleQuery = `
+        SELECT 
+          park_id,
+          'activity' as type,
+          COUNT(*) as count
+        FROM activities 
+        WHERE park_id = ANY($1)
+        AND start_date >= $2 AND start_date <= $3
+        GROUP BY park_id
+        
+        UNION ALL
+        
+        SELECT 
+          p.id as park_id,
+          'event' as type,
+          COUNT(*) as count
+        FROM events e
+        INNER JOIN parks p ON p.id = ANY($1)
+        WHERE e.location ILIKE '%' || p.name || '%'
+        AND e.start_date >= $2 AND e.start_date <= $3
+        GROUP BY p.id
+      `;
+      const scheduleResult = await pool.query(scheduleQuery, [parkIds, now, thirtyDaysFromNow]);
+      
+      scheduleResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const type = row.type;
+        const count = parseInt(row.count);
+        
+        summary[parkId].schedule.total += count;
+        if (type === 'activity') summary[parkId].schedule.breakdown.activities = count;
+        else if (type === 'event') summary[parkId].schedule.breakdown.events = count;
+      });
+
+      res.json(summary);
+    } catch (error) {
+      console.error('Error fetching parks summary:', error);
+      res.status(500).json({ message: 'Error fetching parks summary' });
+    }
+  });
+
   // Ruta para obtener estadísticas del dashboard de parques (DEBE IR ANTES DE /parks/:id)
   apiRouter.get("/parks/dashboard", async (_req: Request, res: Response) => {
     try {
@@ -7218,190 +7405,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/parks/summary?ids=... - Consolidated endpoint to get all metrics for multiple parks
-  apiRouter.get('/parks/summary', isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const idsParam = req.query.ids as string;
-      
-      if (!idsParam) {
-        return res.status(400).json({ message: 'Missing ids parameter' });
-      }
-
-      const parkIds = idsParam.split(',').map(id => Number(id.trim())).filter(id => !isNaN(id));
-      
-      if (parkIds.length === 0) {
-        return res.status(400).json({ message: 'No valid park IDs provided' });
-      }
-
-      // Optimized queries using SQL aggregation for better performance
-      const summary: Record<number, any> = {};
-
-      // Initialize all parks in summary
-      parkIds.forEach(id => {
-        summary[id] = {
-          metrics: null,
-          incidents: { total: 0, priorityBreakdown: { high: 0, medium: 0, low: 0 } },
-          assets: { total: 0, typeBreakdown: { preventive: 0, corrective: 0, emergency: 0 } },
-          reports: { total: 0, typeBreakdown: { complaint: 0, suggestion: 0, compliment: 0 } },
-          schedule: { total: 0, breakdown: { activities: 0, events: 0 } }
-        };
-      });
-
-      // 1. Get metrics (using aggregated query for all parks at once)
-      const metricsQuery = `
-        SELECT 
-          park_id,
-          ROUND(AVG(overall_rating), 1) as average_rating,
-          COUNT(*) as total_evaluations,
-          ROUND(AVG(cleanliness), 1) as avg_cleanliness,
-          ROUND(AVG(safety), 1) as avg_safety,
-          ROUND(AVG(maintenance), 1) as avg_maintenance,
-          ROUND(AVG(accessibility), 1) as avg_accessibility,
-          ROUND(AVG(amenities), 1) as avg_amenities,
-          ROUND(AVG(activities), 1) as avg_activities,
-          ROUND(AVG(staff), 1) as avg_staff,
-          ROUND(AVG(natural_beauty), 1) as avg_natural_beauty
-        FROM park_evaluations 
-        WHERE park_id = ANY($1)
-        GROUP BY park_id
-      `;
-      const metricsResult = await pool.query(metricsQuery, [parkIds]);
-      
-      metricsResult.rows.forEach((row: any) => {
-        summary[row.park_id].metrics = {
-          averageRating: row.average_rating || 0,
-          totalEvaluations: parseInt(row.total_evaluations) || 0,
-          ratingBreakdown: {
-            cleanliness: row.avg_cleanliness || 0,
-            safety: row.avg_safety || 0,
-            maintenance: row.avg_maintenance || 0,
-            accessibility: row.avg_accessibility || 0,
-            amenities: row.avg_amenities || 0,
-            activities: row.avg_activities || 0,
-            staff: row.avg_staff || 0,
-            naturalBeauty: row.avg_natural_beauty || 0
-          }
-        };
-      });
-
-      // 2. Get pending incidents (aggregated by park and priority)
-      const incidentsQuery = `
-        SELECT 
-          park_id,
-          priority,
-          COUNT(*) as count
-        FROM incidents 
-        WHERE park_id = ANY($1) 
-        AND status NOT IN ('resolved', 'closed', 'cancelled')
-        GROUP BY park_id, priority
-      `;
-      const incidentsResult = await pool.query(incidentsQuery, [parkIds]);
-      
-      incidentsResult.rows.forEach((row: any) => {
-        const parkId = row.park_id;
-        const priority = row.priority;
-        const count = parseInt(row.count);
-        
-        summary[parkId].incidents.total += count;
-        if (priority === 'high') summary[parkId].incidents.priorityBreakdown.high = count;
-        else if (priority === 'medium') summary[parkId].incidents.priorityBreakdown.medium = count;
-        else if (priority === 'low') summary[parkId].incidents.priorityBreakdown.low = count;
-      });
-
-      // 3. Get assets in maintenance (aggregated by park and type)
-      const assetsQuery = `
-        SELECT 
-          a.park_id,
-          am.maintenance_type,
-          COUNT(*) as count
-        FROM asset_maintenances am
-        INNER JOIN assets a ON am.asset_id = a.id
-        WHERE a.park_id = ANY($1)
-        AND am.status IN ('scheduled', 'in_progress')
-        GROUP BY a.park_id, am.maintenance_type
-      `;
-      const assetsResult = await pool.query(assetsQuery, [parkIds]);
-      
-      assetsResult.rows.forEach((row: any) => {
-        const parkId = row.park_id;
-        const maintenanceType = row.maintenance_type;
-        const count = parseInt(row.count);
-        
-        summary[parkId].assets.total += count;
-        if (maintenanceType === 'preventive') summary[parkId].assets.typeBreakdown.preventive = count;
-        else if (maintenanceType === 'corrective') summary[parkId].assets.typeBreakdown.corrective = count;
-        else if (maintenanceType === 'emergency') summary[parkId].assets.typeBreakdown.emergency = count;
-      });
-
-      // 4. Get pending reports (aggregated by park and type)
-      const reportsQuery = `
-        SELECT 
-          park_id,
-          form_type,
-          COUNT(*) as count
-        FROM park_feedback 
-        WHERE park_id = ANY($1)
-        AND status IN ('pending', 'under_review')
-        GROUP BY park_id, form_type
-      `;
-      const reportsResult = await pool.query(reportsQuery, [parkIds]);
-      
-      reportsResult.rows.forEach((row: any) => {
-        const parkId = row.park_id;
-        const formType = row.form_type;
-        const count = parseInt(row.count);
-        
-        summary[parkId].reports.total += count;
-        if (formType === 'report_problem') summary[parkId].reports.typeBreakdown.complaint = count;
-        else if (formType === 'suggest_improvement') summary[parkId].reports.typeBreakdown.suggestion = count;
-        else if (formType === 'share') summary[parkId].reports.typeBreakdown.compliment = count;
-      });
-
-      // 5. Get upcoming schedule (aggregated by park and type)
-      const now = new Date();
-      const thirtyDaysFromNow = new Date();
-      thirtyDaysFromNow.setDate(now.getDate() + 30);
-
-      const scheduleQuery = `
-        SELECT 
-          park_id,
-          'activity' as type,
-          COUNT(*) as count
-        FROM activities 
-        WHERE park_id = ANY($1)
-        AND start_date >= $2 AND start_date <= $3
-        GROUP BY park_id
-        
-        UNION ALL
-        
-        SELECT 
-          p.id as park_id,
-          'event' as type,
-          COUNT(*) as count
-        FROM events e
-        INNER JOIN parks p ON p.id = ANY($1)
-        WHERE e.location ILIKE '%' || p.name || '%'
-        AND e.start_date >= $2 AND e.start_date <= $3
-        GROUP BY p.id
-      `;
-      const scheduleResult = await pool.query(scheduleQuery, [parkIds, now, thirtyDaysFromNow]);
-      
-      scheduleResult.rows.forEach((row: any) => {
-        const parkId = row.park_id;
-        const type = row.type;
-        const count = parseInt(row.count);
-        
-        summary[parkId].schedule.total += count;
-        if (type === 'activity') summary[parkId].schedule.breakdown.activities = count;
-        else if (type === 'event') summary[parkId].schedule.breakdown.events = count;
-      });
-
-      res.json(summary);
-    } catch (error) {
-      console.error('Error fetching parks summary:', error);
-      res.status(500).json({ message: 'Error fetching parks summary' });
-    }
-  });
 
   // ===== FIN ENDPOINTS DE MÉTRICAS DE PARQUES =====
   
