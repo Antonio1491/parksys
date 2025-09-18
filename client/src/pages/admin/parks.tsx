@@ -500,8 +500,6 @@ const AdminParksContent = () => {
             <CardContent>
               <div className="space-y-2">
                 <div className="flex items-center font-poppins text-sm text-gray-600">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  <span className="truncate">{park.address}</span>
                 </div>
                 
                 {park.municipalityText && (
