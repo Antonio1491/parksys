@@ -20,7 +20,6 @@ import { ExportButton } from "@/components/ui/export-button";
 
 // Consolidated hook for parks summary - solves N+1 performance issue
 const useParksMetricsSummary = (parkIds: number[]) => {
-  const sortedIds = parkIds.sort().join(',');
   return useQuery<Record<number, {
     metrics: ParkMetrics | null;
     incidents: PendingIncidents;
@@ -28,8 +27,7 @@ const useParksMetricsSummary = (parkIds: number[]) => {
     reports: PendingReports;
     schedule: UpcomingSchedule;
   }>>({
-    queryKey: ['parks-summary', sortedIds],
-    queryFn: () => apiRequest(`/api/parks/summary?ids=${sortedIds}`),
+    queryKey: ['/api/parks', 'summary', parkIds.sort().join(',')],
     enabled: parkIds.length > 0,
     staleTime: 3 * 60 * 1000, // 3 minutes
   });
@@ -340,15 +338,15 @@ const AdminParksContent = () => {
           </Badge>
         )}
 
-        {/* Sección de alertas */}
-        <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-          <h4 className="text-xs font-medium text-gray-600 mb-2">Estado Operativo</h4>
-          <div className="grid grid-cols-1 gap-1">
-            {getAlertComponent(incidents?.total || 0, "incidencias")}
+        {/* Sección de alertas */} 
+        <div className="rounded-lg p-3 space-y-2"> 
+          <div className="grid grid-cols-1 gap-1 font-poppins">
+            {getAlertComponent(incidents?.total || 0, "incidencias")} 
             {getAlertComponent(assets?.total || 0, "activos")}
-            {getAlertComponent(reports?.total || 0, "reportes")}
-          </div>
+            {getAlertComponent(reports?.total || 0, "reportes")} 
+          </div> 
         </div>
+
 
         {/* Programación próxima */}
         {schedule && schedule.total > 0 && (
@@ -704,12 +702,6 @@ const AdminParksContent = () => {
     );
   };
 
-  // Get park IDs for current page to fetch consolidated metrics
-  const currentParkIds = currentParks.map(park => park.id);
-  
-  // Fetch consolidated metrics for current page parks - PERFORMANCE OPTIMIZATION
-  const { data: parksMetricsSummary, isLoading: isLoadingMetrics } = useParksMetricsSummary(currentParkIds);
-
   // Render grid view
   const renderGridView = () => {
     return (
@@ -759,12 +751,8 @@ const AdminParksContent = () => {
                       </Badge>
                     )}
                   </div>
-                  {/* Componente de métricas del parque - OPTIMIZADO con datos consolidados */}
-                  <ParkMetricsCard 
-                    park={park} 
-                    summaryData={parksMetricsSummary?.[park.id]} 
-                    isLoadingSummary={isLoadingMetrics}
-                  />
+                  {/* Componente de métricas del parque */}
+                  <ParkMetricsCard park={park} />
                 </div>
               </div>
             </CardHeader>

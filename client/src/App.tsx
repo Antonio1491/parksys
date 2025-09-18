@@ -30,7 +30,6 @@ import AdminInstructorInvitations from "@/pages/admin/instructor-invitations";
 import InstructorRegistration from "@/pages/public/instructor-registration";
 import AccessUsersPage from "@/pages/admin/configuracion-seguridad/access/users";
 import ActivityDetailPage from "@/pages/activity-detail";
-import TestAccess from "@/pages/test-access";
 import AdminVolunteers from "@/pages/admin/volunteers";
 import Landing from "@/pages/Landing";
 import ParksModuleShowcase from "@/pages/ParksModuleShowcase";
@@ -503,7 +502,6 @@ function Router() {
           </Suspense>
         </Route>
         <Route path="/admin/login" component={AdminLogin} />
-        <Route path="/test-access" component={TestAccess} />
         <Route path="/admin/permissions">
           <Suspense fallback={<div className="p-8 text-center">Cargando gestión de permisos...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/permissions')))}
@@ -835,11 +833,6 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/space-reservations/index')))}
           </Suspense>
         </Route>
-        <Route path="/admin/space-reservations/spaces/edit/:id">
-          <Suspense fallback={<div className="p-8 text-center">Cargando edición de espacio...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/space-reservations/spaces/edit/[id]')))}
-          </Suspense>
-        </Route>
         <Route path="/admin/space-reservations/spaces/new">
           <Suspense fallback={<div className="p-8 text-center">Cargando nuevo espacio...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/space-reservations/spaces/new')))}
@@ -927,16 +920,6 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/trees/catalog/new/simple')))}
           </Suspense>
         </Route>
-        <Route path="/admin/trees/catalog/:id">
-          <Suspense fallback={<div className="p-8 text-center">Cargando detalles de especie arbórea...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/trees/catalog/[id]/index')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/trees/catalog/:id/edit">
-          <Suspense fallback={<div className="p-8 text-center">Cargando formulario de edición de especie arbórea...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/trees/catalog/[id]/edit/index')))}
-          </Suspense>
-        </Route>
         
         {/* Rutas de Fauna */}
         <Route path="/admin/fauna/species">
@@ -966,16 +949,6 @@ function Router() {
         <Route path="/admin/trees/inventory/new">
           <Suspense fallback={<div className="p-8 text-center">Cargando formulario de nuevo árbol...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/trees/inventory/new/index')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/trees/inventory/:id">
-          <Suspense fallback={<div className="p-8 text-center">Cargando detalles del árbol...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/trees/inventory/[id]/index')))}
-          </Suspense>
-        </Route>
-        <Route path="/admin/trees/inventory/:id/edit">
-          <Suspense fallback={<div className="p-8 text-center">Cargando formulario de edición del árbol...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/trees/inventory/[id]/edit/index')))}
           </Suspense>
         </Route>
         
