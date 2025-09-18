@@ -250,6 +250,28 @@ export function registerHybridRoleRoutes(app: Express) {
     }
   });
 
+  // Obtener submódulos de permisos (TEMPORAL - SIN AUTH)
+  app.get("/api/permissions/submodules", async (req, res) => {
+    try {
+      const submodules = await storage.getPermissionSubmodules();
+      res.json(submodules);
+    } catch (error) {
+      console.error("❌ Error obteniendo submódulos de permisos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Obtener páginas de permisos (TEMPORAL - SIN AUTH)
+  app.get("/api/permissions/pages", async (req, res) => {
+    try {
+      const pages = await storage.getPermissionPages();
+      res.json(pages);
+    } catch (error) {
+      console.error("❌ Error obteniendo páginas de permisos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // Obtener acciones de permisos (TEMPORAL - SIN AUTH)
   app.get("/api/permissions/actions", async (req, res) => {
     try {
