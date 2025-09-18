@@ -31,7 +31,9 @@ interface Park {
   certificaciones?: string;
   createdAt: string;
   updatedAt: string;
-  primaryImageUrl?: string; // ✅ Imagen principal del parque
+  primaryImageUrl?: string; // ✅ Compatibilidad con formato antiguo
+  primaryImage?: string; // ✅ Imagen principal del parque (desde el backend)
+  mainImageUrl?: string; // ✅ Imagen principal alternativa
   // Nuevo campo
   typology?: {
     id: number;
@@ -134,14 +136,23 @@ const AdminParksContent = () => {
   });
 
   // Fetch parks with images for better visual display
-  const { data: parksWithImagesResponse } = useQuery<{data: Park[]}>({
+  const { data: parksWithImagesResponse } = useQuery<{data: any[]}>({
     queryKey: ['/api/parks-with-images'], 
     queryFn: () => apiRequest('/api/parks-with-images'),
     staleTime: 30000, // Cache for 30 seconds
   });
   
   const parks = parksResponse?.data || [];
-  const parksWithImages = parksWithImagesResponse?.data || parks; // Usar datos con imágenes si están disponibles
+  // Mapear los datos para que coincidan con la interfaz esperada
+  const parksWithImages = React.useMemo(() => {
+    if (parksWithImagesResponse?.data) {
+      return parksWithImagesResponse.data.map((park: any) => ({
+        ...park,
+        primaryImageUrl: park.primaryImage || park.mainImageUrl || park.primaryImageUrl
+      }));
+    }
+    return parks;
+  }, [parksWithImagesResponse, parks]);
 
 
 
