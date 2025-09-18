@@ -1,0 +1,55 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-RPCDYKBN.js?v=14eab8c0:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:23 🔥 Firebase initialized successfully
+i18next.js?v=14eab8c0:208 i18next::backendConnector: loaded namespace common for language es Object
+i18next.js?v=14eab8c0:208 i18next: languageChanged es
+i18next.js?v=14eab8c0:208 i18next: initialized Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:321 🌐 [QUERY] GET /api/roles/1/permissions
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:321 🌐 [QUERY] GET /api/roles
+queryClient.ts:321 🌐 [QUERY] GET /api/permissions/system
+queryClient.ts:321 🌐 [QUERY] GET /api/roles/permissions/matrix
+queryClient.ts:321 🌐 [QUERY] GET /api/permissions/modules
+queryClient.ts:321 🌐 [QUERY] GET /api/permissions/submodules
+queryClient.ts:321 🌐 [QUERY] GET /api/permissions/pages
+queryClient.ts:321 🌐 [QUERY] GET /api/permissions/actions
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:321 🌐 [QUERY] GET /api/notifications/count
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+permissions-hierarchical-matrix.tsx:305 🐛 [DEBUG] Submodule parques: Object
+permissions-hierarchical-matrix.tsx:306 🐛 [DEBUG] All pages in pageMap: Array(69)0: {id: 23, submodule_id: 9, name: 'Parques', slug: 'parques', description: 'Evaluaciones de parques', …}1: {id: 2, submodule_id: 2, name: 'Listado', slug: 'management', description: 'Gestión de actividades', …}2: {id: 34, submodule_id: 10, name: 'Calendario', slug: 'calendar', description: 'Calendario de mantenimiento', …}3: {id: 51, submodule_id: 15, name: 'Categorías', slug: 'categories', description: 'Categorías contables', …}4: {id: 17, submodule_id: 7, name: 'Inscripciones', slug: 'registrations', description: 'Inscripciones de eventos', …}5: {id: 6, submodule_id: 2, name: 'Instructores', slug: 'instructors', description: 'Instructores de actividades', …}6: {id: 7, submodule_id: 3, name: 'Amenidades', slug: 'amenidades', description: 'Página principal de amenidades', …}7: {id: 31, submodule_id: 10, name: 'Inventario', slug: 'inventory', description: 'Inventario de activos', …}8: {id: 11, submodule_id: 5, name: 'Especies', slug: 'species', description: 'Especies de fauna', …}9: {id: 83, submodule_id: 27, name: 'Panel de Mantenimiento', slug: 'maintenance', description: 'Panel de mantenimiento', …}10: {id: 12, submodule_id: 6, name: 'Conteo', slug: 'count', description: 'Conteo de visitantes', …}11: {id: 13, submodule_id: 6, name: 'Retroalimentación', slug: 'feedback', description: 'Retroalimentación de visitantes', …}12: {id: 14, submodule_id: 7, name: 'Listado', slug: 'list', description: 'Listado de eventos', …}13: {id: 18, submodule_id: 7, name: 'Tabulador', slug: 'tabulador', description: 'Tabulador de costos', …}14: {id: 60, submodule_id: 16, name: 'Concesiones Activas', slug: 'active', description: 'Concesiones activas', …}15: {id: 67, submodule_id: 18, name: 'Espacios', slug: 'spaces', description: 'Espacios publicitarios', …}16: {id: 21, submodule_id: 8, name: 'Nueva Reserva', slug: 'new', description: 'Nueva reserva', …}17: {id: 24, submodule_id: 9, name: 'Instructores', slug: 'instructores', description: 'Evaluaciones de instructores', …}18: {id: 25, submodule_id: 9, name: 'Voluntarios', slug: 'voluntarios', description: 'Evaluaciones de voluntarios', …}19: {id: 26, submodule_id: 9, name: 'Actividades', slug: 'actividades', description: 'Evaluaciones de actividades', …}20: {id: 27, submodule_id: 9, name: 'Concesionarios', slug: 'concesionarios', description: 'Evaluaciones de concesionarios', …}21: {id: 28, submodule_id: 9, name: 'Eventos', slug: 'eventos', description: 'Evaluaciones de eventos', …}22: {id: 29, submodule_id: 9, name: 'Criterios', slug: 'criterios', description: 'Criterios de evaluación', …}23: {id: 32, submodule_id: 10, name: 'Mapa', slug: 'map', description: 'Mapa de activos', …}24: {id: 35, submodule_id: 10, name: 'Asignaciones', slug: 'assignments', description: 'Asignaciones de activos', …}25: {id: 44, submodule_id: 13, name: 'Listado', slug: 'listing', description: 'Listado de voluntarios', …}26: {id: 38, submodule_id: 12, name: 'Dashboard', slug: 'dashboard', description: 'Dashboard de almacén', …}27: {id: 40, submodule_id: 12, name: 'Consumibles', slug: 'consumables', description: 'Consumibles', …}28: {id: 41, submodule_id: 12, name: 'Inventario', slug: 'stock', description: 'Inventario de almacén', …}29: {id: 42, submodule_id: 12, name: 'Movimientos', slug: 'movements', description: 'Movimientos de almacén', …}30: {id: 43, submodule_id: 12, name: 'Requisiciones', slug: 'requisitions', description: 'Requisiciones', …}31: {id: 45, submodule_id: 13, name: 'Registro', slug: 'register', description: 'Registro de voluntarios', …}32: {id: 46, submodule_id: 13, name: 'Reconocimientos', slug: 'recognition', description: 'Reconocimientos', …}33: {id: 47, submodule_id: 14, name: 'Presupuestos', slug: 'budget-planning', description: 'Planificación presupuestaria', …}34: {id: 48, submodule_id: 14, name: 'Flujo de Efectivo', slug: 'cash-flow-matrix', description: 'Matriz de flujo de efectivo', …}35: {id: 49, submodule_id: 14, name: 'Calculadora', slug: 'calculator', description: 'Calculadora financiera', …}36: {id: 50, submodule_id: 14, name: 'Registro Pagos', slug: 'payments', description: 'Registro de pagos', …}37: {id: 52, submodule_id: 15, name: 'Transacciones', slug: 'transactions', description: 'Transacciones contables', …}38: {id: 53, submodule_id: 15, name: 'Asientos Contables', slug: 'journal-entries', description: 'Asientos del diario', …}39: {id: 54, submodule_id: 15, name: 'Balanza', slug: 'trial-balance', description: 'Balanza de comprobación', …}40: {id: 55, submodule_id: 15, name: 'Estados Financieros', slug: 'financial-statements', description: 'Estados financieros', …}41: {id: 56, submodule_id: 15, name: 'Integración', slug: 'integration', description: 'Integración contable', …}42: {id: 57, submodule_id: 16, name: 'Catálogo', slug: 'catalog', description: 'Catálogo de concesiones', …}43: {id: 58, submodule_id: 16, name: 'Concesionarios', slug: 'concessionaires', description: 'Gestión de concesionarios', …}44: {id: 62, submodule_id: 17, name: 'Contratos', slug: 'contracts', description: 'Contratos de marketing', …}45: {id: 61, submodule_id: 17, name: 'Patrocinadores', slug: 'sponsors', description: 'Gestión de patrocinadores', …}46: {id: 63, submodule_id: 17, name: 'Paquetes', slug: 'packages', description: 'Paquetes de marketing', …}47: {id: 64, submodule_id: 17, name: 'Beneficios', slug: 'benefits', description: 'Beneficios de marketing', …}48: {id: 65, submodule_id: 17, name: 'Eventos', slug: 'events', description: 'Eventos de marketing', …}49: {id: 66, submodule_id: 17, name: 'Activos', slug: 'assets', description: 'Activos de marketing', …}50: {id: 68, submodule_id: 18, name: 'Colocaciones', slug: 'placements', description: 'Colocaciones publicitarias', …}51: {id: 69, submodule_id: 18, name: 'Métricas', slug: 'analytics', description: 'Métricas publicitarias', …}52: {id: 70, submodule_id: 19, name: 'Plantillas', slug: 'templates', description: 'Plantillas de comunicación', …}53: {id: 71, submodule_id: 19, name: 'Cola de Emails', slug: 'queue', description: 'Cola de emails', …}54: {id: 72, submodule_id: 19, name: 'Envío Masivo', slug: 'bulk', description: 'Envío masivo de emails', …}55: {id: 73, submodule_id: 20, name: 'Empleados', slug: 'employees', description: 'Gestión de empleados', …}56: {id: 74, submodule_id: 21, name: 'Nómina', slug: 'payroll', description: 'Gestión de nómina', …}57: {id: 75, submodule_id: 22, name: 'Vacaciones', slug: 'vacations', description: 'Gestión de vacaciones', …}58: {id: 76, submodule_id: 23, name: 'Gestión de Roles', slug: 'roles', description: 'Gestión de roles', …}59: {id: 77, submodule_id: 23, name: 'Matriz de Permisos', slug: 'permissions', description: 'Matriz de permisos', …}60: {id: 78, submodule_id: 23, name: 'Gestión de Usuarios', slug: 'users', description: 'Gestión de usuarios', …}61: {id: 79, submodule_id: 24, name: 'Políticas', slug: 'policies', description: 'Políticas del sistema', …}62: {id: 80, submodule_id: 25, name: 'Notificaciones', slug: 'notifications', description: 'Notificaciones del sistema', …}63: {id: 81, submodule_id: 26, name: 'Panel de Auditoría', slug: 'audit', description: 'Panel de auditoría', …}64: {id: 82, submodule_id: 26, name: 'Auditoría de Roles', slug: 'role-audits', description: 'Auditoría de roles', …}65: {id: 84, submodule_id: 27, name: 'Respaldos', slug: 'backup', description: 'Respaldos del sistema', …}66: {id: 85, submodule_id: 27, name: 'Rendimiento', slug: 'performance', description: 'Monitoreo de rendimiento', …}67: {id: 86, submodule_id: 27, name: 'Actualizaciones', slug: 'updates', description: 'Actualizaciones del sistema', …}68: {id: 87, submodule_id: 28, name: 'Exportaciones', slug: 'exports', description: 'Exportaciones del sistema', …}length: 69[[Prototype]]: Array(0)
+permissions-hierarchical-matrix.tsx:307 🐛 [DEBUG] Filtered pages for submodule parques: Array(0)
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+permissions-hierarchical-matrix.tsx:305 🐛 [DEBUG] Submodule parques: Object
+permissions-hierarchical-matrix.tsx:306 🐛 [DEBUG] All pages in pageMap: Array(69)
+permissions-hierarchical-matrix.tsx:307 🐛 [DEBUG] Filtered pages for submodule parques: Array(0)
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:321 🌐 [QUERY] GET /api/notifications/count
+queryClient.ts:321 🌐 [QUERY] GET /api/notifications/count
