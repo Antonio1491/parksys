@@ -330,7 +330,7 @@ export default function TreeSpecies() {
 
   // Extraer los datos de la respuesta
   const treeSpecies = treeSpeciesResponse?.data || [];
-  const parks = parksResponse || [];
+  const parks = Array.isArray(parksResponse) ? parksResponse : (parksResponse?.data || []);
   const parkSpeciesAssignments = parkSpeciesResponse?.data || [];
 
   // Filtrar especies
