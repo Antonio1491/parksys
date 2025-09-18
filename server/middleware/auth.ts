@@ -118,7 +118,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     // 6. Obtener roles del usuario (BYPASS TEMPORAL DURANTE MIGRACIÓN)
     // Durante la migración Firebase, usar directamente el roleId legacy para evitar errores de tabla user_roles
     console.log(`🚨 [AUTH-BYPASS] Usando rol legacy directo durante migración Firebase`);
-    const userRolesList = localUser.roleId ? [{ roleId: localUser.roleId }] : [];
+    const userRolesList = localUser.role_id ? [{ roleId: localUser.role_id }] : [];
 
     // 7. Configurar objeto usuario en request con rol normalizado
     // Normalizar rol desde DB - usar roleId como fuente de verdad principal
@@ -130,19 +130,19 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       5: 'supervisor',
       6: 'user'
     };
-    const normalizedRole = roleMapping[localUser.roleId ?? 0] || 'user'; // ✅ SIEMPRE usar roleId como fuente principal, manejar null
+    const normalizedRole = roleMapping[localUser.role_id ?? 0] || 'user'; // ✅ SIEMPRE usar roleId como fuente principal, manejar null
     
     req.user = {
       id: localUser.id,
-      firebaseUid: localUser.firebaseUid,
+      firebaseUid: localUser.firebase_uid,
       username: localUser.username,
       email: localUser.email,
-      fullName: localUser.fullName,
+      fullName: localUser.full_name,
       role: normalizedRole, // ✅ AGREGADO: rol normalizado como string
-      roleId: localUser.roleId,
-      isActive: localUser.isActive,
+      roleId: localUser.role_id,
+      isActive: localUser.is_active,
       roles: userRolesList,
-      needsPasswordReset: localUser.needsPasswordReset
+      needsPasswordReset: localUser.needs_password_reset
     };
 
     console.log(`✅ [AUTH] Usuario autenticado: ${localUser.email}`);
