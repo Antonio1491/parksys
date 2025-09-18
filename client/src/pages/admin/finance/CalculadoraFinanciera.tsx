@@ -398,35 +398,6 @@ const CalculadoraFinanciera = () => {
     }
   };
 
-  const copyResults = () => {
-    const results = `
-Calculadora Financiera - ${data.title}
-===================================
-
-RENTABILIDAD POR CLASE:
-- Ingreso Mínimo: ${formatCurrency(calculations.minNetIncomePerClass)}
-- Ingreso Máximo: ${formatCurrency(calculations.maxNetIncomePerClass)}
-- Costos Totales: ${formatCurrency(calculations.maxTotalCostsPerClass)}
-- Utilidad Mínima: ${formatCurrency(calculations.minGrossProfitPerClass)}
-- Utilidad Máxima: ${formatCurrency(calculations.maxGrossProfitPerClass)}
-
-PROYECCIÓN MENSUAL:
-- Ingreso Mensual: ${formatCurrency(calculations.maxMonthlyIncome)}
-- Costos Mensuales: ${formatCurrency(calculations.monthlyTotalCosts)}
-- Utilidad Mensual: ${formatCurrency(calculations.maxMonthlyGrossProfit)}
-
-INDICADORES:
-- Margen de Utilidad: ${formatPercentage(calculations.maxGrossMargin)}
-- Punto de Equilibrio: ${calculations.breakEvenPoint} participantes
-- Cumple Expectativas: ${calculations.maxMeetsExpectations ? 'Sí' : 'No'}
-    `;
-    
-    navigator.clipboard.writeText(results.trim());
-    toast({
-      title: "Resultados copiados",
-      description: "Los resultados han sido copiados al portapapeles"
-    });
-  };
 
   // Función para guardar cálculo financiero
   const saveCalculationMutation = useMutation({
