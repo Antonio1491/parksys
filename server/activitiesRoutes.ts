@@ -5,7 +5,7 @@ import { sql, eq } from 'drizzle-orm';
 import { insertActivitySchema, activityCategories, insertActivityCategorySchema, activities } from '@shared/schema';
 import { storage } from './storage';
 import { db } from './db';
-import { isAuthenticated, requirePermission, hasParkAccess } from './middleware/auth';
+import { isAuthenticated, requirePermission, userHasParkAccess, auditFinancialDecision } from './middleware/auth';
 
 // Schema para validar cálculos financieros - preserva todos los campos para fidelidad completa
 const financialCalculationSchema = z.object({
@@ -167,8 +167,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
   apiRouter.post("/parks/:id/activities", isAuthenticated, hasParkAccess, async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
-      console.log("Headers recibidos:", req.headers);
-      console.log("Datos recibidos para crear actividad:", req.body);
+      // Security: Removed sensitive logging of headers and body data
       
       // Extraer los datos
       const { startDate, endDate, ...otherData } = req.body;
@@ -228,8 +227,7 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
     try {
       const activityId = Number(req.params.id);
       
-      console.log("Headers recibidos:", req.headers);
-      console.log("Datos recibidos para actualizar actividad:", req.body);
+      // Security: Removed sensitive logging of headers and body data
       console.log("🎯 INICIO DEL PROCESO DE ACTUALIZACIÓN - ID:", activityId);
       
       // Verificar si la actividad existe
@@ -321,8 +319,8 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
     try {
       const activityId = Number(req.params.id);
       
-      console.log("Headers recibidos:", req.headers);
       console.log("Eliminando actividad con ID:", activityId);
+      // Security: Removed sensitive logging of headers
       
       // Verificar si la actividad existe
       const existingActivity = await (storage as any).getActivity(activityId);
@@ -663,20 +661,15 @@ export function registerActivityRoutes(app: any, apiRouter: any, isAuthenticated
 
       // CRITICAL: Verificar autorización a nivel de recurso - acceso al parque
       if (existingActivity.parkId) {
-        // Verificar si el usuario tiene acceso al parque de la actividad
         const user = (req as any).user;
-        const userCanAccessPark = user.roles?.some((role: any) => 
-          role.permissions?.includes('all') || 
-          role.municipalityIds?.includes(existingActivity.municipalityId) ||
-          role.parkIds?.includes(existingActivity.parkId)
-        ) || user.isSuper || user.permissions?.includes('all');
         
-        if (!userCanAccessPark) {
+        if (!userHasParkAccess(user, existingActivity.parkId)) {
           console.log(`🚫 [SECURITY] Usuario ${user.id} intentó aprobar actividad del parque ${existingActivity.parkId} sin acceso`);
           return res.status(403).json({ 
             message: "No tienes autorización para tomar decisiones financieras sobre actividades de este parque" 
           });
         }
+        
         console.log(`✅ [SECURITY] Usuario ${user.id} autorizado para parque ${existingActivity.parkId}`);
       }
 

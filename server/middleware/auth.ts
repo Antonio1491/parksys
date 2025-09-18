@@ -330,3 +330,67 @@ export const requireAdmin = async (req: Request, res: Response, next: NextFuncti
 
   next();
 };
+
+// Función centralizada para verificar acceso a parques (específica para usuarios)
+export const userHasParkAccess = (user: any, parkId: number): boolean => {
+  console.log(`🔍 [DEBUG] userHasParkAccess - User:`, JSON.stringify({
+    id: user.id,
+    roleId: user.roleId, 
+    role: user.role,
+    isSuper: user.isSuper,
+    permissions: user.permissions
+  }, null, 2));
+  console.log(`🔍 [DEBUG] userHasParkAccess - Checking park:`, parkId);
+  
+  // Super Admin tiene acceso a todos los parques
+  if (user.roleId === 1 || user.role === 'super-admin' || user.role === 'super_admin' || user.isSuper) {
+    console.log(`✅ [DEBUG] Super Admin bypass activated for user ${user.id}`);
+    return true;
+  }
+  
+  // Verificar permisos universales
+  if (user.permissions?.includes('all') || user.roles?.some((role: any) => role.permissions?.includes('all'))) {
+    return true;
+  }
+  
+  // Verificar acceso específico al parque
+  const hasSpecificAccess = user.roles?.some((role: any) => 
+    role.municipalityIds?.includes(user.municipalityId) ||
+    role.parkIds?.includes(parkId)
+  ) || user.parkIds?.includes(parkId);
+  
+  return hasSpecificAccess;
+};
+
+// Middleware para verificar acceso a parques específicos
+export const requireParkAccess = (parkId: number) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'No autorizado' });
+    }
+
+    if (!userHasParkAccess(req.user, parkId)) {
+      console.log(`🚫 [SECURITY] Usuario ${req.user.id} sin acceso al parque ${parkId}`);
+      return res.status(403).json({ 
+        message: 'No tienes autorización para acceder a este parque' 
+      });
+    }
+
+    console.log(`✅ [SECURITY] Usuario ${req.user.id} autorizado para parque ${parkId}`);
+    next();
+  };
+};
+
+// Función para logging de auditoría de decisiones financieras
+export const auditFinancialDecision = (userId: number, activityId: number, decision: string, reason: string) => {
+  const auditLog = {
+    timestamp: new Date().toISOString(),
+    action: 'financial_decision',
+    userId,
+    activityId,
+    decision,
+    reason: reason.substring(0, 100) // Truncar para evitar logs muy largos
+  };
+  
+  console.log(`📊 [AUDIT] Financial Decision:`, JSON.stringify(auditLog));
+};
