@@ -1509,7 +1509,7 @@ export const parks = pgTable("parks", {
   greenArea: numeric("green_area"), // Área permeable
   foundationYear: integer("foundation_year"),
   administrator: text("administrator"),
-  conservationStatus: text("conservation_status"),
+  status: varchar("status", { length: 50 }).default("en_funcionamiento"), // Estado del parque: en_funcionamiento, operando_parcialmente, en_mantenimiento, cerrado_temporalmente, cerrado_indefinidamente, reapertura_proxima, en_proyecto_construccion, uso_restringido
   regulationUrl: text("regulation_url"),
   openingHours: text("opening_hours"),
   contactEmail: text("contact_email"),

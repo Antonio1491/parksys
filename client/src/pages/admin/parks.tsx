@@ -288,7 +288,7 @@ const AdminParksContent = () => {
       const singularLabel = label.endsWith('s') ? label.slice(0, -1) : label;
       const displayText = hasAlerts
         ? `${count} ${count === 1 ? singularLabel : label}`
-        : `Sin ${label}`;
+        : `Sin ${label} pendientes`;
 
       return (
         <div className="flex items-center gap-1 text-sm font-poppins">
@@ -349,7 +349,7 @@ const AdminParksContent = () => {
         )}
 
         {/* Sección de alertas */} 
-        <div className="rounded-lg p-3 space-y-2"> 
+        <div className="rounded-lg pl-3 space-y-2"> 
           <div className="grid grid-cols-1 gap-1 font-poppins">
             {getAlertComponent(incidents?.total || 0, "incidencias")} 
             {getAlertComponent(assets?.total || 0, "activos")}
@@ -360,21 +360,17 @@ const AdminParksContent = () => {
 
         {/* Programación próxima */}
         {schedule && schedule.total > 0 && (
-          <div className="bg-blue-50 rounded-lg p-3">
+          <div className="pl-3">
             <div className="flex items-center gap-1 mb-2">
-              <Calendar className="h-3 w-3 text-blue-500" />
-              <h4 className="text-xs font-medium text-blue-700">Próximos eventos</h4>
+              <h4 className="text-md font-medium text-gray-800">Programación próxima</h4>
             </div>
-            <div className="text-xs text-blue-600">
+            <div className="text-md text-gray-800">
               {schedule.breakdown.activities > 0 && (
-                <span>{schedule.breakdown.activities} actividades </span>
+                <span> Actividades {schedule.breakdown.activities}</span>
               )}
               {schedule.breakdown.events > 0 && (
-                <span>{schedule.breakdown.events} eventos</span>
+                <span> Eventos {schedule.breakdown.events}</span>
               )}
-            </div>
-            <div className="text-xs text-blue-500 mt-1">
-              Total: {schedule.total} programados
             </div>
           </div>
         )}
