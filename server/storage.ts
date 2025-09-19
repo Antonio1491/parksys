@@ -1055,6 +1055,10 @@ export class DatabaseStorage implements IStorage {
         fields.push(`opening_hours = $${paramIndex++}`);
         values.push(JSON.stringify(data.dailySchedule));
       }
+      if (data.status !== undefined) {
+        fields.push(`status = $${paramIndex++}`);
+        values.push(data.status);
+      }
       
       // Siempre actualizar updated_at
       fields.push(`updated_at = NOW()`);
