@@ -687,18 +687,9 @@ const AdminParksContent = () => {
                               variant="secondary" 
                               className="ml-2 bg-[#a8bd7d] text-white"
                             >
-                              <Award className="h-3 w-3 mr-1" />
-                              Certificado
+                              <Award className="h-8 w-4" />
                             </Badge>
                           )}
-                        </div>
-                        {/* Componente de métricas del parque para vista lista */}
-                        <div className="mt-2 max-w-2xl">
-                          <ParkMetricsCard 
-                            park={park} 
-                            summaryData={parksSummaryData?.[park.id]} 
-                            isLoadingSummary={isSummaryLoading}
-                          />
                         </div>
                       </div>
                     </div>
@@ -731,18 +722,6 @@ const AdminParksContent = () => {
                   )}
                 </div>
                 <div className="flex items-center space-x-2 ml-6">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocation(`/admin/parks/${park.id}/edit`);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    data-testid={`button-edit-park-list-${park.id}`}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
                   <Button
                     variant="outline"
                     size="sm"

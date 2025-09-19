@@ -846,7 +846,7 @@ export default function AdminParkView() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Link href={`/admin/parks/${id}/edit`}>
+          <Link href={`/admin/parks/${park.id}/manage`}>
             <Button>Editar Parque</Button>
           </Link>
         </div>

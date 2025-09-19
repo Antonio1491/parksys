@@ -13,7 +13,7 @@ export async function getParksDirectly(filters?: any) {
         p.park_type as "parkType", p.description, p.address, 
         p.postal_code as "postalCode", p.latitude, p.longitude, 
         p.area, p.foundation_year as "foundationYear",
-        p.administrator, p.conservation_status as "conservationStatus",
+        p.administrator, p.status,
         p.regulation_url as "regulationUrl", p.opening_hours as "openingHours", 
         p.contact_email as "contactEmail", p.contact_phone as "contactPhone",
         p.video_url as "videoUrl", p.certificaciones, p.typology_id,
