@@ -106,7 +106,7 @@ export function ExportButton({
     <>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size={size} disabled={disabled || isExporting} className={className}>
+          <Button variant={buttonVariant} size={size} disabled={disabled || isExporting} className={className}>
             <Download className="mr-2 h-4 w-4" />
             {isExporting ? 'Exportando...' : 'Exportar'}
           </Button>
@@ -134,8 +134,8 @@ export function ExportButton({
       {/* Botón de exportación rápida para formatos soportados */}
       {supportedFormats.length === 1 && (
         <Button
-          variant="ghost"
-          size="sm"
+          variant={buttonVariant}
+          size={size}
           onClick={() => handleQuickExport(supportedFormats[0])}
           disabled={disabled || isExporting}
           className="ml-1 shrink-0"

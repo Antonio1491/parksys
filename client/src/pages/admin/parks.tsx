@@ -334,7 +334,7 @@ const AdminParksContent = () => {
     return (
       <div className="space-y-3">
         {/* Badge de evaluación promedio */}
-        {metrics && metrics.averageRating !== null && (
+        {metrics && metrics.averageRating !== null && typeof metrics.averageRating === 'number' && !isNaN(metrics.averageRating) && (
           <Badge 
             variant="secondary" 
             className={`${getRatingColor(metrics.averageRating)} text-xs font-medium`}
