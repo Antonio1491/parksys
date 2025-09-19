@@ -53,6 +53,10 @@ export default {
         },
         principal: "hsl(var(--principal))",
         "header-background": "hsl(var(--header-background))",
+        light: 'hsl(var(--light))',
+        buttonHover: 'hsl(var(--button-hover))',
+
+        // Sidebar colors
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -63,6 +67,40 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
           hover: "hsl(var(--sidebar-hover))",
+          system: 'hsl(var(--sidebar-system))',
+          gestion: 'hsl(var(--sidebar-gestion))',
+          operations: 'hsl(var(--sidebar-operations))',
+          adminFinance: 'hsl(var(--sidebar-admin-finance))',
+          mktComm: 'hsl(var(--sidebar-mkt-comm))',
+          hr: 'hsl(var(--sidebar-hr))',
+          security: 'hsl(var(--sidebar-security))',
+          public: 'hsl(var(--sidebar-public))',
+        },
+
+        // Niveles en charts
+        value: {
+          high: 'hsl(var(--high))',
+          medium: 'hsl(var(--medium))',
+          low: 'hsl(var(--low))',
+        },
+
+        // Estados del sistema
+        status: {
+          active: 'hsl(var(--status-active))',
+          scheduled: 'hsl(var(--status-scheduled))',
+          cancelled: 'hsl(var(--status-cancelled))',
+          paused: 'hsl(var(--status-paused))',
+          awaitingBudget: 'hsl(var(--status-awaiting-budget))',
+          foreground: 'hsl(var(--status-foreground))',
+        },
+
+        // Categorías temáticas
+        category: {
+          art: 'hsl(var(--category-art))',
+          nature: 'hsl(var(--category-nature))',
+          recreation: 'hsl(var(--category-recreation))',
+          community: 'hsl(var(--category-community))',
+          foreground: 'hsl(var(--category-foreground))',
         },
       },
       keyframes: {

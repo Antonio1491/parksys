@@ -498,7 +498,7 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
             <FormItem>
               <FormLabel>Estado del parque</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona el estado del parque" />
                   </SelectTrigger>

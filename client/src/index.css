@@ -348,6 +348,32 @@
     --sidebar-border: 20 5.9% 90%;
     --sidebar-ring: 167 100% 33%;
     --sidebar-hover: 181 94% 21%;
+
+    /* Nueva definición de colores */
+    --light: 220 16% 96%;
+    --button-hover: 171 51% 87%;
+    --status-active: 128 46% 63%;
+    --status-scheduled: 37 70% 66%;
+    --status-cancelled: 0 57% 74%;
+    --status-paused: 192 60% 62%;
+    --status-awaiting-budget: 235 64% 75%;
+    --status-foreground: 0 0% 6%;
+    --category-art: 270 100% 95%;
+    --category-nature: 108 81% 87%;
+    --category-recreation: 197 100% 89%;
+    --category-community: 6 81% 87%;
+    --category-foreground: 0 0% 6%;
+    --sidebar-system: 210 25% 50%;
+    --sidebar-gestion: 263 31% 34%;
+    --sidebar-operations: 302 28% 58%;
+    --sidebar-admin-finance: 71 37% 61%;
+    --sidebar-mkt-comm: 214 69% 38%;
+    --sidebar-hr: 202 78% 45%;
+    --sidebar-security: 196 71% 75%;
+    --sidebar-public: 214 69% 38%;
+    --high: 113 47% 56%;
+    --medium: 53 32% 62%;
+    --low: 0 27% 53%;
   }
 
   .dark {
