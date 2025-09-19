@@ -3,6 +3,7 @@ import { Upload, Image, X, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { useParams } from 'wouter';
 
 interface EventImageUploaderProps {
   onImageUpload: (imageUrl: string) => void;
@@ -18,6 +19,11 @@ export default function EventImageUploader({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const { toast } = useToast();
+  const params = useParams();
+  
+  // Detectar contexto: ¿estamos editando un evento existente o creando uno nuevo?
+  const isEditMode = params.id && !isNaN(parseInt(params.id));
+  const eventId = isEditMode ? parseInt(params.id as string) : null;
 
   const handleFileSelect = async (file: File) => {
     if (!file) return;
@@ -45,12 +51,21 @@ export default function EventImageUploader({
     setUploading(true);
 
     try {
-      console.log('📤 [EVENT-FRONTEND] Iniciando upload de imagen:', file.name);
+      console.log(`📤 [EVENT-FRONTEND] Iniciando upload de imagen (${isEditMode ? 'EDIT' : 'CREATE'} mode):`, file.name);
       
       const formData = new FormData();
-      formData.append('image', file);
+      // Usar nombre de campo correcto según el endpoint
+      const fieldName = isEditMode ? 'imageFile' : 'image';
+      formData.append(fieldName, file);
 
-      const response = await fetch('/api/events/upload-event-image', {
+      // Determinar endpoint según contexto
+      const endpoint = isEditMode 
+        ? `/api/events/${eventId}/images`
+        : '/api/events/upload-event-image';
+
+      console.log(`📤 [EVENT-FRONTEND] Usando endpoint: ${endpoint}, campo: ${fieldName}`);
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer direct-token-${Date.now()}-admin`
