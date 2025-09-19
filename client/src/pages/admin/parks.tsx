@@ -283,6 +283,34 @@ const AdminParksContent = () => {
       return "bg-red-100 text-red-800";
     };
 
+    const getStatusColor = (status: string | null) => {
+      switch (status) {
+        case "en_funcionamiento": return "bg-green-100 text-green-800";
+        case "operando_parcialmente": return "bg-yellow-100 text-yellow-800";
+        case "en_mantenimiento": return "bg-orange-100 text-orange-800";
+        case "cerrado_temporalmente": return "bg-red-100 text-red-800";
+        case "cerrado_indefinidamente": return "bg-red-200 text-red-900";
+        case "reapertura_proxima": return "bg-blue-100 text-blue-800";
+        case "en_proyecto_construccion": return "bg-purple-100 text-purple-800";
+        case "uso_restringido": return "bg-gray-100 text-gray-800";
+        default: return "bg-gray-100 text-gray-800";
+      }
+    };
+
+    const getStatusText = (status: string | null) => {
+      switch (status) {
+        case "en_funcionamiento": return "En funcionamiento";
+        case "operando_parcialmente": return "Operando parcialmente";
+        case "en_mantenimiento": return "En mantenimiento";
+        case "cerrado_temporalmente": return "Cerrado temporalmente";
+        case "cerrado_indefinidamente": return "Cerrado indefinidamente";
+        case "reapertura_proxima": return "Reapertura próxima";
+        case "en_proyecto_construccion": return "En proyecto / construcción";
+        case "uso_restringido": return "Uso restringido";
+        default: return "Estado no definido";
+      }
+    };
+
     const getAlertComponent = (count: number, label: string) => {
       const hasAlerts = count > 0;
       const singularLabel = label.endsWith('s') ? label.slice(0, -1) : label;
@@ -338,15 +366,26 @@ const AdminParksContent = () => {
 
     return (
       <div className="space-y-3">
-        {/* Badge de evaluación promedio */}
-        {metrics && metrics.averageRating !== null && typeof metrics.averageRating === 'number' && !isNaN(metrics.averageRating) && (
+        {/* Badges de evaluación y estado */}
+        <div className="flex flex-wrap gap-2">
+          {/* Badge de evaluación promedio */}
+          {metrics && metrics.averageRating !== null && typeof metrics.averageRating === 'number' && !isNaN(metrics.averageRating) && (
+            <Badge 
+              variant="secondary" 
+              className={`${getRatingColor(metrics.averageRating)} text-xs font-medium`}
+            >
+              ⭐ {metrics.averageRating.toFixed(1)} ({metrics.totalEvaluations} eval.)
+            </Badge>
+          )}
+          
+          {/* Badge de estado del parque */}
           <Badge 
             variant="secondary" 
-            className={`${getRatingColor(metrics.averageRating)} text-xs font-medium`}
+            className={`${getStatusColor(park.status)} text-xs font-medium`}
           >
-            ⭐ {metrics.averageRating.toFixed(1)} ({metrics.totalEvaluations} eval.)
+            {getStatusText(park.status)}
           </Badge>
-        )}
+        </div>
 
         {/* Sección de alertas */} 
         <div className="rounded-lg pl-3 space-y-2"> 
