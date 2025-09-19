@@ -49,11 +49,11 @@ const Events: React.FC = () => {
   });
 
   // Procesar datos del backend
-  const events = Array.isArray(eventsData?.data) ? eventsData.data : Array.isArray(eventsData) ? eventsData : [];
-  const parks = Array.isArray(parksData?.data) ? parksData.data : Array.isArray(parksData) ? parksData : [];
+  const events = Array.isArray((eventsData as any)?.data) ? (eventsData as any).data : Array.isArray(eventsData) ? eventsData : [];
+  const parks = Array.isArray((parksData as any)?.data) ? (parksData as any).data : Array.isArray(parksData) ? parksData : [];
   
   // Obtener categorías únicas de los eventos
-  const categories = [...new Set(events.map((event: Event) => event.event_type))];
+  const categories = Array.from(new Set(events.map((event: Event) => event.event_type)));
 
   const filteredEvents = events.filter((event: Event) => {
     const parkName = event.parks && event.parks.length > 0 ? event.parks[0].name : event.location;

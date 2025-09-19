@@ -1,0 +1,20 @@
+Console.js:61 Warning: Each child in a list should have a unique "key" prop.
+
+Check the render method of `Events`. See https://reactjs.org/link/warning-keys for more information.
+    at _c11 (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ui/select.tsx:208:13)
+    at Events (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/Events.tsx:31:39)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=14eab8c0:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=NfcuD6chANNz1I5lyPyiU:61:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=14eab8c0:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=14eab8c0:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=14eab8c0:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…e/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…e/runner/workspace/node_modules/.vite/deps/next-themes.js?v=14eab8c0:42:18)
+
+Console.js:61 Image loaded successfully: /api/storage/file/uploads/1758243407584-5abd8588-863c-4d18-a59a-34bfe596a950-dog-jumping-over-hurdle-2024-09-13-05-35-57-utc.jpg
