@@ -27,7 +27,12 @@ const useParksMetricsSummary = (parkIds: number[]) => {
     reports: PendingReports;
     schedule: UpcomingSchedule;
   }>>({
-    queryKey: ['/api/parks', 'summary', parkIds.sort().join(',')],
+    queryKey: ['/api/parks/summary', parkIds.sort().join(',')],
+    queryFn: () => {
+      if (parkIds.length === 0) return Promise.resolve({});
+      const idsParam = parkIds.join(',');
+      return apiRequest(`/api/parks/summary?ids=${idsParam}`);
+    },
     enabled: parkIds.length > 0,
     staleTime: 3 * 60 * 1000, // 3 minutes
   });
@@ -498,6 +503,10 @@ const AdminParksContent = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentParks = filteredParks.slice(startIndex, endIndex);
 
+  // Get metrics summary for current page parks only (performance optimization)
+  const currentParkIds = currentParks.map(park => park.id);
+  const { data: parksSummaryData, isLoading: isSummaryLoading } = useParksMetricsSummary(currentParkIds);
+
   // Reset to first page when search changes
   React.useEffect(() => {
     setCurrentPage(1);
@@ -625,7 +634,11 @@ const AdminParksContent = () => {
                         </div>
                         {/* Componente de métricas del parque para vista lista */}
                         <div className="mt-2 max-w-2xl">
-                          <ParkMetricsCard park={park} />
+                          <ParkMetricsCard 
+                            park={park} 
+                            summaryData={parksSummaryData?.[park.id]} 
+                            isLoadingSummary={isSummaryLoading}
+                          />
                         </div>
                       </div>
                     </div>
@@ -752,7 +765,11 @@ const AdminParksContent = () => {
                     )}
                   </div>
                   {/* Componente de métricas del parque */}
-                  <ParkMetricsCard park={park} />
+                  <ParkMetricsCard 
+                    park={park} 
+                    summaryData={parksSummaryData?.[park.id]} 
+                    isLoadingSummary={isSummaryLoading}
+                  />
                 </div>
               </div>
             </CardHeader>
