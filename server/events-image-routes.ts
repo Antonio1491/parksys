@@ -25,6 +25,57 @@ const eventImageUpload = multer({
   }
 });
 
+// Upload genérico para eventos (cuando aún no existe eventId - caso creación)
+router.post("/upload-image", eventImageUpload.single('image'), async (req: Request, res: Response) => {
+  try {
+    console.log('📤 [EVENT-GENERIC] Iniciando upload genérico de imagen de evento');
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "No se proporcionó archivo de imagen" });
+    }
+
+    console.log(`📤 [EVENT-GENERIC] Procesando archivo: ${req.file.originalname}`);
+    
+    let imageUrl: string;
+    
+    try {
+      // 1. INTENTAR REPLIT OBJECT STORAGE (persistente)
+      console.log('📤 [EVENT-GENERIC] Intentando Replit Object Storage...');
+      imageUrl = await replitObjectStorage.uploadFile(req.file.buffer, req.file.originalname);
+      imageUrl = replitObjectStorage.getPublicUrl(imageUrl);
+      console.log('✅ [EVENT-GENERIC] Object Storage exitoso:', imageUrl);
+      
+    } catch (objectStorageError) {
+      console.log('⚠️ [EVENT-GENERIC] Object Storage falló, usando filesystem...', objectStorageError);
+      
+      // 2. FALLBACK A FILESYSTEM (carpeta persistente)
+      const uploadDir = path.join(process.cwd(), 'uploads', 'event-images');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const filename = `event-generic-${uniqueSuffix}${path.extname(req.file.originalname)}`;
+      const filePath = path.join(uploadDir, filename);
+      
+      fs.writeFileSync(filePath, req.file.buffer);
+      imageUrl = `/uploads/event-images/${filename}`;
+      console.log('✅ [EVENT-GENERIC] Filesystem usado:', imageUrl);
+    }
+    
+    console.log(`✅ [EVENT-GENERIC] Upload completado: ${imageUrl}`);
+    
+    res.status(200).json({
+      imageUrl: replitObjectStorage.normalizeUrl(imageUrl),
+      url: replitObjectStorage.normalizeUrl(imageUrl), // Compatibilidad 
+      method: imageUrl.includes('/api/storage/file/') ? 'object-storage' : 'filesystem'
+    });
+  } catch (error) {
+    console.error("❌ [EVENT-GENERIC] Error al subir imagen genérica:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
 // Obtener todas las imágenes de un evento
 router.get("/:eventId/images", async (req: Request, res: Response) => {
   try {
