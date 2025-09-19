@@ -141,6 +141,8 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
   }, [park, form]);
 
   const onSubmit = (values: ParkFormValues) => {
+    console.log("🔄 [FRONTEND] Datos del formulario antes de limpiar:", values);
+    
     // Limpiar valores nulos/vacíos para el backend
     const cleanedValues = {
       ...values,
@@ -157,6 +159,7 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
       certificaciones: values.certificaciones || undefined
     };
 
+    console.log("🔄 [FRONTEND] Datos después de limpiar (enviando al backend):", cleanedValues);
     mutation.mutate(cleanedValues);
   };
 

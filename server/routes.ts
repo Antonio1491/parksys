@@ -2976,6 +2976,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ruta normal para actualizar un parque (con verificación de permisos)
   apiRouter.put("/parks/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log(`🔄 [PUT /parks/:id] Petición recibida para parque: ${req.params.id}`);
+      console.log("🔄 [PUT /parks/:id] Datos del cuerpo:", JSON.stringify(req.body));
+      
       const parkId = Number(req.params.id);
       
       // Procesar los datos del parque
