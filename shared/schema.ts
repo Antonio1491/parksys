@@ -1630,6 +1630,17 @@ export const insertParkSchema = createInsertSchema(parks).omit({
   greenArea: z.coerce.number().nullable().optional(),
   foundationYear: z.coerce.number().nullable().optional(),
   capacity: z.coerce.number().nullable().optional(),
+  // Validación para el campo status
+  status: z.enum([
+    "en_funcionamiento",
+    "operando_parcialmente", 
+    "en_mantenimiento",
+    "cerrado_temporalmente",
+    "cerrado_indefinidamente",
+    "reapertura_proxima",
+    "en_proyecto_construccion",
+    "uso_restringido"
+  ]).default("en_funcionamiento").optional(),
 });
 
 // Categorías de eventos (diferente de actividades)
