@@ -247,7 +247,8 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       };
       
       // Insertar evento en la base de datos
-      const [createdEvent] = await db.insert(events).values(insertData).returning();
+      const createdEvents = await db.insert(events).values(insertData).returning();
+      const createdEvent = createdEvents[0];
       
       // Si se proporcionaron parques, crear relaciones
       if (eventData.parkIds && Array.isArray(eventData.parkIds) && eventData.parkIds.length > 0) {
@@ -466,6 +467,153 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       return res.status(500).json({ 
         message: "Error al obtener eventos del parque", 
         error: error.message 
+      });
+    }
+  });
+
+  // Eliminar eventos en lote (bulk delete)
+  apiRouter.post("/events/bulk-delete", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { eventIds } = req.body;
+      
+      if (!Array.isArray(eventIds) || eventIds.length === 0) {
+        return res.status(400).json({
+          message: "Se requiere un array de IDs de eventos no vacío"
+        });
+      }
+      
+      // Verificar que todos los IDs son números válidos
+      const validIds = eventIds.filter(id => !isNaN(parseInt(id))).map(id => parseInt(id));
+      
+      if (validIds.length === 0) {
+        return res.status(400).json({
+          message: "No se proporcionaron IDs de eventos válidos"
+        });
+      }
+      
+      console.log(`🗑️ [BULK-DELETE] Eliminando ${validIds.length} eventos:`, validIds);
+      
+      // Eliminar relaciones evento-parque primero (si existen)
+      try {
+        for (const eventId of validIds) {
+          await db.delete(eventParks).where(eq(eventParks.eventId, eventId));
+        }
+      } catch (relationError) {
+        console.log(`⚠️ [BULK-DELETE] No se pudieron eliminar relaciones de parques (puede que no existan):`, relationError);
+      }
+      
+      // Eliminar eventos
+      const deletedEvents = [];
+      for (const eventId of validIds) {
+        try {
+          const [deletedEvent] = await db
+            .delete(events)
+            .where(eq(events.id, eventId))
+            .returning();
+          if (deletedEvent) {
+            deletedEvents.push(deletedEvent);
+          }
+        } catch (deleteError) {
+          console.error(`Error eliminando evento ${eventId}:`, deleteError);
+        }
+      }
+      
+      console.log(`✅ [BULK-DELETE] Eliminados ${deletedEvents.length} eventos exitosamente`);
+      
+      return res.json({
+        message: `Se eliminaron ${deletedEvents.length} evento(s) correctamente`,
+        deletedCount: deletedEvents.length,
+        requestedCount: validIds.length,
+        deletedEvents
+      });
+    } catch (error) {
+      console.error("Error en bulk delete de eventos:", error);
+      return res.status(500).json({
+        message: "Error al eliminar eventos en lote",
+        error: (error as any).message
+      });
+    }
+  });
+
+  // Importar eventos desde CSV
+  apiRouter.post("/events/import", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { events: eventsData } = req.body;
+      
+      if (!Array.isArray(eventsData) || eventsData.length === 0) {
+        return res.status(400).json({
+          message: "Se requiere un array de eventos no vacío en el campo 'events'"
+        });
+      }
+      
+      console.log(`📥 [IMPORT] Importando ${eventsData.length} eventos`);
+      
+      const importedEvents = [];
+      const errors = [];
+      
+      for (let i = 0; i < eventsData.length; i++) {
+        try {
+          const eventData = eventsData[i];
+          
+          // Validación básica
+          if (!eventData.title) {
+            errors.push(`Fila ${i + 1}: El título es obligatorio`);
+            continue;
+          }
+          
+          // Preparar datos para inserción
+          const insertData = {
+            title: eventData.title,
+            description: eventData.description || null,
+            eventType: eventData.eventType || "other",
+            startDate: eventData.startDate ? new Date(eventData.startDate) : new Date(),
+            endDate: eventData.endDate ? new Date(eventData.endDate) : null,
+            startTime: eventData.startTime || null,
+            endTime: eventData.endTime || null,
+            location: eventData.location || null,
+            capacity: eventData.capacity ? parseInt(eventData.capacity) : null,
+            registrationType: eventData.registrationType || "free",
+            organizerName: eventData.organizerName || null,
+            organizerEmail: eventData.organizerEmail || null,
+            organizerPhone: eventData.organizerPhone || null,
+            price: eventData.price ? parseFloat(eventData.price) : 0,
+            status: eventData.status || "draft",
+            targetAudience: "all",
+            featuredImageUrl: null,
+            isRecurring: false,
+            recurrencePattern: null,
+            geolocation: null,
+            createdById: (req as any).user?.id || null
+          };
+          
+          // Insertar evento
+          const createdEvents = await db.insert(events).values(insertData).returning();
+          const createdEvent = createdEvents[0];
+          importedEvents.push(createdEvent);
+          
+        } catch (eventError) {
+          console.error(`Error importando evento fila ${i + 1}:`, eventError);
+          errors.push(`Fila ${i + 1}: Error al procesar evento - ${(eventError as any).message}`);
+        }
+      }
+      
+      console.log(`✅ [IMPORT] Importados ${importedEvents.length} eventos exitosamente`);
+      if (errors.length > 0) {
+        console.log(`⚠️ [IMPORT] ${errors.length} errores encontrados:`, errors);
+      }
+      
+      return res.json({
+        message: `Importación completada: ${importedEvents.length} eventos importados`,
+        importedCount: importedEvents.length,
+        totalRequested: eventsData.length,
+        errors: errors.length > 0 ? errors : undefined,
+        importedEvents
+      });
+    } catch (error) {
+      console.error("Error en importación de eventos:", error);
+      return res.status(500).json({
+        message: "Error al importar eventos",
+        error: (error as any).message
       });
     }
   });
