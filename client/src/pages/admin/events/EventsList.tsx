@@ -32,7 +32,8 @@ import {
   CheckSquare,
   Square,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ImageIcon
 } from 'lucide-react';
 
 // Interfaces
@@ -42,6 +43,8 @@ interface Event {
   description?: string;
   eventType?: string;
   category?: string;
+  categoryId?: number;
+  targetAudience?: string;
   status: string;
   startDate?: string;
   endDate?: string;
@@ -53,6 +56,7 @@ interface Event {
   organizerName?: string;
   organizerEmail?: string;
   organizerPhone?: string;
+  organizerOrganization?: string;
   price?: number;
   registrationType?: string;
   imageUrl?: string;
@@ -61,7 +65,14 @@ interface Event {
   updatedAt: string;
   organizer?: string;
   parkName?: string;
+  parks?: Array<{ id: number; name: string; address?: string }>;
+  parkIds?: number[];
   requiresApproval?: boolean;
+  isFree?: boolean;
+  notes?: string;
+  latitude?: number;
+  longitude?: number;
+  geolocation?: any;
 }
 
 interface EventFormData {
@@ -120,8 +131,10 @@ const EventsList: React.FC = () => {
   });
 
   // Obtener categorías de eventos
-  // No necesitamos categorías separadas - usamos los tipos de eventos del backend
-  const categoriesData = [];
+  const { data: categoriesData = [] } = useQuery({
+    queryKey: ['/api/event-categories'],
+    retry: 1
+  });
 
   // Mutación para eliminar evento
   const deleteEventMutation = useMutation({
@@ -267,17 +280,26 @@ const EventsList: React.FC = () => {
         'título',
         'descripción',
         'tipoEvento',
+        'categoría',
+        'públicoObjetivo',
         'fechaInicio',
         'fechaFin',
         'horaInicio',
         'horaFin',
         'ubicación',
+        'parquesAsociados',
         'capacidad',
         'tipoRegistro',
         'nombreOrganizador',
+        'organizaciónOrganizador',
         'emailOrganizador',
         'telefonoOrganizador',
         'precio',
+        'esGratis',
+        'requiereAprobación',
+        'notas',
+        'latitud',
+        'longitud',
         'estado'
       ];
 
@@ -287,17 +309,26 @@ const EventsList: React.FC = () => {
           event.title || '',
           event.description || '',
           event.eventType || '',
+          event.category || '',
+          event.targetAudience || '',
           event.startDate || '',
           event.endDate || '',
           event.startTime || '',
           event.endTime || '',
           event.location || '',
+          event.parks ? event.parks.map(p => p.name).join('; ') : event.parkName || '',
           event.capacity || '',
           event.registrationType || '',
           event.organizerName || '',
+          event.organizerOrganization || '',
           event.organizerEmail || '',
           event.organizerPhone || '',
           event.price || '',
+          event.isFree ? 'Sí' : 'No',
+          event.requiresApproval ? 'Sí' : 'No',
+          event.notes || '',
+          event.latitude || '',
+          event.longitude || '',
           event.status || ''
         ];
       });
@@ -343,17 +374,26 @@ const EventsList: React.FC = () => {
         'título',
         'descripción',
         'tipoEvento',
+        'categoría',
+        'públicoObjetivo',
         'fechaInicio',
         'fechaFin',
         'horaInicio',
         'horaFin',
         'ubicación',
+        'parquesAsociados',
         'capacidad',
         'tipoRegistro',
         'nombreOrganizador',
+        'organizaciónOrganizador',
         'emailOrganizador',
         'telefonoOrganizador',
         'precio',
+        'esGratis',
+        'requiereAprobación',
+        'notas',
+        'latitud',
+        'longitud',
         'estado'
       ];
 
@@ -362,17 +402,26 @@ const EventsList: React.FC = () => {
         'Festival de Primavera',
         'Celebración de la llegada de la primavera con actividades familiares.',
         'cultural',
+        'Cultural',
+        'all',
         '2025-03-15',
         '2025-03-15',
         '10:00:00',
         '18:00:00',
         'Plaza Central',
+        'Parque Central; Parque Norte',
         '200',
         'free',
         'María González',
+        'Departamento de Eventos',
         'maria@parques.gob.mx',
         '3312345678',
         '0',
+        'Sí',
+        'No',
+        'Evento familiar con actividades para todas las edades',
+        '20.6597',
+        '-103.3496',
         'published'
       ];
 
@@ -471,9 +520,15 @@ const EventsList: React.FC = () => {
                          event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.organizer?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || event.eventType === categoryFilter;
+    const matchesCategory = categoryFilter === 'all' || 
+                        event.eventType === categoryFilter ||
+                        (event.categoryId && event.categoryId.toString() === categoryFilter) ||
+                        (categories.find(cat => cat.id?.toString() === categoryFilter)?.name === event.eventType);
     const matchesStatus = statusFilter === 'all' || event.status === statusFilter;
-    const matchesPark = parkFilter === 'all' || event.location === parkFilter || event.parkName === parkFilter;
+    const matchesPark = parkFilter === 'all' || 
+                        event.location === parkFilter || 
+                        event.parkName === parkFilter ||
+                        event.parks?.some(p => p.name === parkFilter || p.id?.toString() === parkFilter);
     
     return matchesSearch && matchesCategory && matchesStatus && matchesPark;
   });
@@ -800,8 +855,8 @@ const EventsList: React.FC = () => {
                                 <h3 className="text-lg font-semibold text-gray-900">
                                   {event.title}
                                 </h3>
-                                <Badge className={statusColors[event.status]}>
-                                  {statusLabels[event.status]}
+                                <Badge className={statusColors[event.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}>
+                                  {statusLabels[event.status as keyof typeof statusLabels] || event.status}
                                 </Badge>
                                 {event.eventType && (
                                   <span 
@@ -824,15 +879,66 @@ const EventsList: React.FC = () => {
                                 </div>
                                 <div className="flex items-center">
                                   <MapPin className="h-4 w-4 mr-1" />
-                                  {event.location || 'Ubicación no especificada'}
+                                  <div className="flex flex-col">
+                                    <span>{event.location || 'Ubicación no especificada'}</span>
+                                    {event.parks && event.parks.length > 0 && (
+                                      <span className="text-xs text-blue-600 mt-1">
+                                        {event.parks.length === 1 
+                                          ? event.parks[0].name 
+                                          : `${event.parks[0].name} +${event.parks.length - 1} más`}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                                 <div className="flex items-center">
                                   <Users className="h-4 w-4 mr-1" />
                                   {event.registeredCount || 0}/{event.capacity || 0}
                                 </div>
                                 {event.price !== undefined && (
-                                  <span className="font-medium text-green-600">
-                                    {formatPrice(event.price)}
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-green-600">
+                                      {formatPrice(event.price)}
+                                    </span>
+                                    {event.isFree && (
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Gratis
+                                      </span>
+                                    )}
+                                    {event.requiresApproval && (
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                        Requiere aprobación
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Campos adicionales en vista lista */}
+                              <div className="flex items-center gap-4 text-xs text-gray-500 mt-2">
+                                {event.targetAudience && (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700">
+                                    {event.targetAudience === 'all' ? 'Todo público' :
+                                     event.targetAudience === 'children' ? 'Niños' :
+                                     event.targetAudience === 'youth' ? 'Jóvenes' :
+                                     event.targetAudience === 'adults' ? 'Adultos' :
+                                     event.targetAudience === 'seniors' ? 'Adultos mayores' :
+                                     event.targetAudience === 'families' ? 'Familias' :
+                                     event.targetAudience}
+                                  </span>
+                                )}
+                                {event.organizerOrganization && (
+                                  <span className="text-gray-600">
+                                    📋 {event.organizerOrganization}
+                                  </span>
+                                )}
+                                {event.notes && (
+                                  <span className="text-gray-600 truncate max-w-32" title={event.notes}>
+                                    📝 {event.notes.substring(0, 30)}{event.notes.length > 30 ? '...' : ''}
+                                  </span>
+                                )}
+                                {event.latitude && event.longitude && (
+                                  <span className="text-gray-600">
+                                    📍 GPS
                                   </span>
                                 )}
                               </div>
@@ -901,8 +1007,8 @@ const EventsList: React.FC = () => {
                           )}
                           {/* Badge de estado arriba a la izquierda */}
                           <div className="absolute top-2 left-2">
-                            <Badge className={statusColors[event.status]}>
-                              {statusLabels[event.status]}
+                            <Badge className={statusColors[event.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}>
+                              {statusLabels[event.status as keyof typeof statusLabels] || event.status}
                             </Badge>
                           </div>
                         </div>
@@ -921,9 +1027,9 @@ const EventsList: React.FC = () => {
                                 {event.eventType}
                               </span>
                             )}
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${statusColors[event.status]}`}>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${statusColors[event.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
                               <span className="mr-1"></span>
-                              {statusLabels[event.status]}
+                              {statusLabels[event.status as keyof typeof statusLabels] || event.status}
                             </span>
                           </div>
                         </div>
@@ -944,13 +1050,62 @@ const EventsList: React.FC = () => {
                             </div>
                             <div className="flex items-center">
                               <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                              <span>{event.location || 'Ubicación no especificada'}</span>
+                              <div className="flex flex-col">
+                                <span>{event.location || 'Ubicación no especificada'}</span>
+                                {event.parks && event.parks.length > 0 && (
+                                  <span className="text-xs text-blue-600 mt-1">
+                                    {event.parks.length === 1 
+                                      ? event.parks[0].name 
+                                      : `${event.parks[0].name} +${event.parks.length - 1} más`}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                             {event.capacity && (
                               <div className="flex items-center">
                                 <Users className="h-4 w-4 mr-2 text-gray-400" />
                                 <span>{event.registeredCount || 0} / {event.capacity} participantes</span>
                               </div>
+                            )}
+                          </div>
+                          
+                          {/* Campos adicionales en vista grid */}
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-3">
+                            {event.targetAudience && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700">
+                                {event.targetAudience === 'all' ? 'Todo público' :
+                                 event.targetAudience === 'children' ? 'Niños' :
+                                 event.targetAudience === 'youth' ? 'Jóvenes' :
+                                 event.targetAudience === 'adults' ? 'Adultos' :
+                                 event.targetAudience === 'seniors' ? 'Adultos mayores' :
+                                 event.targetAudience === 'families' ? 'Familias' :
+                                 event.targetAudience}
+                              </span>
+                            )}
+                            {event.isFree && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-50 text-green-700">
+                                Gratis
+                              </span>
+                            )}
+                            {event.requiresApproval && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full bg-orange-50 text-orange-700">
+                                Requiere aprobación
+                              </span>
+                            )}
+                            {event.organizerOrganization && (
+                              <span className="text-gray-600 truncate">
+                                📋 {event.organizerOrganization}
+                              </span>
+                            )}
+                            {event.notes && (
+                              <span className="text-gray-600 truncate" title={event.notes}>
+                                📝 {event.notes.substring(0, 20)}...
+                              </span>
+                            )}
+                            {event.latitude && event.longitude && (
+                              <span className="text-gray-600">
+                                📍 GPS
+                              </span>
                             )}
                           </div>
                           
@@ -1108,17 +1263,26 @@ const EventsList: React.FC = () => {
                         title: row['título'] || '',
                         description: row['descripción'] || '',
                         eventType: row['tipoEvento'] || '',
+                        category: row['categoría'] || '',
+                        targetAudience: row['públicoObjetivo'] || 'all',
                         startDate: row['fechaInicio'] || null,
                         endDate: row['fechaFin'] || null,
                         startTime: row['horaInicio'] || null,
                         endTime: row['horaFin'] || null,
                         location: row['ubicación'] || '',
+                        parkNames: row['parquesAsociados'] || '', // Will be processed into park IDs
                         capacity: row['capacidad'] ? parseInt(row['capacidad']) : null,
                         registrationType: row['tipoRegistro'] || 'free',
                         organizerName: row['nombreOrganizador'] || '',
+                        organizerOrganization: row['organizaciónOrganizador'] || '',
                         organizerEmail: row['emailOrganizador'] || '',
                         organizerPhone: row['telefonoOrganizador'] || '',
                         price: row['precio'] ? parseFloat(row['precio']) : 0,
+                        isFree: row['esGratis'] === 'Sí' || row['esGratis'] === 'true',
+                        requiresApproval: row['requiereAprobación'] === 'Sí' || row['requiereAprobación'] === 'true',
+                        notes: row['notas'] || '',
+                        latitude: row['latitud'] ? parseFloat(row['latitud']) : null,
+                        longitude: row['longitud'] ? parseFloat(row['longitud']) : null,
                         status: row['estado'] || 'draft'
                       })).filter((event: any) => event.title.trim() !== ''); // Filter out empty rows
 
@@ -1205,7 +1369,7 @@ const EventsList: React.FC = () => {
                       
                       {/* Badge de estado en la imagen */}
                       <div className="absolute top-3 right-3">
-                        <Badge className={statusColors[selectedEvent.status]}>
+                        <Badge className={statusColors[selectedEvent.status as keyof typeof statusColors]}>
                           {statusLabels[selectedEvent.status]}
                         </Badge>
                       </div>
@@ -1259,6 +1423,9 @@ const EventsList: React.FC = () => {
                             <h3 className="text-sm font-semibold text-gray-900 mb-1">Organizador</h3>
                             <div className="text-sm text-gray-600">
                               <p>{selectedEvent.organizerName}</p>
+                              {selectedEvent.organizerOrganization && (
+                                <p className="text-gray-500">{selectedEvent.organizerOrganization}</p>
+                              )}
                               {selectedEvent.organizerEmail && (
                                 <p className="text-blue-600">{selectedEvent.organizerEmail}</p>
                               )}
@@ -1266,6 +1433,21 @@ const EventsList: React.FC = () => {
                                 <p>{selectedEvent.organizerPhone}</p>
                               )}
                             </div>
+                          </div>
+                        )}
+
+                        {selectedEvent.targetAudience && (
+                          <div>
+                            <h3 className="text-sm font-semibold text-gray-900 mb-1">Público objetivo</h3>
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {selectedEvent.targetAudience === 'all' ? 'Todo público' :
+                               selectedEvent.targetAudience === 'children' ? 'Niños' :
+                               selectedEvent.targetAudience === 'youth' ? 'Jóvenes' :
+                               selectedEvent.targetAudience === 'adults' ? 'Adultos' :
+                               selectedEvent.targetAudience === 'seniors' ? 'Adultos mayores' :
+                               selectedEvent.targetAudience === 'families' ? 'Familias' :
+                               selectedEvent.targetAudience}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -1284,12 +1466,80 @@ const EventsList: React.FC = () => {
                         {selectedEvent.price !== undefined && (
                           <div>
                             <h3 className="text-sm font-semibold text-gray-900 mb-1">Precio</h3>
-                            <span className="text-sm font-medium text-green-600">
-                              {formatPrice(selectedEvent.price)}
+                            <div className="space-y-1">
+                              <span className="text-sm font-medium text-green-600">
+                                {formatPrice(selectedEvent.price)}
+                              </span>
+                              {selectedEvent.isFree && (
+                                <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  Evento gratuito
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {selectedEvent.requiresApproval && (
+                          <div>
+                            <h3 className="text-sm font-semibold text-gray-900 mb-1">Registro</h3>
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              Requiere aprobación
                             </span>
                           </div>
                         )}
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sección adicional: Parques asociados y información extra */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Información adicional</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Parques asociados */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">Parques asociados</h4>
+                      {selectedEvent.parks && selectedEvent.parks.length > 0 ? (
+                        <div className="space-y-2">
+                          {selectedEvent.parks.map((park) => (
+                            <div key={park.id} className="bg-white p-3 rounded-lg border">
+                              <div className="font-medium text-sm text-gray-900">{park.name}</div>
+                              {park.address && (
+                                <div className="text-xs text-gray-500 mt-1">{park.address}</div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500 bg-white p-3 rounded-lg border">
+                          {selectedEvent.parkName || 'No hay parques asociados a este evento'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Información adicional */}
+                    <div className="space-y-4">
+                      {selectedEvent.notes && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-900 mb-2">Notas</h4>
+                          <div className="bg-white p-3 rounded-lg border text-sm text-gray-700">
+                            {selectedEvent.notes}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {(selectedEvent.latitude && selectedEvent.longitude) && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-900 mb-2">Coordenadas GPS</h4>
+                          <div className="bg-white p-3 rounded-lg border text-sm text-gray-700">
+                            <div className="space-y-1">
+                              <div>Latitud: {selectedEvent.latitude}</div>
+                              <div>Longitud: {selectedEvent.longitude}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

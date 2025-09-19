@@ -988,16 +988,14 @@ const AdminActivities = () => {
             </div>
 
             {/* Botón limpiar filtros */}
-            <div className="flex rounded-lg items-center border-gray-300 border">
+            <div className="flex rounded-lg items-center border-gray-300 border hover hover-[#ceefea]">
               <Button 
-                variant="outline" 
-                size="default"
                 onClick={handleClearFilters} 
                 className="h-9 w-10 p-0 flex items-center justify-center"
                 data-testid="button-clear-filters"
                 title="Limpiar filtros"
               >
-                <Brush className="h-4 w-4" />
+                <Brush className="text-gray-600 h-4 w-4" />
               </Button>
             </div>
 

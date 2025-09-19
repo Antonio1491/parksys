@@ -155,11 +155,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --principal: 73 58% 51%;
-  --header-background: 169 50% 47%;
-}
-
 @layer components {
   .menu-icon {
     @apply text-green-500;
@@ -331,6 +326,10 @@
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 60 9.1% 97.8%;
+    --principal: 73 58% 51%;
+    --header-background: 169 50% 47%;
+    --certificated: 80 33% 62%; /* #a8bd7d */
+    --certificated-foreground: 0 0% 100%;
     --ring: 167 100% 33%;
     --radius: 0.5rem;
 

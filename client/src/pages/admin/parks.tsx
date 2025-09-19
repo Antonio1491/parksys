@@ -285,15 +285,20 @@ const AdminParksContent = () => {
 
     const getAlertComponent = (count: number, label: string) => {
       const hasAlerts = count > 0;
+      const singularLabel = label.endsWith('s') ? label.slice(0, -1) : label;
+      const displayText = hasAlerts
+        ? `${count} ${count === 1 ? singularLabel : label}`
+        : `Sin ${label}`;
+
       return (
-        <div className="flex items-center gap-1 text-xs">
+        <div className="flex items-center gap-1 text-sm font-poppins">
           {hasAlerts ? (
             <AlertTriangle className="h-3 w-3 text-orange-500" />
           ) : (
             <CheckCircle className="h-3 w-3 text-green-500" />
           )}
-          <span className={hasAlerts ? "text-orange-700" : "text-green-700"}>
-            {count} {label}
+          <span className={hasAlerts ? "text-orange-700 font-medium" : "text-gray-800"}>
+            {displayText}
           </span>
         </div>
       );
@@ -344,7 +349,7 @@ const AdminParksContent = () => {
         )}
 
         {/* Sección de alertas */} 
-        <div className="rounded-sm p-3 space-y-2"> 
+        <div className="rounded-lg p-3 space-y-2"> 
           <div className="grid grid-cols-1 gap-1 font-poppins">
             {getAlertComponent(incidents?.total || 0, "incidencias")} 
             {getAlertComponent(assets?.total || 0, "activos")}
@@ -796,8 +801,7 @@ const AdminParksContent = () => {
                     <CardTitle className="font-poppins font-bold text-gray-900 text-lg flex-1">{park.name}</CardTitle>
                     {isParkCertified(park) && (
                       <Badge 
-                        variant="secondary" 
-                        className="ml-2 bg-[#a8bd7d] text-white"
+                        variant="certificated" 
                       >
                         <Award className="h-3 w-3 mr-1" />
                         Certificado
