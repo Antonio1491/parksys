@@ -144,13 +144,19 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         // Obtener información detallada de los parques
         const parksInfo = [];
         for (const relation of parkRelations) {
-          const [parkInfo] = await db.execute(
-            `SELECT id, name, address, municipality_id as "municipalityId", park_type as "parkType" 
-             FROM parks WHERE id = $1`, 
-            [relation.parkId]
-          );
-          if (parkInfo.rows && parkInfo.rows.length > 0) {
-            parksInfo.push(parkInfo.rows[0]);
+          const parkInfo = await db
+            .select({ 
+              id: parks.id, 
+              name: parks.name, 
+              address: parks.address, 
+              municipalityId: parks.municipalityId, 
+              parkType: parks.parkType 
+            })
+            .from(parks)
+            .where(eq(parks.id, relation.parkId));
+            
+          if (parkInfo.length > 0) {
+            parksInfo.push(parkInfo[0]);
           }
         }
         
@@ -208,13 +214,18 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       // Obtener información detallada de los parques
       const parksInfo = [];
       for (const relation of parkRelations) {
-        const [parkInfo] = await db.execute(
-          `SELECT id, name, municipality_id as "municipalityId", park_type as "parkType" 
-           FROM parks WHERE id = $1`, 
-          [relation.parkId]
-        );
-        if (parkInfo.rows && parkInfo.rows.length > 0) {
-          parksInfo.push(parkInfo.rows[0]);
+        const parkInfo = await db
+          .select({ 
+            id: parks.id, 
+            name: parks.name, 
+            municipalityId: parks.municipalityId, 
+            parkType: parks.parkType 
+          })
+          .from(parks)
+          .where(eq(parks.id, relation.parkId));
+          
+        if (parkInfo.length > 0) {
+          parksInfo.push(parkInfo[0]);
         }
       }
       
@@ -293,16 +304,17 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         // Obtener información de los parques para la respuesta
         const parksInfo = [];
         for (const parkId of eventData.parkIds) {
-          const [parkInfo] = await db.execute(
-            `SELECT id, name FROM parks WHERE id = $1`, 
-            [parkId]
-          );
-          if (parkInfo.rows && parkInfo.rows.length > 0) {
-            parksInfo.push(parkInfo.rows[0]);
+          const parkInfo = await db
+            .select({ id: parks.id, name: parks.name })
+            .from(parks)
+            .where(eq(parks.id, parseInt(parkId)));
+            
+          if (parkInfo.length > 0) {
+            parksInfo.push(parkInfo[0]);
           }
         }
         
-        createdEvent.parks = parksInfo;
+        (createdEvent as any).parks = parksInfo;
       } else {
         createdEvent.parks = [];
       }
@@ -385,16 +397,17 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         // Obtener información de los parques para la respuesta
         const parksInfo = [];
         for (const parkId of eventData.parkIds) {
-          const [parkInfo] = await db.execute(
-            `SELECT id, name FROM parks WHERE id = $1`, 
-            [parkId]
-          );
-          if (parkInfo.rows && parkInfo.rows.length > 0) {
-            parksInfo.push(parkInfo.rows[0]);
+          const parkInfo = await db
+            .select({ id: parks.id, name: parks.name })
+            .from(parks)
+            .where(eq(parks.id, parseInt(parkId)));
+            
+          if (parkInfo.length > 0) {
+            parksInfo.push(parkInfo[0]);
           }
         }
         
-        updatedEvent.parks = parksInfo;
+        (updatedEvent as any).parks = parksInfo;
       }
       
       return res.json(updatedEvent);

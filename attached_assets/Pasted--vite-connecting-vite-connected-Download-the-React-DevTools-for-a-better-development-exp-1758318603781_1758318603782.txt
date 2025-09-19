@@ -1,0 +1,167 @@
+ [vite] connecting...
+ [vite] connected.
+ Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+ 🔥 Firebase initialized successfully
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [QUERY] GET /api/roles/1/permissions
+ i18next::backendConnector: loaded namespace common for language es Object
+ i18next: languageChanged es
+ i18next: initialized Object
+ i18next::backendConnector: loaded namespace parks for language es Object
+ i18next::translator: missingKey es common messages.loading messages.loading
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [API REQUEST] GET /api/parks
+ 🎪 [DEBUG] Checking request: GET /api/parks
+ 🌐 [API REQUEST] GET /api/parks-with-images
+ 🎪 [DEBUG] Checking request: GET /api/parks-with-images
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+ 🌐 [QUERY] GET /api/notifications/count
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [API REQUEST] GET /api/parks/summary?ids=100,102,104,86,89,90,91,98,99
+ 🎪 [DEBUG] Checking request: GET /api/parks/summary?ids=100,102,104,86,89,90,91,98,99
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [QUERY] GET /api/parks/90/details
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+/admin/parks/90/view:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/parks
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/parks
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+/api/parks/90:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/parks-with-images
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/parks-with-images
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+/api/parks/99:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object

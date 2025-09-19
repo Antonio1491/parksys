@@ -275,7 +275,7 @@ export async function getParkByIdDirectly(parkId: number) {
           park_type as "parkType", description, address, 
           postal_code as "postalCode", latitude, longitude, 
           area, green_area as "greenArea", foundation_year as "foundationYear",
-          administrator, conservation_status as "conservationStatus",
+          administrator, status,
           regulation_url as "regulationUrl", opening_hours as "openingHours", 
           contact_email as "contactEmail", contact_phone as "contactPhone",
           video_url as "videoUrl", certificaciones
