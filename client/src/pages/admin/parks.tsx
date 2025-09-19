@@ -14,6 +14,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck, ChevronDown, CheckCircle, Calendar } from "lucide-react";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
 import AdminLayout from "@/components/AdminLayout";
 import { apiRequest } from "@/lib/queryClient";
 import { ExportButton } from "@/components/ui/export-button";
@@ -82,6 +90,34 @@ const useUpcomingSchedule = (parkId: number) => {
 // Helper function moved to top level
 const isParkCertified = (park: Park) => {
   return park.certificaciones && park.certificaciones.trim() !== '' && park.certificaciones !== 'Ninguna';
+};
+
+// Helper functions for park status
+const getStatusColor = (status?: string) => {
+  switch (status) {
+    case 'Operativo':
+      return 'bg-green-100 text-green-800';
+    case 'En mantenimiento':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'Cerrado temporalmente':
+      return 'bg-red-100 text-red-800';
+    case 'En construcción':
+      return 'bg-blue-100 text-blue-800';
+    case 'Renovación':
+      return 'bg-purple-100 text-purple-800';
+    case 'Cerrado permanentemente':
+      return 'bg-gray-100 text-gray-800';
+    case 'Planificado':
+      return 'bg-indigo-100 text-indigo-800';
+    case 'Abandonado':
+      return 'bg-orange-100 text-orange-800';
+    default:
+      return 'bg-gray-100 text-gray-600';
+  }
+};
+
+const getStatusText = (status?: string) => {
+  return status || 'Sin estado';
 };
 
 interface Park {
@@ -260,7 +296,7 @@ const AdminParksContent = () => {
   
   // Pagination and view states
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [selectionMode, setSelectionMode] = useState(false);
   const itemsPerPage = 9;
 
@@ -757,6 +793,119 @@ const AdminParksContent = () => {
     );
   };
 
+  // Render table view with specific fields: Nombre, Área, Dirección, Administrador
+  const renderParksTable = () => {
+    // Helper function to format area
+    const formatArea = (area: number) => {
+      if (!area) return 'N/A';
+      return `${(area / 10000).toLocaleString(undefined, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      })} ha`;
+    };
+
+    return (
+      <div className="rounded-xl overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {selectionMode && (
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={currentParks.length > 0 && currentParks.every(park => selectedParks.has(park.id))}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        handleSelectAllParks();
+                      } else {
+                        handleDeselectAllParks();
+                      }
+                    }}
+                    data-testid="checkbox-select-all-table"
+                  />
+                </TableHead>
+              )}
+              <TableHead className="w-[80px]">ID</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Área</TableHead>
+              <TableHead>Dirección</TableHead>
+              <TableHead>Administrador</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentParks.map((park: Park) => (
+              <TableRow key={park.id}>
+                {selectionMode && (
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedParks.has(park.id)}
+                      onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                      data-testid={`checkbox-park-table-${park.id}`}
+                    />
+                  </TableCell>
+                )}
+                <TableCell className="font-medium">#{park.id}</TableCell>
+                <TableCell>
+                  <div>
+                    <p className="font-medium">{park.name}</p>
+                    {park.status && (
+                      <div className="mt-1">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-xs font-medium ${getStatusColor(park.status)}`}
+                        >
+                          {getStatusText(park.status)}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>{formatArea(park.area)}</TableCell>
+                <TableCell>
+                  <div className="max-w-xs">
+                    <p className="truncate">{park.address}</p>
+                  </div>
+                </TableCell>
+                <TableCell>{(park as any).administrator || 'Sin asignar'}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border bg-transparent text-gray-800 hover:text-white hover:bg-blue-600"
+                      onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
+                      data-testid={`button-view-park-table-${park.id}`}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border bg-transparent text-gray-800 hover:text-white hover:bg-emerald-600"
+                      onClick={() => setLocation(`/admin/parks/${park.id}/manage`)}
+                      data-testid={`button-edit-park-table-${park.id}`}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border bg-transparent text-red-800 hover:text-white hover:bg-red-600"
+                      onClick={() => handleDeleteClick(park)}
+                      data-testid={`button-delete-park-table-${park.id}`}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  };
+
   // Render grid view
   const renderGridView = () => {
     return (
@@ -1070,18 +1219,20 @@ const AdminParksContent = () => {
                 {/* 1. Botón para cambiar los modos de visualización del grid */}
                 <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#ededed] px-1 py-1 rounded-lg">
                   <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    variant={viewMode === 'cards' ? 'default' : 'ghost'}
                     size="sm"
-                    onClick={() => setViewMode('grid')}
-                    data-testid="button-view-grid"
+                    onClick={() => setViewMode('cards')}
+                    className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                    data-testid="button-view-cards"
                   >
                     <Grid className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant={viewMode === 'list' ? 'default' : 'ghost'}
+                    variant={viewMode === 'table' ? 'default' : 'ghost'}
                     size="sm"
-                    onClick={() => setViewMode('list')}
-                    data-testid="button-view-list"
+                    onClick={() => setViewMode('table')}
+                    className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                    data-testid="button-view-table"
                   >
                     <List className="h-4 w-4" />
                   </Button>
@@ -1090,7 +1241,7 @@ const AdminParksContent = () => {
                 {/* 2. Botón de selección con menú desplegable */}
                 <div className="relative group">
                   <Button
-                    variant={selectionMode ? 'default' : 'outline'}
+                    variant={selectionMode ? 'default' : 'ghost'}
                     size="sm"
                     className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed]'}`}
                     data-testid="button-selection-toggle"
@@ -1168,7 +1319,7 @@ const AdminParksContent = () => {
           </div>
         ) : (
           <>
-            {viewMode === 'grid' ? renderGridView() : renderListView()}
+            {viewMode === 'cards' ? renderGridView() : renderParksTable()}
             {renderPagination()}
           </>
         )}
