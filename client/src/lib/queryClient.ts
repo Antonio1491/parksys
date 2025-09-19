@@ -181,6 +181,14 @@ export async function apiRequest(
 
   console.log(`🌐 [API REQUEST] ${method} ${url}`);
   
+  // Debug específico para eventos
+  if (url.includes('/api/events') && method === 'POST') {
+    console.log('🎪 POST a /api/events detectado');
+    console.log('🎪 Data enviada:', JSON.stringify(data, null, 2));
+    console.log('🎪 Headers completos:', JSON.stringify(headers, null, 2));
+    console.log('🎪 Stored user:', localStorage.getItem('user'));
+  }
+  
   // Debug específico para evaluaciones
   if (url.includes('/api/park-evaluations') && method === 'POST') {
     console.log('📋 POST a /api/park-evaluations detectado');
