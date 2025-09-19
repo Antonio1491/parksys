@@ -449,7 +449,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.use('/activity-registrations', activityRegistrationsRouter);
   console.log('📝 Rutas de inscripciones de actividades registradas');
   
-  // Registramos las rutas de inscripciones y pagos de eventos
+  // ¡CRÍTICO! Registrar rutas de imágenes ANTES para evitar interceptación
+  apiRouter.use('/events', eventImageRouter);
+  console.log('📸 Rutas de imágenes de eventos registradas con MÁXIMA PRIORIDAD');
+  
+  // Registramos las rutas de inscripciones y pagos de eventos  
   apiRouter.use('/events', eventRegistrationsRouter);
   apiRouter.use('/events', eventPaymentsRouter);
   console.log('📝 Rutas de inscripciones y pagos de eventos registradas');
@@ -901,9 +905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registramos las rutas del módulo de eventos
   registerEventRoutes(app, apiRouter, isAuthenticated);
   
-  // Registramos las rutas de imágenes de eventos
-  apiRouter.use('/events', eventImageRouter);
-  console.log('📸 Rutas de imágenes de eventos registradas');
+  // Las rutas de imágenes de eventos YA están registradas con prioridad arriba
   
   // Registramos las rutas de categorías de eventos
   registerEventCategoriesRoutes(app, apiRouter, isAuthenticated);
