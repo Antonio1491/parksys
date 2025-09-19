@@ -130,22 +130,6 @@ export function ExportButton({
           />
         </DialogContent>
       </Dialog>
-
-      {/* Botón de exportación rápida para formatos soportados */}
-      {supportedFormats.length === 1 && (
-        <Button
-          variant={buttonVariant}
-          size={size}
-          onClick={() => handleQuickExport(supportedFormats[0])}
-          disabled={disabled || isExporting}
-          className="ml-1 shrink-0"
-          title={`Exportación rápida ${formatLabels[supportedFormats[0] as keyof typeof formatLabels]}`}
-        >
-          {React.createElement(formatIcons[supportedFormats[0] as keyof typeof formatIcons], {
-            className: "h-4 w-4"
-          })}
-        </Button>
-      )}
     </>
   );
 }

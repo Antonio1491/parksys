@@ -344,7 +344,7 @@ const AdminParksContent = () => {
         )}
 
         {/* Sección de alertas */} 
-        <div className="rounded-lg p-3 space-y-2"> 
+        <div className="rounded-sm p-3 space-y-2"> 
           <div className="grid grid-cols-1 gap-1 font-poppins">
             {getAlertComponent(incidents?.total || 0, "incidencias")} 
             {getAlertComponent(assets?.total || 0, "activos")}
