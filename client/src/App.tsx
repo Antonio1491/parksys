@@ -275,8 +275,7 @@ function Router() {
 
         <Route path="/admin/parks-import" component={AdminParksImport} />
         <Route path="/admin/parks/new" component={AdminParkEdit} />
-        <Route path="/admin/parks/:id" component={AdminParkEdit} />
-        <Route path="/admin/parks/:id/edit" component={AdminParkEdit} />
+        <Route path="/admin/parks/:id" component={AdminParkView} />
         <Route path="/admin/parks/:id/view" component={AdminParkView} />
         <Route path="/admin/parks/:id/manage">
           <Suspense fallback={<div className="p-8 text-center">Cargando gestión del parque...</div>}>

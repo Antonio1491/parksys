@@ -689,7 +689,7 @@ const AdminParksContent = () => {
                     <p className="mt-2 text-sm text-gray-600 line-clamp-2">{park.description}</p>
                   )}
                 </div>
-                <div className="flex items-center ml-6">
+                <div className="flex items-center space-x-2 ml-6">
                   <Button
                     variant="outline"
                     size="sm"
@@ -698,11 +698,23 @@ const AdminParksContent = () => {
                       setLocation(`/admin/parks/${park.id}/manage`);
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
-                    title="Gestión del parque"
+                    title="Gestión completa del parque"
                     className="text-blue-600 hover:text-blue-700"
-                    data-testid={`button-edit-park-list-${park.id}`}
+                    data-testid={`button-manage-park-list-${park.id}`}
                   >
-                    <Edit className="h-4 w-4" />
+                    <Wrench className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(park);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -796,20 +808,35 @@ const AdminParksContent = () => {
                 </div>
               </div>
               
-              <div className="flex justify-center items-center mt-4 pt-4 border-t">
+              <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation(`/admin/parks/${park.id}/manage`);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    title="Gestión completa del parque"
+                    className="text-blue-600 hover:text-blue-700"
+                    data-testid={`button-manage-park-grid-${park.id}`}
+                  >
+                    <Wrench className="h-4 w-4" />
+                  </Button>
+                </div>
+                
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setLocation(`/admin/parks/${park.id}/manage`);
+                    handleDeleteClick(park);
                   }}
                   onKeyDown={(e) => e.stopPropagation()}
-                  title="Gestión del parque"
-                  className="text-blue-600 hover:text-blue-700"
-                  data-testid={`button-edit-park-grid-${park.id}`}
+                  className="text-red-600 hover:text-red-700"
                 >
-                  <Edit className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -1031,7 +1058,7 @@ const AdminParksContent = () => {
                   <Button
                     variant={selectionMode ? 'default' : 'outline'}
                     size="sm"
-                    className={`flex items-center h-10 w-10 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed] hover:bg-gray-200'}`}
+                    className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed]'}`}
                     data-testid="button-selection-toggle"
                   >
                     <CopyCheck className="h-4 w-4 mr-1" />
