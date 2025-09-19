@@ -689,19 +689,7 @@ const AdminParksContent = () => {
                     <p className="mt-2 text-sm text-gray-600 line-clamp-2">{park.description}</p>
                   )}
                 </div>
-                <div className="flex items-center space-x-2 ml-6">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocation(`/admin/parks/${park.id}/edit`);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    data-testid={`button-edit-park-list-${park.id}`}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-center ml-6">
                   <Button
                     variant="outline"
                     size="sm"
@@ -710,23 +698,11 @@ const AdminParksContent = () => {
                       setLocation(`/admin/parks/${park.id}/manage`);
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
-                    title="Gestión completa del parque"
+                    title="Gestión del parque"
                     className="text-blue-600 hover:text-blue-700"
-                    data-testid={`button-manage-park-list-${park.id}`}
+                    data-testid={`button-edit-park-list-${park.id}`}
                   >
-                    <Wrench className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteClick(park);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -820,47 +796,20 @@ const AdminParksContent = () => {
                 </div>
               </div>
               
-              <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocation(`/admin/parks/${park.id}/edit`);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    data-testid={`button-edit-park-grid-${park.id}`}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocation(`/admin/parks/${park.id}/manage`);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    title="Gestión completa del parque"
-                    className="text-blue-600 hover:text-blue-700"
-                    data-testid={`button-manage-park-grid-${park.id}`}
-                  >
-                    <Wrench className="h-4 w-4" />
-                  </Button>
-                </div>
-                
+              <div className="flex justify-center items-center mt-4 pt-4 border-t">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDeleteClick(park);
+                    setLocation(`/admin/parks/${park.id}/manage`);
                   }}
                   onKeyDown={(e) => e.stopPropagation()}
-                  className="text-red-600 hover:text-red-700"
+                  title="Gestión del parque"
+                  className="text-blue-600 hover:text-blue-700"
+                  data-testid={`button-edit-park-grid-${park.id}`}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Edit className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
