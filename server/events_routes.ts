@@ -131,19 +131,50 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         return res.json({ data: filteredEventsWithNormalizedImages });
       }
       
-      // 🎯 NORMALIZAR URLs de imágenes antes de enviar al cliente
-      const eventsWithNormalizedImages = eventsList.map(event => ({
-        ...event,
-        // Los eventos solo tienen featuredImageUrl, no imageUrl
-        featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
-        // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
-        startDate: event.startDate ? event.startDate.toString() : null,
-        endDate: event.endDate ? event.endDate.toString() : null,
-        startTime: event.startTime ? event.startTime.toString() : null,
-        endTime: event.endTime ? event.endTime.toString() : null
-      }));
+      // 🎯 OBTENER PARQUES ASOCIADOS PARA CADA EVENTO
+      const eventsWithParks = [];
+      
+      for (const event of eventsList) {
+        // Obtener parques asociados al evento
+        const parkRelations = await db
+          .select()
+          .from(eventParks)
+          .where(eq(eventParks.eventId, event.id));
+        
+        // Obtener información detallada de los parques
+        const parksInfo = [];
+        for (const relation of parkRelations) {
+          const [parkInfo] = await db.execute(
+            `SELECT id, name, address, municipality_id as "municipalityId", park_type as "parkType" 
+             FROM parks WHERE id = $1`, 
+            [relation.parkId]
+          );
+          if (parkInfo.rows && parkInfo.rows.length > 0) {
+            parksInfo.push(parkInfo.rows[0]);
+          }
+        }
+        
+        // 🎯 NORMALIZAR URLs de imágenes y agregar parques asociados
+        const eventWithParksAndImages = {
+          ...event,
+          // Los eventos solo tienen featuredImageUrl, no imageUrl
+          featuredImageUrl: event.featuredImageUrl ? replitObjectStorage.normalizeUrl(event.featuredImageUrl) : event.featuredImageUrl,
+          // 🎯 ARREGLAR FECHAS: Asegurar que las fechas se serialicen correctamente
+          startDate: event.startDate ? event.startDate.toString() : null,
+          endDate: event.endDate ? event.endDate.toString() : null,
+          startTime: event.startTime ? event.startTime.toString() : null,
+          endTime: event.endTime ? event.endTime.toString() : null,
+          // 🎯 AGREGAR PARQUES ASOCIADOS
+          parks: parksInfo
+        };
+        
+        eventsWithParks.push(eventWithParksAndImages);
+      }
 
-      return res.json({ data: eventsWithNormalizedImages });
+      console.log('🎯 [CRITICAL-EVENTS-DEBUG] After mapping, first event:', eventsWithParks[0]);
+      console.log('📅 [CRITICAL] Returning', eventsWithParks.length, 'events via critical route');
+
+      return res.json(eventsWithParks);
     } catch (error) {
       console.error("Error al obtener eventos:", error);
       return res.status(500).json({ 
