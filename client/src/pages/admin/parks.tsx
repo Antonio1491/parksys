@@ -606,16 +606,35 @@ const AdminParksContent = () => {
     return (
       <div className="space-y-4">
         {currentParks.map((park: Park) => (
-          <Card key={park.id} className="hover:shadow-md transition-shadow">
+          <Card 
+            key={park.id} 
+            className="hover:shadow-lg hover:bg-gray-50/50 transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setLocation(`/admin/parks/${park.id}/view`);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Ver detalles del parque ${park.name}`}
+            data-testid={`card-park-list-${park.id}`}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 flex-1">
                   {selectionMode && (
-                    <Checkbox
-                      checked={selectedParks.has(park.id)}
-                      onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
-                      data-testid={`checkbox-park-list-${park.id}`}
-                    />
+                    <div 
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <Checkbox
+                        checked={selectedParks.has(park.id)}
+                        onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                        data-testid={`checkbox-park-list-${park.id}`}
+                      />
+                    </div>
                   )}
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -674,16 +693,11 @@ const AdminParksContent = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
-                    title="Ver detalles del parque"
-                    data-testid={`button-view-park-list-${park.id}`}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setLocation(`/admin/parks/${park.id}/edit`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation(`/admin/parks/${park.id}/edit`);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
                     data-testid={`button-edit-park-list-${park.id}`}
                   >
                     <Edit className="h-4 w-4" />
@@ -691,7 +705,11 @@ const AdminParksContent = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setLocation(`/admin/parks/${park.id}/manage`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation(`/admin/parks/${park.id}/manage`);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
                     title="Gestión completa del parque"
                     className="text-blue-600 hover:text-blue-700"
                     data-testid={`button-manage-park-list-${park.id}`}
@@ -701,7 +719,11 @@ const AdminParksContent = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDeleteClick(park)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(park);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
                     className="text-red-600 hover:text-red-700"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -720,7 +742,21 @@ const AdminParksContent = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {currentParks.map((park: Park) => (
-          <Card key={park.id} className="hover:shadow-md hover:border-[#00444f] transition-shadow overflow-hidden">
+          <Card 
+            key={park.id} 
+            className="hover:shadow-lg hover:border-[#00444f] hover:bg-gray-50/30 transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none overflow-hidden"
+            onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setLocation(`/admin/parks/${park.id}/view`);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Ver detalles del parque ${park.name}`}
+            data-testid={`card-park-grid-${park.id}`}
+          >
             {/* Imagen del parque */}
             <div className="relative aspect-video overflow-hidden bg-gray-100">
               {park.primaryImageUrl ? (
@@ -738,7 +774,11 @@ const AdminParksContent = () => {
                 </div>
               )}
               {selectionMode && (
-                <div className="absolute top-2 left-2">
+                <div 
+                  className="absolute top-2 left-2" 
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
                   <Checkbox
                     checked={selectedParks.has(park.id)}
                     onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
@@ -785,16 +825,11 @@ const AdminParksContent = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
-                    title="Ver detalles del parque"
-                    data-testid={`button-view-park-grid-${park.id}`}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setLocation(`/admin/parks/${park.id}/edit`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation(`/admin/parks/${park.id}/edit`);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
                     data-testid={`button-edit-park-grid-${park.id}`}
                   >
                     <Edit className="h-4 w-4" />
@@ -802,7 +837,11 @@ const AdminParksContent = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setLocation(`/admin/parks/${park.id}/manage`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation(`/admin/parks/${park.id}/manage`);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
                     title="Gestión completa del parque"
                     className="text-blue-600 hover:text-blue-700"
                     data-testid={`button-manage-park-grid-${park.id}`}
@@ -814,7 +853,11 @@ const AdminParksContent = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDeleteClick(park)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteClick(park);
+                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
                   className="text-red-600 hover:text-red-700"
                 >
                   <Trash2 className="h-4 w-4" />
