@@ -324,8 +324,8 @@
     --secondary-foreground: 0 0% 100%;
     --accent: 190 100% 14%; /* #003D49 */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
+    --destructive: 0 68% 52%;
+    --destructive-foreground: 60 9% 98%;
     --principal: 73 58% 51%;
     --header-background: 169 50% 47%;
     --ring: 167 100% 33%;
