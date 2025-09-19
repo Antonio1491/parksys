@@ -2098,6 +2098,11 @@ app.put("/api/parks/:id", async (req: Request, res: Response) => {
       updateFields.push(`administrator = $${paramIndex++}`);
       values.push(parkData.administrator);
     }
+    if (parkData.status !== undefined) {
+      updateFields.push(`status = $${paramIndex++}`);
+      values.push(parkData.status);
+      console.log(`🔄 [STATUS UPDATE] Actualizando status a: ${parkData.status}`);
+    }
     if (parkData.conservationStatus !== undefined) {
       updateFields.push(`conservation_status = $${paramIndex++}`);
       values.push(parkData.conservationStatus);
