@@ -181,7 +181,8 @@ export async function apiRequest(
 
   console.log(`🌐 [API REQUEST] ${method} ${url}`);
   
-  // Debug específico para eventos
+  // Debug específico para eventos - SIEMPRE LOG
+  console.log('🎪 [DEBUG] Checking request:', method, url);
   if (url.includes('/api/events') && method === 'POST') {
     console.log('🎪 POST a /api/events detectado');
     console.log('🎪 Data enviada:', JSON.stringify(data, null, 2));

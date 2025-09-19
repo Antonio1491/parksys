@@ -115,10 +115,16 @@ export default function NewEventPage() {
       };
 
       console.log('🚀 DATOS TRANSFORMADOS PARA BACKEND:', eventData);
-      return apiRequest('/api/events', {
+      console.log('🎪 [MUTATION] About to call apiRequest for POST /api/events');
+      console.log('🎪 [MUTATION] apiRequest function exists:', typeof apiRequest);
+      
+      const result = apiRequest('/api/events', {
         method: 'POST',
         data: eventData
       });
+      
+      console.log('🎪 [MUTATION] apiRequest call completed, result:', result);
+      return result;
     },
     onSuccess: () => {
       toast({
