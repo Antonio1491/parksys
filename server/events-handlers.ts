@@ -558,11 +558,13 @@ export async function deleteEvent(req: Request, res: Response) {
     return res.json({ message: "Evento eliminado correctamente" });
   } catch (error) {
     console.error("💥 [DELETE-EVENT] Error completo:", error);
-    console.error("💥 [DELETE-EVENT] Stack trace:", error.stack);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error("💥 [DELETE-EVENT] Stack trace:", errorStack);
     return res.status(500).json({ 
       message: "Error al eliminar evento", 
-      error: error.message,
-      details: error.stack 
+      error: errorMessage,
+      details: errorStack 
     });
   }
 }
