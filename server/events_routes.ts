@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import { db } from "./db";
 import { EventTypes, TargetAudiences, EventStatuses, eventParks } from "@shared/events-schema";
 import { events, parks } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql, desc } from "drizzle-orm";
 import { replitObjectStorage } from './objectStorage-replit';
 
 /**
@@ -186,6 +186,75 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       return res.status(500).json({ 
         message: "Error al obtener eventos", 
         error: error.message 
+      });
+    }
+  });
+
+  // Obtener estadísticas de eventos
+  apiRouter.get("/events/stats", async (req: Request, res: Response) => {
+    try {
+      // Obtener total de eventos
+      const totalResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(events);
+      const total = Number(totalResult[0].count);
+
+      // Obtener eventos publicados
+      const publishedResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(events)
+        .where(eq(events.status, 'published'));
+      const published = Number(publishedResult[0].count);
+
+      // Obtener eventos en borrador
+      const draftResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(events)
+        .where(eq(events.status, 'draft'));
+      const draft = Number(draftResult[0].count);
+
+      return res.json({
+        total,
+        published,
+        draft,
+        upcoming: 0  // Por simplicidad, retornamos 0 para upcoming
+      });
+    } catch (error) {
+      console.error("Error al obtener evento stats:", error);
+      return res.status(500).json({ 
+        message: "Error al obtener evento", 
+        error: error instanceof Error ? error.message : 'Error desconocido' 
+      });
+    }
+  });
+
+  // Obtener eventos recientes
+  apiRouter.get("/events/recent", async (req: Request, res: Response) => {
+    try {
+      const recentEvents = await db
+        .select({
+          id: events.id,
+          title: events.title,
+          description: events.description,
+          eventType: events.eventType,
+          status: events.status,
+          startDate: events.startDate,
+          endDate: events.endDate,
+          location: events.location,
+          capacity: events.capacity,
+          featuredImageUrl: events.featuredImageUrl,
+          createdAt: events.createdAt
+        })
+        .from(events)
+        .orderBy(desc(events.createdAt))
+        .limit(10);
+
+      return res.json(recentEvents);
+    } catch (error) {
+      console.error("Error al obtener evento recent:", error);
+      return res.status(500).json({ 
+        message: "Error al obtener evento", 
+        error: error instanceof Error ? error.message : 'Error desconocido' 
       });
     }
   });

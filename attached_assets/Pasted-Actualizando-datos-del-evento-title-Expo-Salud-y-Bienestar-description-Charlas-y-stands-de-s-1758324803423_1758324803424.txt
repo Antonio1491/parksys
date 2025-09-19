@@ -1,0 +1,232 @@
+Actualizando datos del evento: {title: 'Expo Salud y Bienestar', description: 'Charlas y stands de salud integral.', eventType: 'Deportivos', startDate: '2025-04-10', endDate: '2025-04-10', …}
+Console.js:61 🌐 [API REQUEST] PUT /api/events/19
+Console.js:61 🎪 [DEBUG] Checking request: PUT /api/events/19
+Console.js:61 ✅ [FRONTEND] Evento actualizado exitosamente: {id: 19, title: 'Expo Salud y Bienestar', description: 'Charlas y stands de salud integral.', eventType: 'Deportivos', targetAudience: 'general', …}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+2Console.js:61 🌐 [QUERY] GET /api/events/19
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events/stats
+Console.js:61 🌐 [QUERY] GET /api/events/recent
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:278  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/stats 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+(anonymous) @ queryClient.ts:332
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+onSuccess @ edit.tsx:226
+execute @ @tanstack_react-query.js?v=14eab8c0:1247
+await in execute
+mutate @ @tanstack_react-query.js?v=14eab8c0:2655
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3371
+onSubmit @ edit.tsx:241
+(anonymous) @ chunk-4BFJKWC4.js?v=14eab8c0:1465
+await in (anonymous)
+callCallback2 @ chunk-RPCDYKBN.js?v=14eab8c0:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=14eab8c0:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=14eab8c0:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=14eab8c0:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=14eab8c0:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=14eab8c0:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=14eab8c0:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=14eab8c0:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=14eab8c0:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=14eab8c0:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=14eab8c0:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=14eab8c0:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5449Understand this error
+injected.js:278  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/recent 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+(anonymous) @ queryClient.ts:332
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+onSuccess @ edit.tsx:226
+execute @ @tanstack_react-query.js?v=14eab8c0:1247
+await in execute
+mutate @ @tanstack_react-query.js?v=14eab8c0:2655
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3371
+onSubmit @ edit.tsx:241
+(anonymous) @ chunk-4BFJKWC4.js?v=14eab8c0:1465
+await in (anonymous)
+callCallback2 @ chunk-RPCDYKBN.js?v=14eab8c0:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=14eab8c0:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=14eab8c0:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=14eab8c0:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=14eab8c0:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=14eab8c0:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=14eab8c0:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=14eab8c0:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=14eab8c0:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=14eab8c0:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=14eab8c0:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=14eab8c0:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5449Understand this error
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 Query failed for: /api/events/stats Error: Error al obtener evento
+    at queryClient.ts:356:15
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ queryClient.ts:360
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+onSuccess @ edit.tsx:226
+execute @ @tanstack_react-query.js?v=14eab8c0:1247
+await in execute
+mutate @ @tanstack_react-query.js?v=14eab8c0:2655
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3371
+onSubmit @ edit.tsx:241
+(anonymous) @ chunk-4BFJKWC4.js?v=14eab8c0:1465
+await in (anonymous)
+callCallback2 @ chunk-RPCDYKBN.js?v=14eab8c0:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=14eab8c0:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=14eab8c0:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=14eab8c0:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=14eab8c0:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=14eab8c0:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=14eab8c0:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=14eab8c0:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=14eab8c0:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=14eab8c0:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=14eab8c0:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=14eab8c0:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5449Understand this error
+Console.js:61 Query failed for: /api/events/recent Error: Error al obtener evento
+    at queryClient.ts:356:15
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ queryClient.ts:360
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627
+setTimeout
+onSuccess @ edit.tsx:226
+execute @ @tanstack_react-query.js?v=14eab8c0:1247
+await in execute
+mutate @ @tanstack_react-query.js?v=14eab8c0:2655
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3371
+onSubmit @ edit.tsx:241
+(anonymous) @ chunk-4BFJKWC4.js?v=14eab8c0:1465
+await in (anonymous)
+callCallback2 @ chunk-RPCDYKBN.js?v=14eab8c0:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=14eab8c0:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=14eab8c0:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=14eab8c0:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=14eab8c0:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=14eab8c0:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=14eab8c0:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=14eab8c0:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=14eab8c0:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=14eab8c0:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=14eab8c0:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=14eab8c0:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5449Understand this error
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}firebaseStatus: {authenticated: true, loading: false, approved: true}isAuthenticated: trueisLoading: falselocalStatus: {authenticated: true, loading: false}user: {firebaseUid: 'AgDictDqdqUOo9hKUYlXPT3t5Bv1', email: 'luis@asociacionesprofesionales.org', displayName: 'Luis', id: 1, username: 'Luis Romahn', …}[[Prototype]]: Object
