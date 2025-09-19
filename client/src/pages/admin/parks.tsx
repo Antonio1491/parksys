@@ -100,6 +100,7 @@ interface Park {
   primaryImageUrl?: string; // ✅ Compatibilidad con formato antiguo
   primaryImage?: string; // ✅ Imagen principal del parque (desde el backend)
   mainImageUrl?: string; // ✅ Imagen principal alternativa
+  status?: string; // ✅ Campo para estado del parque
   // Nuevo campo
   typology?: {
     id: number;
@@ -283,7 +284,7 @@ const AdminParksContent = () => {
       return "bg-red-100 text-red-800";
     };
 
-    const getStatusColor = (status: string | null) => {
+    const getStatusColor = (status: string | null | undefined) => {
       switch (status) {
         case "en_funcionamiento": return "bg-green-100 text-green-800";
         case "operando_parcialmente": return "bg-yellow-100 text-yellow-800";
@@ -297,7 +298,7 @@ const AdminParksContent = () => {
       }
     };
 
-    const getStatusText = (status: string | null) => {
+    const getStatusText = (status: string | null | undefined) => {
       switch (status) {
         case "en_funcionamiento": return "En funcionamiento";
         case "operando_parcialmente": return "Operando parcialmente";
