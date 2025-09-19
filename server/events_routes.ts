@@ -648,6 +648,69 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
     }
   });
 
+  // Función para parsear fechas en formato DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY
+  function parseDate(dateString: string): Date | null {
+    if (!dateString || dateString.trim() === '') return null;
+    
+    const cleanDate = dateString.trim();
+    
+    // Intentar parsear formato DD/MM/YY o DD/MM/YYYY
+    const slashMatch = cleanDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (slashMatch) {
+      const [, day, month, year] = slashMatch;
+      let fullYear = year;
+      
+      // Convertir año de 2 dígitos a 4 dígitos
+      if (year.length === 2) {
+        const yearNum = parseInt(year);
+        fullYear = yearNum < 50 ? `20${year}` : `19${year}`;
+      }
+      
+      // Crear fecha en formato ISO (YYYY-MM-DD)
+      const isoDate = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      const date = new Date(isoDate);
+      
+      // Validar que la fecha es válida
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    
+    // Intentar parsear formato DD-MM-YY o DD-MM-YYYY
+    const dashMatch = cleanDate.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+    if (dashMatch) {
+      const [, day, month, year] = dashMatch;
+      let fullYear = year;
+      
+      // Convertir año de 2 dígitos a 4 dígitos
+      if (year.length === 2) {
+        const yearNum = parseInt(year);
+        fullYear = yearNum < 50 ? `20${year}` : `19${year}`;
+      }
+      
+      // Crear fecha en formato ISO (YYYY-MM-DD)
+      const isoDate = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      const date = new Date(isoDate);
+      
+      // Validar que la fecha es válida
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    
+    // Intentar formato ISO directo (YYYY-MM-DD)
+    const isoMatch = cleanDate.match(/^\d{4}-\d{2}-\d{2}$/);
+    if (isoMatch) {
+      const date = new Date(cleanDate);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    
+    console.warn(`⚠️ [PARSEDATE] No se pudo parsear la fecha: "${cleanDate}"`);
+    return null;
+  }
+
   // Importar eventos desde CSV
   apiRouter.post("/events/import", isAuthenticated, async (req: Request, res: Response) => {
     try {
@@ -674,13 +737,28 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
             continue;
           }
           
+          // Parsear fechas correctamente
+          const parsedStartDate = eventData.startDate ? parseDate(eventData.startDate) : new Date();
+          const parsedEndDate = eventData.endDate ? parseDate(eventData.endDate) : null;
+          
+          // Validar que las fechas se parsearon correctamente
+          if (eventData.startDate && !parsedStartDate) {
+            errors.push(`Fila ${i + 1}: Formato de fecha de inicio inválido: "${eventData.startDate}"`);
+            continue;
+          }
+          
+          if (eventData.endDate && !parsedEndDate) {
+            errors.push(`Fila ${i + 1}: Formato de fecha de fin inválido: "${eventData.endDate}"`);
+            continue;
+          }
+
           // Preparar datos para inserción
           const insertData = {
             title: eventData.title,
             description: eventData.description || null,
             eventType: eventData.eventType || "other",
-            startDate: eventData.startDate ? new Date(eventData.startDate) : new Date(),
-            endDate: eventData.endDate ? new Date(eventData.endDate) : null,
+            startDate: parsedStartDate,
+            endDate: parsedEndDate,
             startTime: eventData.startTime || null,
             endTime: eventData.endTime || null,
             location: eventData.location || null,
