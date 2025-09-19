@@ -24,7 +24,7 @@ interface Event {
   registeredCount?: number;
   event_type: string;
   status: 'draft' | 'published' | 'cancelled';
-  imageUrl?: string;
+  featuredImageUrl?: string;
   organizer_name: string;
   organizer_email: string;
   parks?: Array<{ id: number; name: string; address: string }>;
@@ -269,20 +269,20 @@ const Events: React.FC = () => {
                   <div className="flex flex-col h-80">
                     {/* Imagen que ocupa 2/3 de la altura */}
                     <div className="relative h-2/3 overflow-hidden">
-                      {event.imageUrl ? (
+                      {event.featuredImageUrl ? (
                         <img 
-                          src={event.imageUrl?.startsWith('/uploads/') 
-                            ? `/api/storage/file/${encodeURIComponent(event.imageUrl.replace(/^\//, ''))}`
-                            : event.imageUrl
+                          src={event.featuredImageUrl?.startsWith('/uploads/') 
+                            ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
+                            : event.featuredImageUrl
                           } 
                           alt={event.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
-                            console.error('Error loading image:', event.imageUrl);
+                            console.error('Error loading image:', event.featuredImageUrl);
                             (e.target as HTMLImageElement).style.display = 'none';
                             (e.target as HTMLImageElement).nextElementSibling?.setAttribute('style', 'display: flex');
                           }}
-                          onLoad={() => console.log('Image loaded successfully:', event.imageUrl)}
+                          onLoad={() => console.log('Image loaded successfully:', event.featuredImageUrl)}
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -398,11 +398,11 @@ const Events: React.FC = () => {
                       
                       {/* Imagen del evento - 1/4 del espacio */}
                       <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg">
-                        {event.imageUrl ? (
+                        {event.featuredImageUrl ? (
                           <img 
-                            src={event.imageUrl?.startsWith('/uploads/') 
-                              ? `/api/storage/file/${encodeURIComponent(event.imageUrl.replace(/^\//, ''))}`
-                              : event.imageUrl
+                            src={event.featuredImageUrl?.startsWith('/uploads/') 
+                              ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
+                              : event.featuredImageUrl
                             } 
                             alt={event.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
