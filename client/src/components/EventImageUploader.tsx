@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useParams } from 'wouter';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 
 interface EventImageUploaderProps {
   onImageUpload: (imageUrl: string) => void;
@@ -20,6 +21,7 @@ export default function EventImageUploader({
   const [dragOver, setDragOver] = useState(false);
   const { toast } = useToast();
   const params = useParams();
+  const { user } = useUnifiedAuth();
   
   // Detectar contexto: ¿estamos editando un evento existente o creando uno nuevo?
   const isEditMode = params.id && !isNaN(parseInt(params.id));
@@ -70,11 +72,15 @@ export default function EventImageUploader({
 
       console.log(`📤 [EVENT-FRONTEND] Usando endpoint: ${endpoint}, campo: ${fieldName}`);
 
+      // Crear headers de autenticación correctos
+      const headers: Record<string, string> = {};
+      if (user?.firebaseUid) {
+        headers['x-firebase-uid'] = user.firebaseUid;
+      }
+
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer direct-token-${Date.now()}-admin`
-        },
+        headers,
         body: formData
       });
 
