@@ -9,7 +9,7 @@ import {
   eventEvaluations,
   insertEventSchema 
 } from "../shared/events-schema";
-import { parks, eventCategories, eventImages } from "../shared/schema";
+import { parks, eventCategories, eventImages, sponsorshipEventsLinks } from "../shared/schema";
 import { eq, and, desc, gte, sql, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { replitObjectStorage } from './objectStorage-replit';
@@ -516,10 +516,28 @@ export async function deleteEvent(req: Request, res: Response) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
     
-    // Eliminar el evento (las relaciones se eliminarán en cascada gracias a las referencias)
-    await db
-      .delete(events)
-      .where(eq(events.id, eventId));
+    // Usar transacción para eliminar todas las relaciones antes del evento
+    await db.transaction(async (tx) => {
+      // 1. Eliminar imágenes del evento
+      await tx
+        .delete(eventImages)
+        .where(eq(eventImages.eventId, eventId));
+      
+      // 2. Eliminar vínculos de patrocinio
+      await tx
+        .delete(sponsorshipEventsLinks)
+        .where(eq(sponsorshipEventsLinks.eventId, eventId));
+      
+      // 3. Eliminar relaciones con parques
+      await tx
+        .delete(eventParks)
+        .where(eq(eventParks.eventId, eventId));
+      
+      // 4. Finalmente eliminar el evento principal
+      await tx
+        .delete(events)
+        .where(eq(events.id, eventId));
+    });
     
     return res.json({ message: "Evento eliminado correctamente" });
   } catch (error) {
