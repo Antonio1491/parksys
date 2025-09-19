@@ -1,0 +1,78 @@
+🚀 DATOS TRANSFORMADOS PARA BACKEND: {title: 'Festival Canino', description: 'Un festival canino en el parque reúne a familias y… libre con los mejores amigos de cuatro patas.\n﻿\n', eventType: 'recreational', targetAudience: 'all', status: 'published', …}
+Console.js:61 🌐 [API REQUEST] POST /api/events
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "title": "Festival Canino",
+  "description": "Un festival canino en el parque reúne a familias y sus mascotas en un ambiente divertido y seguro. Ofrece competencias de agilidad, pasarela de disfraces, talleres de cuidado y adopciones responsables. Se instalan áreas de juegos, exhibiciones de entrenamiento y stands de productos para perros. Es un espacio para fortalecer la convivencia, promover la tenencia responsable y disfrutar al aire libre con los mejores amigos de cuatro patas.\n﻿\n",
+  "eventType": "recreational",
+  "targetAudience": "all",
+  "status": "published",
+  "featuredImageUrl": "/api/storage/file/uploads/1758243657728-ac1696ef-0531-43af-a936-09bb56f3b93e-dog-jumping-over-hurdle-2024-09-13-05-35-57-utc.jpg",
+  "startDate": "2025-09-26",
+  "endDate": "2025-09-26",
+  "startTime": "08:00",
+  "endTime": "17:00",
+  "isRecurring": false,
+  "recurrencePattern": null,
+  "location": "Colina del Viento",
+  "capacity": 150,
+  "registrationType": "free",
+  "organizerName": null,
+  "organizerOrganization": null,
+  "organizerEmail": "luis@asociacionesprofesionales.org",
+  "organizerPhone": "9999444060",
+  "geolocation": {
+    "lat": 20.70574230792962,
+    "lng": -103.39139409881048
+  },
+  "isFree": false,
+  "price": 15000,
+  "requiresApproval": false,
+  "parkIds": [
+    99
+  ]
+}
+Console.js:61 🎪 Headers completos: {
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MjQxOTQyLCJleHAiOjE3NTgyNDU1NDIsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.oSj3jge0YUMeypD2CpGWeIPVW6FdL1VYdINwkxh12x5WsBIxNM-MkL15A1E8TnyVdWN0n5YTMGFOGkywGE_2jb6nfNzk_1_XpEaefNegmqBLriaShACSDevAO8atrhv_mBCFU1PQ8oYHLp_6EWJdoXCULy-AltKA3A2yaICsLM7YHJAIRj7GSLgpIovkcUEkx602NVV1B2EZsjfcxUt_N_HdNF61aYVXx7ySMnU_jQya_hpcKZIvhWLcl7xyYb_-RML-jjLcZlvKFlBYOjNWIWQCPzuG0drgwu5Kl0OsAR4Ep4VBmAhNrLkyHJfkYxAnzOkYRO-OneB6np6R0Vs-1Q",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1",
+  "Content-Type": "application/json"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+injected.js:278  POST https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+apiRequest @ queryClient.ts:201
+await in apiRequest
+mutationFn @ new-fixed.tsx:215
+fn @ @tanstack_react-query.js?v=14eab8c0:1203
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+execute @ @tanstack_react-query.js?v=14eab8c0:1239
+await in execute
+mutate @ @tanstack_react-query.js?v=14eab8c0:2655
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3371
+onSubmit @ new-fixed.tsx:243
+(anonymous) @ chunk-4BFJKWC4.js?v=14eab8c0:1465
+await in (anonymous)
+callCallback2 @ chunk-RPCDYKBN.js?v=14eab8c0:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=14eab8c0:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=14eab8c0:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=14eab8c0:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=14eab8c0:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=14eab8c0:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=14eab8c0:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=14eab8c0:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=14eab8c0:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=14eab8c0:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=14eab8c0:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=14eab8c0:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=14eab8c0:5449Understand this error
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
