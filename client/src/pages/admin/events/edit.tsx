@@ -222,10 +222,7 @@ export default function EditEventPage() {
       // Forzar refetch inmediato para actualizar la UI
       queryClient.refetchQueries({ queryKey: [`/api/events/${id}`] });
       
-      // Pequeño delay antes de redirigir para que se vea el cambio
-      setTimeout(() => {
-        setLocation('/admin/events');
-      }, 500);
+      // NO redirigir automáticamente - mantener al usuario en la página de edición
     },
     onError: (error: any) => {
       toast({
