@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Images, MapPin, Users, TreePine, FileText } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
@@ -40,6 +41,16 @@ const parkSchema = z.object({
   contactPhone: z.string().optional(),
   contactEmail: z.string().optional(),
   certificaciones: z.string().optional(),
+  status: z.enum([
+    "en_funcionamiento",
+    "operando_parcialmente", 
+    "en_mantenimiento",
+    "cerrado_temporalmente",
+    "cerrado_indefinidamente",
+    "reapertura_proxima",
+    "en_proyecto_construccion",
+    "uso_restringido"
+  ]).default("en_funcionamiento").optional(),
 });
 
 type ParkFormValues = z.infer<typeof parkSchema>;
@@ -80,6 +91,7 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
       contactPhone: '',
       contactEmail: '',
       certificaciones: '',
+      status: 'en_funcionamiento',
     },
   });
 
@@ -121,6 +133,7 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
         contactPhone: park.contactPhone || '',
         contactEmail: park.contactEmail || '',
         certificaciones: park.certificaciones || '',
+        status: park.status || 'en_funcionamiento',
       };
 
       form.reset(formValues);
@@ -471,6 +484,35 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
               <FormLabel>Correo electrónico de contacto</FormLabel>
               <FormControl>
                 <Input placeholder="correo@ejemplo.com" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* Estado del parque */}
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Estado del parque</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el estado del parque" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en_funcionamiento">En funcionamiento</SelectItem>
+                    <SelectItem value="operando_parcialmente">Operando parcialmente</SelectItem>
+                    <SelectItem value="en_mantenimiento">En mantenimiento</SelectItem>
+                    <SelectItem value="cerrado_temporalmente">Cerrado temporalmente</SelectItem>
+                    <SelectItem value="cerrado_indefinidamente">Cerrado indefinidamente</SelectItem>
+                    <SelectItem value="reapertura_proxima">Reapertura próxima</SelectItem>
+                    <SelectItem value="en_proyecto_construccion">En proyecto / construcción</SelectItem>
+                    <SelectItem value="uso_restringido">Uso restringido</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
