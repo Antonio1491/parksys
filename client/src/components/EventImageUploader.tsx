@@ -50,7 +50,7 @@ export default function EventImageUploader({
       const formData = new FormData();
       formData.append('image', file);
 
-      const response = await fetch('/api/events/upload-image', {
+      const response = await fetch('/api/events/upload-event-image', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer direct-token-${Date.now()}-admin`

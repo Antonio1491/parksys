@@ -26,7 +26,7 @@ const eventImageUpload = multer({
 });
 
 // Upload genérico para eventos (cuando aún no existe eventId - caso creación)
-router.post("/upload-image", eventImageUpload.single('image'), async (req: Request, res: Response) => {
+router.post("/upload-event-image", eventImageUpload.single('image'), async (req: Request, res: Response) => {
   try {
     console.log('📤 [EVENT-GENERIC] Iniciando upload genérico de imagen de evento');
     
