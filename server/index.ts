@@ -266,6 +266,18 @@ console.log("✅ [OBJECT-STORAGE-PRIORITY] Endpoint /public-objects/ registrado 
 
 // Remove complex health check middleware - let direct endpoints handle all health checks
 
+// MIDDLEWARE API PRIORITARIO - ANTES QUE VITE
+app.use('/api/*', (req: Request, res: Response, next: NextFunction) => {
+  console.log(`🎯 [API PRIORITY] ${req.method} ${req.url} - Intercepted before Vite`);
+  next();
+});
+
+// Middleware para loggear TODAS las peticiones
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`🌍 [ALL REQUESTS] ${req.method} ${req.url}`);
+  next();
+});
+
 // Middleware CORS para Replit
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -284,6 +296,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 
 
+
+// TEST PUT ENDPOINT - MÁXIMA PRIORIDAD
+app.put('/api/test-put', (req: Request, res: Response) => {
+  console.log('🧪 [PUT TEST] PUT request received successfully!');
+  console.log('🧪 [PUT TEST] Body:', req.body);
+  res.json({ success: true, message: 'PUT is working' });
+});
 
 // Simple API health check - priority over static files
 app.get('/api/status', (req: Request, res: Response) => {
