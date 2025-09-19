@@ -608,7 +608,7 @@ const AdminParksContent = () => {
         {currentParks.map((park: Park) => (
           <Card 
             key={park.id} 
-            className="hover:shadow-lg hover:bg-gray-50/50 transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            className="hover:shadow-lg duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none"
             onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -744,7 +744,7 @@ const AdminParksContent = () => {
         {currentParks.map((park: Park) => (
           <Card 
             key={park.id} 
-            className="hover:shadow-lg hover:border-[#00444f] hover:bg-gray-50/30 transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none overflow-hidden"
+            className="hover:shadow-lg hover:border-[#00444f] transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none overflow-hidden"
             onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -827,26 +827,15 @@ const AdminParksContent = () => {
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLocation(`/admin/parks/${park.id}/edit`);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    data-testid={`button-edit-park-grid-${park.id}`}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
                       setLocation(`/admin/parks/${park.id}/manage`);
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
-                    title="Gestión completa del parque"
-                    className="text-blue-600 hover:text-blue-700"
-                    data-testid={`button-manage-park-grid-${park.id}`}
+                    title="Editar parque"
+                    className="text-gray-800 hover:text-gray-800 hover:bg-[#ceefea]"
+                    data-testid={`button-edit-park-grid-${park.id}`}
                   >
-                    <Wrench className="h-4 w-4" />
+                    <Edit className="h-4 w-4 mr-2" />
+                    Editar
                   </Button>
                 </div>
                 
@@ -858,9 +847,11 @@ const AdminParksContent = () => {
                     handleDeleteClick(park);
                   }}
                   onKeyDown={(e) => e.stopPropagation()}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-gray-800 hover:text-gray-800 hover:bg-[#ceefea]"
+                  data-testid={`button-delete-park-grid-${park.id}`}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar
                 </Button>
               </div>
             </CardContent>
@@ -1014,7 +1005,7 @@ const AdminParksContent = () => {
               Nuevo
             </Button>,
             <Button 
-              variant="outline" 
+              variant="secondary" 
               onClick={() => setLocation("/admin/parks-import")}
               data-testid="button-import-parks"
             >
@@ -1022,8 +1013,8 @@ const AdminParksContent = () => {
               Importar
             </Button>,
             <ExportButton
-              className="bg-[#00444f] text-[#ffffff] hover:bg-[#00a587] hover:text-white"
               entity="parks"
+              buttonVariant="tertiary"
             />,
           ]}
         />
@@ -1093,7 +1084,7 @@ const AdminParksContent = () => {
                     <div className="py-1">
                       <button
                         onClick={() => setSelectionMode(true)}
-                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                        className="w-full text-left block px-2 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
                         data-testid="menu-enable-selection"
                       >
                         <CopyCheck className="h-4 w-4 mr-2" />
@@ -1132,7 +1123,7 @@ const AdminParksContent = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleBulkDeleteClick}
-                  className="flex items-center h-11 w-11 bg-[#ededed] text-red-600 hover:bg-red-300 hover:text-red-700"
+                  className="flex items-center h-11 min-w-11 bg-[#ededed] text-red-600 hover:bg-red-100 hover:text-red-700"
                   disabled={selectedParks.size === 0}
                   data-testid="button-delete-selected"
                 >

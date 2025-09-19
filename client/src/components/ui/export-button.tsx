@@ -8,24 +8,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Download, FileSpreadsheet, FileText, File, ChevronDown } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, File } from 'lucide-react';
 import { useExport } from '@/hooks/use-export';
 import { ExportConfigForm } from './export-config-form';
 import { ExportOptions } from '../../../../shared/exports/config';
 
 interface ExportButtonProps {
   entity: string;
-  variant?: 'button' | 'dropdown' | 'menu';
   size?: 'sm' | 'default' | 'lg';
   className?: string;
   disabled?: boolean;
   filters?: Record<string, any>;
+  buttonVariant?: 'default' | 'primary' | 'secondary' | 'tertiary';
   customFields?: string[];
   onExportStart?: () => void;
   onExportComplete?: (filename: string) => void;
@@ -48,11 +42,11 @@ const formatLabels = {
 
 export function ExportButton({
   entity,
-  variant = 'button',
   size = 'default',
   className = '',
   disabled = false,
   filters,
+  buttonVariant = 'tertiary',
   customFields,
   onExportStart,
   onExportComplete,
@@ -69,7 +63,7 @@ export function ExportButton({
 
   if (!isReady || !config) {
     return (
-      <Button variant="outline" size={size} disabled className={className}>
+      <Button variant={buttonVariant} size={size} disabled className={className}>
         <Download className="mr-2 h-4 w-4" />
         Exportar
       </Button>
