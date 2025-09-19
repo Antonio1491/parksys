@@ -53,7 +53,7 @@ const Events: React.FC = () => {
   const parks = Array.isArray((parksData as any)?.data) ? (parksData as any).data : Array.isArray(parksData) ? parksData : [];
   
   // Obtener categorías únicas de los eventos
-  const categories = Array.from(new Set(events.map((event: Event) => event.event_type)));
+  const categories: string[] = Array.from(new Set(events.map((event: Event) => event.event_type)));
 
   const filteredEvents = events.filter((event: Event) => {
     const parkName = event.parks && event.parks.length > 0 ? event.parks[0].name : event.location;
