@@ -695,6 +695,18 @@ const AdminParksContent = () => {
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
+                      setLocation(`/admin/parks/${park.id}/edit`);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    data-testid={`button-edit-park-list-${park.id}`}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setLocation(`/admin/parks/${park.id}/manage`);
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
@@ -810,6 +822,18 @@ const AdminParksContent = () => {
               
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation(`/admin/parks/${park.id}/edit`);
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    data-testid={`button-edit-park-grid-${park.id}`}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -1105,10 +1129,10 @@ const AdminParksContent = () => {
 
                 {/* 3. Botón para eliminar elementos independiente */}
                 <Button
-                  variant="destructive"
+                  variant="outline"
                   size="sm"
                   onClick={handleBulkDeleteClick}
-                  className="flex items-center"
+                  className="flex items-center bg-[#ededed] text-red-600 hover:bg-red-50 hover:text-red-700"
                   disabled={selectedParks.size === 0}
                   data-testid="button-delete-selected"
                 >
