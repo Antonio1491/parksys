@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { db } from "./db";
 import { EventTypes, TargetAudiences, EventStatuses, eventParks } from "@shared/events-schema";
-import { events } from "@shared/schema";
+import { events, parks } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { replitObjectStorage } from './objectStorage-replit';
 
