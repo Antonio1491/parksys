@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -211,20 +211,11 @@ const NewEventPageFixed: React.FC = () => {
 
       console.log("🚀 DATOS TRANSFORMADOS PARA BACKEND:", transformedData);
       
-      const response = await fetch("/api/events", {
+      // ✅ USAR apiRequest CON HEADERS FIREBASE
+      return apiRequest("/api/events", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(transformedData),
+        data: transformedData,
       });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Error al crear el evento");
-      }
-      
-      return response.json();
     },
     onSuccess: (data) => {
       toast({
