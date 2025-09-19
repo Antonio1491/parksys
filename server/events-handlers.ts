@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
 import { db } from "./db";
 import { 
-  events, 
+  events,
+  eventImages,
+  parks, 
+  eventCategories, 
+  sponsorshipEventsLinks
+} from "../shared/schema";
+import { 
   eventParks, 
   eventResources, 
   eventRegistrations,
@@ -9,7 +15,6 @@ import {
   eventEvaluations,
   insertEventSchema 
 } from "../shared/events-schema";
-import { parks, eventCategories, eventImages, sponsorshipEventsLinks } from "../shared/schema";
 import { eq, and, desc, gte, sql, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { replitObjectStorage } from './objectStorage-replit';
