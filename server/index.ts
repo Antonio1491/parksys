@@ -2098,6 +2098,11 @@ app.put("/api/parks/:id", async (req: Request, res: Response) => {
       updateFields.push(`administrator = $${paramIndex++}`);
       values.push(parkData.administrator);
     }
+    
+    // Debug específico para el campo status
+    console.log(`🔍 [STATUS DEBUG] parkData.status = ${parkData.status} (type: ${typeof parkData.status})`);
+    console.log(`🔍 [STATUS DEBUG] parkData keys:`, Object.keys(parkData));
+    
     if (parkData.status !== undefined) {
       updateFields.push(`status = $${paramIndex++}`);
       values.push(parkData.status);
