@@ -1132,7 +1132,7 @@ const AdminParksContent = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleBulkDeleteClick}
-                  className="flex items-center bg-[#ededed] text-red-600 hover:bg-red-50 hover:text-red-700"
+                  className="flex items-center h-11 w-11 bg-[#ededed] text-red-600 hover:bg-red-50 hover:text-red-700"
                   disabled={selectedParks.size === 0}
                   data-testid="button-delete-selected"
                 >
