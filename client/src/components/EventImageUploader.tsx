@@ -57,6 +57,11 @@ export default function EventImageUploader({
       // Usar nombre de campo correcto según el endpoint
       const fieldName = isEditMode ? 'imageFile' : 'image';
       formData.append(fieldName, file);
+      
+      // En modo edición, marcar como imagen principal para que actualice featuredImageUrl
+      if (isEditMode) {
+        formData.append('isPrimary', 'true');
+      }
 
       // Determinar endpoint según contexto
       const endpoint = isEditMode 

@@ -176,6 +176,16 @@ router.post("/:eventId/images", eventImageUpload.single('imageFile'), async (req
         uploadedById: 1 // TODO: Obtener del contexto de usuario
       })
       .returning();
+
+    // Si esta imagen es principal, actualizar también el featuredImageUrl del evento
+    if (isPrimary) {
+      await db
+        .update(events)
+        .set({ featuredImageUrl: imageUrl })
+        .where(eq(events.id, eventId));
+      
+      console.log(`✅ [EVENT-HÍBRIDO] featuredImageUrl actualizado en evento ${eventId}: ${imageUrl}`);
+    }
     
     console.log(`✅ [EVENT-HÍBRIDO] Imagen guardada en DB para evento ${eventId}: ${imageUrl}`);
     
@@ -277,8 +287,15 @@ router.patch("/:eventId/images/:imageId/set-primary", async (req: Request, res: 
       .update(eventImages)
       .set({ isPrimary: true })
       .where(and(eq(eventImages.id, imageId), eq(eventImages.eventId, eventId)));
+
+    // Actualizar también el featuredImageUrl del evento con esta imagen
+    await db
+      .update(events)
+      .set({ featuredImageUrl: image[0].imageUrl })
+      .where(eq(events.id, eventId));
     
     console.log(`✅ [EVENT-HÍBRIDO] Imagen ${imageId} establecida como principal para evento ${eventId}`);
+    console.log(`✅ [EVENT-HÍBRIDO] featuredImageUrl actualizado en evento ${eventId}: ${image[0].imageUrl}`);
     
     res.json({ message: "Imagen establecida como principal exitosamente" });
   } catch (error) {

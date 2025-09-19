@@ -48,7 +48,7 @@ interface EventData {
   eventType: string;
   targetAudience: string;
   status: string;
-  imageUrl?: string; // Cambiar de featuredImageUrl a imageUrl
+  featuredImageUrl?: string; // Usar featuredImageUrl que es el campo real del backend
   startDate: string;
   endDate?: string;
   startTime?: string;
@@ -130,9 +130,9 @@ export default function EditEventPage() {
     if (event) {
       console.log('🔄 Cargando datos del evento:', event);
       
-      // Establecer la imagen del evento (usar imageUrl que viene del LEFT JOIN)
-      if (event.imageUrl) {
-        setEventImage(event.imageUrl);
+      // Establecer la imagen del evento (usar featuredImageUrl que viene del backend)
+      if (event.featuredImageUrl) {
+        setEventImage(event.featuredImageUrl);
       }
 
       // Actualizar valores del formulario
@@ -196,7 +196,7 @@ export default function EditEventPage() {
         registrationType: data.registration_required ? 'registration' : 'free',
         status: 'published',
         targetAudience: 'general',
-        imageUrl: eventImage || null, // Cambiar de featuredImageUrl a imageUrl
+        featuredImageUrl: eventImage || null, // Usar featuredImageUrl que es lo que espera el backend
         // Campo requerido por el backend - array de IDs de parques
         parkIds: data.park_id ? [parseInt(data.park_id)] : []
       };
