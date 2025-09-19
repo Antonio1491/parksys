@@ -503,51 +503,67 @@ export async function updateEvent(req: Request, res: Response) {
 
 // Eliminar un evento
 export async function deleteEvent(req: Request, res: Response) {
+  console.log("🚨 [DELETE-EVENT] Iniciando eliminación de evento...");
   try {
     const eventId = parseInt(req.params.id);
+    console.log(`🔍 [DELETE-EVENT] ID recibido: ${req.params.id}, parseado: ${eventId}`);
     
     // Validar que el ID sea un número válido
     if (isNaN(eventId)) {
+      console.log("❌ [DELETE-EVENT] ID inválido");
       return res.status(400).json({ message: "ID de evento inválido" });
     }
     
     // Verificar que el evento existe
+    console.log(`🔍 [DELETE-EVENT] Buscando evento con ID: ${eventId}`);
     const [existingEvent] = await db
       .select()
       .from(events)
       .where(eq(events.id, eventId));
     
     if (!existingEvent) {
+      console.log("❌ [DELETE-EVENT] Evento no encontrado");
       return res.status(404).json({ message: "Evento no encontrado" });
     }
     
+    console.log("✅ [DELETE-EVENT] Evento encontrado:", existingEvent.title);
+    
     // Usar transacción para eliminar todas las relaciones antes del evento
+    console.log("🔄 [DELETE-EVENT] Iniciando transacción...");
     await db.transaction(async (tx) => {
-      // 1. Eliminar imágenes del evento
+      console.log("🗑️ [DELETE-EVENT] Paso 1: Eliminando imágenes del evento...");
       await tx
         .delete(eventImages)
         .where(eq(eventImages.eventId, eventId));
       
-      // 2. Eliminar vínculos de patrocinio
+      console.log("🗑️ [DELETE-EVENT] Paso 2: Eliminando vínculos de patrocinio...");
       await tx
         .delete(sponsorshipEventsLinks)
         .where(eq(sponsorshipEventsLinks.eventId, eventId));
       
-      // 3. Eliminar relaciones con parques
+      console.log("🗑️ [DELETE-EVENT] Paso 3: Eliminando relaciones con parques...");
       await tx
         .delete(eventParks)
         .where(eq(eventParks.eventId, eventId));
       
-      // 4. Finalmente eliminar el evento principal
+      console.log("🗑️ [DELETE-EVENT] Paso 4: Eliminando evento principal...");
       await tx
         .delete(events)
         .where(eq(events.id, eventId));
+      
+      console.log("✅ [DELETE-EVENT] Transacción completada exitosamente");
     });
     
+    console.log("🎉 [DELETE-EVENT] Evento eliminado correctamente");
     return res.json({ message: "Evento eliminado correctamente" });
   } catch (error) {
-    console.error("Error al eliminar evento:", error);
-    return res.status(500).json({ message: "Error al eliminar evento", error });
+    console.error("💥 [DELETE-EVENT] Error completo:", error);
+    console.error("💥 [DELETE-EVENT] Stack trace:", error.stack);
+    return res.status(500).json({ 
+      message: "Error al eliminar evento", 
+      error: error.message,
+      details: error.stack 
+    });
   }
 }
 
