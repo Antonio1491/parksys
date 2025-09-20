@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { Calendar, MapPin, Clock, Users, Search, Filter, Grid, List, Star, Eye, Phone, Mail, CheckCircle, Tag, Trees } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -71,32 +73,29 @@ const Events: React.FC = () => {
 
 
 
-  // Mapeo de colores desde la base de datos de categorías
+  // Mapeo de colores para categorías de eventos (estilo similar a actividades)
   const eventTypeColors = {
-    'Benéficos': '#06B6D4',
-    'Culturales': '#8B5CF6',
-    'Deportivos': '#10B981',
-    'Empresariales': '#3B82F6',
-    'Gubernamentales': '#EF4444',
-    'Sociales': '#EC4899'
-  };
-
-  const eventTypeLabels = {
-    cultural: 'Cultural',
-    sports: 'Deportes',
-    environmental: 'Ambiental',
-    educational: 'Educativo',
-    social: 'Social'
+    'Benéficos': 'bg-cyan-100 text-cyan-800 border-cyan-200',
+    'Culturales': 'bg-purple-100 text-purple-800 border-purple-200',
+    'Deportivos': 'bg-green-100 text-green-800 border-green-200',
+    'Empresariales': 'bg-blue-100 text-blue-800 border-blue-200',
+    'Gubernamentales': 'bg-red-100 text-red-800 border-red-200',
+    'Sociales': 'bg-pink-100 text-pink-800 border-pink-200',
+    'Comunitarios': 'bg-orange-100 text-orange-800 border-orange-200',
+    'Recreativos': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'educational': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    'environmental': 'bg-teal-100 text-teal-800 border-teal-200'
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-MX', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      if (!dateString) return 'Fecha no disponible';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Fecha inválida';
+      return format(date, 'dd MMM yyyy', { locale: es });
+    } catch (error) {
+      return 'Fecha inválida';
+    }
   };
 
   const formatTime = (timeString?: string) => {
@@ -202,7 +201,7 @@ const Events: React.FC = () => {
                     <SelectItem value="all">Todas las categorías</SelectItem>
                     {categories.map((category: string) => (
                       <SelectItem key={category} value={category}>
-                        {eventTypeLabels[category as keyof typeof eventTypeLabels] || category}
+                        {category}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -266,11 +265,12 @@ const Events: React.FC = () => {
               <Link key={event.id} href={`/event/${event.id}`}>
                 <Card className={viewMode === 'list' 
                   ? "hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500" 
-                  : "group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden border-0 shadow-sm"}>
+                  : "group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden border border-gray-200"}>
                 {viewMode === 'grid' ? (
-                  <div className="aspect-video relative overflow-hidden">
-                    {event.featuredImageUrl ? (
-                      <>
+                  <>
+                    {/* Imagen principal - altura fija para evitar cortes */}
+                    <div className="h-48 relative overflow-hidden">
+                      {event.featuredImageUrl ? (
                         <img 
                           src={event.featuredImageUrl?.startsWith('/uploads/') 
                             ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
@@ -284,79 +284,87 @@ const Events: React.FC = () => {
                             (e.target as HTMLImageElement).nextElementSibling?.setAttribute('style', 'display: flex');
                           }}
                         />
-                        <div className="absolute inset-0 bg-black/20"></div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="bg-gradient-to-br from-blue-100 to-purple-100 w-full h-full flex items-center justify-center">
-                          <Calendar className="h-16 w-16 text-blue-600/50" />
-                        </div>
-                      </>
-                    )}
-                    
-                    {/* Badge de categoría */}
-                    <div className="absolute top-3 left-3">
-                      <Badge 
-                        className="border shadow-sm text-xs text-white"
-                        style={{ 
-                          backgroundColor: eventTypeColors[event.event_type as keyof typeof eventTypeColors] || '#3B82F6',
-                          borderColor: 'rgba(255,255,255,0.3)'
-                        }}
-                      >
-                        {event.event_type}
-                      </Badge>
-                    </div>
+                      ) : (
+                        <>
+                          <div className="bg-gradient-to-br from-blue-100 to-purple-100 w-full h-full flex items-center justify-center">
+                            <Calendar className="h-16 w-16 text-blue-600/50" />
+                          </div>
+                          <div className="absolute inset-0 bg-black/10"></div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Calendar className="h-16 w-16 text-white/70" />
+                          </div>
+                        </>
+                      )}
+                      
+                      {/* Badge de categoría */}
+                      <div className="absolute top-4 left-4">
+                        <Badge className={`${eventTypeColors[event.event_type as keyof typeof eventTypeColors] || 'bg-gray-100 text-gray-800 border-gray-200'} border shadow-sm`}>
+                          {event.event_type}
+                        </Badge>
+                      </div>
 
-                    {/* Badge de estado */}
-                    <div className="absolute top-3 right-3">
-                      <Badge 
-                        className="border shadow-sm text-xs font-semibold"
-                        style={{ 
-                          backgroundColor: event.status === 'published' ? '#10B981' : '#6B7280',
-                          color: 'white',
-                          borderColor: event.status === 'published' ? '#059669' : '#4B5563'
-                        }}
-                      >
-                        {event.status === 'published' ? 'Activo' : 'Borrador'}
-                      </Badge>
+                      {/* Badge de estado */}
+                      {event.status && (
+                        <div className="absolute top-4 right-4">
+                          <Badge className={`${event.status === 'published' ? 'bg-green-500 text-white border-green-600' : 'bg-gray-500 text-white border-gray-600'} border shadow-sm font-semibold`}>
+                            {event.status === 'published' ? 'Activo' : 'Borrador'}
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                     
-                    {/* Contenido superpuesto con fondo semitransparente */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-4 space-y-2">
-                      {/* Título del evento */}
-                      <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    {/* Encabezado con título */}
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
                         {event.title}
-                      </h3>
+                      </CardTitle>
+                    </CardHeader>
+                    
+                    {/* Contenido con información */}
+                    <CardContent className="pt-0">
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{event.description}</p>
                       
-                      {/* Información del parque/ubicación */}
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <MapPin className="h-3 w-3 text-blue-600 flex-shrink-0" />
-                        <span className="text-xs truncate">
-                          {event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}
-                        </span>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                          <span className="truncate">{event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <span className="text-xs">
+                            {formatDate(event.start_date)}
+                          </span>
+                        </div>
+                        
+                        {event.start_time && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Clock className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                            <span className="text-xs">{formatTime(event.start_time)}</span>
+                          </div>
+                        )}
+                        
+                        {event.capacity && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Users className="h-4 w-4 text-orange-600 flex-shrink-0" />
+                            <span className="text-xs">{event.registeredCount || 0}/{event.capacity} personas</span>
+                          </div>
+                        )}
                       </div>
                       
-                      {/* Fecha */}
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <Calendar className="h-3 w-3 text-green-600 flex-shrink-0" />
-                        <span className="text-xs">
-                          {formatDate(event.start_date)}
-                        </span>
-                      </div>
-                      
-                      {/* Botón Ver detalle */}
                       <Button 
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white h-7 text-xs px-3" 
+                        className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white" 
+                        size="sm"
                         onClick={(e) => {
                           e.preventDefault();
                           window.open(`/event/${event.id}`, '_blank');
                         }}
                       >
                         Ver detalle
-                        <Eye className="h-2 w-2 ml-1" />
+                        <Eye className="h-3 w-3 ml-2" />
                       </Button>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </>
                 ) : (
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
