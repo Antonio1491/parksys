@@ -464,7 +464,7 @@ const EventsList: React.FC = () => {
 
   // Función para obtener el color de una categoría por nombre
   const getCategoryColor = (categoryName: string) => {
-    const category = eventCategories?.find((cat: any) => cat.name === categoryName);
+    const category = categories?.find((cat: any) => cat.name === categoryName);
     return category?.color || '#6b7280';
   };
 
@@ -497,13 +497,6 @@ const EventsList: React.FC = () => {
     cancelled: 'Cancelado'
   } as const;
 
-  const eventCategories = [
-    { name: 'cultural', color: '#8b5cf6' },
-    { name: 'deportivo', color: '#10b981' },
-    { name: 'educativo', color: '#3b82f6' },
-    { name: 'recreativo', color: '#f59e0b' },
-    { name: 'social', color: '#ef4444' }
-  ];
 
   // Estilos de estado
   const eventStatusColors = {

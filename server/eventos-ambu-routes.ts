@@ -26,7 +26,6 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
   apiRouter.get("/eventos-ambu", async (req: Request, res: Response) => {
     try {
       const { 
-        impacto_tipo, 
         categoria, 
         status, 
         parque_id, 
@@ -38,9 +37,6 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
       
       let whereConditions: any[] = [];
       
-      if (impacto_tipo) {
-        whereConditions.push(eq(eventosAmbu.impactoTipo, impacto_tipo as any));
-      }
       
       if (categoria) {
         whereConditions.push(eq(eventosAmbu.categoria, categoria as any));
@@ -126,7 +122,6 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
         horaInicio: eventosAmbu.horaInicio,
         horaFin: eventosAmbu.horaFin,
         categoria: eventosAmbu.categoria,
-        impactoTipo: eventosAmbu.impactoTipo,
         status: eventosAmbu.status,
         parqueId: eventosAmbu.parqueId,
         numeroAsistentes: eventosAmbu.numeroAsistentes
@@ -201,17 +196,12 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
   apiRouter.post("/eventos-ambu", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const eventoData = insertEventoAmbuSchema.parse(req.body.evento);
-      const solicitudData = insertSolicitudEventoSchema.parse(req.body.solicitud);
+      const solicitudData = insertSolicitudAmbuSchema.parse(req.body.solicitud);
       
-      // Calcular fecha límite de anticipación
+      // Calcular fecha límite de anticipación (usar 30 días como estándar)
       const fechaEvento = new Date(eventoData.fechaEvento);
       const fechaLimite = new Date();
-      
-      if (eventoData.impactoTipo === "bajo_impacto") {
-        fechaLimite.setDate(fechaLimite.getDate() + 10); // 10 días hábiles
-      } else {
-        fechaLimite.setDate(fechaLimite.getDate() + 60); // 2 meses
-      }
+      fechaLimite.setDate(fechaLimite.getDate() + 30); // 30 días estándar
       
       eventoData.fechaLimiteAnticipacion = fechaLimite.toISOString().split('T')[0];
       
@@ -222,7 +212,7 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
       
       // Crear solicitud asociada
       solicitudData.eventoId = nuevoEvento.id;
-      const [nuevaSolicitud] = await db.insert(solicitudEvento)
+      const [nuevaSolicitud] = await db.insert(solicitudesAmbu)
         .values(solicitudData)
         .returning();
       
@@ -230,9 +220,8 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
       await calcularCostosEvento(nuevoEvento.id, eventoData);
       
       // Registrar seguimiento inicial
-      await db.insert(seguimientoEvento).values({
+      await db.insert(seguimientoAmbu).values({
         eventoId: nuevoEvento.id,
-        usuarioId: (req as any).user?.id,
         accion: "solicitud_creada",
         observaciones: "Solicitud de evento creada inicialmente",
         responsable: solicitudData.nombreSolicitante
@@ -250,7 +239,7 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
     try {
       const { id } = req.params;
       const eventoData = insertEventoAmbuSchema.partial().parse(req.body.evento);
-      const solicitudData = insertSolicitudEventoSchema.partial().parse(req.body.solicitud);
+      const solicitudData = insertSolicitudAmbuSchema.partial().parse(req.body.solicitud);
       
       // Actualizar evento
       const [eventoActualizado] = await db.update(eventosAmbu)
@@ -260,9 +249,9 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
       
       // Actualizar solicitud si existe
       if (solicitudData && Object.keys(solicitudData).length > 0) {
-        await db.update(solicitudEvento)
+        await db.update(solicitudesAmbu)
           .set({ ...solicitudData, updatedAt: new Date() })
-          .where(eq(solicitudEvento.eventoId, parseInt(id)));
+          .where(eq(solicitudesAmbu.eventoId, parseInt(id)));
       }
       
       // Recalcular costos si cambió información relevante
@@ -271,9 +260,8 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
       }
       
       // Registrar seguimiento
-      await db.insert(seguimientoEvento).values({
+      await db.insert(seguimientoAmbu).values({
         eventoId: parseInt(id),
-        usuarioId: (req as any).user?.id,
         accion: "evento_actualizado",
         observaciones: "Información del evento actualizada",
         responsable: (req as any).user?.fullName || "Sistema"
@@ -298,9 +286,8 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
         .returning();
       
       // Registrar seguimiento del cambio de estado
-      await db.insert(seguimientoEvento).values({
+      await db.insert(seguimientoAmbu).values({
         eventoId: parseInt(id),
-        usuarioId: (req as any).user?.id,
         accion: `status_cambiado_${status}`,
         observaciones: observaciones || `Estado cambiado a: ${status}`,
         responsable: (req as any).user?.fullName || "Sistema"
@@ -327,9 +314,8 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
         .returning();
       
       // Registrar seguimiento
-      await db.insert(seguimientoEvento).values({
+      await db.insert(seguimientoAmbu).values({
         eventoId: parseInt(id),
-        usuarioId: (req as any).user?.id,
         accion: "documento_subido",
         observaciones: `Documento subido: ${documentoData.tipoDocumento}`,
         responsable: (req as any).user?.fullName || "Sistema"
@@ -356,9 +342,8 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
         .returning();
       
       // Registrar seguimiento
-      await db.insert(seguimientoEvento).values({
+      await db.insert(seguimientoAmbu).values({
         eventoId: parseInt(id),
-        usuarioId: (req as any).user?.id,
         accion: "reunion_programada",
         observaciones: `Reunión programada para: ${reunionData.fechaReunion}`,
         responsable: reunionData.responsableReunion || "Sistema"
@@ -461,13 +446,11 @@ async function calcularCostosEvento(eventoId: number, eventoData: any) {
       });
     }
     
-    // Actualizar costos totales en el evento
+    // Actualizar costos totales en el evento (sin diferenciación de impacto)
     await db.update(eventosAmbu).set({
       costoTotal: parseFloat(costos.total.toString()),
-      anticipo: eventoData.impactoTipo === "alto_impacto" ? 
-        parseFloat((costos.total * 0.5).toString()) : 0,
-      depositoGarantia: eventoData.impactoTipo === "alto_impacto" ? 
-        parseFloat((costos.total * 0.1).toString()) : 0
+      anticipo: parseFloat((costos.total * 0.3).toString()), // 30% estándar
+      depositoGarantia: parseFloat((costos.total * 0.1).toString()) // 10% estándar
     }).where(eq(eventosAmbu.id, eventoId));
     
   } catch (error) {
