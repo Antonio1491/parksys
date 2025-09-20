@@ -1,0 +1,209 @@
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] POST /api/events/import
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/import
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "events": [
+    {
+      "title": "Festival de Primavera",
+      "description": "Celebración de la llegada de la primavera con actividades familiares.",
+      "eventType": "cultural",
+      "category": "Culturales",
+      "targetAudience": "all",
+      "startDate": "16/09/25",
+      "endDate": "16/09/25",
+      "startTime": "10:00:00",
+      "endTime": "18:00:00",
+      "location": "Plaza Central",
+      "parkNames": "Parque Central; Parque Norte",
+      "capacity": 200,
+      "registrationType": "free",
+      "organizerName": "María González",
+      "organizerOrganization": "Departamento de Eventos",
+      "organizerEmail": "maria@parques.gob.mx",
+      "organizerPhone": "3312345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Evento familiar con actividades para todas las edades",
+      "latitude": 20.6597,
+      "longitude": -103.3496,
+      "status": "published"
+    },
+    {
+      "title": "Carrera Verde",
+      "description": "Carrera recreativa de 5 km para promover la vida saludable.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "17/09/25",
+      "endDate": "17/09/25",
+      "startTime": "7:00:00",
+      "endTime": "10:00:00",
+      "location": "Entrada Principal",
+      "parkNames": "Parque Fundidora",
+      "capacity": 500,
+      "registrationType": "free",
+      "organizerName": "Jorge Ramírez",
+      "organizerOrganization": "Club Corredores MTY",
+      "organizerEmail": "jramirez@club.com",
+      "organizerPhone": "8112345678",
+      "price": 200,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Premiación a primeros lugares",
+      "latitude": 25.6751,
+      "longitude": -100.3185,
+      "status": "published"
+    },
+    {
+      "title": "Picnic Musical",
+      "description": "Concierto acústico al aire libre con bandas locales.",
+      "eventType": "cultural",
+      "category": "Recreativos",
+      "targetAudience": "all",
+      "startDate": "18/09/25",
+      "endDate": "18/09/25",
+      "startTime": "16:00:00",
+      "endTime": "21:00:00",
+      "location": "Lago Menor",
+      "parkNames": "Bosque de Chapultepec",
+      "capacity": 800,
+      "registrationType": "free",
+      "organizerName": "Ana Torres",
+      "organizerOrganization": "Secretaría de Cultura CDMX",
+      "organizerEmail": "atorres@cultura.mx",
+      "organizerPhone": "5512345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Área designada para picnic",
+      "latitude": 19.4204,
+      "longitude": -99.1917,
+      "status": "published"
+    },
+    {
+      "title": "Festival del Niño",
+      "description": "Juegos, talleres y espectáculos infantiles.",
+      "eventType": "recreativo",
+      "category": "Comunitarios",
+      "targetAudience": "all",
+      "startDate": "19/09/25",
+      "endDate": "19/09/25",
+      "startTime": "9:00:00",
+      "endTime": "14:00:00",
+      "location": "Foro Infantil",
+      "parkNames": "Parque Tangamanga I",
+      "capacity": 1000,
+      "registrationType": "free",
+      "organizerName": "Laura Méndez",
+      "organizerOrganization": "DIF SLP",
+      "organizerEmail": "lmendez@difslp.mx",
+      "organizerPhone": "4441234567",
+      "price": 50,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Evento anual Día del Niño",
+      "latitude": 22.1412,
+      "longitude": -100.9953,
+      "status": "published"
+    },
+    {
+      "title": "Yoga al Amanecer",
+      "description": "Clase masiva de yoga en la explanada.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "20/09/25",
+      "endDate": "20/09/25",
+      "startTime": "6:30:00",
+      "endTime": "8:00:00",
+      "location": "Explanada Principal",
+      "parkNames": "Parque Metropolitano de Guadalajara",
+      "capacity": 300,
+      "registrationType": "free",
+      "organizerName": "Sofía Delgado",
+      "organizerOrganization": "Yoga GDL",
+      "organizerEmail": "sdelgado@yogagdl.mx",
+      "organizerPhone": "3311122233",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Se recomienda llevar tapete",
+      "latitude": 20.7045,
+      "longitude": -103.4426,
+      "status": "published"
+    },
+    {
+      "title": "Feria del Medio Ambiente",
+      "description": "Exhibiciones y talleres de sustentabilidad.",
+      "eventType": "cultural",
+      "category": "Ambientales",
+      "targetAudience": "all",
+      "startDate": "21/09/25",
+      "endDate": "21/09/25",
+      "startTime": "10:00:00",
+      "endTime": "17:00:00",
+      "location": "Zona de Pabellones",
+      "parkNames": "Parque Bicentenario",
+      "capacity": 1500,
+      "registrationType": "free",
+      "organizerName": "Ricardo Pérez",
+      "organizerOrganization": "SEMARNAT",
+      "organizerEmail": "rperez@semarnat.gob.mx",
+      "organizerPhone": "5556781234",
+      "price": 0,
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzIzNTUxLCJleHAiOjE3NTgzMjcxNTEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Q7XV7s0iOgAJKluDeUO9eGUGG2gIwLyd-Bnq9KHotb2zGl2qyCvOdkKGaPKuVAP8Ftbl3BXermRVSL-mvfG7185Bwp01il1dTsURQnHRfstc0Iw3ovP08e5eMcvpOM1rqFYnkIQhDlWkTqoOJRhPF8IWwtMx81Z4U7nZwhIBYcuW_CWWbBjMAxcAMddPB8FuJiqITu2R7qjzmWU9mZKQcbYtfGSv5yo0q1n_QT85mWjHEhHSUn6yamRnmcrjruLvY0WXpwk8vigWeSjOoXnjj_04wFK085hLpkH0gsxd77ZXuF1mtKHF8MuO7UKRm8-xhmeAmUbaDQYY1NJ0DIOi8A",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events/118
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔄 Cargando datos del evento: {id: 118, title: 'Expo Salud y Bienestar', description: 'Charlas y stands de salud integral.', eventType: 'cultural', targetAudience: 'all', …}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}

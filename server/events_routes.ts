@@ -758,7 +758,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
             const lat = parseFloat(eventData.latitude);
             const lng = parseFloat(eventData.longitude);
             if (!isNaN(lat) && !isNaN(lng)) {
-              geolocation = { lat, lng };
+              geolocation = JSON.stringify({ lat, lng });
             }
           }
 
