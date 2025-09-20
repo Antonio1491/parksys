@@ -218,6 +218,7 @@ export default function EditEventPage() {
   });
 
   const onSubmit = (data: EditEventForm) => {
+    console.log('🚀 [SUBMIT] onSubmit ejecutándose con datos:', data);
     updateEventMutation.mutate(data);
   };
 
@@ -656,6 +657,12 @@ export default function EditEventPage() {
                       type="submit"
                       className="w-full"
                       disabled={updateEventMutation.isPending}
+                      onClick={() => {
+                        console.log('🖱️ [CLICK] Botón "Actualizar Evento" clickeado');
+                        console.log('🔍 [FORM] Errores del formulario:', form.formState.errors);
+                        console.log('🔍 [FORM] Es válido:', form.formState.isValid);
+                        console.log('🔍 [FORM] Valores:', form.getValues());
+                      }}
                     >
                       {updateEventMutation.isPending ? (
                         <>
