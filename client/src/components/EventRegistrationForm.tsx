@@ -38,6 +38,13 @@ interface EventData {
   isFree?: boolean;
   requiresApproval?: boolean;
   registrations?: any[];
+  // Unified discount fields
+  discountSeniors?: number;
+  discountStudents?: number;
+  discountFamilies?: number;
+  discountDisability?: number;
+  discountEarlyBird?: number;
+  discountEarlyBirdDeadline?: string;
 }
 
 interface EventRegistrationFormProps {
