@@ -15,31 +15,10 @@ import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
 import { apiRequest } from '@/lib/queryClient';
 import EventImageUploader from '@/components/EventImageUploader';
+import { updateEventSchema } from '@shared/events-schema';
 
-// Schema de validación para evento (corregido)
-const editEventSchema = z.object({
-  title: z.string().min(1, 'El título es requerido').max(255, 'El título es muy largo'),
-  description: z.string().min(1, 'La descripción es requerida'),
-  start_date: z.string().min(1, 'La fecha de inicio es requerida'),
-  end_date: z.string().optional(),
-  start_time: z.string().optional(), // ✅ HORA OPCIONAL
-  end_time: z.string().optional(),
-  park_id: z.string().min(1, 'Debe seleccionar un parque'),
-  category: z.string().min(1, 'Debe seleccionar una categoría'),
-  capacity: z.string().optional(),
-  location: z.string().optional(),
-  organizer_name: z.string().optional(),
-  organizer_organization: z.string().optional(),
-  contact_email: z.string().email('Email inválido').optional().or(z.literal('')),
-  contact_phone: z.string().optional(),
-  latitude: z.string().optional(),
-  longitude: z.string().optional(),
-  registration_required: z.boolean().default(false),
-  price: z.string().optional(),
-  notes: z.string().optional()
-});
-
-type EditEventForm = z.infer<typeof editEventSchema>;
+// 🎯 Usar el esquema unificado de events-schema.ts
+type EditEventForm = z.infer<typeof updateEventSchema>;
 
 interface EventData {
   id: number;
@@ -101,27 +80,27 @@ export default function EditEventPage() {
   };
 
   const form = useForm<EditEventForm>({
-    resolver: zodResolver(editEventSchema),
+    resolver: zodResolver(updateEventSchema),
     defaultValues: {
       title: '',
       description: '',
-      start_date: '',
-      end_date: '',
-      start_time: '',
-      end_time: '',
-      park_id: '',
-      category: '',
-      capacity: '',
+      startDate: '',
+      endDate: '',
+      startTime: '',
+      endTime: '',
+      parkIds: [],
+      eventType: '',
+      capacity: undefined,
       location: '',
-      organizer_name: '',
-      organizer_organization: '',
-      contact_email: '',
-      contact_phone: '',
-      latitude: '',
-      longitude: '',
-      registration_required: false,
-      price: '',
-      notes: ''
+      organizerName: '',
+      organizerOrganization: '',
+      organizerEmail: '',
+      organizerPhone: '',
+      geolocation: null,
+      registrationType: 'free',
+      price: undefined,
+      targetAudience: 'all',
+      status: 'draft'
     }
   });
 
@@ -135,27 +114,27 @@ export default function EditEventPage() {
         setEventImage(event.featuredImageUrl);
       }
 
-      // Actualizar valores del formulario
+      // 🎯 Actualizar valores del formulario usando esquema unificado
       form.reset({
         title: event.title || '',
         description: event.description || '',
-        start_date: formatDateForInput(event.startDate),
-        end_date: formatDateForInput(event.endDate || ''),
-        start_time: event.startTime || '',
-        end_time: event.endTime || '',
-        park_id: event.parks && event.parks.length > 0 ? String(event.parks[0].id) : '',
-        category: event.eventType || '',
-        capacity: event.capacity ? String(event.capacity) : '',
+        startDate: formatDateForInput(event.startDate),
+        endDate: formatDateForInput(event.endDate || ''),
+        startTime: event.startTime || '',
+        endTime: event.endTime || '',
+        parkIds: event.parks ? event.parks.map(p => p.id) : [],
+        eventType: event.eventType || '',
+        capacity: event.capacity || undefined,
         location: event.location || '',
-        organizer_name: event.organizerName || '',
-        organizer_organization: event.organizerOrganization || '',
-        contact_email: event.organizerEmail || '',
-        contact_phone: event.organizerPhone || '',
-        latitude: event.geolocation?.lat ? String(event.geolocation.lat) : '',
-        longitude: event.geolocation?.lng ? String(event.geolocation.lng) : '',
-        registration_required: event.registrationType === 'registration',
-        price: '',
-        notes: ''
+        organizerName: event.organizerName || '',
+        organizerOrganization: event.organizerOrganization || '',
+        organizerEmail: event.organizerEmail || '',
+        organizerPhone: event.organizerPhone || '',
+        geolocation: event.geolocation || null,
+        registrationType: event.registrationType || 'free',
+        price: undefined,
+        targetAudience: event.targetAudience || 'all',
+        status: event.status || 'draft'
       });
     }
   }, [event, form]);
@@ -173,32 +152,30 @@ export default function EditEventPage() {
     queryKey: ['/api/event-categories']
   });
 
-  // Mutación para actualizar evento
+  // 🎯 Mutación para actualizar evento usando esquema unificado
   const updateEventMutation = useMutation({
     mutationFn: async (data: EditEventForm) => {
       const eventData = {
         title: data.title,
         description: data.description,
-        eventType: data.category, // Usar category del formulario como eventType
-        startDate: data.start_date,
-        endDate: data.end_date || null,
-        startTime: data.start_time || null,
-        endTime: data.end_time || null,
-        capacity: data.capacity ? parseInt(data.capacity) : null,
+        eventType: data.eventType,
+        startDate: data.startDate,
+        endDate: data.endDate || null,
+        startTime: data.startTime || null,
+        endTime: data.endTime || null,
+        capacity: data.capacity || null,
         location: data.location || null,
-        organizerName: data.organizer_name || null,
-        organizerOrganization: data.organizer_organization || null,
-        organizerEmail: data.contact_email || null,
-        organizerPhone: data.contact_phone || null,
-        geolocation: data.latitude && data.longitude 
-          ? { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) }
-          : null,
-        registrationType: data.registration_required ? 'registration' : 'free',
-        status: 'published',
-        targetAudience: 'general',
-        featuredImageUrl: eventImage || null, // Usar featuredImageUrl que es lo que espera el backend
-        // Campo requerido por el backend - array de IDs de parques
-        parkIds: data.park_id ? [parseInt(data.park_id)] : []
+        organizerName: data.organizerName || null,
+        organizerOrganization: data.organizerOrganization || null,
+        organizerEmail: data.organizerEmail || null,
+        organizerPhone: data.organizerPhone || null,
+        geolocation: data.geolocation || null,
+        registrationType: data.registrationType || 'free',
+        status: data.status || 'published',
+        targetAudience: data.targetAudience || 'all',
+        featuredImageUrl: eventImage || null,
+        // 🎯 Array de parques (múltiples parques soportados)
+        parkIds: data.parkIds || []
       };
 
       console.log('🚀 Actualizando datos del evento:', eventData);
