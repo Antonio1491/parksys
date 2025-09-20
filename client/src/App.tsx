@@ -574,9 +574,7 @@ function Router() {
 
         {/* Rutas para el módulo de eventos AMBU */}
         <Route path="/admin/eventos-ambu">
-          <Suspense fallback={<div className="p-8 text-center">Cargando gestión de eventos AMBU...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/admin/eventos-ambu/index')))}
-          </Suspense>
+          {() => { setLocation('/admin/eventos-ambu/calendar'); return null; }}
         </Route>
 
         <Route path="/admin/eventos-ambu/calendar">

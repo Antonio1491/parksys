@@ -16,7 +16,6 @@ interface CategoriaAmbu {
   id: number;
   nombre: string;
   descripcion?: string;
-  impactoTipo: 'bajo_impacto' | 'alto_impacto';
   tarifaBase: number;
   activa: boolean;
   createdAt: string;
@@ -25,7 +24,6 @@ interface CategoriaAmbu {
 interface CategoriaFormData {
   nombre: string;
   descripcion: string;
-  impactoTipo: 'bajo_impacto' | 'alto_impacto';
   tarifaBase: number;
   activa: boolean;
 }
@@ -36,7 +34,6 @@ export default function CategoriasEventosAmbu() {
   const [formData, setFormData] = useState<CategoriaFormData>({
     nombre: '',
     descripcion: '',
-    impactoTipo: 'bajo_impacto',
     tarifaBase: 0,
     activa: true
   });
@@ -55,7 +52,7 @@ export default function CategoriasEventosAmbu() {
     mutationFn: (data: CategoriaFormData) => 
       apiRequest('/api/eventos-ambu/categorias', {
         method: 'POST',
-        body: JSON.stringify(data)
+        data: data
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/eventos-ambu/categorias'] });
@@ -80,7 +77,7 @@ export default function CategoriasEventosAmbu() {
     mutationFn: ({ id, data }: { id: number; data: CategoriaFormData }) =>
       apiRequest(`/api/eventos-ambu/categorias/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(data)
+        data: data
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/eventos-ambu/categorias'] });
@@ -127,7 +124,6 @@ export default function CategoriasEventosAmbu() {
     setFormData({
       nombre: '',
       descripcion: '',
-      impactoTipo: 'bajo_impacto',
       tarifaBase: 0,
       activa: true
     });
@@ -148,7 +144,6 @@ export default function CategoriasEventosAmbu() {
     setFormData({
       nombre: categoria.nombre,
       descripcion: categoria.descripcion || '',
-      impactoTipo: categoria.impactoTipo,
       tarifaBase: categoria.tarifaBase,
       activa: categoria.activa
     });
@@ -241,19 +236,6 @@ export default function CategoriasEventosAmbu() {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="impactoTipo">Tipo de Impacto</Label>
-                <select
-                  id="impactoTipo"
-                  value={formData.impactoTipo}
-                  onChange={(e) => setFormData({ ...formData, impactoTipo: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00a587]"
-                  required
-                >
-                  <option value="bajo_impacto">Bajo Impacto</option>
-                  <option value="alto_impacto">Alto Impacto</option>
-                </select>
-              </div>
 
               <div>
                 <Label htmlFor="tarifaBase">Tarifa Base (MXN)</Label>
@@ -331,12 +313,6 @@ export default function CategoriasEventosAmbu() {
               </div>
               
               <div className="flex gap-2">
-                <Badge 
-                  variant={categoria.impactoTipo === 'bajo_impacto' ? 'default' : 'secondary'}
-                  className={categoria.impactoTipo === 'bajo_impacto' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}
-                >
-                  {categoria.impactoTipo === 'bajo_impacto' ? 'Bajo Impacto' : 'Alto Impacto'}
-                </Badge>
                 <Badge variant={categoria.activa ? 'default' : 'secondary'}>
                   {categoria.activa ? 'Activa' : 'Inactiva'}
                 </Badge>
