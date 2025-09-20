@@ -373,7 +373,7 @@ const NewEventPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="organizerName"
+                  name="organizer_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-800 font-semibold">Nombre del organizador *</FormLabel>
@@ -392,7 +392,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="organizerOrganization"
+                  name="organizer_organization"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-800 font-semibold">Empresa / Organización</FormLabel>
@@ -537,7 +537,7 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(parks?.data || parks || []).map((park: any) => (
+                          {(parks || []).map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
@@ -547,7 +547,7 @@ const NewEventPage: React.FC = () => {
                       <FormDescription>
                         Parques seleccionados:{" "}
                         {field.value?.length
-                          ? (parks?.data || parks || [])
+                          ? (parks || [])
                               .filter((park: any) => field.value?.includes(park.id))
                               .map((park: any) => park.name)
                               .join(", ")
