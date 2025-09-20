@@ -803,12 +803,20 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
           };
           
           // Insertar evento
+          console.log(`🔍 [PRE-INSERT] Insertando evento "${eventData.title}"`);
           const createdEvents = await db.insert(events).values([insertData]).returning();
-          const createdEvent = createdEvents[0];
+          console.log(`🔍 [POST-INSERT] createdEvents length: ${createdEvents.length}`);
           
-          console.log(`🔍 [DEBUG] Evento creado "${createdEvent.title}" (ID: ${createdEvent.id})`);
-          console.log(`🔍 [DEBUG] parkNames recibido: "${eventData.parkNames}"`);
-          console.log(`🔍 [DEBUG] Condición parkNames: ${!!eventData.parkNames}, createdEvent.id: ${!!createdEvent.id}`);
+          const createdEvent = createdEvents[0];
+          console.log(`🔍 [CREATED-EVENT] createdEvent: ${createdEvent ? 'EXISTS' : 'NULL'}`);
+          
+          if (createdEvent) {
+            console.log(`🔍 [DEBUG] Evento creado "${createdEvent.title}" (ID: ${createdEvent.id})`);
+            console.log(`🔍 [DEBUG] parkNames recibido: "${eventData.parkNames}"`);
+            console.log(`🔍 [DEBUG] Condición parkNames: ${!!eventData.parkNames}, createdEvent.id: ${!!createdEvent.id}`);
+          } else {
+            console.error(`❌ [ERROR] createdEvent es null o undefined`);
+          }
           
           // Procesar asociaciones de parques si existen
           if (eventData.parkNames && createdEvent.id) {
