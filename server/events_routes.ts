@@ -404,6 +404,15 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       const eventId = parseInt(req.params.id);
       const eventData = req.body;
       
+      // 🔍 DEBUG: Log incoming data
+      console.log('🎯 [PUT EVENT DEBUG] Incoming data for event', eventId, ':', {
+        price: eventData.price,
+        isFree: eventData.isFree,
+        hasPrice: 'price' in eventData,
+        hasIsFree: 'isFree' in eventData,
+        fullData: eventData
+      });
+      
       // Verificar que el evento existe
       const [existingEvent] = await db
         .select()
@@ -444,12 +453,28 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       // Actualizar fecha de modificación
       updateData.updatedAt = new Date();
       
+      // 🔍 DEBUG: Log what will be updated
+      console.log('🎯 [PUT EVENT DEBUG] UpdateData to save:', {
+        hasPrice: 'price' in updateData,
+        price: updateData.price,
+        hasIsFree: 'isFree' in updateData, 
+        isFree: updateData.isFree,
+        allFields: Object.keys(updateData)
+      });
+      
       // Actualizar evento en la base de datos
       const [updatedEvent] = await db
         .update(events)
         .set(updateData)
         .where(eq(events.id, eventId))
         .returning();
+      
+      // 🔍 DEBUG: Log what was returned from DB
+      console.log('🎯 [PUT EVENT DEBUG] Updated event from DB:', {
+        id: updatedEvent.id,
+        price: updatedEvent.price,
+        isFree: updatedEvent.isFree
+      });
       
       // Actualizar relaciones con parques si se proporcionaron
       if (eventData.parkIds && Array.isArray(eventData.parkIds)) {
