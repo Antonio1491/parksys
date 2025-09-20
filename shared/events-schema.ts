@@ -41,6 +41,16 @@ export const events = pgTable("events", {
   isFree: boolean("is_free").default(true).notNull(),
   price: integer("price"), // Precio en centavos para evitar problemas de float
   requiresApproval: boolean("requires_approval").default(false).notNull(),
+  // Campos de descuentos unificados
+  discountSeniors: integer("discount_seniors").default(0),
+  discountStudents: integer("discount_students").default(0),
+  discountFamilies: integer("discount_families").default(0),
+  discountDisability: integer("discount_disability").default(0),
+  discountEarlyBird: integer("discount_early_bird").default(0),
+  discountEarlyBirdDeadline: date("discount_early_bird_deadline"),
+  // Campos de costeo financiero
+  costRecoveryPercentage: integer("cost_recovery_percentage").default(30),
+  costingNotes: text("costing_notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   createdById: integer("created_by_id"), // ID del usuario que creó el evento
@@ -142,6 +152,16 @@ export const insertEventSchema = createInsertSchema(events, {
   // Campos de precio con lógica condicional
   isFree: z.boolean().default(true),
   price: z.preprocess(v => v === '' || v == null ? undefined : v, z.coerce.number().int().positive().optional()),
+  // Campos de descuentos unificados
+  discountSeniors: z.coerce.number().min(0).max(100).default(0),
+  discountStudents: z.coerce.number().min(0).max(100).default(0),
+  discountFamilies: z.coerce.number().min(0).max(100).default(0),
+  discountDisability: z.coerce.number().min(0).max(100).default(0),
+  discountEarlyBird: z.coerce.number().min(0).max(100).default(0),
+  discountEarlyBirdDeadline: z.string().optional(),
+  // Campos de costeo financiero
+  costRecoveryPercentage: z.coerce.number().min(0).max(100).default(30),
+  costingNotes: z.string().optional(),
 }).omit({ id: true, createdAt: true, updatedAt: true }).extend({
   parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque")
 }).refine((data) => {
@@ -181,6 +201,16 @@ export const updateEventSchema = z.object({
   registration_required: z.boolean().optional(),
   isFree: z.boolean().optional(),
   price: z.preprocess(v => v === '' || v == null ? undefined : v, z.coerce.number().int().positive().optional()),
+  // Campos de descuentos unificados
+  discountSeniors: z.coerce.number().min(0).max(100).optional(),
+  discountStudents: z.coerce.number().min(0).max(100).optional(),
+  discountFamilies: z.coerce.number().min(0).max(100).optional(),
+  discountDisability: z.coerce.number().min(0).max(100).optional(),
+  discountEarlyBird: z.coerce.number().min(0).max(100).optional(),
+  discountEarlyBirdDeadline: z.string().optional(),
+  // Campos de costeo financiero
+  costRecoveryPercentage: z.coerce.number().min(0).max(100).optional(),
+  costingNotes: z.string().optional(),
   parkIds: z.array(z.number()).optional()
 }).refine((data) => {
   // Si el evento no es gratuito, debe tener precio

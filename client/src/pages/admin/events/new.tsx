@@ -41,24 +41,53 @@ import { Checkbox } from "@/components/ui/checkbox";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { CostingSection } from "@/components/CostingSection";
 
-// Usar el esquema unificado extendido para fechas de form y descuentos
+// Esquema para el formulario con fechas como Date objects
 const eventFormSchema = z.object({
-  ...insertEventSchema.shape,
+  title: z.string().min(3).max(255),
+  description: z.string().optional(),
+  eventType: z.string().min(2).max(50),
+  targetAudience: z.string().max(100).optional(),
+  status: z.enum(["draft", "published", "cancelled", "postponed"]).default("draft"),
+  featuredImageUrl: z.string().optional(),
   startDate: z.date({
     required_error: "La fecha de inicio es requerida",
   }),
   endDate: z.date().optional().nullable(),
-  // Validación explícita para campos de descuentos
-  discountSeniors: z.number().min(0).max(100).default(0),
-  discountStudents: z.number().min(0).max(100).default(0),
-  discountFamilies: z.number().min(0).max(100).default(0),
-  discountDisability: z.number().min(0).max(100).default(0),
-  discountEarlyBird: z.number().min(0).max(100).default(0),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  capacity: z.coerce.number().int().positive().optional(),
+  registrationType: z.enum(["free", "registration"]).default("free"),
+  organizerName: z.string().max(100).optional(),
+  organizerEmail: z.string().email().optional().or(z.literal('')),
+  organizerPhone: z.string().max(20).optional(),
+  organizerOrganization: z.string().optional(),
+  location: z.string().optional(),
+  // Campos de precio
+  isFree: z.boolean().default(true),
+  price: z.preprocess(v => v === '' || v == null ? undefined : v, z.coerce.number().int().positive().optional()),
+  requiresApproval: z.boolean().default(false),
+  // Campos de descuentos unificados
+  discountSeniors: z.coerce.number().min(0).max(100).default(0),
+  discountStudents: z.coerce.number().min(0).max(100).default(0),
+  discountFamilies: z.coerce.number().min(0).max(100).default(0),
+  discountDisability: z.coerce.number().min(0).max(100).default(0),
+  discountEarlyBird: z.coerce.number().min(0).max(100).default(0),
   discountEarlyBirdDeadline: z.date().optional().nullable(),
-  // Validación para campos de costeo
-  costRecoveryPercentage: z.number().min(0).max(100).default(30),
-  financialNotes: z.string().optional(),
-}).omit({ id: true, createdAt: true, updatedAt: true })
+  // Campos de costeo financiero
+  costRecoveryPercentage: z.coerce.number().min(0).max(100).default(30),
+  costingNotes: z.string().optional(),
+  // Array de parques
+  parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque")
+}).refine((data) => {
+  // Si el evento no es gratuito, debe tener precio
+  if (!data.isFree && (!data.price || data.price <= 0)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "El precio es requerido para eventos de pago",
+  path: ["price"]
+})
 
 // Tipos
 type EventFormValues = z.infer<typeof eventFormSchema>;
@@ -111,7 +140,7 @@ const NewEventPage: React.FC = () => {
       discountEarlyBirdDeadline: undefined,
       // Campos de costeo financiero unificados
       costRecoveryPercentage: 30,
-      financialNotes: "",
+      costingNotes: "",
     },
   });
 
@@ -497,7 +526,7 @@ const NewEventPage: React.FC = () => {
                           
                           if (currentValues.includes(valueNumber)) {
                             field.onChange(
-                              currentValues.filter((val) => val !== valueNumber)
+                              currentValues.filter((val: number) => val !== valueNumber)
                             );
                           } else {
                             field.onChange([...currentValues, valueNumber]);
@@ -510,17 +539,17 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(parks || []).map((park: any) => (
+                          {Array.isArray(parks) ? parks.map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
                             </SelectItem>
-                          ))}
+                          )) : null}
                         </SelectContent>
                       </Select>
                       <FormDescription>
                         Parques seleccionados:{" "}
-                        {field.value?.length
-                          ? (parks || [])
+                        {field.value?.length && Array.isArray(parks)
+                          ? parks
                               .filter((park: any) => field.value?.includes(park.id))
                               .map((park: any) => park.name)
                               .join(", ")
@@ -870,8 +899,8 @@ const NewEventPage: React.FC = () => {
                   <CostingSection
                     costRecoveryPercentage={form.watch("costRecoveryPercentage") || 30}
                     onCostRecoveryChange={(percentage) => form.setValue("costRecoveryPercentage", percentage)}
-                    financialNotes={form.watch("financialNotes") || ""}
-                    onFinancialNotesChange={(notes) => form.setValue("financialNotes", notes)}
+                    financialNotes={form.watch("costingNotes") || ""}
+                    onFinancialNotesChange={(notes) => form.setValue("costingNotes", notes)}
                     showAdvancedFields={true}
                   />
                 </div>

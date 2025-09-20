@@ -17,6 +17,7 @@ import AdminLayout from '@/components/AdminLayout';
 import { apiRequest } from '@/lib/queryClient';
 import EventImageUploader from '@/components/EventImageUploader';
 import { updateEventSchema } from '@shared/events-schema';
+import { CostingSection } from '@/components/CostingSection';
 
 // 🎯 Usar el esquema unificado de events-schema.ts
 type EditEventForm = z.infer<typeof updateEventSchema>;
@@ -44,6 +45,16 @@ interface EventData {
   parks: Array<{ id: number; name: string; address: string }>;
   isFree?: boolean;
   price?: string | number;
+  // Campos de descuentos
+  discountSeniors?: number;
+  discountStudents?: number;
+  discountFamilies?: number;
+  discountDisability?: number;
+  discountEarlyBird?: number;
+  discountEarlyBirdDeadline?: string;
+  // Campos de costeo
+  costRecoveryPercentage?: number;
+  costingNotes?: string;
 }
 
 export default function EditEventPage() {
@@ -104,7 +115,17 @@ export default function EditEventPage() {
       isFree: true,
       price: undefined,
       targetAudience: 'all',
-      status: 'draft'
+      status: 'draft',
+      // Campos de descuentos
+      discountSeniors: 0,
+      discountStudents: 0,
+      discountFamilies: 0,
+      discountDisability: 0,
+      discountEarlyBird: 0,
+      discountEarlyBirdDeadline: undefined,
+      // Campos de costeo
+      costRecoveryPercentage: 30,
+      costingNotes: ''
     }
   });
 
@@ -139,7 +160,17 @@ export default function EditEventPage() {
         isFree: event.isFree !== undefined ? event.isFree : true,
         price: event.isFree ? undefined : (event.price ? Number(event.price) / 100 : undefined),
         targetAudience: event.targetAudience || 'all',
-        status: event.status || 'draft'
+        status: event.status || 'draft',
+        // Campos de descuentos con valores por defecto seguros
+        discountSeniors: event.discountSeniors || 0,
+        discountStudents: event.discountStudents || 0,
+        discountFamilies: event.discountFamilies || 0,
+        discountDisability: event.discountDisability || 0,
+        discountEarlyBird: event.discountEarlyBird || 0,
+        discountEarlyBirdDeadline: event.discountEarlyBirdDeadline || undefined,
+        // Campos de costeo con valores por defecto seguros
+        costRecoveryPercentage: event.costRecoveryPercentage || 30,
+        costingNotes: event.costingNotes || ''
       });
     }
   }, [event, form]);
@@ -182,7 +213,17 @@ export default function EditEventPage() {
         price: data.isFree ? undefined : (data.price ? Math.round(Number(data.price) * 100) : undefined),
         featuredImageUrl: eventImage || null,
         // 🎯 Array de parques (múltiples parques soportados)
-        parkIds: data.parkIds || []
+        parkIds: data.parkIds || [],
+        // 🎯 Campos de descuentos unificados
+        discountSeniors: data.discountSeniors || 0,
+        discountStudents: data.discountStudents || 0,
+        discountFamilies: data.discountFamilies || 0,
+        discountDisability: data.discountDisability || 0,
+        discountEarlyBird: data.discountEarlyBird || 0,
+        discountEarlyBirdDeadline: data.discountEarlyBirdDeadline || undefined,
+        // 🎯 Campos de costeo financiero
+        costRecoveryPercentage: data.costRecoveryPercentage || 30,
+        costingNotes: data.costingNotes || undefined
       };
 
       console.log('🚀 Actualizando datos del evento:', eventData);
@@ -529,6 +570,99 @@ export default function EditEventPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* NUEVO: Campos de descuentos unificados */}
+                  {!form.watch("isFree") && (
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <h4 className="text-sm font-semibold text-purple-800 mb-3">🎟️ Descuentos Disponibles</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-xs">🧓 Adultos mayores (%)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            placeholder="0"
+                            className="h-8 text-sm mt-1"
+                            {...form.register('discountSeniors')}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">🎓 Estudiantes (%)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            placeholder="0"
+                            className="h-8 text-sm mt-1"
+                            {...form.register('discountStudents')}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">👨‍👩‍👧‍👦 Familias (%)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            placeholder="0"
+                            className="h-8 text-sm mt-1"
+                            {...form.register('discountFamilies')}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">♿ Discapacidad (%)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            placeholder="0"
+                            className="h-8 text-sm mt-1"
+                            {...form.register('discountDisability')}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">⏰ Inscripción temprana (%)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            placeholder="0"
+                            className="h-8 text-sm mt-1"
+                            {...form.register('discountEarlyBird')}
+                          />
+                        </div>
+                        {form.watch("discountEarlyBird") > 0 && (
+                          <div>
+                            <Label className="text-xs">Fecha límite</Label>
+                            <Input
+                              type="date"
+                              className="h-8 text-sm mt-1"
+                              {...form.register('discountEarlyBirdDeadline')}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-xs text-purple-700 mt-2">
+                        Configure los porcentajes de descuento que estarán disponibles para los participantes durante el registro
+                      </div>
+                    </div>
+                  )}
+
+                  {/* NUEVO: Sección de costeo financiero unificado */}
+                  <div>
+                    <CostingSection
+                      costRecoveryPercentage={form.watch("costRecoveryPercentage") || 30}
+                      onCostRecoveryChange={(percentage) => form.setValue("costRecoveryPercentage", percentage)}
+                      financialNotes={form.watch("costingNotes") || ""}
+                      onFinancialNotesChange={(notes) => form.setValue("costingNotes", notes)}
+                      showAdvancedFields={true}
+                    />
+                  </div>
 
                   <div>
                     <Label htmlFor="location">Ubicación Específica</Label>
