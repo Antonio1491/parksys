@@ -30,6 +30,9 @@ interface Event {
   organizerName: string;
   organizerEmail: string;
   parks?: Array<{ id: number; name: string; address: string }>;
+  price?: string;
+  isFree?: boolean;
+  registrationType?: string;
 }
 
 const Events: React.FC = () => {
@@ -104,6 +107,36 @@ const Events: React.FC = () => {
   const formatTime = (timeString?: string) => {
     if (!timeString) return 'Todo el día';
     return timeString;
+  };
+
+  // Función para determinar si un evento es gratuito
+  const isEventFree = (event: Event) => {
+    // Si isFree está explícitamente establecido, usarlo
+    if (event.isFree === true) return true;
+    if (event.isFree === false) return false;
+    
+    // Si no hay isFree, verificar el precio
+    if (event.price) {
+      const price = parseFloat(event.price);
+      return price === 0;
+    }
+    
+    // Fallback: verificar registrationType
+    return event.registrationType === 'free';
+  };
+
+  // Función para formatear el precio
+  const formatPrice = (event: Event) => {
+    if (isEventFree(event)) {
+      return 'Evento Gratuito';
+    }
+    
+    if (event.price) {
+      const price = parseFloat(event.price);
+      return `$${price.toFixed(2)} MXN`;
+    }
+    
+    return 'Precio no especificado';
   };
 
   if (eventsLoading) {
@@ -353,6 +386,13 @@ const Events: React.FC = () => {
                             <span className="text-xs">{event.registeredCount || 0}/{event.capacity} personas</span>
                           </div>
                         )}
+                        
+                        <div className="flex items-center gap-2">
+                          <Tag className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                          <span className={`text-xs font-medium ${isEventFree(event) ? 'text-emerald-700' : 'text-blue-700'}`}>
+                            {formatPrice(event)}
+                          </span>
+                        </div>
                       </div>
                       
                       <Button 
@@ -417,6 +457,13 @@ const Events: React.FC = () => {
                               <span>{event.registeredCount || 0}/{event.capacity} personas</span>
                             </div>
                           )}
+                          
+                          <div className="flex items-center gap-2">
+                            <Tag className="h-4 w-4 text-emerald-600" />
+                            <span className={`font-medium ${isEventFree(event) ? 'text-emerald-700' : 'text-blue-700'}`}>
+                              {formatPrice(event)}
+                            </span>
+                          </div>
                         </div>
                         
                         {event.organizerName && (

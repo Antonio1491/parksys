@@ -88,6 +88,36 @@ const EventDetail = () => {
     return timeString.slice(0, 5);
   };
 
+  // Función para determinar si un evento es gratuito
+  const isEventFree = (event: Event) => {
+    // Si isFree está explícitamente establecido, usarlo
+    if (event.isFree === true) return true;
+    if (event.isFree === false) return false;
+    
+    // Si no hay isFree, verificar el precio
+    if (event.price) {
+      const price = parseFloat(event.price.toString());
+      return price === 0;
+    }
+    
+    // Fallback: verificar registrationType
+    return event.registrationType === 'free';
+  };
+
+  // Función para formatear el precio
+  const formatPrice = (event: Event) => {
+    if (isEventFree(event)) {
+      return 'Actividad Gratuita';
+    }
+    
+    if (event.price) {
+      const price = parseFloat(event.price.toString());
+      return `$${price.toFixed(2)} MXN`;
+    }
+    
+    return 'Precio no especificado';
+  };
+
   if (isLoading) {
     return (
       <PublicLayout>
@@ -377,6 +407,13 @@ const EventDetail = () => {
                          event.targetAudience === 'children' ? 'Niños' :
                          event.targetAudience === 'seniors' ? 'Adultos mayores' :
                          event.targetAudience}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                      <span className="text-gray-600">Precio:</span>
+                      <span className={`font-medium ${isEventFree(event) ? 'text-emerald-700' : 'text-blue-700'}`}>
+                        {formatPrice(event)}
                       </span>
                     </div>
                     
