@@ -781,8 +781,8 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
             title: eventData.title,
             description: eventData.description || null,
             eventType: mappedEventType,
-            startDate: parsedStartDate,
-            endDate: parsedEndDate,
+            startDate: parsedStartDate ? parsedStartDate.toISOString() : new Date().toISOString(),
+            endDate: parsedEndDate ? parsedEndDate.toISOString() : null,
             startTime: eventData.startTime || null,
             endTime: eventData.endTime || null,
             location: eventData.location || null,
@@ -803,7 +803,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
           };
           
           // Insertar evento
-          const createdEvents = await db.insert(events).values(insertData).returning();
+          const createdEvents = await db.insert(events).values([insertData]).returning();
           const createdEvent = createdEvents[0];
           
           console.log(`🔍 [DEBUG] Evento creado "${createdEvent.title}" (ID: ${createdEvent.id})`);
