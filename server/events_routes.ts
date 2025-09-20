@@ -399,7 +399,9 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
   });
 
   // Actualizar un evento existente
+  console.log('🔍 [DEBUG] Registering PUT /events/:id handler in registerEventRoutes function');
   apiRouter.put("/events/:id", isAuthenticated, async (req: Request, res: Response) => {
+    console.log('🎯 [PUT HANDLER] Handler started! Request reached our function!');
     try {
       const eventId = parseInt(req.params.id);
       const eventData = req.body;

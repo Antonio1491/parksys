@@ -449,6 +449,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.use('/activity-registrations', activityRegistrationsRouter);
   console.log('📝 Rutas de inscripciones de actividades registradas');
   
+  // 🎯 PRIORIDAD MÁXIMA: Registramos las rutas principales de eventos PRIMERO
+  console.log('🎯 [PRIORITY] Registering main event routes with MAXIMUM PRIORITY');
+  registerEventRoutes(app, apiRouter, isAuthenticated);
+  console.log('✅ [PRIORITY] Main event routes registered successfully');
+  
   // ¡CRÍTICO! Registrar rutas de imágenes ANTES para evitar interceptación
   apiRouter.use('/events', eventImageRouter);
   console.log('📸 Rutas de imágenes de eventos registradas con MÁXIMA PRIORIDAD');
@@ -902,9 +907,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Registramos las rutas del módulo de eventos
-  registerEventRoutes(app, apiRouter, isAuthenticated);
-  
+  // Las rutas principales de eventos YA están registradas con prioridad arriba
   // Las rutas de imágenes de eventos YA están registradas con prioridad arriba
   
   // Registramos las rutas de categorías de eventos
