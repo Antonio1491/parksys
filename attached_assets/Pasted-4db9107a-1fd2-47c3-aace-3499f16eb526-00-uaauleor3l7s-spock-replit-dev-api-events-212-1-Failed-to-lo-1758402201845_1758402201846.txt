@@ -1,0 +1,623 @@
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+eruda.js:2 Query failed for: /api/events/212 Error: Error al obtener evento
+    at queryClient.ts:268:13
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ queryClient.ts:360
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627Understand this error
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/events/212
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212 500 (Internal Server Error)
+window.fetch @ Network.js:219
+apply @ injected.js:278
+(anonymous) @ queryClient.ts:332
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627Understand this error
+eruda.js:2  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212 500 (Internal Server Error)
+window.fetch @ eruda.js:2
+apply @ injected.js:278
+(anonymous) @ queryClient.ts:245
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js:850
+run @ @tanstack_react-query.js:500
+start @ @tanstack_react-query.js:542
+fetch @ @tanstack_react-query.js:937
+executeFetch_fn @ @tanstack_react-query.js:2244
+onSubscribe @ @tanstack_react-query.js:1948
+subscribe @ @tanstack_react-query.js:24
+(anonymous) @ @tanstack_react-query.js:3093
+subscribeToStore @ chunk-RPCDYKBN.js:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js:19447
+commitRootImpl @ chunk-RPCDYKBN.js:19416
+commitRoot @ chunk-RPCDYKBN.js:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js:9119
+(anonymous) @ chunk-RPCDYKBN.js:18627Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/212:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+eruda.js:2 Query failed for: /api/events/212 Error: Error al obtener evento
+    at queryClient.ts:268:13
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ queryClient.ts:360
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627Understand this error
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+3eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔥 Firebase initialized successfully
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/events/212
+eruda.js:2 🌐 [QUERY] GET /api/parks
+eruda.js:2 🌐 [QUERY] GET /api/event-categories
+eruda.js:2 🌐 [QUERY] GET /api/roles/1/permissions
+eruda.js:2 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+eruda.js:2 i18next: languageChanged es
+eruda.js:2 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔄 Cargando datos del evento: {id: 212, title: 'Festival de la Juventud', description: 'Bandas, deportes extremos y talleres.', eventType: 'Recreativos', targetAudience: 'all', …}
+eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+2eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/events/stats
+eruda.js:2 🌐 [QUERY] GET /api/events/recent
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/events
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+3eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+9eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔥 Firebase initialized successfully
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/parks
+eruda.js:2 🌐 [QUERY] GET /api/event-categories
+eruda.js:2 🌐 [QUERY] GET /api/roles/1/permissions
+eruda.js:2 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+eruda.js:2 i18next: languageChanged es
+eruda.js:2 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔥 Firebase initialized successfully
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/parks
+eruda.js:2 🌐 [QUERY] GET /api/event-categories
+eruda.js:2 🌐 [QUERY] GET /api/roles/1/permissions
+eruda.js:2 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+eruda.js:2 i18next: languageChanged es
+eruda.js:2 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 Query failed for: /api/parks TypeError: Failed to fetch
+    at window.fetch (eruda.js:2:218642)
+    at Object.apply (injected.js:278:39)
+    at queryClient.ts:245:23
+Mt.forEach.n.<computed> @ eruda.js:2
+(anonymous) @ queryClient.ts:272
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384Understand this error
+eruda.js:2 Network connectivity issue: TypeError: Failed to fetch
+    at window.fetch (eruda.js:2:218642)
+    at Object.apply (injected.js:278:39)
+    at queryClient.ts:245:23
+Mt.forEach.n.<computed> @ eruda.js:2
+(anonymous) @ queryClient.ts:274
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=14eab8c0:850
+run @ @tanstack_react-query.js?v=14eab8c0:500
+start @ @tanstack_react-query.js?v=14eab8c0:542
+fetch @ @tanstack_react-query.js?v=14eab8c0:937
+executeFetch_fn @ @tanstack_react-query.js?v=14eab8c0:2244
+onSubscribe @ @tanstack_react-query.js?v=14eab8c0:1948
+subscribe @ @tanstack_react-query.js?v=14eab8c0:24
+(anonymous) @ @tanstack_react-query.js?v=14eab8c0:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=14eab8c0:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19432
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=14eab8c0:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18718
+workLoop @ chunk-RPCDYKBN.js?v=14eab8c0:197
+flushWork @ chunk-RPCDYKBN.js?v=14eab8c0:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=14eab8c0:384Understand this error
+eruda.js:2 🔥 Firebase initialized successfully
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/parks
+eruda.js:2 🌐 [QUERY] GET /api/event-categories
+eruda.js:2 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+eruda.js:2 i18next: languageChanged es
+eruda.js:2 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+eruda.js:2 🌐 [QUERY] GET /api/roles/1/permissions
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+eruda.js:2 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+eruda.js:2 🌐 [QUERY] GET /api/notifications/count
+  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events 404 (Not Found)
+(anonymous) @ 4db9107a-1fd2-47c3-a…s&id=%3Ar3qo%3A:151Understand this error
+  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events 404 (Not Found)
+(anonymous) @ 4db9107a-1fd2-47c3-a…s&id=%3Ar3qo%3A:151Understand this error
+  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events 404 (Not Found)
+(anonymous) @ 4db9107a-1fd2-47c3-a…s&id=%3Ar3qo%3A:151Understand this error
+  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events 404 (Not Found)
+(anonymous) @ 4db9107a-1fd2-47c3-a…s&id=%3Ar3qo%3A:151Understand this error
+ 🔥 Firebase initialized successfully
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [QUERY] GET /api/parks
+ 🌐 [QUERY] GET /api/event-categories
+ 🌐 [QUERY] GET /api/roles/1/permissions
+ i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+ i18next: languageChanged es
+ i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [QUERY] GET /api/notifications/count
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔥 Firebase initialized successfully
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [QUERY] GET /api/parks
+ 🌐 [QUERY] GET /api/event-categories
+ i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+ i18next: languageChanged es
+ i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+ 🌐 [QUERY] GET /api/roles/1/permissions
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🌐 [QUERY] GET /api/notifications/count
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+ 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔥 Firebase initialized successfully
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/parks
+Console.js:61 🌐 [QUERY] GET /api/event-categories
+Console.js:61 🌐 [QUERY] GET /api/roles/1/permissions
+Console.js:61 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+Console.js:61 i18next: languageChanged es
+Console.js:61 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
