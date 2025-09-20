@@ -218,11 +218,7 @@ const NewEventPage: React.FC = () => {
     );
   }
 
-  // Debug: Log de datos para verificar
-  console.log("Parks data:", parks);
-  console.log("Event categories:", eventCategories);
-  console.log("Form values actuales:", form.getValues());
-  console.log("🎯 PRECIO CAMPOS - isFree:", form.watch("isFree"), "price:", form.watch("price"), "requiresApproval:", form.watch("requiresApproval"));
+  // Debug limpiezado
 
   return (
     <AdminLayout>
@@ -236,6 +232,11 @@ const NewEventPage: React.FC = () => {
           <p className="text-gray-600 mt-2">
             Crear un nuevo evento
           </p>
+          {/* 🚨 DEBUG VISUAL */}
+          <div className="mt-4 p-2 bg-red-100 border border-red-300 rounded">
+            <p className="text-red-800 font-bold">🚨 DEBUG: isFree = {form.watch("isFree") ? "TRUE (Gratuito)" : "FALSE (Con Precio)"}</p>
+            <p className="text-red-800">Secciones deberían aparecer cuando isFree = FALSE</p>
+          </div>
         </Card>
 
         <Form {...form}>
