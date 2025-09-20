@@ -1682,6 +1682,20 @@ export const events = pgTable("events", {
   price: decimal("price", { precision: 10, scale: 2 }).default("0.00"),
   isFree: boolean("is_free").default(true),
   requiresApproval: boolean("requires_approval").default(false),
+  
+  // Campos de descuentos aplicables (unificado con actividades)
+  discountSeniors: decimal("discount_seniors", { precision: 5, scale: 2 }).default("0.00"), // descuento adultos mayores
+  discountStudents: decimal("discount_students", { precision: 5, scale: 2 }).default("0.00"), // descuento estudiantes  
+  discountFamilies: decimal("discount_families", { precision: 5, scale: 2 }).default("0.00"), // descuento familias numerosas
+  discountDisability: decimal("discount_disability", { precision: 5, scale: 2 }).default("0.00"), // descuento discapacidad
+  discountEarlyBird: decimal("discount_early_bird", { precision: 5, scale: 2 }).default("0.00"), // descuento inscripción temprana
+  discountEarlyBirdDeadline: timestamp("discount_early_bird_deadline"), // fecha límite inscripción temprana
+  
+  // Campos de costeo financiero (unificado con actividades)
+  costRecoveryPercentage: decimal("cost_recovery_percentage", { precision: 5, scale: 2 }).default("30.00"), // % objetivo de recuperación
+  financialNotes: text("financial_notes"), // observaciones del área de finanzas
+  reviewedBy: integer("reviewed_by"), // ID del usuario que revisó (referencias a users)
+  reviewedAt: timestamp("reviewed_at"), // fecha de revisión financiera
 });
 
 // Tabla de imágenes de eventos (idéntica al patrón de actividades y parques)
@@ -4158,6 +4172,21 @@ export const spaceReservations = pgTable("space_reservations", {
   approvedAt: timestamp("approved_at"),
   cancellationReason: text("cancellation_reason"),
   notes: text("notes"),
+  
+  // Campos de descuentos aplicables (unificado con actividades)
+  discountSeniors: decimal("discount_seniors", { precision: 5, scale: 2 }).default("0.00"), // descuento adultos mayores
+  discountStudents: decimal("discount_students", { precision: 5, scale: 2 }).default("0.00"), // descuento estudiantes  
+  discountFamilies: decimal("discount_families", { precision: 5, scale: 2 }).default("0.00"), // descuento familias numerosas
+  discountDisability: decimal("discount_disability", { precision: 5, scale: 2 }).default("0.00"), // descuento discapacidad
+  discountEarlyBird: decimal("discount_early_bird", { precision: 5, scale: 2 }).default("0.00"), // descuento inscripción temprana
+  discountEarlyBirdDeadline: timestamp("discount_early_bird_deadline"), // fecha límite inscripción temprana
+  
+  // Campos de costeo financiero (unificado con actividades)
+  costRecoveryPercentage: decimal("cost_recovery_percentage", { precision: 5, scale: 2 }).default("30.00"), // % objetivo de recuperación
+  financialNotes: text("financial_notes"), // observaciones del área de finanzas
+  reviewedBy: integer("reviewed_by"), // ID del usuario que revisó (referencias a users)
+  reviewedAt: timestamp("reviewed_at"), // fecha de revisión financiera
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
