@@ -126,7 +126,6 @@ const NewEventPage: React.FC = () => {
       organizerOrganization: "",
       organizerEmail: "",
       organizerPhone: "",
-      geolocation: undefined,
       // Campos de precio y pago
       isFree: true,
       price: undefined,
@@ -188,10 +187,10 @@ const NewEventPage: React.FC = () => {
     // Normalizar payload para compatibilidad con insertEventSchema
     const normalizedPayload = {
       ...data,
-      // Convertir fechas a strings YYYY-MM-DD
-      startDate: data.startDate.toISOString().split('T')[0],
-      endDate: data.endDate ? data.endDate.toISOString().split('T')[0] : undefined,
-      discountEarlyBirdDeadline: data.discountEarlyBirdDeadline ? data.discountEarlyBirdDeadline.toISOString().split('T')[0] : undefined,
+      // Mantener fechas como Date objects (igual que en edit.tsx)
+      startDate: data.startDate,
+      endDate: data.endDate || undefined,
+      discountEarlyBirdDeadline: data.discountEarlyBirdDeadline || undefined,
       // Limpiar valores null/undefined opcionales
       capacity: data.capacity || undefined,
       price: data.price || undefined,
@@ -875,7 +874,7 @@ const NewEventPage: React.FC = () => {
                                 <PopoverContent className="w-auto p-0" align="start">
                                   <Calendar
                                     mode="single"
-                                    selected={field.value}
+                                    selected={field.value || undefined}
                                     onSelect={field.onChange}
                                     disabled={(date) => date < new Date()}
                                     initialFocus
@@ -1029,10 +1028,10 @@ const NewEventPage: React.FC = () => {
               <div className="mt-6">
                 <FormField
                   control={form.control}
-                  name="notes"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notas Adicionales</FormLabel>
+                      <FormLabel>Descripción del Evento</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Información adicional sobre el evento o instrucciones especiales..."
