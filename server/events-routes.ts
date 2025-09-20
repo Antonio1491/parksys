@@ -54,7 +54,7 @@ eventRouter.get("/events-reference-data", getEventReferenceData);
 
 // Rutas protegidas (requieren autenticación)
 eventRouter.post("/events", createEvent);
-eventRouter.put("/events/:id", updateEvent);
+// eventRouter.put("/events/:id", updateEvent); // 🚫 TEMPORAL: Deshabilitado para evitar conflicto con handler principal
 eventRouter.delete("/events/:id", deleteEvent);
 
 export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
