@@ -312,7 +312,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       };
 
       return res.json(eventWithNormalizedImages);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error al obtener evento ${req.params.id}:`, error);
       return res.status(500).json({ 
         message: "Error al obtener evento", 
@@ -341,8 +341,8 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         targetAudience: eventData.targetAudience || "all",
         status: eventData.status || "draft",
         featuredImageUrl: eventData.featuredImageUrl || null,
-        startDate: new Date(eventData.startDate),
-        endDate: eventData.endDate ? new Date(eventData.endDate) : null,
+        startDate: eventData.startDate,
+        endDate: eventData.endDate || null,
         startTime: eventData.startTime || null,
         endTime: eventData.endTime || null,
         isRecurring: eventData.isRecurring || false,
@@ -519,7 +519,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         message: "Evento eliminado correctamente", 
         event: deletedEvent 
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error al eliminar evento ${req.params.id}:`, error);
       return res.status(500).json({ 
         message: "Error al eliminar evento", 
@@ -543,7 +543,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       return res.json([]);
       
       // Extraer los IDs de eventos asociados a este parque
-      const eventIds = eventParkRelations.map(rel => rel.eventId);
+      // const eventIds = eventParkRelations.map(rel => rel.eventId);
       
       if (eventIds.length === 0) {
         return res.json([]);
