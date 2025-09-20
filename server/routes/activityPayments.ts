@@ -4,6 +4,7 @@ import { storage } from "../storage";
 import { activityRegistrations, insertActivityRegistrationSchema } from "../../shared/schema";
 import { eq } from "drizzle-orm";
 import { emailService } from "../email/emailService";
+import { calculateUnifiedDiscounts } from "./unified-discounts";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -18,7 +19,7 @@ export function registerActivityPaymentRoutes(app: Express) {
   app.post("/api/activities/:activityId/create-payment-intent", async (req, res) => {
     try {
       const { activityId } = req.params;
-      const { registrationId, customerData } = req.body;
+      const { registrationId, customerData, amount, originalAmount, appliedDiscounts } = req.body;
 
       // Obtener datos de la actividad
       const activity = await storage.getActivityById(parseInt(activityId));
@@ -30,7 +31,32 @@ export function registerActivityPaymentRoutes(app: Express) {
         return res.status(400).json({ error: "Esta actividad es gratuita" });
       }
 
-      const amount = Math.round(parseFloat(activity.price || "0") * 100); // Convert to cents
+      // Validar descuentos server-side usando los descuentos configurados de la actividad
+      const basePrice = parseFloat(activity.price || "0");
+      const serverDiscountCalculation = calculateUnifiedDiscounts(
+        basePrice,
+        {
+          discountSeniors: Math.min(appliedDiscounts?.discountSeniors || 0, activity.discountSeniors || 0),
+          discountStudents: Math.min(appliedDiscounts?.discountStudents || 0, activity.discountStudents || 0),
+          discountFamilies: Math.min(appliedDiscounts?.discountFamilies || 0, activity.discountFamilies || 0),
+          discountDisability: Math.min(appliedDiscounts?.discountDisability || 0, activity.discountDisability || 0),
+          discountEarlyBird: Math.min(appliedDiscounts?.discountEarlyBird || 0, activity.discountEarlyBird || 0),
+        },
+        activity.discountEarlyBirdDeadline
+      );
+
+      // Verificar que el monto enviado por el cliente coincide con el cálculo server-side
+      const expectedAmount = serverDiscountCalculation.finalAmount;
+      if (amount && Math.abs(amount - expectedAmount) > 0.01) { // tolerancia de 1 centavo
+        return res.status(400).json({
+          error: `Monto inválido. Esperado: $${expectedAmount.toFixed(2)}, recibido: $${amount.toFixed(2)}`
+        });
+      }
+
+      // Usar el monto validado server-side
+      const finalAmount = serverDiscountCalculation.finalAmount;
+      const baseAmount = serverDiscountCalculation.originalAmount;
+      const amountInCents = Math.round(finalAmount * 100); // Convert to cents
 
       // Crear customer en Stripe si se proporcionan datos
       let customerId;
@@ -52,11 +78,15 @@ export function registerActivityPaymentRoutes(app: Express) {
 
       // Crear payment intent básico
       const paymentIntent = await stripe.paymentIntents.create({
-        amount,
+        amount: amountInCents,
         currency: "mxn",
         metadata: {
           activityId: activityId,
           activityTitle: activity.title,
+          original_amount: baseAmount.toString(),
+          final_amount: finalAmount.toString(),
+          discounts_applied: JSON.stringify(serverDiscountCalculation.discountBreakdown),
+          discount_percentage: serverDiscountCalculation.totalDiscountPercentage.toString(),
         },
         description: `Pago por actividad: ${activity.title}`,
       });
@@ -74,7 +104,10 @@ export function registerActivityPaymentRoutes(app: Express) {
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id,
         customerId: customerId,
-        amount: amount / 100,
+        amount: finalAmount,
+        originalAmount: baseAmount,
+        discountBreakdown: serverDiscountCalculation.discountBreakdown,
+        totalDiscountPercentage: serverDiscountCalculation.totalDiscountPercentage,
         currency: 'mxn'
       });
     } catch (error: any) {

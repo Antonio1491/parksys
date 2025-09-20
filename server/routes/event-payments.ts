@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Stripe from 'stripe';
 import { neon } from '@neondatabase/serverless';
 import { z } from 'zod';
+import { calculateUnifiedDiscounts } from './unified-discounts';
 
 const router = Router();
 const sql = neon(process.env.DATABASE_URL!);
@@ -17,11 +18,21 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Schema de validación para crear payment intent
 const paymentIntentSchema = z.object({
   amount: z.number().min(0.5, 'El monto mínimo es $0.50'),
+  originalAmount: z.number().optional(),
   customerData: z.object({
     fullName: z.string().min(2),
     email: z.string().email(),
     phone: z.string().optional(),
   }),
+  // Unified discount fields
+  appliedDiscounts: z.object({
+    discountSeniors: z.number().min(0).max(100).default(0),
+    discountStudents: z.number().min(0).max(100).default(0),
+    discountFamilies: z.number().min(0).max(100).default(0),
+    discountDisability: z.number().min(0).max(100).default(0),
+    discountEarlyBird: z.number().min(0).max(100).default(0),
+    totalDiscountPercentage: z.number().min(0).max(100).default(0),
+  }).optional(),
 });
 
 // POST /api/events/:id/create-payment-intent - Crear intención de pago para evento
@@ -30,11 +41,13 @@ router.post('/:eventId/create-payment-intent', async (req, res) => {
     const { eventId } = req.params;
     const validatedData = paymentIntentSchema.parse(req.body);
 
-    // Obtener información del evento
+    // Obtener información del evento incluyendo campos de descuentos
     const eventData = await sql`
       SELECT 
         id, title, price, is_free, 
-        organizer_name, organizer_email, capacity
+        organizer_name, organizer_email, capacity,
+        discount_seniors, discount_students, discount_families, 
+        discount_disability, discount_early_bird, discount_early_bird_deadline
       FROM events 
       WHERE id = ${eventId}
     `;
@@ -53,6 +66,28 @@ router.post('/:eventId/create-payment-intent', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Este evento es gratuito'
+      });
+    }
+
+    // Validar descuentos server-side usando los descuentos configurados del evento
+    const serverDiscountCalculation = calculateUnifiedDiscounts(
+      event.price,
+      {
+        discountSeniors: Math.min(validatedData.appliedDiscounts?.discountSeniors || 0, event.discount_seniors || 0),
+        discountStudents: Math.min(validatedData.appliedDiscounts?.discountStudents || 0, event.discount_students || 0),
+        discountFamilies: Math.min(validatedData.appliedDiscounts?.discountFamilies || 0, event.discount_families || 0),
+        discountDisability: Math.min(validatedData.appliedDiscounts?.discountDisability || 0, event.discount_disability || 0),
+        discountEarlyBird: Math.min(validatedData.appliedDiscounts?.discountEarlyBird || 0, event.discount_early_bird || 0),
+      },
+      event.discount_early_bird_deadline
+    );
+
+    // Verificar que el monto enviado por el cliente coincide con el cálculo server-side
+    const expectedAmount = serverDiscountCalculation.finalAmount;
+    if (Math.abs(validatedData.amount - expectedAmount) > 0.01) { // tolerancia de 1 centavo
+      return res.status(400).json({
+        success: false,
+        error: `Monto inválido. Esperado: $${expectedAmount.toFixed(2)}, recibido: $${validatedData.amount.toFixed(2)}`
       });
     }
 
@@ -102,9 +137,13 @@ router.post('/:eventId/create-payment-intent', async (req, res) => {
       });
     }
 
+    // Usar el monto validado server-side
+    const finalAmount = serverDiscountCalculation.finalAmount;
+    const originalAmount = serverDiscountCalculation.originalAmount;
+    
     // Crear PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(event.price * 100), // Convertir a centavos
+      amount: Math.round(finalAmount * 100), // Convertir a centavos
       currency: 'mxn',
       customer: customer.id,
       metadata: {
@@ -113,6 +152,10 @@ router.post('/:eventId/create-payment-intent', async (req, res) => {
         customer_name: validatedData.customerData.fullName,
         customer_email: validatedData.customerData.email,
         module: 'events',
+        original_amount: originalAmount.toString(),
+        final_amount: finalAmount.toString(),
+        discounts_applied: JSON.stringify(serverDiscountCalculation.discountBreakdown),
+        discount_percentage: serverDiscountCalculation.totalDiscountPercentage.toString(),
       },
       description: `Inscripción a evento: ${event.title}`,
     });
@@ -123,7 +166,10 @@ router.post('/:eventId/create-payment-intent', async (req, res) => {
       success: true,
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
-      amount: event.price,
+      amount: finalAmount,
+      originalAmount: originalAmount,
+      discountBreakdown: serverDiscountCalculation.discountBreakdown,
+      totalDiscountPercentage: serverDiscountCalculation.totalDiscountPercentage,
     });
 
   } catch (error) {

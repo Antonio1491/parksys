@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { spaceReservations, reservableSpaces, parks } from "../../shared/schema";
+import { calculateUnifiedDiscounts } from "./unified-discounts";
 
 // Configurar Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -19,20 +20,34 @@ export function registerSpacePaymentRoutes(app: Express) {
   app.post("/api/space-reservations/:id/create-payment-intent", async (req, res) => {
     try {
       const { id } = req.params;
-      const { amount } = req.body;
+      const { amount, originalAmount, appliedDiscounts } = req.body;
 
       console.log(`🎪 Creando payment intent para reserva ${id} por $${amount}`);
 
-      // Validar que la reserva existe
-      const reservation = await db
-        .select()
+      // Validar que la reserva existe y obtener sus descuentos configurados
+      const reservationData = await db
+        .select({
+          id: spaceReservations.id,
+          spaceId: spaceReservations.spaceId,
+          contactName: spaceReservations.contactName,
+          contactEmail: spaceReservations.contactEmail,
+          totalCost: spaceReservations.totalCost,
+          discountSeniors: spaceReservations.discountSeniors,
+          discountStudents: spaceReservations.discountStudents,
+          discountFamilies: spaceReservations.discountFamilies,
+          discountDisability: spaceReservations.discountDisability,
+          discountEarlyBird: spaceReservations.discountEarlyBird,
+          discountEarlyBirdDeadline: spaceReservations.discountEarlyBirdDeadline,
+        })
         .from(spaceReservations)
         .where(eq(spaceReservations.id, parseInt(id)))
         .limit(1);
 
-      if (reservation.length === 0) {
+      if (reservationData.length === 0) {
         return res.status(404).json({ error: "Reserva no encontrada" });
       }
+
+      const reservation = reservationData[0];
 
       // Obtener información del espacio y parque
       const spaceInfo = await db
@@ -43,14 +58,38 @@ export function registerSpacePaymentRoutes(app: Express) {
         })
         .from(reservableSpaces)
         .leftJoin(parks, eq(reservableSpaces.parkId, parks.id))
-        .where(eq(reservableSpaces.id, reservation[0].spaceId))
+        .where(eq(reservableSpaces.id, reservation.spaceId))
         .limit(1);
+
+      // Validar descuentos server-side usando los descuentos configurados de la reserva
+      const baseCost = parseFloat(reservation.totalCost || "0");
+      const serverDiscountCalculation = calculateUnifiedDiscounts(
+        baseCost,
+        {
+          discountSeniors: Math.min(appliedDiscounts?.discountSeniors || 0, reservation.discountSeniors || 0),
+          discountStudents: Math.min(appliedDiscounts?.discountStudents || 0, reservation.discountStudents || 0),
+          discountFamilies: Math.min(appliedDiscounts?.discountFamilies || 0, reservation.discountFamilies || 0),
+          discountDisability: Math.min(appliedDiscounts?.discountDisability || 0, reservation.discountDisability || 0),
+          discountEarlyBird: Math.min(appliedDiscounts?.discountEarlyBird || 0, reservation.discountEarlyBird || 0),
+        },
+        reservation.discountEarlyBirdDeadline
+      );
+
+      // Verificar que el monto enviado por el cliente coincide con el cálculo server-side
+      const expectedAmount = serverDiscountCalculation.finalAmount;
+      if (Math.abs(amount - expectedAmount) > 0.01) { // tolerancia de 1 centavo
+        return res.status(400).json({
+          error: `Monto inválido. Esperado: $${expectedAmount.toFixed(2)}, recibido: $${amount.toFixed(2)}`
+        });
+      }
 
       const spaceName = spaceInfo[0]?.spaceName || 'Espacio';
       const parkName = spaceInfo[0]?.parkName || 'Parque';
 
-      // Convertir el amount a centavos (Stripe requiere centavos)
-      const amountInCentavos = Math.round(amount * 100);
+      // Usar el monto validado server-side
+      const validatedFinalAmount = serverDiscountCalculation.finalAmount;
+      const validatedOriginalAmount = serverDiscountCalculation.originalAmount;
+      const amountInCentavos = Math.round(validatedFinalAmount * 100);
       
       console.log(`💰 Conversion: ${amount} pesos → ${amountInCentavos} centavos`);
 
@@ -64,18 +103,26 @@ export function registerSpacePaymentRoutes(app: Express) {
           reservationType: 'space',
           spaceName: spaceName,
           parkName: parkName,
-          customerName: reservation[0].contactName,
-          customerEmail: reservation[0].contactEmail
+          customerName: reservation.contactName,
+          customerEmail: reservation.contactEmail,
+          original_amount: validatedOriginalAmount.toString(),
+          final_amount: validatedFinalAmount.toString(),
+          discounts_applied: JSON.stringify(serverDiscountCalculation.discountBreakdown),
+          discount_percentage: serverDiscountCalculation.totalDiscountPercentage.toString(),
         },
         description: `Reserva de ${spaceName} en ${parkName}`,
-        receipt_email: reservation[0].contactEmail
+        receipt_email: reservation.contactEmail
       });
 
       console.log(`✅ Payment intent creado: ${paymentIntent.id} por ${amountInCentavos} centavos`);
 
       res.json({ 
         clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id
+        paymentIntentId: paymentIntent.id,
+        amount: validatedFinalAmount,
+        originalAmount: validatedOriginalAmount,
+        discountBreakdown: serverDiscountCalculation.discountBreakdown,
+        totalDiscountPercentage: serverDiscountCalculation.totalDiscountPercentage,
       });
 
     } catch (error: any) {

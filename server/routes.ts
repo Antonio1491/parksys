@@ -75,6 +75,7 @@ import eventPaymentsRouter from "./routes/event-payments";
 import paymentsRouter from "./routes/payments";
 import { registerActivityPaymentRoutes } from "./routes/activityPaymentsSimple";
 import { registerSpacePaymentRoutes } from "./routes/space-payments";
+import unifiedDiscountRouter from "./routes/unified-discounts";
 import { registerActivityStatsRoutes } from "./routes/activity-stats";
 import { uploadAdvertising, handleAdvertisingUpload } from "./api/advertising-upload";
 import { 
@@ -311,6 +312,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerSpaceReservationRoutes(app, apiRouter, isAuthenticated);
   registerReservableSpacesRoutes(app);
   registerSpacePaymentRoutes(app);
+  
+  // Unified discount validation routes
+  app.use('/api/unified-discounts', unifiedDiscountRouter);
   
   // Object Storage routes for images and files
   registerObjectStorageRoutes(app, apiRouter, isAuthenticated);
