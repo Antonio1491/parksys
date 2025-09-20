@@ -792,7 +792,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
             organizerEmail: eventData.organizerEmail || null,
             organizerPhone: eventData.organizerPhone || null,
             organizerOrganization: eventData.organizerOrganization || null,
-            price: eventData.price ? parseFloat(eventData.price) : 0,
+            price: eventData.price ? String(eventData.price) : "0",
             status: eventData.status || "published",
             targetAudience: "all",
             featuredImageUrl: null,
