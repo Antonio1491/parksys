@@ -42,6 +42,8 @@ interface EventData {
   organizerPhone?: string;
   geolocation?: { lat: number; lng: number };
   parks: Array<{ id: number; name: string; address: string }>;
+  isFree?: boolean;
+  price?: string | number;
 }
 
 export default function EditEventPage() {
@@ -134,8 +136,8 @@ export default function EditEventPage() {
         organizerPhone: event.organizerPhone || '',
         geolocation: event.geolocation || null,
         registrationType: event.registrationType || 'free',
-        isFree: true, // Por defecto asumir que es gratuito hasta implementar la lógica del backend
-        price: undefined,
+        isFree: event.isFree !== undefined ? event.isFree : true,
+        price: event.isFree ? undefined : (event.price ? Number(event.price) / 100 : undefined),
         targetAudience: event.targetAudience || 'all',
         status: event.status || 'draft'
       });
@@ -177,7 +179,7 @@ export default function EditEventPage() {
         status: data.status || 'published',
         targetAudience: data.targetAudience || 'all',
         isFree: data.isFree,
-        price: data.isFree ? null : data.price,
+        price: data.isFree ? undefined : (data.price ? Math.round(Number(data.price) * 100) : undefined),
         featuredImageUrl: eventImage || null,
         // 🎯 Array de parques (múltiples parques soportados)
         parkIds: data.parkIds || []

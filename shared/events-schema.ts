@@ -156,11 +156,32 @@ export const insertEventSchema = createInsertSchema(events, {
 });
 
 // Schema para actualización de eventos (más permisivo)
-export const updateEventSchema = insertEventSchema.partial().extend({
-  title: z.string().min(3, "El título es requerido"),
-  parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque"),
+export const updateEventSchema = z.object({
+  title: z.string().min(3, "El título es requerido").optional(),
+  description: z.string().optional(),
+  eventType: z.string().optional(),
+  targetAudience: z.string().optional(),
+  status: z.string().optional(),
+  featuredImageUrl: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  location: z.string().optional(),
+  capacity: z.number().int().positive().optional(),
+  registrationType: z.string().optional(),
+  organizerName: z.string().optional(),
+  organizerOrganization: z.string().optional(),
+  organizerEmail: z.string().optional(),
+  organizerPhone: z.string().optional(),
+  geolocation: z.any().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  notes: z.string().optional(),
+  registration_required: z.boolean().optional(),
   isFree: z.boolean().optional(),
-  price: z.number().int().positive().optional()
+  price: z.number().int().positive().optional(),
+  parkIds: z.array(z.number()).optional()
 }).refine((data) => {
   // Si el evento no es gratuito, debe tener precio
   if (data.isFree === false && (!data.price || data.price <= 0)) {
