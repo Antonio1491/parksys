@@ -12,6 +12,8 @@ import { replitObjectStorage } from './objectStorage-replit';
  * @param isAuthenticated Middleware de autenticación
  */
 export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
+  console.log('🚨🚨🚨 [CRITICAL] registerEventRoutes FUNCTION IS BEING CALLED!!!');
+  
   // Obtener todos los eventos con filtros opcionales
   apiRouter.get("/events", async (req: Request, res: Response) => {
     try {
