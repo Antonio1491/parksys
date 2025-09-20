@@ -205,13 +205,24 @@ const NewEventPage: React.FC = () => {
     createEventMutation.mutate(normalizedPayload);
   };
 
-  // Estados de carga
+  // Estados de carga con DEBUG
+  console.log("🔥 ESTADO LOADING:", { 
+    parksLoading, 
+    categoriesLoading, 
+    parksData: parks?.length || 0,
+    categoriesData: eventCategories?.length || 0,
+    parksError,
+    timestamp: new Date().toISOString()
+  });
+  
   if (parksLoading || categoriesLoading) {
     return (
       <AdminLayout>
         <div className="space-y-6">
           <Card className="p-4">
-            <div>Cargando formulario...</div>
+            <div style={{padding: "20px", backgroundColor: "yellow", border: "3px solid black"}}>
+              🔥 CARGANDO FORMULARIO - parksLoading: {String(parksLoading)}, categoriesLoading: {String(categoriesLoading)}
+            </div>
           </Card>
         </div>
       </AdminLayout>
