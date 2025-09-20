@@ -73,7 +73,7 @@ const Events: React.FC = () => {
 
 
 
-  // Mapeo de colores para categorías de eventos (estilo similar a actividades)
+  // Mapeo de colores para categorías de eventos (usando valores originales de la base de datos)
   const eventTypeColors = {
     'Benéficos': 'bg-cyan-100 text-cyan-800 border-cyan-200',
     'Culturales': 'bg-purple-100 text-purple-800 border-purple-200',
@@ -82,9 +82,12 @@ const Events: React.FC = () => {
     'Gubernamentales': 'bg-red-100 text-red-800 border-red-200',
     'Sociales': 'bg-pink-100 text-pink-800 border-pink-200',
     'Comunitarios': 'bg-orange-100 text-orange-800 border-orange-200',
-    'Recreativos': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-    'educational': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    'environmental': 'bg-teal-100 text-teal-800 border-teal-200'
+    'Recreativos': 'bg-indigo-100 text-indigo-800 border-indigo-200'
+  };
+
+  // Función para obtener color de categoría con fallback
+  const getCategoryColor = (eventType: string) => {
+    return eventTypeColors[eventType as keyof typeof eventTypeColors] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
   const formatDate = (dateString: string) => {
@@ -298,7 +301,7 @@ const Events: React.FC = () => {
                       
                       {/* Badge de categoría */}
                       <div className="absolute top-4 left-4">
-                        <Badge className={`${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || 'bg-gray-100 text-gray-800 border-gray-200'} border shadow-sm`}>
+                        <Badge className={`${getCategoryColor(event.eventType)} border shadow-sm`}>
                           {event.eventType}
                         </Badge>
                       </div>
@@ -378,7 +381,7 @@ const Events: React.FC = () => {
                               borderColor: 'rgba(255,255,255,0.3)'
                             }}
                           >
-                            {event.eventType}
+                            {eventTypeTranslations[event.eventType as keyof typeof eventTypeTranslations] || event.eventType}
                           </Badge>
                           <Badge 
                             className="border text-xs font-semibold"
