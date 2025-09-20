@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useParams } from 'wouter';
 import { ArrowLeft, Calendar, MapPin, Users, Clock, FileText, Save, Plus, Image } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -98,6 +99,7 @@ export default function EditEventPage() {
       organizerPhone: '',
       geolocation: null,
       registrationType: 'free',
+      isFree: true,
       price: undefined,
       targetAudience: 'all',
       status: 'draft'
@@ -132,6 +134,7 @@ export default function EditEventPage() {
         organizerPhone: event.organizerPhone || '',
         geolocation: event.geolocation || null,
         registrationType: event.registrationType || 'free',
+        isFree: true, // Por defecto asumir que es gratuito hasta implementar la lógica del backend
         price: undefined,
         targetAudience: event.targetAudience || 'all',
         status: event.status || 'draft'
@@ -173,6 +176,8 @@ export default function EditEventPage() {
         registrationType: data.registrationType || 'free',
         status: data.status || 'published',
         targetAudience: data.targetAudience || 'all',
+        isFree: data.isFree,
+        price: data.isFree ? null : data.price,
         featuredImageUrl: eventImage || null,
         // 🎯 Array de parques (múltiples parques soportados)
         parkIds: data.parkIds || []
@@ -314,7 +319,7 @@ export default function EditEventPage() {
                           const valueNumber = Number(value);
                           
                           if (currentValues.includes(valueNumber)) {
-                            form.setValue('parkIds', currentValues.filter(val => val !== valueNumber));
+                            form.setValue('parkIds', currentValues.filter((val: number) => val !== valueNumber));
                           } else {
                             form.setValue('parkIds', [...currentValues, valueNumber]);
                           }
@@ -454,17 +459,46 @@ export default function EditEventPage() {
                         className="mt-1"
                       />
                     </div>
+                  </div>
 
-                    <div>
-                      <Label htmlFor="price">Precio</Label>
-                      <Input
-                        id="price"
-                        {...form.register('price')}
-                        placeholder="Ej: $100, Gratuito"
-                        className="mt-1"
+                  {/* Campos de precio y pago */}
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold text-yellow-800 mb-3">💰 Configuración de Precio</h4>
+                    <div className="flex flex-row items-center justify-between rounded-lg border p-4 bg-white">
+                      <div className="space-y-0.5">
+                        <Label className="text-base">Evento gratuito</Label>
+                        <p className="text-sm text-gray-500">¿Este evento es completamente gratuito para los participantes?</p>
+                      </div>
+                      <Checkbox
+                        checked={form.watch('isFree')}
+                        onCheckedChange={(checked) => form.setValue('isFree', !!checked)}
                       />
                     </div>
                   </div>
+
+                  {!form.watch('isFree') && (
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <div>
+                        <Label className="text-green-800 font-semibold">💵 Precio por participante</Label>
+                        <div className="relative mt-1">
+                          <span className="absolute left-3 top-2.5 text-gray-500 font-semibold">$</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            className="pl-8 border-green-300 focus:border-green-500"
+                            {...form.register('price')}
+                          />
+                        </div>
+                        <p className="text-sm text-green-700 mt-1">
+                          Precio en pesos mexicanos por cada participante
+                        </p>
+                        {form.formState.errors.price && (
+                          <p className="text-sm text-red-500 mt-1">{form.formState.errors.price.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <div>
                     <Label htmlFor="location">Ubicación Específica</Label>
