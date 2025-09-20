@@ -96,7 +96,6 @@ function ParkLandingPage() {
 
   const { data: park, isLoading, error } = useQuery<ExtendedPark>({
     queryKey: [`/api/parks/${parkId}/extended`],
-    suspense: false,
     retry: 1,
     enabled: !!parkId,
   });
