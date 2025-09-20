@@ -10,7 +10,6 @@ interface EventoAmbu {
   id: number;
   titulo: string;
   descripcion: string;
-  impactoTipo: "bajo_impacto" | "alto_impacto";
   categoria: string;
   fechaEvento?: string; // Formato camelCase
   fechaevento?: string; // Formato lowercase del API
@@ -34,10 +33,6 @@ const statusColors = {
   realizado: "bg-purple-100 text-purple-800"
 };
 
-const impactoColors = {
-  bajo_impacto: "bg-emerald-100 text-emerald-800",
-  alto_impacto: "bg-orange-100 text-orange-800"
-};
 
 export default function CalendarioEventosAmbu() {
   const [fechaActual, setFechaActual] = useState(new Date());
@@ -201,7 +196,7 @@ export default function CalendarioEventosAmbu() {
             </h1>
           </div>
           <p className="text-gray-600 mt-2">
-            Vista mensual de eventos de bajo y alto impacto ({eventos.length} eventos cargados)
+            Vista mensual de eventos AMBU ({eventos.length} eventos cargados)
           </p>
         </Card>
 
@@ -258,11 +253,7 @@ export default function CalendarioEventosAmbu() {
                               {eventosDelDia.slice(0, 2).map((evento: EventoAmbu) => (
                                 <div
                                   key={`evento-${evento.id}`}
-                                  className={`text-xs p-1 rounded text-white ${
-                                    evento.impactoTipo === 'bajo_impacto' 
-                                      ? 'bg-emerald-500' 
-                                      : 'bg-orange-500'
-                                  }`}
+                                  className="text-xs p-1 rounded text-white bg-blue-500"
                                   title={evento.titulo}
                                 >
                                   {evento.titulo.length > 15 
@@ -304,9 +295,6 @@ export default function CalendarioEventosAmbu() {
                       <div key={`proximo-${evento.id}`} className="border-l-4 border-blue-500 pl-3 py-2">
                         <div className="flex justify-between items-start mb-1">
                           <h4 className="font-medium text-sm line-clamp-2">{evento.titulo}</h4>
-                          <Badge className={impactoColors[evento.impactoTipo]} variant="secondary">
-                            {evento.impactoTipo === "bajo_impacto" ? "Bajo" : "Alto"}
-                          </Badge>
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-1 text-xs text-gray-600">
@@ -350,19 +338,6 @@ export default function CalendarioEventosAmbu() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div>
-                    <h4 className="font-medium text-sm mb-2">Tipo de Impacto</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-emerald-500 rounded"></div>
-                        <span className="text-sm">Bajo Impacto (≤10 días)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-orange-500 rounded"></div>
-                        <span className="text-sm">Alto Impacto (2 meses)</span>
-                      </div>
-                    </div>
-                  </div>
                   
                   <div>
                     <h4 className="font-medium text-sm mb-2">Estados</h4>
