@@ -134,14 +134,14 @@ export const insertEventSchema = createInsertSchema(events, {
   endDate: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
-  capacity: z.number().int().positive().optional(),
+  capacity: z.coerce.number().int().positive().optional(),
   registrationType: z.enum(["free", "registration"]).default("free"),
   organizerName: z.string().max(100).optional(),
   organizerEmail: z.string().email().optional().or(z.literal('')),
   organizerPhone: z.string().max(20).optional(),
   // Campos de precio con lógica condicional
   isFree: z.boolean().default(true),
-  price: z.number().int().positive().optional(),
+  price: z.preprocess(v => v === '' || v == null ? undefined : v, z.coerce.number().int().positive().optional()),
 }).omit({ id: true, createdAt: true, updatedAt: true }).extend({
   parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque")
 }).refine((data) => {
@@ -168,7 +168,7 @@ export const updateEventSchema = z.object({
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   location: z.string().optional(),
-  capacity: z.number().int().positive().optional(),
+  capacity: z.coerce.number().int().positive().optional(),
   registrationType: z.string().optional(),
   organizerName: z.string().optional(),
   organizerOrganization: z.string().optional(),
@@ -180,7 +180,7 @@ export const updateEventSchema = z.object({
   notes: z.string().optional(),
   registration_required: z.boolean().optional(),
   isFree: z.boolean().optional(),
-  price: z.number().int().positive().optional(),
+  price: z.preprocess(v => v === '' || v == null ? undefined : v, z.coerce.number().int().positive().optional()),
   parkIds: z.array(z.number()).optional()
 }).refine((data) => {
   // Si el evento no es gratuito, debe tener precio
