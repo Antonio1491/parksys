@@ -406,6 +406,9 @@ export async function updateEvent(req: Request, res: Response) {
     }
     
     console.log('🖼️ [UPDATE-EVENT] Datos procesados:', { parkIds, imageUrl, eventData });
+    console.log('💰 [DEBUG-PRICE] Precio en eventData:', eventData.price);
+    console.log('💰 [DEBUG-PRICE] isFree en eventData:', eventData.isFree);
+    console.log('💰 [DEBUG-PRICE] Datos completos del cuerpo de la petición:', req.body);
     
     // Actualizar el evento (SIN imageUrl que se maneja por separado)
     const [updatedEvent] = await db
