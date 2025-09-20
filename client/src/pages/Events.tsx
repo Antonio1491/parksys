@@ -374,14 +374,8 @@ const Events: React.FC = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-lg text-gray-900">{event.title}</h3>
-                          <Badge 
-                            className="border text-xs text-white"
-                            style={{ 
-                              backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
-                              borderColor: 'rgba(255,255,255,0.3)'
-                            }}
-                          >
-                            {eventTypeTranslations[event.eventType as keyof typeof eventTypeTranslations] || event.eventType}
+                          <Badge className={`${getCategoryColor(event.eventType)} border text-xs`}>
+                            {event.eventType}
                           </Badge>
                           <Badge 
                             className="border text-xs font-semibold"
