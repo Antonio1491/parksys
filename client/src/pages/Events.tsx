@@ -17,18 +17,18 @@ interface Event {
   id: number;
   title: string;
   description: string;
-  start_date: string;
-  end_date: string;
-  start_time?: string;
-  end_time?: string;
+  startDate: string;
+  endDate: string;
+  startTime?: string;
+  endTime?: string;
   location: string;
   capacity: number;
   registeredCount?: number;
-  event_type: string;
+  eventType: string;
   status: 'draft' | 'published' | 'cancelled';
   featuredImageUrl?: string;
-  organizer_name: string;
-  organizer_email: string;
+  organizerName: string;
+  organizerEmail: string;
   parks?: Array<{ id: number; name: string; address: string }>;
 }
 
@@ -55,7 +55,7 @@ const Events: React.FC = () => {
   const parks = Array.isArray((parksData as any)?.data) ? (parksData as any).data : Array.isArray(parksData) ? parksData : [];
   
   // Obtener categorías únicas de los eventos
-  const categories: string[] = Array.from(new Set(events.map((event: Event) => event.event_type)));
+  const categories: string[] = Array.from(new Set(events.map((event: Event) => event.eventType)));
 
   const filteredEvents = events.filter((event: Event) => {
     const parkName = event.parks && event.parks.length > 0 ? event.parks[0].name : event.location;
@@ -64,8 +64,8 @@ const Events: React.FC = () => {
                          event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          parkName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.organizer_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || event.event_type === categoryFilter;
+                         event.organizerName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === 'all' || event.eventType === categoryFilter;
     const matchesPark = parkFilter === 'all' || parkName === parkFilter;
     
     return matchesSearch && matchesCategory && matchesPark;
@@ -298,8 +298,8 @@ const Events: React.FC = () => {
                       
                       {/* Badge de categoría */}
                       <div className="absolute top-4 left-4">
-                        <Badge className={`${eventTypeColors[event.event_type as keyof typeof eventTypeColors] || 'bg-gray-100 text-gray-800 border-gray-200'} border shadow-sm`}>
-                          {event.event_type}
+                        <Badge className={`${eventTypeColors[event.eventType as keyof typeof eventTypeColors] || 'bg-gray-100 text-gray-800 border-gray-200'} border shadow-sm`}>
+                          {event.eventType}
                         </Badge>
                       </div>
 
@@ -333,14 +333,14 @@ const Events: React.FC = () => {
                         <div className="flex items-center gap-2 text-gray-600">
                           <Calendar className="h-4 w-4 text-green-600 flex-shrink-0" />
                           <span className="text-xs">
-                            {formatDate(event.start_date)}
+                            {formatDate(event.startDate)}
                           </span>
                         </div>
                         
-                        {event.start_time && (
+                        {event.startTime && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <Clock className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                            <span className="text-xs">{formatTime(event.start_time)}</span>
+                            <span className="text-xs">{formatTime(event.startTime)}</span>
                           </div>
                         )}
                         
@@ -374,11 +374,11 @@ const Events: React.FC = () => {
                           <Badge 
                             className="border text-xs text-white"
                             style={{ 
-                              backgroundColor: eventTypeColors[event.event_type as keyof typeof eventTypeColors] || '#3B82F6',
+                              backgroundColor: eventTypeColors[event.eventType as keyof typeof eventTypeColors] || '#3B82F6',
                               borderColor: 'rgba(255,255,255,0.3)'
                             }}
                           >
-                            {event.event_type}
+                            {event.eventType}
                           </Badge>
                           <Badge 
                             className="border text-xs font-semibold"
@@ -403,14 +403,14 @@ const Events: React.FC = () => {
                           <div className="flex items-center gap-2 text-gray-600">
                             <Calendar className="h-4 w-4 text-green-600" />
                             <span>
-                              {formatDate(event.start_date)}
+                              {formatDate(event.startDate)}
                             </span>
                           </div>
                           
-                          {event.start_time && (
+                          {event.startTime && (
                             <div className="flex items-center gap-2 text-gray-600">
                               <Clock className="h-4 w-4 text-purple-600" />
-                              <span>{formatTime(event.start_time)}</span>
+                              <span>{formatTime(event.startTime)}</span>
                             </div>
                           )}
                           
@@ -422,10 +422,10 @@ const Events: React.FC = () => {
                           )}
                         </div>
                         
-                        {event.organizer_name && (
+                        {event.organizerName && (
                           <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
                             <Star className="h-4 w-4 text-yellow-600" />
-                            <span>Organiza: {event.organizer_name}</span>
+                            <span>Organiza: {event.organizerName}</span>
                           </div>
                         )}
                       </div>
