@@ -1244,25 +1244,16 @@ function ParkLandingPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-green-700 mb-8">
-                    Organiza tu evento en este parque. Tenemos opciones para eventos de bajo y alto impacto.
+                    Organiza tu evento AMBU en este parque.
                   </p>
                   <div className="space-y-6">
-                    <Link href="/admin/eventos-ambu/solicitud-bajo-impacto">
+                    <Link href="/admin/eventos-ambu/calendar">
                       <Button 
                         variant="outline" 
                         className="w-full bg-white hover:bg-green-50 text-green-700 border-green-300 hover:border-green-400"
                       >
                         <Calendar className="h-4 w-4 mr-2" />
-                        Solicitud de evento de bajo impacto
-                      </Button>
-                    </Link>
-                    <Link href="/admin/eventos-ambu/solicitud-alto-impacto">
-                      <Button 
-                        variant="outline" 
-                        className="w-full bg-white hover:bg-green-50 text-green-700 border-green-300 hover:border-green-400"
-                      >
-                        <Calendar className="h-4 w-4 mr-2" />
-                        Solicitud de evento de alto impacto
+                        Ver Calendario de Eventos AMBU
                       </Button>
                     </Link>
                   </div>
