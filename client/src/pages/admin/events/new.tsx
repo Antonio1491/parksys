@@ -209,8 +209,8 @@ const NewEventPage: React.FC = () => {
   console.log("🔥 ESTADO LOADING:", { 
     parksLoading, 
     categoriesLoading, 
-    parksData: parks?.length || 0,
-    categoriesData: eventCategories?.length || 0,
+    parksData: Array.isArray(parks) ? parks.length : 0,
+    categoriesData: Array.isArray(eventCategories) ? eventCategories.length : 0,
     parksError,
     timestamp: new Date().toISOString()
   });
