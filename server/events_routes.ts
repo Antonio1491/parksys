@@ -730,12 +730,36 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       for (let i = 0; i < eventsData.length; i++) {
         try {
           const eventData = eventsData[i];
+          console.log(`🔍 [LOOP-START] Procesando evento ${i + 1}: "${eventData.title}"`);
           
           // Validación básica
           if (!eventData.title) {
+            console.log(`❌ [VALIDATION] Fila ${i + 1}: Sin título - SKIPPING`);
             errors.push(`Fila ${i + 1}: El título es obligatorio`);
             continue;
           }
+          console.log(`✅ [VALIDATION] Fila ${i + 1}: Título OK`);
+          
+          // Parsear fechas correctamente
+          const parsedStartDate = eventData.startDate ? parseDate(eventData.startDate) : new Date();
+          const parsedEndDate = eventData.endDate ? parseDate(eventData.endDate) : null;
+          console.log(`🔍 [DATES] Fila ${i + 1}: startDate="${eventData.startDate}" → ${parsedStartDate}, endDate="${eventData.endDate}" → ${parsedEndDate}`);
+          
+          // Validar que las fechas se parsearon correctamente
+          if (eventData.startDate && !parsedStartDate) {
+            console.log(`❌ [VALIDATION] Fila ${i + 1}: Fecha inicio inválida "${eventData.startDate}" - SKIPPING`);
+            errors.push(`Fila ${i + 1}: Formato de fecha de inicio inválido: "${eventData.startDate}"`);
+            continue;
+          }
+          
+          if (eventData.endDate && !parsedEndDate) {
+            console.log(`❌ [VALIDATION] Fila ${i + 1}: Fecha fin inválida "${eventData.endDate}" - SKIPPING`);
+            errors.push(`Fila ${i + 1}: Formato de fecha de fin inválido: "${eventData.endDate}"`);
+            continue;
+          }
+          console.log(`✅ [VALIDATION] Fila ${i + 1}: Fechas OK - CONTINUANDO A INSERCIÓN`);
+          
+          // Procesar coordenadas para geolocalización
           
           // Parsear fechas correctamente
           const parsedStartDate = eventData.startDate ? parseDate(eventData.startDate) : new Date();
