@@ -752,11 +752,35 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
             continue;
           }
 
+          // Procesar coordenadas para geolocalización
+          let geolocation = null;
+          if (eventData.latitude && eventData.longitude) {
+            const lat = parseFloat(eventData.latitude);
+            const lng = parseFloat(eventData.longitude);
+            if (!isNaN(lat) && !isNaN(lng)) {
+              geolocation = { lat, lng };
+            }
+          }
+
+          // Mapear category a eventType si existe
+          let mappedEventType = eventData.eventType || "other";
+          if (eventData.category) {
+            const categoryMap: Record<string, string> = {
+              "Culturales": "cultural",
+              "Recreativos": "recreativo", 
+              "Deportivos": "sports",
+              "Educativos": "educational",
+              "Sociales": "social",
+              "Ambientales": "environmental"
+            };
+            mappedEventType = categoryMap[eventData.category] || eventData.category.toLowerCase() || "other";
+          }
+
           // Preparar datos para inserción
           const insertData = {
             title: eventData.title,
             description: eventData.description || null,
-            eventType: eventData.eventType || "other",
+            eventType: mappedEventType,
             startDate: parsedStartDate,
             endDate: parsedEndDate,
             startTime: eventData.startTime || null,
@@ -767,19 +791,57 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
             organizerName: eventData.organizerName || null,
             organizerEmail: eventData.organizerEmail || null,
             organizerPhone: eventData.organizerPhone || null,
+            organizerOrganization: eventData.organizerOrganization || null,
             price: eventData.price ? parseFloat(eventData.price) : 0,
-            status: eventData.status || "draft",
+            status: eventData.status || "published",
             targetAudience: "all",
             featuredImageUrl: null,
             isRecurring: false,
             recurrencePattern: null,
-            geolocation: null,
+            geolocation: geolocation,
             createdById: (req as any).user?.id || null
           };
           
           // Insertar evento
           const createdEvents = await db.insert(events).values(insertData).returning();
           const createdEvent = createdEvents[0];
+          
+          // Procesar asociaciones de parques si existen
+          if (eventData.parkNames && createdEvent.id) {
+            try {
+              // Separar nombres de parques (delimitados por ; o ,)
+              const parkNamesList = eventData.parkNames
+                .split(/[;,]/)
+                .map((name: string) => name.trim())
+                .filter((name: string) => name.length > 0);
+              
+              console.log(`🏞️ [IMPORT] Procesando ${parkNamesList.length} parques para evento "${createdEvent.title}": ${parkNamesList.join(', ')}`);
+              
+              for (const parkName of parkNamesList) {
+                // Buscar parque por nombre (case insensitive)
+                const foundParks = await db.select()
+                  .from(parks)
+                  .where(sql`LOWER(${parks.name}) = LOWER(${parkName})`);
+                
+                if (foundParks.length > 0) {
+                  const park = foundParks[0];
+                  // Insertar asociación evento-parque
+                  await db.insert(eventParks).values({
+                    eventId: createdEvent.id,
+                    parkId: park.id
+                  });
+                  console.log(`✅ [IMPORT] Asociado evento "${createdEvent.title}" con parque "${park.name}" (ID: ${park.id})`);
+                } else {
+                  console.warn(`⚠️ [IMPORT] Parque no encontrado: "${parkName}" para evento "${createdEvent.title}"`);
+                  errors.push(`Fila ${i + 1}: Parque no encontrado: "${parkName}"`);
+                }
+              }
+            } catch (parkError) {
+              console.error(`Error procesando parques para evento ${createdEvent.id}:`, parkError);
+              errors.push(`Fila ${i + 1}: Error al asociar parques - ${(parkError as any).message}`);
+            }
+          }
+          
           importedEvents.push(createdEvent);
           
         } catch (eventError) {
