@@ -358,7 +358,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       };
       
       // Insertar evento en la base de datos
-      const createdEvents = await db.insert(events).values(insertData).returning();
+      const createdEvents = await db.insert(events).values([insertData]).returning();
       const createdEvent = createdEvents[0];
       
       // Si se proporcionaron parques, crear relaciones
@@ -385,7 +385,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
         
         (createdEvent as any).parks = parksInfo;
       } else {
-        createdEvent.parks = [];
+        (createdEvent as any).parks = [];
       }
       
       return res.status(201).json(createdEvent);
