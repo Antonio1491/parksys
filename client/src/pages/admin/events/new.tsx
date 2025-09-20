@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { queryClient } from "@/lib/queryClient";
+import { insertEventSchema, EventTypes, TargetAudiences, EventStatuses, RegistrationTypes } from "@shared/events-schema";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -39,85 +40,18 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from "@/components/ui/checkbox";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-// Esquema para validar el formulario
-const eventFormSchema = z.object({
-  title: z
-    .string()
-    .min(3, { message: "El título debe tener al menos 3 caracteres" })
-    .max(255, { message: "El título no puede exceder los 255 caracteres" }),
-  description: z.string().optional().nullable(),
-  eventType: z.string({
-    required_error: "Selecciona un tipo de evento",
-  }),
-  targetAudience: z.string().default("all"),
-  status: z.string().default("draft"),
+// Usar el esquema unificado extendido para fechas de form
+const eventFormSchema = insertEventSchema.extend({
   startDate: z.date({
     required_error: "La fecha de inicio es requerida",
   }),
   endDate: z.date().optional().nullable(),
-  location: z.string().optional().nullable(),
-  capacity: z.coerce
-    .number()
-    .min(0, { message: "La capacidad no puede ser negativa" })
-    .optional()
-    .nullable(),
-  registrationType: z.string().default("open"),
-  parkIds: z.array(z.coerce.number()).optional().default([]),
-  organizer_name: z.string().optional().nullable(),
-  organizer_organization: z.string().optional().nullable(),
-  contact_email: z.string().email().optional().nullable(),
-  contact_phone: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
-  geolocation: z.any().optional().nullable(),
-  // Campos de precio y pago
-  isFree: z.boolean().default(true),
-  price: z.coerce
-    .number()
-    .min(0, { message: "El precio no puede ser negativo" })
-    .optional()
-    .nullable(),
-  requiresApproval: z.boolean().default(false),
-});
+})
 
 // Tipos
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
-// Arreglo de tipos de eventos
-const eventTypes = [
-  { value: "cultural", label: "Cultural" },
-  { value: "sports", label: "Deportivo" },
-  { value: "environmental", label: "Ambiental" },
-  { value: "social", label: "Social" },
-  { value: "educational", label: "Educativo" },
-  { value: "recreational", label: "Recreativo" },
-  { value: "other", label: "Otro" },
-];
-
-// Arreglo de públicos objetivo
-const targetAudiences = [
-  { value: "all", label: "Todo público" },
-  { value: "children", label: "Niños" },
-  { value: "youth", label: "Jóvenes" },
-  { value: "adults", label: "Adultos" },
-  { value: "seniors", label: "Adultos mayores" },
-  { value: "families", label: "Familias" },
-];
-
-// Arreglo de estados de eventos
-const eventStatuses = [
-  { value: "draft", label: "Borrador" },
-  { value: "published", label: "Publicado" },
-  { value: "cancelled", label: "Cancelado" },
-  { value: "postponed", label: "Pospuesto" },
-  { value: "completed", label: "Completado" },
-];
-
-// Arreglo de tipos de registro
-const registrationTypes = [
-  { value: "open", label: "Abierto" },
-  { value: "invitation", label: "Por invitación" },
-  { value: "closed", label: "Cerrado" },
-];
+// Usar arrays importados del schema unificado
 
 const NewEventPage: React.FC = () => {
   const [, navigate] = useLocation();
@@ -142,19 +76,19 @@ const NewEventPage: React.FC = () => {
       targetAudience: "all",
       status: "draft",
       startDate: new Date(),
-      endDate: null,
+      endDate: undefined,
       location: "",
-      capacity: null,
-      registrationType: "open",
+      capacity: undefined,
+      registrationType: "free",
       parkIds: [],
-      organizer_name: "",
-      organizer_organization: "",
-      contact_email: "",
-      contact_phone: "",
-      geolocation: null,
+      organizerName: "",
+      organizerOrganization: "",
+      organizerEmail: "",
+      organizerPhone: "",
+      geolocation: undefined,
       // Campos de precio y pago
       isFree: true,
-      price: null,
+      price: undefined,
       requiresApproval: false,
     },
   });
@@ -199,9 +133,25 @@ const NewEventPage: React.FC = () => {
   // Manejar envío del formulario
   const onSubmit = (data: EventFormValues) => {
     console.log("DATOS DEL FORMULARIO COMPLETOS:", data);
-    console.log("Nombre del organizador:", data.organizer_name);
-    console.log("Organización:", data.organizer_organization);
-    createEventMutation.mutate(data);
+    
+    // Normalizar payload para compatibilidad con insertEventSchema
+    const normalizedPayload = {
+      ...data,
+      // Convertir fechas a strings YYYY-MM-DD
+      startDate: data.startDate.toISOString().split('T')[0],
+      endDate: data.endDate ? data.endDate.toISOString().split('T')[0] : undefined,
+      // Limpiar valores null/undefined opcionales
+      capacity: data.capacity || undefined,
+      price: data.price || undefined,
+      organizerName: data.organizerName || undefined,
+      organizerOrganization: data.organizerOrganization || undefined,
+      organizerEmail: data.organizerEmail || undefined,
+      organizerPhone: data.organizerPhone || undefined,
+      location: data.location || undefined,
+    };
+    
+    console.log("PAYLOAD NORMALIZADO:", normalizedPayload);
+    createEventMutation.mutate(normalizedPayload);
   };
 
   // Estados de carga
@@ -272,7 +222,7 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {eventStatuses.map((status) => (
+                          {EventStatuses.map((status) => (
                             <SelectItem key={status.value} value={status.value}>
                               {status.label}
                             </SelectItem>
@@ -319,7 +269,7 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {eventTypes.map((type) => (
+                          {EventTypes.map((type) => (
                             <SelectItem key={type.value} value={type.value}>
                               {type.label}
                             </SelectItem>
@@ -347,7 +297,7 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {targetAudiences.map((audience) => (
+                          {TargetAudiences.map((audience) => (
                             <SelectItem key={audience.value} value={audience.value}>
                               {audience.label}
                             </SelectItem>
@@ -373,7 +323,7 @@ const NewEventPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="organizer_name"
+                  name="organizerName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-800 font-semibold">Nombre del organizador *</FormLabel>
@@ -392,7 +342,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="organizer_organization"
+                  name="organizerOrganization"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-blue-800 font-semibold">Empresa / Organización</FormLabel>
@@ -629,7 +579,7 @@ const NewEventPage: React.FC = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {registrationTypes.map((type) => (
+                          {RegistrationTypes.map((type) => (
                             <SelectItem key={type.value} value={type.value}>
                               {type.label}
                             </SelectItem>
@@ -736,7 +686,7 @@ const NewEventPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="organizer_name"
+                  name="organizerName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nombre del Contacto</FormLabel>
@@ -755,7 +705,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="organizer_organization"
+                  name="organizerOrganization"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Empresa / Organización</FormLabel>
@@ -773,7 +723,7 @@ const NewEventPage: React.FC = () => {
                 />
                 <FormField
                   control={form.control}
-                  name="organizer_name"
+                  name="organizerName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nombre del Contacto</FormLabel>
@@ -792,7 +742,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="organizer_organization"
+                  name="organizerOrganization"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Empresa / Organización</FormLabel>
@@ -811,7 +761,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="contact_email"
+                  name="organizerEmail"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email de Contacto</FormLabel>
@@ -830,7 +780,7 @@ const NewEventPage: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="contact_phone"
+                  name="organizerPhone"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Teléfono de Contacto</FormLabel>
