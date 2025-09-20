@@ -51,38 +51,6 @@ export default function TabuladorCostosAmbu() {
           </p>
         </Card>
 
-      {/* Información General */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card className="border-emerald-200 bg-emerald-50">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 rounded-lg">
-                <FileText className="h-5 w-5 text-emerald-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-emerald-900">Eventos de Bajo Impacto</h3>
-                <p className="text-sm text-emerald-700">Anticipación: 10 días hábiles</p>
-                <p className="text-sm text-emerald-700">Formulario: F-DIC-22</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-orange-200 bg-orange-50">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Calculator className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-orange-900">Eventos de Alto Impacto</h3>
-                <p className="text-sm text-orange-700">Anticipación: 2 meses</p>
-                <p className="text-sm text-orange-700">Formulario: F-DIC-23 + 50% anticipo</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       <Tabs defaultValue="fotografia" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
@@ -107,9 +75,6 @@ export default function TabuladorCostosAmbu() {
                 <div className="border rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="font-semibold text-lg">Fotografía Social</h3>
-                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                      Bajo Impacto
-                    </Badge>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="bg-gray-50 p-3 rounded">
@@ -129,9 +94,7 @@ export default function TabuladorCostosAmbu() {
                 <div className="border rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="font-semibold text-lg">Fotografía Comercial</h3>
-                    <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-                      Alto Impacto
-                    </Badge>
+
                   </div>
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="bg-gray-50 p-3 rounded">
@@ -186,9 +149,7 @@ export default function TabuladorCostosAmbu() {
                 <div className="border rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="font-semibold text-lg">Carreras Comerciales</h3>
-                    <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-                      Alto Impacto
-                    </Badge>
+
                   </div>
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="bg-gray-50 p-3 rounded">
@@ -392,27 +353,6 @@ export default function TabuladorCostosAmbu() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <Info className="h-5 w-5 text-blue-600 mt-0.5" />
-              <div>
-                <p className="font-medium text-blue-900">Eventos de Alto Impacto</p>
-                <p className="text-sm text-blue-700">
-                  Requieren 50% de anticipo y 10% de depósito en garantía. Incluyen reuniones de logística 
-                  con Protección Civil, Seguridad Pública y otras dependencias.
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-              <Info className="h-5 w-5 text-emerald-600 mt-0.5" />
-              <div>
-                <p className="font-medium text-emerald-900">Eventos de Bajo Impacto</p>
-                <p className="text-sm text-emerald-700">
-                  Proceso simplificado con 10 días hábiles de anticipación. Ideal para eventos familiares, 
-                  sesiones fotográficas y actividades educativas.
-                </p>
-              </div>
-            </div>
 
             <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
               <Info className="h-5 w-5 text-yellow-600 mt-0.5" />
