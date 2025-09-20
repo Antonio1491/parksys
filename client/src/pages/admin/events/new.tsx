@@ -892,18 +892,17 @@ const NewEventPage: React.FC = () => {
                       Configure los porcentajes de descuento que estarán disponibles para los participantes durante el registro
                     </div>
                   </div>
+                  {/* NUEVO: Sección de costeo financiero unificado */}
+                  <div className="md:col-span-2">
+                    <CostingSection
+                      costRecoveryPercentage={form.watch("costRecoveryPercentage") || 30}
+                      onCostRecoveryChange={(percentage) => form.setValue("costRecoveryPercentage", percentage)}
+                      financialNotes={form.watch("costingNotes") || ""}
+                      onFinancialNotesChange={(notes) => form.setValue("costingNotes", notes)}
+                      showAdvancedFields={true}
+                    />
+                  </div>
                 )}
-
-                {/* NUEVO: Sección de costeo financiero unificado */}
-                <div className="md:col-span-2">
-                  <CostingSection
-                    costRecoveryPercentage={form.watch("costRecoveryPercentage") || 30}
-                    onCostRecoveryChange={(percentage) => form.setValue("costRecoveryPercentage", percentage)}
-                    financialNotes={form.watch("costingNotes") || ""}
-                    onFinancialNotesChange={(notes) => form.setValue("costingNotes", notes)}
-                    showAdvancedFields={true}
-                  />
-                </div>
               </div>
             </div>
 
