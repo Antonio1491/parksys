@@ -139,14 +139,37 @@ export const insertEventSchema = createInsertSchema(events, {
   organizerName: z.string().max(100).optional(),
   organizerEmail: z.string().email().optional().or(z.literal('')),
   organizerPhone: z.string().max(20).optional(),
+  // Campos de precio con lógica condicional
+  isFree: z.boolean().default(true),
+  price: z.number().int().positive().optional(),
 }).omit({ id: true, createdAt: true, updatedAt: true }).extend({
   parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque")
+}).refine((data) => {
+  // Si el evento no es gratuito, debe tener precio
+  if (!data.isFree && (!data.price || data.price <= 0)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "El precio es requerido para eventos de pago",
+  path: ["price"]
 });
 
 // Schema para actualización de eventos (más permisivo)
 export const updateEventSchema = insertEventSchema.partial().extend({
   title: z.string().min(3, "El título es requerido"),
-  parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque")
+  parkIds: z.array(z.number()).min(1, "Debe seleccionar al menos un parque"),
+  isFree: z.boolean().optional(),
+  price: z.number().int().positive().optional()
+}).refine((data) => {
+  // Si el evento no es gratuito, debe tener precio
+  if (data.isFree === false && (!data.price || data.price <= 0)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "El precio es requerido para eventos de pago",
+  path: ["price"]
 });
 
 // Tipos para TypeScript
