@@ -12,7 +12,6 @@ export const eventosAmbu = pgTable("eventos_ambu", {
   id: serial("id").primaryKey(),
   titulo: varchar("titulo", { length: 255 }).notNull(),
   descripcion: text("descripcion").notNull(),
-  impactoTipo: varchar("impacto_tipo", { length: 20 }).notNull(), // bajo_impacto, alto_impacto
   categoria: varchar("categoria", { length: 100 }).notNull(),
   fechaEvento: date("fecha_evento").notNull(),
   horaInicio: time("hora_inicio").notNull(),
@@ -100,7 +99,7 @@ export const seguimientoAmbu = pgTable("seguimiento_ambu", {
   fechaAccion: timestamp("fecha_accion").defaultNow()
 });
 
-// Reuniones de logística (para eventos de alto impacto)
+// Reuniones de logística
 export const reunionesAmbu = pgTable("reuniones_ambu", {
   id: serial("id").primaryKey(),
   eventoId: integer("evento_id").references(() => eventosAmbu.id).notNull(),
