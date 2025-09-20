@@ -185,6 +185,13 @@ export function EventRegistrationForm({ event }: EventRegistrationFormProps) {
                 title: event.title,
                 price: event.price || 0,
                 isFree: event.isFree,
+                // Pass all discount fields to enable unified discount system
+                discountSeniors: event.discountSeniors,
+                discountStudents: event.discountStudents,
+                discountFamilies: event.discountFamilies,
+                discountDisability: event.discountDisability,
+                discountEarlyBird: event.discountEarlyBird,
+                discountEarlyBirdDeadline: event.discountEarlyBirdDeadline,
               }}
               participantData={{
                 fullName: registrationData.participantName,

@@ -18,6 +18,7 @@ import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
 import { SpaceMediaManager } from '@/components/SpaceMediaManager';
+import { CostingSection } from '@/components/CostingSection';
 
 // Validation schema
 const reservationSchema = z.object({
@@ -30,7 +31,17 @@ const reservationSchema = z.object({
   start_time: z.string().min(1, 'Selecciona hora de inicio'),
   end_time: z.string().min(1, 'Selecciona hora de fin'),
   special_requests: z.string().optional(),
-  deposit_paid: z.boolean().default(false)
+  deposit_paid: z.boolean().default(false),
+  // Unified discount fields
+  discountSeniors: z.number().min(0).max(100).default(0),
+  discountStudents: z.number().min(0).max(100).default(0),
+  discountFamilies: z.number().min(0).max(100).default(0),
+  discountDisability: z.number().min(0).max(100).default(0),
+  discountEarlyBird: z.number().min(0).max(100).default(0),
+  discountEarlyBirdDeadline: z.string().optional(),
+  // Unified costing fields
+  costRecoveryPercentage: z.number().min(0).max(100).default(30),
+  financialNotes: z.string().optional(),
 }).refine((data) => {
   const startDate = new Date(data.start_date);
   const endDate = new Date(data.end_date);
@@ -92,7 +103,17 @@ export default function NewReservationPage() {
       start_time: '',
       end_time: '',
       special_requests: '',
-      deposit_paid: false
+      deposit_paid: false,
+      // Unified discount fields
+      discountSeniors: 0,
+      discountStudents: 0,
+      discountFamilies: 0,
+      discountDisability: 0,
+      discountEarlyBird: 0,
+      discountEarlyBirdDeadline: '',
+      // Unified costing fields
+      costRecoveryPercentage: 30,
+      financialNotes: '',
     }
   });
 
@@ -125,7 +146,17 @@ export default function NewReservationPage() {
         totalCost: calculatedCost,
         depositPaid: data.deposit_paid,
         eventId: null,
-        activityId: null
+        activityId: null,
+        // Unified discount fields
+        discountSeniors: data.discountSeniors,
+        discountStudents: data.discountStudents,
+        discountFamilies: data.discountFamilies,
+        discountDisability: data.discountDisability,
+        discountEarlyBird: data.discountEarlyBird,
+        discountEarlyBirdDeadline: data.discountEarlyBirdDeadline,
+        // Unified costing fields
+        costRecoveryPercentage: data.costRecoveryPercentage,
+        financialNotes: data.financialNotes,
       };
 
       const response = await fetch('/api/space-reservations', {
@@ -479,6 +510,179 @@ export default function NewReservationPage() {
                           </div>
                         </FormItem>
                       )}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Unified Discount Section */}
+                {selectedSpace && parseFloat(selectedSpace.hourly_rate) > 0 && (
+                  <Card className="w-full">
+                    <CardHeader>
+                      <CardTitle className="text-purple-600">🎟️ Descuentos Disponibles</CardTitle>
+                      <CardDescription>
+                        Configure los descuentos que estarán disponibles durante el proceso de reserva
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="discountSeniors"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm">🧓 Adultos mayores (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  placeholder="0"
+                                  className="h-8 text-sm"
+                                  {...field}
+                                  value={field.value || ""}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="discountStudents"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm">🎓 Estudiantes (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  placeholder="0"
+                                  className="h-8 text-sm"
+                                  {...field}
+                                  value={field.value || ""}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="discountFamilies"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm">👨‍👩‍👧‍👦 Familias (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  placeholder="0"
+                                  className="h-8 text-sm"
+                                  {...field}
+                                  value={field.value || ""}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="discountDisability"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm">♿ Discapacidad (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  placeholder="0"
+                                  className="h-8 text-sm"
+                                  {...field}
+                                  value={field.value || ""}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="discountEarlyBird"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm">⏰ Reserva temprana (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  placeholder="0"
+                                  className="h-8 text-sm"
+                                  {...field}
+                                  value={field.value || ""}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        {form.watch("discountEarlyBird") > 0 && (
+                          <FormField
+                            control={form.control}
+                            name="discountEarlyBirdDeadline"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm">Fecha límite reserva temprana</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="date"
+                                    className="h-8 text-sm"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                      </div>
+                      <div className="text-sm text-purple-700 bg-purple-50 p-3 rounded-md">
+                        Configure los porcentajes de descuento que estarán disponibles para los clientes durante el proceso de reserva
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Unified Costing Section */}
+                <Card className="w-full">
+                  <CardHeader>
+                    <CardTitle className="text-indigo-600">💰 Configuración Financiera</CardTitle>
+                    <CardDescription>
+                      Herramientas administrativas para el análisis de costeo y recuperación de inversión
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CostingSection
+                      costRecoveryPercentage={form.watch("costRecoveryPercentage") || 30}
+                      onCostRecoveryChange={(percentage) => form.setValue("costRecoveryPercentage", percentage)}
+                      financialNotes={form.watch("financialNotes") || ""}
+                      onFinancialNotesChange={(notes) => form.setValue("financialNotes", notes)}
+                      showAdvancedFields={true}
                     />
                   </CardContent>
                 </Card>
