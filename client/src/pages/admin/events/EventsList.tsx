@@ -462,10 +462,27 @@ const EventsList: React.FC = () => {
   const parks: any[] = Array.isArray(parksData?.data) ? parksData.data : Array.isArray(parksData) ? parksData : [];
   const categories: any[] = Array.isArray(categoriesData?.data) ? categoriesData.data : Array.isArray(categoriesData) ? categoriesData : [];
 
-  // Función para obtener el color de una categoría por nombre
-  const getCategoryColor = (categoryName: string) => {
+  // Mapeo de event_type a nombres de categorías
+  const categoryMapping: Record<string, string> = {
+    'cultural': 'Culturales',
+    'sports': 'Deportivos', 
+    'recreativo': 'Recreativos',
+    'comunitarios': 'Comunitarios',
+    'educational': 'Educativos',
+    'environmental': 'Ambientales',
+    'social': 'Sociales'
+  };
+
+  // Función para obtener el color de una categoría por event_type
+  const getCategoryColor = (eventType: string) => {
+    const categoryName = categoryMapping[eventType] || eventType;
     const category = categories?.find((cat: any) => cat.name === categoryName);
     return category?.color || '#6b7280';
+  };
+
+  // Función para obtener el nombre en español de una categoría
+  const getCategoryDisplayName = (eventType: string) => {
+    return categoryMapping[eventType] || eventType;
   };
 
   // Función para obtener el estilo del badge de categoría
@@ -860,7 +877,7 @@ const EventsList: React.FC = () => {
                                       className="w-2 h-2 rounded-full mr-1" 
                                       style={{ backgroundColor: getCategoryColor(event.eventType) }}
                                     />
-                                    {event.eventType}
+                                    {getCategoryDisplayName(event.eventType)}
                                   </span>
                                 )}
                               </div>
@@ -1016,8 +1033,11 @@ const EventsList: React.FC = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             {event.eventType && (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium bg-blue-100 text-blue-800">
-                                {event.eventType}
+                              <span 
+                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium"
+                                style={{ backgroundColor: getCategoryColor(event.eventType) + '20', color: getCategoryColor(event.eventType), borderColor: getCategoryColor(event.eventType) }}
+                              >
+                                {getCategoryDisplayName(event.eventType)}
                               </span>
                             )}
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${statusColors[event.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
@@ -1386,7 +1406,7 @@ const EventsList: React.FC = () => {
                               className="w-2 h-2 rounded-full mr-2" 
                               style={{ backgroundColor: getCategoryColor(selectedEvent.eventType) }}
                             />
-                            {selectedEvent.eventType}
+                            {getCategoryDisplayName(selectedEvent.eventType)}
                           </span>
                         )}
                       </div>
