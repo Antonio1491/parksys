@@ -25,7 +25,6 @@ interface EventoDetalle {
     id: number;
     titulo: string;
     descripcion: string;
-    impactoTipo: "bajo_impacto" | "alto_impacto";
     categoria: string;
     fechaEvento: string;
     horaInicio: string;
@@ -64,10 +63,6 @@ const statusColors = {
   realizado: "bg-purple-100 text-purple-800"
 };
 
-const impactoColors = {
-  bajo_impacto: "bg-emerald-100 text-emerald-800",
-  alto_impacto: "bg-orange-100 text-orange-800"
-};
 
 export default function DetalleEventoAmbu() {
   const params = useParams();
@@ -157,9 +152,6 @@ export default function DetalleEventoAmbu() {
               {evento.evento.titulo}
             </h1>
             <div className="flex items-center gap-3 mt-2">
-              <Badge className={impactoColors[evento.evento.impactoTipo]}>
-                {evento.evento.impactoTipo === "bajo_impacto" ? "Bajo Impacto" : "Alto Impacto"}
-              </Badge>
               <Badge className={statusColors[evento.evento.status as keyof typeof statusColors]}>
                 <div className="flex items-center gap-1">
                   {getStatusIcon(evento.evento.status)}
@@ -194,9 +186,6 @@ export default function DetalleEventoAmbu() {
           <TabsTrigger value="costos">Costos</TabsTrigger>
           <TabsTrigger value="documentos">Documentos</TabsTrigger>
           <TabsTrigger value="seguimiento">Seguimiento</TabsTrigger>
-          {evento.evento.impactoTipo === "alto_impacto" && (
-            <TabsTrigger value="reuniones">Reuniones</TabsTrigger>
-          )}
         </TabsList>
 
         {/* Información General */}
@@ -262,31 +251,6 @@ export default function DetalleEventoAmbu() {
                     </p>
                   </div>
 
-                  {evento.evento.impactoTipo === "alto_impacto" && (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label className="text-sm font-medium text-gray-500">Anticipo (50%)</Label>
-                          <p className="text-lg font-semibold text-orange-600">
-                            ${(evento.evento.costoTotal * 0.5).toFixed(2)}
-                          </p>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium text-gray-500">Depósito (10%)</Label>
-                          <p className="text-lg font-semibold text-blue-600">
-                            ${(evento.evento.costoTotal * 0.1).toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                        <p className="text-sm text-orange-800">
-                          <strong>Nota:</strong> Para eventos de alto impacto se requiere el pago del 50% 
-                          de anticipo y 10% de depósito en garantía antes de la aprobación final.
-                        </p>
-                      </div>
-                    </>
-                  )}
                 </CardContent>
               </Card>
             )}
@@ -493,56 +457,6 @@ export default function DetalleEventoAmbu() {
           </Card>
         </TabsContent>
 
-        {/* Reuniones (solo para alto impacto) */}
-        {evento.evento.impactoTipo === "alto_impacto" && (
-          <TabsContent value="reuniones">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reuniones de Logística</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {evento.reuniones && evento.reuniones.length > 0 ? (
-                  <div className="space-y-4">
-                    {evento.reuniones.map((reunion: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="font-medium">
-                            Reunión {new Date(reunion.fechaReunion).toLocaleDateString()}
-                          </h4>
-                          <span className="text-sm text-gray-500">{reunion.horaReunion}</span>
-                        </div>
-                        
-                        {reunion.agenda && (
-                          <div className="mb-3">
-                            <Label className="text-sm font-medium text-gray-500">Agenda</Label>
-                            <p className="text-sm">{reunion.agenda}</p>
-                          </div>
-                        )}
-                        
-                        {reunion.acuerdos && (
-                          <div className="mb-3">
-                            <Label className="text-sm font-medium text-gray-500">Acuerdos</Label>
-                            <p className="text-sm">{reunion.acuerdos}</p>
-                          </div>
-                        )}
-                        
-                        {reunion.responsableReunion && (
-                          <p className="text-xs text-gray-500">
-                            Responsable: {reunion.responsableReunion}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-500 py-8">
-                    No se han programado reuniones de logística
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
       </Tabs>
     </div>
     </AdminLayout>
