@@ -369,7 +369,7 @@ const EventRegistrationsPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos los eventos</SelectItem>
-                      {eventsData?.map((event: any) => (
+                      {Array.isArray(eventsData) && eventsData.map((event: any) => (
                         <SelectItem key={event.id} value={event.id.toString()}>
                           {event.title}
                         </SelectItem>
