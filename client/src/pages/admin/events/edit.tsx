@@ -662,6 +662,19 @@ export default function EditEventPage() {
                         console.log('🔍 [FORM] Errores del formulario:', form.formState.errors);
                         console.log('🔍 [FORM] Es válido:', form.formState.isValid);
                         console.log('🔍 [FORM] Valores:', form.getValues());
+                        console.log('🔍 [FORM] Estado completo del formulario:', {
+                          isValid: form.formState.isValid,
+                          isValidating: form.formState.isValidating,
+                          isDirty: form.formState.isDirty,
+                          isSubmitted: form.formState.isSubmitted,
+                          isSubmitting: form.formState.isSubmitting,
+                          isSubmitSuccessful: form.formState.isSubmitSuccessful,
+                          submitCount: form.formState.submitCount,
+                          touchedFields: form.formState.touchedFields,
+                          dirtyFields: form.formState.dirtyFields
+                        });
+                        // Intentar envío manual para debug
+                        form.handleSubmit(onSubmit)();
                       }}
                     >
                       {updateEventMutation.isPending ? (
