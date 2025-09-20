@@ -436,7 +436,10 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
       if (eventData.organizerName !== undefined) updateData.organizerName = eventData.organizerName;
       if (eventData.organizerEmail !== undefined) updateData.organizerEmail = eventData.organizerEmail;
       if (eventData.organizerPhone !== undefined) updateData.organizerPhone = eventData.organizerPhone;
+      if (eventData.organizerOrganization !== undefined) updateData.organizerOrganization = eventData.organizerOrganization;
       if (eventData.geolocation !== undefined) updateData.geolocation = eventData.geolocation;
+      if (eventData.isFree !== undefined) updateData.isFree = eventData.isFree;
+      if (eventData.price !== undefined) updateData.price = eventData.price;
       
       // Actualizar fecha de modificación
       updateData.updatedAt = new Date();
