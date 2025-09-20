@@ -1,0 +1,1293 @@
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+19The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+19The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+ParkSys:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+ParkSys:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+ParkSys:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+_app-207a000b2ad7ded8.js:28 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-207a000b2ad7ded8.js:28 [LaunchDarkly] LaunchDarkly client initialized
+ParkSys:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+19Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'battery'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+framework-ccf7d8e11de6190a.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1
+uD @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'battery'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'battery'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'battery'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/__replco/workspace_iframe.html?initialPath=%2Fadmin%2Fevents%2Fedit%2F19&id=%3Arur%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events/edit/19:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events/edit/19:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events/edit/19:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+9Refused to load the script '<URL>' because it violates the following Content Security Policy directive: "default-src 'none'". Note that 'script-src-elem' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events/edit/19:1 Refused to execute inline event handler because it violates the following Content Security Policy directive: "default-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. Note also that 'script-src' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events/edit/19:1 Refused to execute inline event handler because it violates the following Content Security Policy directive: "default-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. Note also that 'script-src' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/admin/events/edit/19:1 Refused to execute inline event handler because it violates the following Content Security Policy directive: "default-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. Note also that 'script-src' was not explicitly set, so 'default-src' is used as a fallback.
+Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/19:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/19:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/events/19:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+_app-207a000b2ad7ded8.js:28 If you do not provide children, you must specify an aria-label for accessibility
+(anonymous) @ _app-207a000b2ad7ded8.js:28
+u @ _app-207a000b2ad7ded8.js:1
+(anonymous) @ _app-207a000b2ad7ded8.js:4
+(anonymous) @ _app-207a000b2ad7ded8.js:4
+ld @ framework-ccf7d8e11de6190a.js:1
+ou @ framework-ccf7d8e11de6190a.js:1
+i @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+uS @ framework-ccf7d8e11de6190a.js:1
+C @ framework-ccf7d8e11de6190a.js:1
+z @ framework-ccf7d8e11de6190a.js:1Understand this warning
+ParkSys:1 Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.
+Element with focus: <input. useView_view__C2mnv#agent-autonomy-level-max>
+Ancestor with aria-hidden: <div> <div style=​"display:​ contents;​">​…​</div>​Understand this warning
+_app-207a000b2ad7ded8.js:28 If you do not provide children, you must specify an aria-label for accessibility
+(anonymous) @ _app-207a000b2ad7ded8.js:28
+u @ _app-207a000b2ad7ded8.js:1
+(anonymous) @ _app-207a000b2ad7ded8.js:4
+(anonymous) @ _app-207a000b2ad7ded8.js:4
+ld @ framework-ccf7d8e11de6190a.js:1
+ou @ framework-ccf7d8e11de6190a.js:1
+i @ framework-ccf7d8e11de6190a.js:1
+uI @ framework-ccf7d8e11de6190a.js:1
+uM @ framework-ccf7d8e11de6190a.js:1
+u_ @ framework-ccf7d8e11de6190a.js:1
+r6 @ framework-ccf7d8e11de6190a.js:1
+(anonymous) @ framework-ccf7d8e11de6190a.js:1Understand this warning
+ 🔥 Firebase initialized successfully
+ i18next::backendConnector: loaded namespace common for language es Object
+ i18next: languageChanged es
+ i18next: initialized Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🔧 [UNIFIED AUTH] Estado: Object
+ 🌐 [QUERY] GET /api/events
+ 🌐 [QUERY] GET /api/parks
+ 🌐 [QUERY] GET /api/event-categories
+ 🌐 [QUERY] GET /api/roles/1/permissions
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ chunk-ZPMKMY5X.js?v=14eab8c0:339
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627Understand this warning
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🌐 [API REQUEST] POST /api/events/import
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/import
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "events": [
+    {
+      "title": "Festival de Primavera",
+      "description": "Celebración de la llegada de la primavera con actividades familiares.",
+      "eventType": "cultural",
+      "category": "Culturales",
+      "targetAudience": "all",
+      "startDate": "16/09/25",
+      "endDate": "16/09/25",
+      "startTime": "10:00:00",
+      "endTime": "18:00:00",
+      "location": "Plaza Central",
+      "parkNames": "Parque Central; Parque Norte",
+      "capacity": 200,
+      "registrationType": "free",
+      "organizerName": "María González",
+      "organizerOrganization": "Departamento de Eventos",
+      "organizerEmail": "maria@parques.gob.mx",
+      "organizerPhone": "3312345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Evento familiar con actividades para todas las edades",
+      "latitude": 20.6597,
+      "longitude": -103.3496,
+      "status": "published"
+    },
+    {
+      "title": "Carrera Verde",
+      "description": "Carrera recreativa de 5 km para promover la vida saludable.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "17/09/25",
+      "endDate": "17/09/25",
+      "startTime": "7:00:00",
+      "endTime": "10:00:00",
+      "location": "Entrada Principal",
+      "parkNames": "Parque Fundidora",
+      "capacity": 500,
+      "registrationType": "free",
+      "organizerName": "Jorge Ramírez",
+      "organizerOrganization": "Club Corredores MTY",
+      "organizerEmail": "jramirez@club.com",
+      "organizerPhone": "8112345678",
+      "price": 200,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Premiación a primeros lugares",
+      "latitude": 25.6751,
+      "longitude": -100.3185,
+      "status": "published"
+    },
+    {
+      "title": "Picnic Musical",
+      "description": "Concierto acústico al aire libre con bandas locales.",
+      "eventType": "cultural",
+      "category": "Recreativos",
+      "targetAudience": "all",
+      "startDate": "18/09/25",
+      "endDate": "18/09/25",
+      "startTime": "16:00:00",
+      "endTime": "21:00:00",
+      "location": "Lago Menor",
+      "parkNames": "Bosque de Chapultepec",
+      "capacity": 800,
+      "registrationType": "free",
+      "organizerName": "Ana Torres",
+      "organizerOrganization": "Secretaría de Cultura CDMX",
+      "organizerEmail": "atorres@cultura.mx",
+      "organizerPhone": "5512345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Área designada para picnic",
+      "latitude": 19.4204,
+      "longitude": -99.1917,
+      "status": "published"
+    },
+    {
+      "title": "Festival del Niño",
+      "description": "Juegos, talleres y espectáculos infantiles.",
+      "eventType": "recreativo",
+      "category": "Comunitarios",
+      "targetAudience": "all",
+      "startDate": "19/09/25",
+      "endDate": "19/09/25",
+      "startTime": "9:00:00",
+      "endTime": "14:00:00",
+      "location": "Foro Infantil",
+      "parkNames": "Parque Tangamanga I",
+      "capacity": 1000,
+      "registrationType": "free",
+      "organizerName": "Laura Méndez",
+      "organizerOrganization": "DIF SLP",
+      "organizerEmail": "lmendez@difslp.mx",
+      "organizerPhone": "4441234567",
+      "price": 50,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Evento anual Día del Niño",
+      "latitude": 22.1412,
+      "longitude": -100.9953,
+      "status": "published"
+    },
+    {
+      "title": "Yoga al Amanecer",
+      "description": "Clase masiva de yoga en la explanada.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "20/09/25",
+      "endDate": "20/09/25",
+      "startTime": "6:30:00",
+      "endTime": "8:00:00",
+      "location": "Explanada Principal",
+      "parkNames": "Parque Metropolitano de Guadalajara",
+      "capacity": 300,
+      "registrationType": "free",
+      "organizerName": "Sofía Delgado",
+      "organizerOrganization": "Yoga GDL",
+      "organizerEmail": "sdelgado@yogagdl.mx",
+      "organizerPhone": "3311122233",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Se recomienda llevar tapete",
+      "latitude": 20.7045,
+      "longitude": -103.4426,
+      "status": "published"
+    },
+    {
+      "title": "Feria del Medio Ambiente",
+      "description": "Exhibiciones y talleres de sustentabilidad.",
+      "eventType": "cultural",
+      "category": "Ambientales",
+      "targetAudience": "all",
+      "startDate": "21/09/25",
+      "endDate": "21/09/25",
+      "startTime": "10:00:00",
+      "endTime": "17:00:00",
+      "location": "Zona de Pabellones",
+      "parkNames": "Parque Bicentenario",
+      "capacity": 1500,
+      "registrationType": "free",
+      "organizerName": "Ricardo Pérez",
+      "organizerOrganization": "SEMARNAT",
+      "organizerEmail": "rperez@semarnat.gob.mx",
+      "organizerPhone": "5556781234",
+      "price": 0,
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzI3MTIxLCJleHAiOjE3NTgzMzA3MjEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TTTL7N3glMjObq3mtqPTZk0MorAVUzd3wkGbsQkGGJzfT20R_spnC_wMPz_JNUUyZg79Orqu9OKSEq6J7vua-rUKny6P7ZenG0vFhRD0X0okLvOwo1xn7ucGAbJAb08Gp6-R4AIe--v3mVC0tB95okpvW_4LY1DzxSNLnQ3AAPwIGwJKpKYPkMAYfPFv51pFOy2LgGe6EgIEafneixdlVdGu2Nwbd8fhui7LYuWE6HVx2bVegTs0hSIfTHAmvJzHl37gWeP1Zzct1ztJ_fz7-AWNsm7FJEAD4pwetm7H6VCofQyeer5Y_tw4zO4_nNTYojstWMGXWUHhUMvMYLXWXg",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🌐 [QUERY] GET /api/events/137
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔄 Cargando datos del evento: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+Console.js:61 🔧 [UNIFIED AUTH] Estado: Object
+5Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events/stats
+Console.js:61 🌐 [QUERY] GET /api/events/recent
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] POST /api/events/bulk-delete
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/bulk-delete
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "eventIds": [
+    137,
+    136,
+    135,
+    134,
+    133,
+    132,
+    131,
+    130,
+    129
+  ]
+}
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzI3MTIxLCJleHAiOjE3NTgzMzA3MjEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TTTL7N3glMjObq3mtqPTZk0MorAVUzd3wkGbsQkGGJzfT20R_spnC_wMPz_JNUUyZg79Orqu9OKSEq6J7vua-rUKny6P7ZenG0vFhRD0X0okLvOwo1xn7ucGAbJAb08Gp6-R4AIe--v3mVC0tB95okpvW_4LY1DzxSNLnQ3AAPwIGwJKpKYPkMAYfPFv51pFOy2LgGe6EgIEafneixdlVdGu2Nwbd8fhui7LYuWE6HVx2bVegTs0hSIfTHAmvJzHl37gWeP1Zzct1ztJ_fz7-AWNsm7FJEAD4pwetm7H6VCofQyeer5Y_tw4zO4_nNTYojstWMGXWUHhUMvMYLXWXg",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] POST /api/events/bulk-delete
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/bulk-delete
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "eventIds": [
+    128,
+    127,
+    126,
+    125,
+    124,
+    123,
+    122,
+    121,
+    120
+  ]
+}
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzI3MTIxLCJleHAiOjE3NTgzMzA3MjEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TTTL7N3glMjObq3mtqPTZk0MorAVUzd3wkGbsQkGGJzfT20R_spnC_wMPz_JNUUyZg79Orqu9OKSEq6J7vua-rUKny6P7ZenG0vFhRD0X0okLvOwo1xn7ucGAbJAb08Gp6-R4AIe--v3mVC0tB95okpvW_4LY1DzxSNLnQ3AAPwIGwJKpKYPkMAYfPFv51pFOy2LgGe6EgIEafneixdlVdGu2Nwbd8fhui7LYuWE6HVx2bVegTs0hSIfTHAmvJzHl37gWeP1Zzct1ztJ_fz7-AWNsm7FJEAD4pwetm7H6VCofQyeer5Y_tw4zO4_nNTYojstWMGXWUHhUMvMYLXWXg",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] DELETE /api/events/119
+Console.js:61 🎪 [DEBUG] Checking request: DELETE /api/events/119
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ chunk-ZPMKMY5X.js?v=14eab8c0:339
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627Understand this warning
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] POST /api/events/import
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/import
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "events": [
+    {
+      "title": "Festival de Primavera",
+      "description": "Celebración de la llegada de la primavera con actividades familiares.",
+      "eventType": "cultural",
+      "category": "Culturales",
+      "targetAudience": "all",
+      "startDate": "16/09/25",
+      "endDate": "16/09/25",
+      "startTime": "10:00:00",
+      "endTime": "18:00:00",
+      "location": "Plaza Central",
+      "parkNames": "Parque Central; Parque Norte",
+      "capacity": 200,
+      "registrationType": "free",
+      "organizerName": "María González",
+      "organizerOrganization": "Departamento de Eventos",
+      "organizerEmail": "maria@parques.gob.mx",
+      "organizerPhone": "3312345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Evento familiar con actividades para todas las edades",
+      "latitude": 20.6597,
+      "longitude": -103.3496,
+      "status": "published"
+    },
+    {
+      "title": "Carrera Verde",
+      "description": "Carrera recreativa de 5 km para promover la vida saludable.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "17/09/25",
+      "endDate": "17/09/25",
+      "startTime": "7:00:00",
+      "endTime": "10:00:00",
+      "location": "Entrada Principal",
+      "parkNames": "Parque Fundidora",
+      "capacity": 500,
+      "registrationType": "free",
+      "organizerName": "Jorge Ramírez",
+      "organizerOrganization": "Club Corredores MTY",
+      "organizerEmail": "jramirez@club.com",
+      "organizerPhone": "8112345678",
+      "price": 200,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Premiación a primeros lugares",
+      "latitude": 25.6751,
+      "longitude": -100.3185,
+      "status": "published"
+    },
+    {
+      "title": "Picnic Musical",
+      "description": "Concierto acústico al aire libre con bandas locales.",
+      "eventType": "cultural",
+      "category": "Recreativos",
+      "targetAudience": "all",
+      "startDate": "18/09/25",
+      "endDate": "18/09/25",
+      "startTime": "16:00:00",
+      "endTime": "21:00:00",
+      "location": "Lago Menor",
+      "parkNames": "Bosque de Chapultepec",
+      "capacity": 800,
+      "registrationType": "free",
+      "organizerName": "Ana Torres",
+      "organizerOrganization": "Secretaría de Cultura CDMX",
+      "organizerEmail": "atorres@cultura.mx",
+      "organizerPhone": "5512345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Área designada para picnic",
+      "latitude": 19.4204,
+      "longitude": -99.1917,
+      "status": "published"
+    },
+    {
+      "title": "Festival del Niño",
+      "description": "Juegos, talleres y espectáculos infantiles.",
+      "eventType": "recreativo",
+      "category": "Comunitarios",
+      "targetAudience": "all",
+      "startDate": "19/09/25",
+      "endDate": "19/09/25",
+      "startTime": "9:00:00",
+      "endTime": "14:00:00",
+      "location": "Foro Infantil",
+      "parkNames": "Parque Tangamanga I",
+      "capacity": 1000,
+      "registrationType": "free",
+      "organizerName": "Laura Méndez",
+      "organizerOrganization": "DIF SLP",
+      "organizerEmail": "lmendez@difslp.mx",
+      "organizerPhone": "4441234567",
+      "price": 50,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Evento anual Día del Niño",
+      "latitude": 22.1412,
+      "longitude": -100.9953,
+      "status": "published"
+    },
+    {
+      "title": "Yoga al Amanecer",
+      "description": "Clase masiva de yoga en la explanada.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "20/09/25",
+      "endDate": "20/09/25",
+      "startTime": "6:30:00",
+      "endTime": "8:00:00",
+      "location": "Explanada Principal",
+      "parkNames": "Parque Metropolitano de Guadalajara",
+      "capacity": 300,
+      "registrationType": "free",
+      "organizerName": "Sofía Delgado",
+      "organizerOrganization": "Yoga GDL",
+      "organizerEmail": "sdelgado@yogagdl.mx",
+      "organizerPhone": "3311122233",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Se recomienda llevar tapete",
+      "latitude": 20.7045,
+      "longitude": -103.4426,
+      "status": "published"
+    },
+    {
+      "title": "Feria del Medio Ambiente",
+      "description": "Exhibiciones y talleres de sustentabilidad.",
+      "eventType": "cultural",
+      "category": "Ambientales",
+      "targetAudience": "all",
+      "startDate": "21/09/25",
+      "endDate": "21/09/25",
+      "startTime": "10:00:00",
+      "endTime": "17:00:00",
+      "location": "Zona de Pabellones",
+      "parkNames": "Parque Bicentenario",
+      "capacity": 1500,
+      "registrationType": "free",
+      "organizerName": "Ricardo Pérez",
+      "organizerOrganization": "SEMARNAT",
+      "organizerEmail": "rperez@semarnat.gob.mx",
+      "organizerPhone": "5556781234",
+      "price": 0,
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzI3MTIxLCJleHAiOjE3NTgzMzA3MjEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TTTL7N3glMjObq3mtqPTZk0MorAVUzd3wkGbsQkGGJzfT20R_spnC_wMPz_JNUUyZg79Orqu9OKSEq6J7vua-rUKny6P7ZenG0vFhRD0X0okLvOwo1xn7ucGAbJAb08Gp6-R4AIe--v3mVC0tB95okpvW_4LY1DzxSNLnQ3AAPwIGwJKpKYPkMAYfPFv51pFOy2LgGe6EgIEafneixdlVdGu2Nwbd8fhui7LYuWE6HVx2bVegTs0hSIfTHAmvJzHl37gWeP1Zzct1ztJ_fz7-AWNsm7FJEAD4pwetm7H6VCofQyeer5Y_tw4zO4_nNTYojstWMGXWUHhUMvMYLXWXg",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events/155
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔄 Cargando datos del evento: {id: 155, title: 'Festival de la Juventud', description: 'Bandas, deportes extremos y talleres.', eventType: 'cultural', targetAudience: 'all', …}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] POST /api/events/bulk-delete
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/bulk-delete
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "eventIds": [
+    156,
+    155,
+    154,
+    153,
+    152,
+    151,
+    150,
+    149,
+    148
+  ]
+}
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzI3MTIxLCJleHAiOjE3NTgzMzA3MjEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TTTL7N3glMjObq3mtqPTZk0MorAVUzd3wkGbsQkGGJzfT20R_spnC_wMPz_JNUUyZg79Orqu9OKSEq6J7vua-rUKny6P7ZenG0vFhRD0X0okLvOwo1xn7ucGAbJAb08Gp6-R4AIe--v3mVC0tB95okpvW_4LY1DzxSNLnQ3AAPwIGwJKpKYPkMAYfPFv51pFOy2LgGe6EgIEafneixdlVdGu2Nwbd8fhui7LYuWE6HVx2bVegTs0hSIfTHAmvJzHl37gWeP1Zzct1ztJ_fz7-AWNsm7FJEAD4pwetm7H6VCofQyeer5Y_tw4zO4_nNTYojstWMGXWUHhUMvMYLXWXg",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] POST /api/events/bulk-delete
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/bulk-delete
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "eventIds": [
+    147,
+    146,
+    145,
+    144,
+    143,
+    142,
+    141,
+    140,
+    139
+  ]
+}
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzI3MTIxLCJleHAiOjE3NTgzMzA3MjEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TTTL7N3glMjObq3mtqPTZk0MorAVUzd3wkGbsQkGGJzfT20R_spnC_wMPz_JNUUyZg79Orqu9OKSEq6J7vua-rUKny6P7ZenG0vFhRD0X0okLvOwo1xn7ucGAbJAb08Gp6-R4AIe--v3mVC0tB95okpvW_4LY1DzxSNLnQ3AAPwIGwJKpKYPkMAYfPFv51pFOy2LgGe6EgIEafneixdlVdGu2Nwbd8fhui7LYuWE6HVx2bVegTs0hSIfTHAmvJzHl37gWeP1Zzct1ztJ_fz7-AWNsm7FJEAD4pwetm7H6VCofQyeer5Y_tw4zO4_nNTYojstWMGXWUHhUMvMYLXWXg",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] DELETE /api/events/138
+Console.js:61 🎪 [DEBUG] Checking request: DELETE /api/events/138
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+4Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔥 Firebase initialized successfully
+Console.js:61 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+Console.js:61 i18next: languageChanged es
+Console.js:61 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🌐 [QUERY] GET /api/parks
+Console.js:61 🌐 [QUERY] GET /api/event-categories
+Console.js:61 🌐 [QUERY] GET /api/roles/1/permissions
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [QUERY] GET /api/notifications/count
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ chunk-ZPMKMY5X.js?v=14eab8c0:339
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=14eab8c0:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=14eab8c0:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=14eab8c0:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=14eab8c0:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=14eab8c0:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=14eab8c0:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=14eab8c0:19416
+commitRoot @ chunk-RPCDYKBN.js?v=14eab8c0:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=14eab8c0:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=14eab8c0:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=14eab8c0:18627Understand this warning
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] POST /api/events/import
+Console.js:61 🎪 [DEBUG] Checking request: POST /api/events/import
+Console.js:61 🎪 POST a /api/events detectado
+Console.js:61 🎪 Data enviada: {
+  "events": [
+    {
+      "title": "Festival de Primavera",
+      "description": "Celebración de la llegada de la primavera con actividades familiares.",
+      "eventType": "cultural",
+      "category": "Culturales",
+      "targetAudience": "all",
+      "startDate": "16/09/25",
+      "endDate": "16/09/25",
+      "startTime": "10:00:00",
+      "endTime": "18:00:00",
+      "location": "Plaza Central",
+      "parkNames": "Parque Central; Parque Norte",
+      "capacity": 200,
+      "registrationType": "free",
+      "organizerName": "María González",
+      "organizerOrganization": "Departamento de Eventos",
+      "organizerEmail": "maria@parques.gob.mx",
+      "organizerPhone": "3312345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Evento familiar con actividades para todas las edades",
+      "latitude": 20.6597,
+      "longitude": -103.3496,
+      "status": "published"
+    },
+    {
+      "title": "Carrera Verde",
+      "description": "Carrera recreativa de 5 km para promover la vida saludable.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "17/09/25",
+      "endDate": "17/09/25",
+      "startTime": "7:00:00",
+      "endTime": "10:00:00",
+      "location": "Entrada Principal",
+      "parkNames": "Parque Fundidora",
+      "capacity": 500,
+      "registrationType": "free",
+      "organizerName": "Jorge Ramírez",
+      "organizerOrganization": "Club Corredores MTY",
+      "organizerEmail": "jramirez@club.com",
+      "organizerPhone": "8112345678",
+      "price": 200,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Premiación a primeros lugares",
+      "latitude": 25.6751,
+      "longitude": -100.3185,
+      "status": "published"
+    },
+    {
+      "title": "Picnic Musical",
+      "description": "Concierto acústico al aire libre con bandas locales.",
+      "eventType": "cultural",
+      "category": "Recreativos",
+      "targetAudience": "all",
+      "startDate": "18/09/25",
+      "endDate": "18/09/25",
+      "startTime": "16:00:00",
+      "endTime": "21:00:00",
+      "location": "Lago Menor",
+      "parkNames": "Bosque de Chapultepec",
+      "capacity": 800,
+      "registrationType": "free",
+      "organizerName": "Ana Torres",
+      "organizerOrganization": "Secretaría de Cultura CDMX",
+      "organizerEmail": "atorres@cultura.mx",
+      "organizerPhone": "5512345678",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Área designada para picnic",
+      "latitude": 19.4204,
+      "longitude": -99.1917,
+      "status": "published"
+    },
+    {
+      "title": "Festival del Niño",
+      "description": "Juegos, talleres y espectáculos infantiles.",
+      "eventType": "recreativo",
+      "category": "Comunitarios",
+      "targetAudience": "all",
+      "startDate": "19/09/25",
+      "endDate": "19/09/25",
+      "startTime": "9:00:00",
+      "endTime": "14:00:00",
+      "location": "Foro Infantil",
+      "parkNames": "Parque Tangamanga I",
+      "capacity": 1000,
+      "registrationType": "free",
+      "organizerName": "Laura Méndez",
+      "organizerOrganization": "DIF SLP",
+      "organizerEmail": "lmendez@difslp.mx",
+      "organizerPhone": "4441234567",
+      "price": 50,
+      "isFree": false,
+      "requiresApproval": true,
+      "notes": "Evento anual Día del Niño",
+      "latitude": 22.1412,
+      "longitude": -100.9953,
+      "status": "published"
+    },
+    {
+      "title": "Yoga al Amanecer",
+      "description": "Clase masiva de yoga en la explanada.",
+      "eventType": "deportivo",
+      "category": "Deportivos",
+      "targetAudience": "all",
+      "startDate": "20/09/25",
+      "endDate": "20/09/25",
+      "startTime": "6:30:00",
+      "endTime": "8:00:00",
+      "location": "Explanada Principal",
+      "parkNames": "Parque Metropolitano de Guadalajara",
+      "capacity": 300,
+      "registrationType": "free",
+      "organizerName": "Sofía Delgado",
+      "organizerOrganization": "Yoga GDL",
+      "organizerEmail": "sdelgado@yogagdl.mx",
+      "organizerPhone": "3311122233",
+      "price": 0,
+      "isFree": true,
+      "requiresApproval": false,
+      "notes": "Se recomienda llevar tapete",
+      "latitude": 20.7045,
+      "longitude": -103.4426,
+      "status": "published"
+    },
+    {
+      "title": "Feria del Medio Ambiente",
+      "description": "Exhibiciones y talleres de sustentabilidad.",
+      "eventType": "cultural",
+      "category": "Ambientales",
+      "targetAudience": "all",
+      "startDate": "21/09/25",
+      "endDate": "21/09/25",
+      "startTime": "10:00:00",
+      "endTime": "17:00:00",
+      "location": "Zona de Pabellones",
+      "parkNames": "Parque Bicentenario",
+      "capacity": 1500,
+      "registrationType": "free",
+      "organizerName": "Ricardo Pérez",
+      "organizerOrganization": "SEMARNAT",
+      "organizerEmail": "rperez@semarnat.gob.mx",
+      "organizerPhone": "5556781234",
+      "price": 0,
+Console.js:61 🎪 Headers completos: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjUwMDZlMjc5MTVhMTcwYWIyNmIxZWUzYjgxZDExNjU0MmYxMjRmMjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1ODE1MDk3MSwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzU4MzI3MTIxLCJleHAiOjE3NTgzMzA3MjEsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TTTL7N3glMjObq3mtqPTZk0MorAVUzd3wkGbsQkGGJzfT20R_spnC_wMPz_JNUUyZg79Orqu9OKSEq6J7vua-rUKny6P7ZenG0vFhRD0X0okLvOwo1xn7ucGAbJAb08Gp6-R4AIe--v3mVC0tB95okpvW_4LY1DzxSNLnQ3AAPwIGwJKpKYPkMAYfPFv51pFOy2LgGe6EgIEafneixdlVdGu2Nwbd8fhui7LYuWE6HVx2bVegTs0hSIfTHAmvJzHl37gWeP1Zzct1ztJ_fz7-AWNsm7FJEAD4pwetm7H6VCofQyeer5Y_tw4zO4_nNTYojstWMGXWUHhUMvMYLXWXg",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1"
+}
+Console.js:61 🎪 Stored user: {"id":1,"username":"Luis Romahn","email":"luis@asociacionesprofesionales.org","roleId":1,"fullName":"Luis Antonio Roman Diez","municipalityId":null,"phone":"9999444060","gender":"masculino","birthDate":null,"bio":null,"profileImageUrl":"/uploads/profiles/profile-1756839040343-466559270.png","firebaseUid":"AgDictDqdqUOo9hKUYlXPT3t5Bv1","needsPasswordReset":false,"notificationPreferences":{"events":true,"system":true,"payroll":true,"feedback":true,"maintenance":true},"isActive":true,"lastLogin":null,"department":null,"position":null,"createdAt":"2025-09-02T18:50:51.431Z","updatedAt":"2025-09-05T20:05:26.647Z","roles":[{"roleId":1}]}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/events/173
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔄 Cargando datos del evento: {id: 173, title: 'Feria de Otoño', description: 'Juegos tradicionales, artesanías y música.', eventType: 'cultural', targetAudience: 'all', …}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+Console.js:61 🌐 [QUERY] GET /api/notifications/count

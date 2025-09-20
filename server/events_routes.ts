@@ -760,23 +760,6 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
           console.log(`✅ [VALIDATION] Fila ${i + 1}: Fechas OK - CONTINUANDO A INSERCIÓN`);
           
           // Procesar coordenadas para geolocalización
-          
-          // Parsear fechas correctamente
-          const parsedStartDate = eventData.startDate ? parseDate(eventData.startDate) : new Date();
-          const parsedEndDate = eventData.endDate ? parseDate(eventData.endDate) : null;
-          
-          // Validar que las fechas se parsearon correctamente
-          if (eventData.startDate && !parsedStartDate) {
-            errors.push(`Fila ${i + 1}: Formato de fecha de inicio inválido: "${eventData.startDate}"`);
-            continue;
-          }
-          
-          if (eventData.endDate && !parsedEndDate) {
-            errors.push(`Fila ${i + 1}: Formato de fecha de fin inválido: "${eventData.endDate}"`);
-            continue;
-          }
-
-          // Procesar coordenadas para geolocalización
           let geolocation = null;
           if (eventData.latitude && eventData.longitude) {
             const lat = parseFloat(eventData.latitude);
