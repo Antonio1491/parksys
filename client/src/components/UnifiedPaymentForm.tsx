@@ -102,6 +102,9 @@ export function UnifiedPaymentForm({
   // Payment processing mutation
   const createPaymentIntentMutation = useMutation({
     mutationFn: async (paymentData: any) => {
+      if (!apiEndpoints?.createPaymentIntent) {
+        throw new Error('Endpoint de pago no configurado');
+      }
       const response = await fetch(apiEndpoints.createPaymentIntent, {
         method: 'POST',
         headers: {
@@ -180,6 +183,9 @@ export function UnifiedPaymentForm({
       }
 
       // Step 3: Complete registration and confirm payment in backend
+      if (!apiEndpoints?.completePayment) {
+        throw new Error('Endpoint de confirmación no configurado');
+      }
       const registrationResponse = await fetch(apiEndpoints.completePayment, {
         method: 'POST',
         headers: {

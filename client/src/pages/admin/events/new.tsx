@@ -39,14 +39,26 @@ import { CalendarIcon, Clock, Users, MapPin, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { CostingSection } from "@/components/CostingSection";
 
-// Usar el esquema unificado extendido para fechas de form
-const eventFormSchema = insertEventSchema.extend({
+// Usar el esquema unificado extendido para fechas de form y descuentos
+const eventFormSchema = z.object({
+  ...insertEventSchema.shape,
   startDate: z.date({
     required_error: "La fecha de inicio es requerida",
   }),
   endDate: z.date().optional().nullable(),
-})
+  // Validación explícita para campos de descuentos
+  discountSeniors: z.number().min(0).max(100).default(0),
+  discountStudents: z.number().min(0).max(100).default(0),
+  discountFamilies: z.number().min(0).max(100).default(0),
+  discountDisability: z.number().min(0).max(100).default(0),
+  discountEarlyBird: z.number().min(0).max(100).default(0),
+  discountEarlyBirdDeadline: z.date().optional().nullable(),
+  // Validación para campos de costeo
+  costRecoveryPercentage: z.number().min(0).max(100).default(30),
+  financialNotes: z.string().optional(),
+}).omit({ id: true, createdAt: true, updatedAt: true })
 
 // Tipos
 type EventFormValues = z.infer<typeof eventFormSchema>;
@@ -90,6 +102,16 @@ const NewEventPage: React.FC = () => {
       isFree: true,
       price: undefined,
       requiresApproval: false,
+      // Campos de descuentos unificados
+      discountSeniors: 0,
+      discountStudents: 0,
+      discountFamilies: 0,
+      discountDisability: 0,
+      discountEarlyBird: 0,
+      discountEarlyBirdDeadline: undefined,
+      // Campos de costeo financiero unificados
+      costRecoveryPercentage: 30,
+      financialNotes: "",
     },
   });
 
@@ -140,6 +162,7 @@ const NewEventPage: React.FC = () => {
       // Convertir fechas a strings YYYY-MM-DD
       startDate: data.startDate.toISOString().split('T')[0],
       endDate: data.endDate ? data.endDate.toISOString().split('T')[0] : undefined,
+      discountEarlyBirdDeadline: data.discountEarlyBirdDeadline ? data.discountEarlyBirdDeadline.toISOString().split('T')[0] : undefined,
       // Limpiar valores null/undefined opcionales
       capacity: data.capacity || undefined,
       price: data.price || undefined,
@@ -674,6 +697,182 @@ const NewEventPage: React.FC = () => {
                         </FormControl>
                       </FormItem>
                     )}
+                  />
+                </div>
+
+                {/* NUEVO: Campos de descuentos unificados */}
+                {!form.watch("isFree") && (
+                  <div className="md:col-span-2 bg-purple-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold text-purple-800 mb-3">🎟️ Descuentos Disponibles</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="discountSeniors"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">🧓 Adultos mayores (%)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                placeholder="0"
+                                className="h-8 text-sm"
+                                {...field}
+                                value={field.value || ""}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="discountStudents"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">🎓 Estudiantes (%)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                placeholder="0"
+                                className="h-8 text-sm"
+                                {...field}
+                                value={field.value || ""}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="discountFamilies"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">👨‍👩‍👧‍👦 Familias (%)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                placeholder="0"
+                                className="h-8 text-sm"
+                                {...field}
+                                value={field.value || ""}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="discountDisability"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">♿ Discapacidad (%)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                placeholder="0"
+                                className="h-8 text-sm"
+                                {...field}
+                                value={field.value || ""}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="discountEarlyBird"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">⏰ Inscripción temprana (%)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                placeholder="0"
+                                className="h-8 text-sm"
+                                {...field}
+                                value={field.value || ""}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {form.watch("discountEarlyBird") > 0 && (
+                        <FormField
+                          control={form.control}
+                          name="discountEarlyBirdDeadline"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Fecha límite</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant="outline"
+                                      className="w-full h-8 text-xs justify-start text-left font-normal"
+                                    >
+                                      {field.value ? (
+                                        format(field.value, "PPP", { locale: es })
+                                      ) : (
+                                        <span>Seleccionar fecha</span>
+                                      )}
+                                      <CalendarIcon className="ml-auto h-3 w-3 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    disabled={(date) => date < new Date()}
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                    </div>
+                    <div className="text-xs text-purple-700 mt-2">
+                      Configure los porcentajes de descuento que estarán disponibles para los participantes durante el registro
+                    </div>
+                  </div>
+                )}
+
+                {/* NUEVO: Sección de costeo financiero unificado */}
+                <div className="md:col-span-2">
+                  <CostingSection
+                    costRecoveryPercentage={form.watch("costRecoveryPercentage") || 30}
+                    onCostRecoveryChange={(percentage) => form.setValue("costRecoveryPercentage", percentage)}
+                    financialNotes={form.watch("financialNotes") || ""}
+                    onFinancialNotesChange={(notes) => form.setValue("financialNotes", notes)}
+                    showAdvancedFields={true}
                   />
                 </div>
               </div>
