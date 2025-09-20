@@ -18,6 +18,34 @@ import {
   InsertEventoAmbu
 } from "@shared/events-ambu-schema";
 
+// === TABULADOR DE COSTOS (USO INTERNO) ===
+const tabuladorCostos = {
+  // Fotografía y Video
+  fotografiaSocial: 2000,
+  fotografiaComercial: 5000,
+  videoComercial: 8000,
+  sesionQuinceanos: 3500,
+  
+  // Eventos deportivos y recreativos
+  actividadesFisicas: 1500,
+  carrerasComerciales: {
+    porParticipante: 25,
+    permisoRuta: 1000
+  },
+  
+  // Infraestructura y servicios
+  montajeDesmontaje: 800,
+  limpiezaPostEvento: 1200,
+  seguridadPrivada: 300, // por hora
+  sonidoLuces: 2500,
+  
+  // Permisos especiales
+  usoNocturno: 2000,
+  alcohol: 5000,
+  ventaComida: 1500,
+  publicidadComercial: 3000
+};
+
 export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
   
   // === EVENTOS PRINCIPALES ===
@@ -356,12 +384,7 @@ export function registerEventosAmbuRoutes(app: any, apiRouter: Router, isAuthent
     }
   });
   
-  // === TABULADOR Y COSTOS ===
-  
-  // Obtener tabulador de costos
-  apiRouter.get("/eventos-ambu/tabulador", async (req: Request, res: Response) => {
-    res.json(tabuladorCostos);
-  });
+  // === CÁLCULO DE COSTOS ===
   
   // Calcular costo de un evento
   apiRouter.post("/eventos-ambu/calcular-costo", async (req: Request, res: Response) => {

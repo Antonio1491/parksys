@@ -712,13 +712,6 @@ const AdminSidebarComplete: React.FC = () => {
               >
                 Inscripciones
               </NavItem>
-              <NavItem 
-                href="/admin/eventos-ambu/tabulador" 
-                icon={<DollarSign className="h-4 w-4" />}
-                active={location.startsWith('/admin/eventos-ambu/tabulador')}
-              >
-                Tabulador de Costos
-              </NavItem>
             </CollapsibleSubmenu>
 
             {/* RESERVAS */}
