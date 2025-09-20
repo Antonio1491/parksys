@@ -264,108 +264,107 @@ const Events: React.FC = () => {
           }>
             {filteredEvents.map((event: Event) => (
               <Link key={event.id} href={`/event/${event.id}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+                <Card className={viewMode === 'list' 
+                  ? "hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500" 
+                  : "group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden border-0 shadow-sm"}>
                 {viewMode === 'grid' ? (
-                  <div className="flex flex-col h-80">
-                    {/* Imagen que ocupa 2/3 de la altura */}
-                    <div className="relative h-2/3 overflow-hidden">
-                      {event.featuredImageUrl ? (
+                  <div className="aspect-video relative overflow-hidden">
+                    {event.featuredImageUrl ? (
+                      <>
                         <img 
                           src={event.featuredImageUrl?.startsWith('/uploads/') 
                             ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
                             : event.featuredImageUrl
                           } 
                           alt={event.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           onError={(e) => {
                             console.error('Error loading image:', event.featuredImageUrl);
                             (e.target as HTMLImageElement).style.display = 'none';
                             (e.target as HTMLImageElement).nextElementSibling?.setAttribute('style', 'display: flex');
                           }}
-                          onLoad={() => console.log('Image loaded successfully:', event.featuredImageUrl)}
                         />
-                      ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          <Calendar className="h-12 w-12 text-gray-400" />
+                        <div className="absolute inset-0 bg-black/20"></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-gradient-to-br from-blue-100 to-purple-100 w-full h-full flex items-center justify-center">
+                          <Calendar className="h-16 w-16 text-blue-600/50" />
                         </div>
-                      )}
-                      
-                      {/* Badge de categoría arriba a la izquierda */}
-                      <div className="absolute top-3 left-3 z-10">
-                        <Badge 
-                          className="text-xs border shadow-sm font-medium text-white"
-                          style={{ 
-                            backgroundColor: eventTypeColors[event.event_type as keyof typeof eventTypeColors] || '#3B82F6',
-                            borderColor: 'rgba(255,255,255,0.3)'
-                          }}
-                        >
-                          {event.event_type}
-                        </Badge>
-                      </div>
+                      </>
+                    )}
+                    
+                    {/* Badge de categoría */}
+                    <div className="absolute top-3 left-3">
+                      <Badge 
+                        className="border shadow-sm text-xs text-white"
+                        style={{ 
+                          backgroundColor: eventTypeColors[event.event_type as keyof typeof eventTypeColors] || '#3B82F6',
+                          borderColor: 'rgba(255,255,255,0.3)'
+                        }}
+                      >
+                        {event.event_type}
+                      </Badge>
+                    </div>
 
-                      {/* Badge de estado arriba a la derecha */}
-                      <div className="absolute top-3 right-3 z-10">
-                        <Badge 
-                          className="text-xs border shadow-sm font-semibold"
-                          style={{ 
-                            backgroundColor: event.status === 'published' ? '#10B981' : '#6B7280',
-                            color: 'white',
-                            borderColor: event.status === 'published' ? '#059669' : '#4B5563'
-                          }}
-                        >
-                          {event.status === 'published' ? 'Activo' : 'Borrador'}
-                        </Badge>
-                      </div>
-                      
-                      {/* Título del evento superpuesto en la parte inferior */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-3">
-                        <h3 className="font-semibold text-xl text-white drop-shadow-lg line-clamp-2">
-                          {event.title}
-                        </h3>
-                      </div>
+                    {/* Badge de estado */}
+                    <div className="absolute top-3 right-3">
+                      <Badge 
+                        className="border shadow-sm text-xs font-semibold"
+                        style={{ 
+                          backgroundColor: event.status === 'published' ? '#10B981' : '#6B7280',
+                          color: 'white',
+                          borderColor: event.status === 'published' ? '#059669' : '#4B5563'
+                        }}
+                      >
+                        {event.status === 'published' ? 'Activo' : 'Borrador'}
+                      </Badge>
                     </div>
                     
-                    {/* Área de contenido inferior */}
-                    <div className="flex-1 p-4 bg-gray-50 flex flex-col justify-center">
-                      <div className="space-y-2">
-                        <div className="flex items-center text-gray-700">
-                          <Calendar className="h-4 w-4 mr-2 text-blue-600" />
-                          <span className="text-sm">
-                            {formatDate(event.start_date)}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-gray-700">
-                          <MapPin className="h-4 w-4 mr-2 text-red-600" />
-                          <span className="text-sm font-medium">
-                            {event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}
-                          </span>
-                        </div>
-                        {event.capacity && (
-                          <div className="flex items-center text-gray-700">
-                            <Users className="h-4 w-4 mr-2 text-purple-600" />
-                            <span className="text-sm">
-                              {event.registeredCount || 0} / {event.capacity} participantes
-                            </span>
-                          </div>
-                        )}
-                        <div className="text-xs text-gray-500 mt-2">
-                          <span className="font-medium">Organiza: </span>
-                          <span className="text-gray-700">{event.organizer_name || 'Administración del Parque'}</span>
-                        </div>
+                    {/* Contenido superpuesto con fondo semitransparente */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-4 space-y-2">
+                      {/* Título del evento */}
+                      <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                        {event.title}
+                      </h3>
+                      
+                      {/* Información del parque/ubicación */}
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <MapPin className="h-3 w-3 text-blue-600 flex-shrink-0" />
+                        <span className="text-xs truncate">
+                          {event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}
+                        </span>
                       </div>
+                      
+                      {/* Fecha */}
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Calendar className="h-3 w-3 text-green-600 flex-shrink-0" />
+                        <span className="text-xs">
+                          {formatDate(event.start_date)}
+                        </span>
+                      </div>
+                      
+                      {/* Botón Ver detalle */}
+                      <Button 
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white h-7 text-xs px-3" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.open(`/event/${event.id}`, '_blank');
+                        }}
+                      >
+                        Ver detalle
+                        <Eye className="h-2 w-2 ml-1" />
+                      </Button>
                     </div>
                   </div>
                 ) : (
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-6">
-                      {/* Contenido del evento - 3/4 del espacio */}
+                    <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-4 mb-3">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {event.title}
-                          </h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold text-lg text-gray-900">{event.title}</h3>
                           <Badge 
-                            className="text-xs border shadow-sm font-medium text-white"
+                            className="border text-xs text-white"
                             style={{ 
                               backgroundColor: eventTypeColors[event.event_type as keyof typeof eventTypeColors] || '#3B82F6',
                               borderColor: 'rgba(255,255,255,0.3)'
@@ -373,44 +372,73 @@ const Events: React.FC = () => {
                           >
                             {event.event_type}
                           </Badge>
+                          <Badge 
+                            className="border text-xs font-semibold"
+                            style={{ 
+                              backgroundColor: event.status === 'published' ? '#10B981' : '#6B7280',
+                              color: 'white',
+                              borderColor: event.status === 'published' ? '#059669' : '#4B5563'
+                            }}
+                          >
+                            {event.status === 'published' ? 'Activo' : 'Borrador'}
+                          </Badge>
                         </div>
                         
-                        <div className="flex items-center gap-6 text-sm text-gray-500 mb-2">
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            {formatDate(event.start_date)} {event.start_time && `- ${formatTime(event.start_time)}`}
+                        <p className="text-gray-600 mb-4 line-clamp-2">{event.description}</p>
+                        
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <MapPin className="h-4 w-4 text-blue-600" />
+                            <span>{event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}</span>
                           </div>
-                          <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            {event.parks && event.parks.length > 0 ? event.parks[0].name : event.location}
+                          
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Calendar className="h-4 w-4 text-green-600" />
+                            <span>
+                              {formatDate(event.start_date)}
+                            </span>
                           </div>
+                          
+                          {event.start_time && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Clock className="h-4 w-4 text-purple-600" />
+                              <span>{formatTime(event.start_time)}</span>
+                            </div>
+                          )}
+                          
+                          {event.capacity && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Users className="h-4 w-4 text-orange-600" />
+                              <span>{event.registeredCount || 0}/{event.capacity} personas</span>
+                            </div>
+                          )}
                         </div>
                         
-                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                          {event.description}
-                        </p>
-                        
-                        <div className="text-xs text-gray-500">
-                          <span className="font-medium">Organiza: </span>
-                          <span className="text-gray-700">{event.organizer_name || 'Administración del Parque'}</span>
-                        </div>
+                        {event.organizer_name && (
+                          <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
+                            <Star className="h-4 w-4 text-yellow-600" />
+                            <span>Organiza: {event.organizer_name}</span>
+                          </div>
+                        )}
                       </div>
                       
-                      {/* Imagen del evento - 1/4 del espacio */}
-                      <div className="w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg">
-                        {event.featuredImageUrl ? (
-                          <img 
-                            src={event.featuredImageUrl?.startsWith('/uploads/') 
-                              ? `/api/storage/file/${encodeURIComponent(event.featuredImageUrl.replace(/^\//, ''))}`
-                              : event.featuredImageUrl
-                            } 
-                            alt={event.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <Calendar className="h-8 w-8 text-gray-400" />
-                          </div>
+                      <div className="ml-4 flex flex-col gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.open(`/event/${event.id}`, '_blank');
+                          }}
+                        >
+                          Ver detalle
+                        </Button>
+                        {event.status === 'published' && (
+                          <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs self-start">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Activo
+                          </Badge>
                         )}
                       </div>
                     </div>
