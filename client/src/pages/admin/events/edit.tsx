@@ -306,13 +306,22 @@ export default function EditEventPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="park_id">Parque *</Label>
+                      <Label htmlFor="parkIds">🎯 Parques asociados (múltiples) *</Label>
                       <Select
-                        value={form.watch('park_id')}
-                        onValueChange={(value) => form.setValue('park_id', value)}
+                        value={""}
+                        onValueChange={(value) => {
+                          const currentValues = form.watch('parkIds') || [];
+                          const valueNumber = Number(value);
+                          
+                          if (currentValues.includes(valueNumber)) {
+                            form.setValue('parkIds', currentValues.filter(val => val !== valueNumber));
+                          } else {
+                            form.setValue('parkIds', [...currentValues, valueNumber]);
+                          }
+                        }}
                       >
                         <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Seleccionar parque" />
+                          <SelectValue placeholder="Seleccionar parques" />
                         </SelectTrigger>
                         <SelectContent>
                           {parks?.map((park: any) => (
@@ -322,19 +331,25 @@ export default function EditEventPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      {form.formState.errors.park_id && (
-                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.park_id.message}</p>
+                      <div className="text-sm text-gray-600 mt-1">
+                        Parques seleccionados: {(form.watch('parkIds') || []).length > 0 
+                          ? parks?.filter((park: any) => (form.watch('parkIds') || []).includes(park.id))
+                              .map((park: any) => park.name).join(', ')
+                          : 'Ninguno'}
+                      </div>
+                      {form.formState.errors.parkIds && (
+                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.parkIds.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <Label htmlFor="category">Categoría *</Label>
+                      <Label htmlFor="eventType">🎯 Tipo de evento *</Label>
                       <Select
-                        value={form.watch('category')}
-                        onValueChange={(value) => form.setValue('category', value)}
+                        value={form.watch('eventType')}
+                        onValueChange={(value) => form.setValue('eventType', value)}
                       >
                         <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Seleccionar categoría" />
+                          <SelectValue placeholder="Seleccionar tipo" />
                         </SelectTrigger>
                         <SelectContent>
                           {(eventCategories as any[])?.map((category: any) => (
@@ -350,8 +365,8 @@ export default function EditEventPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      {form.formState.errors.category && (
-                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.category.message}</p>
+                      {form.formState.errors.eventType && (
+                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.eventType.message}</p>
                       )}
                     </div>
                   </div>
@@ -369,24 +384,24 @@ export default function EditEventPage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="start_date">Fecha de Inicio *</Label>
+                      <Label htmlFor="startDate">🎯 Fecha de Inicio *</Label>
                       <Input
-                        id="start_date"
+                        id="startDate"
                         type="date"
-                        {...form.register('start_date')}
+                        {...form.register('startDate')}
                         className="mt-1"
                       />
-                      {form.formState.errors.start_date && (
-                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.start_date.message}</p>
+                      {form.formState.errors.startDate && (
+                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.startDate.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <Label htmlFor="end_date">Fecha de Fin</Label>
+                      <Label htmlFor="endDate">🎯 Fecha de Fin</Label>
                       <Input
-                        id="end_date"
+                        id="endDate"
                         type="date"
-                        {...form.register('end_date')}
+                        {...form.register('endDate')}
                         className="mt-1"
                       />
                     </div>
@@ -394,24 +409,24 @@ export default function EditEventPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="start_time">Hora de Inicio *</Label>
+                      <Label htmlFor="startTime">🎯 Hora de Inicio *</Label>
                       <Input
-                        id="start_time"
+                        id="startTime"
                         type="time"
-                        {...form.register('start_time')}
+                        {...form.register('startTime')}
                         className="mt-1"
                       />
-                      {form.formState.errors.start_time && (
-                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.start_time.message}</p>
+                      {form.formState.errors.startTime && (
+                        <p className="text-sm text-red-500 mt-1">{form.formState.errors.startTime.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <Label htmlFor="end_time">Hora de Fin</Label>
+                      <Label htmlFor="endTime">🎯 Hora de Fin</Label>
                       <Input
-                        id="end_time"
+                        id="endTime"
                         type="time"
-                        {...form.register('end_time')}
+                        {...form.register('endTime')}
                         className="mt-1"
                       />
                     </div>
@@ -541,44 +556,44 @@ export default function EditEventPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="organizer_name">Nombre del Organizador</Label>
+                    <Label htmlFor="organizerName">🎯 Nombre del Organizador</Label>
                     <Input
-                      id="organizer_name"
-                      {...form.register('organizer_name')}
+                      id="organizerName"
+                      {...form.register('organizerName')}
                       placeholder="Nombre del organizador"
                       className="mt-1"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="organizer_organization">Empresa / Organización</Label>
+                    <Label htmlFor="organizerOrganization">🎯 Empresa / Organización</Label>
                     <Input
-                      id="organizer_organization"
-                      {...form.register('organizer_organization')}
+                      id="organizerOrganization"
+                      {...form.register('organizerOrganization')}
                       placeholder="Nombre de la empresa u organización"
                       className="mt-1"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="contact_email">Email de Contacto</Label>
+                    <Label htmlFor="organizerEmail">🎯 Email de Contacto</Label>
                     <Input
-                      id="contact_email"
+                      id="organizerEmail"
                       type="email"
-                      {...form.register('contact_email')}
+                      {...form.register('organizerEmail')}
                       placeholder="organizador@parques.gob.mx"
                       className="mt-1"
                     />
-                    {form.formState.errors.contact_email && (
-                      <p className="text-sm text-red-500 mt-1">{form.formState.errors.contact_email.message}</p>
+                    {form.formState.errors.organizerEmail && (
+                      <p className="text-sm text-red-500 mt-1">{form.formState.errors.organizerEmail.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <Label htmlFor="contact_phone">Teléfono de Contacto</Label>
+                    <Label htmlFor="organizerPhone">🎯 Teléfono de Contacto</Label>
                     <Input
-                      id="contact_phone"
-                      {...form.register('contact_phone')}
+                      id="organizerPhone"
+                      {...form.register('organizerPhone')}
                       placeholder="33 1234 5678"
                       className="mt-1"
                     />
