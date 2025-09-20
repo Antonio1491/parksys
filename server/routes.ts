@@ -73,9 +73,10 @@ import activityRegistrationsRouter from "./routes/activity-registrations";
 import eventRegistrationsRouter from "./routes/event-registrations";
 import eventPaymentsRouter from "./routes/event-payments";
 import paymentsRouter from "./routes/payments";
-import { registerActivityPaymentRoutes } from "./routes/activityPaymentsSimple";
+import { registerActivityPaymentRoutes } from "./routes/activityPayments";
 import { registerSpacePaymentRoutes } from "./routes/space-payments";
 import unifiedDiscountRouter from "./routes/unified-discounts";
+import costingIntegrationRouter from "./routes/costing-integration";
 import { registerActivityStatsRoutes } from "./routes/activity-stats";
 import { uploadAdvertising, handleAdvertisingUpload } from "./api/advertising-upload";
 import { 
@@ -315,6 +316,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Unified discount validation routes
   app.use('/api/unified-discounts', unifiedDiscountRouter);
+  
+  // Costing integration routes
+  app.use('/api/costing', costingIntegrationRouter);
   
   // Object Storage routes for images and files
   registerObjectStorageRoutes(app, apiRouter, isAuthenticated);
@@ -1080,6 +1084,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   } catch (error) {
     console.warn("⚠️ [NON-CRITICAL] Error al importar createHybridPaymentTables:", error);
+  }
+
+  // Crear tabla de auditoría de costeo - NON-BLOCKING para evitar fallas de deployment  
+  try {
+    const { createCostingAuditTable } = await import("./create-costing-audit-table");
+    
+    // Ejecutar en background sin bloquear el startup
+    setImmediate(async () => {
+      try {
+        await createCostingAuditTable();
+        console.log("💰 Tabla de auditoría de costeo inicializada automáticamente");
+      } catch (backgroundError) {
+        console.warn("⚠️ [NON-CRITICAL] Error al crear tabla de auditoría de costeo (no bloquea el servidor):", backgroundError);
+      }
+    });
+  } catch (error) {
+    console.warn("⚠️ [NON-CRITICAL] Error al importar createCostingAuditTable:", error);
   }
   
   // Registramos las rutas del sistema de cobro híbrido

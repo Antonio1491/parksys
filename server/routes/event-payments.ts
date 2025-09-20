@@ -257,6 +257,44 @@ router.post('/:eventId/confirm-payment', async (req, res) => {
 
     console.log(`✅ Inscripción confirmada para evento ${eventId}: ${registration.id}`);
 
+    // Procesar costeo financiero automáticamente
+    try {
+      const originalAmount = parseFloat(paymentIntent.metadata.original_amount);
+      const finalAmount = parseFloat(paymentIntent.metadata.final_amount);
+      const discountPercentage = parseFloat(paymentIntent.metadata.discount_percentage || '0');
+      const discountBreakdown = JSON.parse(paymentIntent.metadata.discounts_applied || '{}');
+
+      // Llamar al módulo de costeo para procesar automáticamente
+      const costingResponse = await fetch(`${process.env.BASE_URL || 'http://localhost:5000'}/api/costing/process-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-firebase-uid': 'system',
+        },
+        body: JSON.stringify({
+          entityType: 'event',
+          entityId: parseInt(eventId),
+          originalAmount: originalAmount,
+          finalAmount: finalAmount,
+          discountPercentage: discountPercentage,
+          discountBreakdown: discountBreakdown,
+          costRecoveryPercentage: 30.0, // valor por defecto
+          paymentIntentId: paymentIntentId,
+          customerEmail: participantData.email
+        })
+      });
+
+      if (costingResponse.ok) {
+        const costingResult = await costingResponse.json();
+        console.log(`💰 Costeo procesado automáticamente para evento ${eventId}:`, costingResult.costingMetrics);
+      } else {
+        console.warn(`⚠️ No se pudo procesar costeo para evento ${eventId}:`, await costingResponse.text());
+      }
+    } catch (costingError) {
+      console.error('❌ Error procesando costeo automático:', costingError);
+      // No fallar la confirmación del pago por errores de costeo
+    }
+
     res.json({
       success: true,
       data: registration,
