@@ -223,6 +223,10 @@ const NewEventPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* DEBUG TEMPORAL: Elemento simple para confirmar renderizado */}
+        <div style={{background: "orange", padding: "10px", border: "3px solid red"}}>
+          🔥 RENDERIZADO OK - isFree: {String(form.watch("isFree"))}
+        </div>
         {/* Header con patrón Card estandarizado */}
         <Card className="p-4 bg-gray-50">
           <div className="flex items-center gap-2">
