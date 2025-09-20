@@ -68,7 +68,7 @@ export function ActivityPaymentForm({
       discounts.push({
         id: 'seniors',
         label: '🧓 Adultos mayores (65+)',
-        percentage: activity.discountSeniors || 0,
+        percentage: activity?.discountSeniors || 0,
         description: 'Descuento para personas de 65 años en adelante'
       });
     }
@@ -77,7 +77,7 @@ export function ActivityPaymentForm({
       discounts.push({
         id: 'students',
         label: '🎓 Estudiantes',
-        percentage: activity.discountStudents || 0,
+        percentage: activity?.discountStudents || 0,
         description: 'Descuento para estudiantes con credencial válida'
       });
     }
@@ -86,7 +86,7 @@ export function ActivityPaymentForm({
       discounts.push({
         id: 'families',
         label: '👨‍👩‍👧‍👦 Familias numerosas',
-        percentage: activity.discountFamilies || 0,
+        percentage: activity?.discountFamilies || 0,
         description: 'Descuento para familias con 3 o más hijos'
       });
     }
@@ -95,7 +95,7 @@ export function ActivityPaymentForm({
       discounts.push({
         id: 'disability',
         label: '♿ Personas con discapacidad',
-        percentage: activity.discountDisability || 0,
+        percentage: activity?.discountDisability || 0,
         description: 'Descuento para personas con discapacidad'
       });
     }

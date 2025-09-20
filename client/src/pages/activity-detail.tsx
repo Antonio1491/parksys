@@ -788,7 +788,7 @@ function ActivityDetailPage() {
                       {activity?.isRecurring ? (
                         activity?.recurringDays && activity.recurringDays.length > 0 
                           ? `Se repite: ${activity.recurringDays.map(day => {
-                              const dayTranslations = {
+                              const dayTranslations: { [key: string]: string } = {
                                 'lunes': 'Lunes',
                                 'martes': 'Martes', 
                                 'miércoles': 'Miércoles',
@@ -1011,19 +1011,19 @@ function ActivityDetailPage() {
                 <CardHeader className="text-center pb-2">
                   <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-primary/10">
                     <AvatarImage 
-                      src={instructorDetails?.profileImageUrl || undefined} 
-                      alt={instructorDetails?.fullName || activity?.instructorName || 'Instructor'}
+                      src={(instructorDetails as any)?.profileImageUrl || undefined} 
+                      alt={(instructorDetails as any)?.fullName || activity?.instructorName || 'Instructor'}
                     />
                     <AvatarFallback className="bg-gradient-to-br from-primary to-primary-600 text-white font-semibold text-lg">
-                      {(instructorDetails?.fullName || activity?.instructorName || 'IN').split(' ').map((n: string) => n[0]).join('')}
+                      {((instructorDetails as any)?.fullName || activity?.instructorName || 'IN').split(' ').map((n: string) => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   <CardTitle className="text-lg font-semibold text-gray-900">
-                    {instructorDetails?.fullName || activity?.instructorName || 'Instructor asignado'}
+                    {(instructorDetails as any)?.fullName || activity?.instructorName || 'Instructor asignado'}
                   </CardTitle>
                   <CardDescription className="flex items-center justify-center gap-1 text-primary">
                     <Award className="h-4 w-4" />
-                    {instructorDetails?.experienceYears || 'N/A'} años de experiencia
+                    {(instructorDetails as any)?.experienceYears || 'N/A'} años de experiencia
                   </CardDescription>
                 </CardHeader>
                 
@@ -1031,14 +1031,14 @@ function ActivityDetailPage() {
                   {/* Especialidades */}
                   <div className="mb-4">
                     <div className="flex flex-wrap gap-1 justify-center">
-                      {getSpecialtiesArray(instructorDetails?.specialties).slice(0, 2).map((specialty: string, index: number) => (
+                      {getSpecialtiesArray((instructorDetails as any)?.specialties).slice(0, 2).map((specialty: string, index: number) => (
                         <Badge key={index} variant="secondary" className="text-xs bg-primary/10 text-primary">
                           {specialty}
                         </Badge>
                       ))}
-                      {getSpecialtiesArray(instructorDetails?.specialties).length > 2 && (
+                      {getSpecialtiesArray((instructorDetails as any)?.specialties).length > 2 && (
                         <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600">
-                          +{getSpecialtiesArray(instructorDetails?.specialties).length - 2}
+                          +{getSpecialtiesArray((instructorDetails as any)?.specialties).length - 2}
                         </Badge>
                       )}
                     </div>
@@ -1046,7 +1046,7 @@ function ActivityDetailPage() {
 
                   {/* Rating */}
                   <div className="flex justify-center mb-4">
-                    {renderStars(instructorDetails?.rating || null)}
+                    {renderStars((instructorDetails as any)?.rating || null)}
                   </div>
 
                   {/* Botones de acción */}
