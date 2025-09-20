@@ -221,6 +221,34 @@ export default function EditEventPage() {
     updateEventMutation.mutate(data);
   };
 
+  // 🎯 Función para manejar cambio de "Evento gratuito" con actualización inmediata
+  const handleToggleFree = (checked: boolean) => {
+    console.log('🎯 [TOGGLE] Cambiando evento gratuito a:', checked);
+    
+    // Actualizar el formulario inmediatamente
+    form.setValue('isFree', checked);
+    
+    // Si se activa gratuito, limpiar el precio
+    if (checked) {
+      form.setValue('price', undefined);
+    }
+    
+    // Obtener todos los datos actuales del formulario
+    const currentData = form.getValues();
+    
+    // Actualizar con el nuevo valor de isFree
+    const updatedData = {
+      ...currentData,
+      isFree: checked,
+      price: checked ? undefined : currentData.price
+    };
+    
+    console.log('🚀 [TOGGLE] Enviando actualización inmediata:', updatedData);
+    
+    // Ejecutar la mutación inmediatamente
+    updateEventMutation.mutate(updatedData);
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -472,7 +500,8 @@ export default function EditEventPage() {
                       </div>
                       <Checkbox
                         checked={form.watch('isFree')}
-                        onCheckedChange={(checked) => form.setValue('isFree', !!checked)}
+                        onCheckedChange={(checked) => handleToggleFree(!!checked)}
+                        data-testid="checkbox-evento-gratuito"
                       />
                     </div>
                   </div>
