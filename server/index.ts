@@ -2894,19 +2894,17 @@ function startServer() {
     
     // ALL HEAVY INITIALIZATION HAPPENS ASYNCHRONOUSLY AFTER SERVER IS LISTENING
     // This ensures health checks can respond immediately during deployment
-    setImmediate(() => {
-      console.log(`🔧 [BACKGROUND] Starting full server initialization...`);
+    // Initialize everything in the background without awaiting to prevent blocking
+    initializeFullServer()
+      .then(() => {
+        console.log(`✅ [BACKGROUND] Full server initialization complete`);
+      })
+      .catch((error) => {
+        console.error(`❌ [BACKGROUND] Server initialization error (non-critical):`, error);
+      });
       
-      // Initialize everything in the background without awaiting to prevent blocking
-      initializeFullServer()
-        .then(() => {
-          console.log(`✅ [BACKGROUND] Full server initialization complete`);
-        })
-        .catch((error) => {
-          console.error(`❌ [BACKGROUND] Server initialization error (non-critical):`, error);
-        });
-    });
-  });
+    }); // End first setImmediate
+  }); // End app.listen
 
   // Function to initialize everything else asynchronously
   async function initializeFullServer() {
@@ -2955,7 +2953,7 @@ function startServer() {
         // ✅ FIXED: Servir archivos estáticos desde dist/public (estructura Vite correcta)
         const distPath = path.join(process.cwd(), 'dist', 'public');
         
-        // Verificar que el directorio existe
+        // Verificar que el directorio exists
         if (!fs.existsSync(distPath)) {
           console.error(`❌ [PROD] Build directory not found: ${distPath}`);
           console.error(`❌ [PROD] Please run 'npm run build' first`);
@@ -2965,26 +2963,18 @@ function startServer() {
           console.log(`✅ [PROD] Static files served from: ${distPath}`);
         }
         
-        // NO LLAMAR A serveStatic() porque ya manejamos las rutas estáticas arriba
-        // const { serveStatic } = await import("./vite");
-        // serveStatic(app);
-        
-        // ✅ ELIMINATED: Duplicate catch-all route removed - already handled in useStaticFrontend block
-        // The SPA catch-all is properly configured above with correct middleware ordering
-        
         console.log("🎨 [FRONTEND] Production static serving configured with correct dist paths");
       } else {
         // 🔧 DEV FIX: Vite was already setup immediately after server start
         console.log("🎨 [FRONTEND] Development Vite already enabled - skipping duplicate setup");
       }
       
-      console.log('✅ [BACKGROUND] Full server initialization complete - API routes have priority over frontend');
+      console.log('✅ [BACKGROUND] Full server initialization complete');
+      
     } catch (error) {
       console.error('❌ [BACKGROUND] Server initialization error (non-critical):', error);
     }
-    }); // End setImmediate
-  }); // End app.listen
-}
+  }
 
   // Helper function to register all routes BEFORE Vite setup (critical for API priority)
   async function registerAllOtherRoutesBeforeVite() {
@@ -3015,8 +3005,8 @@ function startServer() {
     }
   }
 
-  // Add process safety handlers to prevent unexpected exits
-  process.on('uncaughtException', (error) => {
+// Add process safety handlers to prevent unexpected exits
+process.on('uncaughtException', (error) => {
     console.error('🚨 [PROCESS] Uncaught Exception:', error);
     console.error('🚨 [PROCESS] Error stack:', error.stack);
     console.error('🚨 [PROCESS] Server will continue running...');
