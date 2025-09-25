@@ -1,0 +1,111 @@
+index-CxP-xPPN.js:2422 🔥 Firebase initialized successfully
+index-CxP-xPPN.js:49 🌐 [API REQUEST] GET /api/parks
+index-CxP-xPPN.js:849 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-CxP-xPPN.js:849 i18next: languageChanged es
+index-CxP-xPPN.js:849 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+index-CxP-xPPN.js:893  GET https://parksys-demo.replit.app/api/advertising-management/space-mapping?pageType=parks&position=footer 404 (Not Found)
+queryFn @ index-CxP-xPPN.js:893
+s @ index-CxP-xPPN.js:49
+y @ index-CxP-xPPN.js:49
+start @ index-CxP-xPPN.js:49
+fetch @ index-CxP-xPPN.js:49
+Kp @ index-CxP-xPPN.js:49
+onSubscribe @ index-CxP-xPPN.js:49
+subscribe @ index-CxP-xPPN.js:49
+(anonymous) @ index-CxP-xPPN.js:49
+XB @ index-CxP-xPPN.js:39
+__ @ index-CxP-xPPN.js:41
+Xh @ index-CxP-xPPN.js:41
+pie @ index-CxP-xPPN.js:41
+Pd @ index-CxP-xPPN.js:41
+j4 @ index-CxP-xPPN.js:41
+ad @ index-CxP-xPPN.js:39
+(anonymous) @ index-CxP-xPPN.js:41
+setTimeout
+hse @ index-CxP-xPPN.js:49
+o @ index-CxP-xPPN.js:49
+batch @ index-CxP-xPPN.js:49
+zo @ index-CxP-xPPN.js:49
+setData @ index-CxP-xPPN.js:49
+onSuccess @ index-CxP-xPPN.js:49
+f @ index-CxP-xPPN.js:49
+Promise.then
+y @ index-CxP-xPPN.js:49
+start @ index-CxP-xPPN.js:49
+fetch @ index-CxP-xPPN.js:49
+Kp @ index-CxP-xPPN.js:49
+onSubscribe @ index-CxP-xPPN.js:49
+subscribe @ index-CxP-xPPN.js:49
+(anonymous) @ index-CxP-xPPN.js:49
+XB @ index-CxP-xPPN.js:39
+__ @ index-CxP-xPPN.js:41
+Xh @ index-CxP-xPPN.js:41
+j4 @ index-CxP-xPPN.js:41
+ad @ index-CxP-xPPN.js:39
+pie @ index-CxP-xPPN.js:41
+Pd @ index-CxP-xPPN.js:41
+Aq @ index-CxP-xPPN.js:41
+C @ index-CxP-xPPN.js:26
+R @ index-CxP-xPPN.js:26Understand this error
+index-CxP-xPPN.js:893 ⚠️ No space mapping found for parks:footer
+gpe @ index-CxP-xPPN.js:893
+QP @ index-CxP-xPPN.js:39
+h2 @ index-CxP-xPPN.js:41
+Dq @ index-CxP-xPPN.js:41
+Oq @ index-CxP-xPPN.js:41
+fie @ index-CxP-xPPN.js:41
+ob @ index-CxP-xPPN.js:41
+j4 @ index-CxP-xPPN.js:41
+ad @ index-CxP-xPPN.js:39
+(anonymous) @ index-CxP-xPPN.js:41
+setTimeout
+hse @ index-CxP-xPPN.js:49
+o @ index-CxP-xPPN.js:49
+batch @ index-CxP-xPPN.js:49
+zo @ index-CxP-xPPN.js:49
+l @ index-CxP-xPPN.js:49
+m @ index-CxP-xPPN.js:49
+(anonymous) @ index-CxP-xPPN.js:49
+Promise.catch
+y @ index-CxP-xPPN.js:49
+start @ index-CxP-xPPN.js:49
+fetch @ index-CxP-xPPN.js:49
+Kp @ index-CxP-xPPN.js:49
+onSubscribe @ index-CxP-xPPN.js:49
+subscribe @ index-CxP-xPPN.js:49
+(anonymous) @ index-CxP-xPPN.js:49
+XB @ index-CxP-xPPN.js:39
+__ @ index-CxP-xPPN.js:41
+Xh @ index-CxP-xPPN.js:41
+pie @ index-CxP-xPPN.js:41
+Pd @ index-CxP-xPPN.js:41
+j4 @ index-CxP-xPPN.js:41
+ad @ index-CxP-xPPN.js:39
+(anonymous) @ index-CxP-xPPN.js:41
+setTimeout
+hse @ index-CxP-xPPN.js:49
+o @ index-CxP-xPPN.js:49
+batch @ index-CxP-xPPN.js:49
+zo @ index-CxP-xPPN.js:49
+setData @ index-CxP-xPPN.js:49
+onSuccess @ index-CxP-xPPN.js:49
+f @ index-CxP-xPPN.js:49
+Promise.then
+y @ index-CxP-xPPN.js:49
+start @ index-CxP-xPPN.js:49
+fetch @ index-CxP-xPPN.js:49
+Kp @ index-CxP-xPPN.js:49
+onSubscribe @ index-CxP-xPPN.js:49
+subscribe @ index-CxP-xPPN.js:49
+(anonymous) @ index-CxP-xPPN.js:49
+XB @ index-CxP-xPPN.js:39
+__ @ index-CxP-xPPN.js:41
+Xh @ index-CxP-xPPN.js:41
+j4 @ index-CxP-xPPN.js:41
+ad @ index-CxP-xPPN.js:39
+pie @ index-CxP-xPPN.js:41
+Pd @ index-CxP-xPPN.js:41
+Aq @ index-CxP-xPPN.js:41
+C @ index-CxP-xPPN.js:26
+R @ index-CxP-xPPN.js:26Understand this warning
+index-CxP-xPPN.js:49 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1

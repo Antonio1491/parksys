@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "simple-server": "node server/simple-health-server.js"
+  }
+}
