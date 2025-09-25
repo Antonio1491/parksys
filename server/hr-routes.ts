@@ -1132,7 +1132,7 @@ export function registerHRRoutes(app: any, apiRouter: Router, isAuthenticated: a
   });
 
   // Ruta para obtener historial de pagos de un empleado
-  apiRouter.get("/hr/employees/:id/payroll-history", async (req: Request, res: Response) => {
+  apiRouter.get("/employees/:id/payroll-history", async (req: Request, res: Response) => {
     try {
       const employeeId = parseInt(req.params.id);
       const { period, year, month } = req.query;
@@ -1238,7 +1238,7 @@ export function registerHRRoutes(app: any, apiRouter: Router, isAuthenticated: a
   });
 
   // Ruta para obtener resumen de historial de pagos (estadísticas)
-  apiRouter.get("/hr/employees/:id/payroll-summary", async (req: Request, res: Response) => {
+  apiRouter.get("/employees/:id/payroll-summary", async (req: Request, res: Response) => {
     try {
       const employeeId = parseInt(req.params.id);
 
