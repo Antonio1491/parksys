@@ -12,8 +12,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, Plus, FileUp, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck, ChevronDown, CheckCircle, Calendar } from "lucide-react";
+import { Search, Plus, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck, ChevronDown, CheckCircle, Calendar } from "lucide-react";
 import { 
   Table, 
   TableBody, 
@@ -96,17 +95,17 @@ const isParkCertified = (park: Park) => {
 const getStatusColor = (status?: string) => {
   switch (status) {
     case 'Operativo':
-      return 'bg-green-100 text-green-800';
+      return 'bg-status-active text-status-foreground';
     case 'En mantenimiento':
-      return 'bg-yellow-100 text-yellow-800';
+      return 'bg-status-scheduled text-status-foreground';
     case 'Cerrado temporalmente':
-      return 'bg-red-100 text-red-800';
+      return 'bg-status-cancelled/60 text-status-foreground';
     case 'En construcción':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-status-paused text-status-foreground';
     case 'Renovación':
-      return 'bg-purple-100 text-purple-800';
+      return 'bg-status-awaitingBudget text-status-foreground';
     case 'Cerrado permanentemente':
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-status-cancelled text-foreground/80';
     case 'Planificado':
       return 'bg-indigo-100 text-indigo-800';
     case 'Abandonado':
@@ -315,22 +314,22 @@ const AdminParksContent = () => {
 
     const getRatingColor = (rating: number | null) => {
       if (!rating) return "bg-gray-100 text-gray-800";
-      if (rating >= 4.5) return "bg-green-100 text-green-800";
-      if (rating >= 3.5) return "bg-yellow-100 text-yellow-800";
-      return "bg-red-100 text-red-800";
+      if (rating >= 4.5) return "bg-value-high/10 text-value-high";
+      if (rating >= 3.5) return "bg-value-medium/10 text-value-medium";
+      return "bg-value-low/10 text-value-low";
     };
 
     const getStatusColor = (status: string | null | undefined) => {
       switch (status) {
-        case "en_funcionamiento": return "bg-green-100 text-green-800";
-        case "operando_parcialmente": return "bg-yellow-100 text-yellow-800";
-        case "en_mantenimiento": return "bg-orange-100 text-orange-800";
-        case "cerrado_temporalmente": return "bg-red-100 text-red-800";
-        case "cerrado_indefinidamente": return "bg-red-200 text-red-900";
-        case "reapertura_proxima": return "bg-blue-100 text-blue-800";
-        case "en_proyecto_construccion": return "bg-purple-100 text-purple-800";
-        case "uso_restringido": return "bg-gray-100 text-gray-800";
-        default: return "bg-gray-100 text-gray-800";
+        case "en_funcionamiento": return "bg-status-active text-status-foreground";
+        case "operando_parcialmente": return "bg-status-scheduled text-status-foreground";
+        case "en_mantenimiento": return "bg-status-scheduled text-status-foreground";
+        case "cerrado_temporalmente": return "bg-status-cancelled text-status-foreground";
+        case "cerrado_indefinidamente": return "bg-status-cancelled text-status-foreground";
+        case "reapertura_proxima": return "bg-status-paused text-status-foreground";
+        case "en_proyecto_construccion": return "bg-status-awaitingBudget text-status-foreground";
+        case "uso_restringido": return "bg-gray-100 text-status-foreground";
+        default: return "bg-gray-100 text-status-foreground";
       }
     };
 
@@ -678,121 +677,6 @@ const AdminParksContent = () => {
     );
   };
 
-  // Render list view
-  const renderListView = () => {
-    return (
-      <div className="space-y-4">
-        {currentParks.map((park: Park) => (
-          <Card 
-            key={park.id} 
-            className="hover:shadow-lg duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-            onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setLocation(`/admin/parks/${park.id}/view`);
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            aria-label={`Ver detalles del parque ${park.name}`}
-            data-testid={`card-park-list-${park.id}`}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3 flex-1">
-                  {selectionMode && (
-                    <div 
-                      onClick={(e) => e.stopPropagation()}
-                      onKeyDown={(e) => e.stopPropagation()}
-                    >
-                      <Checkbox
-                        checked={selectedParks.has(park.id)}
-                        onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
-                        data-testid={`checkbox-park-list-${park.id}`}
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900 flex-1">{park.name}</h3>
-                          {isParkCertified(park) && (
-                            <Badge 
-                              variant="secondary" 
-                              className="ml-2 bg-[#a8bd7d] text-white"
-                            >
-                              <Award className="h-8 w-4" />
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-6 text-sm text-gray-600 mt-2">
-                    <div className="flex items-center">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      <span className="max-w-xs truncate">{park.address}</span>
-                    </div>
-                    {park.municipalityText && (
-                      <div className="flex items-center">
-                        <Map className="h-4 w-4 mr-1" />
-                        <span className="font-medium text-emerald-700">{park.municipalityText}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center">
-                      <Package className="h-4 w-4 mr-1" />
-                      <span>
-                        {park.area
-                          ? `${(park.area / 10000).toLocaleString(undefined, {
-                              minimumFractionDigits: 1,
-                              maximumFractionDigits: 1,
-                            })} ha`
-                          : 'N/A'}
-                      </span>
-                    </div>
-                  </div>
-                  {park.description && (
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-2">{park.description}</p>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2 ml-6">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocation(`/admin/parks/${park.id}/manage`);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    title="Gestión completa del parque"
-                    className="text-blue-600 hover:text-blue-700"
-                    data-testid={`button-manage-park-list-${park.id}`}
-                  >
-                    <Wrench className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteClick(park);
-                    }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  };
-
   // Render table view with specific fields: Nombre, Área, Dirección, Administrador
   const renderParksTable = () => {
     // Helper function to format area
@@ -872,7 +756,7 @@ const AdminParksContent = () => {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="border bg-transparent text-gray-800 hover:text-white hover:bg-blue-600"
+                      className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
                       onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
                       data-testid={`button-view-park-table-${park.id}`}
                     >
@@ -881,7 +765,7 @@ const AdminParksContent = () => {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="border bg-transparent text-gray-800 hover:text-white hover:bg-emerald-600"
+                      className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
                       onClick={() => setLocation(`/admin/parks/${park.id}/manage`)}
                       data-testid={`button-edit-park-table-${park.id}`}
                     >
@@ -890,11 +774,11 @@ const AdminParksContent = () => {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="border bg-transparent text-red-800 hover:text-white hover:bg-red-600"
+                      className="bg-transparent text-destructive hover:text-destructive hover:bg-destructive/10 h-11 w-11"
                       onClick={() => handleDeleteClick(park)}
                       data-testid={`button-delete-park-table-${park.id}`}
                     >
-                      <Trash className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
@@ -958,11 +842,11 @@ const AdminParksContent = () => {
               )}
             </div>
 
-            <CardHeader className="pb-4">
+            <CardHeader className="min-h-64 pb-4">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
-                    <CardTitle className="font-poppins font-bold text-gray-900 text-lg flex-1">{park.name}</CardTitle>
+                    <CardTitle className="font-poppins font-bold text-foreground/80 text-lg flex-1">{park.name}</CardTitle>
                     {isParkCertified(park) && (
                       <Badge 
                         variant="certificated" 
@@ -999,7 +883,7 @@ const AdminParksContent = () => {
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
                     title="Editar parque"
-                    className="text-gray-800 hover:text-gray-800 hover:bg-[#ceefea]"
+                    className="text-foreground/80 bg-transparent hover:text-foreground/80 hover:bg-buttonHover"
                     data-testid={`button-edit-park-grid-${park.id}`}
                   >
                     <Edit className="h-4 w-4 mr-2" />
@@ -1015,7 +899,7 @@ const AdminParksContent = () => {
                     handleDeleteClick(park);
                   }}
                   onKeyDown={(e) => e.stopPropagation()}
-                  className="text-gray-800 hover:text-gray-800 hover:bg-[#ceefea]"
+                  className="text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover"
                   data-testid={`button-delete-park-grid-${park.id}`}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
@@ -1217,24 +1101,24 @@ const AdminParksContent = () => {
               
               <div className="flex items-center space-x-2">
                 {/* 1. Botón para cambiar los modos de visualización del grid */}
-                <div className="flex w-auto justify-end flex items-center space-x-1 bg-[#ededed] px-1 py-1 rounded-lg">
+                <div className="flex w-auto justify-end flex items-center bg-[#ededed] rounded-lg">
                   <Button
                     variant={viewMode === 'cards' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('cards')}
-                    className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                    className={`h-11 w-22 ${viewMode === 'cards' ? 'bg-primary text-white' : 'text-foreground'}`}
                     data-testid="button-view-cards"
                   >
-                    <Grid className="h-4 w-4" />
+                    <Grid />
                   </Button>
                   <Button
                     variant={viewMode === 'table' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('table')}
-                    className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                    className={`h-11 w-22 ${viewMode === 'table' ? 'bg-primary text-white' : 'text-foreground'}`}
                     data-testid="button-view-table"
                   >
-                    <List className="h-4 w-4" />
+                    <List />
                   </Button>
                 </div>
 
@@ -1243,10 +1127,10 @@ const AdminParksContent = () => {
                   <Button
                     variant={selectionMode ? 'default' : 'ghost'}
                     size="sm"
-                    className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed]'}`}
+                    className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-primary text-primary-foreground hover:bg-buttonHover' : 'bg-[#ededed]'}`}
                     data-testid="button-selection-toggle"
                   >
-                    <CopyCheck className="h-4 w-4 mr-1" />
+                    <CopyCheck />
                   </Button>
 
                   {/* Dropdown menu con CSS hover */}
@@ -1254,7 +1138,7 @@ const AdminParksContent = () => {
                     <div className="py-1">
                       <button
                         onClick={() => setSelectionMode(true)}
-                        className="w-full text-left block px-2 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                        className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
                         data-testid="menu-enable-selection"
                       >
                         <CopyCheck className="h-4 w-4 mr-2" />
@@ -1267,10 +1151,10 @@ const AdminParksContent = () => {
                           }
                           handleSelectAllParks();
                         }}
-                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                        className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
                         data-testid="menu-select-all"
                       >
-                        <CheckSquare className="h-5 w-5 mr-2" />
+                        <CheckSquare className="h-4 w-4 mr-2" />
                         Seleccionar todo
                       </button>
                       <button
@@ -1278,7 +1162,7 @@ const AdminParksContent = () => {
                           handleDeselectAllParks();
                           setSelectionMode(false);
                         }}
-                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                        className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
                         data-testid="menu-deselect-all"
                       >
                         <Square className="h-4 w-4 mr-2" />
@@ -1293,11 +1177,11 @@ const AdminParksContent = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleBulkDeleteClick}
-                  className="flex items-center h-11 min-w-11 bg-[#ededed] text-red-600 hover:bg-red-100 hover:text-red-700"
+                  className="flex items-center h-11 min-w-11 bg-[#ededed] text-destructive hover:bg-destructive/10 hover:text-destructive"
                   disabled={selectedParks.size === 0}
                   data-testid="button-delete-selected"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 />
                   {selectedParks.size > 0 ? ` (${selectedParks.size})` : ''}
                 </Button>
               </div>

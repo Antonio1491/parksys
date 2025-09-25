@@ -205,24 +205,14 @@ const NewEventPage: React.FC = () => {
     createEventMutation.mutate(normalizedPayload);
   };
 
-  // Estados de carga con DEBUG
-  console.log("🔥 ESTADO LOADING:", { 
-    parksLoading, 
-    categoriesLoading, 
-    parksData: Array.isArray(parks) ? parks.length : 0,
-    categoriesData: Array.isArray(eventCategories) ? eventCategories.length : 0,
-    parksError,
-    timestamp: new Date().toISOString()
-  });
+  // Estados de carga
   
   if (parksLoading || categoriesLoading) {
     return (
       <AdminLayout>
         <div className="space-y-6">
           <Card className="p-4">
-            <div style={{padding: "20px", backgroundColor: "yellow", border: "3px solid black"}}>
-              🔥 CARGANDO FORMULARIO - parksLoading: {String(parksLoading)}, categoriesLoading: {String(categoriesLoading)}
-            </div>
+            <div>Cargando formulario...</div>
           </Card>
         </div>
       </AdminLayout>
@@ -234,10 +224,6 @@ const NewEventPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* DEBUG TEMPORAL: Elemento simple para confirmar renderizado */}
-        <div style={{background: "orange", padding: "10px", border: "3px solid red"}}>
-          🔥 RENDERIZADO OK - isFree: {String(form.watch("isFree"))}
-        </div>
         {/* Header con patrón Card estandarizado */}
         <Card className="p-4 bg-gray-50">
           <div className="flex items-center gap-2">
@@ -746,6 +732,7 @@ const NewEventPage: React.FC = () => {
 
                 {/* NUEVO: Campos de descuentos unificados */}
                 {!form.watch("isFree") && (
+                  <>
                   <div className="md:col-span-2 bg-purple-50 p-4 rounded-lg">
                     <h4 className="text-sm font-semibold text-purple-800 mb-3">🎟️ Descuentos Disponibles</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -917,6 +904,7 @@ const NewEventPage: React.FC = () => {
                       showAdvancedFields={true}
                     />
                   </div>
+                  </>
                 )}
               </div>
             </div>
