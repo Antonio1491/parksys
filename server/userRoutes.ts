@@ -232,13 +232,27 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
       return next();
     }
     
-    // En producción, verificamos la autenticación
-    if (!req.user) {
+    // En producción, verificamos la autenticación Firebase
+    if (!req.user && !(req as any).firebaseUser) {
       return res.status(401).json({ message: "Authentication required" });
     }
     
-    if (req.user.role !== 'admin' && req.user.role !== 'director') {
+    // Si tenemos firebaseUser pero no req.user, usar el usuario de Firebase
+    const user = req.user || (req as any).firebaseUser;
+    
+    if (!user) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    // Verificar roles usando la estructura actual del sistema
+    const userRole = user.role || user.roleSlug || 'user';
+    if (userRole !== 'admin' && userRole !== 'super-admin' && userRole !== 'director') {
       return res.status(403).json({ message: "You don't have permission to access this resource" });
+    }
+    
+    // Asegurar que req.user está configurado para compatibilidad
+    if (!req.user) {
+      req.user = user;
     }
     
     next();

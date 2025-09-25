@@ -1253,5 +1253,7 @@ router.get('/campaigns/:id', async (req, res) => {
 // Importar rutas de mapeo de espacios
 import spaceMappingRouter from './routes/space-mapping-routes';
 router.use('/space-mappings', spaceMappingRouter);
+// ALSO register under singular route for backwards compatibility
+router.use('/space-mapping', spaceMappingRouter);
 
 export default router;
