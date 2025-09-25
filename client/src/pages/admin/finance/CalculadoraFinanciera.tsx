@@ -63,6 +63,18 @@ interface CalculatorData {
   indirect3: number;
   otherIndirectCosts: number;
   
+  // Sistema de descuentos unificado
+  discountSeniors?: number;
+  discountStudents?: number;
+  discountFamilies?: number;
+  discountDisability?: number;
+  discountEarlyBird?: number;
+  discountEarlyBirdDeadline?: string;
+  
+  // Costeo financiero
+  costRecoveryPercentage: number;
+  financialNotes?: string;
+  
   // Configuración
   desiredMarginPercentage: number;
 }
@@ -148,7 +160,14 @@ const CalculadoraFinanciera = () => {
         indirect2: 100,
         indirect3: 50,
         otherIndirectCosts: 0,
-        desiredMarginPercentage: 30
+        desiredMarginPercentage: 30,
+        costRecoveryPercentage: 30,
+        discountSeniors: 15,
+        discountStudents: 10,
+        discountFamilies: 20,
+        discountDisability: 25,
+        discountEarlyBird: 10,
+        financialNotes: "Actividad de bienestar comunitario con subsidio parcial"
       }
     },
     {
@@ -200,7 +219,14 @@ const CalculadoraFinanciera = () => {
         indirect2: 150,
         indirect3: 50,
         otherIndirectCosts: 0,
-        desiredMarginPercentage: 25
+        desiredMarginPercentage: 25,
+        costRecoveryPercentage: 35,
+        discountSeniors: 10,
+        discountStudents: 15,
+        discountFamilies: 20,
+        discountDisability: 25,
+        discountEarlyBird: 5,
+        financialNotes: "Taller cultural con apoyo municipal para fomento artístico"
       }
     }
   ]);
