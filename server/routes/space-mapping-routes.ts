@@ -432,71 +432,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// GET /api/advertising-management/space-mapping - Obtener mapeo específico por página/posición
-router.get('/space-mapping', async (req, res) => {
-  try {
-    const { pageType, position } = req.query;
-    
-    if (!pageType || !position) {
-      return res.status(400).json({
-        success: false,
-        error: 'pageType y position son requeridos'
-      });
-    }
-    
-    const result = await pool.query(`
-      SELECT 
-        sm.*,
-        ads.name as space_name,
-        ads.dimensions as space_dimensions,
-        ads.is_active as space_is_active
-      FROM space_mappings sm
-      JOIN ad_spaces ads ON sm.space_id = ads.id
-      WHERE sm.page_type = $1 AND sm.position = $2 AND sm.is_active = true
-      ORDER BY sm.priority DESC
-      LIMIT 1
-    `, [pageType, position]);
-    
-    if (result.rows.length === 0) {
-      return res.json({
-        success: true,
-        data: []
-      });
-    }
-    
-    const mapping = {
-      id: result.rows[0].id,
-      pageType: result.rows[0].page_type,
-      position: result.rows[0].position,
-      spaceId: result.rows[0].space_id,
-      isActive: result.rows[0].is_active,
-      priority: result.rows[0].priority,
-      fallbackBehavior: result.rows[0].fallback_behavior,
-      layoutConfig: result.rows[0].layout_config,
-      createdAt: result.rows[0].created_at,
-      updatedAt: result.rows[0].updated_at,
-      space: {
-        name: result.rows[0].space_name,
-        dimensions: result.rows[0].space_dimensions,
-        isActive: result.rows[0].space_is_active
-      }
-    };
-    
-    console.log(`🎯 Mapeo encontrado para ${pageType}:${position} -> espacio ${mapping.spaceId}`);
-    
-    res.json({
-      success: true,
-      data: [mapping]
-    });
-    
-  } catch (error) {
-    console.error('❌ Error obteniendo mapeo específico:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Error interno del servidor'
-    });
-  }
-});
+// RUTA DUPLICADA REMOVIDA - La ruta principal router.get('/', ...) ya maneja estos filtros con pageType y position
 
 // POST /api/advertising-management/space-mappings/auto-populate - Auto-poblar mapeos faltantes
 router.post('/auto-populate', async (req, res) => {
