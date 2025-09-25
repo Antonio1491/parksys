@@ -259,28 +259,30 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
     }
   }, [currentPlacement, isVisible, hasTrackedImpression, enableAnalytics]);
 
-  // Auto-refresh para asignaciones
+  // Auto-refresh para asignaciones - DISABLED for deployment stability
   useEffect(() => {
+    // DEPLOYMENT FIX: Temporarily disabled auto-refresh to prevent infinite loops during deployment
     if (!autoRefresh) return;
 
-    const interval = setInterval(() => {
-      cacheManager.invalidate(pageType, position);
-      refetchPlacements();
-    }, 60000); // Cada minuto
+    // const interval = setInterval(() => {
+    //   cacheManager.invalidate(pageType, position);
+    //   refetchPlacements();
+    // }, 60000); // Cada minuto
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [autoRefresh, pageType, position, refetchPlacements]);
 
-  // Rotación automática de anuncios
+  // Rotación automática de anuncios - DISABLED for deployment stability
   useEffect(() => {
+    // DEPLOYMENT FIX: Temporarily disabled auto-rotation to prevent infinite loops during deployment
     if (activePlacements.length <= 1) return;
 
-    const interval = setInterval(() => {
-      setCurrentAdIndex((prev) => (prev + 1) % activePlacements.length);
-      setHasTrackedImpression(false); // Reset para nueva impresión
-    }, 15000); // Cambiar cada 15 segundos
+    // const interval = setInterval(() => {
+    //   setCurrentAdIndex((prev) => (prev + 1) % activePlacements.length);
+    //   setHasTrackedImpression(false); // Reset para nueva impresión
+    // }, 15000); // Cambiar cada 15 segundos
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [activePlacements.length]);
 
   // Escuchar eventos de actualización global
