@@ -267,7 +267,14 @@ const CalculadoraFinanciera = () => {
       indirect2: 0,
       indirect3: 0,
       otherIndirectCosts: 0,
-      desiredMarginPercentage: 30
+      desiredMarginPercentage: 30,
+      costRecoveryPercentage: 30,
+      discountSeniors: 0,
+      discountStudents: 0,
+      discountFamilies: 0,
+      discountDisability: 0,
+      discountEarlyBird: 0,
+      financialNotes: ""
     };
   });
 
