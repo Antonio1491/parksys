@@ -1191,29 +1191,31 @@ app.get("/api/parks/top-monthly-visitors", async (_req: Request, res: Response) 
   }
 });
 
-// Nuevo endpoint para obtener parques con sus imágenes de galería
-app.get("/api/parks-with-images", async (req: Request, res: Response) => {
-  try {
-    console.log("🏞️ [CRITICAL] Obteniendo parques con imágenes de galería...");
-    
-    const { getParksDirectly } = await import('./direct-park-queries');
-    const parksWithImages = await getParksDirectly();
-    
-    // Formatear los datos para incluir primaryImage en el formato esperado por el frontend
-    const formattedParks = parksWithImages.map((park: any) => ({
-      ...park,
-      primaryImage: park.primaryImage || null,
-      mainImageUrl: park.primaryImage || null // Para compatibilidad
-    }));
-    
-    console.log(`🏞️ [CRITICAL] Returning ${formattedParks.length} parks via critical route`);
-    res.json({ data: formattedParks });
-    
-  } catch (error: any) {
-    console.error("❌ Error al obtener parques con imágenes:", error);
-    res.status(500).json({ message: "Error al obtener parques con imágenes" });
-  }
-});
+// DISABLED: Public parks with images route disabled in production for security
+if (process.env.NODE_ENV === 'development') {
+  app.get("/api/parks-with-images", async (req: Request, res: Response) => {
+    try {
+      console.log("🏞️ [DEV-ONLY] Obteniendo parques con imágenes de galería...");
+      
+      const { getParksDirectly } = await import('./direct-park-queries');
+      const parksWithImages = await getParksDirectly() || [];
+      
+      // Formatear los datos para incluir primaryImage en el formato esperado por el frontend
+      const formattedParks = parksWithImages.map((park: any) => ({
+        ...park,
+        primaryImage: park.primaryImage || null,
+        mainImageUrl: park.primaryImage || null // Para compatibilidad
+      }));
+      
+      console.log(`🏞️ [DEV-ONLY] Returning ${formattedParks.length} parks via critical route`);
+      res.json({ data: formattedParks });
+      
+    } catch (error: any) {
+      console.error("❌ Error al obtener parques con imágenes:", error);
+      res.status(500).json({ message: "Error al obtener parques con imágenes" });
+    }
+  });
+}
 
 // NOTA: Ruta /api/parks movida a routes.ts para incluir imágenes
 // La ruta completa que incluye primaryImage está en routes.ts usando getParksDirectly
@@ -2557,49 +2559,54 @@ function startServer() {
   // Create API router for immediate registration
   const criticalApiRouter = express.Router();
   
-  // Register critical parks API route immediately
-  criticalApiRouter.get("/parks", async (req: any, res: any) => {
-    try {
-      const { getParksDirectly } = await import('./direct-park-queries');
-      const filters: any = {};
-      
-      if (req.query.municipalityId) {
-        filters.municipalityId = Number(req.query.municipalityId);
+  // DISABLED: Public parks route disabled in production for security
+  // Only enable in development environment
+  if (process.env.NODE_ENV === 'development') {
+    criticalApiRouter.get("/parks", async (req: any, res: any) => {
+      try {
+        const { getParksDirectly } = await import('./direct-park-queries');
+        const filters: any = {};
+        
+        if (req.query.municipalityId) {
+          filters.municipalityId = Number(req.query.municipalityId);
+        }
+        
+        const parks = await getParksDirectly(filters);
+        console.log(`🏞️ [DEV-ONLY] Returning ${parks?.length || 0} parks via critical route`);
+        res.json({ data: parks || [] });
+      } catch (error) {
+        console.error('❌ [DEV-ONLY] Error in parks route:', error);
+        res.status(500).json({ message: "Error fetching parks" });
       }
-      
-      const parks = await getParksDirectly(filters);
-      console.log(`🏞️ [CRITICAL] Returning ${parks?.length || 0} parks via critical route`);
-      res.json({ data: parks || [] });
-    } catch (error) {
-      console.error('❌ [CRITICAL] Error in parks route:', error);
-      res.status(500).json({ message: "Error fetching parks" });
-    }
-  });
+    });
+  }
 
-  // Register critical parks filter API route (public endpoint for filters)
-  criticalApiRouter.get("/parks/filter", async (req: any, res: any) => {
-    try {
-      const { getParksDirectly } = await import('./direct-park-queries');
-      const filters: any = {};
-      
-      if (req.query.municipalityId) {
-        filters.municipalityId = Number(req.query.municipalityId);
+  // DISABLED: Public parks filter route disabled in production for security
+  if (process.env.NODE_ENV === 'development') {
+    criticalApiRouter.get("/parks/filter", async (req: any, res: any) => {
+      try {
+        const { getParksDirectly } = await import('./direct-park-queries');
+        const filters: any = {};
+        
+        if (req.query.municipalityId) {
+          filters.municipalityId = Number(req.query.municipalityId);
+        }
+        
+        const parks = await getParksDirectly(filters);
+        // Return simple array for filter dropdown (id, name only)
+        const parksList = parks?.map((park: any) => ({
+          id: park.id,
+          name: park.name
+        })) || [];
+        
+        console.log(`🏞️ [DEV-ONLY-FILTER] Returning ${parksList.length} parks for filter dropdown`);
+        res.json(parksList);
+      } catch (error) {
+        console.error('❌ [DEV-ONLY-FILTER] Error in parks filter route:', error);
+        res.status(500).json({ message: "Error fetching parks for filter" });
       }
-      
-      const parks = await getParksDirectly(filters);
-      // Return simple array for filter dropdown (id, name only)
-      const parksList = parks?.map((park: any) => ({
-        id: park.id,
-        name: park.name
-      })) || [];
-      
-      console.log(`🏞️ [CRITICAL-FILTER] Returning ${parksList.length} parks for filter dropdown`);
-      res.json(parksList);
-    } catch (error) {
-      console.error('❌ [CRITICAL-FILTER] Error in parks filter route:', error);
-      res.status(500).json({ message: "Error fetching parks for filter" });
-    }
-  });
+    });
+  }
 
   // Register critical sponsors API route
   criticalApiRouter.get("/sponsors", async (req: any, res: any) => {
