@@ -111,7 +111,7 @@ if (isProductionMode) {
       console.log(`🌐 [ROOT] Browser request detected, serving React app`);
       
       // Serve the React app for browser requests (only when not health check)
-      const indexPath = path.join(process.cwd(), 'dist', 'index.html');
+      const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
       console.log(`📁 [ROOT] Looking for index.html at: ${indexPath}`);
       
       if (fs.existsSync(indexPath)) {
@@ -122,6 +122,8 @@ if (isProductionMode) {
         console.log(`📂 [ROOT] Current working directory: ${process.cwd()}`);
         console.log(`📂 [ROOT] Checking if dist directory exists: ${fs.existsSync(path.join(process.cwd(), 'dist'))}`);
         console.log(`📂 [ROOT] Available files in dist:`, fs.existsSync(path.join(process.cwd(), 'dist')) ? fs.readdirSync(path.join(process.cwd(), 'dist')) : 'directory does not exist');
+        console.log(`📂 [ROOT] Checking if dist/public exists: ${fs.existsSync(path.join(process.cwd(), 'dist', 'public'))}`);
+        console.log(`📂 [ROOT] Available files in dist/public:`, fs.existsSync(path.join(process.cwd(), 'dist', 'public')) ? fs.readdirSync(path.join(process.cwd(), 'dist', 'public')) : 'directory does not exist');
         res.status(503).send('Application not built. Please run npm run build first.');
       }
     } catch (error) {
@@ -2802,7 +2804,7 @@ function startServer() {
     
     // 🔧 [FRONTEND-FIX] Build-presence-controlled static SPA fallback
     // ✅ FIXED: Detect built assets presence using correct Vite dist structure
-    const distDir = path.join(process.cwd(), 'dist');
+    const distDir = path.join(process.cwd(), 'dist', 'public');
     const hasBuild = fs.existsSync(path.join(distDir, 'index.html')) && 
                      fs.existsSync(path.join(distDir, 'assets'));
     const useStaticFrontend = hasBuild || 
@@ -2827,7 +2829,7 @@ function startServer() {
           console.log("✅ [BUILD] Existing build detected, skipping rebuild");
         }
         
-        // ✅ FIXED: Serve from dist/assets (correct Vite output structure)
+        // ✅ FIXED: Serve from dist/public/assets (correct Vite output structure)
         app.use('/assets', express.static(path.join(distDir, 'assets'), { 
           immutable: true, 
           maxAge: '1y',
@@ -2953,9 +2955,9 @@ function startServer() {
       // NOW setup frontend serving - this will establish the catch-all route AFTER all API routes
       const isProduction = process.env.NODE_ENV === 'production';
       if (isProduction) {
-        // ✅ FIXED: Servir archivos estáticos desde dist (estructura Vite correcta)
+        // ✅ FIXED: Servir archivos estáticos desde dist/public (estructura Vite correcta)
         const path = require('path');
-        const distPath = path.join(process.cwd(), 'dist');
+        const distPath = path.join(process.cwd(), 'dist', 'public');
         
         // Verificar que el directorio existe
         const fs = require('fs');
