@@ -29,7 +29,7 @@ export default function AccountingIntegration() {
 
   const { data: integrationStats, isLoading: statsLoading } = useQuery({
     queryKey: ['/api/accounting/integration/stats'],
-    refetchInterval: 30000, // Actualizar cada 30 segundos
+    refetchInterval: false, // DEPLOYMENT FIX: Disabled polling to prevent deployment hanging
   });
 
   const syncMutation = useMutation({

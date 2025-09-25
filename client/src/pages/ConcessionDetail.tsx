@@ -57,7 +57,7 @@ export default function ConcessionDetail() {
   const { data: concessionResponse, isLoading, error, refetch } = useQuery({
     queryKey: [`/api/active-concessions/${id}`],
     enabled: !!id,
-    refetchInterval: 30000, // Refresca cada 30 segundos
+    refetchInterval: false, // DEPLOYMENT FIX: Disabled polling to prevent deployment hanging
     refetchIntervalInBackground: false,
   });
 

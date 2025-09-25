@@ -98,9 +98,8 @@ export default function VisitorDashboard() {
       console.log('🌐 [FRONTEND] Datos recibidos del dashboard:', data);
       return data;
     },
-    suspense: false,
     retry: 1,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false, // DEPLOYMENT FIX: Disabled to prevent deployment hanging
     staleTime: 0 // Siempre fetch fresh data
   });
 

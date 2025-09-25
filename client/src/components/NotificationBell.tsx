@@ -19,7 +19,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ className = 
   const { data: notificationData, isLoading } = useQuery<NotificationCount>({
     queryKey: ['/api/notifications/count'],
     enabled: !!user, // Solo ejecutar si hay usuario autenticado
-    refetchInterval: 30000, // Refrescar cada 30 segundos para ser reactivo
+    refetchInterval: false, // DEPLOYMENT FIX: Disabled polling to prevent deployment hanging
   });
 
   const unreadCount = notificationData?.unreadCount || 0;

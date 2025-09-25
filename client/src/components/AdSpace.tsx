@@ -43,10 +43,10 @@ const AdSpace: React.FC<AdSpaceProps> = ({ spaceId, position, pageType, classNam
       if (!response.ok) throw new Error('Error al cargar asignaciones');
       return response.json();
     },
-    refetchInterval: 3 * 1000,
+    refetchInterval: false, // DEPLOYMENT FIX: Disabled aggressive polling
     staleTime: 1000,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    refetchOnWindowFocus: false, // DEPLOYMENT FIX: Disabled to prevent deployment hanging
+    refetchOnMount: false, // DEPLOYMENT FIX: Disabled to prevent deployment hanging
   });
 
   // Obtener la asignación activa (si existe)

@@ -131,12 +131,13 @@ const Home: React.FC = () => {
     setCurrentIndex(index);
   };
 
-  // Auto-avanzar carousel cada 5 segundos
+  // Auto-avanzar carousel cada 5 segundos - DISABLED FOR DEPLOYMENT
   useEffect(() => {
-    if (featuredParks.length > 1) {
-      const interval = setInterval(nextSlide, 5000);
-      return () => clearInterval(interval);
-    }
+    // DEPLOYMENT FIX: Disabled auto-slide to prevent deployment hanging
+    // if (featuredParks.length > 1) {
+    //   const interval = setInterval(nextSlide, 5000);
+    //   return () => clearInterval(interval);
+    // }
   }, [featuredParks.length]);
 
   // Función para generar resumen del parque

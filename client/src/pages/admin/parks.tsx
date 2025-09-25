@@ -462,8 +462,8 @@ const AdminParksContent = () => {
   } = useQuery<{data: Park[]}>({
     queryKey: ['/api/parks'],
     queryFn: () => apiRequest('/api/parks'),
-    refetchOnWindowFocus: true,    // ✅ Actualizar al volver a la ventana
-    refetchInterval: 30000,        // ✅ Actualizar cada 30 segundos automáticamente
+    refetchOnWindowFocus: false,    // DEPLOYMENT FIX: Disabled to prevent deployment hanging
+    refetchInterval: false,        // DEPLOYMENT FIX: Disabled auto-refresh to prevent deployment hanging
     staleTime: 10000,              // ✅ Datos frescos por 10 segundos
     retry: 1,
   });

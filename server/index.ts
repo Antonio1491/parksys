@@ -266,12 +266,22 @@ app.use('/api/*', (req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Middleware para loggear peticiones (SOLO EN DESARROLLO para máximo rendimiento en producción)
-app.use((req: Request, res: Response, next: NextFunction) => {
-  // PRODUCTION OPTIMIZATION: No logging in production for instant health check responses
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`🌍 [ALL REQUESTS] ${req.method} ${req.url}`);
+// DEPLOYMENT EMERGENCY FIX: Block HEAD /api requests causing infinite loops
+app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+  if (req.method === 'HEAD') {
+    // Respond immediately to HEAD requests without processing
+    res.status(200).end();
+    return;
   }
+  next();
+});
+
+// Middleware para loggear peticiones (DISABLED DURING DEPLOYMENT CRISIS)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // DEPLOYMENT EMERGENCY: Completely disable logging to prevent spam
+  // if (process.env.NODE_ENV !== 'production') {
+  //   console.log(`🌍 [ALL REQUESTS] ${req.method} ${req.url}`);
+  // }
   next();
 });
 

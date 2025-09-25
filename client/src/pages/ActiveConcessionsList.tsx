@@ -57,7 +57,7 @@ function ActiveConcessionsList() {
       const response = await fetch('/api/active-concessions');
       return response.json();
     },
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false, // DEPLOYMENT FIX: Disabled to prevent deployment hanging
     staleTime: 30000 // Cache por 30 segundos para permitir actualizaciones más frecuentes
   });
 
