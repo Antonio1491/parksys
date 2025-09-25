@@ -14,7 +14,7 @@ import { registerFinancialIntegrationsAPI } from "./financial-integrations-api";
 import { registerMultimediaRoutes, createMultimediaTables } from "./multimedia-system";
 import { registerBudgetPlanningRoutes } from "./budget-planning-routes";
 import { createParkEvaluationsTables } from "./create-park-evaluations-tables";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { incomeCategories, expenseCategories } from "../shared/finance-schema";
 import { eq } from "drizzle-orm";
 import { registerInstructorInvitationRoutes } from "./instructorInvitationRoutes";
@@ -844,11 +844,11 @@ app.post("/api/activities", async (req: Request, res: Response) => {
       healthRequirements: healthRequirements || null,
       
       // WORKFLOW FINANCIERO: Todas las actividades nuevas requieren costeo
-      status: "por_costear",
-      financialStatus: "por_costear",
+      status: "por_costear" as const,
+      financialStatus: "por_costear" as const,
       
       // Campos de costeo financiero (mapeo correcto según schema)
-      costRecoveryPercentage: costRecoveryPercentage ? Number(costRecoveryPercentage) : 30,
+      costRecoveryPercentage: costRecoveryPercentage ? costRecoveryPercentage.toString() : "30",
       financialNotes: costingNotes ? 
         `Concepto: ${costingConcept || 'No especificado'}\n\nObservaciones: ${costingNotes}` : 
         `Concepto: ${costingConcept || 'No especificado'}`
@@ -883,7 +883,7 @@ app.get("/api/activities/pending-approval", isAuthenticated, async (req: Request
     console.log("🏦 [FINANCE-APPROVAL] Filtro de estado:", status);
 
     // SEGURIDAD: Validar estados permitidos para prevenir SQL injection
-    const allowedStatuses = ['por_costear', 'activa', 'rechazada', 'all'];
+    const allowedStatuses = ['por_costear', 'activa', 'cancelada', 'all'];
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({ message: "Estado de filtro inválido" });
     }
@@ -923,7 +923,7 @@ app.get("/api/activities/pending-approval", isAuthenticated, async (req: Request
         .leftJoin(parks, eq(activities.parkId, parks.id))
         .leftJoin(activityCategories, eq(activities.categoryId, activityCategories.id))
         .leftJoin(instructors, eq(activities.instructorId, instructors.id))
-        .where(inArray(activities.status, ['por_costear', 'activa', 'rechazada']))
+        .where(inArray(activities.status, ['por_costear', 'activa', 'cancelada']))
         .orderBy(activities.createdAt);
     } else {
       query = db
@@ -955,7 +955,7 @@ app.get("/api/activities/pending-approval", isAuthenticated, async (req: Request
         .leftJoin(parks, eq(activities.parkId, parks.id))
         .leftJoin(activityCategories, eq(activities.categoryId, activityCategories.id))
         .leftJoin(instructors, eq(activities.instructorId, instructors.id))
-        .where(eq(activities.status, status))
+        .where(eq(activities.status, status as any))
         .orderBy(activities.createdAt);
     }
     
@@ -1045,8 +1045,8 @@ app.post("/api/activities/:id/financial-approval", isAuthenticated, async (req: 
     const { sql } = await import("drizzle-orm");
     
     // Determinar el nuevo estado y notas
-    const newStatus = action === 'approve' ? 'activa' : 'rechazada';
-    const newFinancialStatus = action === 'approve' ? 'aprobada' : 'rechazada';
+    const newStatus = action === 'approve' ? 'activa' : 'cancelada';
+    const newFinancialStatus = action === 'approve' ? 'aprobada' : 'cancelada';
     
     // Construir las notas financieras
     let updatedNotes = comment || '';
@@ -1080,10 +1080,10 @@ app.post("/api/activities/:id/financial-approval", isAuthenticated, async (req: 
       return res.status(404).json({ message: "Actividad no encontrada" });
     }
 
-    console.log(`🏦 [FINANCE-APPROVAL] Actividad ${activityId} ${action === 'approve' ? 'aprobada' : 'rechazada'} exitosamente`);
+    console.log(`🏦 [FINANCE-APPROVAL] Actividad ${activityId} ${action === 'approve' ? 'aprobada' : 'cancelada'} exitosamente`);
     
     res.json({ 
-      message: `Actividad ${action === 'approve' ? 'aprobada' : 'rechazada'} exitosamente`,
+      message: `Actividad ${action === 'approve' ? 'aprobada' : 'cancelada'} exitosamente`,
       activity: result.rows[0],
       action,
       newStatus
