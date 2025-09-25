@@ -2956,11 +2956,9 @@ function startServer() {
       const isProduction = process.env.NODE_ENV === 'production';
       if (isProduction) {
         // ✅ FIXED: Servir archivos estáticos desde dist/public (estructura Vite correcta)
-        const path = require('path');
         const distPath = path.join(process.cwd(), 'dist', 'public');
         
         // Verificar que el directorio existe
-        const fs = require('fs');
         if (!fs.existsSync(distPath)) {
           console.error(`❌ [PROD] Build directory not found: ${distPath}`);
           console.error(`❌ [PROD] Please run 'npm run build' first`);

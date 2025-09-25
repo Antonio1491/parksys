@@ -1,6 +1,8 @@
 import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Script para asignar imágenes de perfil a los usuarios
@@ -60,8 +62,6 @@ export async function assignProfileImages() {
     };
     
     // Crear fotos de ejemplo en la carpeta de perfiles
-    const fs = require('fs');
-    const path = require('path');
     const profilesDir = path.resolve('./public/uploads/profiles');
     
     if (!fs.existsSync(profilesDir)) {
