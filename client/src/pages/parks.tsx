@@ -55,7 +55,7 @@ const Parks: React.FC = () => {
   
   // Filtrar parques sin nombre o marcados como eliminados - agregar programación defensiva
   const filteredParks = Array.isArray(allParks) ? allParks.filter(park => 
-    park.name.trim() !== '' && !park.isDeleted
+    park.name && park.name.trim() !== '' && (park.isDeleted === false || park.isDeleted === undefined || park.isDeleted === null)
   ) : [];
 
   // Mostrar todos los parques sin paginación
