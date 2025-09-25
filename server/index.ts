@@ -312,7 +312,7 @@ app.get('/api/status', (req: Request, res: Response) => {
       environment: process.env.NODE_ENV || 'production',
       replit: {
         deployment_id: process.env.REPLIT_DEPLOYMENT_ID || 'prod-default',
-        domain: process.env.REPLIT_DOMAIN || 'localhost'
+        domain: process.env.REPLIT_DOMAIN || '0.0.0.0'
       }
     });
   } catch (error) {
