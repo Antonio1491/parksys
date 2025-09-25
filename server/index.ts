@@ -79,38 +79,19 @@ app.get('/cloudrun-health', (req, res) => {
   res.end(healthResponse);
 });
 
-// ULTRA-SIMPLE ROOT HANDLER FOR PRODUCTION HEALTH CHECKS
+// SIMPLE ROOT HANDLER FOR PRODUCTION - ALWAYS SERVE FRONTEND
 const isProductionMode = process.env.NODE_ENV === 'production';
 if (isProductionMode) {
   app.get('/', (req: Request, res: Response) => {
-    // INSTANT HEALTH CHECK - No logging, no file operations, just immediate response
-    const userAgent = req.headers['user-agent'] || '';
-    const acceptHeader = req.headers.accept || '';
-    
-    // Health check detection without logging
-    const isHealthCheck = (
-      userAgent.includes('GoogleHC') || 
-      userAgent.includes('kube-probe') ||
-      userAgent.includes('ELB-HealthChecker') ||
-      userAgent.includes('curl') ||
-      userAgent.includes('wget') ||
-      !acceptHeader.includes('text/html')
-    );
-    
-    if (isHealthCheck) {
-      // INSTANT RESPONSE - No console.log, no delays
-      res.writeHead(200, healthHeaders);
-      res.end(healthResponse);
-      return;
-    }
-    
-    // Serve React app for browsers (with minimal logging)
+    // DEPLOYMENT FIX: Always serve React app on root route
+    // Health checks should use dedicated endpoints like /health
     const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
-    try {
-      res.sendFile(indexPath);
-    } catch (error) {
-      res.status(503).send('Service Unavailable');
-    }
+    res.sendFile(indexPath, (error) => {
+      if (error) {
+        console.error('❌ [ROOT] Failed to serve index.html:', error);
+        res.status(500).send('Frontend build not available');
+      }
+    });
   });
 } else {
   console.log(`🚀 [DEV] Skipping root handler - Vite will handle '/' route in development`);
@@ -2835,8 +2816,8 @@ function startServer() {
           res.sendFile(indexPath);
         });
         
-        // 🎯 General static files from dist root (for other assets like images, fonts)
-        app.use(express.static(distDir, { 
+        // 🎯 CRITICAL: Serve static assets BEFORE catch-all SPA route
+        app.use(express.static(path.join(process.cwd(), 'dist', 'public'), { 
           maxAge: '1h',
           fallthrough: true,
           setHeaders: (res, filePath) => {
