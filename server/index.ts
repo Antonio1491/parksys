@@ -79,23 +79,10 @@ app.get('/cloudrun-health', (req, res) => {
   res.end(healthResponse);
 });
 
-// SIMPLE ROOT HANDLER FOR PRODUCTION - ALWAYS SERVE FRONTEND
+// DEPLOYMENT FIX: NO CUSTOM ROOT HANDLER - Let express.static handle everything
+// This prevents conflicts with Replit deployment health checks
 const isProductionMode = process.env.NODE_ENV === 'production';
-if (isProductionMode) {
-  app.get('/', (req: Request, res: Response) => {
-    // DEPLOYMENT FIX: Always serve React app on root route
-    // Health checks should use dedicated endpoints like /health
-    const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
-    res.sendFile(indexPath, (error) => {
-      if (error) {
-        console.error('❌ [ROOT] Failed to serve index.html:', error);
-        res.status(500).send('Frontend build not available');
-      }
-    });
-  });
-} else {
-  console.log(`🚀 [DEV] Skipping root handler - Vite will handle '/' route in development`);
-}
+console.log(`🚀 [DEPLOYMENT] Skipping custom root handler - letting express.static handle '/' route`);
 
 app.get('/health', (req: Request, res: Response) => {
   res.writeHead(200, healthHeaders);
@@ -2809,12 +2796,9 @@ function startServer() {
           }
         }));
         
-        // 🎯 Root handler for index.html
-        app.get('/', (req, res) => {
-          const indexPath = path.join(distDir, 'index.html');
-          console.log(`📁 [ROOT] Serving index.html from: ${indexPath}`);
-          res.sendFile(indexPath);
-        });
+        // 🎯 NO ROOT HANDLER - express.static will serve index.html automatically
+        // This prevents conflicts with Replit deployment health checks
+        console.log(`📁 [STATIC] express.static will handle index.html at root`);
         
         // 🎯 CRITICAL: Serve static assets BEFORE catch-all SPA route
         app.use(express.static(path.join(process.cwd(), 'dist', 'public'), { 
