@@ -2943,6 +2943,85 @@ function startServer() {
       console.log("✅ [API-PRIORITY] Firebase auth routes already registered (skipping duplicate)");
 
 
+      // 🔥 PRODUCTION FIX: Critical space-mapping endpoint for advertising system
+      app.get('/api/advertising-management/space-mapping', async (req, res) => {
+        try {
+          const { pageType, position } = req.query;
+          
+          let query = `
+            SELECT 
+              sm.*,
+              ads.name as space_name,
+              ads.dimensions as space_dimensions,
+              ads.page_type as space_page_type
+            FROM space_mappings sm
+            JOIN ad_spaces ads ON sm.space_id = ads.id
+          `;
+          
+          const conditions: string[] = [];
+          const values: any[] = [];
+          let paramCount = 0;
+          
+          if (pageType) {
+            paramCount++;
+            conditions.push(`sm.page_type = $${paramCount}`);
+            values.push(pageType);
+          }
+          
+          if (position) {
+            paramCount++;
+            conditions.push(`sm.position = $${paramCount}`);
+            values.push(position);
+          }
+          
+          if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
+          }
+          
+          query += ' ORDER BY sm.priority DESC, sm.created_at ASC';
+          
+          const result = await pool.query(query, values);
+          
+          const mappings = result.rows.map(row => ({
+            id: row.id,
+            pageType: row.page_type,
+            position: row.position,
+            spaceId: row.space_id,
+            isActive: row.is_active,
+            priority: row.priority,
+            fallbackBehavior: row.fallback_behavior,
+            layoutConfig: row.layout_config,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+            space: {
+              name: row.space_name,
+              dimensions: row.space_dimensions,
+              pageType: row.space_page_type
+            }
+          }));
+          
+          console.log(`🗺️ [PROD-FIX] Space-mapping: ${pageType}:${position} - Found ${mappings.length} mappings`);
+          
+          if (mappings.length === 0) {
+            console.log(`⚠️ No space mapping found for ${pageType}:${position}`);
+          }
+          
+          res.json({
+            success: true,
+            data: mappings,
+            total: mappings.length
+          });
+          
+        } catch (error) {
+          console.error('❌ [PROD-FIX] Error in space-mapping endpoint:', error);
+          res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor'
+          });
+        }
+      });
+      console.log("🔥 [PROD-FIX] Critical space-mapping endpoint registered with maximum priority");
+
       // Register all other routes BEFORE Vite
       await registerAllOtherRoutesBeforeVite();
       console.log("✅ [API-PRIORITY] All API routes registered before Vite setup");
