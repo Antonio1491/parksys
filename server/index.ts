@@ -79,56 +79,37 @@ app.get('/cloudrun-health', (req, res) => {
   res.end(healthResponse);
 });
 
-// Only handle root route in PRODUCTION - let Vite handle it in development
+// ULTRA-SIMPLE ROOT HANDLER FOR PRODUCTION HEALTH CHECKS
 const isProductionMode = process.env.NODE_ENV === 'production';
 if (isProductionMode) {
   app.get('/', (req: Request, res: Response) => {
+    // INSTANT HEALTH CHECK - No logging, no file operations, just immediate response
+    const userAgent = req.headers['user-agent'] || '';
+    const acceptHeader = req.headers.accept || '';
+    
+    // Health check detection without logging
+    const isHealthCheck = (
+      userAgent.includes('GoogleHC') || 
+      userAgent.includes('kube-probe') ||
+      userAgent.includes('ELB-HealthChecker') ||
+      userAgent.includes('curl') ||
+      userAgent.includes('wget') ||
+      !acceptHeader.includes('text/html')
+    );
+    
+    if (isHealthCheck) {
+      // INSTANT RESPONSE - No console.log, no delays
+      res.writeHead(200, healthHeaders);
+      res.end(healthResponse);
+      return;
+    }
+    
+    // Serve React app for browsers (with minimal logging)
+    const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
     try {
-      // ULTRA-OPTIMIZED: Check if this is a health check request
-      const acceptHeader = req.headers.accept;
-      const userAgent = req.headers['user-agent'];
-      
-      console.log(`🔍 [ROOT] Request: Accept=${acceptHeader}, UserAgent=${userAgent}`);
-      
-      // Detect health check patterns (Cloud Run, Kubernetes, load balancers)
-      // FIXED: Only detect actual health checks, not browser requests
-      const isHealthCheck = (
-        userAgent?.includes('GoogleHC') || 
-        userAgent?.includes('kube-probe') ||
-        userAgent?.includes('ELB-HealthChecker') ||
-        userAgent?.includes('curl') ||
-        userAgent?.includes('wget')
-      ) && !acceptHeader?.includes('text/html');
-      
-      if (isHealthCheck) {
-        console.log(`🏥 [ROOT] Health check detected, returning OK`);
-        // Immediate health check response - no file system operations
-        res.writeHead(200, healthHeaders);
-        res.end(healthResponse);
-        return;
-      }
-      
-      console.log(`🌐 [ROOT] Browser request detected, serving React app`);
-      
-      // Serve the React app for browser requests (only when not health check)
-      const indexPath = path.join(process.cwd(), 'dist', 'public', 'index.html');
-      console.log(`📁 [ROOT] Looking for index.html at: ${indexPath}`);
-      
-      if (fs.existsSync(indexPath)) {
-        console.log(`✅ [ROOT] index.html found, serving file`);
-        res.sendFile(indexPath);
-      } else {
-        console.log(`❌ [ROOT] index.html not found at ${indexPath}`);
-        console.log(`📂 [ROOT] Current working directory: ${process.cwd()}`);
-        console.log(`📂 [ROOT] Checking if dist directory exists: ${fs.existsSync(path.join(process.cwd(), 'dist'))}`);
-        console.log(`📂 [ROOT] Available files in dist:`, fs.existsSync(path.join(process.cwd(), 'dist')) ? fs.readdirSync(path.join(process.cwd(), 'dist')) : 'directory does not exist');
-        console.log(`📂 [ROOT] Checking if dist/public exists: ${fs.existsSync(path.join(process.cwd(), 'dist', 'public'))}`);
-        console.log(`📂 [ROOT] Available files in dist/public:`, fs.existsSync(path.join(process.cwd(), 'dist', 'public')) ? fs.readdirSync(path.join(process.cwd(), 'dist', 'public')) : 'directory does not exist');
-        res.status(503).send('Application not built. Please run npm run build first.');
-      }
+      res.sendFile(indexPath);
     } catch (error) {
-      console.error(`🚨 [ROOT] Error in root handler:`, error);
-      res.status(500).send('Internal Server Error');
+      res.status(503).send('Service Unavailable');
     }
   });
 } else {
@@ -268,15 +249,21 @@ console.log("✅ [OBJECT-STORAGE-PRIORITY] Endpoint /public-objects/ registrado 
 
 // Remove complex health check middleware - let direct endpoints handle all health checks
 
-// MIDDLEWARE API PRIORITARIO - ANTES QUE VITE
+// MIDDLEWARE API PRIORITARIO - ANTES QUE VITE (Sin logging en producción)
 app.use('/api/*', (req: Request, res: Response, next: NextFunction) => {
-  console.log(`🎯 [API PRIORITY] ${req.method} ${req.url} - Intercepted before Vite`);
+  // PRODUCTION OPTIMIZATION: No logging for API routes in production
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`🎯 [API PRIORITY] ${req.method} ${req.url} - Intercepted before Vite`);
+  }
   next();
 });
 
-// Middleware para loggear TODAS las peticiones
+// Middleware para loggear peticiones (SOLO EN DESARROLLO para máximo rendimiento en producción)
 app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log(`🌍 [ALL REQUESTS] ${req.method} ${req.url}`);
+  // PRODUCTION OPTIMIZATION: No logging in production for instant health check responses
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`🌍 [ALL REQUESTS] ${req.method} ${req.url}`);
+  }
   next();
 });
 
