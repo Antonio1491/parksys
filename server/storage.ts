@@ -214,7 +214,7 @@ export class DatabaseStorage implements IStorage {
     try {
       const result = await pool.query(`
         SELECT 
-          p.id, p.name, p.municipality_id as "municipalityId", 
+          p.id, p.name, 
           p.municipality_text as "municipalityText",
           p.park_type as "parkType", p.description, p.address, 
           p.postal_code as "postalCode", p.latitude, p.longitude, 
@@ -541,7 +541,6 @@ export class DatabaseStorage implements IStorage {
       const result = await db.execute(
         sql`SELECT u.id, u.username, u.email, u.full_name as "fullName", 
             u.role_id as "roleId", r.name as "roleName", r.level as "roleLevel",
-            u.municipality_id as "municipalityId",
             u.created_at as "createdAt", u.updated_at as "updatedAt",
             u.is_active as "isActive", u.last_login as "lastLogin",
             u.department, u.position, u.phone, u.gender, 
@@ -589,7 +588,6 @@ export class DatabaseStorage implements IStorage {
         password: userData.password,
         roleId: userData.roleId || (userData.role ? parseInt(userData.role) : 1), // Usar roleId directamente
         fullName: userData.fullName,
-        municipalityId: userData.municipalityId,
         phone: userData.phone || null,
         gender: userData.gender || null,
         birthDate: userData.birthDate || null,
@@ -969,7 +967,7 @@ export class DatabaseStorage implements IStorage {
     try {
       const result = await pool.query(`
         SELECT 
-          id, name, municipality_id as "municipalityId", municipality_text as "municipalityText",
+          id, name, municipality_text as "municipalityText",
           park_type as "parkType", description, address,
           postal_code as "postalCode", latitude, longitude,
           area, green_area as "greenArea", foundation_year as "foundationYear",
@@ -1073,7 +1071,7 @@ export class DatabaseStorage implements IStorage {
         SET ${fields.join(', ')}
         WHERE id = $${paramIndex}
         RETURNING 
-          id, name, municipality_id as "municipalityId", municipality_text as "municipalityText",
+          id, name, municipality_text as "municipalityText",
           park_type as "parkType", description, address,
           postal_code as "postalCode", latitude, longitude,
           area, green_area as "greenArea", foundation_year as "foundationYear",
@@ -1608,7 +1606,6 @@ export class DatabaseStorage implements IStorage {
       // ESTRATEGIA NUEVA: Construir objeto completamente limpio sin campos problemáticos
       const insertData = {
         name: parkData.name,
-        municipalityId: parkData.municipalityId,
         municipalityText: parkData.municipalityText,
         parkType: parkData.parkType || 'urbano',
         description: parkData.description || '',
@@ -2767,7 +2764,6 @@ export const storage = new DatabaseStorage();
 
 // Consulta directa para obtener parques sin usar el storage
 export async function getParksDirectly(filters?: {
-  municipalityId?: number;
   parkType?: string;
   postalCode?: string;
   search?: string;
@@ -2776,7 +2772,7 @@ export async function getParksDirectly(filters?: {
     // Construimos la consulta SQL básica
     let queryStr = `
       SELECT 
-        id, name, municipality_id as "municipalityId", 
+        id, name,
         park_type as "parkType", description, address, 
         postal_code as "postalCode", latitude, longitude, 
         area, foundation_year as "foundationYear",
@@ -2791,11 +2787,6 @@ export async function getParksDirectly(filters?: {
     let paramIndex = 1;
     
     // Añadimos filtros si existen
-    if (filters?.municipalityId !== undefined) {
-      queryStr += ` AND municipality_id = $${paramIndex++}`;
-      params.push(filters.municipalityId);
-    }
-    
     if (filters?.parkType) {
       queryStr += ` AND park_type = $${paramIndex++}`;
       params.push(filters.parkType);

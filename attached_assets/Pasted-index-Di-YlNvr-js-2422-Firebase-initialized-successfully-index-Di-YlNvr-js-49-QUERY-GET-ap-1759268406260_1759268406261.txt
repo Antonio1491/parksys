@@ -1,0 +1,209 @@
+index-Di_YlNvr.js:2422 🔥 Firebase initialized successfully
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/roles/1/permissions
+index-Di_YlNvr.js:849 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-Di_YlNvr.js:849 i18next: languageChanged es
+index-Di_YlNvr.js:849 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+index-Di_YlNvr.js:849 i18next::backendConnector: loaded namespace parks for language es {title: 'Gestión de Parques', subtitle: 'Sistema integral de administración de parques municipales', fields: {…}, types: {…}, status: {…}, …}
+index-Di_YlNvr.js:849 i18next::translator: missingKey es common messages.loading messages.loading
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/parks
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/parks
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/parks-with-images
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/parks-with-images
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/roles/1/permissions 403 (Forbidden)
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+setOptions @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49 Query failed for: /api/roles/1/permissions Error: Se requieren privilegios de Super Administrador
+    at index-Di_YlNvr.js:49:48333
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+setOptions @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:849 i18next::translator: missingKey es common messages.loading messages.loading
+index-Di_YlNvr.js:849 i18next::translator: missingKey es common messages.loading messages.loading
+index-Di_YlNvr.js:49  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3 500 (Internal Server Error)
+At @ index-Di_YlNvr.js:49
+await in At
+lNe @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:1657
+Promise.then
+registerStateListener @ index-Di_YlNvr.js:1657
+onAuthStateChanged @ index-Di_YlNvr.js:1657
+Kwe @ index-Di_YlNvr.js:2017
+(anonymous) @ index-Di_YlNvr.js:2422
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:2422 Error checking user status: Error: 500: {"error":"Error interno del servidor"}
+    at At (index-Di_YlNvr.js:49:46738)
+    at async lNe (index-Di_YlNvr.js:2422:3536)
+    at async index-Di_YlNvr.js:2422:1139
+lNe @ index-Di_YlNvr.js:2422
+await in lNe
+(anonymous) @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:1657
+Promise.then
+registerStateListener @ index-Di_YlNvr.js:1657
+onAuthStateChanged @ index-Di_YlNvr.js:1657
+Kwe @ index-Di_YlNvr.js:2017
+(anonymous) @ index-Di_YlNvr.js:2422
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/roles/1/permissions
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/notifications/count
+index-Di_YlNvr.js:49  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3 500 (Internal Server Error)
+At @ index-Di_YlNvr.js:49
+await in At
+lNe @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:1657
+Promise.then
+registerStateListener @ index-Di_YlNvr.js:1657
+onAuthStateChanged @ index-Di_YlNvr.js:1657
+Kwe @ index-Di_YlNvr.js:2017
+(anonymous) @ index-Di_YlNvr.js:2422
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+R4 @ index-Di_YlNvr.js:41
+md @ index-Di_YlNvr.js:39
+kie @ index-Di_YlNvr.js:41
+Ld @ index-Di_YlNvr.js:41
+Zq @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:2422 Error checking user status: Error: 500: {"error":"Error interno del servidor"}
+    at At (index-Di_YlNvr.js:49:46738)
+    at async lNe (index-Di_YlNvr.js:2422:3536)
+    at async index-Di_YlNvr.js:2422:1139
+lNe @ index-Di_YlNvr.js:2422
+await in lNe
+(anonymous) @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:1657
+Promise.then
+registerStateListener @ index-Di_YlNvr.js:1657
+onAuthStateChanged @ index-Di_YlNvr.js:1657
+Kwe @ index-Di_YlNvr.js:2017
+(anonymous) @ index-Di_YlNvr.js:2422
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+R4 @ index-Di_YlNvr.js:41
+md @ index-Di_YlNvr.js:39
+kie @ index-Di_YlNvr.js:41
+Ld @ index-Di_YlNvr.js:41
+Zq @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/roles/1/permissions 403 (Forbidden)
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+setOptions @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+R4 @ index-Di_YlNvr.js:41
+md @ index-Di_YlNvr.js:39
+kie @ index-Di_YlNvr.js:41
+Ld @ index-Di_YlNvr.js:41
+Zq @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49 Query failed for: /api/roles/1/permissions Error: Se requieren privilegios de Super Administrador
+    at index-Di_YlNvr.js:49:48333
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+setOptions @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+R4 @ index-Di_YlNvr.js:41
+md @ index-Di_YlNvr.js:39
+kie @ index-Di_YlNvr.js:41
+Ld @ index-Di_YlNvr.js:41
+Zq @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3 500 (Internal Server Error)
+At @ index-Di_YlNvr.js:49
+await in At
+lNe @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:1657
+Promise.then
+registerStateListener @ index-Di_YlNvr.js:1657
+onAuthStateChanged @ index-Di_YlNvr.js:1657
+Kwe @ index-Di_YlNvr.js:2017
+(anonymous) @ index-Di_YlNvr.js:2422
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+R4 @ index-Di_YlNvr.js:41
+md @ index-Di_YlNvr.js:39
+kie @ index-Di_YlNvr.js:41
+Ld @ index-Di_YlNvr.js:41
+Zq @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:2422 Error checking user status: Error: 500: {"error":"Error interno del servidor"}
+    at At (index-Di_YlNvr.js:49:46738)
+    at async lNe (index-Di_YlNvr.js:2422:3536)
+    at async index-Di_YlNvr.js:2422:1139
+lNe @ index-Di_YlNvr.js:2422
+await in lNe
+(anonymous) @ index-Di_YlNvr.js:2422
+(anonymous) @ index-Di_YlNvr.js:1657
+Promise.then
+registerStateListener @ index-Di_YlNvr.js:1657
+onAuthStateChanged @ index-Di_YlNvr.js:1657
+Kwe @ index-Di_YlNvr.js:2017
+(anonymous) @ index-Di_YlNvr.js:2422
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+R4 @ index-Di_YlNvr.js:41
+md @ index-Di_YlNvr.js:39
+kie @ index-Di_YlNvr.js:41
+Ld @ index-Di_YlNvr.js:41
+Zq @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26

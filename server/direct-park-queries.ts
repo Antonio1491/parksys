@@ -8,7 +8,7 @@ export async function getParksDirectly(filters?: any) {
     // Construir la consulta SQL básica CON tipología
     let queryStr = `
       SELECT DISTINCT
-        p.id, p.name, p.municipality_id as "municipalityId", 
+        p.id, p.name,
         p.municipality_text as "municipalityText",
         p.park_type as "parkType", p.description, p.address, 
         p.postal_code as "postalCode", p.latitude, p.longitude, 
@@ -30,11 +30,6 @@ export async function getParksDirectly(filters?: any) {
     
     // Añadir filtros si existen
     if (filters) {
-      if (filters.municipalityId !== undefined) {
-        queryStr += ` AND p.municipality_id = $${paramIndex++}`;
-        params.push(filters.municipalityId);
-      }
-      
       if (filters.parkType) {
         queryStr += ` AND p.park_type = $${paramIndex++}`;
         params.push(filters.parkType);
@@ -270,7 +265,7 @@ export async function getParkByIdDirectly(parkId: number) {
     try {
       const parkResult = await pool.query(`
         SELECT 
-          id, name, municipality_id as "municipalityId", 
+          id, name,
           municipality_text as "municipalityText",
           park_type as "parkType", description, address, 
           postal_code as "postalCode", latitude, longitude, 
@@ -295,25 +290,6 @@ export async function getParkByIdDirectly(parkId: number) {
       console.error("Error al obtener datos básicos del parque:", err);
       // Si falla esta consulta esencial, retornamos null
       return null;
-    }
-    
-    // Obtener información del municipio si existe municipalityId
-    let municipality = null;
-    if (park.municipalityId) {
-      try {
-        const municipalityResult = await pool.query(`
-          SELECT id, name, state 
-          FROM municipalities 
-          WHERE id = $1
-        `, [park.municipalityId]);
-        
-        if (municipalityResult.rowCount > 0) {
-          municipality = municipalityResult.rows[0];
-          console.log("Municipio encontrado:", municipality.name);
-        }
-      } catch (err) {
-        console.error("Error al obtener municipio:", err);
-      }
     }
 
     // Documentos - usar la tabla park_documents que existe

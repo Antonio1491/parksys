@@ -1,8 +1,8 @@
-import React, { useState, useEffect, startTransition, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, Trash2, Eye, Edit, X, MapPin, Package, AlertTriangle, TreePine, Activity, FileText, UserCheck, Wrench, Grid, List, ChevronLeft, ChevronRight, Award, Map, Upload, Trash, CheckSquare, Square, Trees, CopyCheck, ChevronDown, CheckCircle, Calendar } from "lucide-react";
+import { Search, Plus, Trash2, Eye, Edit, X, MapPin, AlertTriangle, TreePine, Grid, List, ChevronLeft, ChevronRight, Award, Upload, CheckSquare, Square, Trees, CopyCheck, CheckCircle } from "lucide-react";
 import { 
   Table, 
   TableBody, 
@@ -34,7 +34,7 @@ const useParksMetricsSummary = (parkIds: number[]) => {
     reports: PendingReports;
     schedule: UpcomingSchedule;
   }>>({
-    queryKey: ['/api/parks/summary', parkIds.sort().join(',')],
+    queryKey: ['/api/parks/summary', [...parkIds].sort().join(',')],
     queryFn: () => {
       if (parkIds.length === 0) return Promise.resolve({});
       const idsParam = parkIds.join(',');
@@ -45,78 +45,9 @@ const useParksMetricsSummary = (parkIds: number[]) => {
   });
 };
 
-// Individual hooks for backward compatibility (will be deprecated)
-const useParkMetrics = (parkId: number) => {
-  return useQuery<ParkMetrics>({
-    queryKey: ['/api/parks', parkId, 'metrics'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!parkId,
-  });
-};
-
-const usePendingIncidents = (parkId: number) => {
-  return useQuery<PendingIncidents>({
-    queryKey: ['/api/parks', parkId, 'pending-incidents'],
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    enabled: !!parkId,
-  });
-};
-
-const useAssetsInMaintenance = (parkId: number) => {
-  return useQuery<AssetsInMaintenance>({
-    queryKey: ['/api/parks', parkId, 'assets-in-maintenance'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!parkId,
-  });
-};
-
-const usePendingReports = (parkId: number) => {
-  return useQuery<PendingReports>({
-    queryKey: ['/api/parks', parkId, 'reports'],
-    staleTime: 3 * 60 * 1000, // 3 minutes
-    enabled: !!parkId,
-  });
-};
-
-const useUpcomingSchedule = (parkId: number) => {
-  return useQuery<UpcomingSchedule>({
-    queryKey: ['/api/parks', parkId, 'upcoming-schedule'],
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    enabled: !!parkId,
-  });
-};
-
 // Helper function moved to top level
 const isParkCertified = (park: Park) => {
   return park.certificaciones && park.certificaciones.trim() !== '' && park.certificaciones !== 'Ninguna';
-};
-
-// Helper functions for park status
-const getStatusColor = (status?: string) => {
-  switch (status) {
-    case 'Operativo':
-      return 'bg-status-active text-status-foreground';
-    case 'En mantenimiento':
-      return 'bg-status-scheduled text-status-foreground';
-    case 'Cerrado temporalmente':
-      return 'bg-status-cancelled/60 text-status-foreground';
-    case 'En construcción':
-      return 'bg-status-paused text-status-foreground';
-    case 'Renovación':
-      return 'bg-status-awaitingBudget text-status-foreground';
-    case 'Cerrado permanentemente':
-      return 'bg-status-cancelled text-foreground/80';
-    case 'Planificado':
-      return 'bg-indigo-100 text-indigo-800';
-    case 'Abandonado':
-      return 'bg-orange-100 text-orange-800';
-    default:
-      return 'bg-gray-100 text-gray-600';
-  }
-};
-
-const getStatusText = (status?: string) => {
-  return status || 'Sin estado';
 };
 
 interface Park {
@@ -321,15 +252,24 @@ const AdminParksContent = () => {
 
     const getStatusColor = (status: string | null | undefined) => {
       switch (status) {
-        case "en_funcionamiento": return "bg-status-active text-status-foreground";
-        case "operando_parcialmente": return "bg-status-scheduled text-status-foreground";
-        case "en_mantenimiento": return "bg-status-scheduled text-status-foreground";
-        case "cerrado_temporalmente": return "bg-status-cancelled text-status-foreground";
-        case "cerrado_indefinidamente": return "bg-status-cancelled text-status-foreground";
-        case "reapertura_proxima": return "bg-status-paused text-status-foreground";
-        case "en_proyecto_construccion": return "bg-status-awaitingBudget text-status-foreground";
-        case "uso_restringido": return "bg-gray-100 text-status-foreground";
-        default: return "bg-gray-100 text-status-foreground";
+        case "en_funcionamiento":
+          return "bg-status-active text-status-foreground hover:bg-status-active/80";
+        case "operando_parcialmente":
+          return "bg-status-scheduled text-status-foreground hover:bg-status-scheduled/80";
+        case "en_mantenimiento":
+          return "bg-status-scheduled text-status-foreground hover:bg-status-scheduled/80";
+        case "cerrado_temporalmente":
+          return "bg-status-cancelled text-status-foreground hover:bg-status-cancelled/80";
+        case "cerrado_indefinidamente":
+          return "bg-status-cancelled text-status-foreground hover:bg-status-cancelled/80";
+        case "reapertura_proxima":
+          return "bg-status-paused text-status-foreground hover:bg-status-paused/80";
+        case "en_proyecto_construccion":
+          return "bg-status-awaitingBudget text-status-foreground hover:bg-status-awaitingBudget/80";
+        case "uso_restringido":
+          return "bg-gray-100 text-status-foreground hover:bg-gray-100/80";
+        default:
+          return "bg-gray-100 text-status-foreground hover:bg-gray-100/80";
       }
     };
 
@@ -416,7 +356,7 @@ const AdminParksContent = () => {
           
           {/* Badge de estado del parque */}
           <Badge 
-            variant="secondary" 
+            variant="status" 
             className={`${getStatusColor(park.status)} text-xs font-medium`}
           >
             {getStatusText(park.status)}
@@ -732,16 +672,6 @@ const AdminParksContent = () => {
                 <TableCell>
                   <div>
                     <p className="font-medium">{park.name}</p>
-                    {park.status && (
-                      <div className="mt-1">
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-xs font-medium ${getStatusColor(park.status)}`}
-                        >
-                          {getStatusText(park.status)}
-                        </Badge>
-                      </div>
-                    )}
                   </div>
                 </TableCell>
                 <TableCell>{formatArea(park.area)}</TableCell>
