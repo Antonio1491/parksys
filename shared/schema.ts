@@ -422,7 +422,6 @@ export const users = pgTable("users", {
   email: text("email").notNull(),
   roleId: integer("role_id").references(() => roles.id), // Referencia a roles
   fullName: text("full_name").notNull(),
-  municipalityId: integer("municipality_id"),
   phone: text("phone"),
   gender: text("gender"),
   birthDate: date("birth_date"),
