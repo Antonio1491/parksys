@@ -89,7 +89,6 @@ async function upsertUser(
       password: "", // No password for OAuth users
       fullName: fullName,
       role: "user", // Default role
-      municipalityId: null // Sin municipio asignado por defecto
     });
   }
 }

@@ -38,8 +38,7 @@ export const SYNC_FIELDS = {
   location: [
     'address',        // Dirección en ficha de ubicación
     'latitude',       // Para mapa integrado
-    'longitude',      // Para mapa integrado
-    'municipalityId'  // Para mostrar municipio
+    'longitude'      // Para mapa integrado
   ],
   
   // Información Adicional (sidebar)
@@ -154,7 +153,7 @@ export function validateParkForLanding(parkData: any): {
   const warnings: string[] = [];
   
   // Campos obligatorios para que funcionen los contenedores existentes
-  const requiredFields = ['name', 'municipalityId'];
+  const requiredFields = ['name'];
   
   requiredFields.forEach(field => {
     if (!parkData[field]) {

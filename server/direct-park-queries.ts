@@ -319,7 +319,6 @@ export async function getParkByIdDirectly(parkId: number) {
     // Inicializamos las propiedades que iremos rellenando
     const extendedPark = {
       ...park,
-      municipality: municipality, // Agregamos el municipio completo
       createdAt: new Date(),
       updatedAt: new Date(),
       active: true,

@@ -1462,10 +1462,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Preparamos los filtros basados en los parámetros de la consulta
       const filters: any = {};
       
-      if (req.query.municipalityId) {
-        filters.municipalityId = Number(req.query.municipalityId);
-      }
-      
       if (req.query.parkType) {
         filters.parkType = String(req.query.parkType);
       }
@@ -1638,13 +1634,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: schema.parks.id,
           name: schema.parks.name,
           address: schema.parks.address,
-          municipalityId: schema.parks.municipalityId,
           area: schema.parks.area,
           parkType: schema.parks.parkType
         })
-        .from(schema.parks)
-        .leftJoin(schema.municipalities, eq(schema.parks.municipalityId, schema.municipalities.id));
-        
+        .from(schema.parks);
+      
       res.json(parks);
     } catch (error) {
       console.error("Error getting parks with amenities:", error);
@@ -2389,7 +2383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Obtener datos básicos del parque
       const parkResult = await pool.query(`
         SELECT 
-          p.id, p.name, p.municipality_id as "municipalityId", 
+          p.id, p.name,
           p.park_type as "parkType", p.description, p.address, 
           p.postal_code as "postalCode", p.latitude, p.longitude, 
           p.area, p.foundation_year as "foundationYear",
@@ -2633,10 +2627,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.log(`[DETAILS] Parque encontrado: ${park.name}`);
 
-      // Get municipality  
-      const municipalities = await storage.getMunicipalities();
-      const municipality = municipalities.find(m => m.id === park.municipalityId);
-
       // Get extended park data to include amenities and images
       const extendedParks = await storage.getExtendedParks();
       const extendedPark = extendedParks.find(p => p.id === parkId);
@@ -2817,7 +2807,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         location: park.location,
         openingHours: park.openingHours || "Sin horarios definidos",
         description: park.description || "Sin descripción disponible",
-        municipalityId: park.municipalityId,
         municipality: municipality ? { name: municipality.name } : { name: "Municipio no encontrado" },
         certificaciones: park.certificaciones,
         amenities: amenities.map((amenity: any) => ({
@@ -4744,25 +4733,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`📋 Documento encontrado:`, { id: document.id, parkId: document.parkId, title: document.title });
-      
-      // Verificamos que el usuario tenga acceso al parque del documento
-      if (req.user.role !== 'super_admin') {
-        const park = await storage.getPark(document.parkId);
-        if (!park) {
-          console.log(`❌ Parque ${document.parkId} no encontrado`);
-          return res.status(404).json({ message: "Park not found" });
-        }
-        
-        console.log(`🏛️ Verificando permisos: usuario municipio ${req.user.municipalityId}, parque municipio ${park.municipalityId}`);
-        
-        if (park.municipalityId !== req.user.municipalityId) {
-          console.log(`❌ Sin permisos para eliminar documento del parque ${document.parkId}`);
-          return res.status(403).json({ 
-            message: "No tiene permisos para administrar documentos de este parque" 
-          });
-        }
-      }
-      
+
       console.log(`✅ Permisos verificados, procediendo a eliminar documento ${documentId}`);
       const result = await storage.deleteDocument(documentId);
       
@@ -4784,20 +4755,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const parkId = Number(req.params.parkId);
       const documentId = Number(req.params.documentId);
-      
-      // Verificamos primero que el usuario tenga acceso al parque
-      if (req.user.role !== 'super_admin') {
-        const park = await storage.getPark(parkId);
-        if (!park) {
-          return res.status(404).json({ message: "Park not found" });
-        }
-        
-        if (park.municipalityId !== req.user.municipalityId) {
-          return res.status(403).json({ 
-            message: "No tiene permisos para administrar documentos de este parque" 
-          });
-        }
-      }
       
       // Verificamos que el documento pertenezca al parque especificado
       const document = await storage.getDocument(documentId);
@@ -5031,20 +4988,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const video = videoResult.rows[0];
       console.log(`🎬 Video encontrado:`, { id: video.id, parkId: video.park_id, title: video.title });
-      
-      // Check permissions (unless super admin or admin in development)
-      if (req.user.role !== 'super_admin' && req.user.role !== 'admin') {
-        console.log(`🏛️ Verificando permisos: usuario municipio ${req.user.municipalityId}, parque municipio ${video.municipality_id}`);
-        
-        if (video.municipality_id !== req.user.municipalityId) {
-          console.log(`❌ Sin permisos para eliminar video del parque ${video.park_id}`);
-          return res.status(403).json({ 
-            message: "No tiene permisos para administrar videos de este parque" 
-          });
-        }
-      } else {
-        console.log(`✅ Permitiendo eliminación - Usuario: ${req.user.role}`);
-      }
       
       // Delete the video
       const deleteResult = await pool.query(`
@@ -5723,21 +5666,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/parks/:id/comments", async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
-      
-      // Si el usuario está autenticado, podemos aprobar automáticamente el comentario
-      // si pertenece al municipio del parque o es super_admin
-      let autoApprove = false;
-      
-      if (req.user) {
-        if (req.user.role === 'super_admin') {
-          autoApprove = true;
-        } else {
-          const park = await storage.getPark(parkId);
-          if (park && park.municipalityId === req.user.municipalityId) {
-            autoApprove = true;
-          }
-        }
-      }
       
       const commentData = { ...req.body, parkId, approved: autoApprove };
       
@@ -6698,12 +6626,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!park) {
           return res.status(404).json({ message: "Park not found" });
         }
-        
-        if (park.municipalityId !== req.user.municipalityId) {
-          return res.status(403).json({ 
-            message: "No tiene permisos para ver incidentes de este parque" 
-          });
-        }
       }
       
       const incidents = await storage.getParkIncidents(parkId);
@@ -6966,22 +6888,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const parkId = Number(req.params.id);
       
-      // Get park with municipality using the same query pattern as the working parks endpoint
-      const parkQuery = await db.select({
-        park: parks,
-        municipality: municipalities
-      })
-        .from(parks)
-        .leftJoin(municipalities, eq(parks.municipalityId, municipalities.id))
-        .where(eq(parks.id, parkId))
-        .limit(1);
-      
-      if (!parkQuery.length) {
-        return res.status(404).json({ message: "Park not found" });
-      }
-      
-      const { park, municipality } = parkQuery[0];
-      
       // Get activities for this park
       const activitiesData = await db.select()
         .from(activities)
@@ -7136,35 +7042,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get parks by municipality ID - for inter-municipal integration
-  publicRouter.get("/municipalities/:id/parks", async (req: Request, res: Response) => {
-    try {
-      const municipalityId = Number(req.params.id);
-      const parks = await storage.getParks({ municipalityId, includeDeleted: false });
-      
-      const simplifiedParks = parks.map(park => ({
-        id: park.id,
-        name: park.name,
-        type: park.parkType,
-        address: park.address,
-        latitude: park.latitude,
-        longitude: park.longitude
-      }));
-      
-      res.json({
-        status: "success",
-        data: simplifiedParks,
-        count: simplifiedParks.length
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ 
-        status: "error", 
-        message: "Error fetching parks data for municipality" 
-      });
-    }
-  });
-
   // ===== NUEVOS ENDPOINTS DE MÉTRICAS DE PARQUES =====
   
   // GET /api/parks/:id/metrics - Evaluación promedio del parque
@@ -7905,7 +7782,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       // Basic filters
-      if (req.query.municipalityId) filters.municipalityId = Number(req.query.municipalityId);
       if (req.query.parkType) filters.parkType = String(req.query.parkType);
       if (req.query.postalCode) filters.postalCode = String(req.query.postalCode);
       if (req.query.search) filters.search = String(req.query.search);

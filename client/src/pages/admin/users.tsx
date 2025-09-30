@@ -78,7 +78,6 @@ type User = {
   roleId: number; // Campo principal del JOIN con roles
   roleName?: string; // Nombre del rol del JOIN
   roleLevel?: number; // Nivel del rol del JOIN
-  municipalityId: number | null;
   createdAt: Date;
   updatedAt: Date;
   isActive?: boolean;
@@ -107,7 +106,6 @@ interface UserFormData {
   password: string;
   role: string; // Legacy - mantener compatibilidad
   role_id?: number; // Nueva referencia jerárquica
-  municipalityId: number | null;
   // Campos comunes adicionales
   phone?: string;
   profileImageUrl?: string;
@@ -176,7 +174,6 @@ const UserDetail: React.FC<{
     email: user?.email || '',
     fullName: user?.fullName || '',
     password: '',
-    municipalityId: user?.municipalityId || null,
     
     // Campos comunes para todos los usuarios
     phone: user?.phone || '',

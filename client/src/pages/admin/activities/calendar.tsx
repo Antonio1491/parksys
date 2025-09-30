@@ -298,11 +298,9 @@ export default function ActivitiesCalendarPage() {
   return (
     <AdminLayout>
         <div className="container mx-auto p-6 space-y-6">
-
-        {/* Nuevo encabezado con PageHeader */}
         <PageHeader
           icon={<CalendarIcon />}
-          title="Calendario de Actividades"
+          title="Calendario"
           subtitle="Consulta las actividades programadas en el calendario mensual."
           actions={[
             <div className="flex items-center space-x-2" key="calendar-nav">
@@ -322,7 +320,7 @@ export default function ActivitiesCalendarPage() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="sm">
                     <CalendarIcon className="h-4 w-4 mr-2" />
-                    Elegir mes
+                    Fecha
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">

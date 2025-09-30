@@ -63,7 +63,6 @@ export interface Recognition {
 export interface Park {
   id: number;
   name: string;
-  municipalityId: number;
   parkType: string;
   description: string | null;
   address: string;

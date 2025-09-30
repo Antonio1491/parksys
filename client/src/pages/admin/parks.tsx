@@ -57,7 +57,6 @@ interface Park {
   address: string;
   area: number;
   parkType: string;
-  municipalityId: number;
   municipality?: { name: string };
   municipalityText?: string; // ✅ Campo para municipio como texto libre
   certificaciones?: string;

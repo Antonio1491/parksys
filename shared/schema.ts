@@ -108,7 +108,6 @@ export const expenseCategories = pgTable("expense_categories", {
 // Presupuestos anuales
 export const budgets = pgTable("budgets", {
   id: serial("id").primaryKey(),
-  municipalityId: integer("municipality_id"),
   parkId: integer("park_id"),
   year: integer("year").notNull(),
   name: varchar("name", { length: 100 }).notNull(),
@@ -1495,7 +1494,6 @@ export const parkTypology = pgTable("park_typology", {
 export const parks = pgTable("parks", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  municipalityId: integer("municipality_id"), // Opcional - para retrocompatibilidad
   municipalityText: text("municipality_text"), // Campo para municipio como texto libre
   parkType: text("park_type").notNull(), // Campo legacy mantenido para retrocompatibilidad
   typologyId: integer("typology_id").references(() => parkTypology.id), // Relación con tipología oficial
@@ -1890,10 +1888,6 @@ export const treeMaintenancesRelations = relations(treeMaintenances, ({ one }) =
 }));
 
 export const parksRelations = relations(parks, ({ one }) => ({
-  municipality: one(municipalities, {
-    fields: [parks.municipalityId],
-    references: [municipalities.id],
-  }),
   typology: one(parkTypology, {
     fields: [parks.typologyId],
     references: [parkTypology.id],

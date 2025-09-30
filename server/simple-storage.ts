@@ -30,10 +30,8 @@ export class SimpleStorage {
     try {
       return await db.select({
         park: parks,
-        municipality: municipalities
       })
-      .from(parks)
-      .leftJoin(municipalities, eq(parks.municipalityId, municipalities.id));
+      .from(parks);
     } catch (error) {
       console.error("Error fetching extended parks:", error);
       return [];

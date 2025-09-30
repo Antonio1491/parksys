@@ -1,0 +1,201 @@
+index-Di_YlNvr.js:2422 🔥 Firebase initialized successfully
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/roles/1/permissions
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/parks/99/extended
+index-Di_YlNvr.js:849 i18next::backendConnector: loaded namespace common for language es {navigation: {…}, actions: {…}, forms: {…}, messages: {…}, dashboard: {…}}
+index-Di_YlNvr.js:849 i18next: languageChanged es
+index-Di_YlNvr.js:849 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/parks/99/extended 500 (Internal Server Error)
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+onSubscribe @ index-Di_YlNvr.js:49
+subscribe @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+vq @ index-Di_YlNvr.js:39
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49 Query failed for: /api/parks/99/extended Error: Error fetching extended park data
+    at index-Di_YlNvr.js:49:48333
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+onSubscribe @ index-Di_YlNvr.js:49
+subscribe @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+vq @ index-Di_YlNvr.js:39
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/parks/99/extended
+index-Di_YlNvr.js:49  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/parks/99/extended 500 (Internal Server Error)
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+Promise.then
+(anonymous) @ index-Di_YlNvr.js:49
+Promise.catch
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+onSubscribe @ index-Di_YlNvr.js:49
+subscribe @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+vq @ index-Di_YlNvr.js:39
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:49 Query failed for: /api/parks/99/extended Error: Error fetching extended park data
+    at index-Di_YlNvr.js:49:48333
+(anonymous) @ index-Di_YlNvr.js:49
+await in (anonymous)
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+Promise.then
+(anonymous) @ index-Di_YlNvr.js:49
+Promise.catch
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+onSubscribe @ index-Di_YlNvr.js:49
+subscribe @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+vq @ index-Di_YlNvr.js:39
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+bosque-los-colomos-99:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+/admin/login:1 [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) <input type=​"password" class=​"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:​border-0 file:​bg-transparent file:​text-sm file:​font-medium file:​text-foreground placeholder:​text-muted-foreground focus-visible:​outline-none focus-visible:​ring-2 focus-visible:​ring-ring focus-visible:​ring-offset-2 disabled:​cursor-not-allowed disabled:​opacity-50 md:​text-sm" id=​"loginPassword" placeholder=​"Ingresa tu contraseña" required value>​flex
+index-Di_YlNvr.js:2422 ✅ Usuario autenticado, redirigiendo al dashboard...
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/parks
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/activities
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/users
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/hr/employees
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/volunteers
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/active-concessions
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/notifications/count
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:849 i18next::backendConnector: loaded namespace parks for language es {title: 'Gestión de Parques', subtitle: 'Sistema integral de administración de parques municipales', fields: {…}, types: {…}, status: {…}, …}
+index-Di_YlNvr.js:849 i18next::translator: missingKey es common messages.loading messages.loading
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/parks-with-images
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/parks-with-images
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/parks/summary?ids=100,102,104,86,89,90,91,98,99
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/parks/summary?ids=100,102,104,86,89,90,91,98,99
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/parks/90/details
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+/admin/parks/90/manage:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+park-manage-Dh1-2gsD.js:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/parks/90 500 (Internal Server Error)
+queryFn @ park-manage-Dh1-2gsD.js:1
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+onSubscribe @ index-Di_YlNvr.js:49
+subscribe @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+vq @ index-Di_YlNvr.js:39
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26
+index-Di_YlNvr.js:849 i18next::translator: missingKey es common messages.loading messages.loading
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/parks
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/parks
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/parks-with-images
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/parks-with-images
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/parks/summary?ids=100,102,104,86,89,90,91,98,99
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/parks/summary?ids=100,102,104,86,89,90,91,98,99
+index-Di_YlNvr.js:49 🌐 [QUERY] GET /api/parks/90/details
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+index-Di_YlNvr.js:49 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+park-manage-Dh1-2gsD.js:1  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/api/parks/90 500 (Internal Server Error)
+queryFn @ park-manage-Dh1-2gsD.js:1
+s @ index-Di_YlNvr.js:49
+y @ index-Di_YlNvr.js:49
+start @ index-Di_YlNvr.js:49
+fetch @ index-Di_YlNvr.js:49
+cg @ index-Di_YlNvr.js:49
+onSubscribe @ index-Di_YlNvr.js:49
+subscribe @ index-Di_YlNvr.js:49
+(anonymous) @ index-Di_YlNvr.js:49
+vq @ index-Di_YlNvr.js:39
+z_ @ index-Di_YlNvr.js:41
+lf @ index-Di_YlNvr.js:41
+(anonymous) @ index-Di_YlNvr.js:41
+C @ index-Di_YlNvr.js:26
+R @ index-Di_YlNvr.js:26

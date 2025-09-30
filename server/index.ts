@@ -2082,10 +2082,6 @@ app.put("/api/parks/:id", async (req: Request, res: Response) => {
       updateFields.push(`park_type = $${paramIndex++}`);
       values.push(parkData.parkType);
     }
-    if (parkData.municipalityId !== undefined) {
-      updateFields.push(`municipality_id = $${paramIndex++}`);
-      values.push(parkData.municipalityId);
-    }
     if (parkData.municipality !== undefined) {
       updateFields.push(`municipality_text = $${paramIndex++}`);
       values.push(parkData.municipality);

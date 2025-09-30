@@ -234,7 +234,6 @@ export async function seedConcessionaires() {
         phone: concessionaireData.user.phone,
         gender: concessionaireData.user.gender as "masculino" | "femenino",
         birthDate: concessionaireData.user.birthDate,
-        municipalityId: 2, // Guadalajara
         createdAt: new Date(),
         updatedAt: new Date()
       }).returning();

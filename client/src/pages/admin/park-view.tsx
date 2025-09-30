@@ -499,7 +499,6 @@ interface ParkDetails {
   location: string;
   openingHours: string;
   description: string;
-  municipalityId: number;
   municipality: { name: string };
   
   // Additional basic park information
@@ -673,7 +672,6 @@ export default function AdminParkView() {
       location: '',
       openingHours: '',
       description: '',
-      municipalityId: null,
       municipality: { name: 'No especificado' },
       amenities: [],
       activities: [],
@@ -834,7 +832,6 @@ export default function AdminParkView() {
           <Link href="/admin/parks">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
             </Button>
           </Link>
           <div>
@@ -847,7 +844,7 @@ export default function AdminParkView() {
         </div>
         <div className="flex gap-2">
           <Link href={`/admin/parks/${park.id}/manage`}>
-            <Button>Editar Parque</Button>
+            <Button>Editar</Button>
           </Link>
         </div>
       </div>
