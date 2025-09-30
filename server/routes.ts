@@ -17,7 +17,7 @@ import * as schema from "@shared/schema";
 const { 
   parkAmenities, amenities, insertParkSchema, 
   incidents, assets, assetMaintenances, parkEvaluations, 
-  activities, events, parks, municipalities 
+  activities, events, parks
 } = schema;
 import { videoRouter } from "./video_routes";
 import { registerVolunteerRoutes } from "./volunteerRoutes";
@@ -1900,13 +1900,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       const maintenanceAreas = parseInt(maintenanceResult.rows[0].count);
       
-      // Parques por municipio
+      // Parques por municipio (usando municipality_text)
       const parksByMunicipalityResult = await pool.query(`
-        SELECT m.name as municipality_name, COUNT(p.id) as count
-        FROM municipalities m
-        LEFT JOIN parks p ON m.id = p.municipality_id
-        GROUP BY m.id, m.name
-        HAVING COUNT(p.id) > 0
+        SELECT 
+          COALESCE(p.municipality_text, 'Sin municipio') as municipality_name, 
+          COUNT(p.id) as count
+        FROM parks p
+        WHERE p.municipality_text IS NOT NULL
+        GROUP BY p.municipality_text
         ORDER BY count DESC
       `);
       
@@ -1942,10 +1943,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Parques con coordenadas para el mapa
       const parksWithCoordinatesResult = await pool.query(`
-        SELECT p.id, p.name, p.latitude, p.longitude, m.name as municipality,
+        SELECT p.id, p.name, p.latitude, p.longitude, 
+               p.municipality_text as municipality,
                p.park_type as type, p.area, p.conservation_status as status
         FROM parks p
-        LEFT JOIN municipalities m ON p.municipality_id = m.id
         WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
       `);
       
@@ -2391,9 +2392,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           p.regulation_url as "regulationUrl", p.opening_hours as "openingHours", 
           p.contact_email as "contactEmail", p.contact_phone as "contactPhone",
           p.video_url as "videoUrl",
-          m.name as "municipalityName", m.state
+          p.municipality_text as "municipalityText"
         FROM parks p
-        LEFT JOIN municipalities m ON p.municipality_id = m.id
         WHERE p.id = $1
       `, [parkId]);
       
@@ -4427,11 +4427,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Park not found" });
         }
         
-        if (park.municipalityId !== req.user.municipalityId) {
-          return res.status(403).json({ 
-            message: "No tiene permisos para administrar imágenes de este parque" 
-          });
-        }
+        // NOTA: municipalityId eliminado - usar permisos basados en rol
+        // Los usuarios con rol !== super_admin ya tienen restricciones en otros endpoints
       }
       
       // Verificamos que la imagen pertenezca al parque especificado
@@ -4973,9 +4970,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const videoId = Number(req.params.videoId);
       console.log(`🗑️ DELETE /park-videos/${videoId} - Iniciando eliminación`);
       
-      // Check if video exists and get park info for permission check
+      // Check if video exists
       const videoResult = await pool.query(`
-        SELECT pv.*, p.municipality_id 
+        SELECT pv.* 
         FROM park_videos pv
         JOIN parks p ON pv.park_id = p.id
         WHERE pv.id = $1
@@ -6778,15 +6775,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all municipalities
+  // Get all municipalities - DESHABILITADO: tabla municipalities no existe
+  // Los parques usan municipality_text (texto libre) en su lugar
   apiRouter.get("/municipalities", async (_req: Request, res: Response) => {
-    try {
-      const municipalities = await db.select().from(schema.municipalities);
-      res.json(municipalities);
-    } catch (error) {
-      console.error("Error getting municipalities:", error);
-      res.status(500).json({ error: "Error al obtener municipios" });
-    }
+    res.json([]);
   });
 
   // Basic authentication for testing usando la función directa

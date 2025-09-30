@@ -163,7 +163,9 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
   }
 };
 
-// Middleware para verificar si el usuario tiene acceso a un municipio específico
+// DESHABILITADO: Middleware para verificar acceso a municipio
+// La tabla municipalities y el campo municipalityId no existen en la DB
+// Los parques usan municipality_text (texto libre) en su lugar
 export const hasMunicipalityAccess = (municipalityId?: number) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     // Si no hay usuario autenticado, no tiene acceso
@@ -171,36 +173,12 @@ export const hasMunicipalityAccess = (municipalityId?: number) => {
       return res.status(401).json({ message: 'No autorizado' });
     }
 
-    // DESARROLLO: Permitir acceso SOLO con flag explícito
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const allowMunicipalBypass = process.env.ALLOW_MUNICIPAL_ACCESS_BYPASS === 'true';
-    if (isDevelopment && allowMunicipalBypass && req.user.role === 'admin') {
-      console.log('🛠️ [DEV] Modo desarrollo - Permitiendo acceso municipal para admin');
+    // Si el usuario es super admin o admin, tiene acceso
+    if (req.user.role === 'super_admin' || req.user.role === 'admin') {
       return next();
     }
 
-    // Si el usuario es super admin, tiene acceso a todos los municipios
-    if (req.user.role === 'super_admin') {
-      return next();
-    }
-
-    // Si el usuario es admin de municipio, solo tiene acceso a su municipio
-    if (req.user.role === 'admin' && req.user.municipalityId) {
-      // Si se especificó un municipalityId en la petición, verificamos que coincida
-      const targetMunicipalityId = municipalityId || 
-                                  Number(req.params.municipalityId) || 
-                                  Number(req.body.municipalityId);
-      
-      if (targetMunicipalityId && req.user.municipalityId !== targetMunicipalityId) {
-        return res.status(403).json({ 
-          message: 'No tiene permisos para acceder a este municipio' 
-        });
-      }
-      
-      return next();
-    }
-
-    // Si el usuario no tiene un rol adecuado o no está asignado a un municipio
+    // Otros roles no tienen acceso a funciones municipales
     return res.status(403).json({ 
       message: 'No tiene los permisos necesarios para realizar esta acción'
     });
@@ -363,8 +341,8 @@ export const userHasParkAccess = (user: any, parkId: number): boolean => {
   }
   
   // Verificar acceso específico al parque
+  // NOTA: municipalityId eliminado - verificación basada solo en parkIds
   const hasSpecificAccess = user.roles?.some((role: any) => 
-    role.municipalityIds?.includes(user.municipalityId) ||
     role.parkIds?.includes(parkId)
   ) || user.parkIds?.includes(parkId);
   

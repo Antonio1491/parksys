@@ -17,7 +17,7 @@ const createUserSchema = z.object({
   fullName: z.string().min(1, "El nombre completo es requerido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
   role: z.string().min(1, "El rol es requerido"), // Ahora acepta roleId como string
-  municipalityId: z.number().nullable().optional(),
+  // municipalityId: z.number().nullable().optional(), // ELIMINADO: campo no existe en DB
   phone: z.string().optional(),
   gender: z.enum(['masculino', 'femenino', 'no_especificar']).optional(),
   birthDate: z.string().nullable().optional(),
@@ -38,7 +38,7 @@ const updateUserSchema = z.object({
   lastName: z.string().min(1, "El apellido es requerido").optional(),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres").optional(),
   role: z.enum(['admin', 'super_admin', 'moderator', 'operator', 'director', 'manager', 'supervisor', 'ciudadano', 'voluntario', 'instructor', 'user', 'guardaparques', 'guardia', 'concesionario']).optional(),
-  municipalityId: z.number().nullable().optional(),
+  // municipalityId: z.number().nullable().optional(), // ELIMINADO: campo no existe en DB
   profileImageUrl: z.string().optional(),
   phone: z.string().optional(),
   gender: z.string().optional(),
@@ -418,7 +418,7 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
             password: hashedPassword,
             roleId: Number(userData.role), // Convertir role a roleId numérico
             fullName: userData.fullName,
-            municipalityId: userData.municipalityId || null,
+            // municipalityId: userData.municipalityId || null, // ELIMINADO: campo no existe en DB
             phone: userData.phone || null,
             gender: userData.gender || null,
             birthDate: userData.birthDate || null,
@@ -859,7 +859,7 @@ export function registerUserRoutes(app: any, apiRouter: Router) {
         totalHours: volunteerData.total_hours,
         isActive: volunteerData.is_active,
         userId: volunteerData.user_id,
-        municipalityId: 2, // Guadalajara por defecto
+        // municipalityId: 2, // ELIMINADO: campo no existe en DB
         // Valores por defecto para los campos requeridos
         ageConsent: true,
         conductConsent: true,
