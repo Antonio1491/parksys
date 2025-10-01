@@ -373,7 +373,7 @@ const AdminParksContent = () => {
 
 
         {/* Programación próxima */}
-        {schedule && schedule.total > 0 && (
+        {schedule && (
           <div className="pl-3">
             <div className="flex items-center gap-1 mb-2">
               <h4 className="text-md font-medium text-gray-800">Programación próxima</h4>

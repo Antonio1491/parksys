@@ -2582,10 +2582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Paso 9: Construyendo respuesta final...');
       const extendedPark = {
         ...park,
-        municipality: {
-          name: park.municipalityName,
-          state: park.state
-        },
+        municipality: park.municipalityText ? { name: park.municipalityText } : { name: "Sin municipio" },
         amenities: amenitiesResult.rows,
         treeSpecies: treeSpeciesResult.rows,
         activities: activitiesResult.rows,
@@ -2807,7 +2804,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         location: park.location,
         openingHours: park.openingHours || "Sin horarios definidos",
         description: park.description || "Sin descripción disponible",
-        municipality: municipality ? { name: municipality.name } : { name: "Municipio no encontrado" },
+        municipality: park.municipalityText ? { name: park.municipalityText } : { name: "Sin municipio" },
         certificaciones: park.certificaciones,
         amenities: amenities.map((amenity: any) => ({
           id: amenity.id,
