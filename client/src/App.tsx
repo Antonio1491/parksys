@@ -6,10 +6,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileCompletionProvider } from "@/components/ProfileCompletionContext";
 import "./i18n";
+import { ROUTES } from '@/routes';
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Parks from "@/pages/parks";
-import ParkDetail from "@/pages/park-detail";
+import ParkLandingPage from "@/pages/ParkLandingPage";
 import AdminDashboard from "@/pages/admin";
 import AdminParks from "@/pages/admin/parks";
 import AdminParkEdit from "@/pages/admin/park-edit";
@@ -18,26 +19,19 @@ import AdminParksImport from "@/pages/admin/parks-import";
 import AdminAnalytics from "@/pages/admin/analytics";
 import AdminDocuments from "@/pages/admin/documents";
 import AdminComments from "@/pages/admin/comments";
-import AdminIncidents from "@/pages/admin/incidents";
-import AdminUsers from "@/pages/admin/users";
 import AdminActivities from "@/pages/admin/activities";
 import AdminAmenities from "@/pages/admin/amenities";
 import AdminSettings from "@/pages/admin/settings";
 import AdminPayments from "@/pages/admin/payments";
 import AdminLogin from "@/pages/admin/login";
 import PendingUsersPage from "@/pages/admin/pending-users";
-import AdminInstructorInvitations from "@/pages/admin/instructor-invitations";
 import InstructorRegistration from "@/pages/public/instructor-registration";
 import AccessUsersPage from "@/pages/admin/configuracion-seguridad/access/users";
 import ActivityDetailPage from "@/pages/activity-detail";
-import AdminVolunteers from "@/pages/admin/volunteers";
 import Landing from "@/pages/Landing";
 import ParksModuleShowcase from "@/pages/ParksModuleShowcase";
-// El import de AdminVolunteerNew ha sido eliminado
 import AdminVolunteerParticipations from "@/pages/admin/volunteers/participations";
 import AdminParticipationEdit from "@/pages/admin/volunteers/participations/edit";
-
-import DashboardPage from "@/pages/admin/volunteers/dashboard-page";
 import EventCategoriesPage from "@/pages/admin/events/categories";
 import NewEventPage from "@/pages/admin/events/new";
 import EventsIndex from "@/pages/admin/events/index";
@@ -46,6 +40,19 @@ import EventRegistrationsPage from "@/pages/admin/events/registrations";
 import Header from "@/components/Header";
 import ParkEvaluationForm from "@/pages/ParkEvaluationForm";
 import EvaluacionesParques from "@/pages/admin/evaluaciones/parques";
+
+/**
+ * Helper para verificar que una ruta del App.tsx 
+ * corresponde con una ruta en routes.ts
+ */
+export function checkRoute(oldPath: string): string {
+  // Busca en todas las rutas
+  console.log(`⚠️ Ruta sin migrar: ${oldPath}`);
+  return oldPath;
+}
+
+// Uso temporal durante migración:
+// <Route path={checkRoute("/admin/parks")} component={AdminParks} />
 
 function Router() {
   const [location, setLocation] = useLocation();
@@ -57,59 +64,37 @@ function Router() {
       {!isVentasRoute && !isAdminRoute && <Header />}
       <div className={!isVentasRoute && !isAdminRoute ? "pt-20" : ""}>
         <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/home" component={Home} />
-        <Route path="/ventas" component={Landing} />
-        <Route path="/landing" component={Landing} />
-        <Route path="/sales">
-          <Suspense fallback={<div className="p-8 text-center">Cargando página de ventas...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/sales-basic')))}
-          </Suspense>
-        </Route>
-        <Route path="/sales/municipal">
-          <Suspense fallback={<div className="p-8 text-center">Cargando página de ParkSys Municipal...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/sales-municipal')))}
-          </Suspense>
-        </Route>
-        <Route path="/sales/network">
-          <Suspense fallback={<div className="p-8 text-center">Cargando página de ParkSys Network...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/sales-network')))}
-          </Suspense>
-        </Route>
-        <Route path="/sales/pro">
-          <Suspense fallback={<div className="p-8 text-center">Cargando página de ParkSys Pro...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/sales-pro')))}
-          </Suspense>
-        </Route>
-        <Route path="/parks-module" component={ParksModuleShowcase} />
-        <Route path="/parks" component={Parks} />
-        <Route path="/parks/:id" component={ParkDetail} />
-        <Route path="/parque/:slug">
+        <Route path={ROUTES.public.home} component={Home} />
+
+          {/*MIGRACIÓN INICIADA DE PÁGINAS PÚBLICAS*/}
+
+          
+          {/*PENDIENTE ADAPTAR FUNCIÓN DINÁMICA*/}
+        <Route path="/parks/:slug">
           <Suspense fallback={<div className="p-8 text-center">Cargando parque...</div>}>
             {React.createElement(React.lazy(() => import('./pages/ParkLandingPage')))}
           </Suspense>
         </Route>
-        <Route path="/instructors">
-          <Suspense fallback={<div className="p-8 text-center">Cargando instructores...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/instructors')))}
+        <Route path="/parks/:parkSlug/evaluations">
+          <Suspense fallback={<div className="p-8 text-center">Cargando evaluaciones del parque...</div>}>
+           {React.createElement(React.lazy(() => import('@/pages/ParkEvaluations')))}
           </Suspense>
         </Route>
-        <Route path="/instructor/:id">
-          <Suspense fallback={<div className="p-8 text-center">Cargando perfil del instructor...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/PublicInstructorProfile')))}
-          </Suspense>
-        </Route>
-        <Route path="/activities">
+        <Route path="/parks/:slug/evaluate" component={ParkEvaluationForm} />
+        <Route path="/parks/:id" component={ParkLandingPage} />
+        <Route path={ROUTES.public.parks} component={Parks} />
+        <Route path={ROUTES.public.activities}>
           <Suspense fallback={<div className="p-8 text-center">Cargando actividades...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/activities')))}
           </Suspense>
         </Route>
-        <Route path="/reservations">
-          <Suspense fallback={<div className="p-8 text-center">Cargando espacios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/reservations')))}
+        <Route path="/activity/:id" component={ActivityDetailPage} />
+        <Route path="/activity/:id/payment">
+          <Suspense fallback={<div className="p-8 text-center">Cargando página de pago...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/activity-payment')))}
           </Suspense>
         </Route>
-        <Route path="/events">
+        <Route path={ROUTES.public.events}>
           <Suspense fallback={<div className="p-8 text-center">Cargando eventos...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/Events')))}
           </Suspense>
@@ -119,10 +104,9 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/event-detail')))}
           </Suspense>
         </Route>
-        <Route path="/activity/:id" component={ActivityDetailPage} />
-        <Route path="/activity/:id/payment">
-          <Suspense fallback={<div className="p-8 text-center">Cargando página de pago...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/activity-payment')))}
+        <Route path={ROUTES.public.reservations}>
+          <Suspense fallback={<div className="p-8 text-center">Cargando espacios...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/reservations')))}
           </Suspense>
         </Route>
         <Route path="/space/:id">
@@ -130,12 +114,12 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/space-detail')))}
           </Suspense>
         </Route>
-        <Route path="/calendar">
+        <Route path={ROUTES.public.calendar}>
           <Suspense fallback={<div className="p-8 text-center">Cargando calendario...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/calendar')))}
           </Suspense>
         </Route>
-        <Route path="/concessions">
+        <Route path={ROUTES.public.concessions}>
           <Suspense fallback={<div className="p-8 text-center">Cargando concesiones...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/ConcessionsList')))}
           </Suspense>
@@ -145,18 +129,7 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/ConcessionDetail')))}
           </Suspense>
         </Route>
-        <Route path="/volunteers">
-          <Suspense fallback={<div className="p-8 text-center">Cargando voluntarios...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/VolunteersList')))}
-          </Suspense>
-        </Route>
-        <Route path="/volunteers/register">
-          <Suspense fallback={<div className="p-8 text-center">Cargando formulario de registro...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/VolunteerRegistration')))}
-          </Suspense>
-        </Route>
-        <Route path="/instructors/register" component={InstructorRegistration} />
-        <Route path="/tree-species">
+        <Route path={ROUTES.public.treeSpecies}>
           <Suspense fallback={<div className="p-8 text-center">Cargando especies arbóreas...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/TreeSpecies')))}
           </Suspense>
@@ -166,7 +139,7 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/TreeSpeciesDetail')))}
           </Suspense>
         </Route>
-        <Route path="/fauna">
+        <Route path={ROUTES.public.fauna}>
           <Suspense fallback={<div className="p-8 text-center">Cargando fauna...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/Fauna')))}
           </Suspense>
@@ -176,12 +149,33 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/FaunaDetail')))}
           </Suspense>
         </Route>
-        <Route path="/parque/:slug/evaluar" component={ParkEvaluationForm} />
-        <Route path="/parque/:parkSlug/evaluaciones">
-          <Suspense fallback={<div className="p-8 text-center">Cargando evaluaciones del parque...</div>}>
-            {React.createElement(React.lazy(() => import('@/pages/ParkEvaluations')))}
+        <Route path={ROUTES.public.volunteers}>
+          <Suspense fallback={<div className="p-8 text-center">Cargando voluntarios...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/VolunteersList')))}
           </Suspense>
         </Route>
+        <Route path={ROUTES.public.volunteerRegister}>
+          <Suspense fallback={<div className="p-8 text-center">Cargando formulario de registro...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/VolunteerRegistration')))}
+          </Suspense>
+        </Route>
+        <Route path={ROUTES.public.instructors}>
+          <Suspense fallback={<div className="p-8 text-center">Cargando instructores...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/instructors')))}
+          </Suspense>
+        </Route>
+        <Route path="/instructor/:id">
+          <Suspense fallback={<div className="p-8 text-center">Cargando perfil del instructor...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/PublicInstructorProfile')))}
+          </Suspense>
+        </Route>
+        <Route path={ROUTES.public.instructorRegister} component={InstructorRegistration} />
+
+
+
+
+
+
 
         {/* Ruta de login principal */}
         <Route path="/login" component={AdminLogin} />

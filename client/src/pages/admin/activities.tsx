@@ -788,26 +788,18 @@ const AdminActivities = () => {
     return `Parque ${parkId}`;
   };
 
-  // Función para obtener los colores de las categorías (igual que en organizador)
-  const getCategoryColors = (categoryName: string) => {
-    switch (categoryName) {
-      case 'Arte y Cultura':
-        return 'bg-[#f1e3ff] text-gray-800';
-      case 'Recreación y Bienestar':
-        return 'bg-blue-100 text-blue-800';
-      case 'Eventos de Temporada':
-        return 'bg-orange-100 text-orange-800';
-      case 'Deportivo':
-        return 'bg-red-100 text-red-800';
-      case 'Comunidad':
-        return 'bg-[#f9cac5] text-gray-800';
-      case 'Naturaleza y Ciencia':
-        return 'bg-[#cff9c5] text-gray-800';
-      case 'Fitness y Ejercicio':
-        return 'bg-indigo-100 text-indigo-800';
-      default:
-        return 'bg-[#c5efff] text-gray-800';
+  // Función para obtener los colores de las categorías
+  const getCategoryColors = (activity: any) => {
+    // Buscar la categoría en categoriesData para obtener su color
+    const categoryId = activity.categoryId || activity.category_id;
+    const category = categoriesData?.find((cat: any) => cat.id === categoryId);
+    // Si tiene color guardado, usarlo
+    if (category?.color) {
+      return `text-gray-800 border border-gray-200`;
     }
+
+    // Color por defecto si no tiene color guardado
+    return 'bg-gray-100 text-gray-800 border border-gray-200';
   };
 
   const uniqueCategories = useMemo(() => {
@@ -867,8 +859,6 @@ const AdminActivities = () => {
     setShowDeleteDialog(true);
   };
 
-
-
   // Handle confirm delete
   const handleConfirmDelete = () => {
     if (!selectedActivity) return;
@@ -916,23 +906,21 @@ const AdminActivities = () => {
             <Button
               key="nuevo"
               onClick={() => setLocation('/admin/organizador/catalogo/crear')}
-              className="bg-[#a0cc4d] hover:bg-[#00a587] text-white"
+              className="bg-[#a0cc4d] hover:bg-[#00a587] text-white hover:text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Nuevo
             </Button>,
             <Button
               key="importar"
-              variant="outline"
               onClick={() => setShowImportDialog(true)}
-              className="border-[#f4f5f7v] text-[#00444f] hover:bg-[#00a587] hover:text-white"
+              className="bg-white border-[#f4f5f7v] text-[#00444f] hover:bg-[#00a587] hover:text-white"
             >
               <Upload className="h-4 w-4 mr-2" />
               Importar
             </Button>,
             <Button
               key="exportar"
-              variant="outline"
               onClick={handleExportCSV}
               className="bg-[#00444f] text-[#ffffff] hover:bg-[#00a587] hover:text-white"
             >
@@ -944,7 +932,7 @@ const AdminActivities = () => {
 
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg">
-          <div className="flex flex-wrap items-start justify-start gap-3">
+          <div className="flex items-start justify-start gap-3">
             <div className="relative flex-1 min-w-[280px] max-w-lg">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />
               <Input
@@ -988,37 +976,32 @@ const AdminActivities = () => {
             </div>
 
             {/* Botón limpiar filtros */}
-            <div className="flex rounded-lg items-center border-gray-300 border hover hover-[#ceefea]">
-              <Button 
-                onClick={handleClearFilters} 
-                className="h-9 w-10 p-0 flex items-center justify-center"
-                data-testid="button-clear-filters"
-                title="Limpiar filtros"
-              >
-                <Brush className="text-gray-600 h-4 w-4" />
+            <div>
+              <Button variant="outline" size="sm" className='w-10 h-10 bg-gray-200' onClick={handleClearFilters}>
+                <Brush className="h-4 w-4 text-[#4b5b65]" />
               </Button>
             </div>
 
             {/* Toggle de vista */}
             <div className="ml-auto">
-              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <div className="flex items-center gap-1 h-10 bg-gray-200 rounded-lg">
                 <Button
                   variant={viewMode === 'cards' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('cards')}
-                  className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                  className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-[#4b5b65]'}`}
                   data-testid="button-view-cards"
                 >
-                  <Grid className="h-6 w-6" />
+                  <Grid className="h-4 w-4" />
                 </Button>
                 <Button
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
-                  size="sm"
+                  size="sm" 
                   onClick={() => setViewMode('table')}
                   className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
                   data-testid="button-view-table"
                 >
-                  <List className="h-6 w-6" />
+                  <List className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -1028,10 +1011,10 @@ const AdminActivities = () => {
               <Button
                 variant={selectionMode ? 'default' : 'outline'}
                 size="sm"
-                className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-[#ededed] hover:bg-gray-200'}`}
+                className={`flex items-center h-10 w-10 ${selectionMode ? 'bg-gray-200 text-white hover-[#00a587]' : 'bg-gray-200 hover:bg-[#00a587]'}`}
                 data-testid="button-selection-toggle"
               >
-                <CopyCheck className="h-4 w-4" />
+                <CopyCheck className="h-4 w-4 text-[#4b5b65] hover-white" />
               </Button>
 
               {/* Dropdown menu con CSS hover */}
@@ -1078,7 +1061,7 @@ const AdminActivities = () => {
               variant="destructive"
               size="sm"
               onClick={handleBulkDeleteClick}
-              className="flex items-center"
+              className="flex items-center h-10 w-10"
               disabled={selectedActivities.size === 0}
               data-testid="button-delete-selected"
             >
@@ -1166,7 +1149,14 @@ const AdminActivities = () => {
                           })()}
                         </TableCell>
                         <TableCell>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColors(getCategoryName(activity))}`}>
+                          <span 
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColors(activity)}`}
+                            style={{
+                              backgroundColor: categoriesData?.find((cat: any) => 
+                                cat.id === (activity.categoryId || activity.category_id)
+                              )?.color || '#e5e7eb'
+                            }}
+                          >
                             {getCategoryName(activity)}
                           </span>
                         </TableCell>
@@ -1197,13 +1187,14 @@ const AdminActivities = () => {
                   </TableBody>
                 </Table>
               ) : (
+              
                 // Vista de fichas
                 <div className="p-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {currentActivities.map((activity: any) => (
-                      <div key={activity.id} className="bg-white border rounded-2xl hover:shadow-md hover:border-[#00444f] transition-shadow duration-200 overflow-hidden">
+                      <div key={activity.id} className="bg-white border rounded-2xl hover:shadow-md hover:border-[#00444f] transition-shadow duration-200 overflow-hidden flex flex-col">
                         {/* Imagen de la actividad */}
-                        <div className="relative h-48 bg-gray-100">
+                        <div className="relative h-48 bg-gray-100 flex-shrink-0">
                           {selectionMode && (
                             <div className="absolute top-2 right-2 z-10">
                               <Checkbox
@@ -1229,84 +1220,95 @@ const AdminActivities = () => {
                             </div>
                           )}
                         </div>
-                        
-                        {/* Header de la ficha */}
-                        <div className="p-4">
-                          <div className="mb-3 flex items-start justify-between">
-                            <h3 className="font-poppins font-bold text-gray-900 line-clamp-2 flex-1 mr-2">{activity.title}</h3>
-                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
-                              #{activity.id}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${getCategoryColors(getCategoryName(activity))}`}>
-                              {getCategoryName(activity)}
-                            </span>
-                            {(() => {
-                              const statusInfo = getStatusDisplay(activity.status || 'programada');
-                              return (
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${statusInfo.color}`}>
-                                  <span className="mr-1"></span>
-                                  {statusInfo.label}
-                                </span>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                        
-                        {/* Contenido de la ficha */}
-                        <div className="p-4">
-                          {activity.description && (
-                            <p className="text-sm text-gray-800 font-poppins mb-3">
-                              {activity.description}
-                            </p>
-                          )}
-                          
-                          <div className="space-y-2 mb-4">
-                            <div className="flex items-center text-sm text-gray-500">
-                              <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                              <span>{getParkName(activity)}</span>
+  
+                        {/* Contenido que crece */}
+                        <div className="flex flex-col flex-1">
+                          {/* Header de la ficha */}
+                          <div className="p-4 pb-2">
+                            <div className="mb-3 flex items-start justify-between">
+                              <h3 className="font-poppins font-bold text-gray-900 line-clamp-2 flex-1 mr-2">{activity.title}</h3>
+                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
+                                #{activity.id}
+                              </span>
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                                <span>{formatDate(activity.startDate)}</span>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span 
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${getCategoryColors(activity)}`}
+                                style={{
+                                  backgroundColor: categoriesData?.find((cat: any) => 
+                                    cat.id === (activity.categoryId || activity.category_id)
+                                  )?.color || '#e5e7eb'
+                                }}
+                              >
+                                {getCategoryName(activity)}
+                              </span>
+                              {(() => {
+                                const statusInfo = getStatusDisplay(activity.status || 'programada');
+                                return (
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-poppins font-medium ${statusInfo.color}`}>
+                                    {statusInfo.label}
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          </div>
+  
+                          {/* Contenido de la ficha - esta sección crece */}
+                          <div className="p-4 pt-2 flex-1">
+                            {activity.description && (
+                              <p className="text-sm text-gray-800 font-poppins mb-3 line-clamp-3">
+                                {activity.description}
+                              </p>
+                            )}
+  
+                            <div className="space-y-2">
+                              <div className="flex items-center text-sm text-gray-500">
+                                <MapPin className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                                <span className="truncate">{getParkName(activity)}</span>
                               </div>
-                              <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                                <span>{formatTime(activity.startDate, activity.startTime)}</span>
-                              </div>
-                              {activity.capacity && (
+                              <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
                                 <div className="flex items-center">
-                                  <Users className="h-4 w-4 mr-2 text-gray-400" />
-                                  <span>{activity.capacity} personas</span>
+                                  <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                                  <span>{formatDate(activity.startDate)}</span>
                                 </div>
-                              )}
+                                <div className="flex items-center">
+                                  <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                                  <span>{formatTime(activity.startDate, activity.startTime)}</span>
+                                </div>
+                                {activity.capacity && (
+                                  <div className="flex items-center">
+                                    <Users className="h-4 w-4 mr-2 text-gray-400" />
+                                    <span>{activity.capacity} personas</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          
-                          {/* Botones de acción */}
-                          <div className="flex justify-between items-center pt-3 border-t">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
-                              onClick={() => handleEdit(activity)}
-                              data-testid={`button-edit-${activity.id}`}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Editar
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
-                              onClick={() => handleDelete(activity)}
-                              data-testid={`button-delete-${activity.id}`}
-                            >
-                              <Trash className="h-4 w-4 mr-2" />
-                              Eliminar
-                            </Button>
+  
+                          {/* Botones de acción - siempre al fondo */}
+                          <div className="p-4 pt-0 mt-auto">
+                            <div className="flex justify-between items-center pt-3 border-t">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
+                                onClick={() => handleEdit(activity)}
+                                data-testid={`button-edit-${activity.id}`}
+                              >
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Editar
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
+                                onClick={() => handleDelete(activity)}
+                                data-testid={`button-delete-${activity.id}`}
+                              >
+                                <Trash className="h-4 w-4 mr-2" />
+                                Eliminar
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -11,6 +11,7 @@ i18n
     lng: 'es', // idioma por defecto
     fallbackLng: 'es',
     debug: true,
+    supportedLngs: ['es', 'en', 'pt'],
 
     interpolation: {
       escapeValue: false,

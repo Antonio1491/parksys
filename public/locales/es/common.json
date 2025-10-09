@@ -1,4 +1,20 @@
 {
+  "nav": {
+    "home": "Inicio",
+    "parks": "Parques",
+    "content": "Contenido",
+    "activities": "Actividades",
+    "events": "Eventos",
+    "reservations": "Reservaciones",
+    "calendar": "Calendario",
+    "commercialServices": "Servicios comerciales",
+    "biodiversity": "Biodiversidad",
+    "treeSpecies": "Especies arbóreas",
+    "fauna": "Fauna",
+    "users": "Usuarios",
+    "volunteers": "Voluntarios",
+    "instructors": "Instructores"
+  },
   "navigation": {
     "dashboard": "Panel de Control",
     "parks": "Parques", 
@@ -46,12 +62,6 @@
     "parkType": "Tipo de Parque",
     "amenity": "Amenidad",
     "searchParks": "Buscar Parques"
-  },
-  "messages": {
-    "loading": "Cargando...",
-    "noData": "No hay datos disponibles",
-    "error": "Error al cargar datos",
-    "success": "Operación exitosa"
   },
   "dashboard": {
     "title": "Panel Ejecutivo",

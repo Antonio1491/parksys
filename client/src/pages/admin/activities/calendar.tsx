@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { PageHeader } from '@/components/ui/page-header';
 import AdminLayout from '@/components/AdminLayout';
 import {
   Card,
@@ -23,13 +24,14 @@ import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
-  Filter,
+  Plus,
   X,
   MapPin,
   Clock,
   User,
   CreditCard,
   Calendar as CalendarIconSimple,
+  Brush,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -87,28 +89,18 @@ interface Instructor {
 }
 
 // Función para obtener colores basados en el color de la categoría
-const getCategoryColors = (categoryColor?: string): string => {
-  if (!categoryColor) return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-  
-  // Convertir el color hex a clases de Tailwind
-  switch (categoryColor) {
-    case '#e74c3c': // Deportivo - rojo
-      return 'bg-red-100 text-red-800 hover:bg-red-200';
-    case '#2ecc71': // Recreación y Bienestar - verde
-      return 'bg-green-100 text-green-800 hover:bg-green-200';
-    case '#9b59b6': // Arte y Cultura - púrpura
-      return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
-    case '#27ae60': // Naturaleza y Ciencia - verde oscuro
-      return 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200';
-    case '#3498db': // Comunidad - azul
-      return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-    case '#f39c12': // Eventos de Temporada - naranja
-      return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
-    case '#ffea00': // Categoria Prueba Luis - amarillo
-      return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
-    default:
-      return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+const getCategoryStyle = (categoryColor?: string) => {
+  if (!categoryColor) {
+    return {
+      className: 'border border-gray-300 text-gray-800',
+      style: { backgroundColor: '#e5e7eb' }
+    };
   }
+
+  return {
+    className: 'border border-gray-300 text-gray-800',
+    style: { backgroundColor: categoryColor }
+  };
 };
 
 export default function ActivitiesCalendarPage() {
@@ -150,10 +142,10 @@ export default function ActivitiesCalendarPage() {
 
   // Crear mapa de colores por categoría
   const categoryColorMap = React.useMemo(() => {
-    const colorMap: Record<string, string> = {};
+    const colorMap: Record<number, string> = {};
     if (Array.isArray(categories)) {
       categories.forEach((category) => {
-        colorMap[category.name] = getCategoryColors(category.color);
+        colorMap[category.id] = category.color || '#e5e7eb';
       });
     }
     return colorMap;
@@ -270,7 +262,11 @@ export default function ActivitiesCalendarPage() {
                 setIsDialogOpen(true);
               }}
             >
-              <Badge className={categoryColorMap[activity.categoryName || ''] || getCategoryColors()} variant="outline">
+              <Badge 
+                className="border border-gray-300 text-gray-800" 
+                variant="outline"
+                style={{ backgroundColor: categoryColorMap[activity.categoryId || activity.category_id] || '#e5e7eb' }}
+              >
                 {activity.title}
               </Badge>
             </div>
@@ -297,30 +293,118 @@ export default function ActivitiesCalendarPage() {
 
   return (
     <AdminLayout>
-        <div className="container mx-auto p-6 space-y-6">
+      <div className="space-y-6">
         <PageHeader
           icon={<CalendarIcon />}
-          title="Calendario"
+          title="Calendario de actividades"
           subtitle="Consulta las actividades programadas en el calendario mensual."
           actions={[
-            <div className="flex items-center space-x-2" key="calendar-nav">
-              <Button variant="outline" size="sm" onClick={prevMonth}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <div className="text-lg font-medium min-w-[200px] text-center text-white">
-                {format(currentDate, 'MMMM yyyy', { locale: es })}
-              </div>
-              <Button variant="outline" size="sm" onClick={nextMonth}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={goToToday}>
+            
+            <Button
+              key="new-activity"
+              onClick={() => setLocation('/admin/organizador/catalogo/crear')}
+              className="bg-[#a0cc4d] hover:bg-[#00a587] text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nueva actividad
+            </Button>
+          ]}
+        />
+
+        {/* Filtros + Navegación */}
+        <div className="bg-white p-4 rounded-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+            {/* Filtros a la izquierda */}
+            <div className="grid grid-cols-5 gap-2 font-poppins">
+              <Select value={filters.category} onValueChange={(value) => setFilters({ ...filters, category: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas las categorías" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.name}>{category.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filters.parkId} onValueChange={(value) => setFilters({ ...filters, parkId: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos los parques" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los parques</SelectItem>
+                  {Array.isArray(parks) && parks.map((park: any) => (
+                    <SelectItem key={park.id} value={park.id.toString()}>{park.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filters.instructorId} onValueChange={(value) => setFilters({ ...filters, instructorId: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos los instructores" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los instructores</SelectItem>
+                  {Array.isArray(instructors) && instructors.map((instructor: Instructor) => (
+                    <SelectItem key={instructor.id} value={instructor.id.toString()}>{instructor.fullName}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filters.isFree} onValueChange={(value) => setFilters({ ...filters, isFree: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas las actividades" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las actividades</SelectItem>
+                  <SelectItem value="free">Gratuitas</SelectItem>
+                  <SelectItem value="paid">De pago</SelectItem>
+                </SelectContent>
+              </Select>
+
+                <Button variant="outline" size="sm" className='w-10 h-10 bg-gray-200' onClick={resetFilters}>
+                  <Brush className="h-4 w-4 text-[#4b5b65]" />
+                </Button>
+
+            </div>
+
+            {/* Navegación a la derecha */}
+            <div className="flex items-center space-x-2">
+              <Button className='border rounded-md bg-white h-10 border-gray-200 text-[#00444f] font-normal' onClick={goToToday}>
                 Hoy
               </Button>
+              <div className="inline-flex items-center rounded-md bg-white h-10 border">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-lg hover:bg-white/60"
+                  onClick={prevMonth}
+                  aria-label="Mes anterior"
+                >
+                  <ChevronLeft className="h-4 w-4 text-[#4b5b65]" />
+                </Button>
+
+                <div className="text-base md:text-md font-poppins text-[#00444f] min-w-[180px] text-center capitalize">
+                  {format(currentDate, 'MMMM yyyy', { locale: es })}
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-lg hover:bg-white/60"
+                  onClick={nextMonth}
+                  aria-label="Mes siguiente"
+                >
+                  <ChevronRight className="h-4 w-4 text-[#4b5b65]" />
+                </Button>
+              </div>
+
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <CalendarIcon className="h-4 w-4 mr-2" />
-                    Fecha
+                  <Button variant="outline" size="sm" className='w-10 h-10 bg-gray-200'>
+                    <CalendarIcon className="h-4 w-4 text-[#4b5b65]" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">
@@ -331,94 +415,10 @@ export default function ActivitiesCalendarPage() {
                   />
                 </PopoverContent>
               </Popover>
-            </div>,
-            <Button
-              key="new-activity"
-              onClick={() => setLocation('/admin/organizador/catalogo/crear')}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Nueva Actividad
-            </Button>
-          ]}
-        />
-
-        {/* Filtros */}
-        <Card className="mb-6">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Filtros</CardTitle>
-              <Button variant="ghost" size="sm" onClick={resetFilters}>
-                <X className="h-4 w-4 mr-2" />
-                Limpiar filtros
-              </Button>
+              
             </div>
-            <CardDescription>
-              Filtra las actividades mostradas en el calendario
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">Categoría</label>
-                <Select value={filters.category} onValueChange={(value) => setFilters({...filters, category: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas las categorías" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas las categorías</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.name}>{category.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-1 block">Parque</label>
-                <Select value={filters.parkId} onValueChange={(value) => setFilters({...filters, parkId: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos los parques" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los parques</SelectItem>
-                    {Array.isArray(parks) && parks.map((park: any) => (
-                      <SelectItem key={park.id} value={park.id.toString()}>{park.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-1 block">Instructor</label>
-                <Select value={filters.instructorId} onValueChange={(value) => setFilters({...filters, instructorId: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos los instructores" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los instructores</SelectItem>
-                    {Array.isArray(instructors) && instructors.map((instructor: Instructor) => (
-                      <SelectItem key={instructor.id} value={instructor.id.toString()}>{instructor.fullName}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-1 block">Precio</label>
-                <Select value={filters.isFree} onValueChange={(value) => setFilters({...filters, isFree: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas las actividades" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas las actividades</SelectItem>
-                    <SelectItem value="free">Gratuitas</SelectItem>
-                    <SelectItem value="paid">De pago</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Calendario */}
         <div className="bg-white rounded-lg border shadow">
@@ -447,9 +447,14 @@ export default function ActivitiesCalendarPage() {
         <div className="mt-6 flex flex-wrap gap-2">
           <div className="text-sm font-medium mr-2">Categorías:</div>
           {Array.isArray(categories) && categories.map((category) => (
-            <Badge key={category.id} className={getCategoryColors(category.color)} variant="outline">
-              {category.name}
-            </Badge>
+      <Badge 
+        key={category.id} 
+        className="border border-gray-300 text-gray-800" 
+        variant="outline"
+        style={{ backgroundColor: category.color || '#e5e7eb' }}
+      >
+        {category.name}
+      </Badge>
           ))}
         </div>
 
@@ -461,7 +466,11 @@ export default function ActivitiesCalendarPage() {
                 <DialogHeader>
                   <div className="flex justify-between items-center">
                     <DialogTitle className="text-2xl font-bold">{selectedActivity.title}</DialogTitle>
-                    <Badge className={categoryColorMap[selectedActivity.categoryName || ''] || getCategoryColors()} variant="outline">
+                    <Badge 
+                      className="border border-gray-300 text-gray-800" 
+                      variant="outline"
+                      style={{ backgroundColor: categoryColorMap[selectedActivity.categoryId || selectedActivity.category_id] || '#e5e7eb' }}
+                    >
                       {selectedActivity.categoryName}
                     </Badge>
                   </div>
@@ -580,8 +589,12 @@ export default function ActivitiesCalendarPage() {
                       }}>
                       <div className="flex justify-between">
                         <h3 className="font-medium">{activity.title}</h3>
-                        <Badge className={categoryColorMap[activity.category || ''] || getCategoryColors()} variant="outline">
-                          {activity.category || 'Sin categoría'}
+                        <Badge 
+                          className="border border-gray-300 text-gray-800" 
+                          variant="outline"
+                          style={{ backgroundColor: categoryColorMap[activity.categoryId || activity.category_id] || '#e5e7eb' }}
+                        >
+                          {activity.categoryName || activity.category || 'Sin categoría'}
                         </Badge>
                       </div>
                       <div className="text-sm text-gray-500 mt-1">

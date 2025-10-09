@@ -211,7 +211,7 @@ const AdminParksContent = () => {
   // Usuario específicamente pidió que NO aparezcan filtros de amenidades u otros
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [parkToDelete, setParkToDelete] = useState<Park | null>(null);
@@ -252,23 +252,23 @@ const AdminParksContent = () => {
     const getStatusColor = (status: string | null | undefined) => {
       switch (status) {
         case "en_funcionamiento":
-          return "bg-status-active text-status-foreground hover:bg-status-active/80";
+          return "bg-status-active text-status-foreground";
         case "operando_parcialmente":
-          return "bg-status-scheduled text-status-foreground hover:bg-status-scheduled/80";
+          return "bg-status-scheduled text-status-foreground";
         case "en_mantenimiento":
-          return "bg-status-scheduled text-status-foreground hover:bg-status-scheduled/80";
+          return "bg-status-scheduled text-status-foreground";
         case "cerrado_temporalmente":
-          return "bg-status-cancelled text-status-foreground hover:bg-status-cancelled/80";
+          return "bg-status-cancelled text-status-foreground";
         case "cerrado_indefinidamente":
-          return "bg-status-cancelled text-status-foreground hover:bg-status-cancelled/80";
+          return "bg-status-cancelled text-status-foreground";
         case "reapertura_proxima":
-          return "bg-status-paused text-status-foreground hover:bg-status-paused/80";
+          return "bg-status-paused text-status-foreground";
         case "en_proyecto_construccion":
-          return "bg-status-awaitingBudget text-status-foreground hover:bg-status-awaitingBudget/80";
+          return "bg-status-awaitingBudget text-status-foreground";
         case "uso_restringido":
-          return "bg-gray-100 text-status-foreground hover:bg-gray-100/80";
+          return "bg-gray-100 text-status-foreground";
         default:
-          return "bg-gray-100 text-status-foreground hover:bg-gray-100/80";
+          return "bg-gray-100 text-status-foreground";
       }
     };
 
@@ -378,12 +378,15 @@ const AdminParksContent = () => {
             <div className="flex items-center gap-1 mb-2">
               <h4 className="text-md font-medium text-gray-800">Programación próxima</h4>
             </div>
-            <div className="text-md text-gray-800">
+            <div className="font-poppins text-sm text-gray-800">
               {schedule.breakdown.activities > 0 && (
-                <span> Actividades {schedule.breakdown.activities}</span>
+                <span>Actividades: {schedule.breakdown.activities}</span>
               )}
               {schedule.breakdown.events > 0 && (
-                <span> Eventos {schedule.breakdown.events}</span>
+                <span>Eventos: {schedule.breakdown.events}</span>
+              )}
+              {schedule.breakdown.activities === 0 && schedule.breakdown.events === 0 && (
+                <span className="italic">No hay actividades o eventos</span>
               )}
             </div>
           </div>
@@ -596,7 +599,7 @@ const AdminParksContent = () => {
               variant={currentPage === page ? "default" : "outline"}
               size="sm"
               onClick={() => handlePageClick(page)}
-              className={currentPage === page ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+              className={currentPage === page ? "min-w-9" : "min-w-9"}
             >
               {page}
             </Button>
@@ -912,10 +915,6 @@ const AdminParksContent = () => {
     bulkDeleteMutation.mutate(parkIds);
   };
 
-  // Check if all current page parks are selected
-  const isAllSelected = currentParks.length > 0 && currentParks.every(park => selectedParks.has(park.id));
-  const isIndeterminate = currentParks.some(park => selectedParks.has(park.id)) && !isAllSelected;
-
   // Handle manual refresh
   const handleRefresh = async () => {
     await refetchParks();
@@ -939,7 +938,7 @@ const AdminParksContent = () => {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-            <p className="mt-2 text-gray-600">{t('messages.loading')}</p>
+            <p className="mt-2 text-gray-600">{t('messages.loadingData')}</p>
           </div>
         </div>
       </AdminLayout>

@@ -1,4 +1,20 @@
 {
+  "nav": {
+    "home": "Home",
+    "parks": "Parks",
+    "content": "Content",
+    "activities": "Activities",
+    "events": "Events",
+    "reservations": "Reservations",
+    "calendar": "Calendar",
+    "commercialServices": "Commercial Services",
+    "biodiversity": "Biodiversity",
+    "treeSpecies": "Tree Species",
+    "fauna": "Fauna",
+    "users": "Users",
+    "volunteers": "Volunteers",
+    "instructors": "Instructors"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "parks": "Parks",

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 import {
   Menu,
   X,
@@ -29,8 +30,77 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-const logoImage = "/images/logo-ambu.png";
+import { ROUTES } from '@/routes';
+
 const agencyLogo = "/images/logo-pdm.png";
+
+interface NavItem {
+  labelKey: string;
+  href?: string;
+  children?: NavItem[];
+}
+
+const publicNavStructure: NavItem[] = [
+  {
+    labelKey: 'nav.home',
+    href: ROUTES.public.home,
+  },
+  {
+    labelKey: 'nav.parks',
+    href: ROUTES.public.parks,
+  },
+  {
+    labelKey: 'nav.content',
+    children: [
+      {
+        labelKey: 'nav.activities',
+        href: ROUTES.public.activities,
+      },
+      {
+        labelKey: 'nav.events',
+        href: ROUTES.public.events,
+      },
+      {
+        labelKey: 'nav.reservations',
+        href: ROUTES.public.reservations,
+      },
+      {
+        labelKey: 'nav.calendar',
+        href: ROUTES.public.calendar,
+      },
+      {
+        labelKey: 'nav.commercialServices',
+        href: ROUTES.public.concessions,
+      },
+    ],
+  },
+  {
+    labelKey: 'nav.biodiversity',
+    children: [
+      {
+        labelKey: 'nav.treeSpecies',
+        href: ROUTES.public.treeSpecies,
+      },
+      {
+        labelKey: 'nav.fauna',
+        href: ROUTES.public.fauna,
+      },
+    ],
+  },
+  {
+    labelKey: 'nav.users',
+    children: [
+      {
+        labelKey: 'nav.volunteers',
+        href: ROUTES.public.volunteers,
+      },
+      {
+        labelKey: 'nav.instructors',
+        href: ROUTES.public.instructors,
+      },
+    ],
+  },
+];
 
 const Header: React.FC = () => {
   const [location] = useLocation();
@@ -39,10 +109,26 @@ const Header: React.FC = () => {
   const [biodiversityMenuOpen, setBiodiversityMenuOpen] = useState(false);
   const [usersMenuOpen, setUsersMenuOpen] = useState(false);
   const [gestionMenuOpen, setGestionMenuOpen] = useState(false);
-
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useUnifiedAuth();
   const isAdmin = location.startsWith("/admin");
+  const isActive = (href?: string, children?: NavItem[]) => {
+    if (!href && !children) return false;
 
+    if (href) {
+      if (href === ROUTES.public.home) {
+        return location === ROUTES.public.home;
+      }
+      return location.startsWith(href);
+    }
+
+    if (children) {
+      return children.some(child => child.href && location.startsWith(child.href));
+    }
+
+    return false;
+  };
+  
   const handleLogout = async () => {
     try {
       await logout();
@@ -147,7 +233,7 @@ const Header: React.FC = () => {
                   {/* Desktop navigation */}
                   <nav className="hidden md:ml-8 md:flex md:space-x-6">
                     <Link
-                      href="/"
+                      href={ROUTES.public.home}
                       className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium ${
                         location === "/"
                           ? "border-primary text-gray-900"
@@ -158,7 +244,7 @@ const Header: React.FC = () => {
                     </Link>
 
                     <Link
-                      href="/parks"
+                      href={ROUTES.public.parks}
                       className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium ${
                         location === "/parks"
                           ? "border-primary text-gray-900"

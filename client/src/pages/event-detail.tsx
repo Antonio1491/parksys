@@ -5,7 +5,6 @@ import PublicLayout from "@/components/PublicLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { 
   Calendar, 
   MapPin, 
@@ -53,17 +52,6 @@ interface Event {
     name: string;
   }>;
 }
-
-const eventTypeLabels = {
-  cultural: "Cultural",
-  sports: "Deportivo", 
-  educational: "Educativo",
-  environmental: "Ambiental",
-  recreational: "Recreativo",
-  community: "Comunitario",
-  artistic: "Artístico",
-  gastronomy: "Gastronómico"
-};
 
 const EventDetail = () => {
   const { id } = useParams();
