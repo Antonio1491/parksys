@@ -70,18 +70,17 @@ function Router() {
 
           
           {/*PENDIENTE ADAPTAR FUNCIÓN DINÁMICA*/}
-        <Route path="/parks/:slug">
+        <Route path="/parque/:slug">
           <Suspense fallback={<div className="p-8 text-center">Cargando parque...</div>}>
             {React.createElement(React.lazy(() => import('./pages/ParkLandingPage')))}
           </Suspense>
         </Route>
-        <Route path="/parks/:parkSlug/evaluations">
+        <Route path="/parque/:parkSlug/evaluations">
           <Suspense fallback={<div className="p-8 text-center">Cargando evaluaciones del parque...</div>}>
            {React.createElement(React.lazy(() => import('@/pages/ParkEvaluations')))}
           </Suspense>
         </Route>
-        <Route path="/parks/:slug/evaluate" component={ParkEvaluationForm} />
-        <Route path="/parks/:id" component={ParkLandingPage} />
+        <Route path="/parque/:slug/evaluate" component={ParkEvaluationForm} />
         <Route path={ROUTES.public.parks} component={Parks} />
         <Route path={ROUTES.public.activities}>
           <Suspense fallback={<div className="p-8 text-center">Cargando actividades...</div>}>
