@@ -1,4 +1,34 @@
 {
+  "admin": {
+    "metrics": "Metrics",
+    "dashboard": "Dashboard",
+    "management": "Management",
+    "operations": "O & M",
+    "finance": "Admin & Finance",
+    "marketing": "MKT & Comm",
+    "hr": "HR",
+    "parks": "Parks",
+    "activities": "Activities",
+    "amenities": "Amenities",
+    "trees": "Trees",
+    "visitors": "Visitors",
+    "events": "Events",
+    "reservations": "Reservations",
+    "evaluations": "Evaluations",
+    "assets": "Assets",
+    "incidents": "Incidents",
+    "warehouse": "Warehouse",
+    "volunteers": "Volunteers",
+    "accounting": "Accounting",
+    "concessions": "Concessions",
+    "help": "Help Center",
+    "notifications": "Notifications",
+    "publicPage": "View public page",
+    "profile": "Profile",
+    "activity": "Activity",
+    "logout": "Logout",
+    "myAccount": "My account"
+  },
   "nav": {
     "home": "Home",
     "parks": "Parks",
@@ -14,6 +44,7 @@
     "users": "Users",
     "volunteers": "Volunteers",
     "instructors": "Instructors"
+    "lenguageSelector": "Select language"
   },
   "navigation": {
     "dashboard": "Dashboard",

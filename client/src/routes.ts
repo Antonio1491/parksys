@@ -47,6 +47,14 @@ export const PUBLIC_ROUTES = {
   instructorProfile: (id: string | number) => `/instructor/${id}`,
   // Acceso a registro por invitación
   instructorRegister: '/instructors/register',
+
+  // Páginas del footer
+  about: '/about',
+  contact: '/contact',
+  privacy: '/privacy',
+  terms: '/terms',
+  faq: '/faq',
+  help: '/help',
 } as const;
 
 // ============================================
@@ -720,7 +728,7 @@ export const ADMIN_USERS = {
   list: '/admin/users',
   pending: '/admin/pending-users',
 
-  // Notificaciones (tomar de base para la página que se queda)
+  // Notificaciones (tomar de base para la página que se queda de notificaciones del sistema)
   notifications: '/admin/users/notifications',
 } as const;
 

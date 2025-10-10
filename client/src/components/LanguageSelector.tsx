@@ -8,62 +8,125 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Globe } from 'lucide-react';
+import clsx from 'clsx';
 
 const languages = [
-  {
-    code: 'es',
-    name: 'Español',
-    flag: '🇪🇸',
-    nativeName: 'Español'
-  },
-  {
-    code: 'en', 
-    name: 'English',
-    flag: '🇺🇸',
-    nativeName: 'English'
-  },
-  {
-    code: 'pt',
-    name: 'Português',
-    flag: '🇧🇷',
-    nativeName: 'Português'
-  }
+  { code: 'es', name: 'Español', flag: '🇪🇸', nativeName: 'Español' },
+  { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷', nativeName: 'Português' },
 ];
 
-export function LanguageSelector() {
-  const { i18n } = useTranslation();
+interface LanguageSelectorProps {
+  variant?: 'dropdown' | 'inline' | 'inline-compact';
+  showLabel?: boolean;
+  className?: string;
+}
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+export function LanguageSelector({
+  variant = 'dropdown',
+  showLabel = true,
+  className,
+}: LanguageSelectorProps) {
+  const { i18n } = useTranslation();
+  const currentLanguage =
+    languages.find((lang) => lang.code === i18n.language) || languages[0];
 
   const changeLanguage = (languageCode: string) => {
     i18n.changeLanguage(languageCode);
   };
 
+  // Variante inline (menú vertical con nombre completo)
+  if (variant === 'inline') {
+    return (
+      <div className={clsx('flex flex-col gap-1 w-full', className)}>
+        {languages.map((language) => (
+          <button
+            key={language.code}
+            onClick={(e) => {
+              e.stopPropagation();
+              changeLanguage(language.code);
+            }}
+            className={clsx(
+              'flex items-center gap-2 px-2 py-1.5 rounded hover:bg-buttonHover text-foreground transition-colors text-left w-full',
+              i18n.language === language.code && 'bg-gray-100 font-medium'
+            )}
+          >
+            <span className="text-lg">{language.flag}</span>
+            <span className="text-sm">{language.nativeName}</span>
+            {i18n.language === language.code && (
+              <span className="ml-auto text-xs text-primary">✓</span>
+            )}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  // Variante inline-compact (solo banderas)
+  if (variant === 'inline-compact') {
+    return (
+      <div className={clsx('flex items-center gap-2 px-2 py-1', className)}>
+        {languages.map((language) => (
+          <button
+            key={language.code}
+            onClick={(e) => {
+              e.stopPropagation();
+              changeLanguage(language.code);
+            }}
+            className={clsx(
+              'p-1 rounded transition-colors',
+              i18n.language === language.code
+                ? 'ring-2 ring-primary'
+                : 'opacity-50'
+            )}
+            title={language.name}
+          >
+            <span className="text-xl">{language.flag}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  // Variante dropdown (por defecto)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2 border" 
-          style={{ 
-            backgroundColor: '#D2EAEA',
-            borderColor: '#003D49'
-          }}
+        <Button
+          variant="outline"
+          size="sm"
+          className={clsx('gap-2 border-0 rounded-full', className)}
         >
           <Globe className="h-4 w-4" />
-          <span className="text-lg">{currentLanguage.flag}</span>
-          <span className="hidden sm:inline">{currentLanguage.nativeName}</span>
+          <span className="text-md">{currentLanguage.flag}</span>
+          {showLabel && (
+            <span className="hidden sm:inline-block">
+              {currentLanguage.nativeName}
+            </span>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent
+        align="end"
+        side="bottom"
+        avoidCollisions={true}
+        className="w-56 z-[60]"
+        style={{
+          maxWidth: 'calc(100vw - 32px)',
+          right: '0px',
+          left: 'auto',
+        }}
+      >
         {languages.map((language) => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => changeLanguage(language.code)}
-            className={`flex items-center gap-2 ${
-              i18n.language === language.code ? 'bg-accent' : ''
-            }`}
+            className={clsx(
+              'flex items-center gap-2',
+              i18n.language === language.code
+                ? 'bg-accent text-background'
+                : 'bg-background'
+            )}
           >
             <span className="text-lg">{language.flag}</span>
             <span>{language.nativeName}</span>

@@ -1,4 +1,34 @@
 {
+  "admin": {
+    "metrics": "Métricas",
+    "dashboard": "Dashboard",
+    "management": "Gestión",
+    "operations": "O & M",
+    "finance": "Admin & Finanzas",
+    "marketing": "MKT & Comm",
+    "hr": "RH",
+    "parks": "Parques",
+    "activities": "Actividades",
+    "amenities": "Amenidades",
+    "trees": "Arbolado",
+    "visitors": "Visitantes",
+    "events": "Eventos",
+    "reservations": "Reservas",
+    "evaluations": "Evaluaciones",
+    "assets": "Activos",
+    "incidents": "Incidencias",
+    "warehouse": "Almacén",
+    "volunteers": "Voluntarios",
+    "accounting": "Contabilidad",
+    "concessions": "Concesiones",
+    "help": "Centro de ayuda",
+    "notifications": "Notificaciones",
+    "publicPage": "Ver página pública",
+    "profile": "Perfil",
+    "activity": "Actividad",
+    "logout": "Cerrar sesión",
+    "myAccount": "Mi cuenta"
+  },
   "nav": {
     "home": "Inicio",
     "parks": "Parques",
@@ -13,7 +43,8 @@
     "fauna": "Fauna",
     "users": "Usuarios",
     "volunteers": "Voluntarios",
-    "instructors": "Instructores"
+    "instructors": "Instructores",
+    "lenguageSelector": "Seleccionar idioma"
   },
   "navigation": {
     "dashboard": "Panel de Control",

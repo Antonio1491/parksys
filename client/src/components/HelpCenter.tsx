@@ -20,7 +20,8 @@ import {
   BookOpen,
   FileText,
   Video,
-  ExternalLink
+  ExternalLink,
+  Info
 } from 'lucide-react';
 
 interface HelpItem {
@@ -106,6 +107,15 @@ const helpItems: HelpItem[] = [
     type: 'guide',
     url: '/help/getting-started',
     icon: <BookOpen className="h-4 w-4" />
+  },
+  {
+    id: 'faq-public',
+    title: 'Preguntas Frecuentes del Sistema',
+    description: 'Respuestas rápidas sobre funcionalidades, acceso y uso general de ParkSys',
+    module: 'General',
+    type: 'faq',
+    url: '/faq',
+    icon: <Info className="h-4 w-4" />
   }
 ];
 

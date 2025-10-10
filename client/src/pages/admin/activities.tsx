@@ -977,14 +977,14 @@ const AdminActivities = () => {
 
             {/* Botón limpiar filtros */}
             <div>
-              <Button variant="outline" size="sm" className='w-10 h-10 bg-gray-200' onClick={handleClearFilters}>
+              <Button variant="outline" size="sm" className='w-10 h-10 bg-gray-100' onClick={handleClearFilters}>
                 <Brush className="h-4 w-4 text-[#4b5b65]" />
               </Button>
             </div>
 
             {/* Toggle de vista */}
             <div className="ml-auto">
-              <div className="flex items-center gap-1 h-10 bg-gray-200 rounded-lg">
+              <div className="flex border rounded-lg p-1 bg-gray-100">
                 <Button
                   variant={viewMode === 'cards' ? 'default' : 'ghost'}
                   size="sm"
@@ -1011,10 +1011,10 @@ const AdminActivities = () => {
               <Button
                 variant={selectionMode ? 'default' : 'outline'}
                 size="sm"
-                className={`flex items-center h-10 w-10 ${selectionMode ? 'bg-gray-200 text-white hover-[#00a587]' : 'bg-gray-200 hover:bg-[#00a587]'}`}
+                className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-gray-100 text-white hover-[#00a587]' : 'bg-gray-100 hover:bg-[#00a587]'}`}
                 data-testid="button-selection-toggle"
               >
-                <CopyCheck className="h-4 w-4 text-[#4b5b65] hover-white" />
+                <CopyCheck className="h-5 w-5 text-[#4b5b65] hover-white" />
               </Button>
 
               {/* Dropdown menu con CSS hover */}
@@ -1061,11 +1061,11 @@ const AdminActivities = () => {
               variant="destructive"
               size="sm"
               onClick={handleBulkDeleteClick}
-              className="flex items-center h-10 w-10"
+              className="flex items-center h-11 w-11"
               disabled={selectedActivities.size === 0}
               data-testid="button-delete-selected"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-5 w-5" />
               {selectedActivities.size > 0 ? ` (${selectedActivities.size})` : ''}
             </Button>
           </div>

@@ -18,7 +18,7 @@ import {
   Calendar, MapPin, Clock, CheckCircle, XCircle, 
   AlertCircle, Eye, Mail, Phone, Grid3X3, List,
   ChevronLeft, ChevronRight, BarChart3, DollarSign,
-  TrendingUp, Target, Trash2, X
+  TrendingUp, Target, Trash2, X, CopyCheck, CheckSquare, Square
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -90,6 +90,8 @@ interface ActivitySummary {
 
 const ActivityRegistrationsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [parkFilter, setParkFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [activityFilter, setActivityFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -99,6 +101,10 @@ const ActivityRegistrationsPage = () => {
   const [summaryViewMode, setSummaryViewMode] = useState<'cards' | 'table'>('cards');
   const [summaryCurrentPage, setSummaryCurrentPage] = useState(1);
   const [selectedRegistrations, setSelectedRegistrations] = useState<number[]>([]);
+  // Estados para selección múltiple
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedActivities, setSelectedActivities] = useState<Set<number>>(new Set());
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [registrationToDelete, setRegistrationToDelete] = useState<number | null>(null);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
@@ -140,6 +146,26 @@ const ActivityRegistrationsPage = () => {
     }
   });
 
+  // Obtener parques para filtro
+  const { data: parksData = [] } = useQuery({
+    queryKey: ['/api/parks/filter'],
+    queryFn: async () => {
+      const response = await fetch('/api/parks/filter');
+      if (!response.ok) throw new Error('Error al cargar parques');
+      return response.json();
+    }
+  });
+
+  // Obtener categorías para filtro
+  const { data: categoriesData = [] } = useQuery({
+    queryKey: ['/api/activity-categories'],
+    queryFn: async () => {
+      const response = await fetch('/api/activity-categories');
+      if (!response.ok) throw new Error('Error al cargar categorías');
+      return response.json();
+    }
+  });
+
   // Obtener resumen de actividades con estadísticas de inscripciones
   const { data: activitiesSummaryData, isLoading: isLoadingSummary } = useQuery({
     queryKey: ['/api/activities-summary-data'],
@@ -153,14 +179,95 @@ const ActivityRegistrationsPage = () => {
   const registrations = registrationsData?.registrations || [];
   const totalPages = registrationsData?.pagination?.totalPages || 1;
   const activities = Array.isArray(activitiesData) ? activitiesData : [];
+  
+  // Filtrar actividades por búsqueda, parque y categoría
+  const filteredSummaryData = activitiesSummaryData?.filter((activity: ActivitySummary) => {
+    // Filtro de búsqueda
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = 
+        activity.title.toLowerCase().includes(searchLower) ||
+        activity.category.toLowerCase().includes(searchLower) ||
+        activity.parkName.toLowerCase().includes(searchLower);
+      if (!matchesSearch) return false;
+    }
 
-  // Paginación para el resumen de actividades
-  const totalSummaryActivities = activitiesSummaryData?.length || 0;
+    // Filtro de parque
+    if (parkFilter && parkFilter !== 'all') {
+      if (activity.parkName !== parkFilter) return false;
+    }
+
+    // Filtro de categoría
+    if (categoryFilter && categoryFilter !== 'all') {
+      if (activity.category !== categoryFilter) return false;
+    }
+
+    return true;
+  }) || [];
+
+  const totalSummaryActivities = filteredSummaryData.length;
   const totalSummaryPages = Math.ceil(totalSummaryActivities / ITEMS_PER_PAGE);
   const startIndex = (summaryCurrentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedSummaryData = activitiesSummaryData?.slice(startIndex, endIndex) || [];
+  const paginatedSummaryData = filteredSummaryData.slice(startIndex, endIndex);
 
+  // Calcular métricas globales
+  const metrics = React.useMemo(() => {
+    if (!activitiesSummaryData || activitiesSummaryData.length === 0) {
+      return {
+        totalActivities: 0,
+        freeActivities: 0,
+        totalRegistrations: 0,
+        totalRevenue: 0
+      };
+    }
+
+    return {
+      totalActivities: activitiesSummaryData.length,
+      freeActivities: activitiesSummaryData.filter((a: ActivitySummary) => a.isFree).length,
+      totalRegistrations: activitiesSummaryData.reduce((sum: number, a: ActivitySummary) => 
+        sum + (a.registrationStats?.totalRegistrations || 0), 0
+      ),
+      totalRevenue: activitiesSummaryData.reduce((sum: number, a: ActivitySummary) => {
+        if (a.isFree) return sum;
+        const registrations = a.registrationStats?.totalRegistrations || 0;
+        const price = parseFloat(a.price || '0');
+        return sum + (registrations * price);
+      }, 0)
+    };
+  }, [activitiesSummaryData]);
+  
+  // Resetear página cuando cambian los filtros
+  React.useEffect(() => {
+    setSummaryCurrentPage(1);
+  }, [searchTerm, parkFilter, categoryFilter]);
+
+  // Funciones para manejo de selección múltiple de actividades
+  const handleSelectActivity = (activityId: number, checked: boolean) => {
+    const newSelected = new Set(selectedActivities);
+    if (checked) {
+      newSelected.add(activityId);
+    } else {
+      newSelected.delete(activityId);
+    }
+    setSelectedActivities(newSelected);
+  };
+
+  const handleSelectAllActivities = () => {
+    const allActivityIds = new Set(paginatedSummaryData.map((activity: ActivitySummary) => activity.id));
+    setSelectedActivities(allActivityIds);
+  };
+
+  const handleDeselectAllActivities = () => {
+    setSelectedActivities(new Set());
+    setSelectionMode(false);
+  };
+
+  const handleBulkDeleteActivities = () => {
+    if (selectedActivities.size === 0) return;
+    setShowBulkDeleteDialog(true);
+  };
+  
   // Mutación para aprobar/rechazar inscripciones
   const statusMutation = useMutation({
     mutationFn: async ({ id, status, reason }: { id: number; status: 'approved' | 'rejected'; reason?: string }) => {
@@ -265,8 +372,6 @@ const ActivityRegistrationsPage = () => {
         return <Badge variant="secondary"><AlertCircle className="w-3 h-3 mr-1" />Pendiente</Badge>;
     }
   };
-
-  // Los filtros se manejan desde el backend, no necesitamos filtrar aquí
   
   // Función para resetear página cuando cambian los filtros
   React.useEffect(() => {
@@ -368,8 +473,70 @@ const ActivityRegistrationsPage = () => {
           icon={<UserCheck />}
         />
 
-        {/* Resumen de Actividades */}
-        <div className="space-y-6">
+          {/* Resumen de Actividades */}
+          <div className="space-y-6">
+            {/* Cards de métricas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Total de actividades */}
+              <Card className="bg-[#00444f] text-white border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-blue-100 text-sm font-medium mb-1">Total de actividades</p>
+                      <p className="text-3xl font-bold">{metrics.totalActivities}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-full">
+                      <Calendar className="h-6 w-6" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Actividades gratuitas */}
+              <Card className="bg-[#00444f] text-white border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-green-100 text-sm font-medium mb-1">Actividades gratuitas</p>
+                      <p className="text-3xl font-bold">{metrics.freeActivities}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-full">
+                      <Target className="h-6 w-6" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Inscripciones registradas */}
+              <Card className="bg-[#14b8a4] text-white border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-purple-100 text-sm font-medium mb-1">Inscripciones registradas</p>
+                      <p className="text-3xl font-bold">{metrics.totalRegistrations}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-full">
+                      <Users className="h-6 w-6" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Ingreso actual */}
+              <Card className="bg-[#00818e] text-white border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-teal-100 text-sm font-medium mb-1">Ingreso actual</p>
+                      <p className="text-3xl font-bold">${metrics.totalRevenue.toLocaleString()}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-full">
+                      <DollarSign className="h-6 w-6" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           {isLoadingSummary ? (
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -380,22 +547,56 @@ const ActivityRegistrationsPage = () => {
           ) : (
             <div className="space-y-6">
               {/* Barra de búsqueda y controles */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    {/* Campo de búsqueda */}
-                    <div className="relative flex-1 max-w-md">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        placeholder="Buscar actividad"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            {/* Campo de búsqueda */}
+                            <div className="relative flex-1 min-w-[250px] max-w-md">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                              <Input
+                                placeholder="Buscar actividad"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10"
+                              />
+                            </div>
 
-                    {/* Botones de acción */}
-                    <div className="flex items-center gap-2">
+                            {/* Filtro de Parque */}
+                            <div className="min-w-[180px]">
+                              <Select value={parkFilter} onValueChange={setParkFilter}>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Filtrar por parque" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">Todos los parques</SelectItem>
+                                  {Array.isArray(parksData) && parksData.map((park: any) => (
+                                    <SelectItem key={park.id} value={park.name}>
+                                      {park.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Filtro de Categoría */}
+                            <div className="min-w-[180px]">
+                              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Filtrar por categoría" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">Todas las categorías</SelectItem>
+                                  {Array.isArray(categoriesData) && categoriesData.map((category: any) => (
+                                    <SelectItem key={category.id} value={category.name}>
+                                      {category.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                      {/* Botones de acción - ahora con ml-auto para empujar a la derecha */}
+                      <div className="flex items-center gap-2 ml-auto">
                       {/* Toggle Grid/Lista */}
                       <div className="flex border rounded-lg p-1 bg-gray-100">
                         <Button
@@ -416,34 +617,61 @@ const ActivityRegistrationsPage = () => {
                         </Button>
                       </div>
 
-                      {/* Botón Copiar */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2"
-                        onClick={() => {
-                          toast({
-                            title: "Función en desarrollo",
-                            description: "La función de copiar estará disponible próximamente."
-                          });
-                        }}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
+                      {/* Botón de selección con menú desplegable */}
+                      <div className="relative group">
+                        <Button
+                          variant={selectionMode ? 'default' : 'outline'}
+                          size="sm"
+                          className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-gray-100' : 'bg-gray-100 hover:bg-[#00a587]'}`}
+                        >
+                          <CopyCheck className={`h-5 w-5 ${selectionMode ? 'text-[#00a587]' : 'text-[#4b5b65]'}`} />
+                        </Button>
 
-                      {/* Botón Eliminar */}
+                        {/* Dropdown menu con CSS hover */}
+                        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                          <div className="py-1">
+                            <button
+                              onClick={() => setSelectionMode(true)}
+                              className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                            >
+                              <CopyCheck className="h-4 w-4 mr-2" />
+                              Selección múltiple
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (!selectionMode) {
+                                  setSelectionMode(true);
+                                }
+                                handleSelectAllActivities();
+                              }}
+                              className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                            >
+                              <CheckSquare className="h-5 w-5 mr-2" />
+                              Seleccionar todo
+                            </button>
+                            <button
+                              onClick={handleDeselectAllActivities}
+                              className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                            >
+                              <Square className="h-4 w-4 mr-2" />
+                              Deseleccionar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Botón para eliminar elementos independiente */}
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         size="sm"
-                        className="flex items-center gap-2"
-                        onClick={() => {
-                          toast({
-                            title: "Función en desarrollo",
-                            description: "La función de eliminar estará disponible próximamente."
-                          });
-                        }}
+                        onClick={handleBulkDeleteActivities}
+                        className="flex items-center h-11 w-11"
+                        disabled={selectedActivities.size === 0}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-5 w-5" />
+                        {selectedActivities.size > 0 && (
+                          <span className="ml-1 text-xs">({selectedActivities.size})</span>
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -453,21 +681,29 @@ const ActivityRegistrationsPage = () => {
               {/* Contenido del resumen */}
               {activitiesSummaryData && activitiesSummaryData.length > 0 ? (
                 <>
-                  {/* Vista de Tarjetas */}
+
                   {/* Vista de Tarjetas */}
                   {summaryViewMode === 'cards' && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                       {paginatedSummaryData.map((activity: ActivitySummary) => (
-                        <Card key={activity.id} className="hover:shadow-lg transition-shadow">
+                        <Card key={activity.id} className="hover:shadow-lg transition-shadow relative">
+                          {/* Checkbox de selección en la esquina superior derecha */}
+                          {selectionMode && (
+                            <div className="absolute top-3 right-3 z-10">
+                              <Checkbox
+                                checked={selectedActivities.has(activity.id)}
+                                onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
+                                className="bg-white/80 data-[state=checked]:bg-[#00a587]"
+                              />
+                            </div>
+                          )}
+
                           <CardHeader className="pb-2">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <CardTitle className="text-lg line-clamp-2">{activity.title}</CardTitle>
                                 <p className="text-sm text-gray-600 mt-1">{activity.category}</p>
                               </div>
-                              <Badge variant={activity.registrationEnabled ? "default" : "secondary"}>
-                                {activity.registrationEnabled ? "Activa" : "Cerrada"}
-                              </Badge>
                             </div>
                           </CardHeader>
                           <CardContent className="space-y-4">
@@ -489,23 +725,15 @@ const ActivityRegistrationsPage = () => {
 
                             {/* Estadísticas de inscripciones */}
                             <div className="border-t pt-4">
-                              <h4 className="font-medium text-sm mb-3">Estadísticas de Inscripciones</h4>
+                              <h4 className="font-medium text-sm mb-3">Inscripciones</h4>
                               <div className="grid grid-cols-2 gap-3">
-                                <div className="text-center p-2 bg-blue-50 rounded">
-                                  <div className="text-lg font-bold text-blue-600">{activity.registrationStats.totalRegistrations}</div>
-                                  <div className="text-xs text-gray-600">Total</div>
+                                <div className="text-center p-3 bg-blue-50 rounded">
+                                  <div className="text-2xl font-bold text-blue-600">{activity.registrationStats.totalRegistrations}</div>
+                                  <div className="text-xs text-gray-600 mt-1">Inscritos</div>
                                 </div>
-                                <div className="text-center p-2 bg-green-50 rounded">
-                                  <div className="text-lg font-bold text-green-600">{activity.registrationStats.approved}</div>
-                                  <div className="text-xs text-gray-600">Aprobadas</div>
-                                </div>
-                                <div className="text-center p-2 bg-orange-50 rounded">
-                                  <div className="text-lg font-bold text-orange-600">{activity.registrationStats.pending}</div>
-                                  <div className="text-xs text-gray-600">Pendientes</div>
-                                </div>
-                                <div className="text-center p-2 bg-gray-50 rounded">
-                                  <div className="text-lg font-bold text-gray-600">{activity.registrationStats.availableSlots}</div>
-                                  <div className="text-xs text-gray-600">Disponibles</div>
+                                <div className="text-center p-3 bg-gray-50 rounded">
+                                  <div className="text-2xl font-bold text-gray-600">{activity.registrationStats.availableSlots}</div>
+                                  <div className="text-xs text-gray-600 mt-1">Disponibles</div>
                                 </div>
                               </div>
                             </div>
@@ -554,19 +782,40 @@ const ActivityRegistrationsPage = () => {
                           <table className="w-full">
                             <thead className="bg-gray-50 border-b">
                               <tr>
+                                {selectionMode && (
+                                  <th className="w-[50px] p-4">
+                                    <Checkbox
+                                      checked={paginatedSummaryData.length > 0 && paginatedSummaryData.every((activity: ActivitySummary) => selectedActivities.has(activity.id))}
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          handleSelectAllActivities();
+                                        } else {
+                                          handleDeselectAllActivities();
+                                        }
+                                      }}
+                                    />
+                                  </th>
+                                )}
                                 <th className="text-left p-4 font-medium text-gray-900">Actividad</th>
                                 <th className="text-left p-4 font-medium text-gray-900">Parque</th>
-                                <th className="text-center p-4 font-medium text-gray-900">Total</th>
-                                <th className="text-center p-4 font-medium text-gray-900">Aprobadas</th>
-                                <th className="text-center p-4 font-medium text-gray-900">Pendientes</th>
+                                <th className="text-center p-4 font-medium text-gray-900">Capacidad</th>
+                                <th className="text-center p-4 font-medium text-gray-900">Inscritos</th>
                                 <th className="text-center p-4 font-medium text-gray-900">Disponibles</th>
-                                <th className="text-right p-4 font-medium text-gray-900">Ingresos</th>
-                                <th className="text-center p-4 font-medium text-gray-900">Estado</th>
+                                <th className="text-right p-4 font-medium text-gray-900">Ingreso Actual</th>
+                                <th className="text-right p-4 font-medium text-gray-900">Ingreso Proyectado</th>
                               </tr>
                             </thead>
                             <tbody>
                               {paginatedSummaryData.map((activity: ActivitySummary, index: number) => (
                                 <tr key={activity.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                  {selectionMode && (
+                                    <td className="p-4">
+                                      <Checkbox
+                                        checked={selectedActivities.has(activity.id)}
+                                        onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
+                                      />
+                                    </td>
+                                  )}
                                   <td className="p-4">
                                     <div>
                                       <div className="font-medium text-gray-900 line-clamp-1">{activity.title}</div>
@@ -578,43 +827,37 @@ const ActivityRegistrationsPage = () => {
                                   </td>
                                   <td className="p-4 text-sm text-gray-600">{activity.parkName}</td>
                                   <td className="p-4 text-center">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                    <span className="text-sm font-bold text-gray-900">
+                                      {activity.capacity || activity.maxRegistrations || '-'}
+                                    </span>
+                                  </td>
+                                  <td className="p-4 text-center">
+                                    <span className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
                                       {activity.registrationStats.totalRegistrations}
                                     </span>
                                   </td>
                                   <td className="p-4 text-center">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                                      {activity.registrationStats.approved}
-                                    </span>
-                                  </td>
-                                  <td className="p-4 text-center">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
-                                      {activity.registrationStats.pending}
-                                    </span>
-                                  </td>
-                                  <td className="p-4 text-center">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+                                    <span className="inline-flex items-center justify-center w-10 h-10 bg-gray-100 text-gray-800 rounded-full text-sm font-bold">
                                       {activity.registrationStats.availableSlots}
                                     </span>
                                   </td>
                                   <td className="p-4 text-right">
                                     {activity.isFree ? (
-                                      <span className="text-gray-500">Gratuita</span>
+                                      <span className="text-gray-500">-</span>
                                     ) : (
-                                      <div>
-                                        <div className="font-medium text-green-600">
-                                          ${activity.revenue.totalRevenue.toLocaleString()}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                          Pot: ${activity.revenue.potentialRevenue.toLocaleString()}
-                                        </div>
-                                      </div>
+                                      <span className="text-sm font-bold text-green-600">
+                                        ${(activity.registrationStats.totalRegistrations * parseFloat(activity.price)).toLocaleString()}
+                                      </span>
                                     )}
                                   </td>
-                                  <td className="p-4 text-center">
-                                    <Badge variant={activity.registrationEnabled ? "default" : "secondary"}>
-                                      {activity.registrationEnabled ? "Activa" : "Cerrada"}
-                                    </Badge>
+                                  <td className="p-4 text-right">
+                                    {activity.isFree ? (
+                                      <span className="text-gray-500">-</span>
+                                    ) : (
+                                      <span className="text-sm font-bold text-blue-600">
+                                        ${((activity.capacity || activity.maxRegistrations || 0) * parseFloat(activity.price)).toLocaleString()}
+                                      </span>
+                                    )}
                                   </td>
                                 </tr>
                               ))}
@@ -701,6 +944,36 @@ const ActivityRegistrationsPage = () => {
             </div>
           )}
         </div>
+
+        {/* Diálogo de confirmación de eliminación masiva */}
+        <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Eliminar actividades seleccionadas?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta acción eliminará permanentemente {selectedActivities.size} actividad{selectedActivities.size !== 1 ? 'es' : ''} seleccionada{selectedActivities.size !== 1 ? 's' : ''}. 
+                Esta acción no se puede deshacer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  toast({
+                    title: "Función en desarrollo",
+                    description: `Se eliminarían ${selectedActivities.size} actividades.`
+                  });
+                  setShowBulkDeleteDialog(false);
+                  setSelectedActivities(new Set());
+                  setSelectionMode(false);
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Eliminar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
       </div>
     </AdminLayout>

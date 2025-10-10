@@ -102,22 +102,85 @@ const publicNavStructure: NavItem[] = [
   },
 ];
 
+interface AdminNavItem {
+  labelKey: string;
+  icon: React.ComponentType<{ className?: string }>;
+  href?: string;
+  children?: {
+    labelKey: string;
+    href: string;
+  }[];
+}
+
+const adminNavStructure: AdminNavItem[] = [
+  {
+    labelKey: 'admin.dashboard',
+    icon: Gauge,
+    href: ROUTES.dashboards.main,
+  },
+  {
+    labelKey: 'admin.management',
+    icon: FolderOpen,
+    children: [
+      { labelKey: 'admin.parks', href: ROUTES.dashboards.parks },
+      { labelKey: 'admin.activities', href: ROUTES.dashboards.activities },
+      { labelKey: 'admin.amenities', href: ROUTES.dashboards.amenities },
+      { labelKey: 'admin.trees', href: ROUTES.dashboards.trees },
+      { labelKey: 'admin.visitors', href: ROUTES.dashboards.visitors },
+      { labelKey: 'admin.events', href: ROUTES.dashboards.events },
+      { labelKey: 'admin.reservations', href: ROUTES.dashboards.reservations },
+      { labelKey: 'admin.evaluations', href: ROUTES.dashboards.evaluations },
+    ],
+  },
+  {
+    labelKey: 'admin.operations',
+    icon: Wrench,
+    children: [
+      { labelKey: 'admin.assets', href: ROUTES.dashboards.assets },
+      { labelKey: 'admin.incidents', href: ROUTES.dashboards.incidents },
+      { labelKey: 'admin.warehouse', href: ROUTES.dashboards.warehouse },
+      { labelKey: 'admin.volunteers', href: ROUTES.dashboards.volunteers },
+    ],
+  },
+  {
+    labelKey: 'admin.finance',
+    icon: DollarSign,
+    children: [
+      { labelKey: 'admin.finance', href: ROUTES.dashboards.finance },
+      { labelKey: 'admin.accounting', href: ROUTES.dashboards.accounting },
+      { labelKey: 'admin.concessions', href: ROUTES.dashboards.concessions },
+    ],
+  },
+  {
+    labelKey: 'admin.marketing',
+    icon: Megaphone,
+    href: ROUTES.dashboards.marketing,
+  },
+  {
+    labelKey: 'admin.hr',
+    icon: Users,
+    href: ROUTES.dashboards.hr,
+  },
+];
+
 const Header: React.FC = () => {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [contentMenuOpen, setContentMenuOpen] = useState(false);
-  const [biodiversityMenuOpen, setBiodiversityMenuOpen] = useState(false);
-  const [usersMenuOpen, setUsersMenuOpen] = useState(false);
-  const [gestionMenuOpen, setGestionMenuOpen] = useState(false);
+  const [mobileDropdowns, setMobileDropdowns] = useState<Record<string, boolean>>({});
+  const [adminMobileMenuOpen, setAdminMobileMenuOpen] = useState(false);
+  const [adminMobileDropdowns, setAdminMobileDropdowns] = useState<Record<string, boolean>>({});
   const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useUnifiedAuth();
   const isAdmin = location.startsWith("/admin");
-  const isActive = (href?: string, children?: NavItem[]) => {
+  const isActive = (
+    href?: string, 
+    children?: NavItem[] | { labelKey: string; href: string }[]
+  ) => {
     if (!href && !children) return false;
 
     if (href) {
-      if (href === ROUTES.public.home) {
-        return location === ROUTES.public.home;
+      if (href === ROUTES.public.home || href === ROUTES.dashboards.main) {
+        return location === href;
       }
       return location.startsWith(href);
     }
@@ -128,7 +191,7 @@ const Header: React.FC = () => {
 
     return false;
   };
-  
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -141,61 +204,23 @@ const Header: React.FC = () => {
     setMobileMenuOpen((prev) => !prev);
   };
 
-  const toggleContentMenu = () => {
-    setContentMenuOpen((prev) => !prev);
+  const toggleMobileDropdown = (key: string) => {
+    setMobileDropdowns(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
 
-  const toggleBiodiversityMenu = () => {
-    setBiodiversityMenuOpen((prev) => !prev);
+  const toggleAdminMobileMenu = () => {
+    setAdminMobileMenuOpen((prev) => !prev);
   };
 
-  const toggleUsersMenu = () => {
-    setUsersMenuOpen((prev) => !prev);
+  const toggleAdminMobileDropdown = (key: string) => {
+    setAdminMobileDropdowns(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
-
-  const toggleGestionMenu = () => {
-    setGestionMenuOpen((prev) => !prev);
-  };
-
-  const isContentActive =
-    location === "/activities" ||
-    location === "/reservations" ||
-    location === "/events" ||
-    location === "/calendar" ||
-    location === "/concessions";
-
-  const isBiodiversityActive =
-    location === "/tree-species" || location === "/fauna";
-
-  const isUsersActive =
-    location === "/volunteers" || location === "/instructors";
-
-  // Estados activos para menús administrativos
-  const isDashboardActive = location === "/admin";
-  const isGestionActive = 
-    location.startsWith("/admin/parks") || 
-    location.startsWith("/admin/activities") ||
-    location.startsWith("/admin/amenities") ||
-    location.startsWith("/admin/trees") ||
-    location.startsWith("/admin/visitors") ||
-    location.startsWith("/admin/events") ||
-    location.startsWith("/admin/dashboard-reservas") ||
-    location.startsWith("/admin/evaluaciones");
-  const isOMActive = 
-    location.startsWith("/admin/assets") || 
-    location.startsWith("/admin/incidents") || 
-    location.startsWith("/admin/volunteers") ||
-    location.startsWith("/admin/incidentes") ||
-    location.startsWith("/admin/dashboard-incidencias");
-  const isFinanzasActive = 
-    location.startsWith("/admin/finance") || 
-    location.startsWith("/admin/accounting") || 
-    location.startsWith("/admin/concessions");
-  const isMarketingActive = 
-    location.startsWith("/admin/marketing") || 
-    location.startsWith("/admin/advertising") || 
-    location.startsWith("/admin/communications");
-  const isRHActive = location.startsWith("/admin/hr");
 
   return (
     <header
@@ -203,28 +228,30 @@ const Header: React.FC = () => {
       style={{ backgroundColor: isAdmin ? "#f4f5f7" : "white" }}
     >
       <div className="flex items-center h-20">
-        {/* Logo administrativo - Posicionado absolutamente al extremo izquierdo */}
+        {/* Logo administrativo - Solo desktop (posición absoluta) */}
         {isAdmin && (
-          <div className="absolute left-0 top-0 bottom-0 w-64 flex items-center justify-center z-10" style={{ backgroundColor: '#f4f5f7' }}>
-            <img
-              src={agencyLogo}
-              alt="Agencia de Bosques Urbanos"
-              className="h-16 w-auto object-contain"
-            />
-          </div>
+        <div className="hidden lg:flex absolute left-0 top-0 bottom-0 w-64 items-center justify-center z-10" style={{ backgroundColor: '#f4f5f7' }}>
+          <img
+            src={agencyLogo}
+            alt="Parques de México"
+            className="h-16 w-auto object-contain"
+          />
+        </div>
         )}
-        
-        <div className={`${isAdmin ? 'ml-64' : ''} max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full`}>
+
+        <div className={`${isAdmin ? 'lg:ml-64' : ''} max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full`}>
           <div className="flex items-center justify-between h-20">
+
+            {/* SECCIÓN IZQUIERDA - Logo y navegación */}
             <div className="flex items-center min-w-0">
-              {/* Logo y navegación - Solo mostrar para páginas públicas */}
+              {/* Logo público */}
               {!isAdmin && (
                 <>
-                  <Link href="/">
+                  <Link href={ROUTES.public.home}>
                     <div className="flex-shrink-0 flex items-center cursor-pointer">
                       <img
                         src={agencyLogo}
-                        alt="Agencia de Bosques Urbanos"
+                        alt="Parques de México"
                         className="h-16 w-auto"
                       />
                     </div>
@@ -232,337 +259,297 @@ const Header: React.FC = () => {
 
                   {/* Desktop navigation */}
                   <nav className="hidden md:ml-8 md:flex md:space-x-6">
-                    <Link
-                      href={ROUTES.public.home}
-                      className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium ${
-                        location === "/"
-                          ? "border-primary text-gray-900"
-                          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                      }`}
-                    >
-                      Inicio
-                    </Link>
+                    {publicNavStructure.map((item) => {
+                      const hasChildren = item.children && item.children.length > 0;
+                      const active = isActive(item.href, item.children);
 
-                    <Link
-                      href={ROUTES.public.parks}
-                      className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium ${
-                        location === "/parks"
-                          ? "border-primary text-gray-900"
-                          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                      }`}
-                    >
-                      Parques
-                    </Link>
+                      if (hasChildren) {
+                        // Dropdown item
+                        return (
+                          <div key={item.labelKey} className="relative group">
+                            <button
+                              className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium flex items-center ${
+                                active
+                                  ? "border-primary text-gray-900"
+                                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                              }`}
+                            >
+                              {t(item.labelKey)}
+                              <ChevronDown className="ml-1 h-3 w-3" />
+                            </button>
 
-                    {/* Menú de Contenido con dropdown */}
-                    <div className="relative group">
-                      <button
-                        className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium flex items-center ${
-                          isContentActive
-                            ? "border-primary text-gray-900"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                        }`}
-                      >
-                        Contenido
-                        <ChevronDown className="ml-1 h-3 w-3" />
-                      </button>
+                            {/* Dropdown menu */}
+                            <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                              <div className="py-1">
+                                {item.children?.map((child) => (
+                                  <Link
+                                    key={child.labelKey}
+                                    href={child.href || '#'}
+                                    className={`block px-4 py-2 text-sm ${
+                                      location === child.href
+                                        ? "bg-gray-100 text-gray-900"
+                                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                                    }`}
+                                  >
+                                    {t(child.labelKey)}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
 
-                      {/* Dropdown menu */}
-                      <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <div className="py-1">
-                          <Link
-                            href="/activities"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Actividades
-                          </Link>
-                          <Link
-                            href="/events"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Eventos
-                          </Link>
-                          <Link
-                            href="/reservations"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Reservaciones
-                          </Link>
-                          <Link
-                            href="/calendar"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Calendario
-                          </Link>
-                          <Link
-                            href="/concessions"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Servicios Comerciales
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Menú de Biodiversidad con dropdown */}
-                    <div className="relative group">
-                      <button
-                        className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium flex items-center ${
-                          isBiodiversityActive
-                            ? "border-primary text-gray-900"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                        }`}
-                      >
-                        Biodiversidad
-                        <ChevronDown className="ml-1 h-3 w-3" />
-                      </button>
-
-                      {/* Dropdown menu */}
-                      <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <div className="py-1">
-                          <Link
-                            href="/tree-species"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Especies de Árboles
-                          </Link>
-                          <Link
-                            href="/fauna"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Fauna
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Menú de Usuarios con dropdown */}
-                    <div className="relative group">
-                      <button
-                        className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium flex items-center ${
-                          isUsersActive
-                            ? "border-primary text-gray-900"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                        }`}
-                      >
-                        Usuarios
-                        <ChevronDown className="ml-1 h-3 w-3" />
-                      </button>
-
-                      {/* Dropdown menu */}
-                      <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <div className="py-1">
-                          <Link
-                            href="/volunteers"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                          >
-                            Voluntarios
-                          </Link>
-                          <Link
-                            href="/instructors"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-900"
-                          >
-                            Instructores
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
+                      // Simple link item
+                      return (
+                        <Link
+                          key={item.labelKey}
+                          href={item.href || '#'}
+                          className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium ${
+                            active
+                              ? "border-primary text-gray-900"
+                              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                          }`}
+                        >
+                          {t(item.labelKey)}
+                        </Link>
+                      );
+                    })}
                   </nav>
                 </>
               )}
 
+            {/* Logo móvil administrativo */}
+            {isAdmin && (
+              <Link href={ROUTES.dashboards.main} className="lg:hidden">
+                <div className="flex-shrink-0 flex items-center cursor-pointer">
+                  <img
+                    src={agencyLogo}
+                    alt="Parques de México"
+                    className="h-12 w-auto object-contain"
+                  />
+                </div>
+              </Link>
+            )}
             </div>
 
             {/* Menús administrativos centralizados - Solo mostrar en páginas administrativas */}
             {isAdmin && (
-              <div className="flex items-center rounded-3xl px-4 py-1 shadow-sm absolute left-1/2 transform -translate-x-1/2" style={{ backgroundColor: "#003d49" }}>
-                    {/* Leyenda Métricas */}
-                    <div className="text-base font-light text-white mr-4 font-poppins">
-                      Métricas
-                    </div>
-                    
-                    <nav className="flex items-center space-x-4">
-                  {/* Menú Dashboard */}
-                  <Link href="/admin" className="flex flex-col items-center hover:opacity-80">
-                    <div 
-                      className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
-                      style={{ backgroundColor: isDashboardActive ? "#f4f5f7" : "transparent" }}
-                    >
-                      <Gauge className={`h-4 w-4 ${isDashboardActive ? "text-[#00444f]" : "text-white"}`} />
-                    </div>
-                  </Link>
-
-                  {/* Menú Gestión */}
-                  <div className="relative group">
-                    <div className="flex flex-col items-center">
-                      <button 
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isGestionActive ? "#f4f5f7" : "transparent" }}
-                      >
-                        <FolderOpen className={`h-4 w-4 ${isGestionActive ? "text-[#00444f]" : "text-white"}`} />
-                      </button>
-                    </div>
-
-                    {/* Dropdown menu */}
-                    <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="py-1">
-                        <Link
-                          href="/admin/parks/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Parques
-                        </Link>
-                        <Link
-                              href="/admin/activities/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Actividades
-                        </Link>
-                        <Link
-                        href="/admin/amenities-dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Amenidades
-                        </Link>
-                        <Link
-                        href="/admin/trees/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Arbolado
-                        </Link>
-                        <Link
-                              href="/admin/visitors/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Visitantes
-                        </Link>
-                        <Link
-                              href="/admin/events"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Eventos
-                        </Link>
-                        <Link
-                          href="/admin/dashboard-reservas"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                        Reservas
-                        </Link>
-                        <Link
-                              href="/admin/evaluaciones"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Evaluaciones
-                        </Link>
-                      </div>
-                    </div>
+              <>
+                {/* Desktop Navigation */}
+                <div className="hidden lg:flex items-center rounded-3xl px-4 py-1 shadow-sm absolute left-1/2 transform -translate-x-1/2 bg-accent">
+                  {/* Leyenda Métricas */}
+                  <div className="text-base font-light text-white mr-4 font-poppins">
+                    {t('admin.metrics')}
                   </div>
 
-                  {/* Menú O & M */}
-                  <div className="relative group">
-                    <div className="flex flex-col items-center">
-                      <button 
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isOMActive ? "#f4f5f7" : "transparent" }}
-                      >
-                        <Wrench className={`h-4 w-4 ${isOMActive ? "text-[#00444f]" : "text-white"}`} />
-                      </button>
-                    </div>
+                  <nav className="flex items-center space-x-4">
+                    {adminNavStructure.map((item) => {
+                      const Icon = item.icon;
+                      const hasChildren = item.children && item.children.length > 0;
+                      const active = isActive(item.href, item.children);
 
-                    {/* Dropdown menu */}
-                    <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="py-1">
-                        <Link
-                          href="/admin/assets/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Activos
-                        </Link>
-                        <Link
-                          href="/admin/incidents/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Incidencias
-                        </Link>
-                        <Link
-                          href="/admin/volunteers/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Voluntarios
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+                      if (hasChildren) {
+                        return (
+                          <div key={item.labelKey} className="relative group">
+                            <button 
+                              className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
+                              style={{ backgroundColor: active ? "Background" : "transparent" }}
+                              title={t(item.labelKey)}
+                            >
+                              <Icon className={`h-4 w-4 ${active ? "text-[#00444f]" : "text-white"}`} />
+                            </button>
 
-                  {/* Menú Admin & Finanzas */}
-                  <div className="relative group">
-                    <div className="flex flex-col items-center">
-                      <button 
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
-                        style={{ backgroundColor: isFinanzasActive ? "#f4f5f7" : "transparent" }}
-                      >
-                        <DollarSign className={`h-4 w-4 ${isFinanzasActive ? "text-[#00444f]" : "text-white"}`} />
-                      </button>
-                    </div>
+                            {/* Dropdown menu */}
+                            <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                              <div className="py-1">
+                                {item.children?.map((child) => (
+                                  <Link
+                                    key={child.labelKey}
+                                    href={child.href}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                                  >
+                                    {t(child.labelKey)}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
 
-                    {/* Dropdown menu */}
-                    <div className="absolute left-0 top-full mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="py-1">
-                        <Link
-                          href="/admin/finance/reports"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                      // Simple link
+                      return (
+                        <Link 
+                          key={item.labelKey} 
+                          href={item.href || '#'} 
+                          className="flex flex-col items-center hover:opacity-80"
+                          title={t(item.labelKey)}
                         >
-                          Finanzas
+                          <div 
+                            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                            style={{ backgroundColor: active ? "Background" : "transparent" }}
+                          >
+                            <Icon className={`h-4 w-4 ${active ? "text-[#00444f]" : "text-white"}`} />
+                          </div>
                         </Link>
-                        <Link
-                          href="/admin/accounting/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Contabilidad
-                        </Link>
-                        <Link
-                          href="/admin/concessions/reports"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          Concesiones
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+                      );
+                    })}
+                  </nav>
+                </div>
 
-                  {/* Menú MKT & Comm */}
-                  <Link href="/admin/communications" className="flex flex-col items-center hover:opacity-80">
-                    <div 
-                      className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
-                      style={{ backgroundColor: isMarketingActive ? "#f4f5f7" : "transparent" }}
-                    >
-                      <Megaphone className={`h-4 w-4 ${isMarketingActive ? "text-[#00444f]" : "text-white"}`} />
-                    </div>
-                  </Link>
-
-                  {/* Menú RH */}
-                  <Link href="/admin/hr/dashboard" className="flex flex-col items-center hover:opacity-80">
-                    <div 
-                      className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
-                      style={{ backgroundColor: isRHActive ? "#f4f5f7" : "transparent" }}
-                    >
-                      <Users className={`h-4 w-4 ${isRHActive ? "text-[#00444f]" : "text-white"}`} />
-                    </div>
-                  </Link>
-                </nav>
-              </div>
+                {/* Mobile Menu Button */}
+                <div className="lg:hidden">
+                  <button
+                    type="button"
+                    className="p-2 rounded-full bg-accent text-background hover:opacity-80 transition-colors"
+                    onClick={toggleAdminMobileMenu}
+                  >
+                    {adminMobileMenuOpen ? (
+                      <X className="h-6 w-6" />
+                    ) : (
+                      <Menu className="h-6 w-6" />
+                    )}
+                  </button>
+                </div>
+              </>
             )}
 
             {/* Right side - Help, language, user */}
             <div className="flex items-center gap-4">
-              {/* Global search - Solo para páginas públicas */}
+              {/* Right side - Public */}
               {!isAdmin && (
-                <div className="hidden lg:block max-w-md">
-                  <GlobalSearch />
+                <div className="flex items-center gap-2 md:gap-2">
+                  {/* Global search */}
+                  {!isAuthenticated && (
+                    <div className="hidden lg:block max-w-md border rounded-full">
+                      <GlobalSearch />
+                    </div>
+                  )}
+
+                  {isAuthenticated && user ? (
+                    // Usuario autenticado en página pública
+                    <>
+                      {/* Global search */}
+                      <div className="hidden lg:block max-w-md border rounded-full">
+                        <GlobalSearch />
+                      </div>
+
+                      {/* Help Center */}
+                      <HelpCenter>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-10 h-10 p-0 rounded-full hover:bg-gray-100"
+                          title={t('admin.help')}
+                        >
+                          <HelpCircle className="!h-5 !w-5 text-gray-600" />
+                        </Button>
+                      </HelpCenter>
+
+                      {/* Botón para ir al admin */}
+                      <Link href={ROUTES.dashboards.main}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="hidden rounded-full md:flex w-10 h-10 bg-primary text-background hover:text-gray-600 items-center gap-2"
+                        >
+                          <LogIn className="!h-5 !w-5" />
+                        </Button>
+                      </Link>
+
+                      {/* Dropdown del usuario */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="flex items-center gap-2 focus:outline-none">
+                          <UserProfileImage
+                            userId={user?.id || 0}
+                            role={user?.role || "user"}
+                            name={user?.username || user?.fullName || user?.displayName || "Usuario"}
+                            size="sm"
+                          />
+                          <div className="hidden md:flex flex-col text-left">
+                            <span className="text-sm font-medium text-gray-800">
+                              {user?.username || user?.fullName || user?.displayName || "Usuario"}
+                            </span>
+                            <span className="text-xs text-gray-600">
+                              {user?.role || "usuario"}
+                            </span>
+                          </div>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent 
+                          align="end" 
+                          side="bottom" 
+                          className="w-56 z-[60] transform -translate-x-2"
+                          sideOffset={8}
+                          alignOffset={-60}
+                          avoidCollisions={true}
+                          collisionPadding={24}
+                          style={{ 
+                            maxWidth: 'calc(100vw - 32px)',
+                            right: '16px',
+                            left: 'auto'
+                          }}
+                          >
+                          <DropdownMenuLabel>{t('admin.myAccount')}</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link href="/admin/settings/profile">{t('admin.profile')}</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href="/admin/user-activity">{t('admin.activity')}</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onSelect={(e) => e.preventDefault()}
+                            className="focus:bg-transparent hover:bg-transparent p-0"
+                          >
+                            <LanguageSelector variant="inline" />
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={handleLogout}>{t('admin.logout')}</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  ) : (
+                    // Usuario NO autenticado
+                    <>
+                      {/* Language Selector */}
+                      <div className="hidden md:block">
+                        <LanguageSelector variant="dropdown" showLabel={false} className="border text-gray-600 rounded-full h-10 hover:bg-gray-100 hover:text-gray-600"/>
+                      </div>
+                      {/* Global search */}
+                      <div className="hidden lg:block max-w-md border rounded-full">
+                        <GlobalSearch />
+                      </div>
+
+                      {/* Help Center FAQ*/}
+                      <Link href={ROUTES.public.faq}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-10 h-10 p-0 rounded-full hover:bg-gray-100"
+                          title={t('admin.help')}
+                          aria-label={t('admin.help')}
+                        >
+                          <HelpCircle className="!h-5 !w-5 text-gray-600" />
+                        </Button>
+                      </Link>
+
+
+                      {/* Login Button */}
+                      <Link href={ROUTES.auth.login}>
+                        <div className="w-10 h-10 bg-primary hover:bg-buttonHover text-background hover:text-foreground rounded-full flex items-center justify-center transition-colors duration-200">
+                          <LogIn className="h-5 w-5" />
+                        </div>
+                      </Link>
+                    </>
+                  )}
                 </div>
               )}
 
-              {isAdmin && user ? (
+              {/* Right side - Admin */}
+              {isAdmin && user && (
                 <div className="flex items-center gap-2">
                   {/* Botón de ayuda */}
                   <HelpCenter>
@@ -571,7 +558,7 @@ const Header: React.FC = () => {
                       size="sm"
                       className="w-9 h-9 p-0 rounded-lg border"
                       style={{ backgroundColor: "#f4f5f7", borderColor: "#003D49" }}
-                      title="Centro de ayuda"
+                      title={t('admin.help')}
                     >
                       <HelpCircle className="h-6 w-8 text-gray-700" />
                     </Button>
@@ -587,7 +574,7 @@ const Header: React.FC = () => {
                       size="sm"
                       className="w-9 h-9 p-0 rounded-lg border"
                       style={{ backgroundColor: "#f4f5f7", borderColor: "#003D49" }}
-                      title="Ver página pública"
+                      title={t('admin.publicPage')}
                     >
                       <Home className="h-6 w-8 text-gray-700" />
                     </Button>
@@ -602,7 +589,7 @@ const Header: React.FC = () => {
                         name={user?.username || user?.fullName || user?.displayName || "Usuario"}
                         size="sm"
                       />
-                      <div className="flex flex-col text-left">
+                      <div className="hidden md:flex flex-col text-left">
                         <span className="text-sm font-medium text-gray-800">
                           {user?.username || user?.fullName || user?.displayName || "Usuario"}
                         </span>
@@ -626,32 +613,26 @@ const Header: React.FC = () => {
                         left: 'auto'
                       }}
                     >
-                      <DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
+                      <DropdownMenuLabel>{t('admin.myAccount')}</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link href="/admin/settings/profile">Perfil</Link>
+                        <Link href="/admin/settings/profile">{t('admin.profile')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/admin/user-activity">Actividad</Link>
+                        <Link href="/admin/user-activity">{t('admin.activity')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/admin/users/notifications">Notificaciones</Link>
+                        <Link href="/admin/users/notifications">{t('admin.notifications')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>
-                        <LanguageSelector />
+                        <LanguageSelector variant="inline"/>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>Cerrar sesión</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>{t('admin.logout')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              ) : (
-                <Link href="/admin/login">
-                  <div className="w-10 h-10 bg-emerald-500 hover:bg-emerald-600 rounded-lg flex items-center justify-center transition-colors duration-200 shadow-md hover:shadow-lg">
-                    <LogIn className="h-5 w-5 text-white" />
-                  </div>
-                </Link>
               )}
 
               {/* Mobile menu button */}
@@ -677,178 +658,138 @@ const Header: React.FC = () => {
       {mobileMenuOpen && !isAdmin && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              href="/"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                location === "/"
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              Inicio
-            </Link>
+            {publicNavStructure.map((item) => {
+              const hasChildren = item.children && item.children.length > 0;
+              const active = isActive(item.href, item.children);
 
-            <Link
-              href="/parks"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                location === "/parks"
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              Parques
-            </Link>
+              if (hasChildren) {
+                return (
+                  <div key={item.labelKey} className="space-y-1">
+                    <button
+                      onClick={() => toggleMobileDropdown(item.labelKey)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
+                        active
+                          ? "bg-primary-50 text-primary-700"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {t(item.labelKey)}
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${
+                          mobileDropdowns[item.labelKey] ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
 
-            {/* Menú móvil de Contenido */}
-            <div className="space-y-1">
-              <button
-                onClick={toggleContentMenu}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
-                  isContentActive
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Contenido
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${contentMenuOpen ? "rotate-180" : ""}`}
-                />
-              </button>
+                    {mobileDropdowns[item.labelKey] && (
+                      <div className="ml-4 space-y-1">
+                        {item.children?.map((child) => (
+                          <Link
+                            key={child.labelKey}
+                            href={child.href || '#'}
+                            className={`block px-3 py-2 rounded-md text-sm font-medium ${
+                              location === child.href
+                                ? "bg-primary-100 text-primary-800"
+                                : "text-gray-600 hover:bg-gray-50"
+                            }`}
+                          >
+                            {t(child.labelKey)}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
 
-              {contentMenuOpen && (
-                <div className="ml-4 space-y-1">
-                  <Link
-                    href="/activities"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/activities"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Actividades
-                  </Link>
+              // Items simples sin children
+              return (
+                <Link
+                  key={item.labelKey}
+                  href={item.href || '#'}
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    active
+                      ? "bg-primary-50 text-primary-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {t(item.labelKey)}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-                  <Link
-                    href="/events"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/events"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Eventos
-                  </Link>
+      {/* Mobile Admin Menu */}
+      {adminMobileMenuOpen && isAdmin && (
+        <div className="lg:hidden" style={{ backgroundColor: "#f4f5f7" }}>
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {adminNavStructure.map((item) => {
+              const Icon = item.icon;
+              const hasChildren = item.children && item.children.length > 0;
+              const active = isActive(item.href, item.children);
 
-                  <Link
-                    href="/calendar"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/calendar"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Calendario
-                  </Link>
+              if (hasChildren) {
+                return (
+                  <div key={item.labelKey} className="space-y-1">
+                    <button
+                      onClick={() => toggleAdminMobileDropdown(item.labelKey)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
+                        active
+                          ? "bg-[#003d49] text-white"
+                          : "text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-5 w-5" />
+                        <span>{t(item.labelKey)}</span>
+                      </div>
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${
+                          adminMobileDropdowns[item.labelKey] ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
 
-                  <Link
-                    href="/concessions"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/concessions"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Servicios Comerciales
-                  </Link>
-                </div>
-              )}
-            </div>
+                    {adminMobileDropdowns[item.labelKey] && (
+                      <div className="ml-4 space-y-1">
+                        {item.children?.map((child) => (
+                          <Link
+                            key={child.labelKey}
+                            href={child.href}
+                            className={`block px-3 py-2 rounded-md text-sm font-medium ${
+                              location === child.href
+                                ? "bg-[#003d49] text-white"
+                                : "text-gray-600 hover:bg-gray-200"
+                            }`}
+                            onClick={() => setAdminMobileMenuOpen(false)}
+                          >
+                            {t(child.labelKey)}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
 
-            {/* Menú móvil de Biodiversidad */}
-            <div className="space-y-1">
-              <button
-                onClick={toggleBiodiversityMenu}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
-                  isBiodiversityActive
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Biodiversidad
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${biodiversityMenuOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {biodiversityMenuOpen && (
-                <div className="ml-4 space-y-1">
-                  <Link
-                    href="/tree-species"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/tree-species"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Especies de Árboles
-                  </Link>
-
-                  <Link
-                    href="/fauna"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/fauna"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Fauna
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Menú móvil de Usuarios */}
-            <div className="space-y-1">
-              <button
-                onClick={toggleUsersMenu}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
-                  isUsersActive
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Usuarios
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${usersMenuOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {usersMenuOpen && (
-                <div className="ml-4 space-y-1">
-                  <Link
-                    href="/volunteers"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/volunteers"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Voluntarios
-                  </Link>
-
-                  <Link
-                    href="/instructors"
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                      location === "/instructors"
-                        ? "bg-primary-100 text-primary-800"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Instructores
-                  </Link>
-                </div>
-              )}
-            </div>
+              return (
+                <Link
+                  key={item.labelKey}
+                  href={item.href || '#'}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium ${
+                    active
+                      ? "bg-[#003d49] text-white"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`}
+                  onClick={() => setAdminMobileMenuOpen(false)}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{t(item.labelKey)}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
