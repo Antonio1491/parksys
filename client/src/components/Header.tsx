@@ -514,10 +514,6 @@ const Header: React.FC = () => {
                   ) : (
                     // Usuario NO autenticado
                     <>
-                      {/* Language Selector */}
-                      <div className="hidden md:block">
-                        <LanguageSelector variant="dropdown" showLabel={false} className="border text-gray-600 rounded-full h-10 hover:bg-gray-100 hover:text-gray-600"/>
-                      </div>
                       {/* Global search */}
                       <div className="hidden lg:block max-w-md border rounded-full">
                         <GlobalSearch />
@@ -536,7 +532,11 @@ const Header: React.FC = () => {
                         </Button>
                       </Link>
 
-
+                      {/* Language Selector */}
+                      <div className="hidden md:block">
+                        <LanguageSelector variant="dropdown" showLabel={false} className="border text-gray-600 rounded-full h-10 hover:bg-gray-100 hover:text-gray-600"/>
+                      </div>
+                      
                       {/* Login Button */}
                       <Link href={ROUTES.auth.login}>
                         <div className="w-10 h-10 bg-primary hover:bg-buttonHover text-background hover:text-foreground rounded-full flex items-center justify-center transition-colors duration-200">
