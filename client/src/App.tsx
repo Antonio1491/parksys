@@ -302,7 +302,11 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/hr/dashboard')))}
           </Suspense>
         </Route>
-        
+        <Route path="/prueba">
+          <Suspense fallback={<div className="p-8 text-center">Cargando página de pruebas...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/public/test')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/parks" component={AdminParks} />
         <Route path="/admin/payments" component={AdminPayments} />
         <Route path="/admin/parks/dashboard">
@@ -475,6 +479,11 @@ function Router() {
         <Route path="/admin/activities/registrations">
           <Suspense fallback={<div className="p-8 text-center">Cargando gestión de inscripciones...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/activities/registrations')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/activities/registrations/:id">
+          <Suspense fallback={<div className="p-8 text-center">Cargando detalle de inscripciones...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/activities/registrations/detail')))}
           </Suspense>
         </Route>
         <Route path="/admin/analytics" component={AdminAnalytics} />

@@ -1,5 +1,6 @@
 {
   "admin": {
+    "login": "Iniciar sesión",
     "metrics": "Métricas",
     "dashboard": "Dashboard",
     "management": "Gestión",
@@ -27,7 +28,8 @@
     "profile": "Perfil",
     "activity": "Actividad",
     "logout": "Cerrar sesión",
-    "myAccount": "Mi cuenta"
+    "myAccount": "Mi cuenta",
+    "notifications": "Notificaciones"
   },
   "nav": {
     "home": "Inicio",
@@ -44,7 +46,7 @@
     "users": "Usuarios",
     "volunteers": "Voluntarios",
     "instructors": "Instructores",
-    "lenguageSelector": "Seleccionar idioma"
+    "languageSelector": "Seleccionar idioma"
   },
   "navigation": {
     "dashboard": "Panel de Control",

@@ -222,20 +222,15 @@
     z-index: 7 !important;
   }
   
-  /* Ensure dropdowns appear above map */
-  [data-radix-select-content] {
-    z-index: 60 !important;
-  }
-  
-  [data-radix-popper-content-wrapper] {
-    z-index: 60 !important;
-  }
-  
-  /* SOLUCIÓN DEFINITIVA PARA ÁREA BLANCA EXTRA EN PÁGINAS DE EDICIÓN */
+   /* SOLUCIÓN DEFINITIVA PARA ÁREA BLANCA EXTRA EN PÁGINAS DE EDICIÓN */
   body, html, #root {
     min-height: 100vh !important;
     height: auto !important;
     overflow-x: hidden !important;
+  }
+
+  .layout-wrapper {
+    position: relative;
   }
   
   /* Eliminar altura mínima problemática en AdminLayout */

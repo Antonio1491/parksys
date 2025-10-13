@@ -130,6 +130,7 @@ export const ADMIN_ACTIVITIES = {
   edit: (id: string | number) => `/admin/activities/${id}/edit`,
   calendar: '/admin/activities/calendar',
   registrations: '/admin/activities/registrations',
+  registrationDetail: (id: string | number) => `/admin/activities/registrations/${id}`,
   
   // Categorías
   categories: {
@@ -756,7 +757,7 @@ export const ADMIN_ROLES = {
 } as const;
 
 // ============================================
-// MÓDULO: CONFIGURACIÓN GENERAL
+// MÓDULO: CONFIGURACIÓN DEL USUSARIO
 // ============================================
 
 export const ADMIN_PROFILE = {
@@ -765,6 +766,9 @@ export const ADMIN_PROFILE = {
 
   // Ajustes de usuario (rediseñar con base firebase)
   profile: '/admin/settings/profile',
+
+  activity: '/admin/user-activity',
+  notifications:'/admin/user-notifications',// ✅ AGREGAR
 } as const;
 
 // ============================================

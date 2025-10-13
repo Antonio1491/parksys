@@ -20,14 +20,16 @@ interface LanguageSelectorProps {
   variant?: 'dropdown' | 'inline' | 'inline-compact';
   showLabel?: boolean;
   className?: string;
+  title?: string;
 }
 
 export function LanguageSelector({
   variant = 'dropdown',
   showLabel = true,
   className,
+  title,
 }: LanguageSelectorProps) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentLanguage =
     languages.find((lang) => lang.code === i18n.language) || languages[0];
 
@@ -96,9 +98,9 @@ export function LanguageSelector({
           variant="outline"
           size="sm"
           className={clsx('gap-2 border-0 rounded-full', className)}
+          title={title ?? t('nav.languageSelector')}
         >
           <Globe className="h-4 w-4" />
-          <span className="text-md">{currentLanguage.flag}</span>
           {showLabel && (
             <span className="hidden sm:inline-block">
               {currentLanguage.nativeName}
@@ -110,7 +112,6 @@ export function LanguageSelector({
         align="end"
         side="bottom"
         avoidCollisions={true}
-        className="w-56 z-[60]"
         style={{
           maxWidth: 'calc(100vw - 32px)',
           right: '0px',

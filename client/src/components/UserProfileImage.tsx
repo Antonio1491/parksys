@@ -38,7 +38,6 @@ const UserProfileImage: React.FC<UserProfileImageProps> = ({
 
       // Añadir timestamp para invalidar cache cuando sea necesario
       const cacheInvalidationKey = `profile_image_cache_${userId}`;
-      const lastUpdate = localStorage.getItem(cacheInvalidationKey);
       const currentTime = Date.now().toString();
       
       // Primero verificamos si tenemos la imagen guardada en localStorage

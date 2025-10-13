@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useLocation } from 'wouter';
 
 interface ActivityRegistration {
   id: number;
@@ -89,6 +90,7 @@ interface ActivitySummary {
 }
 
 const ActivityRegistrationsPage = () => {
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [parkFilter, setParkFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -242,6 +244,12 @@ const ActivityRegistrationsPage = () => {
     setSummaryCurrentPage(1);
   }, [searchTerm, parkFilter, categoryFilter]);
 
+  // Función para navegar al detalle de inscripciones
+  const handleActivityClick = (activityId: number) => {
+    if (selectionMode) return; // No navegar si está en modo selección
+    setLocation(`/admin/activities/registrations/${activityId}`);
+  };
+  
   // Funciones para manejo de selección múltiple de actividades
   const handleSelectActivity = (activityId: number, checked: boolean) => {
     const newSelected = new Set(selectedActivities);
@@ -478,14 +486,14 @@ const ActivityRegistrationsPage = () => {
             {/* Cards de métricas */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Total de actividades */}
-              <Card className="bg-[#00444f] text-white border-0">
+              <Card className="bg-[#ceefea] text-white border-0">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-blue-100 text-sm font-medium mb-1">Total de actividades</p>
-                      <p className="text-3xl font-bold">{metrics.totalActivities}</p>
+                      <p className="text-[#00444f] text-sm font-medium mb-1">Total de actividades</p>
+                      <p className="text-3xl text-[#00444f] font-bold">{metrics.totalActivities}</p>
                     </div>
-                    <div className="bg-white/20 p-3 rounded-full">
+                    <div className="bg-[#00444f] p-3 rounded-full">
                       <Calendar className="h-6 w-6" />
                     </div>
                   </div>
@@ -493,14 +501,14 @@ const ActivityRegistrationsPage = () => {
               </Card>
 
               {/* Actividades gratuitas */}
-              <Card className="bg-[#00444f] text-white border-0">
+              <Card className="bg-[#ceefea] text-white border-0">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-green-100 text-sm font-medium mb-1">Actividades gratuitas</p>
-                      <p className="text-3xl font-bold">{metrics.freeActivities}</p>
+                      <p className="text-[#00444f] text-sm font-medium mb-1">Actividades gratuitas</p>
+                      <p className="text-3xl text-[#00444f] font-bold">{metrics.freeActivities}</p>
                     </div>
-                    <div className="bg-white/20 p-3 rounded-full">
+                    <div className="bg-[#00444f] p-3 rounded-full">
                       <Target className="h-6 w-6" />
                     </div>
                   </div>
@@ -508,14 +516,14 @@ const ActivityRegistrationsPage = () => {
               </Card>
 
               {/* Inscripciones registradas */}
-              <Card className="bg-[#14b8a4] text-white border-0">
+              <Card className="bg-[#ceefea] text-white border-0">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-purple-100 text-sm font-medium mb-1">Inscripciones registradas</p>
-                      <p className="text-3xl font-bold">{metrics.totalRegistrations}</p>
+                      <p className="text-[#00444f] text-sm font-medium mb-1">Inscripciones registradas</p>
+                      <p className="text-3xl text-[#00444f] font-bold">{metrics.totalRegistrations}</p>
                     </div>
-                    <div className="bg-white/20 p-3 rounded-full">
+                    <div className="bg-[#00444f] p-3 rounded-full">
                       <Users className="h-6 w-6" />
                     </div>
                   </div>
@@ -523,14 +531,14 @@ const ActivityRegistrationsPage = () => {
               </Card>
 
               {/* Ingreso actual */}
-              <Card className="bg-[#00818e] text-white border-0">
+              <Card className="bg-[#ceefea] text-white border-0">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-teal-100 text-sm font-medium mb-1">Ingreso actual</p>
-                      <p className="text-3xl font-bold">${metrics.totalRevenue.toLocaleString()}</p>
+                      <p className="text-[#00444f] text-sm font-medium mb-1">Ingreso actual</p>
+                      <p className="text-3xl text-[#00444f] font-bold">${metrics.totalRevenue.toLocaleString()}</p>
                     </div>
-                    <div className="bg-white/20 p-3 rounded-full">
+                    <div className="bg-[#00444f] p-3 rounded-full">
                       <DollarSign className="h-6 w-6" />
                     </div>
                   </div>
@@ -683,20 +691,29 @@ const ActivityRegistrationsPage = () => {
                 <>
 
                   {/* Vista de Tarjetas */}
-                  {summaryViewMode === 'cards' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {paginatedSummaryData.map((activity: ActivitySummary) => (
-                        <Card key={activity.id} className="hover:shadow-lg transition-shadow relative">
+                          {summaryViewMode === 'cards' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                              {paginatedSummaryData.map((activity: ActivitySummary) => (
+                                <Card 
+                                  key={activity.id} 
+                                  className={`hover:shadow-lg transition-all relative ${
+                                    !selectionMode ? 'cursor-pointer hover:scale-[1.02]' : ''
+                                  }`}
+                                  onClick={() => handleActivityClick(activity.id)}
+                                >
                           {/* Checkbox de selección en la esquina superior derecha */}
-                          {selectionMode && (
-                            <div className="absolute top-3 right-3 z-10">
-                              <Checkbox
-                                checked={selectedActivities.has(activity.id)}
-                                onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
-                                className="bg-white/80 data-[state=checked]:bg-[#00a587]"
-                              />
-                            </div>
-                          )}
+                                  {selectionMode && (
+                                    <div 
+                                      className="absolute top-3 right-3 z-10"
+                                      onClick={(e) => e.stopPropagation()} // ← AGREGAR ESTO
+                                    >
+                                      <Checkbox
+                                        checked={selectedActivities.has(activity.id)}
+                                        onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
+                                        className="bg-white/80 data-[state=checked]:bg-[#00a587]"
+                                      />
+                                    </div>
+                                  )}
 
                           <CardHeader className="pb-2">
                             <div className="flex items-start justify-between">
@@ -707,6 +724,7 @@ const ActivityRegistrationsPage = () => {
                             </div>
                           </CardHeader>
                           <CardContent className="space-y-4">
+                          
                             {/* Información básica */}
                             <div className="space-y-2 text-sm">
                               <div className="flex items-center gap-2 text-gray-600">
@@ -783,18 +801,12 @@ const ActivityRegistrationsPage = () => {
                             <thead className="bg-gray-50 border-b">
                               <tr>
                                 {selectionMode && (
-                                  <th className="w-[50px] p-4">
+                                  <td className="p-4" onClick={(e) => e.stopPropagation()}>
                                     <Checkbox
-                                      checked={paginatedSummaryData.length > 0 && paginatedSummaryData.every((activity: ActivitySummary) => selectedActivities.has(activity.id))}
-                                      onCheckedChange={(checked) => {
-                                        if (checked) {
-                                          handleSelectAllActivities();
-                                        } else {
-                                          handleDeselectAllActivities();
-                                        }
-                                      }}
+                                      checked={selectedActivities.has(activity.id)}
+                                      onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
                                     />
-                                  </th>
+                                  </td>
                                 )}
                                 <th className="text-left p-4 font-medium text-gray-900">Actividad</th>
                                 <th className="text-left p-4 font-medium text-gray-900">Parque</th>
@@ -805,9 +817,15 @@ const ActivityRegistrationsPage = () => {
                                 <th className="text-right p-4 font-medium text-gray-900">Ingreso Proyectado</th>
                               </tr>
                             </thead>
-                            <tbody>
-                              {paginatedSummaryData.map((activity: ActivitySummary, index: number) => (
-                                <tr key={activity.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                  <tbody>
+                                    {paginatedSummaryData.map((activity: ActivitySummary, index: number) => (
+                                      <tr 
+                                        key={activity.id} 
+                                        className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${
+                                          !selectionMode ? 'cursor-pointer hover:bg-blue-50' : ''
+                                        } transition-colors`}
+                                        onClick={() => handleActivityClick(activity.id)}
+                                      >
                                   {selectionMode && (
                                     <td className="p-4">
                                       <Checkbox

@@ -420,12 +420,6 @@ const Header: React.FC = () => {
               {/* Right side - Public */}
               {!isAdmin && (
                 <div className="flex items-center gap-2 md:gap-2">
-                  {/* Global search */}
-                  {!isAuthenticated && (
-                    <div className="hidden lg:block max-w-md border rounded-full">
-                      <GlobalSearch />
-                    </div>
-                  )}
 
                   {isAuthenticated && user ? (
                     // Usuario autenticado en página pública
@@ -447,6 +441,9 @@ const Header: React.FC = () => {
                         </Button>
                       </HelpCenter>
 
+                      {/* Botón de notificaciones */}
+                      <NotificationBell buttonClassName="hover:bg-gray-100"/>
+
                       {/* Botón para ir al admin */}
                       <Link href={ROUTES.dashboards.main}>
                         <Button
@@ -465,7 +462,7 @@ const Header: React.FC = () => {
                             userId={user?.id || 0}
                             role={user?.role || "user"}
                             name={user?.username || user?.fullName || user?.displayName || "Usuario"}
-                            size="sm"
+                            size="md"
                           />
                           <div className="hidden md:flex flex-col text-left">
                             <span className="text-sm font-medium text-gray-800">
@@ -494,10 +491,10 @@ const Header: React.FC = () => {
                           <DropdownMenuLabel>{t('admin.myAccount')}</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem asChild>
-                            <Link href="/admin/settings/profile">{t('admin.profile')}</Link>
+                            <Link href={ROUTES.admin.profile.profile}>{t('admin.profile')}</Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link href="/admin/user-activity">{t('admin.activity')}</Link>
+                            <Link href={ROUTES.admin.profile.activity}>{t('admin.activity')}</Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
@@ -539,8 +536,8 @@ const Header: React.FC = () => {
                       
                       {/* Login Button */}
                       <Link href={ROUTES.auth.login}>
-                        <div className="w-10 h-10 bg-primary hover:bg-buttonHover text-background hover:text-foreground rounded-full flex items-center justify-center transition-colors duration-200">
-                          <LogIn className="h-5 w-5" />
+                        <div className="w-10 h-10 bg-primary hover:bg-buttonHover text-background hover:text-foreground rounded-full flex items-center justify-center transition-colors duration-200" title={t('admin.login')} aria-label={t('admin.login')}>
+                          <LogIn className="h-4 w-4" />
                         </div>
                       </Link>
                     </>
@@ -550,30 +547,28 @@ const Header: React.FC = () => {
 
               {/* Right side - Admin */}
               {isAdmin && user && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 md:gap-2">
                   {/* Botón de ayuda */}
                   <HelpCenter>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-9 h-9 p-0 rounded-lg border"
-                      style={{ backgroundColor: "#f4f5f7", borderColor: "#003D49" }}
+                      className="w-10 h-10 p-0 rounded-full border-accent bg-transparent"
                       title={t('admin.help')}
                     >
-                      <HelpCircle className="h-6 w-8 text-gray-700" />
+                      <HelpCircle className="!h-5 !w-5 text-gray-600" />
                     </Button>
                   </HelpCenter>
 
                   {/* Botón de notificaciones */}
-                  <NotificationBell />
+                  <NotificationBell buttonClassName="bg-transparent border-accent"/>
 
                   {/* Botón para acceder a la página pública */}
-                  <Link href="/">
+                  <Link href={ROUTES.public.home}>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-9 h-9 p-0 rounded-lg border"
-                      style={{ backgroundColor: "#f4f5f7", borderColor: "#003D49" }}
+                      className="w-10 h-10 p-0 rounded-full border-accent bg-transparent"
                       title={t('admin.publicPage')}
                     >
                       <Home className="h-6 w-8 text-gray-700" />
@@ -587,7 +582,7 @@ const Header: React.FC = () => {
                         userId={user?.id || 0}
                         role={user?.role || "user"}
                         name={user?.username || user?.fullName || user?.displayName || "Usuario"}
-                        size="sm"
+                        size="md"
                       />
                       <div className="hidden md:flex flex-col text-left">
                         <span className="text-sm font-medium text-gray-800">
@@ -599,33 +594,20 @@ const Header: React.FC = () => {
                       </div>
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent 
-                      align="end" 
-                      side="bottom"
-                      className="w-56 z-[60] transform -translate-x-2"
-                      sideOffset={8}
-                      alignOffset={-60}
-                      avoidCollisions={true}
-                      collisionPadding={24}
-                      style={{ 
-                        maxWidth: 'calc(100vw - 32px)',
-                        right: '16px',
-                        left: 'auto'
-                      }}
-                    >
+                    <DropdownMenuContent align="end" className="w-48 max-w-[calc(100vw-2rem)]">
                       <DropdownMenuLabel>{t('admin.myAccount')}</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin/settings/profile">{t('admin.profile')}</Link>
+                      <DropdownMenuItem asChild className="focus:bg-buttonHover">
+                        <Link href={ROUTES.admin.profile.profile}>{t('admin.profile')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/admin/user-activity">{t('admin.activity')}</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin/users/notifications">{t('admin.notifications')}</Link>
+                        <Link href={ROUTES.admin.profile.activity}>{t('admin.activity')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onSelect={(e) => e.preventDefault()}
+                        className="focus:bg-transparent hover:bg-transparent p-0"
+                        >
                         <LanguageSelector variant="inline"/>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

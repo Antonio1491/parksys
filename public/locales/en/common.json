@@ -1,5 +1,6 @@
 {
   "admin": {
+    "login": "Login",
     "metrics": "Metrics",
     "dashboard": "Dashboard",
     "management": "Management",
@@ -27,7 +28,8 @@
     "profile": "Profile",
     "activity": "Activity",
     "logout": "Logout",
-    "myAccount": "My account"
+    "myAccount": "My account",
+    "notifications": "Notifications"
   },
   "nav": {
     "home": "Home",
@@ -43,8 +45,8 @@
     "fauna": "Fauna",
     "users": "Users",
     "volunteers": "Volunteers",
-    "instructors": "Instructors"
-    "lenguageSelector": "Select language"
+    "instructors": "Instructors",
+    "languageSelector": "Select language"
   },
   "navigation": {
     "dashboard": "Dashboard",
