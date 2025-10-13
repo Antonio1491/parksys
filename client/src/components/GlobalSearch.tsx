@@ -407,7 +407,8 @@ const GlobalSearch: React.FC = () => {
           setTimeout(() => inputRef.current?.focus(), 100);
         }}
         className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
-        title="Búsqueda global"
+        title={t('nav.globalSearch')}
+        aria-label={t('nav.globalSearch')}
       >
         <Search className="w-5 h-5 text-gray-600" />
       </button>

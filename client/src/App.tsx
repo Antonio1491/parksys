@@ -10,7 +10,6 @@ import { ROUTES } from '@/routes';
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Parks from "@/pages/parks";
-import ParkLandingPage from "@/pages/ParkLandingPage";
 import AdminDashboard from "@/pages/admin";
 import AdminParks from "@/pages/admin/parks";
 import AdminParkEdit from "@/pages/admin/park-edit";
@@ -28,8 +27,6 @@ import PendingUsersPage from "@/pages/admin/pending-users";
 import InstructorRegistration from "@/pages/public/instructor-registration";
 import AccessUsersPage from "@/pages/admin/configuracion-seguridad/access/users";
 import ActivityDetailPage from "@/pages/activity-detail";
-import Landing from "@/pages/Landing";
-import ParksModuleShowcase from "@/pages/ParksModuleShowcase";
 import AdminVolunteerParticipations from "@/pages/admin/volunteers/participations";
 import AdminParticipationEdit from "@/pages/admin/volunteers/participations/edit";
 import EventCategoriesPage from "@/pages/admin/events/categories";
@@ -302,12 +299,22 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/hr/dashboard')))}
           </Suspense>
         </Route>
+
+        {/* Página para pruebas */}
         <Route path="/prueba">
           <Suspense fallback={<div className="p-8 text-center">Cargando página de pruebas...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/public/test')))}
           </Suspense>
         </Route>
-        <Route path="/admin/parks" component={AdminParks} />
+
+        {/* ========================================== */}
+        {/* DASHBOARDS ADMINISTRATIVOS - MIGRADOS ✅   */}
+        {/* ========================================== */}
+          
+        {/* Rutas del módulo de Parques */}
+        <Route path={ROUTES.admin.parks} component={AdminParks} />
+
+        
         <Route path="/admin/payments" component={AdminPayments} />
         <Route path="/admin/parks/dashboard">
           <Suspense fallback={<div className="p-8 text-center">Cargando dashboard de parques...</div>}>

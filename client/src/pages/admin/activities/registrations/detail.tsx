@@ -123,6 +123,20 @@ const ActivityRegistrationDetail = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handleStatusChange = (id: number, status: 'approved' | 'rejected') => {
+    statusMutation.mutate({ id, status });
+  };
+
+  const handleDelete = (id: number) => {
+    setRegistrationToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+  const confirmDelete = () => {
+    if (registrationToDelete) {
+      deleteMutation.mutate(registrationToDelete);
+    }
+  };
+  
   // Calcular estadísticas
   const stats = React.useMemo(() => {
     // Mutación para cambiar estado
@@ -199,20 +213,6 @@ const ActivityRegistrationDetail = () => {
     const totalRevenue = isFree ? 0 : capacity * price;
     const currentRevenue = isFree ? 0 : totalRegistrations * price;
     const revenuePercentage = totalRevenue > 0 ? (currentRevenue / totalRevenue) * 100 : 0;
-
-    const handleStatusChange = (id: number, status: 'approved' | 'rejected') => {
-      statusMutation.mutate({ id, status });
-    };
-
-    const handleDelete = (id: number) => {
-      setRegistrationToDelete(id);
-      setIsDeleteDialogOpen(true);
-    };
-    const confirmDelete = () => {
-      if (registrationToDelete) {
-        deleteMutation.mutate(registrationToDelete);
-      }
-    };
 
     return {
       capacity,
