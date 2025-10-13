@@ -597,7 +597,7 @@ const Header: React.FC = () => {
                     <DropdownMenuContent align="end" className="w-48 max-w-[calc(100vw-2rem)]">
                       <DropdownMenuLabel>{t('admin.myAccount')}</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild className="focus:bg-buttonHover">
+                      <DropdownMenuItem asChild className="focus:bg-buttonHover focus:text-foreground">
                         <Link href={ROUTES.admin.profile.profile}>{t('admin.profile')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
