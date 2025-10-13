@@ -17,7 +17,7 @@ const GlobalSearch: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [ navigate] = useLocation();
+  const [navigate] = useLocation();
   const { t } = useTranslation();
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

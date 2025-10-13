@@ -46,7 +46,8 @@
     "users": "Usuarios",
     "volunteers": "Voluntarios",
     "instructors": "Instructores",
-    "languageSelector": "Seleccionar idioma"
+    "languageSelector": "Seleccionar idioma",
+    "globalSearch": "Búsqueda global"
   },
   "navigation": {
     "dashboard": "Panel de Control",
