@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, MapPin, Calendar, Users, TreePine, GraduationCap, Building, Squirrel, Sparkles, Home } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import { useTranslation } from 'react-i18next';
 
 interface SearchResult {
   id: string;
@@ -16,7 +17,8 @@ const GlobalSearch: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [location, navigate] = useLocation();
+  const [ navigate] = useLocation();
+  const { t } = useTranslation();
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 

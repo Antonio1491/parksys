@@ -189,6 +189,16 @@ const ActivityRegistrationDetail = () => {
           return <Badge variant="secondary"><AlertCircle className="w-3 h-3 mr-1" />Pendiente</Badge>;
       }
     };
+    const capacity = activity?.capacity || activity?.maxRegistrations || 0;
+    const totalRegistrations = registrations.length;
+    const availableSlots = Math.max(0, capacity - totalRegistrations);
+    const price = parseFloat(activity?.price || '0');
+    const isFree = activity?.isFree || price === 0;
+
+    // Calcular ingresos
+    const totalRevenue = isFree ? 0 : capacity * price;
+    const currentRevenue = isFree ? 0 : totalRegistrations * price;
+    const revenuePercentage = totalRevenue > 0 ? (currentRevenue / totalRevenue) * 100 : 0;
 
     const handleStatusChange = (id: number, status: 'approved' | 'rejected') => {
       statusMutation.mutate({ id, status });
@@ -203,16 +213,6 @@ const ActivityRegistrationDetail = () => {
         deleteMutation.mutate(registrationToDelete);
       }
     };
-    const capacity = activity?.capacity || activity?.maxRegistrations || 0;
-    const totalRegistrations = registrations.length;
-    const availableSlots = Math.max(0, capacity - totalRegistrations);
-    const price = parseFloat(activity?.price || '0');
-    const isFree = activity?.isFree || price === 0;
-
-    // Calcular ingresos
-    const totalRevenue = isFree ? 0 : capacity * price;
-    const currentRevenue = isFree ? 0 : totalRegistrations * price;
-    const revenuePercentage = totalRevenue > 0 ? (currentRevenue / totalRevenue) * 100 : 0;
 
     return {
       capacity,

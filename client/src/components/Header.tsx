@@ -268,6 +268,7 @@ const Header: React.FC = () => {
                         return (
                           <div key={item.labelKey} className="relative group">
                             <button
+                              aria-label={t(item.labelKey)}
                               className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium flex items-center ${
                                 active
                                   ? "border-primary text-gray-900"
@@ -283,6 +284,7 @@ const Header: React.FC = () => {
                               <div className="py-1">
                                 {item.children?.map((child) => (
                                   <Link
+                                    aria-label={t(child.labelKey)}
                                     key={child.labelKey}
                                     href={child.href || '#'}
                                     className={`block px-4 py-2 text-sm ${
@@ -305,6 +307,7 @@ const Header: React.FC = () => {
                         <Link
                           key={item.labelKey}
                           href={item.href || '#'}
+                          aria-label={t(item.labelKey)}
                           className={`border-b-2 pt-1 pb-3 px-1 text-sm font-medium ${
                             active
                               ? "border-primary text-gray-900"
@@ -339,7 +342,7 @@ const Header: React.FC = () => {
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center rounded-3xl px-4 py-1 shadow-sm absolute left-1/2 transform -translate-x-1/2 bg-accent">
                   {/* Leyenda Métricas */}
-                  <div className="text-base font-light text-white mr-4 font-poppins">
+                  <div aria-label={t('admin.metrics')} className="text-base font-light text-white mr-4 font-poppins">
                     {t('admin.metrics')}
                   </div>
 
@@ -356,6 +359,7 @@ const Header: React.FC = () => {
                               className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-80 transition-colors"
                               style={{ backgroundColor: active ? "Background" : "transparent" }}
                               title={t(item.labelKey)}
+                              aria-label={t(item.labelKey)}
                             >
                               <Icon className={`h-4 w-4 ${active ? "text-[#00444f]" : "text-white"}`} />
                             </button>
@@ -367,6 +371,7 @@ const Header: React.FC = () => {
                                   <Link
                                     key={child.labelKey}
                                     href={child.href}
+                                    aria-label={t(child.labelKey)}
                                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                                   >
                                     {t(child.labelKey)}
@@ -385,6 +390,7 @@ const Header: React.FC = () => {
                           href={item.href || '#'} 
                           className="flex flex-col items-center hover:opacity-80"
                           title={t(item.labelKey)}
+                          aria-label={t(item.labelKey)}
                         >
                           <div 
                             className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
