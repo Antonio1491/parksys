@@ -21,6 +21,7 @@ interface LanguageSelectorProps {
   showLabel?: boolean;
   className?: string;
   title?: string;
+  buttonClassName?: string;
 }
 
 export function LanguageSelector({
@@ -28,6 +29,7 @@ export function LanguageSelector({
   showLabel = true,
   className,
   title,
+  buttonClassName,
 }: LanguageSelectorProps) {
   const { t, i18n } = useTranslation();
   const currentLanguage =
@@ -49,7 +51,7 @@ export function LanguageSelector({
               changeLanguage(language.code);
             }}
             className={clsx(
-              'flex items-center gap-2 px-2 py-1.5 rounded hover:bg-buttonHover text-foreground transition-colors text-left w-full',
+              'flex items-center gap-2 px-2 py-1.5 rounded hover:bg-buttonHover text-foreground transition-colors text-left w-full', buttonClassName,
               i18n.language === language.code && 'bg-gray-100 font-medium'
             )}
           >

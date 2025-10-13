@@ -198,7 +198,6 @@ const ActivityRegistrationDetail = () => {
       setRegistrationToDelete(id);
       setIsDeleteDialogOpen(true);
     };
-    
     const confirmDelete = () => {
       if (registrationToDelete) {
         deleteMutation.mutate(registrationToDelete);

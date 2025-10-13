@@ -477,7 +477,7 @@ const Header: React.FC = () => {
                         <DropdownMenuContent 
                           align="end" 
                           side="bottom" 
-                          className="w-56 z-[60] transform -translate-x-2"
+                          className="w-48 z-[60] transform -translate-x-2"
                           sideOffset={8}
                           alignOffset={-60}
                           avoidCollisions={true}
@@ -490,10 +490,10 @@ const Header: React.FC = () => {
                           >
                           <DropdownMenuLabel>{t('admin.myAccount')}</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem asChild>
+                          <DropdownMenuItem asChild className="focus:bg-gray-100 focus:text-foreground">
                             <Link href={ROUTES.admin.profile.profile}>{t('admin.profile')}</Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
+                          <DropdownMenuItem asChild className="focus:bg-gray-100 focus:text-foreground">
                             <Link href={ROUTES.admin.profile.activity}>{t('admin.activity')}</Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -501,10 +501,10 @@ const Header: React.FC = () => {
                             onSelect={(e) => e.preventDefault()}
                             className="focus:bg-transparent hover:bg-transparent p-0"
                           >
-                            <LanguageSelector variant="inline" />
+                            <LanguageSelector variant="inline" buttonClassName="hover:bg-gray-100"/>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={handleLogout}>{t('admin.logout')}</DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleLogout} className="focus:bg-gray-100 focus:text-foreground">{t('admin.logout')}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </>
@@ -600,7 +600,7 @@ const Header: React.FC = () => {
                       <DropdownMenuItem asChild className="focus:bg-buttonHover focus:text-foreground">
                         <Link href={ROUTES.admin.profile.profile}>{t('admin.profile')}</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
+                      <DropdownMenuItem asChild className="focus:bg-buttonHover focus:text-foreground">
                         <Link href={ROUTES.admin.profile.activity}>{t('admin.activity')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -611,7 +611,7 @@ const Header: React.FC = () => {
                         <LanguageSelector variant="inline"/>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>{t('admin.logout')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout} className="focus:bg-buttonHover focus:text-foreground">{t('admin.logout')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
