@@ -44,7 +44,8 @@ import {
   Phone,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  TrendingUp
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -201,21 +202,21 @@ const ActivityRegistrationDetail = () => {
       deleteMutation.mutate(registrationToDelete);
     }
   };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Aprobada</Badge>;
+      case 'rejected':
+        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Rechazada</Badge>;
+      case 'pending':
+      default:
+        return <Badge variant="secondary"><AlertCircle className="w-3 h-3 mr-1" />Pendiente</Badge>;
+    }
+  };
   
   // Calcular estadísticas
   const stats = React.useMemo(() => {
-
-    const getStatusBadge = (status: string) => {
-      switch (status) {
-        case 'approved':
-          return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Aprobada</Badge>;
-        case 'rejected':
-          return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Rechazada</Badge>;
-        case 'pending':
-        default:
-          return <Badge variant="secondary"><AlertCircle className="w-3 h-3 mr-1" />Pendiente</Badge>;
-      }
-    };
     const capacity = activity?.capacity || activity?.maxRegistrations || 0;
     const totalRegistrations = registrations.length;
     const availableSlots = Math.max(0, capacity - totalRegistrations);
