@@ -18,6 +18,25 @@ export async function getAllActivities(req: Request, res: Response) {
 }
 
 /**
+ * Controlador para obtener una actividad específica por ID
+ */
+export async function getActivity(req: Request, res: Response) {
+  try {
+    const activityId = Number(req.params.id);
+    const activity = await storage.getActivity(activityId);
+
+    if (!activity) {
+      return res.status(404).json({ message: "Actividad no encontrada" });
+    }
+
+    res.json(activity);
+  } catch (error) {
+    console.error('Error al obtener actividad:', error);
+    res.status(500).json({ message: 'Error al recuperar actividad' });
+  }
+}
+
+/**
  * Controlador para obtener las actividades de un parque específico
  */
 export async function getParkActivities(req: Request, res: Response) {

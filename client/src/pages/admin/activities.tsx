@@ -441,7 +441,7 @@ const AdminActivities = () => {
         const text = e.target?.result as string;
         console.log('📄 Contenido del archivo CSV (primeros 500 caracteres):', text.substring(0, 500));
         
-        const lines = text.split('\n').filter(line => line.trim());
+        const lines = (text || '').toString().split('\n').filter(line => line.trim());
         
         if (lines.length < 2) {
           throw new Error('El archivo debe contener al menos una fila de datos además del encabezado.');
@@ -546,7 +546,7 @@ const AdminActivities = () => {
               case 'fechainicio':
                 // Convertir "16/09/25" a "2025-09-16" formato ISO
                 if (value) {
-                  const [day, month, year] = value.split('/');
+                  const [day, month, year] = (value?.toString() || '').split('/');
                   const fullYear = year.length === 2 ? `20${year}` : year;
                   activityData.startDate = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`).toISOString();
                   console.log(`📅 Fecha inicio convertida: "${value}" -> "${activityData.startDate}"`);
@@ -557,7 +557,7 @@ const AdminActivities = () => {
               case 'fechafin':
                 // Convertir "16/09/25" a "2025-09-16" formato ISO
                 if (value) {
-                  const [day, month, year] = value.split('/');
+                  const [day, month, year] = (value?.toString() || '').split('/');
                   const fullYear = year.length === 2 ? `20${year}` : year;
                   activityData.endDate = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`).toISOString();
                   console.log(`📅 Fecha fin convertida: "${value}" -> "${activityData.endDate}"`);
@@ -606,14 +606,14 @@ const AdminActivities = () => {
                 break;
               case 'díasrecurrentes':
               case 'diasrecurrentes':
-                activityData.recurringDays = value ? value.split(';').filter(d => d.trim()) : [];
+                activityData.recurringDays = value ? (value.toString() || '').split(';').filter(d => d.trim()) : [];
                 break;
               case 'mercadoobjetivo':
                 if (value && value.trim()) {
                   // Si contiene ';' dividir, sino crear array con un elemento
-                  activityData.targetMarket = value.includes(';') 
-                    ? value.split(';').filter(t => t.trim()) 
-                    : [value.trim()];
+                  activityData.targetMarket = value.includes(';')
+                  ? value.toString().split(';').filter(t => t.trim())
+                  : [value.trim()];
                   console.log(`🎯 Mercado objetivo: ${JSON.stringify(activityData.targetMarket)}`);
                 } else {
                   activityData.targetMarket = [];
@@ -622,9 +622,9 @@ const AdminActivities = () => {
               case 'necesidadesespeciales':
                 if (value && value.trim()) {
                   // Si contiene ';' dividir, sino crear array con un elemento
-                  activityData.specialNeeds = value.includes(';') 
-                    ? value.split(';').filter(n => n.trim()) 
-                    : [value.trim()];
+                  activityData.specialNeeds = value.includes(';')
+                  ? value.toString().split(';').filter(n => n.trim())
+                  : [value.trim()];
                   console.log(`♿ Necesidades especiales: ${JSON.stringify(activityData.specialNeeds)}`);
                 } else {
                   activityData.specialNeeds = [];

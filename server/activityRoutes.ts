@@ -188,6 +188,7 @@ activityRouter.get("/activities/:id", async (req: Request, res: Response) => {
                a.discount_disability as "discountDisability",
                a.discount_early_bird as "discountEarlyBird",
                a.discount_early_bird_deadline as "discountEarlyBirdDeadline",
+               a.image_url as "imageUrl",
                p.name as "parkName", i.first_name || ' ' || i.last_name as "instructorName"
            FROM activities a
            LEFT JOIN parks p ON a.park_id = p.id

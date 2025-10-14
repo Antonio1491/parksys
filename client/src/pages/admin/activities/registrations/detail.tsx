@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRoute, useLocation } from 'wouter';
+import ROUTES from '@/routes'
 import AdminLayout from '@/components/AdminLayout';
+import { ReturnHeader } from '@/components/ui/return-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -112,6 +114,69 @@ const ActivityRegistrationDetail = () => {
   });
 
   const registrations = registrationsData?.registrations || [];
+
+  React.useEffect(() => {
+    if (activity) {
+      console.log('🎯 Activity completa:', activity);
+      console.log('📸 ImageURL específico:', activity.imageUrl);
+      console.log('🔑 Todas las keys del objeto:', Object.keys(activity));
+    }
+  }, [activity]);
+  
+  // Mutación para eliminar
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/activity-registrations/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error al eliminar inscripción');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Inscripción eliminada',
+        description: 'La inscripción ha sido eliminada correctamente.'
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/activity-registrations/activity/${activityId}`] });
+      setIsDeleteDialogOpen(false);
+      setRegistrationToDelete(null);
+    },
+    onError: () => {
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar la inscripción.',
+        variant: 'destructive'
+      });
+    }
+  });
+
+  // Mutación para cambiar estado
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: 'approved' | 'rejected' }) => {
+      const response = await fetch(`/api/activity-registrations/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) throw new Error('Error al actualizar estado');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Estado actualizado",
+        description: "El estado de la inscripción ha sido actualizado."
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/activity-registrations/activity/${activityId}`] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Hubo un problema al actualizar el estado.",
+        variant: "destructive"
+      });
+    }
+  });
+  
   // Filtrar inscripciones
   const filteredRegistrations = registrations.filter((reg: ActivityRegistration) => {
     const matchesSearch = searchTerm === '' || 
@@ -139,59 +204,7 @@ const ActivityRegistrationDetail = () => {
   
   // Calcular estadísticas
   const stats = React.useMemo(() => {
-    // Mutación para cambiar estado
-    const statusMutation = useMutation({
-      mutationFn: async ({ id, status }: { id: number; status: 'approved' | 'rejected' }) => {
-        const response = await fetch(`/api/activity-registrations/${id}/status`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status })
-        });
-        if (!response.ok) throw new Error('Error al actualizar estado');
-        return response.json();
-      },
-      onSuccess: () => {
-        toast({
-          title: "Estado actualizado",
-          description: "El estado de la inscripción ha sido actualizado."
-        });
-        queryClient.invalidateQueries({ queryKey: [`/api/activity-registrations/activity/${activityId}`] });
-      },
-      onError: () => {
-        toast({
-          title: "Error",
-          description: "Hubo un problema al actualizar el estado.",
-          variant: "destructive"
-        });
-      }
-    });
 
-    // Mutación para eliminar
-    const deleteMutation = useMutation({
-      mutationFn: async (id: number) => {
-        const response = await fetch(`/api/activity-registrations/${id}`, {
-          method: 'DELETE'
-        });
-        if (!response.ok) throw new Error('Error al eliminar inscripción');
-        return response.json();
-      },
-      onSuccess: () => {
-        toast({
-          title: 'Inscripción eliminada',
-          description: 'La inscripción ha sido eliminada correctamente.'
-        });
-        queryClient.invalidateQueries({ queryKey: [`/api/activity-registrations/activity/${activityId}`] });
-        setIsDeleteDialogOpen(false);
-        setRegistrationToDelete(null);
-      },
-      onError: () => {
-        toast({
-          title: 'Error',
-          description: 'No se pudo eliminar la inscripción.',
-          variant: 'destructive'
-        });
-      }
-    });
     const getStatusBadge = (status: string) => {
       switch (status) {
         case 'approved':
@@ -275,13 +288,13 @@ const ActivityRegistrationDetail = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-0">
         {/* Header con botón volver */}
-        <div className="bg-[#00a587] text-white p-6 rounded-t-lg">
+
+        <div className="bg-header-background text-white justify-between px-2 py-1 -mx-4 -mt-4">
           <Button
-            variant="ghost"
             onClick={() => setLocation('/admin/activities/registrations')}
-            className="text-white hover:bg-white/20 mb-4 flex items-center gap-2"
+            className="text-white bg-header-background hover:bg-header-background hover:text-[] flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver a Gestión de Inscripciones
@@ -289,10 +302,10 @@ const ActivityRegistrationDetail = () => {
         </div>
 
         {/* Hero Section con imagen y título */}
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white p-8 -mx-4">
           <div className="flex items-start gap-6">
             {/* Imagen placeholder */}
-            <div className="w-64 h-48 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex-shrink-0 overflow-hidden">
+            <div className="w-80 aspect-[21/9] rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
               {activity.imageUrl ? (
                 <img 
                   src={activity.imageUrl} 
@@ -307,8 +320,8 @@ const ActivityRegistrationDetail = () => {
             </div>
 
             {/* Información de la actividad */}
-            <div className="flex-1 space-y-4">
-              <h1 className="text-3xl font-bold text-gray-900">{activity.title}</h1>
+            <div className="flex-1 space-y-4 mt-6">
+              <h1 className="text-3xl font-bold text-[#00444f]">{activity.title}</h1>
 
               <div className="flex flex-wrap gap-6 text-gray-700">
                 <div className="flex items-center gap-2">
