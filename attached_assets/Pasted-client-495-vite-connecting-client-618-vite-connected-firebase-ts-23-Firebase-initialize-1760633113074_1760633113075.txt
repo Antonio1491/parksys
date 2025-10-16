@@ -1,0 +1,34 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+firebase.ts:23 🔥 Firebase initialized successfully
+i18next.js?v=3eba499a:208 i18next::backendConnector: loaded namespace common for language es {admin: {…}, nav: {…}, return: {…}, navigation: {…}, actions: {…}, …}
+i18next.js?v=3eba499a:208 i18next: languageChanged es
+i18next.js?v=3eba499a:208 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: 'common', fallbackLng: Array(1), …}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:330 🌐 [QUERY] GET /api/instructors
+queryClient.ts:330 🌐 [QUERY] GET /api/roles/1/permissions
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/CHJYA3H9cMUslOBuxMbG7nkLxsE3
+queryClient.ts:330 🌐 [QUERY] GET /api/notifications/count
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+client:223 [vite] hot updated: /src/pages/admin/park-view.tsx
+client:223 [vite] hot updated: /src/index.css?v=gs6dwFpY8ahKj0e3fZ6pL

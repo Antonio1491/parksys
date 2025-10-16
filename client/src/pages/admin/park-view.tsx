@@ -1338,10 +1338,10 @@ export default function AdminParkView() {
           
           <div>
             <h1 className="text-3xl font-bold text-[#00444f] mt-4">{displayPark.name}</h1>
-            <p className="text-gray-600 flex items-center gap-14 mt-8">
+            <p className="text-gray-600 flex items-start gap-14 mt-8">
               {/* Dirección */}
-              <div className="flex items-center gap-3">
-                <div className="p-2">
+              <div className="flex items-start gap-3">
+                <div className="p-2 border-2 border-[#00444f] rounded-full">
                   <MapPin className="h-5 w-5 text-[#00444f]" />
                 </div>
                 <div>
