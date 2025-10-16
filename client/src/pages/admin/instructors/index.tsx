@@ -102,15 +102,10 @@ export default function InstructorsListPage() {
   const { data: instructors = [], isLoading, isError, refetch } = useQuery<Instructor[]>({
     queryKey: ['/api/instructors'],
     retry: 1,
-    enabled: true, // Hacemos la consulta automáticamente
+    enabled: true,
   });
 
-  // Debug logs
-  console.log('🎯 Instructores data:', instructors);
-  console.log('🔄 isLoading:', isLoading);
-  console.log('❌ isError:', isError);
-  console.log('📊 Array.isArray:', Array.isArray(instructors));
-  console.log('📏 Length:', instructors?.length);
+  console.log('[INSTRUCTORS] Data:', instructors, 'Loading:', isLoading, 'Error:', isError);
 
   // Mutación para eliminar un instructor individual
   const deleteInstructorMutation = useMutation({
@@ -170,15 +165,9 @@ export default function InstructorsListPage() {
 
   // Filtrar instructores según criterios de búsqueda
   const filteredInstructors = React.useMemo(() => {
-    console.log('🔍 [FILTER] instructors:', instructors);
-    console.log('🔍 [FILTER] is array?:', Array.isArray(instructors));
+    if (!Array.isArray(instructors)) return [];
     
-    if (!Array.isArray(instructors)) {
-      console.log('❌ [FILTER] instructors no es array, retornando []');
-      return [];
-    }
-    
-    const filtered = instructors.filter((instructor: Instructor) => {
+    return instructors.filter((instructor: Instructor) => {
       // Filtro por término de búsqueda (nombre o email)
       const matchesSearch = searchTerm === '' || 
         `${instructor.firstName} ${instructor.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -193,9 +182,6 @@ export default function InstructorsListPage() {
       
       return matchesSearch && matchesStatus && matchesSpecialty;
     });
-    
-    console.log('✅ [FILTER] filteredInstructors:', filtered.length, 'de', instructors.length);
-    return filtered;
   }, [instructors, searchTerm, filterStatus, filterSpecialty]);
 
   // Calcular instructores paginados
