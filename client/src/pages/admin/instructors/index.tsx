@@ -105,8 +105,6 @@ export default function InstructorsListPage() {
     enabled: true,
   });
 
-  console.log('[INSTRUCTORS] Data:', instructors, 'Loading:', isLoading, 'Error:', isError);
-
   // Mutación para eliminar un instructor individual
   const deleteInstructorMutation = useMutation({
     mutationFn: async (instructorId: number) => {
@@ -543,7 +541,7 @@ export default function InstructorsListPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedInstructors.map((instructor: Instructor) => (
+                  {paginatedInstructors?.map((instructor: Instructor) => (
                     <TableRow key={instructor.id}>
                       <TableCell className="font-medium">
                         {instructor.firstName} {instructor.lastName}
