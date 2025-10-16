@@ -45,7 +45,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  TrendingUp
+  TrendingUp,
+  PersonStanding,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -289,23 +290,26 @@ const ActivityRegistrationDetail = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-0">
         {/* Header con botón volver */}
-
-        <div className="bg-header-background text-white justify-between px-2 py-1 -mx-4 -mt-4">
-          <Button
-            onClick={() => setLocation('/admin/activities/registrations')}
-            className="text-white bg-header-background hover:bg-header-background hover:text-[] flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Volver a Gestión de Inscripciones
-          </Button>
-        </div>
-
+        <ReturnHeader />
+      <div className="space-y-4">
         {/* Hero Section con imagen y título */}
-        <div className="bg-white p-8 -mx-4">
+        <div className="bg-white p-8 -mx-6 relative">
+          
+          {/* Botón Exportar - Flotante en esquina superior derecha */}
+          <div className="absolute top-12 right-12 z-10">
+            <Button 
+              onClick={exportToCSV} 
+              className="bg-[#00444f] hover:bg-[#00a587] text-white"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </Button>
+          </div>
+
+          {/* Layout en columnas: Imagen | Información */}
           <div className="flex items-start gap-6">
-            {/* Imagen placeholder */}
+            {/* Columna 1: Imagen */}
             <div className="w-80 aspect-[21/9] rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
               {activity.imageUrl ? (
                 <img 
@@ -320,34 +324,23 @@ const ActivityRegistrationDetail = () => {
               )}
             </div>
 
-            {/* Información de la actividad */}
-            <div className="flex-1 space-y-4 mt-6">
-              <h1 className="text-3xl font-bold text-[#00444f]">{activity.title}</h1>
+            {/* Columna 2: Información */}
+            <div className="flex-1 space-y-4 mt-4">
+              <h1 className="text-3xl font-bold font-poppins text-[#00444f]">{activity.title}</h1>
 
-              <div className="flex flex-wrap gap-6 text-gray-700">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap gap-6 text-[#00444f]">
+                <div className="flex items-center gap-2 font-poppins">
                   <MapPin className="h-5 w-5 text-[#00a587]" />
                   <span>{activity.parkName || 'Sin parque'}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 font-poppins">
                   <Calendar className="h-5 w-5 text-[#00a587]" />
                   <span>{format(new Date(activity.startDate), 'dd/MM/yyyy', { locale: es })}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 font-poppins">
                   <Clock className="h-5 w-5 text-[#00a587]" />
                   <span>{activity.startTime}</span>
                 </div>
-              </div>
-
-              {/* Botón exportar */}
-              <div className="pt-4">
-                <Button 
-                  onClick={exportToCSV} 
-                  className="bg-[#00444f] hover:bg-[#00a587] text-white"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Exportar
-                </Button>
               </div>
             </div>
           </div>
@@ -356,39 +349,41 @@ const ActivityRegistrationDetail = () => {
         {/* Cards de estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Capacidad Total */}
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-0">
+          <Card className="bg-[#ceefea] font-poppins border-0 h-32">
             <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-sm text-gray-700 mb-1">Capacidad total</p>
-                  <p className="text-4xl font-bold text-gray-900">{stats.capacity}</p>
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-600">Registros</p>
-                    <div className="w-full bg-gray-300 rounded-full h-2 mt-1">
+                  <div className="flex items-end gap-6">
+                  <p className="text-sm font-poppins text-gray-700 font-semibold">Capacidad total</p>
+                  <p className="text-2xl font-bold text-[#00444f]">{stats.capacity}</p>
+                  </div>
+                  <div className="mt-4">
+                    <p className="text-xs text-gray-700 font-poppins font-semibold">Registros</p>
+                    <div className="w-full bg-[#00444f] rounded-full h-3 mt-1">
                       <div 
-                        className="bg-[#00444f] h-2 rounded-full transition-all duration-300"
+                        className="bg-[#00a587] h-2 rounded-full transition-all duration-300"
                         style={{ width: `${stats.registrationPercentage}%` }}
                       ></div>
                     </div>
                   </div>
                 </div>
-                <div className="bg-[#00444f] p-3 rounded-full">
-                  <Target className="h-6 w-6 text-white" />
+                <div className="bg-[#00a587] p-2 rounded-full">
+                  <PersonStanding className="h-4 w-4 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Registros disponibles */}
-          <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-0">
+          <Card className="bg-[#ceefea] font-poppins border-0 h-32">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-sm text-gray-700 mb-1">Registros disponibles</p>
-                  <p className="text-4xl font-bold text-gray-900">{stats.availableSlots}</p>
+                  <p className="text-sm text-gray-700 font-semibold mt-4 mb-5">Registros disponibles</p>
+                  <p className="text-2xl font-bold text-[#00444f]">{stats.availableSlots}</p>
                 </div>
-                <div className="bg-[#00a587] p-3 rounded-full">
-                  <Target className="h-6 w-6 text-white" />
+                <div className="bg-[#00a587] p-2 rounded-full">
+                  <Target className="h-4 w-4 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -396,27 +391,29 @@ const ActivityRegistrationDetail = () => {
 
           {/* Ingreso Total */}
           {!stats.isFree && (
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-0">
+            <Card className="bg-[#ceefea] font-poppins border-0 h-32">
               <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="text-sm text-gray-700 mb-1">Ingreso total</p>
-                    <p className="text-4xl font-bold text-gray-900">{stats.totalRevenue.toLocaleString()}</p>
-                    <div className="mt-2">
-                      <p className="text-xs text-gray-600 flex items-center gap-1">
+                    <div className="flex items-end gap-6">
+                    <p className="text-sm text-gray-700 font-semibold">Ingreso total</p>
+                    <p className="text-2xl font-bold text-[#00444f]">{stats.totalRevenue.toLocaleString()}</p>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-xs text-gray-700 flex items-center gap-1">
                         <Percent className="h-3 w-3" />
                         {stats.revenuePercentage.toFixed(0)}%
                       </p>
-                      <div className="w-full bg-gray-300 rounded-full h-2 mt-1">
+                      <div className="w-full bg-[#00444f] rounded-full h-3 mt-1">
                         <div 
-                          className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-[#00a587] h-2 rounded-full transition-all duration-300"
                           style={{ width: `${stats.revenuePercentage}%` }}
                         ></div>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-green-600 p-3 rounded-full">
-                    <DollarSign className="h-6 w-6 text-white" />
+                  <div className="bg-[#00a587] p-2 rounded-full">
+                    <DollarSign className="h-4 w-4 text-white" />
                   </div>
                 </div>
               </CardContent>
@@ -424,20 +421,20 @@ const ActivityRegistrationDetail = () => {
           )}
 
           {/* Inscripción / Ingreso Actual */}
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-0">
+          <Card className="bg-[#ceefea] font-poppins border-0 h-32">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-sm text-gray-700 mb-1">{stats.isFree ? 'Inscripción' : 'Ingreso actual'}</p>
-                  <p className="text-4xl font-bold text-gray-900">
+                  <p className="text-sm text-gray-700 font-semibold mt-4 mb-5">{stats.isFree ? 'Inscripción' : 'Ingreso actual'}</p>
+                  <p className="text-2xl font-bold text-[#00444f]">
                     {stats.isFree ? stats.totalRegistrations : stats.currentRevenue.toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-purple-600 p-3 rounded-full">
+                <div className="bg-[#00a587] p-2 rounded-full">
                   {stats.isFree ? (
-                    <TrendingUp className="h-6 w-6 text-white" />
+                    <TrendingUp className="h-4 w-4 text-white" />
                   ) : (
-                    <DollarSign className="h-6 w-6 text-white" />
+                    <DollarSign className="h-4 w-4 text-white" />
                   )}
                 </div>
               </div>
@@ -458,18 +455,6 @@ const ActivityRegistrationDetail = () => {
                   className="pl-10"
                 />
               </div>
-
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los estados</SelectItem>
-                  <SelectItem value="pending">Pendientes</SelectItem>
-                  <SelectItem value="approved">Aprobadas</SelectItem>
-                  <SelectItem value="rejected">Rechazadas</SelectItem>
-                </SelectContent>
-              </Select>
 
               <div className="flex items-center gap-2 ml-auto">
                 <Button variant="outline" size="sm" className="h-10 w-10 p-0">
@@ -494,7 +479,6 @@ const ActivityRegistrationDetail = () => {
                   <TableHead>Participante</TableHead>
                   <TableHead>Contacto</TableHead>
                   <TableHead>Fecha de Inscripción</TableHead>
-                  <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>

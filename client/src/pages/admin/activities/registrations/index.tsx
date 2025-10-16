@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import ROUTES from '@/routes';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -247,7 +248,7 @@ const ActivityRegistrationsPage = () => {
   // Función para navegar al detalle de inscripciones
   const handleActivityClick = (activityId: number) => {
     if (selectionMode) return; // No navegar si está en modo selección
-    setLocation(`/admin/activities/registrations/${activityId}`);
+    setLocation(ROUTES.admin.activities.registrationDetail.build(activityId));
   };
   
   // Funciones para manejo de selección múltiple de actividades

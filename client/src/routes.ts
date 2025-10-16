@@ -1,5 +1,7 @@
 // src/routes.ts
 
+import { create } from "domain";
+
 /**
  * Sistema centralizado de rutas de ParkSys
  * Crear y editar en páginas independientes, vista detallada en modal (excepto parques)
@@ -116,8 +118,14 @@ export const DASHBOARD_ROUTES = {
 export const ADMIN_PARKS = {
   list: '/admin/parks',
   create: '/admin/parks/new',
-  view: (id: string | number) => `/admin/parks/${id}/view`,
-  edit: (id: string | number) => `/admin/parks/${id}/edit`,
+  view: {
+    path: '/admin/parks/:id/view',
+    build: (id: string | number) => `/admin/parks/${id}/view`,
+  },
+  edit: {
+    path: '/admin/parks/:id/edit',
+    build: (id: string | number) => `/admin/parks/${id}/edit`,
+  },
 } as const;
 
 // ============================================
@@ -125,26 +133,41 @@ export const ADMIN_PARKS = {
 // ============================================
 
 export const ADMIN_ACTIVITIES = {
-  catalog: '/admin/activities/catalog',
+  list: '/admin/activities/catalog',
   create: '/admin/activities/new',
-  edit: (id: string | number) => `/admin/activities/${id}/edit`,
+  view: {
+    path: '/admin/activities/:id/view',
+    build: (id: string | number) => `/admin/activities/${id}/view`,
+  },
+  edit: {
+    path: '/admin/activities/:id/edit',
+    build: (id: string | number) => `/admin/activities/${id}/edit`,
+  },
   calendar: '/admin/activities/calendar',
   registrations: '/admin/activities/registrations',
-  registrationDetail: (id: string | number) => `/admin/activities/registrations/${id}`,
-  
-  // Categorías
+  registrationDetail: {
+    path: '/admin/activities/registrations/:id',
+    build: (id: string | number) => `/admin/activities/registrations/${id}`,
+  },
   categories: {
     list: '/admin/activities/categories',
-    // Creación y edición nuevas
     create: '/admin/activities/categories/new',
-    edit: (id: string | number) => `/admin/activities/categories/${id}/edit`,
+    edit: {
+      path: '/admin/activities/categories/:id/edit',
+      build: (id: string | number) => `/admin/activities/categories/${id}/edit`,
+    },
   },
-  
-  // Instructores
   instructors: {
     list: '/admin/activities/instructors',
     create: '/admin/activities/instructors/new',
-    edit: (id: string | number) => `/admin/activities/instructors/${id}/edit`,
+    view: {
+      path: '/admin/activities/instructors/:id/view',
+      build: (id: string | number) => `/admin/activities/instructors/${id}/view`,
+    },
+    edit: {
+      path: '/admin/activities/instructors/:id/edit',
+      build: (id: string | number) => `/admin/activities/instructors/${id}/edit`,
+    },
   },
 } as const;
 
@@ -156,7 +179,10 @@ export const ADMIN_AMENITIES = {
   list: '/admin/amenities',
   // Creación y edición nuevas
   create: '/admin/amenities/new',
-  edit: (id: string | number) => `/admin/amenities/${id}/edit`,
+  edit: {
+    path: '/admin/amenities/:id/edit',
+    build: (id: string | number) => `/admin/amenities/${id}/edit`,
+  },
 } as const;
 
 // ============================================
@@ -171,7 +197,7 @@ export const ADMIN_TREES = {
   
   // Catálogo de especies
   species: {
-    catalog: '/admin/trees/species',
+    list: '/admin/trees/species',
     create: '/admin/trees/species/new',
     edit: (id: string | number) => `/admin/trees/species/${id}/edit`,
   },
@@ -227,7 +253,7 @@ export const ADMIN_EVENTS = {
   categories: {
     list: '/admin/events/categories',
     // Creación y edición nuevas
-    new: '/admin/events/categories/new',
+    create: '/admin/events/categories/new',
     edit: (id: string | number) => `/admin/events/categories/${id}/edit`,
   },
 } as const;
@@ -380,7 +406,7 @@ export const ADMIN_WAREHOUSE = {
 
 export const ADMIN_VOLUNTEERS = {
   list: '/admin/volunteers/list',
-  register: '/admin/volunteers/register',
+  create: '/admin/volunteers/register',
   edit: (id: string | number) => `/admin/volunteers/edit/${id}`,
   
   // Participaciones - no implementada
@@ -458,7 +484,7 @@ export const ADMIN_ACCOUNTING = {
 
 export const ADMIN_CONCESSIONS = {
   // Catálogo
-  catalog: '/admin/concessions/catalog',
+  list: '/admin/concessions/catalog',
   // Creación y edición nuevas
   create: '/admin/concessions/catalog/new',
   edit: (id: string | number) => `/admin/concessions/catalog/${id}/edit`,
@@ -693,6 +719,7 @@ export const ADMIN_SETTINGS = {
   users: {
     list: '/admin/configuracion-seguridad/access/users',
     // Nueva página para editar usuario
+    create: '/admin/configuracion-seguridad/access/users/new',
     edit: (id: string | number) => `/admin/configuracion-seguridad/access/users/${id}/edit`,
   },
 

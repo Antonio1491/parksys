@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, Link } from "wouter";
+import ROUTES from '@/routes';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,7 @@ import ParkIncidentsInventory from "@/components/ParkIncidentsInventory";
 import ParkVolunteersInventory from "@/components/ParkVolunteersInventory";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ReturnHeader } from "@/components/ui/return-header";
 
 // Esquema para agregar amenidad a parque
 const addAmenitySchema = z.object({
@@ -654,6 +656,9 @@ export default function AdminParkView() {
   const [viewingAmenity, setViewingAmenity] = React.useState<any>(null);
   const [refreshKey, setRefreshKey] = React.useState(0);
   
+  // Agregar junto a los otros estados
+  const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
+  
   // Estados para modal de mapa de activos
   const [isAssetMapModalOpen, setIsAssetMapModalOpen] = React.useState(false);
   const [selectedAsset, setSelectedAsset] = React.useState<any>(null);
@@ -823,162 +828,655 @@ export default function AdminParkView() {
     return variants[status.toLowerCase()] || "secondary";
   };
 
-  return (
-    <AdminLayout>
-      <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/parks">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{displayPark.name}</h1>
-            <p className="text-gray-600 flex items-center gap-2 mt-1">
-              <MapPin className="h-4 w-4" />
-              {displayPark.address || displayPark.location} • {displayPark.municipality?.name || 'Municipio no encontrado'}
-            </p>
+  // Función para exportar a CSV (Opción B)
+  const exportToCSV = () => {
+    if (!park) {
+      toast({
+        title: "Error",
+        description: "No hay datos del parque para exportar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Preparar los datos del parque
+    const csvData = [
+      ['Campo', 'Valor'],
+      ['=== INFORMACIÓN BÁSICA ===', ''],
+      ['Nombre del Parque', park.name || ''],
+      ['Municipio', park.municipality?.name || ''],
+      ['Ubicación', park.location || ''],
+      ['Dirección', park.address || ''],
+      ['Tipo de Parque', park.parkType || ''],
+      ['Código Postal', park.postalCode || ''],
+      ['Latitud', park.latitude?.toString() || ''],
+      ['Longitud', park.longitude?.toString() || ''],
+      ['Área Total (m²)', park.area?.toString() || ''],
+      ['Área Verde', park.greenArea || ''],
+      ['Año de Fundación', park.foundationYear?.toString() || ''],
+      ['Administrador', park.administrator || ''],
+      ['Estado de Conservación', park.conservationStatus || ''],
+      ['Email de Contacto', park.contactEmail || ''],
+      ['Teléfono de Contacto', park.contactPhone || ''],
+      ['Descripción', park.description || ''],
+      ['', ''],
+      ['=== ESTADÍSTICAS ===', ''],
+      ['Total de Actividades', park.stats?.totalActivities?.toString() || '0'],
+      ['Total de Árboles', park.stats?.totalTrees?.toString() || '0'],
+      ['Evaluación Promedio', park.stats?.averageEvaluation?.toFixed(2) || '0.0'],
+      ['Total de Eventos', park.stats?.totalEvents?.toString() || '0'],
+      ['Incidencias Pendientes', park.stats?.pendingIncidents?.toString() || '0'],
+      ['Número de Certificaciones', park.certificaciones ? park.certificaciones.split(',').filter(c => c.trim()).length.toString() : '0'],
+      ['Concesiones Activas', park.stats?.activeConcessions?.toString() || '0'],
+      ['Voluntarios Activos', park.stats?.activeVolunteers?.toString() || '0'],
+      ['Total de Evaluaciones', park.stats?.totalEvaluations?.toString() || '0'],
+      ['Total de Reservas', park.stats?.totalReservations?.toString() || '0'],
+      ['Total de Retroalimentación', park.stats?.totalFeedback?.toString() || '0'],
+    ];
+
+    // Convertir a formato CSV
+    const csvContent = csvData.map(row => 
+      row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
+    // Crear el blob y descargar
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `parque_${park.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    setIsExportModalOpen(false);
+    toast({
+      title: "✅ Exportación exitosa",
+      description: `Los datos del parque "${park.name}" se han exportado en formato CSV.`,
+    });
+  };
+
+  // Función para exportar a PDF (Opción C - Reporte completo)
+  const exportToPDF = () => {
+    if (!park) {
+      toast({
+        title: "Error",
+        description: "No hay datos del parque para exportar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Crear una ventana con el contenido para imprimir
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({
+        title: "Error",
+        description: "No se pudo abrir la ventana de impresión. Verifica los permisos del navegador.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Preparar certificaciones
+    const certifications = park.certificaciones 
+      ? park.certificaciones.split(',').filter(cert => cert.trim().length > 0).map(cert => cert.trim())
+      : [];
+
+    // Crear el HTML del documento
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Ficha del Parque - ${park.name}</title>
+        <style>
+          @media print {
+            @page { margin: 2cm; }
+            body { margin: 0; }
+          }
+
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+
+          .header {
+            text-align: center;
+            border-bottom: 3px solid #00a587;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+
+          .header h1 {
+            color: #00444f;
+            margin: 0;
+            font-size: 32px;
+          }
+
+          .header p {
+            color: #666;
+            margin: 5px 0;
+          }
+
+          .section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+          }
+
+          .section-title {
+            background: #ceefea;
+            color: #00444f;
+            padding: 10px 15px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-left: 5px solid #00a587;
+          }
+
+          .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+          }
+
+          .info-item {
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+          }
+
+          .info-label {
+            font-weight: bold;
+            color: #00444f;
+            font-size: 14px;
+          }
+
+          .info-value {
+            color: #555;
+            font-size: 14px;
+            margin-top: 3px;
+          }
+
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+          }
+
+          .stat-card {
+            background: #f0f8ff;
+            border: 2px solid #00a587;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+          }
+
+          .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00444f;
+            margin: 5px 0;
+          }
+
+          .stat-label {
+            color: #666;
+            font-size: 14px;
+          }
+
+          .list-item {
+            padding: 8px;
+            background: #f9f9f9;
+            margin-bottom: 8px;
+            border-left: 3px solid #00a587;
+            padding-left: 12px;
+          }
+
+          .certification-item {
+            padding: 10px;
+            background: #e8f5e9;
+            margin-bottom: 10px;
+            border-left: 4px solid #4caf50;
+            padding-left: 15px;
+            display: flex;
+            align-items: center;
+          }
+
+          .certification-icon {
+            font-size: 24px;
+            margin-right: 10px;
+          }
+
+          .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+
+          th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+          }
+
+          th {
+            background: #00444f;
+            color: white;
+          }
+
+          tr:hover {
+            background: #f5f5f5;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${park.name}</h1>
+          <p><strong>📍 ${park.address || park.location}</strong></p>
+          <p>${park.municipality?.name || 'Municipio no especificado'}</p>
+          <p style="color: #999; font-size: 12px;">Ficha generada el ${new Date().toLocaleDateString('es-MX', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</p>
+        </div>
+
+        <!-- INFORMACIÓN BÁSICA -->
+        <div class="section">
+          <div class="section-title">📋 Información Básica</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Tipo de Parque</div>
+              <div class="info-value">${park.parkType || 'No especificado'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Municipio</div>
+              <div class="info-value">${park.municipality?.name || 'No especificado'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Código Postal</div>
+              <div class="info-value">${park.postalCode || 'No especificado'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Año de Fundación</div>
+              <div class="info-value">${park.foundationYear || 'No especificado'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Área Total</div>
+              <div class="info-value">${park.area ? park.area + ' m²' : 'No especificada'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Área Verde</div>
+              <div class="info-value">${park.greenArea || 'No especificada'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Coordenadas</div>
+              <div class="info-value">${park.latitude && park.longitude ? `${park.latitude}, ${park.longitude}` : 'No especificadas'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Administrador</div>
+              <div class="info-value">${park.administrator || 'No especificado'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Email de Contacto</div>
+              <div class="info-value">${park.contactEmail || 'No especificado'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Teléfono de Contacto</div>
+              <div class="info-value">${park.contactPhone || 'No especificado'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Estado de Conservación</div>
+              <div class="info-value">${park.conservationStatus || 'No especificado'}</div>
+            </div>
+          </div>
+          ${park.description ? `
+            <div class="info-item">
+              <div class="info-label">Descripción</div>
+              <div class="info-value">${park.description}</div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="section">
+          <div class="section-title">📊 Estadísticas del Parque</div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Actividades</div>
+              <div class="stat-number">${park.stats?.totalActivities || 0}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Árboles</div>
+              <div class="stat-number">${park.stats?.totalTrees || 0}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Evaluación Promedio</div>
+              <div class="stat-number">${park.stats?.averageEvaluation?.toFixed(1) || '0.0'}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Eventos</div>
+              <div class="stat-number">${park.stats?.totalEvents || 0}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Incidencias Pendientes</div>
+              <div class="stat-number">${park.stats?.pendingIncidents || 0}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Certificaciones</div>
+              <div class="stat-number">${certifications.length}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Concesiones Activas</div>
+              <div class="stat-number">${park.stats?.activeConcessions || 0}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Reservas</div>
+              <div class="stat-number">${park.stats?.totalReservations || 0}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Evaluaciones Totales</div>
+              <div class="stat-number">${park.stats?.totalEvaluations || 0}</div>
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Link href={`/admin/parks/${park.id}/manage`}>
-            <Button>Editar</Button>
-          </Link>
+
+        <!-- CERTIFICACIONES -->
+        ${certifications.length > 0 ? `
+        <div class="section">
+          <div class="section-title">🏆 Certificaciones</div>
+          ${certifications.map(cert => `
+            <div class="certification-item">
+              <div class="certification-icon">${cert.toLowerCase().includes('green flag') || cert.toLowerCase().includes('bandera verde') ? '🏅' : '🏆'}</div>
+              <div>
+                <strong>${cert}</strong>
+                ${cert.toLowerCase().includes('green flag') || cert.toLowerCase().includes('bandera verde') ? 
+                  '<div style="font-size: 12px; color: #666;">Certificación Internacional</div>' : ''}
+              </div>
+            </div>
+          `).join('')}
         </div>
-      </div>
+        ` : ''}
 
-      {/* Stats Cards - Reorganized in two rows */}
-      <div className="space-y-4 mb-8">
-        {/* Primera fila - 5 tarjetas principales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-8 w-8 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold">{displayPark.stats?.totalActivities || 0}</p>
-                  <p className="text-sm text-gray-600">Actividades</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <!-- AMENIDADES -->
+        ${park.amenities && park.amenities.length > 0 ? `
+        <div class="section">
+          <div class="section-title">🎯 Amenidades del Parque</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre del Módulo</th>
+                <th>Amenidad</th>
+                <th>Superficie</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${park.amenities.map(amenity => `
+                <tr>
+                  <td>${amenity.moduleName || '-'}</td>
+                  <td>${amenity.name}</td>
+                  <td>${amenity.surfaceArea ? amenity.surfaceArea + ' m²' : '-'}</td>
+                  <td>${amenity.status || 'Activa'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        ` : ''}
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <TreePine className="h-8 w-8 text-emerald-600" />
-                <div>
-                  <p className="text-2xl font-bold">{park.stats?.totalTrees || 0}</p>
-                  <p className="text-sm text-gray-600">Árboles</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <!-- ACTIVIDADES -->
+        ${park.activities && park.activities.length > 0 ? `
+        <div class="section">
+          <div class="section-title">🎨 Actividades Programadas</div>
+          ${park.activities.map(activity => `
+            <div class="list-item">
+              <strong>${activity.title}</strong><br>
+              <span style="font-size: 13px; color: #666;">
+                📅 ${new Date(activity.startDate).toLocaleDateString('es-MX')}
+                ${activity.instructorName ? ` | 👨‍🏫 ${activity.instructorName}` : ''}
+                | 👥 ${activity.participantCount} participantes
+              </span>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Star className="h-8 w-8 text-yellow-600" />
-                <div>
-                  <p className="text-2xl font-bold">{park.stats?.averageEvaluation?.toFixed(1) || '0.0'}</p>
-                  <p className="text-sm text-gray-600">Evaluación</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-8 w-8 text-purple-600" />
-                <div>
-                  <p className="text-2xl font-bold">{park.stats?.totalEvents || 0}</p>
-                  <p className="text-sm text-gray-600">Eventos</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="h-8 w-8 text-red-600" />
-                <div>
-                  <p className="text-2xl font-bold">{park.stats?.pendingIncidents || 0}</p>
-                  <p className="text-sm text-gray-600">Incidencias</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div class="footer">
+          <p><strong>ParkSys</strong> - Sistema Integral de Gestión de Parques Urbanos</p>
+          <p>Este documento es un reporte oficial generado automáticamente</p>
         </div>
 
-        {/* Segunda fila - 4 tarjetas nuevas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() {
+              window.close();
+            }, 100);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+
+    setIsExportModalOpen(false);
+    toast({
+      title: "✅ Generando PDF",
+      description: "Se ha abierto la ventana de impresión. Selecciona 'Guardar como PDF' en tu navegador.",
+    });
+  };
+  
+  return (
+    <AdminLayout>
+      {/* Header con botón volver */}
+      <ReturnHeader />
+      
+      <div className="space-y-4">       
+        
+      {/* Header */}
+      <div className="bg-white p-8 -mx-6 relative">
+        {/* Botones de editar */}
+        <div className="absolute top-12 right-12 z-10">
+          <div className="flex gap-2">
+            <Link href={ROUTES.admin.parks.edit.build(park.id)}>
+              <Button className="bg-[#a0cc4d] hover:bg-[#00a884] text-white hover:text-white"
+                >
+                <Edit className="h-4 w-4 mr-2" />
+                Editar
+              </Button>
+            </Link>
+            <Button 
+              onClick={() => setIsExportModalOpen(true)}
+              className="bg-[#00444f] hover:bg-[#00a587] text-white hover:text-white"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </Button>
+          </div>
+        </div>
+        
+        <div className="flex items-start gap-10">
+
+          <div className="w-80 aspect-[16/10] rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
+            {park.primaryImageUrl ? (
+              <img
+                src={park.primaryImageUrl}
+                alt={`Imagen de ${park.name}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-gray-400 text-sm">Sin imagen</span>
+              </div>
+            )}
+          </div>
+          
+          <div>
+            <h1 className="text-3xl font-bold text-[#00444f] mt-4">{displayPark.name}</h1>
+            <p className="text-gray-600 flex items-center gap-14 mt-8">
+              {/* Dirección */}
               <div className="flex items-center gap-3">
-                <Shield className="h-8 w-8 text-green-600" />
+                <div className="p-2">
+                  <MapPin className="h-5 w-5 text-[#00444f]" />
+                </div>
                 <div>
-                  <p className="text-2xl font-bold">
-                    {park.certificaciones ? park.certificaciones.split(',').filter(cert => cert.trim().length > 0).length : 0}
+                  <p className="text-xs text-gray-500 uppercase font-medium">Dirección</p>
+                  <p className="text-sm text-gray-900 font-medium mt-1">
+                    {displayPark.address || displayPark.location || 'No especificada'}
                   </p>
-                  <p className="text-sm text-gray-600">Certificaciones</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Store className="h-8 w-8 text-orange-600" />
+              {/* Área */}
+              <div className="flex items-start gap-3">
+                <div className="p-2">
+                  <MapIcon className="h-5 w-5 text-[#00444f]" />
+                </div>
                 <div>
-                  <p className="text-2xl font-bold">{park.stats?.activeConcessions || 0}</p>
-                  <p className="text-sm text-gray-600">Concesiones</p>
+                  <p className="text-xs text-gray-500 uppercase font-medium">Área</p>
+                  <p className="text-sm text-gray-900 font-medium mt-1">
+                    {displayPark.area ? `${parseFloat(displayPark.area).toLocaleString()} ha` : 'No especificada'}
+                  </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <MessageSquare className="h-8 w-8 text-cyan-600" />
+              {/* Año de Fundación */}
+              <div className="flex items-start gap-3">
+                <div className="p-2">
+                  <Calendar className="h-5 w-5 text-[#00444f]" />
+                </div>
                 <div>
-                  <p className="text-2xl font-bold">{park.stats?.totalFeedback || 0}</p>
-                  <p className="text-sm text-gray-600">Retroalimentación</p>
+                  <p className="text-xs text-gray-500 uppercase font-medium">Fundación</p>
+                  <p className="text-sm text-gray-900 font-medium mt-1">
+                    {displayPark.foundationYear || 'No especificado'}
+                  </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <ThumbsUp className="h-8 w-8 text-green-600" />
+              {/* Administrador */}
+              <div className="flex items-start gap-3">
+                <div className="p-2">
+                  <Users className="h-5 w-5 text-[#00444f]" />
+                </div>
                 <div>
-                  <p className="text-2xl font-bold">{park.stats?.totalEvaluations || 0}</p>
-                  <p className="text-sm text-gray-600">Evaluaciones</p>
+                  <p className="text-xs text-gray-500 uppercase font-medium">Administrador</p>
+                  <p className="text-sm text-gray-900 font-medium mt-1">
+                    {displayPark.administrator || 'No especificado'}
+                  </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </p>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <CalendarDays className="h-8 w-8 text-indigo-600" />
-                <div>
-                  <p className="text-2xl font-bold">{park.stats?.totalReservations || 0}</p>
-                  <p className="text-sm text-gray-600">Reservas</p>
-                </div>
+            {/* Descripción del parque */}
+            {displayPark.description && (
+              <div className="mt-6">
+                <p className="text-gray-700 leading-relaxed">
+                  {displayPark.description}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </div>
         </div>
       </div>
+        
+      {/* Stats Cards - Reorganized in two rows */}
+        <div className="space-y-4 mb-8">
+          {/* Primera fila - 4 tarjetas principales con diseño actualizado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Evaluación */}
+            <Card className="bg-[#ceefea] border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-[#00444f] rounded-full">
+                    <Star className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 font-medium">Evaluación</p>
+                    <p className="text-3xl font-bold text-[#00444f]">
+                      {park.stats?.averageEvaluation?.toFixed(1) || '0.0'}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reservas */}
+            <Card className="bg-[#ceefea] border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-[#00444f] rounded-full">
+                    <CalendarDays className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 font-medium">Reservas</p>
+                    <p className="text-3xl font-bold text-[#00444f]">
+                      {park.stats?.totalReservations || 0}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Eventos */}
+            <Card className="bg-[#ceefea] border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-[#00444f] rounded-full">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 font-medium">Eventos</p>
+                    <p className="text-3xl font-bold text-[#00444f]">
+                      {park.stats?.totalEvents || 0}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Incidencias */}
+            <Card className="bg-[#ceefea] border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-[#00444f] rounded-full">
+                    <AlertTriangle className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 font-medium">Incidencias</p>
+                    <p className="text-3xl font-bold text-[#00444f]">
+                      {park.stats?.pendingIncidents || 0}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
       {/* Detailed Tabs */}
       <Tabs defaultValue="activities" className="space-y-6">
@@ -1296,6 +1794,74 @@ export default function AdminParkView() {
         </DialogContent>
       </Dialog>
       </div>
+      {/* Modal de Exportación */}
+      <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Exportar Datos del Parque</DialogTitle>
+            <DialogDescription>
+              Selecciona el formato en el que deseas exportar la información de {park?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {/* Opción 1: PDF */}
+            <button
+              onClick={exportToPDF}
+              className="w-full p-4 border-2 border-gray-200 rounded-lg hover:border-[#00a587] hover:bg-[#ceefea] transition-all group"
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+                  <FileText className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Exportar PDF Completo
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Reporte completo con toda la información del parque: datos básicos, estadísticas, certificaciones, amenidades y actividades.
+                  </p>
+                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                    <span className="px-2 py-1 bg-gray-100 rounded">Recomendado</span>
+                    <span>• Formato PDF</span>
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {/* Opción 2: CSV */}
+            <button
+              onClick={exportToCSV}
+              className="w-full p-4 border-2 border-gray-200 rounded-lg hover:border-[#00a587] hover:bg-[#ceefea] transition-all group"
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                  <Download className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Exportar CSV
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Datos básicos y estadísticas del parque en formato CSV. Ideal para análisis en Excel o bases de datos.
+                  </p>
+                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                    <span>Formato CSV</span>
+                    <span>• Compatible con Excel</span>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setIsExportModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

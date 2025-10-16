@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import { ROUTES } from '@/routes';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { PageHeader } from '@/components/ui/page-header';
@@ -302,7 +303,7 @@ export default function ActivitiesCalendarPage() {
             
             <Button
               key="new-activity"
-              onClick={() => setLocation('/admin/organizador/catalogo/crear')}
+              onClick={() => setLocation(ROUTES.admin.activities.create)}
               className="bg-[#a0cc4d] hover:bg-[#00a587] text-white"
             >
               <Plus className="h-4 w-4 mr-2" />

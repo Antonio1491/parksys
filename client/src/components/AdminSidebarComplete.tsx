@@ -3,6 +3,13 @@ import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { SidebarSearch } from './SidebarSearch';
+import { adminSidebarStructure } from '@/config/adminSidebarStructure';
+import { sidebarSubmenus, sidebarMeta } from '@/config/sidebarSubmenus';
+import { sidebarModules } from '@/config/sidebarConfig';
+import {
+  getActiveSubmenuFromLocation,
+  getActiveModuleFromLocation,
+} from '@/utils/sidebarHelpers';
 const parksysLogo = "/parksys-logo-final.png";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -21,26 +28,19 @@ import {
   Gift,
   Tag,
   BarChart3,
-  BarChart,
   Package,
   Shield,
-  User,
-  ListFilter,
-  Workflow,
   Building,
   CreditCard,
   ClipboardCheck,
   Boxes,
-  Box,
   CalendarDays,
-  CircleDollarSign,
   MapPin,
   CalendarClock,
   GraduationCap,
   Award,
   DollarSign,
   TrendingUp,
-  TrendingDown,
   Target,
   ArrowRightLeft,
   Calculator,
@@ -48,61 +48,43 @@ import {
   Handshake,
   Store,
   ListChecks,
-  Clipboard,
-  BadgeCheck,
   LayoutGrid,
-  Flower2,
   FolderOpen,
   FolderTree,
   BookOpen,
-  Scissors,
   TreePine,
-  HardHat,
-  Camera,
-  Heart,
-  AlertCircle,
   Mail,
-  Clock,
   AlertTriangle,
   Database,
-  Lock,
   Leaf,
   HeartHandshake,
-  HandHeart,
-  Star,
   ClipboardList,
-  PersonStanding,
   ChevronRight,
   UserCheck,
-  Activity,
-  Banknote,
-  PieChart,
   Receipt,
-  Wallet,
-  ChevronsUpDown,
-  ChevronDown,
   Wrench,
   Archive,
-  FileEdit,
-  Briefcase,
   UserCog,
-  Zap,
-  Book,
   Plus,
-  Image,
   Scale,
-  Monitor,
   Grid,
-  History,
   Download,
   Upload,
-  Bird,
   PackagePlus,
   Trees,
   List,
   Shovel,
   Binoculars,
+  Star,
 } from 'lucide-react';
+
+// Importaciones de utilidades y configuraciones - comentado temporalmente
+/*
+const [location] = useLocation();
+const activeModule = getActiveModuleFromLocation(location, sidebarModules);
+const activeSubmenu = getActiveSubmenuFromLocation(location, sidebarSubmenus);
+const { t } = useTranslation();
+*/
 
 interface NavItemProps {
   href: string;
@@ -131,6 +113,63 @@ type CollapsibleSubmenuProps = {
   onToggle?: (id: string) => void;
   isActive?: boolean;
 };
+
+// Renderizar módulos y submenús - comentado temporalmente
+
+/*
+{adminSidebarStructure.map(({ moduleKey, labelKey, icon: Icon, submenus }) => (
+  <ModuleNav
+    key={moduleKey}
+    title={t(labelKey)}
+    icon={<Icon className="h-5 w-5" />}
+    value={moduleKey}
+    defaultOpen={activeModule === moduleKey}
+  >
+    {submenus.map(({ id: submenuId, type }) => {
+      const routes = sidebarSubmenus[submenuId];
+      const meta = sidebarMeta[submenuId];
+
+      if (type === 'link') {
+        const href = typeof routes[0] === 'string' ? routes[0] : routes[0](':id');
+        return (
+          <NavItem
+            key={submenuId}
+            href={href}
+            icon={<meta.icon className="h-4 w-4" />}
+            active={activeSubmenu === submenuId}
+          >
+            {t(meta.label)}
+          </NavItem>
+        );
+      }
+
+      return (
+        <CollapsibleSubmenu
+          key={submenuId}
+          id={submenuId}
+          title={t(meta.label)}
+          icon={<meta.icon className="h-4 w-4" />}
+          isActive={activeSubmenu === submenuId}
+          collapsible
+        >
+          {routes.map((route: string | ((id: string | number) => string)) => {
+            const href = typeof route === 'string' ? route : route(':id');
+            return (
+              <NavItem
+                key={href}
+                href={href}
+                icon={<meta.icon className="h-4 w-4" />}
+              >
+                {t(meta.label)}
+              </NavItem>
+            );
+          })}
+        </CollapsibleSubmenu>
+      );
+    })}
+  </ModuleNav>
+))}
+*/
 
 const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleColor }) => {
   const iconWithClass = React.cloneElement(icon as React.ReactElement, {

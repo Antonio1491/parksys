@@ -49,6 +49,21 @@
     "languageSelector": "Select language",
     "globalSearch": "Global Search"
   },
+  "return": {
+    "parks": "Back to Park Management",
+    "activities": "Back to Activity Catalog",
+    "inscriptions": "Back to Registration Management",
+    "categories": "Back to Categories",
+    "instructors": "Back to Instructors",
+    "amenities": "Back to Amenities",
+    "assets": "Back to Assets",
+    "incidents": "Back to Incidents",
+    "warehouse": "Back to Warehouse",
+    "volunteers": "Back to Volunteers",
+    "events": "Back to Events",
+    "spaceReservations": "Back to Space Reservations",
+    "home": "Back to Dashboard"
+},
   "navigation": {
     "dashboard": "Dashboard",
     "parks": "Parks",

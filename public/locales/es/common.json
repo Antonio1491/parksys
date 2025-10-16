@@ -49,6 +49,21 @@
     "languageSelector": "Seleccionar idioma",
     "globalSearch": "Búsqueda global"
   },
+  "return": {
+    "parks": "Volver a Gestión de Parques",
+    "activities": "Volver a Catálogo de Actividades",
+    "inscriptions": "Volver a Gestión de Inscripciones",
+    "categories": "Volver a Categorías",
+    "instructors": "Volver a Instructores",
+    "amenities": "Volver a Amenidades",
+    "assets": "Volver a Activos",
+    "incidents": "Volver a Incidentes",
+    "warehouse": "Volver a Almacén",
+    "volunteers": "Volver a Voluntarios",
+    "events": "Volver a Eventos",
+    "spaceReservations": "Volver a Reservas de Espacios",
+    "home": "Volver al Panel de Control"
+  },
   "navigation": {
     "dashboard": "Panel de Control",
     "parks": "Parques", 

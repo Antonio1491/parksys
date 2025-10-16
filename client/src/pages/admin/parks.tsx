@@ -2,6 +2,7 @@ import React, { useState, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
+import ROUTES from "@/routes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -689,7 +690,7 @@ const AdminParksContent = () => {
                       variant="outline" 
                       size="sm" 
                       className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
-                      onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
+                      onClick={() => setLocation(ROUTES.admin.parks.view.build(park.id))}
                       data-testid={`button-view-park-table-${park.id}`}
                     >
                       <Eye className="h-4 w-4" />
@@ -698,7 +699,7 @@ const AdminParksContent = () => {
                       variant="outline" 
                       size="sm" 
                       className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
-                      onClick={() => setLocation(`/admin/parks/${park.id}/manage`)}
+                      onClick={() => setLocation(ROUTES.admin.parks.edit.build(park.id))}
                       data-testid={`button-edit-park-table-${park.id}`}
                     >
                       <Edit className="h-4 w-4" />
@@ -730,11 +731,11 @@ const AdminParksContent = () => {
           <Card 
             key={park.id} 
             className="hover:shadow-lg hover:border-[#00444f] transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none overflow-hidden"
-            onClick={() => setLocation(`/admin/parks/${park.id}/view`)}
+            onClick={() => setLocation(ROUTES.admin.parks.view.build(park.id))}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                setLocation(`/admin/parks/${park.id}/view`);
+                setLocation(ROUTES.admin.parks.view.build(park.id));
               }
             }}
             role="button"
@@ -811,7 +812,7 @@ const AdminParksContent = () => {
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLocation(`/admin/parks/${park.id}/manage`);
+                      setLocation(ROUTES.admin.parks.edit.build(park.id));
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
                     title="Editar parque"
@@ -867,15 +868,6 @@ const AdminParksContent = () => {
       newSelected.delete(parkId);
     }
     setSelectedParks(newSelected);
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allParkIds = new Set(currentParks.map(park => park.id));
-      setSelectedParks(allParkIds);
-    } else {
-      setSelectedParks(new Set());
-    }
   };
 
   const handleSelectAllParks = () => {
@@ -978,7 +970,7 @@ const AdminParksContent = () => {
           actions={[
             <Button 
               variant="primary" 
-              onClick={() => setLocation("/admin/parks/new")}
+              onClick={() => setLocation(ROUTES.admin.parks.create)}
               data-testid="button-new-park"
             >
               <Plus className="w-4 h-4 mr-2 mr-2 stroke-[4]" />
@@ -986,7 +978,7 @@ const AdminParksContent = () => {
             </Button>,
             <Button 
               variant="secondary" 
-              onClick={() => setLocation("/admin/parks-import")}
+              onClick={() => setLocation("/admin/parks-import")} // Cambiar a modal de importación
               data-testid="button-import-parks"
             >
               <Upload className="h-4 w-4 mr-2" />

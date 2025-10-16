@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from '@/components/ui/table';
@@ -60,7 +61,7 @@ interface Instructor {
   lastName: string;
   email: string;
   phone?: string;
-  specialties?: string[];
+  specialties?: string[] | string;
   experienceYears: number;
   status?: string;
   profileImageUrl?: string;
@@ -68,6 +69,18 @@ interface Instructor {
   preferredParkName?: string;
   rating?: number;
   activitiesCount?: number;
+}
+
+// Helper para normalizar especialidades
+function normalizeSpecialties(raw?: string[] | string): string[] {
+  if (!raw) return [];
+
+  const rawList = Array.isArray(raw) ? raw : [raw];
+
+  return rawList
+    .flatMap((entry) => entry.split(';'))
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 }
 
 export default function InstructorsListPage() {
@@ -86,11 +99,18 @@ export default function InstructorsListPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Obtener datos de instructores
-  const { data: instructors = [], isLoading, isError, refetch } = useQuery({
+  const { data: instructors = [], isLoading, isError, refetch } = useQuery<Instructor[]>({
     queryKey: ['/api/instructors'],
     retry: 1,
     enabled: true, // Hacemos la consulta automáticamente
   });
+
+  // Debug logs
+  console.log('🎯 Instructores data:', instructors);
+  console.log('🔄 isLoading:', isLoading);
+  console.log('❌ isError:', isError);
+  console.log('📊 Array.isArray:', Array.isArray(instructors));
+  console.log('📏 Length:', instructors?.length);
 
   // Mutación para eliminar un instructor individual
   const deleteInstructorMutation = useMutation({
@@ -150,9 +170,15 @@ export default function InstructorsListPage() {
 
   // Filtrar instructores según criterios de búsqueda
   const filteredInstructors = React.useMemo(() => {
-    if (!Array.isArray(instructors)) return [];
+    console.log('🔍 [FILTER] instructors:', instructors);
+    console.log('🔍 [FILTER] is array?:', Array.isArray(instructors));
     
-    return instructors.filter((instructor: Instructor) => {
+    if (!Array.isArray(instructors)) {
+      console.log('❌ [FILTER] instructors no es array, retornando []');
+      return [];
+    }
+    
+    const filtered = instructors.filter((instructor: Instructor) => {
       // Filtro por término de búsqueda (nombre o email)
       const matchesSearch = searchTerm === '' || 
         `${instructor.firstName} ${instructor.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -162,15 +188,14 @@ export default function InstructorsListPage() {
       const matchesStatus = filterStatus === 'all' || instructor.status === filterStatus;
       
       // Filtro por especialidad
-      const matchesSpecialty = filterSpecialty === 'all' || 
-        (instructor.specialties && (
-          Array.isArray(instructor.specialties) 
-            ? instructor.specialties.some(s => s.toLowerCase().includes(filterSpecialty.toLowerCase()))
-            : instructor.specialties.toLowerCase().includes(filterSpecialty.toLowerCase())
-        ));
+      const matchesSpecialty = filterSpecialty === 'all' || normalizeSpecialties(instructor.specialties)
+      .some((s) => s.toLowerCase().includes(filterSpecialty.toLowerCase()));
       
       return matchesSearch && matchesStatus && matchesSpecialty;
     });
+    
+    console.log('✅ [FILTER] filteredInstructors:', filtered.length, 'de', instructors.length);
+    return filtered;
   }, [instructors, searchTerm, filterStatus, filterSpecialty]);
 
   // Calcular instructores paginados
@@ -217,23 +242,16 @@ export default function InstructorsListPage() {
 
   // Lista de especialidades únicas para el filtro
   const specialties = React.useMemo(() => {
-    if (!Array.isArray(instructors) || instructors.length === 0) return [];
-    
+    if (!Array.isArray(instructors)) return [];
+
     const allSpecialties = new Set<string>();
-    instructors.forEach((instructor: Instructor) => {
-      if (instructor.specialties && Array.isArray(instructor.specialties)) {
-        instructor.specialties.forEach((specialty: string) => {
-          allSpecialties.add(specialty.trim());
-        });
-      } else if (instructor.specialties && typeof instructor.specialties === 'string') {
-        // Fallback para datos legacy que puedan estar como string
-        const specialtiesList = instructor.specialties.split(',');
-        specialtiesList.forEach((specialty: string) => {
-          allSpecialties.add(specialty.trim());
-        });
-      }
+
+    instructors.forEach((instructor) => {
+      normalizeSpecialties(instructor.specialties).forEach((s) => {
+        allSpecialties.add(s);
+      });
     });
-    
+
     return Array.from(allSpecialties);
   }, [instructors]);
 
@@ -266,23 +284,25 @@ export default function InstructorsListPage() {
   };
 
   // Renderizar columna de especialidades
-  const renderSpecialties = (specialties?: string[]) => {
-    if (!specialties || !Array.isArray(specialties) || specialties.length === 0) {
+  const renderSpecialties = (specialties?: string[] | string) => {
+    const normalized = normalizeSpecialties(specialties);
+
+    if (normalized.length === 0) {
       return <span className="text-gray-400 italic">No especificado</span>;
     }
 
-    if (specialties.length <= 2) {
-      return specialties.map((specialty, index) => (
+    if (normalized.length <= 2) {
+      return normalized.map((specialty, index) => (
         <Badge key={index} variant="outline" className="mr-1">{specialty}</Badge>
       ));
-    } else {
-      return (
-        <>
-          <Badge variant="outline" className="mr-1">{specialties[0]}</Badge>
-          <Badge variant="outline" className="mr-1">+{specialties.length - 1} más</Badge>
-        </>
-      );
     }
+
+    return (
+      <>
+        <Badge variant="outline" className="mr-1">{normalized[0]}</Badge>
+        <Badge variant="outline" className="mr-1">+{normalized.length - 1} más</Badge>
+      </>
+    );
   };
 
   return (
@@ -350,7 +370,7 @@ export default function InstructorsListPage() {
               <p className="text-gray-600 mt-2">Gestiona la lista de instructores registrados en la plataforma</p>
             </div>
             <div className="flex space-x-2">
-              <Button onClick={() => setLocation('/admin/activities/instructors/new')}>
+              <Button onClick={() => setLocation(ROUTES.admin.activities.instructors.create)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Nuevo Instructor
               </Button>
@@ -563,7 +583,7 @@ export default function InstructorsListPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setLocation(`/admin/instructors/detail/${instructor.id}`)}
+                            onClick={() => setLocation(ROUTES.admin.activities.instructors.view.build(instructor.id))}
                             title="Ver detalles"
                           >
                             <Eye className="h-4 w-4" />
@@ -571,7 +591,7 @@ export default function InstructorsListPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setLocation(`/admin/instructors/edit/${instructor.id}`)}
+                            onClick={() => setLocation(ROUTES.admin.activities.instructors.edit.build(instructor.id))}
                             title="Editar instructor"
                           >
                             <Edit className="h-4 w-4" />

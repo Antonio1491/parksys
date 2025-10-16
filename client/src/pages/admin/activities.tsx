@@ -3,6 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Plus, Pencil, Trash, Search, ChevronLeft, ChevronRight, Calendar, X, Image as ImageIcon, Grid, List, Clock, MapPin, Users, Boxes, Download, Upload, FileText, Brush, CopyCheck, CheckSquare, Square, Trash2 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import AdminLayout from '@/components/AdminLayout';
+import { ROUTES } from '@/routes';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -850,7 +851,7 @@ const AdminActivities = () => {
 
   // Handle edit functionality - redirigir al formulario completo del organizador
   const handleEdit = (activity: any) => {
-    setLocation(`/admin/organizador/catalogo/editar/${activity.id}`);
+    setLocation(ROUTES.admin.activities.edit.build(activity.id));
   };
 
   // Handle delete functionality
@@ -905,7 +906,7 @@ const AdminActivities = () => {
           actions={[
             <Button
               key="nuevo"
-              onClick={() => setLocation('/admin/organizador/catalogo/crear')}
+              onClick={() => setLocation(ROUTES.admin.activities.create)}
               className="bg-[#a0cc4d] hover:bg-[#00a587] text-white hover:text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
