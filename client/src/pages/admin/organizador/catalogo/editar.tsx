@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useLocation, useParams } from 'wouter';
-
+import ROUTES from '@/routes';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +19,8 @@ import { queryClient, apiRequest } from '@/lib/queryClient';
 import { Checkbox } from '@/components/ui/checkbox';
 import LocationSelector from '@/components/LocationSelector';
 import ActivityImageManagerSimple from '@/components/ActivityImageManagerSimple';
-import { Edit, FileText, Image } from 'lucide-react';
+import { Edit, FileText, Image, Boxes, MapPin, Users, Accessibility, Calendar, Package, UserCheck, GraduationCap, Save, NotebookPen, GraduationCapIcon } from 'lucide-react';
+import { ReturnHeader } from '@/components/ui/return-header';
 
 // Días de la semana para actividades recurrentes
 const DIAS_SEMANA = [
@@ -179,12 +180,8 @@ const EditarActividadPage = () => {
   });
   const instructores = Array.isArray(instructoresResponse?.data) ? instructoresResponse.data : [];
 
-
-
-
-
   // Consulta para obtener los datos de la actividad actual
-  const { data: actividad, isLoading: isLoadingActividad } = useQuery({
+  const { data: activity, isLoading: isLoadingActivity } = useQuery({
     queryKey: [`/api/activities/${activityId}`],
     enabled: !!activityId,
   });
@@ -237,8 +234,8 @@ const EditarActividadPage = () => {
 
   // Llenar el formulario cuando se cargan los datos de la actividad
   useEffect(() => {
-    if (actividad) {
-      const data = actividad as any;
+    if (activity) {
+      const data = activity as any;
       // Extraer fecha y hora de inicio
       let startDate = '';
       let startTime = '09:00';
@@ -349,7 +346,7 @@ const EditarActividadPage = () => {
 
       form.reset(formValues);
     }
-  }, [actividad, form]);
+  }, [activity, form]);
 
   // Mutación para actualizar la actividad
   const updateMutation = useMutation({
@@ -447,7 +444,7 @@ const EditarActividadPage = () => {
       queryClient.invalidateQueries({ queryKey: [`/api/activities/${activityId}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/actividades-fotos'] });
       
-      setLocation(`/admin/activities/management`);
+      setLocation(ROUTES.admin.activities.list);
     },
     onError: (error) => {
       console.error('Error al actualizar actividad:', error);
@@ -463,7 +460,7 @@ const EditarActividadPage = () => {
     updateMutation.mutate(values);
   };
 
-  if (isLoadingActividad || isLoadingParques || isLoadingCategorias || isLoadingInstructores) {
+  if (isLoadingActivity || isLoadingParques || isLoadingCategorias || isLoadingInstructores) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -476,7 +473,7 @@ const EditarActividadPage = () => {
     );
   }
 
-  if (!actividad) {
+  if (!activity) {
     return (
       <AdminLayout>
         <div className="container mx-auto px-4 py-8">
@@ -484,7 +481,7 @@ const EditarActividadPage = () => {
             <CardContent className="p-6 text-center">
               <p className="text-red-600">No se encontró la actividad solicitada.</p>
               <Button 
-                onClick={() => setLocation('/admin/organizador/catalogo/ver')} 
+                onClick={() => setLocation(ROUTES.admin.activities.list)} 
                 className="mt-4"
               >
                 Volver al catálogo
@@ -498,74 +495,184 @@ const EditarActividadPage = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Edit className="w-5 h-5" />
-              Editar Actividad
-            </CardTitle>
-            <CardDescription>
-              Modifica los detalles de la actividad seleccionada
-            </CardDescription>
-          </CardHeader>
+    <ReturnHeader />
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header con botón de cancelar y guardar */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-2 border-2 border-[#00444f] rounded-full">
+              <Edit className="h-5 w-5 text-[#00444f]" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-[#00444f]">{activity.title}</h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button 
+              type="submit"
+              disabled={updateMutation.isPending}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {updateMutation.isPending ? "Guardando..." : "Guardar"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLocation(ROUTES.admin.activities.list)}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+        
+        <Tabs defaultValue="informacion" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="informacion" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Información
+            </TabsTrigger>
+            <TabsTrigger value="multimedia" className="flex items-center gap-2">
+              <Image className="h-4 w-4" />
+              Multimedia
+            </TabsTrigger>
+          </TabsList>
           
-          <CardContent>
-            <Tabs defaultValue="informacion" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="informacion" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Información
-                </TabsTrigger>
-                <TabsTrigger value="multimedia" className="flex items-center gap-2">
-                  <Image className="h-4 w-4" />
-                  Multimedia
-                </TabsTrigger>
-              </TabsList>
+          <Card>
+            <CardContent>
               
-              <TabsContent value="informacion" className="space-y-6">
-                <Form {...form}>
-              <form 
-                key={activityId} 
-                onSubmit={form.handleSubmit(onSubmit)} 
-                className="space-y-6"
-              >
-                
-                {/* Sección de Información Básica */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Información Básica</h3>
+                <TabsContent value="informacion" className="space-y-6">
+                  <Form {...form}>
+                <form 
+                  key={activityId} 
+                  onSubmit={form.handleSubmit(onSubmit)} 
+                  className="space-y-6"
+                >
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Sección de Información Básica */}
+                  <div className="space-y-4">
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <FileText className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Información Básica</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem className="md:col-span-2">
+                            <FormLabel>Título *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ej: Yoga en el parque" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+  
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Estado</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value || undefined}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona estado" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {ESTADOS_ACTIVIDAD.map((estado) => (
+                                  <SelectItem key={estado.id} value={estado.id}>
+                                    {estado.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+  
+                    <div className="grid grid-cols-1 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => {
+                          const selectedCategory = Array.isArray(categorias) ? categorias.find((c: any) => c.id.toString() === field.value) : null;
+                          return (
+                            <FormItem>
+                              <FormLabel>Categoría *</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value || undefined}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Selecciona una categoría" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {Array.isArray(categorias) && categorias.map((categoria: any) => (
+                                    <SelectItem key={categoria.id} value={categoria.id.toString()}>
+                                      {categoria.name || categoria.nombre}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    </div>
+  
                     <FormField
                       control={form.control}
-                      name="title"
+                      name="description"
                       render={({ field }) => (
-                        <FormItem className="md:col-span-2">
-                          <FormLabel>Título *</FormLabel>
+                        <FormItem>
+                          <FormLabel>Descripción *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Ej: Yoga en el parque" {...field} />
+                            <Textarea
+                              placeholder="Describe la actividad, qué se hará, objetivos, etc."
+                              className="min-h-[100px]"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
+                  </div>
+  
+                  {/* Sección de Ubicación */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <MapPin className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Ubicación</h3>
+                    </div>
+                    
                     <FormField
                       control={form.control}
-                      name="status"
+                      name="parkId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Estado</FormLabel>
+                          <FormLabel>Parque *</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value || undefined}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Selecciona estado" />
+                                <SelectValue placeholder="Selecciona un parque" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {ESTADOS_ACTIVIDAD.map((estado) => (
-                                <SelectItem key={estado.id} value={estado.id}>
-                                  {estado.label}
+                              {Array.isArray(parques) && parques.map((parque: any) => (
+                                <SelectItem key={parque.id} value={parque.id.toString()}>
+                                  {parque.nombre || parque.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -574,470 +681,144 @@ const EditarActividadPage = () => {
                         </FormItem>
                       )}
                     />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4">
+  
                     <FormField
                       control={form.control}
-                      name="category"
-                      render={({ field }) => {
-                        const selectedCategory = Array.isArray(categorias) ? categorias.find((c: any) => c.id.toString() === field.value) : null;
-                        return (
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ubicación específica</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ej: Área de juegos, Cancha de fútbol, Junto al lago" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Especifica dónde exactamente dentro del parque se realizará la actividad
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+  
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="latitude"
+                        render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Categoría *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value || undefined}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecciona una categoría" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {Array.isArray(categorias) && categorias.map((categoria: any) => (
-                                  <SelectItem key={categoria.id} value={categoria.id.toString()}>
-                                    {categoria.name || categoria.nombre}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <FormLabel>Latitud (GPS)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                step="any" 
+                                placeholder="Ej: 20.676667" 
+                                {...field}
+                                onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                                value={field.value || ""}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Coordenada de latitud para ubicación GPS precisa
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
-                        );
-                      }}
-                    />
+                        )}
+                      />
+  
+                      <FormField
+                        control={form.control}
+                        name="longitude"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Longitud (GPS)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                step="any" 
+                                placeholder="Ej: -103.342222" 
+                                {...field}
+                                onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                                value={field.value || ""}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Coordenada de longitud para ubicación GPS precisa
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+  
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                              (position) => {
+                                form.setValue('latitude', position.coords.latitude);
+                                form.setValue('longitude', position.coords.longitude);
+                                toast({
+                                  title: "Ubicación obtenida",
+                                  description: "Las coordenadas GPS han sido establecidas automáticamente.",
+                                });
+                              },
+                              (error) => {
+                                toast({
+                                  title: "Error",
+                                  description: "No se pudo obtener la ubicación. Por favor ingresa las coordenadas manualmente.",
+                                  variant: "destructive"
+                                });
+                              }
+                            );
+                          } else {
+                            toast({
+                              title: "No soportado",
+                              description: "Tu navegador no soporta la geolocalización.",
+                              variant: "destructive"
+                            });
+                          }
+                        }}
+                        className="w-full"
+                      >
+                        📍 Obtener Ubicación Actual
+                      </Button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Haz clic para obtener automáticamente tu ubicación GPS actual
+                      </p>
+                    </div>
                   </div>
-
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Descripción *</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Describe la actividad, qué se hará, objetivos, etc."
-                            className="min-h-[100px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Sección de Ubicación */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Ubicación</h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name="parkId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Parque *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || undefined}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona un parque" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Array.isArray(parques) && parques.map((parque: any) => (
-                              <SelectItem key={parque.id} value={parque.id.toString()}>
-                                {parque.nombre || parque.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ubicación específica</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Ej: Área de juegos, Cancha de fútbol, Junto al lago" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Especifica dónde exactamente dentro del parque se realizará la actividad
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  
+                  {/* Sección de Segmentación */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <Users className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Segmentación</h3>
+                    </div>
+                    
                     <FormField
                       control={form.control}
-                      name="latitude"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Latitud (GPS)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              step="any" 
-                              placeholder="Ej: 20.676667" 
-                              {...field}
-                              onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                              value={field.value || ""}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Coordenada de latitud para ubicación GPS precisa
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="longitude"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Longitud (GPS)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              step="any" 
-                              placeholder="Ej: -103.342222" 
-                              {...field}
-                              onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                              value={field.value || ""}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Coordenada de longitud para ubicación GPS precisa
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        if (navigator.geolocation) {
-                          navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                              form.setValue('latitude', position.coords.latitude);
-                              form.setValue('longitude', position.coords.longitude);
-                              toast({
-                                title: "Ubicación obtenida",
-                                description: "Las coordenadas GPS han sido establecidas automáticamente.",
-                              });
-                            },
-                            (error) => {
-                              toast({
-                                title: "Error",
-                                description: "No se pudo obtener la ubicación. Por favor ingresa las coordenadas manualmente.",
-                                variant: "destructive"
-                              });
-                            }
-                          );
-                        } else {
-                          toast({
-                            title: "No soportado",
-                            description: "Tu navegador no soporta la geolocalización.",
-                            variant: "destructive"
-                          });
-                        }
-                      }}
-                      className="w-full"
-                    >
-                      📍 Obtener Ubicación Actual
-                    </Button>
-                    <p className="text-xs text-gray-500 mt-2 text-center">
-                      Haz clic para obtener automáticamente tu ubicación GPS actual
-                    </p>
-                  </div>
-                </div>
-
-                {/* Sección de Segmentación */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Segmentación</h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name="targetMarket"
-                    render={() => (
-                      <FormItem>
-                        <div className="mb-4">
-                          <FormLabel>Mercado Meta</FormLabel>
-                          <FormDescription>
-                            Selecciona los grupos de edad a los que está dirigida esta actividad
-                          </FormDescription>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {MERCADO_META.map((item) => (
-                            <FormField
-                              key={item.id}
-                              control={form.control}
-                              name="targetMarket"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={item.id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(item.id)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...(field.value || []), item.id])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== item.id
-                                                )
-                                              );
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                      {item.label}
-                                    </FormLabel>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Sección de Capacidades Diferentes */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Capacidades Diferentes</h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name="specialNeeds"
-                    render={() => (
-                      <FormItem>
-                        <div className="mb-4">
-                          <FormLabel>Accesibilidad para personas con capacidades diferentes</FormLabel>
-                          <FormDescription>
-                            Selecciona los tipos de discapacidad para los que esta actividad está adaptada
-                          </FormDescription>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {CAPACIDADES_DIFERENTES.map((item) => (
-                            <FormField
-                              key={item.id}
-                              control={form.control}
-                              name="specialNeeds"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={item.id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(item.id)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...(field.value || []), item.id])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== item.id
-                                                )
-                                              );
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                      {item.label}
-                                    </FormLabel>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Sección de fecha y hora */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Fecha y Horario</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="startDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Fecha de inicio *</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="endDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Fecha de finalización</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormDescription>
-                            Opcional para actividades de un solo día
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  {/* Nuevos campos para hora de inicio y finalización */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="startTime"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Hora de inicio *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="time" 
-                              {...field} 
-                              onChange={(e) => {
-                                field.onChange(e); // Actualizar el campo normalmente
-                                
-                                // Calcular la duración automáticamente
-                                const endTime = form.getValues("endTime");
-                                if (endTime) {
-                                  const duracionCalculada = calcularDuracionEnMinutos(e.target.value, endTime);
-                                  form.setValue("duration", duracionCalculada);
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Hora a la que comenzará la actividad
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="endTime"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Hora de finalización *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="time" 
-                              {...field}
-                              onChange={(e) => {
-                                field.onChange(e); // Actualizar el campo normalmente
-                                
-                                // Calcular la duración automáticamente
-                                const startTime = form.getValues("startTime");
-                                if (startTime) {
-                                  const duracionCalculada = calcularDuracionEnMinutos(startTime, e.target.value);
-                                  form.setValue("duration", duracionCalculada);
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Hora a la que terminará la actividad
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="duration"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Duración (minutos)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            placeholder="Se calcula automáticamente" 
-                            {...field} 
-                            disabled={true} // Deshabilitamos el campo para que sea de solo lectura
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Se calcula automáticamente basado en la hora de inicio y finalización
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="isRecurring"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel>Actividad recurrente</FormLabel>
-                          <FormDescription>
-                            Marca esta opción si la actividad se repite en días específicos
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  {form.watch("isRecurring") && (
-                    <FormField
-                      control={form.control}
-                      name="recurringDays"
+                      name="targetMarket"
                       render={() => (
                         <FormItem>
                           <div className="mb-4">
-                            <FormLabel>Días de la semana</FormLabel>
+                            <FormLabel>Mercado Meta</FormLabel>
                             <FormDescription>
-                              Selecciona los días en que se repite la actividad
+                              Selecciona los grupos de edad a los que está dirigida esta actividad
                             </FormDescription>
                           </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {DIAS_SEMANA.map((item) => (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {MERCADO_META.map((item) => (
                               <FormField
                                 key={item.id}
                                 control={form.control}
-                                name="recurringDays"
+                                name="targetMarket"
                                 render={({ field }) => {
                                   return (
                                     <FormItem
@@ -1071,618 +852,877 @@ const EditarActividadPage = () => {
                         </FormItem>
                       )}
                     />
-                  )}
-                </div>
-
-                {/* Sección de capacidad y materiales */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Capacidad y Materiales</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  </div>
+  
+                  {/* Sección de Capacidades Diferentes */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <Accessibility className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Capacidades Diferentes</h3>
+                    </div>
+                    
                     <FormField
                       control={form.control}
-                      name="capacity"
+                      name="specialNeeds"
+                      render={() => (
+                        <FormItem>
+                          <div className="mb-4">
+                            <FormLabel>Accesibilidad para personas con capacidades diferentes</FormLabel>
+                            <FormDescription>
+                              Selecciona los tipos de discapacidad para los que esta actividad está adaptada
+                            </FormDescription>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {CAPACIDADES_DIFERENTES.map((item) => (
+                              <FormField
+                                key={item.id}
+                                control={form.control}
+                                name="specialNeeds"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={item.id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(item.id)}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([...(field.value || []), item.id])
+                                              : field.onChange(
+                                                  field.value?.filter(
+                                                    (value) => value !== item.id
+                                                  )
+                                                );
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal">
+                                        {item.label}
+                                      </FormLabel>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+  
+                  {/* Sección de fecha y hora */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <Calendar className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Fecha y Horario</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fecha de inicio *</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+  
+                      <FormField
+                        control={form.control}
+                        name="endDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fecha de finalización</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              Opcional para actividades de un solo día
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    {/* Nuevos campos para hora de inicio y finalización */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="startTime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hora de inicio *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="time" 
+                                {...field} 
+                                onChange={(e) => {
+                                  field.onChange(e); // Actualizar el campo normalmente
+                                  
+                                  // Calcular la duración automáticamente
+                                  const endTime = form.getValues("endTime");
+                                  if (endTime) {
+                                    const duracionCalculada = calcularDuracionEnMinutos(e.target.value, endTime);
+                                    form.setValue("duration", duracionCalculada);
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Hora a la que comenzará la actividad
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+  
+                      <FormField
+                        control={form.control}
+                        name="endTime"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hora de finalización *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="time" 
+                                {...field}
+                                onChange={(e) => {
+                                  field.onChange(e); // Actualizar el campo normalmente
+                                  
+                                  // Calcular la duración automáticamente
+                                  const startTime = form.getValues("startTime");
+                                  if (startTime) {
+                                    const duracionCalculada = calcularDuracionEnMinutos(startTime, e.target.value);
+                                    form.setValue("duration", duracionCalculada);
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Hora a la que terminará la actividad
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+  
+                    <FormField
+                      control={form.control}
+                      name="duration"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Capacidad máxima</FormLabel>
+                          <FormLabel>Duración (minutos)</FormLabel>
                           <FormControl>
                             <Input 
                               type="number" 
                               min="0" 
-                              placeholder="Ej: 20" 
-                              {...field}
-                              onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                              value={field.value || ""}
+                              placeholder="Se calcula automáticamente" 
+                              {...field} 
+                              disabled={true} // Deshabilitamos el campo para que sea de solo lectura
                             />
                           </FormControl>
                           <FormDescription>
-                            Número máximo de participantes permitidos
+                            Se calcula automáticamente basado en la hora de inicio y finalización
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    <div className="space-y-3">
+  
+                    <FormField
+                      control={form.control}
+                      name="isRecurring"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel>Actividad recurrente</FormLabel>
+                            <FormDescription>
+                              Marca esta opción si la actividad se repite en días específicos
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+  
+                    {form.watch("isRecurring") && (
                       <FormField
                         control={form.control}
-                        name="price"
+                        name="recurringDays"
+                        render={() => (
+                          <FormItem>
+                            <div className="mb-4">
+                              <FormLabel>Días de la semana</FormLabel>
+                              <FormDescription>
+                                Selecciona los días en que se repite la actividad
+                              </FormDescription>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              {DIAS_SEMANA.map((item) => (
+                                <FormField
+                                  key={item.id}
+                                  control={form.control}
+                                  name="recurringDays"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem
+                                        key={item.id}
+                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                      >
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(item.id)}
+                                            onCheckedChange={(checked) => {
+                                              return checked
+                                                ? field.onChange([...(field.value || []), item.id])
+                                                : field.onChange(
+                                                    field.value?.filter(
+                                                      (value) => value !== item.id
+                                                    )
+                                                  );
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="font-normal">
+                                          {item.label}
+                                        </FormLabel>
+                                      </FormItem>
+                                    );
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+  
+                  {/* Sección de capacidad y materiales */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <Package className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Capacidad y Materiales</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="capacity"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Precio (MXN)</FormLabel>
+                            <FormLabel>Capacidad máxima</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
                                 min="0" 
-                                step="0.01" 
-                                placeholder="Ej: 50.00" 
-                                {...field} 
-                                disabled={form.watch("isFree") || form.watch("isPriceRandom")}
+                                placeholder="Ej: 20" 
+                                {...field}
+                                onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                value={field.value || ""}
                               />
                             </FormControl>
                             <FormDescription>
-                              {form.watch("isFree") 
-                                ? "Actividad gratuita" 
-                                : form.watch("isPriceRandom") 
-                                  ? "El precio será variable o por donativo" 
-                                  : "Precio fijo por persona"}
+                              Número máximo de participantes permitidos
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
-                      <div className="flex flex-col gap-2 mt-2">
+  
+                      <div className="space-y-3">
                         <FormField
                           control={form.control}
-                          name="isFree"
+                          name="price"
                           render={({ field }) => (
-                            <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                            <FormItem>
+                              <FormLabel>Precio (MXN)</FormLabel>
                               <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={(checked) => {
-                                    field.onChange(checked);
-                                    if (checked) {
-                                      form.setValue("price", 0);
-                                      form.setValue("isPriceRandom", false);
-                                    }
-                                  }}
+                                <Input 
+                                  type="number" 
+                                  min="0" 
+                                  step="0.01" 
+                                  placeholder="Ej: 50.00" 
+                                  {...field} 
+                                  disabled={form.watch("isFree") || form.watch("isPriceRandom")}
                                 />
                               </FormControl>
-                              <FormLabel className="font-medium">
-                                Actividad Gratuita
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="isPriceRandom"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={(checked) => {
-                                    field.onChange(checked);
-                                    if (checked) {
-                                      form.setValue("isFree", false);
-                                    }
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-medium">
-                                Precio Aleatorio (Donativo/Variable)
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Sección de descuentos aplicables */}
-                  {!form.watch("isFree") && (
-                    <div className="space-y-4 pt-4 border-t">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-md font-medium">🎫 Descuentos Aplicables</h4>
-                        <span className="text-sm text-muted-foreground">(Opcional)</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Configure descuentos especiales para diferentes grupos de beneficiarios
-                      </p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Descuento para Adultos Mayores */}
-                        <FormField
-                          control={form.control}
-                          name="discountSeniors"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2">
-                                👴 Adultos Mayores (65+)
-                              </FormLabel>
-                              <FormControl>
-                                <div className="flex items-center gap-2">
-                                  <Input 
-                                    type="number" 
-                                    min="0" 
-                                    max="100" 
-                                    step="1"
-                                    placeholder="" 
-                                    {...field}
-                                    className="w-20"
-                                  />
-                                  <span className="text-sm text-muted-foreground">% de descuento</span>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Descuento para Estudiantes */}
-                        <FormField
-                          control={form.control}
-                          name="discountStudents"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2">
-                                👨‍🎓 Estudiantes con Credencial
-                              </FormLabel>
-                              <FormControl>
-                                <div className="flex items-center gap-2">
-                                  <Input 
-                                    type="number" 
-                                    min="0" 
-                                    max="100" 
-                                    step="1"
-                                    placeholder="" 
-                                    {...field}
-                                    className="w-20"
-                                  />
-                                  <span className="text-sm text-muted-foreground">% de descuento</span>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Descuento para Familias Numerosas */}
-                        <FormField
-                          control={form.control}
-                          name="discountFamilies"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2">
-                                👨‍👩‍👧‍👦 Familias Numerosas (3+ hijos)
-                              </FormLabel>
-                              <FormControl>
-                                <div className="flex items-center gap-2">
-                                  <Input 
-                                    type="number" 
-                                    min="0" 
-                                    max="100" 
-                                    step="1"
-                                    placeholder="" 
-                                    {...field}
-                                    className="w-20"
-                                  />
-                                  <span className="text-sm text-muted-foreground">% de descuento</span>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Descuento por Discapacidad */}
-                        <FormField
-                          control={form.control}
-                          name="discountDisability"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2">
-                                ♿ Personas con Discapacidad
-                              </FormLabel>
-                              <FormControl>
-                                <div className="flex items-center gap-2">
-                                  <Input 
-                                    type="number" 
-                                    min="0" 
-                                    max="100" 
-                                    step="1"
-                                    placeholder="" 
-                                    {...field}
-                                    className="w-20"
-                                  />
-                                  <span className="text-sm text-muted-foreground">% de descuento</span>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Descuento por Inscripción Temprana */}
-                      <div className="space-y-3 pt-2 border-t">
-                        <FormField
-                          control={form.control}
-                          name="discountEarlyBird"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2">
-                                🏅 Inscripciones Tempranas
-                              </FormLabel>
-                              <FormControl>
-                                <div className="flex items-center gap-2">
-                                  <Input 
-                                    type="number" 
-                                    min="0" 
-                                    max="100" 
-                                    step="1"
-                                    placeholder="" 
-                                    {...field}
-                                    className="w-20"
-                                  />
-                                  <span className="text-sm text-muted-foreground">% de descuento</span>
-                                </div>
-                              </FormControl>
+                              <FormDescription>
+                                {form.watch("isFree") 
+                                  ? "Actividad gratuita" 
+                                  : form.watch("isPriceRandom") 
+                                    ? "El precio será variable o por donativo" 
+                                    : "Precio fijo por persona"}
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                         
-                        {form.watch("discountEarlyBird") && Number(form.watch("discountEarlyBird")) > 0 && (
+                        <div className="flex flex-col gap-2 mt-2">
                           <FormField
                             control={form.control}
-                            name="discountEarlyBirdDeadline"
+                            name="isFree"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={(checked) => {
+                                      field.onChange(checked);
+                                      if (checked) {
+                                        form.setValue("price", 0);
+                                        form.setValue("isPriceRandom", false);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-medium">
+                                  Actividad Gratuita
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="isPriceRandom"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={(checked) => {
+                                      field.onChange(checked);
+                                      if (checked) {
+                                        form.setValue("isFree", false);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-medium">
+                                  Precio Aleatorio (Donativo/Variable)
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </div>
+  
+                    {/* Sección de descuentos aplicables */}
+                    {!form.watch("isFree") && (
+                      <div className="space-y-4 pt-4 border-t">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-md font-medium">🎫 Descuentos Aplicables</h4>
+                          <span className="text-sm text-muted-foreground">(Opcional)</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Configure descuentos especiales para diferentes grupos de beneficiarios
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Descuento para Adultos Mayores */}
+                          <FormField
+                            control={form.control}
+                            name="discountSeniors"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Fecha límite para inscripción temprana</FormLabel>
+                                <FormLabel className="flex items-center gap-2">
+                                  👴 Adultos Mayores (65+)
+                                </FormLabel>
                                 <FormControl>
-                                  <Input 
-                                    type="date" 
+                                  <div className="flex items-center gap-2">
+                                    <Input 
+                                      type="number" 
+                                      min="0" 
+                                      max="100" 
+                                      step="1"
+                                      placeholder="" 
+                                      {...field}
+                                      className="w-20"
+                                    />
+                                    <span className="text-sm text-muted-foreground">% de descuento</span>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+  
+                          {/* Descuento para Estudiantes */}
+                          <FormField
+                            control={form.control}
+                            name="discountStudents"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                  👨‍🎓 Estudiantes con Credencial
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="flex items-center gap-2">
+                                    <Input 
+                                      type="number" 
+                                      min="0" 
+                                      max="100" 
+                                      step="1"
+                                      placeholder="" 
+                                      {...field}
+                                      className="w-20"
+                                    />
+                                    <span className="text-sm text-muted-foreground">% de descuento</span>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+  
+                          {/* Descuento para Familias Numerosas */}
+                          <FormField
+                            control={form.control}
+                            name="discountFamilies"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                  👨‍👩‍👧‍👦 Familias Numerosas (3+ hijos)
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="flex items-center gap-2">
+                                    <Input 
+                                      type="number" 
+                                      min="0" 
+                                      max="100" 
+                                      step="1"
+                                      placeholder="" 
+                                      {...field}
+                                      className="w-20"
+                                    />
+                                    <span className="text-sm text-muted-foreground">% de descuento</span>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+  
+                          {/* Descuento por Discapacidad */}
+                          <FormField
+                            control={form.control}
+                            name="discountDisability"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                  ♿ Personas con Discapacidad
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="flex items-center gap-2">
+                                    <Input 
+                                      type="number" 
+                                      min="0" 
+                                      max="100" 
+                                      step="1"
+                                      placeholder="" 
+                                      {...field}
+                                      className="w-20"
+                                    />
+                                    <span className="text-sm text-muted-foreground">% de descuento</span>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+  
+                        {/* Descuento por Inscripción Temprana */}
+                        <div className="space-y-3 pt-2 border-t">
+                          <FormField
+                            control={form.control}
+                            name="discountEarlyBird"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                  🏅 Inscripciones Tempranas
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="flex items-center gap-2">
+                                    <Input 
+                                      type="number" 
+                                      min="0" 
+                                      max="100" 
+                                      step="1"
+                                      placeholder="" 
+                                      {...field}
+                                      className="w-20"
+                                    />
+                                    <span className="text-sm text-muted-foreground">% de descuento</span>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          {form.watch("discountEarlyBird") && Number(form.watch("discountEarlyBird")) > 0 && (
+                            <FormField
+                              control={form.control}
+                              name="discountEarlyBirdDeadline"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Fecha límite para inscripción temprana</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      type="date" 
+                                      {...field}
+                                      min={new Date().toISOString().split('T')[0]}
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Hasta esta fecha aplicará el descuento por inscripción temprana
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
+                        </div>
+  
+                        {/* Resumen de descuentos */}
+                        {(form.watch("discountSeniors") || form.watch("discountStudents") || 
+                          form.watch("discountFamilies") || form.watch("discountDisability") || 
+                          form.watch("discountEarlyBird")) && (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <h5 className="text-sm font-medium text-blue-800 mb-2">Descuentos Configurados:</h5>
+                            <div className="text-xs text-blue-700 space-y-1">
+                              {form.watch("discountSeniors") && Number(form.watch("discountSeniors")) > 0 && (
+                                <p>• Adultos mayores: {form.watch("discountSeniors")}% de descuento</p>
+                              )}
+                              {form.watch("discountStudents") && Number(form.watch("discountStudents")) > 0 && (
+                                <p>• Estudiantes: {form.watch("discountStudents")}% de descuento</p>
+                              )}
+                              {form.watch("discountFamilies") && Number(form.watch("discountFamilies")) > 0 && (
+                                <p>• Familias numerosas: {form.watch("discountFamilies")}% de descuento</p>
+                              )}
+                              {form.watch("discountDisability") && Number(form.watch("discountDisability")) > 0 && (
+                                <p>• Personas con discapacidad: {form.watch("discountDisability")}% de descuento</p>
+                              )}
+                              {form.watch("discountEarlyBird") && Number(form.watch("discountEarlyBird")) > 0 && (
+                                <p>• Inscripción temprana: {form.watch("discountEarlyBird")}% de descuento
+                                  {form.watch("discountEarlyBirdDeadline") && ` (hasta ${form.watch("discountEarlyBirdDeadline")})`}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+  
+                    <FormField
+                      control={form.control}
+                      name="materials"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Materiales necesarios</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Lista de materiales que se usarán o que deben traer los participantes"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+  
+                    <FormField
+                      control={form.control}
+                      name="requirements"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Requisitos para participantes</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Requisitos especiales, rango de edad, condiciones físicas, etc."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+  
+                  {/* Sección de Registro Ciudadano */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <Users className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Configuración de Registro Ciudadano</h3>
+                      <p className="text-sm text-gray-600">Configura si los ciudadanos pueden inscribirse a esta actividad desde el sitio público</p>
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="allowsPublicRegistration"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">
+                              Permitir inscripción pública
+                            </FormLabel>
+                            <FormDescription>
+                              Los ciudadanos podrán inscribirse a esta actividad desde la página pública
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+  
+                    {form.watch("allowsPublicRegistration") && (
+                      <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="maxRegistrations"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Capacidad máxima de inscripciones</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    placeholder="Ej: 25"
                                     {...field}
-                                    min={new Date().toISOString().split('T')[0]}
+                                    value={field.value || ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                                   />
                                 </FormControl>
                                 <FormDescription>
-                                  Hasta esta fecha aplicará el descuento por inscripción temprana
+                                  Número máximo de personas que se pueden inscribir. Se recomienda que coincida con el número máximo escrito en la sección de Capacidad y Materiales.
                                 </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
-                        )}
-                      </div>
-
-                      {/* Resumen de descuentos */}
-                      {(form.watch("discountSeniors") || form.watch("discountStudents") || 
-                        form.watch("discountFamilies") || form.watch("discountDisability") || 
-                        form.watch("discountEarlyBird")) && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                          <h5 className="text-sm font-medium text-blue-800 mb-2">Descuentos Configurados:</h5>
-                          <div className="text-xs text-blue-700 space-y-1">
-                            {form.watch("discountSeniors") && Number(form.watch("discountSeniors")) > 0 && (
-                              <p>• Adultos mayores: {form.watch("discountSeniors")}% de descuento</p>
+  
+                          <FormField
+                            control={form.control}
+                            name="registrationDeadline"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Fecha límite de inscripción</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="date"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Fecha después de la cual no se aceptan inscripciones
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
                             )}
-                            {form.watch("discountStudents") && Number(form.watch("discountStudents")) > 0 && (
-                              <p>• Estudiantes: {form.watch("discountStudents")}% de descuento</p>
-                            )}
-                            {form.watch("discountFamilies") && Number(form.watch("discountFamilies")) > 0 && (
-                              <p>• Familias numerosas: {form.watch("discountFamilies")}% de descuento</p>
-                            )}
-                            {form.watch("discountDisability") && Number(form.watch("discountDisability")) > 0 && (
-                              <p>• Personas con discapacidad: {form.watch("discountDisability")}% de descuento</p>
-                            )}
-                            {form.watch("discountEarlyBird") && Number(form.watch("discountEarlyBird")) > 0 && (
-                              <p>• Inscripción temprana: {form.watch("discountEarlyBird")}% de descuento
-                                {form.watch("discountEarlyBirdDeadline") && ` (hasta ${form.watch("discountEarlyBirdDeadline")})`}
-                              </p>
-                            )}
-                          </div>
+                          />
                         </div>
-                      )}
-                    </div>
-                  )}
-
-                  <FormField
-                    control={form.control}
-                    name="materials"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Materiales necesarios</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Lista de materiales que se usarán o que deben traer los participantes"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="requirements"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Requisitos para participantes</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Requisitos especiales, rango de edad, condiciones físicas, etc."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Sección de Registro Ciudadano */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Configuración de Registro Ciudadano</h3>
-                  <p className="text-sm text-gray-600">Configura si los ciudadanos pueden inscribirse a esta actividad desde el sitio público</p>
-                  
-                  <FormField
-                    control={form.control}
-                    name="allowsPublicRegistration"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">
-                            Permitir inscripción pública
-                          </FormLabel>
-                          <FormDescription>
-                            Los ciudadanos podrán inscribirse a esta actividad desde la página pública
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  {form.watch("allowsPublicRegistration") && (
-                    <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  
                         <FormField
                           control={form.control}
-                          name="maxRegistrations"
+                          name="registrationInstructions"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Capacidad máxima de inscripciones</FormLabel>
+                              <FormLabel>Instrucciones para inscripción</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder="Ej: 25"
-                                  {...field}
-                                  value={field.value || ""}
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Número máximo de personas que se pueden inscribir. Se recomienda que coincida con el número máximo escrito en la sección de Capacidad y Materiales.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="registrationDeadline"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Fecha límite de inscripción</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="date"
+                                <Textarea
+                                  placeholder="Instrucciones específicas para los participantes al inscribirse"
                                   {...field}
                                   value={field.value || ""}
                                 />
                               </FormControl>
                               <FormDescription>
-                                Fecha después de la cual no se aceptan inscripciones
+                                Información adicional que verán los ciudadanos al inscribirse
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                      </div>
-
-                      <FormField
-                        control={form.control}
-                        name="registrationInstructions"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Instrucciones para inscripción</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Instrucciones específicas para los participantes al inscribirse"
-                                {...field}
-                                value={field.value || ""}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              Información adicional que verán los ciudadanos al inscribirse
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="requiresApproval"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-base">
-                                Requiere aprobación administrativa
-                              </FormLabel>
-                              <FormDescription>
-                                Las inscripciones deben ser aprobadas manualmente por un administrador
-                              </FormDescription>
-                            </div>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  
                         <FormField
                           control={form.control}
-                          name="ageRestrictions"
+                          name="requiresApproval"
                           render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Restricciones de edad</FormLabel>
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                              <div className="space-y-0.5">
+                                <FormLabel className="text-base">
+                                  Requiere aprobación administrativa
+                                </FormLabel>
+                                <FormDescription>
+                                  Las inscripciones deben ser aprobadas manualmente por un administrador
+                                </FormDescription>
+                              </div>
                               <FormControl>
-                                <Input
-                                  placeholder="Ej: 18-65 años, Menores acompañados"
-                                  {...field}
-                                  value={field.value || ""}
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
-                              <FormDescription>
-                                Restricciones específicas de edad para participar
-                              </FormDescription>
-                              <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        <FormField
-                          control={form.control}
-                          name="healthRequirements"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Requisitos de salud</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Ej: Certificado médico, buena condición física"
-                                  {...field}
-                                  value={field.value || ""}
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Requisitos médicos o de salud para participar
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sección de Instructor/Facilitador */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Datos del Instructor o Facilitador</h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name="instructorId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Seleccionar Instructor</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona un instructor" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {!Array.isArray(instructores) || instructores.length === 0 ? (
-                              <SelectItem value="no-instructors" disabled>
-                                No hay instructores disponibles
-                              </SelectItem>
-                            ) : (
-                              instructores.map((instructor: any) => (
-                                <SelectItem key={instructor.id} value={instructor.id.toString()}>
-                                  {instructor.firstName} {instructor.lastName} ({instructor.email})
-                                </SelectItem>
-                              ))
+  
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="ageRestrictions"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Restricciones de edad</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Ej: 18-65 años, Menores acompañados"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Restricciones específicas de edad para participar
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
                             )}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Selecciona un instructor registrado en el sistema. Si el instructor que buscas no está en la lista, primero debes registrarlo en la sección de Usuarios.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
+                          />
+  
+                          <FormField
+                            control={form.control}
+                            name="healthRequirements"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Requisitos de salud</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Ej: Certificado médico, buena condición física"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Requisitos médicos o de salud para participar
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
                     )}
-                  />
-                  
-                  {instructores.length === 0 && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-md p-4 my-4">
-                      <p className="text-amber-800">
-                        No hay instructores registrados en el sistema. Dirígete a la sección de Instructores en este módulo de Actividades, para crear un Instructor primero.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t">
-                  <div className="flex justify-end gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setLocation('/admin/organizador/catalogo/ver')}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button 
-                      type="submit"
-                      disabled={updateMutation.isPending}
-                    >
-                      {updateMutation.isPending ? "Guardando..." : "Actualizar Actividad"}
-                    </Button>
                   </div>
-                </div>
-              </form>
-                </Form>
-              </TabsContent>
-              
-              <TabsContent value="multimedia" className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Gestión de Imágenes</h3>
-                  <p className="text-sm text-gray-600">
-                    Administra las imágenes de esta actividad
-                  </p>
-                  {activityId > 0 ? (
-                    <ActivityImageManagerSimple 
-                      activityId={activityId} 
-                    />
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">Cargando gestor de imágenes...</p>
+  
+                  {/* Sección de Instructor/Facilitador */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <GraduationCap className="h-4 w-4 text-gray-800" />
+                      </div>
+                      <h3 className="text-lg font-medium">Datos del Instructor o Facilitador</h3>
                     </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+                    
+                    <FormField
+                      control={form.control}
+                      name="instructorId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seleccionar Instructor</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecciona un instructor" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {!Array.isArray(instructores) || instructores.length === 0 ? (
+                                <SelectItem value="no-instructors" disabled>
+                                  No hay instructores disponibles
+                                </SelectItem>
+                              ) : (
+                                instructores.map((instructor: any) => (
+                                  <SelectItem key={instructor.id} value={instructor.id.toString()}>
+                                    {instructor.firstName} {instructor.lastName} ({instructor.email})
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Selecciona un instructor registrado en el sistema. Si el instructor que buscas no está en la lista, primero debes registrarlo en la sección de Usuarios.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {instructores.length === 0 && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-md p-4 my-4">
+                        <p className="text-amber-800">
+                          No hay instructores registrados en el sistema. Dirígete a la sección de Instructores en este módulo de Actividades, para crear un Instructor primero.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+  
+                  
+                </form>
+                  </Form>
+                </TabsContent>
+                
+                <TabsContent value="multimedia" className="space-y-6">
+                  <div className="space-y-4">
+                    
+                    {activityId > 0 ? (
+                      <ActivityImageManagerSimple 
+                        activityId={activityId} 
+                      />
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">Cargando gestor de imágenes...</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+            
+            </CardContent>
+          </Card>
+        </Tabs>
       </div>
     </AdminLayout>
   );

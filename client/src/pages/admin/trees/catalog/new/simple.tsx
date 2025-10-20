@@ -10,6 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import ROUTES from '@/routes';
 import { useState } from "react";
 import { Upload, Image } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
@@ -579,7 +580,7 @@ function SimpleNewTreeSpecies() {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setLocation('/admin/trees/catalog')}
+                onClick={() => setLocation(ROUTES.admin.trees.species.list)}
               >
                 Cancelar
               </Button>

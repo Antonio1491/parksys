@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -131,7 +132,7 @@ const MaintenanceCalendarSimplePage = () => {
                 Programa y visualiza el mantenimiento de activos por fechas
               </p>
             </div>
-            <Button onClick={() => setLocation('/admin/assets/maintenance/schedule')}>
+            <Button onClick={() => setLocation(ROUTES.admin.assets.maintenance.create)}>
               <Plus className="mr-2 h-4 w-4" />
               Programar Mantenimiento
             </Button>

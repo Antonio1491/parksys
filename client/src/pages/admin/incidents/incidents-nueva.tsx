@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, ClipboardList, Search, X, AlertTriangle, BarChart, Bookmark, Calendar, MapPin, User, Clock, Filter, ExternalLink, Upload, Download, FileSpreadsheet } from 'lucide-react';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import AdminLayout from '@/components/AdminLayout';
 import { format } from 'date-fns';
@@ -49,15 +50,15 @@ export default function IncidentsNueva() {
       ];
 
   const handleNewIncident = () => {
-    setLocation('/admin/incidents/new');
+    setLocation(ROUTES.admin.incidents.create);
   };
 
   const handleManageCategories = () => {
-    setLocation('/admin/incidents/categories');
+    setLocation(ROUTES.admin.incidents.categories.list);
   };
 
   const handleViewDashboard = () => {
-    setLocation('/admin/incidents/dashboard');
+    setLocation(ROUTES.dashboards.incidents);
   };
 
   // Filtrar incidencias
@@ -327,7 +328,7 @@ export default function IncidentsNueva() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setLocation(`/admin/incidents/${incident.id}`)}
+          onClick={() => setLocation(ROUTES.admin.incidents.view.build(incident.id))}
         >
           <ExternalLink className="h-4 w-4" />
         </Button>

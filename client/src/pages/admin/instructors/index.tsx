@@ -105,18 +105,6 @@ export default function InstructorsListPage() {
     enabled: true,
   });
 
-  // Debug temporal
-  React.useEffect(() => {
-    console.log('🔍 INSTRUCTORS DEBUG:', {
-      instructors,
-      isArray: Array.isArray(instructors),
-      length: instructors?.length,
-      isLoading,
-      isError,
-      firstItem: instructors?.[0]
-    });
-  }, [instructors, isLoading, isError]);
-
   // Mutación para eliminar un instructor individual
   const deleteInstructorMutation = useMutation({
     mutationFn: async (instructorId: number) => {

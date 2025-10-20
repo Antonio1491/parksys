@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
 import { 
@@ -480,7 +481,7 @@ const AssetDetailPage: React.FC = () => {
         title: "Activo eliminado",
         description: "El activo se ha eliminado correctamente.",
       });
-      setLocation('/admin/assets');
+      setLocation(ROUTES.admin.assets.list);
     },
     onError: (error) => {
       toast({
@@ -529,7 +530,7 @@ const AssetDetailPage: React.FC = () => {
   
   // Función para volver a la lista de activos
   const handleBackToList = () => {
-    setLocation('/admin/assets/inventory');
+    setLocation(ROUTES.admin.assets.list);
   };
   
   // Función para abrir el diálogo de edición
@@ -627,7 +628,7 @@ const AssetDetailPage: React.FC = () => {
             Registrar Mantenimiento
           </Button>
           <Button 
-            onClick={() => window.location.href = `/admin/assets/${id}/edit-enhanced`} 
+            onClick={() => window.location.href = ROUTES.admin.assets.edit.build(id)} 
             variant="outline"
             data-testid="edit-asset-btn"
           >

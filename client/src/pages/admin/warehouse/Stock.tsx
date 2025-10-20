@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes'
 import {
   Package,
   Search,
@@ -61,15 +62,15 @@ export default function StockPage() {
 
   // ===== NAVEGACIÓN =====
   const handleNew = () => {
-    setLocation('/admin/warehouse/stock/new');
+    setLocation(ROUTES.admin.warehouse.stock.create);
   };
 
   const handleEdit = (stock: StockWithRelations) => {
-    setLocation(`/admin/warehouse/stock/${stock.id}/edit`);
+    setLocation(ROUTES.admin.warehouse.stock.edit.build(stock.id));
   };
 
   const handleView = (stock: StockWithRelations) => {
-    setLocation(`/admin/warehouse/stock/${stock.id}`);
+    setLocation(ROUTES.admin.warehouse.stock.view.build(stock.id));
   };
 
   // ===== QUERIES =====
@@ -241,7 +242,7 @@ export default function StockPage() {
 
   return (
     <AdminLayout title="Inventario de Stock" subtitle="Gestiona y monitorea el stock disponible en cada ubicación">
-      <div className="max-w-7xl mx-auto" data-testid="stock-page">
+      <div className="w-auto mx-auto" data-testid="stock-page">
         {/* HEADER */}
         <div className="flex justify-between items-start mb-8">
           <div>

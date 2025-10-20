@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
 import { googleMapsService } from '@/services/GoogleMapsService';
@@ -248,7 +249,7 @@ function GoogleMapComponent({ position, onLocationSelect, height = '384px' }: Go
 }
 
 export default function EditAssetPage() {
-  const [, params] = useRoute('/admin/assets/:id/edit-enhanced');
+  const [, params] = useRoute(ROUTES.admin.assets.edit.path);
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -415,7 +416,7 @@ export default function EditAssetPage() {
         description: "Activo actualizado correctamente",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/assets'] });
-      setLocation('/admin/assets/inventory');
+      setLocation(ROUTES.admin.assets.list);
     },
     onError: (error: any) => {
       toast({
@@ -483,7 +484,7 @@ export default function EditAssetPage() {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => setLocation('/admin/assets/inventory')}
+            onClick={() => setLocation(ROUTES.admin.assets.list)}
             className="mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -1292,7 +1293,7 @@ export default function EditAssetPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setLocation('/admin/assets/inventory')}
+                onClick={() => setLocation(ROUTES.admin.assets.list)}
               >
                 Cancelar
               </Button>

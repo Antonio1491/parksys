@@ -990,7 +990,7 @@ const AdminActivities = () => {
                   variant={viewMode === 'cards' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('cards')}
-                  className={`${viewMode === 'cards' ? 'bg-[#00a587] text-white' : 'text-[#4b5b65]'}`}
+                  className={`${viewMode === 'cards' ? 'bg-primary text-white' : 'text-foreground'}`}
                   data-testid="button-view-cards"
                 >
                   <Grid className="h-4 w-4" />
@@ -999,7 +999,7 @@ const AdminActivities = () => {
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
                   size="sm" 
                   onClick={() => setViewMode('table')}
-                  className={`${viewMode === 'table' ? 'bg-[#00a587] text-white' : 'text-gray-600'}`}
+                  className={`${viewMode === 'table' ? 'bg-primary text-white' : 'text-foreground'}`}
                   data-testid="button-view-table"
                 >
                   <List className="h-4 w-4" />
@@ -1012,7 +1012,7 @@ const AdminActivities = () => {
               <Button
                 variant={selectionMode ? 'default' : 'outline'}
                 size="sm"
-                className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-gray-100 text-white hover-[#00a587]' : 'bg-gray-100 hover:bg-[#00a587]'}`}
+                className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-primary text-white hover-[#00a587]' : 'bg-gray-100 hover:bg-[#00a587]'}`}
                 data-testid="button-selection-toggle"
               >
                 <CopyCheck className="h-5 w-5 text-[#4b5b65] hover-white" />
@@ -1059,10 +1059,10 @@ const AdminActivities = () => {
 
             {/* Botón para eliminar elementos independiente */}
             <Button
-              variant="destructive"
+              variant="outline"
               size="sm"
               onClick={handleBulkDeleteClick}
-              className="flex items-center h-11 w-11"
+              className="flex items-center h-11 w-11 bg-[#ededed] text-destructive hover:bg-destructive/10 hover:text-destructive"
               disabled={selectedActivities.size === 0}
               data-testid="button-delete-selected"
             >

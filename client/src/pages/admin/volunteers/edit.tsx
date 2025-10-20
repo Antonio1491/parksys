@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
+import ROUTES from "@/routes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -65,7 +66,7 @@ export default function EditVolunteerPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [match, params] = useRoute('/admin/volunteers/edit/:id');
+  const [match, params] = useRoute(ROUTES.admin.volunteers.edit.path);
   const volunteerId = params?.id;
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -289,7 +290,7 @@ export default function EditVolunteerPage() {
         description: 'Los datos del voluntario han sido actualizados exitosamente',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/volunteers'] });
-      setLocation('/admin/volunteers');
+      setLocation(ROUTES.admin.volunteers.list);
     },
     onError: (error) => {
       toast({
@@ -323,7 +324,7 @@ export default function EditVolunteerPage() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => setLocation('/admin/volunteers')}
+            onClick={() => setLocation(ROUTES.admin.volunteers.list)}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

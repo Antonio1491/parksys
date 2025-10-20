@@ -256,7 +256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       fileSize: 5 * 1024 * 1024 // 5MB
     }
   });
-  
+
   // Template download routes (must be defined before conflicting routes)
   app.get('/api/template/parks-import', generateImportTemplate);
   
@@ -612,6 +612,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 
+  
   // GET /api/events-summary - Resumen de todos los eventos con estadísticas (para admin)
   apiRouter.get('/events-summary', async (req, res) => {
     try {

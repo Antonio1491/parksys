@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useParams } from 'wouter';
+import ROUTES from '@/routes';
 import { ArrowLeft, Calendar, MapPin, Users, Clock, FileText, Save, Plus, Image } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -308,7 +309,7 @@ export default function EditEventPage() {
       <AdminLayout>
         <div className="text-center py-12">
           <h2 className="text-xl font-semibold mb-4">Evento no encontrado</h2>
-          <Button onClick={() => setLocation('/admin/events')}>
+          <Button onClick={() => setLocation(ROUTES.admin.events.list)}>
             Volver a eventos
           </Button>
         </div>
@@ -325,7 +326,7 @@ export default function EditEventPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setLocation('/admin/events')}
+              onClick={() => setLocation(ROUTES.admin.events.list)}
               className="flex items-center space-x-2"
             >
               <ArrowLeft className="h-4 w-4" />

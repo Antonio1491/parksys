@@ -27,8 +27,8 @@ import {
   Clock, PlusCircle, FileEdit, FileX
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
-import { Participation } from '@/types';
 import { Link } from 'wouter';
+import ROUTES from '@/routes';
 
 const ParticipationsList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -122,7 +122,7 @@ const ParticipationsList: React.FC = () => {
               <Download className="h-4 w-4 mr-2" />
               Exportar
             </Button>
-            <Link href="/admin/volunteers/participations/new">
+            <Link href={ROUTES.admin.volunteers.participationCreate}>
               <Button>
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Registrar Participación
@@ -157,8 +157,7 @@ const ParticipationsList: React.FC = () => {
                     <SelectValue placeholder="Filtrar por parque" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos los parques</SelectItem>
-                    {parks.map((park: any) => (
+                    {Array.isArray(parks) && parks.map((park: any) => (
                       <SelectItem key={park.id} value={park.id.toString()}>
                         {park.name}
                       </SelectItem>

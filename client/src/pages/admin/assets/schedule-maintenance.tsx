@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'wouter';
+import React, { useState } from 'react';
+import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useQuery } from '@tanstack/react-query';
-
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,12 +21,11 @@ import {
 } from '@/components/ui/select';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-
 import { queryClient } from '@/lib/queryClient';
 
 const ScheduleMaintenancePage = () => {
-  const [_, setLocation] = useLocation();
-  const { id } = useParams<{ id: string }>();
+  const [location, setLocation] = useLocation();
+  const assetIdFromUrl = new URLSearchParams(window.location.search).get('assetId');
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [maintenanceType, setMaintenanceType] = useState('preventivo');
   const [priority, setPriority] = useState('medium');
@@ -34,7 +33,7 @@ const ScheduleMaintenancePage = () => {
   const [notes, setNotes] = useState('');
   const [estimatedCost, setEstimatedCost] = useState('');
   const [assignedToId, setAssignedToId] = useState('');
-  const [selectedAssetId, setSelectedAssetId] = useState(id || '');
+  const [selectedAssetId, setSelectedAssetId] = useState(assetIdFromUrl || '');
   const [submitting, setSubmitting] = useState(false);
 
   // Obtener lista de activos
@@ -72,13 +71,6 @@ const ScheduleMaintenancePage = () => {
   // Determinar qué datos utilizar (API o muestra)
   const displayAssets = assets.length > 0 ? assets : sampleAssets;
   const displayUsers = relevantUsers.length > 0 ? relevantUsers : sampleUsers;
-
-  // Efecto para preseleccionar el activo cuando se pasa el ID en la URL
-  useEffect(() => {
-    if (id) {
-      setSelectedAssetId(id);
-    }
-  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,10 +144,10 @@ const ScheduleMaintenancePage = () => {
       });
 
       // Redirigir según el origen: si viene del inventario (con ID), volver al inventario
-      if (id) {
-        setLocation('/admin/assets/inventory');
+      if (assetIdFromUrl) {
+        setLocation(ROUTES.admin.assets.list);
       } else {
-        setLocation('/admin/assets/maintenance/calendar');
+        setLocation(ROUTES.admin.assets.maintenance.calendar);
       }
     } catch (error) {
       console.error('Error al programar mantenimiento:', error);
@@ -174,12 +166,12 @@ const ScheduleMaintenancePage = () => {
       <div className="container py-6">
         <div className="mb-6 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={() => setLocation('/admin/assets/maintenance/calendar')}>
+            <Button variant="outline" onClick={() => setLocation(ROUTES.admin.assets.maintenance.calendar)}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver al Calendario
             </Button>
-            {id && (
-              <Button variant="outline" onClick={() => setLocation('/admin/assets/inventory')}>
+            {assetIdFromUrl && (
+              <Button variant="outline" onClick={() => setLocation(ROUTES.admin.assets.list)}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Volver al Inventario
               </Button>
@@ -330,7 +322,7 @@ const ScheduleMaintenancePage = () => {
           </div>
 
           <div className="mt-6 flex justify-end">
-            <Button variant="outline" type="button" className="mr-2" onClick={() => setLocation('/admin/assets/maintenance/calendar')}>
+            <Button variant="outline" type="button" className="mr-2" onClick={() => setLocation(ROUTES.admin.assets.maintenance.calendar)}>
               Cancelar
             </Button>
             <Button type="submit" disabled={submitting}>

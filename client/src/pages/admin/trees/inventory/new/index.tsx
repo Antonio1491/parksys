@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -158,7 +159,7 @@ function NewTreePage() {
       queryClient.invalidateQueries({ queryKey: ['/api/trees'] });
       
       // Redirigir al listado
-      navigate('/admin/trees/inventory');
+      navigate(ROUTES.admin.trees.list);
     } catch (error) {
       console.error('Error al crear el árbol:', error);
       toast({
@@ -229,7 +230,7 @@ function NewTreePage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/admin/trees/inventory')}
+            onClick={() => navigate(ROUTES.admin.trees.list)}
             className="mr-2"
           >
             <ArrowLeft className="h-5 w-5" />

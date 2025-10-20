@@ -259,13 +259,6 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold">Gestión de Amenidades del Parque</h3>
-        <p className="text-sm text-gray-600">
-          Selecciona amenidades de la lista disponible para agregarlas al parque
-        </p>
-      </div>
 
       {/* Layout de dos columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -274,12 +267,8 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Amenidades Disponibles
+              Disponibles
             </CardTitle>
-            <p className="text-sm text-gray-600">
-              Haz clic en una amenidad para agregarla al parque
-            </p>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
@@ -289,7 +278,7 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
                   <div
                     key={amenity.id}
                     onClick={() => handleQuickAddAmenity(amenity.id)}
-                    className="flex items-center gap-3 p-3 border rounded-lg hover:bg-blue-50 hover:border-blue-200 cursor-pointer transition-colors"
+                    className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-100 hover:border-gray-100 cursor-pointer transition-colors"
                   >
                     <AmenityIcon 
                       name={amenity.name}
@@ -318,12 +307,8 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Amenidades del Parque ({parkAmenities.length})
+              Asignadas ({parkAmenities.length})
             </CardTitle>
-            <p className="text-sm text-gray-600">
-              Amenidades actualmente asignadas a este parque
-            </p>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
@@ -337,7 +322,7 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
                 parkAmenities.map((amenity, index) => (
                   <div
                     key={`${amenity.id}-${amenity.amenityId}-${index}`}
-                    className="flex items-center gap-3 p-3 border rounded-lg bg-green-50 border-green-200"
+                    className="flex items-center gap-3 p-3 border rounded-lg border-green-200"
                   >
                     <AmenityIcon 
                       name={amenity.amenityName}
@@ -360,17 +345,10 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEditAmenity(amenity)}
-                      >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
                         onClick={() => handleRemoveAmenity(amenity.id)}
                         disabled={removeAmenityMutation.isPending}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-3" />
                       </Button>
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -112,7 +113,7 @@ export default function ConsumableForm() {
         description: 'El consumible se ha creado exitosamente.',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/warehouse/consumables'] });
-      setLocation('/admin/warehouse/consumables');
+      setLocation(ROUTES.admin.warehouse.list);
     },
     onError: (error: any) => {
       toast({
@@ -133,7 +134,7 @@ export default function ConsumableForm() {
   };
 
   const handleCancel = () => {
-    setLocation('/admin/warehouse/consumables');
+    setLocation(ROUTES.admin.warehouse.list);
   };
 
   return (

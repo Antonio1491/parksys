@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useRoute } from 'wouter';
+import ROUTES from '@/routes';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -58,7 +59,7 @@ type StockEditData = z.infer<typeof stockEditSchema>;
 
 export default function StockEdit() {
   const [, setLocation] = useLocation();
-  const [match, params] = useRoute('/admin/warehouse/stock/:id/edit');
+  const [match, params] = useRoute(ROUTES.admin.warehouse.stock.edit.path);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -131,7 +132,7 @@ export default function StockEdit() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/warehouse/stock'] });
       queryClient.invalidateQueries({ queryKey: ['/api/warehouse/stock', stockId] });
-      setLocation('/admin/warehouse/stock');
+      setLocation(ROUTES.admin.warehouse.stock.list);
     },
     onError: (error: any) => {
       toast({
@@ -152,7 +153,7 @@ export default function StockEdit() {
   };
 
   const handleCancel = () => {
-    setLocation('/admin/warehouse/stock');
+    setLocation(ROUTES.admin.warehouse.stock.list);
   };
 
   // Loading states
@@ -203,8 +204,8 @@ export default function StockEdit() {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        <div className="max-w-7xl mx-auto">
+      <div >
+        <div className="w-auto mx-auto">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <Button

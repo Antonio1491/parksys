@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Papa from 'papaparse';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -99,8 +100,7 @@ const EventsList: React.FC = () => {
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showViewDialog, setShowViewDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  
+    
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 9;
@@ -254,7 +254,7 @@ const EventsList: React.FC = () => {
 
   const handleEditEvent = (event: Event) => {
     // Navegación usando wouter 
-    setLocation(`/admin/events/edit/${event.id}`);
+    setLocation(ROUTES.admin.events.edit.build(event.id));
   };
 
   const handleDeleteEvent = (eventId: number) => {
@@ -630,7 +630,7 @@ const EventsList: React.FC = () => {
           actions={[
             <Button
               key="new-event"
-              onClick={() => setLocation('/admin/events/new')}
+              onClick={() => setLocation(ROUTES.admin.events.create)}
               className="bg-[#a0cc4d] hover:bg-[#00a587] text-white"
               data-testid="button-new-event"
             >

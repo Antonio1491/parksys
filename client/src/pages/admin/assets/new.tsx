@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
@@ -401,7 +402,7 @@ const CreateAssetPage: React.FC = () => {
   
   // Función para volver a la lista de activos
   const handleBackToList = () => {
-    setLocation('/admin/assets');
+    setLocation(ROUTES.admin.assets.list);
   };
   
   // Manejar envío del formulario

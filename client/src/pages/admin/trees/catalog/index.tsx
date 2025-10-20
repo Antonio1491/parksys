@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -133,13 +134,13 @@ function TreeSpeciesCatalog() {
   };
 
   const handleCreateNew = () => {
-    setLocation('/admin/trees/catalog/new');
+    setLocation(ROUTES.admin.trees.species.create);
   };
 
   const handleViewDetails = (id: number) => {
     // Validate that id is a valid number
     if (typeof id === 'number' && !isNaN(id) && id > 0) {
-      setLocation(`/admin/trees/catalog/${id}`);
+      setLocation(ROUTES.admin.trees.species.view.build(id));
     } else {
       console.warn('Invalid tree species ID:', id);
       toast({

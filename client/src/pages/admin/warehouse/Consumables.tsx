@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { Consumable, ConsumableCategory } from '@shared/schema';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -115,11 +116,11 @@ export default function ConsumablesPage() {
 
   // ===== HANDLERS =====
   const handleEdit = (consumable: Consumable) => {
-    setLocation(`/admin/warehouse/consumables/${consumable.id}/edit`);
+    setLocation(ROUTES.admin.warehouse.edit.build(consumable.id));
   };
 
   const handleNew = () => {
-    setLocation('/admin/warehouse/consumables/new');
+    setLocation(ROUTES.admin.warehouse.create);
   };
 
   const handleDelete = (consumable: Consumable) => {

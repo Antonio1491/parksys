@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -157,7 +158,7 @@ export default function InstructorDetailPage() {
           <div className="flex items-center mb-6">
             <Button 
               variant="ghost" 
-              onClick={() => setLocation('/admin/activities/instructors')}
+              onClick={() => setLocation(ROUTES.admin.activities.instructors.list)}
               className="mr-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -180,7 +181,7 @@ export default function InstructorDetailPage() {
           <div className="flex items-center mb-6">
             <Button 
               variant="ghost" 
-              onClick={() => setLocation('/admin/activities/instructors')}
+              onClick={() => setLocation(ROUTES.admin.activities.instructors.list)}
               className="mr-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -213,7 +214,7 @@ export default function InstructorDetailPage() {
           <div className="flex items-center">
             <Button 
               variant="ghost" 
-              onClick={() => setLocation('/admin/activities/instructors')}
+              onClick={() => setLocation(ROUTES.admin.activities.instructors.list)}
               className="mr-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />

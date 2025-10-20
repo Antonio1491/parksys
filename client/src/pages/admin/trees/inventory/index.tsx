@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { Helmet } from 'react-helmet';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -185,7 +186,7 @@ function TreeInventoryPage() {
   }, [error, toast]);
 
   const handleAddTree = () => {
-    setLocation('/admin/trees/inventory/new');
+    setLocation(ROUTES.admin.trees.create);
   };
 
   // Mutación para limpiar el inventario de árboles

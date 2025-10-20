@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import ROUTES from "@/routes";
 import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -442,11 +443,11 @@ export default function VolunteersPage() {
   };
 
   const handleNewVolunteer = () => {
-    navigate('/admin/volunteers/register');
+    navigate(ROUTES.admin.volunteers.create);
   };
 
   const handleEditVolunteer = (volunteerId: number) => {
-    navigate(`/admin/volunteers/edit/${volunteerId}`);
+    navigate(ROUTES.admin.volunteers.edit.build(volunteerId));
   };
 
   const handleDeleteVolunteer = async (volunteer: Volunteer) => {

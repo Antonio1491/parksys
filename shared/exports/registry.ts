@@ -104,6 +104,38 @@ export const EXPORT_REGISTRY: Record<string, ExportConfig> = {
     }
   },
 
+  instructors: {
+    entity: 'instructors',
+    displayName: 'Instructores',
+    description: 'Listado completo de instructores registrados en el sistema',
+    fields: [
+      { key: 'firstName', label: 'Nombre', type: 'text', required: true, width: 20 },
+      { key: 'lastName', label: 'Apellido', type: 'text', required: true, width: 20 },
+      { key: 'email', label: 'Correo Electrónico', type: 'email', width: 25 },
+      { key: 'phone', label: 'Teléfono', type: 'text', width: 15 },
+      { key: 'status', label: 'Estado', type: 'text', width: 15 },
+      { key: 'specialties', label: 'Especialidades', type: 'array', width: 30 },
+      { key: 'experienceYears', label: 'Años de Experiencia', type: 'number', format: '#,##0', width: 10 },
+      { key: 'bio', label: 'Biografía', type: 'text', width: 40 },
+      { key: 'hourlyRate', label: 'Tarifa por Hora', type: 'currency', width: 15 },
+      { key: 'preferredParkName', label: 'Parque Preferido', type: 'text', width: 25 },
+      { key: 'rating', label: 'Calificación', type: 'number', format: '#,##0.0', width: 10 },
+      { key: 'activitiesCount', label: 'Actividades Asignadas', type: 'number', format: '#,##0', width: 10 },
+      { key: 'createdAt', label: 'Fecha de Registro', type: 'date', format: 'DD/MM/YYYY', width: 15 }
+    ],
+    permissions: ['instructors.export', 'admin'],
+    defaultFormat: 'xlsx',
+    supportedFormats: ['csv', 'xlsx', 'pdf'],
+    filters: {
+      available: ['status', 'specialties', 'experienceYears'],
+      default: {}
+    },
+    sorting: {
+      default: { field: 'createdAt', direction: 'desc' },
+      available: ['firstName', 'lastName', 'experienceYears', 'rating', 'createdAt']
+    }
+  },
+  
   volunteers: {
     entity: 'volunteers',
     displayName: 'Voluntarios',

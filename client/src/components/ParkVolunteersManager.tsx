@@ -227,9 +227,8 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
       {/* COLUMNA IZQUIERDA: Voluntarios Disponibles */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Voluntarios Disponibles ({filteredAvailableVolunteers.length})
+          <CardTitle className="flex items-center gap-2 mb-4">
+            Disponibles ({filteredAvailableVolunteers.length})
           </CardTitle>
           
           {/* Filtros */}
@@ -243,23 +242,12 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
                 className="pl-10"
               />
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSearchTerm('');
-                setStatusFilter('all');
-              }}
-            >
-              <Filter className="h-4 w-4 mr-1" />
-              Limpiar
-            </Button>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 max-h-[600px] overflow-y-auto">
             {filteredAvailableVolunteers.map((volunteer) => (
-              <div key={volunteer.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div key={volunteer.id} className="border rounded-lg p-4 hover:bg-gray-100 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
@@ -308,8 +296,7 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
                     onClick={() => handleAssignVolunteer(volunteer.id)}
                     disabled={assignVolunteerMutation.isPending}
                   >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Asignar
+                    <Plus className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -330,8 +317,7 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Voluntarios Asignados ({assignedVolunteers.length})
+            Asignados ({assignedVolunteers.length})
           </CardTitle>
         </CardHeader>
         <CardContent>

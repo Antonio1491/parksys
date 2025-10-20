@@ -1021,36 +1021,38 @@ const AdminParksContent = () => {
               
               <div className="flex items-center space-x-2">
                 {/* 1. Botón para cambiar los modos de visualización del grid */}
-                <div className="flex w-auto justify-end flex items-center bg-[#ededed] rounded-lg">
-                  <Button
-                    variant={viewMode === 'cards' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('cards')}
-                    className={`h-11 w-22 ${viewMode === 'cards' ? 'bg-primary text-white' : 'text-foreground'}`}
-                    data-testid="button-view-cards"
-                  >
-                    <Grid />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'table' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('table')}
-                    className={`h-11 w-22 ${viewMode === 'table' ? 'bg-primary text-white' : 'text-foreground'}`}
-                    data-testid="button-view-table"
-                  >
-                    <List />
-                  </Button>
+                <div className="ml-auto">
+                  <div className="flex border rounded-lg p-1 bg-gray-100">
+                    <Button
+                      variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('cards')}
+                      className={`${viewMode === 'cards' ? 'bg-primary text-white' : 'text-foreground'}`}
+                      data-testid="button-view-cards"
+                    >
+                      <Grid className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'table' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('table')}
+                      className={`${viewMode === 'table' ? 'bg-primary text-white' : 'text-foreground'}`}
+                      data-testid="button-view-table"
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 {/* 2. Botón de selección con menú desplegable */}
                 <div className="relative group">
                   <Button
-                    variant={selectionMode ? 'default' : 'ghost'}
+                    variant={selectionMode ? 'default' : 'outline'}
                     size="sm"
-                    className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-primary text-primary-foreground hover:bg-buttonHover' : 'bg-[#ededed]'}`}
+                    className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-primary text-white hover-[#00a587]' : 'bg-gray-100 hover:bg-[#00a587]'}`}
                     data-testid="button-selection-toggle"
                   >
-                    <CopyCheck />
+                    <CopyCheck className="h-5 w-5 text-[#4b5b65] hover-white" />
                   </Button>
 
                   {/* Dropdown menu con CSS hover */}
@@ -1101,7 +1103,7 @@ const AdminParksContent = () => {
                   disabled={selectedParks.size === 0}
                   data-testid="button-delete-selected"
                 >
-                  <Trash2 />
+                  <Trash2 className="h-5 w-5" />
                   {selectedParks.size > 0 ? ` (${selectedParks.size})` : ''}
                 </Button>
               </div>

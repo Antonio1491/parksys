@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useRoute } from 'wouter';
+import ROUTES from '@/routes';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -64,7 +65,7 @@ type ConsumableFormValues = z.infer<typeof consumableFormSchema>;
 
 export default function ConsumableEdit() {
   const [, setLocation] = useLocation();
-  const [match, params] = useRoute('/admin/warehouse/consumables/:id/edit');
+  const [match, params] = useRoute(ROUTES.admin.warehouse.edit.path);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -150,7 +151,7 @@ export default function ConsumableEdit() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/warehouse/consumables'] });
       queryClient.invalidateQueries({ queryKey: ['/api/warehouse/consumables', consumableId] });
-      setLocation('/admin/warehouse/consumables');
+      setLocation(ROUTES.admin.warehouse.list);
     },
     onError: (error: any) => {
       toast({
@@ -171,7 +172,7 @@ export default function ConsumableEdit() {
   };
 
   const handleCancel = () => {
-    setLocation('/admin/warehouse/consumables');
+    setLocation(ROUTES.admin.warehouse.list);
   };
 
   // Loading states

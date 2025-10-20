@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-
+import ROUTES from '@/routes';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +17,8 @@ import { toast } from '@/hooks/use-toast';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 import { Checkbox } from '@/components/ui/checkbox';
 import LocationSelector from '@/components/LocationSelector';
-import { Plus } from 'lucide-react';
+import { Plus, X, MapPin, Boxes } from 'lucide-react';
+import { ReturnHeader } from '@/components/ui/return-header';
 
 // Las categorías se cargan dinámicamente desde la API
 
@@ -375,38 +376,42 @@ const CrearActividadPage = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <ReturnHeader />
+      <div className="p-4">
+      <div className="container mx-auto p-4 space-y-4">
         {/* Header con patrón Card estandarizado */}
-        <Card className="p-4 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <Plus className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-gray-900">Crear Nueva Actividad</h1>
-              </div>
-              <p className="text-gray-600 mt-2">Completa el formulario para crear una nueva actividad para el catálogo</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-2 border-2 border-[#00444f] rounded-full">
+              <Boxes className="h-5 w-5 text-[#00444f]" />
             </div>
-            <Button variant="outline" onClick={() => setLocation('/admin/activities/management')}>
-              Actividades Disponibles
+            <div>
+              <h1 className="text-3xl font-poppins font-bold text-[#00444f]">Nueva Actividad</h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button
+              type="submit"
+              disabled={createMutation.isPending}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {createMutation.isPending ? "Guardar Cambios" : "Crear"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLocation(ROUTES.admin.activities.list)}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancelar
             </Button>
           </div>
-        </Card>
+        </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Formulario de Actividad</CardTitle>
-            <CardDescription>
-              Ingresa la información completa de la actividad. Los campos marcados con * son obligatorios.
-              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-700">
-                  📋 <strong>Flujo de Aprobación:</strong> Todas las actividades nuevas se crean con estado "Por Costear" y requieren autorización financiera antes de activarse.
-                </p>
-              </div>
-            </CardDescription>
-          </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
               {/* Sección de información básica */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Información Básica</h3>
@@ -1543,28 +1548,11 @@ const CrearActividadPage = () => {
                   </div>
                 )}
               </div>
-
-              <div className="pt-4 border-t">
-                <div className="flex justify-end gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setLocation('/admin/organizador/catalogo/ver')}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button 
-                    type="submit"
-                    disabled={createMutation.isPending}
-                  >
-                    {createMutation.isPending ? "Guardando..." : "Guardar Actividad"}
-                  </Button>
-                </div>
-              </div>
             </form>
           </Form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
       </div>
     </AdminLayout>
   );

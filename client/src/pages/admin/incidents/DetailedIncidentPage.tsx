@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useRoute } from 'wouter';
+import ROUTES from '@/routes';
 import { 
   AlertTriangle, 
   Clock, 
@@ -167,7 +168,7 @@ const getStatusIcon = (status: string) => {
 };
 
 const DetailedIncidentPage = () => {
-  const [, params] = useRoute('/admin/incidents/:id');
+  const [, params] = useRoute(ROUTES.admin.incidents.view.path);
   const [location, setLocation] = useLocation();
   const incidentId = params?.id ? parseInt(params.id) : 0;
   const { toast } = useToast();
@@ -380,7 +381,7 @@ const DetailedIncidentPage = () => {
   };
 
   const goBack = () => {
-    setLocation('/admin/incidents');
+    setLocation(ROUTES.admin.incidents.list);
   };
 
   if (isLoadingIncident) {

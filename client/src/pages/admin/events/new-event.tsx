@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { ArrowLeft, Calendar, MapPin, Users, Clock, FileText, Save, Plus, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -132,7 +133,7 @@ export default function NewEventPage() {
         description: 'El evento ha sido creado exitosamente.'
       });
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
-      setLocation('/admin/events');
+      setLocation(ROUTES.admin.events.list);
     },
     onError: (error: any) => {
       toast({

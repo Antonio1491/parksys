@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation as useWouterLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useForm } from 'react-hook-form';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ChevronLeft,
-  Loader
+  Loader,
+  Plus,
+  TreePine,
+  Trees
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -19,6 +23,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import AdminLayout from '@/components/AdminLayout';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { ReturnHeader } from "@/components/ui/return-header";
 
 // Define el esquema de validación para el formulario
 const parkSchema = z.object({
@@ -191,7 +196,7 @@ const AdminParkEdit: React.FC = () => {
         title: isEdit ? 'Parque actualizado' : 'Parque creado',
         description: `El parque ha sido ${isEdit ? 'actualizado' : 'creado'} correctamente.`,
       });
-      setLocation('/admin/parks');
+      setLocation(ROUTES.admin.parks.list);
     },
     onError: (error: any) => {
       console.error('Error en onError:', error);
@@ -215,30 +220,37 @@ const AdminParkEdit: React.FC = () => {
   }
 
   return (
-    <AdminLayout
+    <AdminLayout    
       title={isEdit ? `Editar parque: ${park?.name || ''}` : 'Nuevo parque'}
       subtitle={isEdit ? "Actualiza la información del parque" : "Ingresa la información para crear un nuevo parque"}
     >
-      <div className="p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation('/admin/parks')}
-              className="mb-2"
+      <ReturnHeader />
+      <div className="p-4">
+        <div className="container mx-auto p-4 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-2 border-2 border-[#00444f] rounded-full">
+                <Trees className="h-5 w-5 text-[#00444f]" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-poppins font-bold text-[#00444f]">Nuevo Parque</h1>
+              </div>
+            </div>
+            
+            <Button 
+              type="submit"
+              disabled={mutation.isPending}
             >
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Volver a la lista
+              <Plus className="h-4 w-4 mr-2" />
+              {mutation.isPending && <Loader className="mr-2 h-4 w-4 animate-spin" />}
+              {isEdit ? 'Guardar Cambios' : 'Crear'}
             </Button>
           </div>
           
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 park-edit-container">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="park-edit-container">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-1">
-                  <TabsTrigger value="basic">Información Básica</TabsTrigger>
-                </TabsList>
+                
             
             <TabsContent value="basic">
               <Card>
@@ -404,9 +416,7 @@ const AdminParkEdit: React.FC = () => {
                       )}
                     />
                   </div>
-                  
-
-                  
+                                   
                   {/* Configuración de horarios individuales por día */}
                   <FormField
                     control={form.control}
@@ -573,13 +583,6 @@ const AdminParkEdit: React.FC = () => {
 
                 </CardContent>
                 <CardFooter className="flex justify-end">
-                  <Button 
-                    type="submit"
-                    disabled={mutation.isPending}
-                  >
-                    {mutation.isPending && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                    {isEdit ? 'Guardar Cambios' : 'Crear Parque'}
-                  </Button>
                 </CardFooter>
               </Card>
             </TabsContent>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -366,11 +367,11 @@ const AssetMapPage: React.FC = () => {
               </p>
             </div>
             <div className="flex space-x-2">
-              <Button variant="outline" onClick={() => setLocation('/admin/assets/inventory')}>
+              <Button variant="outline" onClick={() => setLocation(ROUTES.admin.assets.list)}>
                 <List className="mr-2 h-4 w-4" />
                 Ver Inventario
               </Button>
-              <Button onClick={() => setLocation('/admin/assets/new')}>
+              <Button onClick={() => setLocation(ROUTES.admin.assets.create)}>
                 <Layers className="mr-2 h-4 w-4" />
                 Nuevo Activo
               </Button>

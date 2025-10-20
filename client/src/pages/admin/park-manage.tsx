@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useLocation as useWouterLocation } from "wouter";
+import ROUTES from '@/routes';
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Images, MapPin, Users, TreePine, FileText } from "lucide-react";
+import { ArrowLeft, Images, MapPin, Users, TreePine, FileText, Save, Trees } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import AdminLayout from "@/components/AdminLayout";
@@ -20,6 +21,7 @@ import ParkMultimediaManager from "@/components/ParkMultimediaManager";
 import ParkAmenitiesManager from "@/components/ParkAmenitiesManager";
 import ParkTreeSpeciesManager from "@/components/ParkTreeSpeciesManager";
 import ParkVolunteersManager from "@/components/ParkVolunteersManager";
+import { ReturnHeader } from "@/components/ui/return-header";
 
 // Schema de validación para el formulario
 const parkSchema = z.object({
@@ -62,7 +64,7 @@ interface ParkBasicInfoFormProps {
 }
 
 const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) => {
-  const [_, setLocation] = useWouterLocation();
+  const [, setLocation] = useWouterLocation();
   const { toast } = useToast();
 
   // Definir el formulario con react-hook-form
@@ -195,7 +197,7 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form id="park-basic-info-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Nombre del parque */}
           <FormField
@@ -541,16 +543,7 @@ const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) =
           )}
         />
         
-        {/* Botón de guardar */}
-        <div className="flex justify-end pt-6">
-          <Button 
-            type="submit" 
-            className="bg-blue-600 hover:bg-blue-700"
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
-          </Button>
-        </div>
+        
       </form>
     </Form>
   );
@@ -597,7 +590,7 @@ export default function ParkManage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <p className="text-red-600">Error cargando el parque</p>
-            <Link href="/admin/parks">
+            <Link href={ROUTES.admin.parks.list}>
               <Button className="mt-4">Volver a parques</Button>
             </Link>
           </div>
@@ -608,25 +601,29 @@ export default function ParkManage() {
 
   return (
     <AdminLayout>
+      {/* Header con botón volver */}
+      <ReturnHeader />
         <div className="container mx-auto p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/admin/parks">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Volver
-                </Button>
-              </Link>
+              <div className="p-2 border-2 border-[#00444f] rounded-full">
+                <Trees className="h-5 w-5 text-[#00444f]" />
+              </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{park.name}</h1>
-                <div className="flex items-center text-gray-600 mt-1">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="text-sm">{park.address}</span>
-                </div>
+                <h1 className="text-3xl font-bold text-[#00444f]">{park.name}</h1>
               </div>
             </div>
 
+            {/* Botón guardar - solo visible en pestaña "basica" */}
+            <Button 
+              type="submit"
+              form="park-basic-info-form"
+              className="bg-[#00444f] hover:bg-[#00a884] hover:text-white"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Guardar
+            </Button>
           </div>
 
           {/* Tabs de gestión */}
@@ -658,8 +655,10 @@ export default function ParkManage() {
             <TabsContent value="basica" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl text-blue-600 flex items-center gap-2">
+                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+                    <div className="p-2 border-2 border-gray-800 rounded-full">
                     <FileText className="h-6 w-6" />
+                    </div>
                     Información Básica del Parque
                   </CardTitle>
                   <CardDescription>
@@ -676,13 +675,19 @@ export default function ParkManage() {
             <TabsContent value="multimedia" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl text-blue-600 flex items-center gap-2">
-                    <Images className="h-6 w-6" />
-                    Gestión de Multimedia del Parque
-                  </CardTitle>
-                  <CardDescription>
-                    Administra imágenes y documentos del parque. Puedes subir archivos o usar URLs externas.
-                  </CardDescription>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+                        <div className="p-2 border-2 border-gray-800 rounded-full">
+                        <Images className="h-6 w-6" />
+                        </div>
+                        Gestión de Multimedia del Parque
+                      </CardTitle>
+                      <CardDescription>
+                        Administra imágenes y documentos del parque. Puedes subir archivos o usar URLs externas.
+                      </CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <ParkMultimediaManager parkId={parseInt(id || '0')} />
@@ -694,8 +699,10 @@ export default function ParkManage() {
             <TabsContent value="amenidades" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl text-green-600 flex items-center gap-2">
+                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+                    <div className="p-2 border-2 border-gray-800 rounded-full">
                     <MapPin className="h-6 w-6" />
+                    </div>
                     Gestión de Amenidades del Parque
                   </CardTitle>
                   <CardDescription>
@@ -708,13 +715,13 @@ export default function ParkManage() {
               </Card>
             </TabsContent>
 
-
-
             <TabsContent value="arboles" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl text-green-600 flex items-center gap-2">
+                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+                    <div className="p-2 border-2 border-gray-800 rounded-full">
                     <TreePine className="h-6 w-6" />
+                    </div>
                     Gestión de Especies Arbóreas del Parque
                   </CardTitle>
                   <CardDescription>
@@ -730,8 +737,10 @@ export default function ParkManage() {
             <TabsContent value="voluntarios" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl text-green-600 flex items-center gap-2">
+                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+                    <div className="p-2 border-2 border-gray-800 rounded-full">
                     <Users className="h-6 w-6" />
+                    </div>
                     Gestión de Voluntarios del Parque
                   </CardTitle>
                   <CardDescription>

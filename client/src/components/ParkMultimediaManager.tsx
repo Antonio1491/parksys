@@ -9,14 +9,14 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-// import { uploadParkImageSmart } from '@/utils/objectStorageUpload';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Upload, 
@@ -24,7 +24,6 @@ import {
   FileText, 
   Trash2, 
   Star, 
-  StarOff, 
   Download,
   Eye,
   Plus,
@@ -93,6 +92,9 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   // Estados para nuevos documentos
   const [newDocumentFile, setNewDocumentFile] = useState<File | null>(null);
   const [newDocumentUrl, setNewDocumentUrl] = useState('');
+  const [newDocumentTitle, setNewDocumentTitle] = useState('');
+  const [newDocumentDescription, setNewDocumentDescription] = useState('');
+  const [newDocumentCategory, setNewDocumentCategory] = useState('general');
 
   // Estados para nuevos videos
   const [newVideoFile, setNewVideoFile] = useState<File | null>(null);
@@ -101,9 +103,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const [newVideoDescription, setNewVideoDescription] = useState('');
   const [isVideoFeatured, setIsVideoFeatured] = useState(false);
   const [videoUploadType, setVideoUploadType] = useState<'file' | 'url'>('file');
-  const [newDocumentTitle, setNewDocumentTitle] = useState('');
-  const [newDocumentDescription, setNewDocumentDescription] = useState('');
-  const [newDocumentCategory, setNewDocumentCategory] = useState('general');
 
   // Función para limpiar formulario de imagen
   const resetImageForm = () => {
@@ -131,13 +130,10 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     setVideoUploadType('file');
   };
 
-
-
   // Consultas para obtener datos
-  const { data: images = [], isLoading: imagesLoading, error: imagesError } = useQuery<ParkImage[]>({
+  const { data: images = [], isLoading: imagesLoading } = useQuery<ParkImage[]>({
     queryKey: [`/api/parks/${parkId}/images`],
     queryFn: async () => {
-      console.log(`🔍 FRONTEND: Cargando imágenes para parque ${parkId}`);
       const response = await fetch(`/api/parks/${parkId}/images`, {
         headers: {
           'Authorization': 'Bearer direct-token-1750522117022',
@@ -146,18 +142,15 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         }
       });
       if (!response.ok) throw new Error('Error cargando imágenes');
-      const data = await response.json();
-      console.log(`✅ FRONTEND: Imágenes cargadas:`, data);
-      return data;
+      return response.json();
     },
     staleTime: 0,
     gcTime: 0
   });
 
-  const { data: documents = [], isLoading: documentsLoading, error: documentsError } = useQuery<ParkDocument[]>({
+  const { data: documents = [], isLoading: documentsLoading } = useQuery<ParkDocument[]>({
     queryKey: [`/api/parks/${parkId}/documents`],
     queryFn: async () => {
-      console.log(`🔍 FRONTEND: Cargando documentos para parque ${parkId}`);
       const response = await fetch(`/api/parks/${parkId}/documents`, {
         headers: {
           'Authorization': 'Bearer direct-token-1750522117022',
@@ -166,9 +159,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         }
       });
       if (!response.ok) throw new Error('Error cargando documentos');
-      const data = await response.json();
-      console.log(`✅ FRONTEND: Documentos cargados:`, data);
-      return data;
+      return response.json();
     },
     staleTime: 0,
     gcTime: 0
@@ -177,7 +168,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const { data: videos = [], isLoading: videosLoading, error: videosError } = useQuery<ParkVideo[]>({
     queryKey: [`/api/parks/${parkId}/videos`],
     queryFn: async () => {
-      console.log(`🔍 FRONTEND: Cargando videos para parque ${parkId}`);
       const response = await fetch(`/api/parks/${parkId}/videos`, {
         headers: {
           'Authorization': 'Bearer direct-token-1750522117022',
@@ -186,9 +176,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         }
       });
       if (!response.ok) throw new Error('Error cargando videos');
-      const data = await response.json();
-      console.log(`✅ FRONTEND: Videos cargados:`, data);
-      return data;
+      return response.json();
     },
     staleTime: 0,
     gcTime: 0
@@ -197,13 +185,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   // Mutaciones para imágenes
   const uploadImageMutation = useMutation({
     mutationFn: async (data: FormData | { imageUrl: string; caption: string; isPrimary: boolean }) => {
-      console.log('📤 [UPLOAD-OS] Iniciando subida con Object Storage:', data instanceof FormData ? 'FormData' : data);
-      
       if (data instanceof FormData) {
-        // 🚀 USAR UNIFIED STORAGE: Persistencia automática con fallback inteligente
-        console.log('🚀 [UNIFIED-STORAGE] Usando sistema unificado con persistencia garantizada');
-        
-        // El UnifiedStorageService maneja Object Storage + fallback automáticamente
         const response = await fetch(`/api/parks/${parkId}/images`, {
           method: 'POST',
           headers: {
@@ -213,31 +195,17 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
           },
           body: data
         });
-        
-        if (!response.ok) {
-          throw new Error(`Error subiendo imagen: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('✅ [UNIFIED-STORAGE] Upload exitoso - PERSISTENCIA GARANTIZADA:', result);
-        
-        return result;
+        if (!response.ok) throw new Error('Error subiendo imagen');
+        return response.json();
       } else {
-        // 🌐 URLs externas: Usar endpoint tradicional (solo para URLs)
-        console.log('🌐 [URL-UPLOAD] URL externa detectada, usando endpoint tradicional');
-        
         const response = await apiRequest(`/api/parks/${parkId}/images`, {
           method: 'POST',
-          data: {
-            ...data,
-            _environment: 'production',
-            _isUrl: true
-          }
+          data: { ...data, _environment: 'production', _isUrl: true }
         });
         return response.json();
       }
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       toast({
         title: "✅ Imagen guardada exitosamente",
         description: "Su imagen ha sido almacenada con persistencia garantizada.",
@@ -248,7 +216,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       resetImageForm();
       setIsImageDialogOpen(false);
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
         description: "No se pudo subir la imagen. Intente nuevamente.",
@@ -259,35 +227,23 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const setPrimaryImageMutation = useMutation({
     mutationFn: async (imageId: number) => {
-      console.log(`⭐ [PRIMARY] Estableciendo imagen ${imageId} como principal`);
-      try {
-        const response = await apiRequest(`/api/park-images/${imageId}/set-primary`, {
-          method: 'POST',
-          data: {}
-        });
-        console.log(`✅ [PRIMARY] Imagen principal actualizada:`, response);
-        return response;
-      } catch (error) {
-        console.error(`❌ [PRIMARY] Error en API:`, error);
-        throw error;
-      }
+      const response = await apiRequest(`/api/park-images/${imageId}/set-primary`, {
+        method: 'POST',
+        data: {}
+      });
+      return response;
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       toast({
         title: "⭐ Imagen principal actualizada",
         description: "¡Nueva imagen principal establecida exitosamente!",
         className: "bg-yellow-50 border-yellow-200 text-yellow-800"
       });
-      // Invalidar y refrescar queries múltiples
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
-      
-      // Forzar refetch inmediato para actualizar UI
       queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/images`] });
     },
-    onError: (error) => {
-      console.error('❌ [PRIMARY] Error:', error);
+    onError: () => {
       toast({
         title: "Error",
         description: "No se pudo establecer como imagen principal.",
@@ -304,24 +260,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       return response;
     },
     onSuccess: () => {
-      // ✅ Toast de éxito silenciado - el usuario ve el resultado inmediatamente en la UI
-      
-      // Invalidación múltiple del cache con diferentes estrategias
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
-      queryClient.removeQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-      queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-      
-      // Forzar re-render del componente
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-      }, 100);
-    },
-    onError: () => {
-      // ✅ Error silenciado - si la imagen no existe, es porque ya fue eliminada (éxito efectivo)
-      console.log('🔄 [DELETE] Imagen ya fue eliminada o no existe - actualizando UI');
-      
-      // Actualizar UI de todas formas
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
       queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/images`] });
@@ -340,11 +278,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         },
         body: data
       });
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Error uploading document:', errorText);
-        throw new Error('Error subiendo documento');
-      }
+      if (!response.ok) throw new Error('Error subiendo documento');
       return response.json();
     },
     onSuccess: () => {
@@ -357,7 +291,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       resetDocumentForm();
       setIsDocumentDialogOpen(false);
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
         description: "No se pudo subir el documento. Intente nuevamente.",
@@ -368,31 +302,21 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const deleteDocumentMutation = useMutation({
     mutationFn: async (documentId: number) => {
-      console.log(`🌐 [API REQUEST] DELETE /api/park-documents/${documentId}`);
       const response = await apiRequest(`/api/park-documents/${documentId}`, {
         method: 'DELETE'
       });
       return response;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Documento eliminado",
-        description: data?.message || "El documento se ha eliminado correctamente.",
+        description: "El documento se ha eliminado correctamente.",
       });
-      // Invalidate all related queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
-      
-      // Force refetch documents immediately
       queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
     },
-    onError: (error: any) => {
-      console.error('❌ Error en eliminación:', error);
-      // Even if there's an error, try to refresh the data in case it was actually deleted
+    onError: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
-      queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
-      
       toast({
         title: "Error",
         description: "No se pudo eliminar el documento.",
@@ -441,7 +365,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       resetVideoForm();
       setIsVideoDialogOpen(false);
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
         description: "No se pudo subir el video. Intente nuevamente.",
@@ -449,7 +373,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       });
     },
   });
-
 
   const setFeaturedVideoMutation = useMutation({
     mutationFn: async (videoId: number) => {
@@ -472,7 +395,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         description: "Se ha establecido el nuevo video destacado del parque.",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/videos`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
     },
     onError: () => {
       toast({
@@ -502,7 +424,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         description: "El video se ha eliminado correctamente.",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/videos`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
     },
     onError: () => {
       toast({
@@ -517,7 +438,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const handleImageSubmit = () => {
     if (newImageFile) {
       const formData = new FormData();
-      formData.append('imageFile', newImageFile);  // DEBE coincidir con backend
+      formData.append('imageFile', newImageFile);
       formData.append('caption', newImageCaption);
       formData.append('isPrimary', isPrimaryImage.toString());
       uploadImageMutation.mutate(formData);
@@ -531,7 +452,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   };
 
   const handleDocumentSubmit = () => {
-    // Validar que se haya proporcionado un título
     if (!newDocumentTitle.trim()) {
       toast({
         title: "Error",
@@ -541,7 +461,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       return;
     }
 
-    // Priorizar archivo sobre URL - el archivo es obligatorio
     if (!newDocumentFile) {
       toast({
         title: "Error", 
@@ -556,9 +475,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     formData.append('title', newDocumentTitle);
     formData.append('description', newDocumentDescription);
     formData.append('category', newDocumentCategory);
-    
-    // URL field removed - not supported in current database schema
-    
+
     uploadDocumentMutation.mutate(formData);
   };
 
@@ -581,14 +498,14 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         });
         return;
       }
-      
+
       const formData = new FormData();
       formData.append('video', newVideoFile);
       formData.append('title', newVideoTitle);
       formData.append('description', newVideoDescription);
       formData.append('isFeatured', isVideoFeatured.toString());
       formData.append('videoType', 'file');
-      
+
       uploadVideoMutation.mutate(formData);
     } else {
       if (!newVideoUrl.trim()) {
@@ -600,7 +517,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         return;
       }
 
-      // Detectar el tipo de video basado en la URL
       let videoType = 'external';
       if (newVideoUrl.includes('youtube.com') || newVideoUrl.includes('youtu.be')) {
         videoType = 'youtube';
@@ -626,18 +542,34 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  console.log('🔍 MULTIMEDIA MANAGER - Renderizando con:', {
-    parkId,
-    images: images.length,
-    documents: documents.length,
-    imagesLoading,
-    documentsLoading,
-    imagesError,
-    documentsError
-  });
-
   return (
     <div className="space-y-6">
+      {/* Header con botón flotante */}
+      <div className="flex justify-end -mt-16 mb-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="bg-[#a0cc4d] hover:bg-[#00a884] text-white hover:text-white">
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => setIsImageDialogOpen(true)}>
+              <ImageIcon className="h-4 w-4 mr-2 text-gray-800" />
+              Agregar Imagen
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsDocumentDialogOpen(true)}>
+              <FileText className="h-4 w-4 mr-2 text-gray-800" />
+              Agregar Documento
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsVideoDialogOpen(true)}>
+              <Video className="h-4 w-4 mr-2 text-gray-800" />
+              Agregar Video
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <Tabs defaultValue="images" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="images" className="flex items-center gap-2">
@@ -656,78 +588,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
         {/* PESTAÑA DE IMÁGENES */}
         <TabsContent value="images" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Galería de Imágenes</h3>
-            <div className="flex gap-2">
-              <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Agregar Imagen
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Agregar Nueva Imagen</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Subir archivo</label>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setNewImageFile(file);
-                            setNewImageUrl('');
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="text-center text-sm text-gray-500">- O -</div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">URL de imagen</label>
-                      <Input
-                        value={newImageUrl}
-                        onChange={(e) => {
-                          setNewImageUrl(e.target.value);
-                          if (e.target.value) setNewImageFile(null);
-                        }}
-                        placeholder="https://ejemplo.com/imagen.jpg"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Descripción</label>
-                      <Textarea
-                        value={newImageCaption}
-                        onChange={(e) => setNewImageCaption(e.target.value)}
-                        placeholder="Descripción de la imagen..."
-                        rows={3}
-                      />
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="isPrimary"
-                        checked={isPrimaryImage}
-                        onChange={(e) => setIsPrimaryImage(e.target.checked)}
-                      />
-                      <label htmlFor="isPrimary" className="text-sm">Establecer como imagen principal</label>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button 
-                      onClick={handleImageSubmit}
-                      disabled={(!newImageFile && !newImageUrl) || uploadImageMutation.isPending}
-                    >
-                      {uploadImageMutation.isPending ? 'Subiendo...' : 'Agregar Imagen'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
 
           {imagesLoading ? (
             <div className="text-center py-8">Cargando imágenes...</div>
@@ -748,7 +608,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                     {image.isPrimary && (
                       <Badge className="absolute top-2 left-2 bg-yellow-500 text-yellow-900">
                         <Star className="h-3 w-3 mr-1 fill-yellow-600 text-yellow-600" />
-                        Principal
                       </Badge>
                     )}
                   </div>
@@ -761,7 +620,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                           variant="outline"
                           onClick={() => setPrimaryImageMutation.mutate(image.id)}
                           disabled={setPrimaryImageMutation.isPending}
-                          className="border-yellow-300 text-yellow-600 hover:bg-yellow-50"
+                          className="border-gray-400 text-gray-800 hover:bg-yellow-100"
                         >
                           <Star className="h-3 w-3 hover:fill-yellow-500" />
                         </Button>
@@ -770,14 +629,16 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                         size="sm"
                         variant="outline"
                         onClick={() => window.open(image.imageUrl, '_blank')}
+                        className="border-gray-400 text-gray-800 hover:bg-gray-200"
                       >
                         <Eye className="h-3 w-3" />
                       </Button>
                       <Button
                         size="sm"
-                        variant="destructive"
+                        variant="outline"
                         onClick={() => deleteImageMutation.mutate(image.id)}
                         disabled={deleteImageMutation.isPending}
+                        className="border-gray-400 text-gray-800 hover:bg-gray-200"
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -791,89 +652,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
         {/* PESTAÑA DE DOCUMENTOS */}
         <TabsContent value="documents" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Documentos del Parque</h3>
-            <Dialog open={isDocumentDialogOpen} onOpenChange={setIsDocumentDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Agregar Documento
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Agregar Nuevo Documento</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Título</label>
-                    <Input
-                      value={newDocumentTitle}
-                      onChange={(e) => setNewDocumentTitle(e.target.value)}
-                      placeholder="Título del documento"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Archivo del Documento *</label>
-                    <Input
-                      type="file"
-                      accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        setNewDocumentFile(file || null);
-                      }}
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Formatos permitidos: PDF, DOC, DOCX, TXT, XLS, XLSX, PPT, PPTX (máx. 10MB)
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">URL de Referencia (opcional)</label>
-                    <Input
-                      value={newDocumentUrl}
-                      onChange={(e) => setNewDocumentUrl(e.target.value)}
-                      placeholder="https://ejemplo.com/documento-original.pdf"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      URL opcional para referenciar el documento original o fuente
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Categoría</label>
-                    <select
-                      value={newDocumentCategory}
-                      onChange={(e) => setNewDocumentCategory(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="general">General</option>
-                      <option value="reglamento">Reglamento</option>
-                      <option value="mantenimiento">Mantenimiento</option>
-                      <option value="eventos">Eventos</option>
-                      <option value="legal">Legal</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Descripción</label>
-                    <Textarea
-                      value={newDocumentDescription}
-                      onChange={(e) => setNewDocumentDescription(e.target.value)}
-                      placeholder="Descripción del documento..."
-                      rows={3}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button 
-                    onClick={handleDocumentSubmit}
-                    disabled={!newDocumentFile || !newDocumentTitle.trim() || uploadDocumentMutation.isPending}
-                  >
-                    {uploadDocumentMutation.isPending ? 'Subiendo...' : 'Agregar Documento'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
 
           {documentsLoading ? (
             <div className="text-center py-8">Cargando documentos...</div>
@@ -896,11 +674,11 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                       </div>
                       <Badge variant="outline">{formatFileSize(document.fileSize)}</Badge>
                     </div>
-                    
+
                     {document.description && (
                       <p className="text-sm text-gray-600 mb-3">{document.description}</p>
                     )}
-                    
+
                     <div className="flex gap-2">
                       <Button
                         size="sm"
@@ -928,135 +706,16 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
         {/* PESTAÑA DE VIDEOS */}
         <TabsContent value="videos" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Galería de Videos</h3>
-            <div className="flex gap-2">
-              <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Agregar Video
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Agregar Nuevo Video</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Tipo de subida</label>
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant={videoUploadType === 'file' ? 'default' : 'outline'}
-                          onClick={() => setVideoUploadType('file')}
-                          className="flex-1"
-                        >
-                          <Upload className="h-4 w-4 mr-2" />
-                          Archivo
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={videoUploadType === 'url' ? 'default' : 'outline'}
-                          onClick={() => setVideoUploadType('url')}
-                          className="flex-1"
-                        >
-                          <Link className="h-4 w-4 mr-2" />
-                          URL
-                        </Button>
-                      </div>
-                    </div>
-
-                    {videoUploadType === 'file' ? (
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Archivo de Video</label>
-                        <Input
-                          type="file"
-                          accept="video/*"
-                          onChange={(e) => setNewVideoFile(e.target.files?.[0] || null)}
-                        />
-                      </div>
-                    ) : (
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">URL del Video</label>
-                        <Input
-                          placeholder="https://youtube.com/watch?v=... o https://vimeo.com/..."
-                          value={newVideoUrl}
-                          onChange={(e) => setNewVideoUrl(e.target.value)}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Soporta YouTube, Vimeo y otras URLs de video
-                        </p>
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Título *</label>
-                      <Input
-                        placeholder="Título del video"
-                        value={newVideoTitle}
-                        onChange={(e) => setNewVideoTitle(e.target.value)}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Descripción</label>
-                      <Textarea
-                        placeholder="Descripción del video (opcional)"
-                        value={newVideoDescription}
-                        onChange={(e) => setNewVideoDescription(e.target.value)}
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="videoFeatured"
-                        checked={isVideoFeatured}
-                        onChange={(e) => setIsVideoFeatured(e.target.checked)}
-                        className="h-4 w-4"
-                      />
-                      <label htmlFor="videoFeatured" className="text-sm font-medium">
-                        Video destacado
-                      </label>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsVideoDialogOpen(false)}>
-                      Cancelar
-                    </Button>
-                    <Button 
-                      onClick={handleVideoSubmit}
-                      disabled={uploadVideoMutation.isPending}
-                      className="bg-purple-600 hover:bg-purple-700"
-                    >
-                      {uploadVideoMutation.isPending ? 'Subiendo...' : 'Agregar Video'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
 
           {videosLoading ? (
             <div className="text-center py-8">Cargando videos...</div>
           ) : videosError ? (
             <div className="text-red-500 text-center py-8">
-              Error al cargar videos: {(videosError as Error).message}
+              Error al cargar videos
             </div>
           ) : videos.length === 0 ? (
-            <div className="text-center py-12">
-              <Video className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No hay videos</h3>
-              <p className="text-gray-500 mb-4">Comienza agregando el primer video al parque.</p>
-              <Button 
-                onClick={() => setIsVideoDialogOpen(true)}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Agregar Video
-              </Button>
+            <div className="text-center py-8 text-gray-500">
+              No hay videos para este parque
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1068,8 +727,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                         <div className="p-2 bg-purple-100 rounded-lg">
                           {video.videoType === 'youtube' ? (
                             <Play className="h-4 w-4 text-purple-600" />
-                          ) : video.videoType === 'vimeo' ? (
-                            <Video className="h-4 w-4 text-purple-600" />
                           ) : (
                             <Video className="h-4 w-4 text-purple-600" />
                           )}
@@ -1090,11 +747,11 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                         </Badge>
                       )}
                     </div>
-                    
+
                     {video.description && (
                       <p className="text-sm text-gray-600 mb-3">{video.description}</p>
                     )}
-                    
+
                     <div className="flex gap-2">
                       <Button
                         size="sm"
@@ -1111,7 +768,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                           onClick={() => setFeaturedVideoMutation.mutate(video.id)}
                           disabled={setFeaturedVideoMutation.isPending}
                           className="border-purple-200 text-purple-600 hover:bg-purple-50"
-                        >
+                          >
                           <Star className="h-3 w-3" />
                         </Button>
                       )}
@@ -1131,6 +788,235 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
           )}
         </TabsContent>
       </Tabs>
+
+      {/* DIÁLOGO DE IMAGEN */}
+      <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar Nueva Imagen</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Subir archivo</label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setNewImageFile(file);
+                    setNewImageUrl('');
+                  }
+                }}
+              />
+            </div>
+            <div className="text-center text-sm text-gray-500">- O -</div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">URL de imagen</label>
+              <Input
+                value={newImageUrl}
+                onChange={(e) => {
+                  setNewImageUrl(e.target.value);
+                  if (e.target.value) setNewImageFile(null);
+                }}
+                placeholder="https://ejemplo.com/imagen.jpg"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Descripción</label>
+              <Textarea
+                value={newImageCaption}
+                onChange={(e) => setNewImageCaption(e.target.value)}
+                placeholder="Descripción de la imagen..."
+                rows={3}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isPrimary"
+                checked={isPrimaryImage}
+                onChange={(e) => setIsPrimaryImage(e.target.checked)}
+              />
+              <label htmlFor="isPrimary" className="text-sm">Establecer como imagen principal</label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={handleImageSubmit}
+              disabled={(!newImageFile && !newImageUrl) || uploadImageMutation.isPending}
+            >
+              {uploadImageMutation.isPending ? 'Subiendo...' : 'Agregar Imagen'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DIÁLOGO DE DOCUMENTO */}
+      <Dialog open={isDocumentDialogOpen} onOpenChange={setIsDocumentDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar Nuevo Documento</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Título</label>
+              <Input
+                value={newDocumentTitle}
+                onChange={(e) => setNewDocumentTitle(e.target.value)}
+                placeholder="Título del documento"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Archivo del Documento *</label>
+              <Input
+                type="file"
+                accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  setNewDocumentFile(file || null);
+                }}
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Formatos permitidos: PDF, DOC, DOCX, TXT, XLS, XLSX, PPT, PPTX (máx. 10MB)
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Categoría</label>
+              <select
+                value={newDocumentCategory}
+                onChange={(e) => setNewDocumentCategory(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="general">General</option>
+                <option value="reglamento">Reglamento</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="eventos">Eventos</option>
+                <option value="legal">Legal</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Descripción</label>
+              <Textarea
+                value={newDocumentDescription}
+                onChange={(e) => setNewDocumentDescription(e.target.value)}
+                placeholder="Descripción del documento..."
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={handleDocumentSubmit}
+              disabled={!newDocumentFile || !newDocumentTitle.trim() || uploadDocumentMutation.isPending}
+            >
+              {uploadDocumentMutation.isPending ? 'Subiendo...' : 'Agregar Documento'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DIÁLOGO DE VIDEO */}
+      <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar Nuevo Video</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Tipo de subida</label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={videoUploadType === 'file' ? 'default' : 'outline'}
+                  onClick={() => setVideoUploadType('file')}
+                  className="flex-1"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Archivo
+                </Button>
+                <Button
+                  type="button"
+                  variant={videoUploadType === 'url' ? 'default' : 'outline'}
+                  onClick={() => setVideoUploadType('url')}
+                  className="flex-1"
+                >
+                  <Link className="h-4 w-4 mr-2" />
+                  URL
+                </Button>
+              </div>
+            </div>
+
+            {videoUploadType === 'file' ? (
+              <div>
+                <label className="text-sm font-medium mb-2 block">Archivo de Video</label>
+                <Input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => setNewVideoFile(e.target.files?.[0] || null)}
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="text-sm font-medium mb-2 block">URL del Video</label>
+                <Input
+                  placeholder="https://youtube.com/watch?v=... o https://vimeo.com/..."
+                  value={newVideoUrl}
+                  onChange={(e) => setNewVideoUrl(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Soporta YouTube, Vimeo y otras URLs de video
+                </p>
+              </div>
+            )}
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Título *</label>
+              <Input
+                placeholder="Título del video"
+                value={newVideoTitle}
+                onChange={(e) => setNewVideoTitle(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Descripción</label>
+              <Textarea
+                placeholder="Descripción del video (opcional)"
+                value={newVideoDescription}
+                onChange={(e) => setNewVideoDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="videoFeatured"
+                checked={isVideoFeatured}
+                onChange={(e) => setIsVideoFeatured(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <label htmlFor="videoFeatured" className="text-sm font-medium">
+                Video destacado
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsVideoDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleVideoSubmit}
+              disabled={uploadVideoMutation.isPending}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {uploadVideoMutation.isPending ? 'Subiendo...' : 'Agregar Video'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

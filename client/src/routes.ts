@@ -1,7 +1,5 @@
 // src/routes.ts
 
-import { create } from "domain";
-
 /**
  * Sistema centralizado de rutas de ParkSys
  * Crear y editar en páginas independientes, vista detallada en modal (excepto parques)
@@ -10,53 +8,89 @@ import { create } from "domain";
  */
 
 // ============================================
-// RUTAS PÚBLICAS
+// RUTAS PÚBLICAS mod
 // ============================================
 
 export const PUBLIC_ROUTES = {
-  home: '/',
-  parks: '/parks',
-  parkDetail: (id: string | number) => `/parks/${id}`,
-  parkBySlug: (slug: string) => `/parks/${slug}`, // ✅ Nuevo: nomenclatura en inglés
-  parkEvaluate: (slug: string) => `/parks/${slug}/evaluate`, // ✅ Actualizado
-  parkEvaluations: (parkSlug: string) => `/parks/${parkSlug}/evaluations`, // ✅ Actualizado
+  home: "/",
+  parks: "/parks",
+  parkDetail: {
+    path: "/parks/:id",
+    build: (id: string | number) => `/parks/${id}`,
+  },
+  parkBySlug: {
+    path: "/parks/:slug",
+    build: (slug: string) => `/parks/${slug}`, // ✅ Nuevo: nomenclatura en inglés
+  },
+  parkEvaluate: {
+    path: "/parks/:slug/evaluate",
+    build: (slug: string) => `/parks/${slug}/evaluate`, // ✅ Actualizado
+  },
+  parkEvaluations: {
+    path: "/parks/:parkSlug/evaluations",
+    build: (parkSlug: string) => `/parks/${parkSlug}/evaluations`, // ✅ Actualizado
+  },
 
-  activities: '/activities',
-  activityDetail: (id: string | number) => `/activity/${id}`,
-  activityPayment: (id: string | number) => `/activity/${id}/payment`,
-  
-  events: '/events',
-  eventDetail: (id: string | number) => `/event/${id}`,
+  activities: "/activities",
+  activityDetail: {
+    path: "/activity/:id",
+    build: (id: string | number) => `/activity/${id}`,
+  },
+  activityPayment: {
+    path: "/activity/:id/payment",
+    build: (id: string | number) => `/activity/${id}/payment`,
+  },
 
-  reservations: '/reservations',
-  spaceDetail: (id: string | number) => `/space/${id}`,
-  
-  calendar: '/calendar',
+  events: "/events",
+  eventDetail: {
+    path: "/event/:id",
+    build: (id: string | number) => `/event/${id}`,
+  },
 
-  concessions: '/concessions',
-  concessionDetail: (id: string | number) => `/concession/${id}`,
+  reservations: "/reservations",
+  spaceDetail: {
+    path: "/space/:id",
+    build: (id: string | number) => `/space/${id}`,
+  },
 
-  treeSpecies: '/tree-species',
-  treeSpeciesDetail: (id: string | number) => `/tree-species/${id}`,
+  calendar: "/calendar",
 
-  fauna: '/fauna',
-  faunaDetail: (id: string | number) => `/fauna/${id}`,
-  
-  volunteers: '/volunteers',
-  volunteerRegister: '/volunteers/register',
+  concessions: "/concessions",
+  concessionDetail: {
+    path: "/concession/:id",
+    build: (id: string | number) => `/concession/${id}`,
+  },
 
-  instructors: '/instructors',
-  instructorProfile: (id: string | number) => `/instructor/${id}`,
+  treeSpecies: "/tree-species",
+  treeSpeciesDetail: {
+    path: "/tree-species/:id",
+    build: (id: string | number) => `/tree-species/${id}`,
+  },
+
+  fauna: "/fauna",
+  faunaDetail: {
+    path: "/fauna/:id",
+    build: (id: string | number) => `/fauna/${id}`,
+  },
+
+  volunteers: "/volunteers",
+  volunteerRegister: "/volunteers/register",
+
+  instructors: "/instructors",
+  instructorProfile: {
+    path: "/instructor/:id",
+    build: (id: string | number) => `/instructor/${id}`,
+  },
   // Acceso a registro por invitación
-  instructorRegister: '/instructors/register',
+  instructorRegister: "/instructors/register",
 
   // Páginas del footer
-  about: '/about',
-  contact: '/contact',
-  privacy: '/privacy',
-  terms: '/terms',
-  faq: '/faq',
-  help: '/help',
+  about: "/about",
+  contact: "/contact",
+  privacy: "/privacy",
+  terms: "/terms",
+  faq: "/faq",
+  help: "/help",
 } as const;
 
 // ============================================
@@ -64,7 +98,7 @@ export const PUBLIC_ROUTES = {
 // ============================================
 
 export const AUTH_ROUTES = {
-  login: '/login',
+  login: "/login",
 
   // Duplicidad adminLogin: '/admin/login',
   // Obsolete resetPassword: '/admin/reset-password',
@@ -91,24 +125,24 @@ export const AUTH_ROUTES = {
 
 // Iniciar la raíz con admin - dashboard
 export const DASHBOARD_ROUTES = {
-  main: '/admin',
-  parks: '/admin/dashboard/parks',
-  activities: '/admin/dashboard/activities',
-  amenities: '/admin/dashboard/amenities',
-  trees: '/admin/dashboard/trees',
-  visitors: '/admin/dashboard/visitors',
-  events: '/admin/dashboard/events',
-  reservations: '/admin/dashboard/reservations',
-  evaluations: '/admin/dashboard/evaluations',
-  assets: '/admin/dashboard/assets',
-  incidents: '/admin/dashboard/incidents',
-  warehouse: '/admin/dashboard/warehouse',
-  volunteers: '/admin/dashboard/volunteers',
-  finance: '/admin/dashboard/finance',
-  accounting: '/admin/dashboard/accounting',
-  concessions: '/admin/dashboard/concessions',
-  marketing: '/admin/dashboard/marketing',
-  hr: '/admin/dashboard/hr',
+  main: "/admin",
+  parks: "/admin/dashboard/parks",
+  activities: "/admin/dashboard/activities",
+  amenities: "/admin/dashboard/amenities",
+  trees: "/admin/dashboard/trees",
+  visitors: "/admin/dashboard/visitors",
+  events: "/admin/dashboard/events",
+  reservations: "/admin/dashboard/reservations",
+  evaluations: "/admin/dashboard/evaluations",
+  assets: "/admin/dashboard/assets",
+  incidents: "/admin/dashboard/incidents",
+  warehouse: "/admin/dashboard/warehouse",
+  volunteers: "/admin/dashboard/volunteers",
+  finance: "/admin/dashboard/finance",
+  accounting: "/admin/dashboard/accounting",
+  concessions: "/admin/dashboard/concessions",
+  marketing: "/admin/dashboard/marketing",
+  hr: "/admin/dashboard/hr",
 } as const;
 
 // ============================================
@@ -116,14 +150,14 @@ export const DASHBOARD_ROUTES = {
 // ============================================
 
 export const ADMIN_PARKS = {
-  list: '/admin/parks',
-  create: '/admin/parks/new',
+  list: "/admin/parks",
+  create: "/admin/parks/new",
   view: {
-    path: '/admin/parks/:id/view',
+    path: "/admin/parks/:id/view",
     build: (id: string | number) => `/admin/parks/${id}/view`,
   },
   edit: {
-    path: '/admin/parks/:id/edit',
+    path: "/admin/parks/:id/edit",
     build: (id: string | number) => `/admin/parks/${id}/edit`,
   },
 } as const;
@@ -133,40 +167,42 @@ export const ADMIN_PARKS = {
 // ============================================
 
 export const ADMIN_ACTIVITIES = {
-  list: '/admin/activities/catalog',
-  create: '/admin/activities/new',
+  list: "/admin/activities",
+  create: "/admin/activities/new",
   view: {
-    path: '/admin/activities/:id/view',
+    path: "/admin/activities/:id/view",
     build: (id: string | number) => `/admin/activities/${id}/view`,
   },
   edit: {
-    path: '/admin/activities/:id/edit',
+    path: "/admin/activities/:id/edit",
     build: (id: string | number) => `/admin/activities/${id}/edit`,
   },
-  calendar: '/admin/activities/calendar',
-  registrations: '/admin/activities/registrations',
+  calendar: "/admin/activities/calendar",
+  registrations: "/admin/activities/registrations",
   registrationDetail: {
-    path: '/admin/activities/registrations/:id',
+    path: "/admin/activities/registrations/:id",
     build: (id: string | number) => `/admin/activities/registrations/${id}`,
   },
   categories: {
-    list: '/admin/activities/categories',
-    create: '/admin/activities/categories/new',
+    list: "/admin/activities/categories",
+    create: "/admin/activities/categories/new",
     edit: {
-      path: '/admin/activities/categories/:id/edit',
+      path: "/admin/activities/categories/:id/edit",
       build: (id: string | number) => `/admin/activities/categories/${id}/edit`,
     },
   },
   instructors: {
-    list: '/admin/activities/instructors',
-    create: '/admin/activities/instructors/new',
+    list: "/admin/activities/instructors",
+    create: "/admin/activities/instructors/new",
     view: {
-      path: '/admin/activities/instructors/:id/view',
-      build: (id: string | number) => `/admin/activities/instructors/${id}/view`,
+      path: "/admin/activities/instructors/:id/view",
+      build: (id: string | number) =>
+        `/admin/activities/instructors/${id}/view`,
     },
     edit: {
-      path: '/admin/activities/instructors/:id/edit',
-      build: (id: string | number) => `/admin/activities/instructors/${id}/edit`,
+      path: "/admin/activities/instructors/:id/edit",
+      build: (id: string | number) =>
+        `/admin/activities/instructors/${id}/edit`,
     },
   },
 } as const;
@@ -176,11 +212,11 @@ export const ADMIN_ACTIVITIES = {
 // ============================================
 
 export const ADMIN_AMENITIES = {
-  list: '/admin/amenities',
+  list: "/admin/amenities",
   // Creación y edición nuevas
-  create: '/admin/amenities/new',
+  create: "/admin/amenities/new",
   edit: {
-    path: '/admin/amenities/:id/edit',
+    path: "/admin/amenities/:id/edit",
     build: (id: string | number) => `/admin/amenities/${id}/edit`,
   },
 } as const;
@@ -190,28 +226,34 @@ export const ADMIN_AMENITIES = {
 // ============================================
 
 export const ADMIN_TREES = {
-  inventory: '/admin/trees/inventory',
-  map: '/admin/trees/map',
-  create: '/admin/trees/new',
-  edit: (id: string | number) => `/admin/trees/${id}/edit`,
-  
-  // Catálogo de especies
+  list: "/admin/trees",
+  map: "/admin/trees/map",
+  create: "/admin/trees/new",
+  edit: {
+    path: "/admin/trees/:id/edit",
+    build: (id: string | number) => `/admin/trees/${id}/edit`,
+  },
   species: {
-    list: '/admin/trees/species',
-    create: '/admin/trees/species/new',
-    edit: (id: string | number) => `/admin/trees/species/${id}/edit`,
+    list: "/admin/trees/species",
+    create: "/admin/trees/species/new",
+    view: {
+      path: "/admin/trees/species/:id/view",
+      build: (id: string | number) => `/admin/trees/species/${id}/view`,
+    },
+    edit: {
+      path: "/admin/trees/species/:id/edit",
+      build: (id: string | number) => `/admin/trees/species/${id}/edit`,
+    },
   },
-
-  // Mantenimiento
   maintenance: {
-    list: '/admin/trees/maintenance',
-    // Creación y edición nuevas
-    create: '/admin/trees/maintenance/new',
-    edit: (id: string | number) => `/admin/trees/maintenance/${id}/edit`,
+    list: "/admin/trees/maintenance",
+    create: "/admin/trees/maintenance/new",
+    edit: {
+      path: "/admin/trees/maintenance/:id/edit",
+      build: (id: string | number) => `/admin/trees/maintenance/${id}/edit`,
+    },
   },
- 
-  // Reportes - reusar en dashboard
-  reports: '/admin/trees/reports',
+  reports: "/admin/trees/reports",
 } as const;
 
 // ============================================
@@ -219,10 +261,12 @@ export const ADMIN_TREES = {
 // ============================================
 
 export const ADMIN_FAUNA = {
-  species: '/admin/fauna/species',
-  // Creación y edición nuevas
-  create: '/admin/fauna/species/new',
-  edit: (id: string | number) => `/admin/fauna/species/${id}/edit`,
+  list: "/admin/fauna/species",
+  create: "/admin/fauna/species/new",
+  edit: {
+    path: "/admin/fauna/species/:id/edit",
+    build: (id: string | number) => `/admin/fauna/species/${id}/edit`,
+  },
 } as const;
 
 // ============================================
@@ -230,12 +274,13 @@ export const ADMIN_FAUNA = {
 // ============================================
 
 export const ADMIN_VISITORS = {
-  count: '/admin/visitors/count',
-  // Creación y edición nuevas
-  create: '/admin/visitors/count/new',
-  edit: (id: string | number) => `/admin/visitors/count/${id}/edit`,
-  // Retroalimentación - desde sección acciones en página pública
-  feedback: '/admin/visitors/feedback',
+  count: "/admin/visitors/count",
+  create: "/admin/visitors/count/new",
+  edit: {
+    path: "/admin/visitors/count/:id/edit",
+    build: (id: string | number) => `/admin/visitors/count/${id}/edit`,
+  },
+  feedback: "/admin/visitors/feedback",
 } as const;
 
 // ============================================
@@ -243,18 +288,25 @@ export const ADMIN_VISITORS = {
 // ============================================
 
 export const ADMIN_EVENTS = {
-  list: '/admin/events/list',
-  create: '/admin/events/new',
-  edit: (id: string | number) => `/admin/events/${id}/edit`,
-  registrations: '/admin/events/registrations',
-  calendar: '/admin/events/calendar',
-  
-  // Categorías
+  list: "/admin/events",
+  create: "/admin/events/new",
+  view: {
+    path: "/admin/events/:id/view",
+    build: (id: string | number) => `/admin/events/${id}/view`,
+  },
+  edit: {
+    path: "/admin/events/:id/edit",
+    build: (id: string | number) => `/admin/events/${id}/edit`,
+  },
+  registrations: "/admin/events/registrations",
+  calendar: "/admin/events/calendar",
   categories: {
-    list: '/admin/events/categories',
-    // Creación y edición nuevas
-    create: '/admin/events/categories/new',
-    edit: (id: string | number) => `/admin/events/categories/${id}/edit`,
+    list: "/admin/events/categories",
+    create: "/admin/events/categories/new",
+    edit: {
+      path: "/admin/events/categories/:id/edit",
+      build: (id: string | number) => `/admin/events/categories/${id}/edit`,
+    },
   },
 } as const;
 
@@ -263,16 +315,21 @@ export const ADMIN_EVENTS = {
 // ============================================
 
 export const ADMIN_SPACE_RESERVATIONS = {
-  list: '/admin/space-reservations/list',
-  create: '/admin/space-reservations/new',
-  edit: (id: string | number) => `/admin/space-reservations/${id}/edit`,
-  calendar: '/admin/space-reservations/calendar',
-  
-  // Gestión de espacios
+  list: "/admin/space-reservations",
+  create: "/admin/space-reservations/new",
+  edit: {
+    path: "/admin/space-reservations/:id/edit",
+    build: (id: string | number) => `/admin/space-reservations/${id}/edit`,
+  },
+  calendar: "/admin/space-reservations/calendar",
   spaces: {
-    list: '/admin/space-reservations/spaces',
-    create: '/admin/space-reservations/spaces/new',
-    edit: (id: string | number) => `/admin/space-reservations/space/${id}/edit`,
+    list: "/admin/space-reservations/spaces",
+    create: "/admin/space-reservations/spaces/new",
+    edit: {
+      path: "/admin/space-reservations/space/:id/edit",
+      build: (id: string | number) =>
+        `/admin/space-reservations/space/${id}/edit`,
+    },
   },
 } as const;
 
@@ -283,19 +340,19 @@ export const ADMIN_SPACE_RESERVATIONS = {
 export const ADMIN_EVALUATIONS = {
   // Criterios
   criteria: {
-    list: '/admin/evaluations/criteria',
+    list: "/admin/evaluations/criteria",
     // Creación y edición nuevas
-    create: '/admin/evaluations/criteria/new',
+    create: "/admin/evaluations/criteria/new",
     edit: (id: string | number) => `/admin/evaluations/criteria/${id}/edit`,
   },
 
   // Evaluaciones
-  parks: '/admin/evaluations/parks',
-  activities: '/admin/evaluations/activities',
-  instructors: '/admin/evaluations/instructors',
-  events: '/admin/evaluations/events',
-  volunteers: '/admin/evaluations/volunteers',
-  concessionaires: '/admin/evaluations/concessionaires',
+  parks: "/admin/evaluations/parks",
+  activities: "/admin/evaluations/activities",
+  instructors: "/admin/evaluations/instructors",
+  events: "/admin/evaluations/events",
+  volunteers: "/admin/evaluations/volunteers",
+  concessionaires: "/admin/evaluations/concessionaires",
 } as const;
 
 // ============================================
@@ -303,42 +360,49 @@ export const ADMIN_EVALUATIONS = {
 // ============================================
 
 export const ADMIN_ASSETS = {
-  // Nueva estructura de activos: catálogo - inventario
-  list: '/admin/assets/list',
-  map: '/admin/assets/map',
-  create: '/admin/assets/new',
-  edit: (id: string | number) => `/admin/assets/${id}/edit`,
-
-  // Categorías
+  list: "/admin/assets",
+  map: "/admin/assets/map",
+  create: "/admin/assets/new",
+  view: {
+    path: "/admin/assets/:id/view",
+    build: (id: string | number) => `/admin/assets/${id}/view`,
+  },
+  edit: {
+    path: "/admin/assets/:id/edit",
+    build: (id: string | number) => `/admin/assets/${id}/edit`,
+  },
   categories: {
-    list: '/admin/assets/categories',
-    // Creación y edición nuevas
-    create: '/admin/assets/categories/new',
-    edit: (id: string | number) => `/admin/assets/categories/${id}/edit`,
+    list: "/admin/assets/categories",
+    create: "/admin/assets/categories/new",
+    edit: {
+      path: "/admin/assets/categories/:id/edit",
+      build: (id: string | number) => `/admin/assets/categories/${id}/edit`,
+    },
   },
-  
-  // Inventario - tipo stock
   inventory: {
-    list: '/admin/assets/inventory',
-    create: '/admin/assets/inventory/new',
-    edit: (id: string | number) => `/admin/assets/inventory/${id}/edit`,
+    list: "/admin/assets/inventory",
+    create: "/admin/assets/inventory/new",
+    edit: {
+      path: "/admin/assets/inventory/:id/edit",
+      build: (id: string | number) => `/admin/assets/inventory/${id}/edit`,
+    },
   },
-  
-  // Asignaciones
   assignments: {
-    list: '/admin/assets/assignments',
-    // Creación y edición nuevas
-    create: '/admin/assets/assignments/new',
-    edit: (id: string | number) => `/admin/assets/assignments/${id}/edit`,
+    list: "/admin/assets/assignments",
+    create: "/admin/assets/assignments/new",
+    edit: {
+      path: "/admin/assets/assignments/:id/edit",
+      build: (id: string | number) => `/admin/assets/assignments/${id}/edit`,
+    },
   },
- 
-  // Mantenimiento
   maintenance: {
-    list: '/admin/assets/maintenance',
-    // Creación y edición nuevas
-    create: '/admin/assets/maintenance/new',
-    edit: (id: string | number) => `/admin/assets/maintenance/${id}/edit`,
-    calendar: '/admin/assets/maintenance/calendar',
+    list: "/admin/assets/maintenance",
+    create: "/admin/assets/maintenance/new",
+    edit: {
+      path: "/admin/assets/maintenance/:id/edit",
+      build: (id: string | number) => `/admin/assets/maintenance/${id}/edit`,
+    },
+    calendar: "/admin/assets/maintenance/calendar",
   },
 } as const;
 
@@ -347,14 +411,23 @@ export const ADMIN_ASSETS = {
 // ============================================
 
 export const ADMIN_INCIDENTS = {
-  list: '/admin/incidents/list',
-  create: '/admin/incidents/new',
-  edit: (id: string | number) => `/admin/incidents/${id}/edit`,
-  
+  list: "/admin/incidents",
+  create: "/admin/incidents/new",
+  view: {
+    path: "/admin/incidents/:id/view",
+    build: (id: string | number) => `/admin/incidents/${id}/view`,
+  },
+  edit: {
+    path: "/admin/incidents/:id/edit",
+    build: (id: string | number) => `/admin/incidents/${id}/edit`,
+  },
   categories: {
-    list: '/admin/incidents/categories',
-    create: '/admin/incidents/categories/new',
-    edit: (id: string | number) => `/admin/incidents/categories/${id}/edit`,
+    list: "/admin/incidents/categories",
+    create: "/admin/incidents/categories/new",
+    edit: {
+      path: "/admin/incidents/categories/:id/edit",
+      build: (id: string | number) => `/admin/incidents/categories/${id}/edit`,
+    },
   },
 } as const;
 
@@ -363,40 +436,48 @@ export const ADMIN_INCIDENTS = {
 // ============================================
 
 export const ADMIN_WAREHOUSE = {
-  // Consumibles
-  list: '/admin/warehouse/consumables',
-  create: '/admin/warehouse/consumables/new',
-  edit: (id: string | number) => `/admin/warehouse/consumables/${id}/edit`,
-  
-  // Stock
+  list: "/admin/warehouse/consumables",
+  create: "/admin/warehouse/consumables/new",
+  edit: {
+    path: "/admin/warehouse/consumables/:id/edit",
+    build: (id: string | number) => `/admin/warehouse/consumables/${id}/edit`,
+  },
   stock: {
-    list: '/admin/warehouse/stock',
-    create: '/admin/warehouse/stock/new',
-    edit: (id: string | number) => `/admin/warehouse/stock/${id}/edit`,
+    list: "/admin/warehouse/stock",
+    create: "/admin/warehouse/stock/new",
+    view: {
+      path: "/admin/warehouse/stock/:id/view",
+      build: (id: string | number) => `/admin/warehouse/stock/${id}/view`,
+    },
+    edit: {
+      path: "/admin/warehouse/stock/:id/edit",
+      build: (id: string | number) => `/admin/warehouse/stock/${id}/edit`,
+    },
   },
-  
-  // Movimientos
   movements: {
-    list: '/admin/warehouse/movements',
-    // Creación y edición nuevas
-    create: '/admin/warehouse/movements/new',
-    edit: (id: string | number) => `/admin/warehouse/movements/${id}/edit`,
+    list: "/admin/warehouse/movements",
+    create: "/admin/warehouse/movements/new",
+    edit: {
+      path: "/admin/warehouse/movements/:id/edit",
+      build: (id: string | number) => `/admin/warehouse/movements/${id}/edit`,
+    },
   },
-  
-  // Requisiciones
   requisitions: {
-    list: '/admin/warehouse/requisitions',
-    // Creación y edición nuevas
-    create: '/admin/warehouse/requisitions/new',
-    edit: (id: string | number) => `/admin/warehouse/requisitions/${id}/edit`,
+    list: "/admin/warehouse/requisitions",
+    create: "/admin/warehouse/requisitions/new",
+    edit: {
+      path: "/admin/warehouse/requisitions/:id/edit",
+      build: (id: string | number) =>
+        `/admin/warehouse/requisitions/${id}/edit`,
+    },
   },
-  
-  // Categorías
   categories: {
-    list: '/admin/warehouse/categories',
-    // Creación y edición nuevas
-    create: '/admin/warehouse/categories/new',
-    edit: (id: string | number) => `/admin/warehouse/categories/${id}/edit`,
+    list: "/admin/warehouse/categories",
+    create: "/admin/warehouse/categories/new",
+    edit: {
+      path: "/admin/warehouse/categories/:id/edit",
+      build: (id: string | number) => `/admin/warehouse/categories/${id}/edit`,
+    },
   },
 } as const;
 
@@ -405,19 +486,20 @@ export const ADMIN_WAREHOUSE = {
 // ============================================
 
 export const ADMIN_VOLUNTEERS = {
-  list: '/admin/volunteers/list',
-  create: '/admin/volunteers/register',
-  edit: (id: string | number) => `/admin/volunteers/edit/${id}`,
-  
-  // Participaciones - no implementada
-  participations: '/admin/volunteers/participations',
-  participationDetail: (id: string | number) => `/admin/volunteers/participations/${id}`,
-  
-  // Reconocimientos - sección en desarrollo
-  recognition: '/admin/volunteers/recognition',
-  
-  // Configuración - Enviar a configuración de notificaciones
-  settings: '/admin/volunteers/settings',
+  list: "/admin/volunteers",
+  create: "/admin/volunteers/register",
+  edit: {
+    path: "/admin/volunteers/edit/:id",
+    build: (id: string | number) => `/admin/volunteers/edit/${id}`,
+  },
+  participations: "/admin/volunteers/participations",
+  participationCreate: "/admin/volunteers/participations/new",
+  participationDetail: {
+    path: "/admin/volunteers/participations/:id",
+    build: (id: string | number) => `/admin/volunteers/participations/${id}`,
+  },
+  recognition: "/admin/volunteers/recognition",
+  settings: "/admin/volunteers/settings",
 } as const;
 
 // ============================================
@@ -426,29 +508,29 @@ export const ADMIN_VOLUNTEERS = {
 
 export const ADMIN_FINANCE = {
   // Presupuesto
-  budgetPlanning: '/admin/finance/budget-planning',
+  budgetPlanning: "/admin/finance/budget-planning",
 
   // Cédulas - fuera del sidebar
-  incomes: '/admin/finance/incomes',
-  expenses: '/admin/finance/expenses',
-  
+  incomes: "/admin/finance/incomes",
+  expenses: "/admin/finance/expenses",
+
   // Flujo de efectivo
-  cashFlowMatrix: '/admin/finance/cash-flow-matrix',
+  cashFlowMatrix: "/admin/finance/cash-flow-matrix",
 
   // Calculadora financiera (rutas unificadas)
-  calculator: '/admin/finance/calculator',
-  
+  calculator: "/admin/finance/calculator",
+
   // Reportes - duplicado de dashboard
-  reports: '/admin/finance/reports',
-  
+  reports: "/admin/finance/reports",
+
   // Catálogo - categorías financieras
-  catalog: '/admin/finance/catalog',
-  
+  catalog: "/admin/finance/catalog",
+
   // Aprobaciones - para actividades
-  pendingApproval: '/admin/finance/pending-approval',
+  pendingApproval: "/admin/finance/pending-approval",
 
   // Pagos
-  payments: '/admin/finance/payments',
+  payments: "/admin/finance/payments",
 } as const;
 
 // ============================================
@@ -457,25 +539,25 @@ export const ADMIN_FINANCE = {
 
 export const ADMIN_ACCOUNTING = {
   // Categorías contables
-  categories: '/admin/accounting/categories',
-  
+  categories: "/admin/accounting/categories",
+
   // Transacciones
-  transactions: '/admin/accounting/transactions',
-  
+  transactions: "/admin/accounting/transactions",
+
   // Asientos contables
-  journalEntries: '/admin/accounting/journal-entries',
-  
+  journalEntries: "/admin/accounting/journal-entries",
+
   // Balance de comprobación
-  trialBalance: '/admin/accounting/trial-balance',
-  
+  trialBalance: "/admin/accounting/trial-balance",
+
   // Estados financieros
-  financialStatements: '/admin/accounting/financial-statements',
-  
+  financialStatements: "/admin/accounting/financial-statements",
+
   // Activos fijos
-  fixedAssets: '/admin/accounting/fixed-assets',
-  
+  fixedAssets: "/admin/accounting/fixed-assets",
+
   // Integración
-  integration: '/admin/accounting/integration',
+  integration: "/admin/accounting/integration",
 } as const;
 
 // ============================================
@@ -484,48 +566,64 @@ export const ADMIN_ACCOUNTING = {
 
 export const ADMIN_CONCESSIONS = {
   // Catálogo
-  list: '/admin/concessions/catalog',
+  list: "/admin/concessions/catalog",
   // Creación y edición nuevas
-  create: '/admin/concessions/catalog/new',
-  edit: (id: string | number) => `/admin/concessions/catalog/${id}/edit`,
-  
+  create: "/admin/concessions/catalog/new",
+  edit: {
+    path: "/admin/concessions/catalog/:id/edit",
+    build: (id: string | number) => `/admin/concessions/catalog/${id}/edit`,
+  },
+
   // Concesionarios
   concessionaires: {
-    list: '/admin/concessions/concessionaires',
+    list: "/admin/concessions/concessionaires",
     // Creación y edición nuevas
-    create: '/admin/concessions/concessionaires/new',
-    edit: (id: string | number) => `/admin/concessions/concessionaires/${id}/edit`,
+    create: "/admin/concessions/concessionaires/new",
+    edit: {
+      path: "/admin/concessions/concessionaires/:id/edit",
+      build: (id: string | number) =>
+        `/admin/concessions/concessionaires/${id}/edit`,
+    },
   },
-  
+
   // Contratos
   contracts: {
-    list: '/admin/concessions/contracts',
+    list: "/admin/concessions/contracts",
     // Creación y edición nuevas
-    create: '/admin/concessions/contracts/new',
-    edit: (id: string | number) => `/admin/concessions/contracts/${id}/edit`,
+    create: "/admin/concessions/contracts/new",
+    edit: {
+      path: "/admin/concessions/contracts/:id/edit",
+      build: (id: string | number) => `/admin/concessions/contracts/${id}/edit`,
+    },
   },
-  
+
   // Ubicaciones - no implementada - agregar a catálogo
-  locations: '/admin/concessions/locations',
+  locations: "/admin/concessions/locations",
 
   // Pagos y finanzas - centralizar en módulo de finanzas
-  payments: '/admin/concessions/payments',
-  hybridPayments: '/admin/concessions/hybrid-payments',
-  
+  payments: "/admin/concessions/payments",
+  hybridPayments: "/admin/concessions/hybrid-payments",
+
   // Evaluaciones - centralizado en módulo de evaluaciones
-  evaluations: '/admin/concessions/evaluations',
-  
+  evaluations: "/admin/concessions/evaluations",
+
   // Concesiones activas
   active: {
-    list: '/admin/concessions/active',
-    create: '/admin/concessions/active/new',
-    edit: (id: string | number) => `/admin/concessions/active/${id}/edit`,
+    list: "/admin/concessions/active",
+    create: "/admin/concessions/active/new",
+    edit: {
+      path: "/admin/concessions/active/:id/edit",
+      build: (id: string | number) => `/admin/concessions/active/${id}/edit`,
+    },
     // Página de imágenes que se agregará a editar
-    images: (id: string | number) => `/admin/concessions/active/${id}/images`,
+    images: {
+      path: "/admin/concessions/active/:id/images",
+      build: (id: string | number) => `/admin/concessions/active/${id}/images`,
+    },
   },
-  
+
   // Reportes - duplicado de dashboard
-  reports: '/admin/concessions/reports',
+  reports: "/admin/concessions/reports",
 } as const;
 
 // ============================================
@@ -534,52 +632,67 @@ export const ADMIN_CONCESSIONS = {
 
 export const ADMIN_MARKETING = {
   // Página de inicio - obsoleta
-  main: '/admin/marketing',
-  
+  main: "/admin/marketing",
+
   // Patrocinadores
   sponsors: {
-    list: '/admin/marketing/sponsors',
+    list: "/admin/marketing/sponsors",
     // Creación y edición en páginas independientes
-    create: '/admin/marketing/sponsors/new',
-    edit: (id: string | number) => `/admin/marketing/sponsors/${id}/edit`,
+    create: "/admin/marketing/sponsors/new",
+    edit: {
+      path: "/admin/marketing/sponsors/:id/edit",
+      buils: (id: string | number) => `/admin/marketing/sponsors/${id}/edit`,
+    },
   },
 
   // Contratos de patrocinio
   contracts: {
-    list: '/admin/marketing/contracts',
+    list: "/admin/marketing/contracts",
     // Creación y edición en páginas independientes
-    create: '/admin/marketing/contracts/new',
-    edit: (id: string | number) => `/admin/marketing/contracts/${id}/edit`,
+    create: "/admin/marketing/contracts/new",
+    edit: {
+      path: "/admin/marketing/contracts/:id/edit",
+      build: (id: string | number) => `/admin/marketing/contracts/${id}/edit`,
+    },
   },
-  
+
   // Paquetes de patrocinio
   packages: {
-    list: '/admin/marketing/packages',
+    list: "/admin/marketing/packages",
     // Creación y edición en páginas independientes
-    create: '/admin/marketing/packages/new',
-    edit: (id: string | number) => `/admin/marketing/packages/${id}/edit`,
+    create: "/admin/marketing/packages/new",
+    edit: {
+      path: "/admin/marketing/packages/:id/edit",
+      build: (id: string | number) => `/admin/marketing/packages/${id}/edit`,
+    },
   },
-  
+
   // Beneficios
   benefits: {
-    list: '/admin/marketing/benefits',
+    list: "/admin/marketing/benefits",
     // Creación y edición en páginas independientes
-    create: '/admin/marketing/benefits/new',
-    edit: (id: string | number) => `/admin/marketing/benefits/${id}/edit`,
+    create: "/admin/marketing/benefits/new",
+    edit: {
+      path: "/admin/marketing/benefits/:id/edit",
+      build: (id: string | number) => `/admin/marketing/benefits/${id}/edit`,
+    },
   },
-  
+
   // Eventos patrocinados
   events: {
-    list: '/admin/marketing/events',
+    list: "/admin/marketing/events",
     // Creación y edición en páginas independientes
-    create: '/admin/marketing/events/new',
-    edit: (id: string | number) => `/admin/marketing/events/${id}/edit`,
+    create: "/admin/marketing/events/new",
+    edit: {
+      path: "/admin/marketing/events/:id/edit",
+      build: (id: string | number) => `/admin/marketing/events/${id}/edit`,
+    },
   },
-  
+
   // Activos patrocinados
   assets: {
-    list: '/admin/marketing/assets',
-    create: '/admin/marketing/assets/new',
+    list: "/admin/marketing/assets",
+    create: "/admin/marketing/assets/new",
   },
 } as const;
 
@@ -589,27 +702,41 @@ export const ADMIN_MARKETING = {
 
 export const ADMIN_ADVERTISING = {
   spaces: {
-    list: '/admin/advertising/spaces',
-    create: '/admin/advertising/spaces/new',
-    edit: (id: string | number) => `/admin/advertising/spaces/${id}/edit`,
+    list: "/admin/advertising/spaces",
+    create: "/admin/advertising/spaces/new",
+    edit: {
+      path: "/admin/advertising/spaces/:id/edit",
+      build: (id: string | number) => `/admin/advertising/spaces/${id}/edit`,
+    },
   },
 
   advertisements: {
-    list: '/admin/advertising/advertisements',
-    create: '/admin/advertising/advertisements/new',
-    edit: (id: string | number) => `/admin/advertising/advertisements/${id}/edit`,
+    list: "/admin/advertising/advertisements",
+    create: "/admin/advertising/advertisements/new",
+    edit: {
+      path: "/admin/advertising/advertisements/:id/edit",
+      build: (id: string | number) =>
+        `/admin/advertising/advertisements/${id}/edit`,
+    },
   },
 
   campaigns: {
-    list: '/admin/advertising/campaigns',
-    create: '/admin/advertising/campaigns/new',
-    edit: (id: string | number) => `/admin/advertising/campaigns/${id}/edit`,
+    list: "/admin/advertising/campaigns",
+    create: "/admin/advertising/campaigns/new",
+    edit: {
+      path: "/admin/advertising/campaigns/:id/edit",
+      build: (id: string | number) => `/admin/advertising/campaigns/${id}/edit`,
+    },
   },
 
   placements: {
-    list: '/admin/advertising/placements',
-    create: '/admin/advertising/placements/new',
-    edit: (id: string | number) => `/admin/advertising/placements/${id}/edit`,
+    list: "/admin/advertising/placements",
+    create: "/admin/advertising/placements/new",
+    edit: {
+      path: "/admin/advertising/placements/:id/edit",
+      build: (id: string | number) =>
+        `/admin/advertising/placements/${id}/edit`,
+    },
   },
 } as const;
 
@@ -620,27 +747,35 @@ export const ADMIN_ADVERTISING = {
 export const ADMIN_COMMUNICATIONS = {
   // Plantillas
   templates: {
-    list: '/admin/communications/templates',
+    list: "/admin/communications/templates",
     // Creación y edición en páginas independientes
-    create: '/admin/communications/templates/new',
-    edit: (id: string | number) => `/admin/communications/templates/${id}/edit`,
+    create: "/admin/communications/templates/new",
+    edit: {
+      path: "/admin/communications/templates/:id/edit",
+      build: (id: string | number) =>
+        `/admin/communications/templates/${id}/edit`,
+    },
   },
-  
+
   // Cola de emails
-  queue: '/admin/communications/queue',
-  
+  queue: "/admin/communications/queue",
+
   // Campañas - no implementado
   campaigns: {
-    list: '/admin/communications/campaigns',
-    create: '/admin/communications/campaigns/new',
-    edit: (id: string | number) => `/admin/communications/campaigns/${id}/edit`,
+    list: "/admin/communications/campaigns",
+    create: "/admin/communications/campaigns/new",
+    edit: {
+      path: "/admin/communications/campaigns/:id/edit",
+      build: (id: string | number) =>
+        `/admin/communications/campaigns/${id}/edit`,
+    },
   },
-  
+
   // Envío masivo
-  bulk: '/admin/communications/bulk',
-  
+  bulk: "/admin/communications/bulk",
+
   // Analytics - no implementado (se puede recuperar para el dashboard)
-  analytics: '/admin/communications/analytics',
+  analytics: "/admin/communications/analytics",
 } as const;
 
 // ============================================
@@ -650,55 +785,70 @@ export const ADMIN_COMMUNICATIONS = {
 export const ADMIN_HR = {
   // Personal
   employees: {
-    list: '/admin/hr/employees',
+    list: "/admin/hr/employees",
     // Crear y editar en páginas independientes
-    create: '/admin/hr/employees/new',
-    edit: (id: string | number) => `/admin/hr/employees/${id}/edit`,
+    create: "/admin/hr/employees/new",
+    edit: {
+      path: "/admin/hr/employees/:id/edit",
+      build: (id: string | number) => `/admin/hr/employees/${id}/edit`,
+    },
   },
-  
-  // Vacaciones y permisos 
+
+  // Vacaciones y permisos
   timeOff: {
-    list: '/admin/hr/vacations',
+    list: "/admin/hr/vacations",
     // Crear y editar en páginas independientes
-    create: '/admin/hr/vacations/new',
-    edit: (id: string | number) => `/admin/hr/vacations/${id}/edit`,
+    create: "/admin/hr/vacations/new",
+    edit: {
+      path: "/admin/hr/vacations/:id/edit",
+      build: (id: string | number) => `/admin/hr/vacations/${id}/edit`,
+    },
   },
 
   // Módulo más simple - obsoleto
-  vacaciones: '/admin/hr/vacaciones',
-  
+  vacaciones: "/admin/hr/vacaciones",
+
   // Capacitación - no implementado
   training: {
-    list: '/admin/hr/training',
+    list: "/admin/hr/training",
     // Crear y editar en páginas independientes
-    create: '/admin/hr/training/new',
-    edit: (id: string | number) => `/admin/hr/training/${id}/edit`,
+    create: "/admin/hr/training/new",
+    edit: {
+      path: "/admin/hr/training/:id/edit",
+      build: (id: string | number) => `/admin/hr/training/${id}/edit`,
+    },
   },
-  
+
   // Nómina
   payroll: {
-    list: '/admin/hr/payroll',
+    list: "/admin/hr/payroll",
     // Crear y editar en páginas independientes
-    create: '/admin/hr/payroll/new',
-    edit: (id: string | number) => `/admin/hr/payroll/${id}/edit`,
+    create: "/admin/hr/payroll/new",
+    edit: {
+      path: "/admin/hr/payroll/:id/edit",
+      build: (id: string | number) => `/admin/hr/payroll/${id}/edit`,
+    },
   },
 
   // Recibos de nómina - no implementado
   receipts: {
-    list: '/admin/hr/receipts',
+    list: "/admin/hr/receipts",
     // Crear y editar en páginas independientes
-    create: '/admin/hr/receipts/new',
-    edit: (id: string | number) => `/admin/hr/receipts/${id}/edit`,
+    create: "/admin/hr/receipts/new",
+    edit: {
+      path: "/admin/hr/receipts/:id/edit",
+      build: (id: string | number) => `/admin/hr/receipts/${id}/edit`,
+    },
   },
-  
+
   // Control de horas - no implementado
-  timeTracking: '/admin/hr/control-horas',
-  
+  timeTracking: "/admin/hr/control-horas",
+
   // Bienestar - no implementado
-  wellness: '/admin/hr/wellness',
-  
+  wellness: "/admin/hr/wellness",
+
   // Analytics - no implementado (recuperar en dashboard)
-  analytics: '/admin/hr/analytics',
+  analytics: "/admin/hr/analytics",
 } as const;
 
 // ============================================
@@ -707,45 +857,54 @@ export const ADMIN_HR = {
 
 export const ADMIN_SETTINGS = {
   // Unificado obsoleto (formato dashboard)
-  main: '/admin/configuracion-seguridad',
-  
+  main: "/admin/configuracion-seguridad",
+
   // Control de acceso
   roles: {
-    list: '/admin/configuracion-seguridad/access/roles',
-    create: '/admin/configuracion-seguridad/access/roles/new',
-    edit: (id: string | number) => `/admin/configuracion-seguridad/access/roles/${id}/edit`,
+    list: "/admin/configuracion-seguridad/access/roles",
+    create: "/admin/configuracion-seguridad/access/roles/new",
+    edit: {
+      path: "/admin/configuracion-seguridad/access/roles/:id/edit",
+      build: (id: string | number) =>
+        `/admin/configuracion-seguridad/access/roles/${id}/edit`,
+    },
   },
-  permissions: '/admin/configuracion-seguridad/access/permissions',
+  permissions: "/admin/configuracion-seguridad/access/permissions",
   users: {
-    list: '/admin/configuracion-seguridad/access/users',
+    list: "/admin/configuracion-seguridad/access/users",
     // Nueva página para editar usuario
-    create: '/admin/configuracion-seguridad/access/users/new',
-    edit: (id: string | number) => `/admin/configuracion-seguridad/access/users/${id}/edit`,
+    create: "/admin/configuracion-seguridad/access/users/new",
+    edit: {
+      path: "/admin/configuracion-seguridad/access/users/:id/edit",
+      build: (id: string | number) =>
+        `/admin/configuracion-seguridad/access/users/${id}/edit`,
+    },
   },
 
   // Políticas - revisar opciones a eliminar
-  policies: '/admin/configuracion-seguridad/policies',
-  
+  policies: "/admin/configuracion-seguridad/policies",
+
   // Notificaciones - en desarrollo
-  notifications: '/admin/configuracion-seguridad/notifications',
-  
+  notifications: "/admin/configuracion-seguridad/notifications",
+
   // Auditoría - en desarrollo
-  audit: '/admin/configuracion-seguridad/audit',
+  audit: "/admin/configuracion-seguridad/audit",
   // Ya está en auditoría (candidato a eliminar)
-  auditRoleAudits: '/admin/configuracion-seguridad/audit/role-audits',
-  
+  auditRoleAudits: "/admin/configuracion-seguridad/audit/role-audits",
+
   // Mantenimiento - probable eliminación
-  maintenance: '/admin/configuracion-seguridad/maintenance',
+  maintenance: "/admin/configuracion-seguridad/maintenance",
 
   // Página de respaldo a mantener
-  backup: '/admin/configuracion-seguridad/maintenance/backup',
+  backup: "/admin/configuracion-seguridad/maintenance/backup",
 
   // Páginas a eliminar
-  maintenancePerformance: '/admin/configuracion-seguridad/maintenance/performance',
-  maintenanceUpdates: '/admin/configuracion-seguridad/maintenance/updates',
-  
+  maintenancePerformance:
+    "/admin/configuracion-seguridad/maintenance/performance",
+  maintenanceUpdates: "/admin/configuracion-seguridad/maintenance/updates",
+
   // Exportaciones - en desarrollo
-  exports: '/admin/configuracion-seguridad/exports',
+  exports: "/admin/configuracion-seguridad/exports",
 } as const;
 
 // ============================================
@@ -753,11 +912,11 @@ export const ADMIN_SETTINGS = {
 // ============================================
 
 export const ADMIN_USERS = {
-  list: '/admin/users',
-  pending: '/admin/pending-users',
+  list: "/admin/users",
+  pending: "/admin/pending-users",
 
   // Notificaciones (tomar de base para la página que se queda de notificaciones del sistema)
-  notifications: '/admin/users/notifications',
+  notifications: "/admin/users/notifications",
 } as const;
 
 // ============================================
@@ -766,13 +925,13 @@ export const ADMIN_USERS = {
 
 export const ADMIN_PERMISSIONS = {
   // Duplicidad con matriz de permisos
-  main: '/admin/permissions',
+  main: "/admin/permissions",
 
   // Dashboard a eliminar
-  dashboard: '/admin/permissions/dashboard',
+  dashboard: "/admin/permissions/dashboard",
 
   // Duplicidad con matriz de permisos
-  matrix: '/admin/permissions/matrix',
+  matrix: "/admin/permissions/matrix",
 } as const;
 
 // ============================================
@@ -780,7 +939,7 @@ export const ADMIN_PERMISSIONS = {
 // ============================================
 
 export const ADMIN_ROLES = {
-  list: '/admin/roles',
+  list: "/admin/roles",
 } as const;
 
 // ============================================
@@ -789,13 +948,13 @@ export const ADMIN_ROLES = {
 
 export const ADMIN_PROFILE = {
   // Página de configuración obsoleta
-  main: '/admin/settings',
+  main: "/admin/settings",
 
   // Ajustes de usuario (rediseñar con base firebase)
-  profile: '/admin/settings/profile',
+  profile: "/admin/settings/profile",
 
-  activity: '/admin/user-activity',
-  notifications:'/admin/user-notifications',// ✅ AGREGAR
+  activity: "/admin/user-activity",
+  notifications: "/admin/user-notifications", // ✅ AGREGAR
 } as const;
 
 // ============================================
@@ -803,7 +962,7 @@ export const ADMIN_PROFILE = {
 // ============================================
 
 export const ADMIN_ANALYTICS = {
-  main: '/admin/analytics',
+  main: "/admin/analytics",
 } as const;
 
 // ============================================
@@ -811,7 +970,7 @@ export const ADMIN_ANALYTICS = {
 // ============================================
 
 export const ADMIN_DOCUMENTS = {
-  list: '/admin/documents',
+  list: "/admin/documents",
 } as const;
 
 // ============================================
@@ -819,7 +978,7 @@ export const ADMIN_DOCUMENTS = {
 // ============================================
 
 export const ADMIN_COMMENTS = {
-  list: '/admin/comments',
+  list: "/admin/comments",
 } as const;
 
 // ============================================
@@ -827,12 +986,12 @@ export const ADMIN_COMMENTS = {
 // ============================================
 
 export const ADMIN_SYSTEM = {
-  emailSettings: '/admin/system/email-settings',
-  backup: '/admin/system/backup',
+  emailSettings: "/admin/system/email-settings",
+  backup: "/admin/system/backup",
 
   // Duplicado en módulo configuración
-  performance: '/admin/system/performance',
-  updates: '/admin/system/updates',
+  performance: "/admin/system/performance",
+  updates: "/admin/system/updates",
 } as const;
 
 // ============================================
@@ -841,9 +1000,9 @@ export const ADMIN_SYSTEM = {
 
 export const HELP_ROUTES = {
   manuals: {
-    visitors: '/help/visitantes-manual',
-    parks: '/help/parques-manual',
-    activities: '/help/actividades-manual',
+    visitors: "/help/visitantes-manual",
+    parks: "/help/parques-manual",
+    activities: "/help/actividades-manual",
   },
 } as const;
 
@@ -854,16 +1013,16 @@ export const HELP_ROUTES = {
 export const ROUTES = {
   // Rutas públicas
   public: PUBLIC_ROUTES,
-  
+
   // Autenticación
   auth: AUTH_ROUTES,
-  
+
   // Dashboards centralizados
   dashboards: DASHBOARD_ROUTES,
-  
+
   // Centro de ayuda
   help: HELP_ROUTES,
-  
+
   // Módulos administrativos
   admin: {
     // Gestión
@@ -872,41 +1031,41 @@ export const ROUTES = {
     amenities: ADMIN_AMENITIES,
     trees: ADMIN_TREES,
     fauna: ADMIN_FAUNA,
-    
+
     // Operación
     visitors: ADMIN_VISITORS,
     events: ADMIN_EVENTS,
     spaceReservations: ADMIN_SPACE_RESERVATIONS,
     evaluations: ADMIN_EVALUATIONS,
-    
+
     // Operación y Mantenimiento
     assets: ADMIN_ASSETS,
     incidents: ADMIN_INCIDENTS,
     warehouse: ADMIN_WAREHOUSE,
-    
+
     // Personas
     volunteers: ADMIN_VOLUNTEERS,
-    
+
     // Administración y Finanzas
     finance: ADMIN_FINANCE,
     accounting: ADMIN_ACCOUNTING,
     concessions: ADMIN_CONCESSIONS,
-    
+
     // Marketing y Comunicaciones
     marketing: ADMIN_MARKETING,
     advertising: ADMIN_ADVERTISING,
     communications: ADMIN_COMMUNICATIONS,
-    
+
     // Recursos Humanos
     hr: ADMIN_HR,
-    
+
     // Configuración y Administración
     settings: ADMIN_SETTINGS,
     users: ADMIN_USERS,
     permissions: ADMIN_PERMISSIONS,
     roles: ADMIN_ROLES,
     profile: ADMIN_PROFILE,
-    
+
     // Sistema (Legacy)
     analytics: ADMIN_ANALYTICS,
     documents: ADMIN_DOCUMENTS,

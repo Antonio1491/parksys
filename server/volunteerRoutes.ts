@@ -843,16 +843,33 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
   apiRouter.get("/participations/all", async (_req: Request, res: Response) => {
     try {
       console.log("Obteniendo todas las participaciones");
-      const participations = await db
-        .select()
-        .from(volunteerParticipations)
-        .orderBy(desc(volunteerParticipations.activityDate));
-        
-      console.log(`Se encontraron ${participations.length} participaciones`);
-      res.json(participations);
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        SELECT 
+          id,
+          volunteer_id as "volunteerId",
+          activity_id as "activityId",
+          activity_name as "activityName",
+          activity_date as "activityDate",
+          hours_contributed as "hoursContributed",
+          park_id as "parkId",
+          supervisor_id as "supervisorId",
+          notes,
+          created_at as "createdAt"
+        FROM volunteer_participations
+        ORDER BY activity_date DESC NULLS LAST
+      `);
+
+      console.log(`Se encontraron ${result.rows.length} participaciones`);
+      res.json(result.rows);
     } catch (error) {
       console.error(`Error al obtener todas las participaciones:`, error);
-      res.status(500).json({ message: "Error al obtener participaciones" });
+      res.status(500).json({ 
+        message: "Error al obtener participaciones",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
     }
   });
 
@@ -860,21 +877,42 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
   apiRouter.get("/volunteers/:id/participations", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const volunteerId = parseInt(req.params.id);
-      
+
       if (isNaN(volunteerId)) {
         return res.status(400).json({ message: "ID de voluntario no válido" });
       }
-      
-      const participations = await db
-        .select()
-        .from(volunteerParticipations)
-        .where(eq(volunteerParticipations.volunteerId, volunteerId))
-        .orderBy(desc(volunteerParticipations.activityDate));
-        
-      res.json(participations);
+
+      console.log(`Obteniendo participaciones para voluntario ${volunteerId}`);
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        SELECT 
+          vp.id,
+          vp.volunteer_id as "volunteerId",
+          vp.activity_id as "activityId",
+          vp.activity_name as "activityName",
+          vp.activity_date as "activityDate",
+          vp.hours_contributed as "hoursContributed",
+          vp.park_id as "parkId",
+          vp.supervisor_id as "supervisorId",
+          vp.notes,
+          vp.created_at as "createdAt",
+          p.name as "parkName"
+        FROM volunteer_participations vp
+        LEFT JOIN parks p ON vp.park_id = p.id
+        WHERE vp.volunteer_id = $1
+        ORDER BY vp.activity_date DESC NULLS LAST
+      `, [volunteerId]);
+
+      console.log(`Se encontraron ${result.rows.length} participaciones para voluntario ${volunteerId}`);
+      res.json(result.rows);
     } catch (error) {
       console.error(`Error al obtener participaciones del voluntario ${req.params.id}:`, error);
-      res.status(500).json({ message: "Error al obtener participaciones" });
+      res.status(500).json({ 
+        message: "Error al obtener participaciones",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
     }
   });
 
@@ -1063,37 +1101,66 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
   apiRouter.post("/volunteers/:id/participations", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const volunteerId = parseInt(req.params.id);
-      
+
       if (isNaN(volunteerId)) {
         return res.status(400).json({ message: "ID de voluntario no válido" });
       }
-      
-      // Aseguramos que el volunteerId en el cuerpo coincida con el de la URL
-      const participationData = {
-        ...req.body,
-        volunteerId,
-        createdAt: new Date()
-      };
-      
-      const validationResult = insertVolunteerParticipationSchema.safeParse(participationData);
-      
-      if (!validationResult.success) {
+
+      console.log(`Creando participación para voluntario ${volunteerId}:`, req.body);
+
+      // Validar campos requeridos
+      const { activityName, activityDate, hoursContributed, parkId, activityId, supervisorId, notes } = req.body;
+
+      if (!activityName || !activityDate || !hoursContributed || !parkId) {
         return res.status(400).json({ 
-          message: "Datos de participación no válidos", 
-          errors: validationResult.error.format() 
+          message: "Campos requeridos faltantes: activityName, activityDate, hoursContributed, parkId" 
         });
       }
-      
-      // Insertamos la nueva participación en la base de datos
-      const [newParticipation] = await db
-        .insert(volunteerParticipations)
-        .values(validationResult.data)
-        .returning();
-        
-      res.status(201).json(newParticipation);
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        INSERT INTO volunteer_participations (
+          volunteer_id,
+          activity_id,
+          activity_name,
+          activity_date,
+          hours_contributed,
+          park_id,
+          supervisor_id,
+          notes,
+          created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+        RETURNING 
+          id,
+          volunteer_id as "volunteerId",
+          activity_id as "activityId",
+          activity_name as "activityName",
+          activity_date as "activityDate",
+          hours_contributed as "hoursContributed",
+          park_id as "parkId",
+          supervisor_id as "supervisorId",
+          notes,
+          created_at as "createdAt"
+      `, [
+        volunteerId,
+        activityId || null,
+        activityName,
+        activityDate,
+        hoursContributed,
+        parkId,
+        supervisorId || null,
+        notes || null
+      ]);
+
+      console.log(`✅ Participación creada exitosamente:`, result.rows[0]);
+      res.status(201).json(result.rows[0]);
     } catch (error) {
       console.error(`Error al crear participación para voluntario ${req.params.id}:`, error);
-      res.status(500).json({ message: "Error al registrar participación" });
+      res.status(500).json({ 
+        message: "Error al registrar participación",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
     }
   });
   
@@ -1101,24 +1168,47 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
   apiRouter.get("/participations/:id", async (req: Request, res: Response) => {
     try {
       const participationId = parseInt(req.params.id);
-      
+
       if (isNaN(participationId)) {
         return res.status(400).json({ message: "ID de participación no válido" });
       }
-      
-      const [participation] = await db
-        .select()
-        .from(volunteerParticipations)
-        .where(eq(volunteerParticipations.id, participationId));
-      
-      if (!participation) {
+
+      console.log(`Obteniendo participación ${participationId}`);
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        SELECT 
+          vp.id,
+          vp.volunteer_id as "volunteerId",
+          vp.activity_id as "activityId",
+          vp.activity_name as "activityName",
+          vp.activity_date as "activityDate",
+          vp.hours_contributed as "hoursContributed",
+          vp.park_id as "parkId",
+          vp.supervisor_id as "supervisorId",
+          vp.notes,
+          vp.created_at as "createdAt",
+          v.full_name as "volunteerName",
+          p.name as "parkName"
+        FROM volunteer_participations vp
+        LEFT JOIN volunteers v ON vp.volunteer_id = v.id
+        LEFT JOIN parks p ON vp.park_id = p.id
+        WHERE vp.id = $1
+      `, [participationId]);
+
+      if (result.rows.length === 0) {
         return res.status(404).json({ message: "Participación no encontrada" });
       }
-      
-      res.json(participation);
+
+      console.log(`✅ Participación encontrada:`, result.rows[0]);
+      res.json(result.rows[0]);
     } catch (error) {
       console.error(`Error al obtener participación ${req.params.id}:`, error);
-      res.status(500).json({ message: "Error al obtener datos de la participación" });
+      res.status(500).json({ 
+        message: "Error al obtener datos de la participación",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
     }
   });
   
@@ -1126,40 +1216,94 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
   apiRouter.put("/participations/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const participationId = parseInt(req.params.id);
-      
+
       if (isNaN(participationId)) {
         return res.status(400).json({ message: "ID de participación no válido" });
       }
-      
+
+      console.log(`Actualizando participación ${participationId}:`, req.body);
+
+      const { pool } = await import("./db");
+
       // Verificar si la participación existe
-      const [existingParticipation] = await db
-        .select()
-        .from(volunteerParticipations)
-        .where(eq(volunteerParticipations.id, participationId));
-      
-      if (!existingParticipation) {
+      const checkResult = await pool.query(
+        'SELECT id, volunteer_id FROM volunteer_participations WHERE id = $1',
+        [participationId]
+      );
+
+      if (checkResult.rows.length === 0) {
         return res.status(404).json({ message: "Participación no encontrada" });
       }
-      
-      // Combinar los datos existentes con los nuevos, respetando los campos inmutables
-      const updateData = {
-        ...req.body,
-        id: participationId,
-        volunteerId: existingParticipation.volunteerId, // El voluntario no se puede cambiar
-        createdAt: existingParticipation.createdAt // La fecha de creación no se puede cambiar
-      };
-      
-      // Actualizar la participación en la base de datos
-      const [updatedParticipation] = await db
-        .update(volunteerParticipations)
-        .set(updateData)
-        .where(eq(volunteerParticipations.id, participationId))
-        .returning();
-        
-      res.json(updatedParticipation);
+
+      // Preparar datos para actualización (solo campos permitidos)
+      const { activityName, activityDate, hoursContributed, parkId, activityId, supervisorId, notes } = req.body;
+
+      // Construir query dinámica solo con campos proporcionados
+      const updateFields: string[] = [];
+      const values: any[] = [];
+      let paramIndex = 1;
+
+      if (activityName !== undefined) {
+        updateFields.push(`activity_name = $${paramIndex++}`);
+        values.push(activityName);
+      }
+      if (activityDate !== undefined) {
+        updateFields.push(`activity_date = $${paramIndex++}`);
+        values.push(activityDate);
+      }
+      if (hoursContributed !== undefined) {
+        updateFields.push(`hours_contributed = $${paramIndex++}`);
+        values.push(hoursContributed);
+      }
+      if (parkId !== undefined) {
+        updateFields.push(`park_id = $${paramIndex++}`);
+        values.push(parkId);
+      }
+      if (activityId !== undefined) {
+        updateFields.push(`activity_id = $${paramIndex++}`);
+        values.push(activityId);
+      }
+      if (supervisorId !== undefined) {
+        updateFields.push(`supervisor_id = $${paramIndex++}`);
+        values.push(supervisorId);
+      }
+      if (notes !== undefined) {
+        updateFields.push(`notes = $${paramIndex++}`);
+        values.push(notes);
+      }
+
+      if (updateFields.length === 0) {
+        return res.status(400).json({ message: "No hay campos para actualizar" });
+      }
+
+      // Agregar ID al final de los valores
+      values.push(participationId);
+
+      const result = await pool.query(`
+        UPDATE volunteer_participations 
+        SET ${updateFields.join(', ')}
+        WHERE id = $${paramIndex}
+        RETURNING 
+          id,
+          volunteer_id as "volunteerId",
+          activity_id as "activityId",
+          activity_name as "activityName",
+          activity_date as "activityDate",
+          hours_contributed as "hoursContributed",
+          park_id as "parkId",
+          supervisor_id as "supervisorId",
+          notes,
+          created_at as "createdAt"
+      `, values);
+
+      console.log(`✅ Participación actualizada exitosamente:`, result.rows[0]);
+      res.json(result.rows[0]);
     } catch (error) {
       console.error(`Error al actualizar participación ${req.params.id}:`, error);
-      res.status(500).json({ message: "Error al actualizar participación" });
+      res.status(500).json({ 
+        message: "Error al actualizar participación",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
     }
   });
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -164,7 +165,7 @@ export default function VolunteerRegisterPage() {
         description: 'El voluntario ha sido registrado exitosamente',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/volunteers'] });
-      setLocation('/admin/volunteers');
+      setLocation(ROUTES.admin.volunteers.list);
     },
     onError: (error) => {
       toast({

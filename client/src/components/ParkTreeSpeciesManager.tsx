@@ -262,13 +262,9 @@ export default function ParkTreeSpeciesManager({ parkId }: ParkTreeSpeciesManage
       {/* Columna izquierda: Especies disponibles */}
       <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-green-700">
-            <Leaf className="h-5 w-5" />
-            Especies Disponibles ({availableSpecies.length})
+          <CardTitle className="flex items-center gap-2 mb-4 text-gray-800">
+            Disponibles ({availableSpecies.length})
           </CardTitle>
-          <CardDescription>
-            Especies arbóreas que pueden ser asignadas a este parque
-          </CardDescription>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
@@ -308,10 +304,7 @@ export default function ParkTreeSpeciesManager({ parkId }: ParkTreeSpeciesManage
                       </div>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="shrink-0">
-                    <Plus className="h-4 w-4 mr-1" />
-                    Asignar
-                  </Button>
+                    <Plus className="h-4 w-4 text-gray-400" />
                 </div>
               ))}
               {availableSpecies.length === 0 && (
@@ -329,13 +322,9 @@ export default function ParkTreeSpeciesManager({ parkId }: ParkTreeSpeciesManage
       {/* Columna derecha: Especies asignadas */}
       <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-green-700">
-            <TreePine className="h-5 w-5" />
-            Especies del Parque ({assignedSpecies?.length || 0})
+          <CardTitle className="flex items-center gap-2 text-gray-800">
+            Asignadas ({assignedSpecies?.length || 0})
           </CardTitle>
-          <CardDescription>
-            Especies arbóreas asignadas a este parque
-          </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 p-0">
           <ScrollArea className="h-full px-6 pb-6">
@@ -343,7 +332,7 @@ export default function ParkTreeSpeciesManager({ parkId }: ParkTreeSpeciesManage
               {assignedSpecies?.map((assignment: ParkTreeSpecies) => (
                 <div
                   key={assignment.id}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-green-50"
+                  className="flex items-center justify-between p-3 rounded-lg border border-green-200"
                 >
                   <div className="flex items-center gap-3">
                     <TreeSpeciesIcon 
@@ -381,15 +370,8 @@ export default function ParkTreeSpeciesManager({ parkId }: ParkTreeSpeciesManage
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleEditAssignment(assignment)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
                       onClick={() => handleRemoveAssignment(assignment.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-gray-800 hover:text-gray-800"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

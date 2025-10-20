@@ -16,8 +16,8 @@ const contextMap: { prefix: string; to: string; labelKey: string }[] = [
     labelKey: 'return.parks',
   },
   {
-    prefix: ROUTES.admin.activities.catalog,
-    to: ROUTES.admin.activities.catalog,
+    prefix: ROUTES.admin.activities.list,
+    to: ROUTES.admin.activities.list,
     labelKey: 'return.activities',
   },
   {
@@ -79,7 +79,7 @@ export const ReturnHeader: React.FC<ReturnHeaderProps> = ({ to, label }) => {
 
   const currentPath = location;
   const match = contextMap.find(({ prefix }) => currentPath.startsWith(prefix));
-  const fallback = { to: '/', labelKey: 'return.home' };
+  const fallback = { to: '/admin', labelKey: 'return.home' };
 
   const finalTo = String(to ?? match?.to ?? fallback.to);
   const finalLabel = label ?? t(match?.labelKey ?? fallback.labelKey);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { AdminLayout } from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -208,7 +209,7 @@ export default function EditInstructorPage() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/instructors'] });
       queryClient.invalidateQueries({ queryKey: [`/api/instructors/${id}`] });
-      setLocation('/admin/activities/instructors');
+      setLocation(ROUTES.admin.activities.instructors.list);
     },
     onError: (error: Error) => {
       toast({
@@ -304,7 +305,7 @@ export default function EditInstructorPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <p className="text-red-600 mb-4">Error al cargar los datos del instructor</p>
-            <Button onClick={() => setLocation('/admin/activities/instructors')}>
+            <Button onClick={() => setLocation(ROUTES.admin.activities.instructors.list)}>
               Volver a la lista
             </Button>
           </div>
@@ -320,7 +321,7 @@ export default function EditInstructorPage() {
           <div className="flex items-center mb-4">
             <Button
               variant="ghost"
-              onClick={() => setLocation('/admin/activities/instructors')}
+              onClick={() => setLocation(ROUTES.admin.activities.instructors.list)}
               className="mr-4"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -629,7 +630,7 @@ export default function EditInstructorPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setLocation('/admin/activities/instructors')}
+                  onClick={() => setLocation(ROUTES.admin.activities.instructors.list)}
                 >
                   Cancelar
                 </Button>

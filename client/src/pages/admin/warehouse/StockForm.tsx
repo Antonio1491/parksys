@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -139,7 +140,7 @@ export default function StockForm() {
         description: 'El stock se ha registrado correctamente.',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/warehouse/stock'] });
-      setLocation('/admin/warehouse/stock');
+      setLocation(ROUTES.admin.warehouse.stock.list);
     },
     onError: (error: any) => {
       toast({
@@ -160,14 +161,14 @@ export default function StockForm() {
   };
 
   const handleCancel = () => {
-    setLocation('/admin/warehouse/stock');
+    setLocation(ROUTES.admin.warehouse.stock.list);
   };
 
   return (
     <AdminLayout>
-      <div className="p-6">
+      <div >
         {/* Header */}
-        <div className="max-w-7xl mx-auto">
+        <div className="w-auto mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <Button
               variant="outline"

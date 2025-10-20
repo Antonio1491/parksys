@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet';
@@ -335,19 +336,19 @@ const InventoryPage: React.FC = () => {
 
   // Handlers para acciones
   const handleEdit = (id: number) => {
-    setLocation(`/admin/assets/${id}/edit-enhanced`);
+    setLocation(ROUTES.admin.assets.edit.build(id));
   };
 
   const handleReportIncident = (id: number) => {
-    setLocation(`/admin/incidents/new?assetId=${id}`);
+    setLocation(`${ROUTES.admin.incidents.create}?assetId=${id}`);
   };
 
   const handleScheduleMaintenance = (id: number) => {
-    setLocation(`/admin/assets/${id}`);
+    setLocation(`${ROUTES.admin.assets.maintenance.create}?assetId=${id}`);
   };
 
   const handleViewAsset = (id: number) => {
-    setLocation(`/admin/assets/${id}`);
+    setLocation(ROUTES.admin.assets.view.build(id));
   };
 
   const deleteAssetMutation = useMutation({
@@ -1062,7 +1063,7 @@ const InventoryPage: React.FC = () => {
       {/* Acciones rápidas */}
       <div className="flex flex-wrap gap-2 mb-6">
         <Button 
-          onClick={() => setLocation('/admin/assets/new')}
+          onClick={() => setLocation(ROUTES.admin.assets.create)}
           className="bg-[#00a587] hover:bg-[#067f5f]"
         >
           <Plus className="h-4 w-4 mr-2" />

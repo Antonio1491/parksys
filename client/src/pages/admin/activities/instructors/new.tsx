@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { AdminLayout } from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -125,7 +126,7 @@ export default function NewInstructorPage() {
       queryClient.invalidateQueries({ queryKey: ['/public-api/instructors/public'] });
       
       // Navegar de vuelta a la lista
-      setLocation('/admin/activities/instructors');
+      setLocation(ROUTES.admin.activities.instructors.list);
     },
     onError: (error) => {
       toast({

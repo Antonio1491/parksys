@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
+import { useTranslation } from 'react-i18next';
 import { AdminLayout } from '@/components/AdminLayout';
+import { PageHeader } from "@/components/ui/page-header";
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +23,6 @@ import { useToast } from '@/hooks/use-toast';
 import { 
   Search, 
   Plus, 
-  Edit2, 
   Edit,
   Trash2, 
   Eye, 
@@ -31,18 +33,12 @@ import {
   Award,
   Calendar,
   MapPin,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
   RefreshCw,
   AlertCircle,
   Download,
   FileEdit,
   ChevronDown,
   ArrowUpDown,
-  Users,
-  UserCheck,
-  Briefcase,
   GraduationCap,
   Upload,
   FileSpreadsheet
@@ -59,6 +55,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiRequest } from '@/lib/queryClient';
+import { ExportButton } from "@/components/ui/export-button";
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Papa from 'papaparse';
@@ -69,6 +66,7 @@ interface Instructor {
   lastName: string;
   email: string;
   phone?: string;
+  status?: string;
   specialties: string[];
   experience: string;
   experienceYears: number;
@@ -83,6 +81,17 @@ interface Instructor {
   userId?: number;
   rating?: number;
   activitiesCount?: number;
+}
+
+function normalizeSpecialties(raw?: string[] | string | null): string[] {
+  if (!raw) return [];
+
+  const rawList = Array.isArray(raw) ? raw : [raw];
+
+  return rawList
+    .flatMap((entry) => entry.split(/[;,]/))
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 }
 
 export default function InstructorsManagementPage() {
@@ -106,7 +115,6 @@ export default function InstructorsManagementPage() {
   
   // Estados para eliminación masiva
   const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
-  const [deleteInstructorId, setDeleteInstructorId] = useState<number | null>(null);
   
   // Estados para importación CSV
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -130,11 +138,15 @@ export default function InstructorsManagementPage() {
       });
     },
     onSuccess: (data, instructorId) => {
+      const deleted = instructors.find(i => i.id === instructorId);
       toast({
         title: "Instructor eliminado",
-        description: "El instructor ha sido eliminado correctamente",
+        description: deleted
+          ? `${deleted.firstName} ${deleted.lastName} ha sido eliminado correctamente.`
+          : "El instructor ha sido eliminado correctamente.",
         variant: "default",
       });
+
       queryClient.invalidateQueries({ queryKey: ['/api/instructors'] });
       queryClient.invalidateQueries({ queryKey: ['/public-api/instructors/public'] });
       setShowDeleteDialog(false);
@@ -268,15 +280,6 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
     window.URL.revokeObjectURL(url);
   };
 
-  // Obtener especialidades únicas para el filtro
-  const uniqueSpecialties = Array.from(
-    new Set(
-      (instructors as Instructor[]).flatMap(instructor => 
-        Array.isArray(instructor.specialties) ? instructor.specialties : []
-      )
-    )
-  ).sort();
-
   // Aplicar todos los filtros
   const filteredInstructors = React.useMemo(() => {
     if (!Array.isArray(instructors)) return [];
@@ -295,7 +298,9 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
 
       // Filtro por especialidad
       const matchesSpecialty = specialtyFilter === 'all' || specialtyFilter === '' || 
-        (Array.isArray(instructor.specialties) ? instructor.specialties : []).includes(specialtyFilter);
+        normalizeSpecialties(instructor.specialties).some(s =>
+          s.toLowerCase().includes(specialtyFilter.toLowerCase())
+        );
 
       // Filtro por calificación
       const matchesRating = ratingFilter === 'all' || ratingFilter === '' || 
@@ -331,11 +336,6 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
       deleteInstructorMutation.mutate(instructorToDelete.id);
     }
   };
-  
-  // Manejar click en botón de eliminar todos
-  const handleDeleteAllClick = () => {
-    setDeleteAllDialogOpen(true);
-  };
 
   // Manejar confirmación de eliminar todos
   const handleConfirmDeleteAll = () => {
@@ -344,10 +344,9 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
 
   // Manejar click en botón de eliminar instructor individual
   const handleDeleteClick = (instructorId: number) => {
-    const instructor = instructors.find(i => i.id === instructorId);
+    const instructor = instructors.find(i => i.id === instructorId) ?? null;
     setInstructorToDelete(instructor);
-    setDeleteInstructorId(instructorId); // opcional si usas ambos
-    setShowDeleteDialog(true);
+    setShowDeleteDialog(!!instructor);
   };
   
   // Formatear fecha
@@ -383,20 +382,22 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
     setCurrentPage(page);
   };
 
-  const formatSpecialties = (specialties: string[] | null | undefined) => {
-    if (!specialties || !Array.isArray(specialties) || specialties.length === 0) {
+  const formatSpecialties = (specialties: string[] | string | null | undefined) => {
+    const normalized = normalizeSpecialties(specialties);
+
+    if (normalized.length === 0) {
       return <span className="text-gray-400 italic">No especificado</span>;
     }
-    
-    if (specialties.length <= 2) {
-      return specialties.map((specialty, index) => (
+
+    if (normalized.length <= 2) {
+      return normalized.map((specialty, index) => (
         <Badge key={index} variant="outline" className="mr-1 mb-1">{specialty}</Badge>
       ));
     } else {
       return (
         <>
-          <Badge variant="outline" className="mr-1 mb-1">{specialties[0]}</Badge>
-          <Badge variant="outline" className="mr-1 mb-1">+{specialties.length - 1} más</Badge>
+          <Badge variant="outline" className="mr-1 mb-1">{normalized[0]}</Badge>
+          <Badge variant="outline" className="mr-1 mb-1">+{normalized.length - 1} más</Badge>
         </>
       );
     }
@@ -404,24 +405,16 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
   
   // Lista de especialidades únicas para el filtro
   const specialties = React.useMemo(() => {
-    if (!Array.isArray(instructors) || instructors.length === 0) return [];
-    
+    if (!Array.isArray(instructors)) return [];
+
     const allSpecialties = new Set<string>();
-    instructors.forEach((instructor: Instructor) => {
-      if (instructor.specialties && Array.isArray(instructor.specialties)) {
-        instructor.specialties.forEach((specialty: string) => {
-          allSpecialties.add(specialty.trim());
-        });
-      } else if (instructor.specialties && typeof instructor.specialties === 'string') {
-        // Fallback para datos legacy que puedan estar como string
-        const specialtiesList = instructor.specialties.split(',');
-        specialtiesList.forEach((specialty: string) => {
-          allSpecialties.add(specialty.trim());
-        });
-      }
+    instructors.forEach((instructor) => {
+      normalizeSpecialties(instructor.specialties).forEach((s) => {
+        allSpecialties.add(s);
+      });
     });
-    
-    return Array.from(allSpecialties);
+
+    return Array.from(allSpecialties).sort();
   }, [instructors]);
 
   const renderStars = (rating: number) => {
@@ -441,142 +434,39 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
   };
 
   return (
-    <AdminLayout title="Gestión de Instructores">
-      {/* Diálogo de confirmación para eliminar todos los instructores */}
-      <AlertDialog open={deleteAllDialogOpen} onOpenChange={setDeleteAllDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción desactivará a todos los instructores en el sistema y no se puede deshacer.
-              Los instructores marcados como inactivos ya no aparecerán en las listas públicas ni podrán ser asignados a actividades.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmDeleteAll}
-              disabled={deleteAllInstructorsMutation.isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteAllInstructorsMutation.isPending ? 'Procesando...' : 'Confirmar eliminación'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+    <AdminLayout >
       <div className="space-y-6">
-        {/* Header con estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Instructores</p>
-                  <p className="text-2xl font-bold text-[#00a587]">{instructors.length}</p>
-                </div>
-                <User className="h-8 w-8 text-[#00a587]" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Especialidades</p>
-                  <p className="text-2xl font-bold text-[#067f5f]">
-                    {new Set(instructors.flatMap((i: Instructor) => i.specialties)).size}
-                  </p>
-                </div>
-                <Award className="h-8 w-8 text-[#067f5f]" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Promedio Experiencia</p>
-                  <p className="text-2xl font-bold text-[#8498a5]">
-                    {instructors.length > 0 
-                      ? Math.round(instructors.reduce((acc: number, i: Instructor) => acc + i.experienceYears, 0) / instructors.length)
-                      : 0} años
-                  </p>
-                </div>
-                <Calendar className="h-8 w-8 text-[#8498a5]" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Calificación Promedio</p>
-                  <p className="text-2xl font-bold text-[#bcd256]">
-                    {instructors.length > 0 
-                      ? (instructors.reduce((acc: number, i: Instructor) => acc + (i.rating || 0), 0) / instructors.length).toFixed(1)
-                      : '0.0'}
-                  </p>
-                </div>
-                <Star className="h-8 w-8 text-[#bcd256]" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Header con título y acciones */}
-        <Card className="p-4 bg-gray-50 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <GraduationCap className="w-8 h-8 text-gray-900" />
-                <h1 className="text-3xl font-bold text-gray-900">Instructores</h1>
-              </div>
-              <p className="text-gray-600 mt-2">Gestiona la lista de instructores registrados en la plataforma</p>
-            </div>
-            <div className="flex space-x-2">
-              <Button onClick={() => setLocation('/admin/activities/instructors/new')} className="bg-[#00a587] hover:bg-[#067f5f]">
-                <Plus className="mr-2 h-4 w-4" />
-                Nuevo Instructor
-              </Button>
-              <Button onClick={() => setShowImportDialog(true)} variant="outline" className="border-[#00a587] text-[#00a587] hover:bg-[#00a587]/10">
-                <Upload className="mr-2 h-4 w-4" />
-                Importar CSV
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    <Download className="mr-2 h-4 w-4" />
-                    Exportar
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Formato</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <FileEdit className="mr-2 h-4 w-4" />
-                    Excel
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <FileEdit className="mr-2 h-4 w-4" />
-                    CSV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <FileEdit className="mr-2 h-4 w-4" />
-                    PDF
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button variant="outline" onClick={handleDeleteAllClick}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Eliminar Todos
-              </Button>
-            </div>
-          </div>
-        </Card>
+        <PageHeader
+          title="Instructores"
+          subtitle="Gestión General del Sistema"
+          icon={<GraduationCap className="h-6 w-6 text-white" />}
+          actions={[
+            <Button
+              key="new"
+              variant="primary"
+              onClick={() => setLocation(ROUTES.admin.activities.instructors.create)}
+              data-testid="button-new-instructor"
+            >
+              <Plus className="w-4 h-4 mr-2 stroke-[4]" />
+              Nuevo
+            </Button>,
+            <Button
+              key="import"
+              variant="secondary"
+              onClick={() => setShowImportDialog(true)} // mantiene el modal
+              data-testid="button-import-instructors"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Importar
+            </Button>,
+            <ExportButton
+              key="export"
+              entity="instructors"
+              buttonVariant="tertiary"
+            />,
+          ]}
+          backgroundColor="bg-header-background"
+        />
         
         {/* Barra de búsqueda */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -661,6 +551,67 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
             <RefreshCw className="mr-2 h-4 w-4" />
             Limpiar filtros
           </Button>
+        </div>
+
+        {/* Tarjetas con estadísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Instructores</p>
+                  <p className="text-2xl font-bold text-[#00a587]">{instructors.length}</p>
+                </div>
+                <User className="h-8 w-8 text-[#00a587]" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Especialidades</p>
+                  <p className="text-2xl font-bold text-[#067f5f]">
+                    {new Set(instructors.flatMap((i: Instructor) => i.specialties)).size}
+                  </p>
+                </div>
+                <Award className="h-8 w-8 text-[#067f5f]" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Promedio Experiencia</p>
+                  <p className="text-2xl font-bold text-[#8498a5]">
+                    {instructors.length > 0 
+                      ? Math.round(instructors.reduce((acc: number, i: Instructor) => acc + i.experienceYears, 0) / instructors.length)
+                      : 0} años
+                  </p>
+                </div>
+                <Calendar className="h-8 w-8 text-[#8498a5]" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Calificación Promedio</p>
+                  <p className="text-2xl font-bold text-[#bcd256]">
+                    {instructors.length > 0 
+                      ? (instructors.reduce((acc: number, i: Instructor) => acc + (i.rating || 0), 0) / instructors.length).toFixed(1)
+                      : '0.0'}
+                  </p>
+                </div>
+                <Star className="h-8 w-8 text-[#bcd256]" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Tabla de instructores */}
@@ -756,7 +707,7 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setLocation(`/admin/activities/instructors/detail/${instructor.id}`)}
+                            onClick={() => setLocation(ROUTES.admin.activities.instructors.view.build(instructor.id))}
                             title="Ver detalles"
                           >
                             <Eye className="h-4 w-4" />
@@ -764,7 +715,7 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setLocation(`/admin/activities/instructors/edit/${instructor.id}`)}
+                            onClick={() => setLocation(ROUTES.admin.activities.instructors.edit.build(instructor.id))}
                             title="Editar instructor"
                           >
                             <Edit className="h-4 w-4" />

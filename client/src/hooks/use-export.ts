@@ -3,6 +3,7 @@ import { ExportOptions, ExportConfig } from '../../../shared/exports/config';
 import { EXPORT_REGISTRY } from '../../../shared/exports/registry';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
 interface UseExportOptions {
   onSuccess?: (filename: string) => void;
@@ -40,6 +41,11 @@ export function useExport(entity: string, options?: UseExportOptions) {
       setIsLoadingConfig(false);
     }
   }, [entity, config, toast]);
+
+  // ✅ Disparar carga de configuración al montar
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig]);
 
   // Función principal de exportación
   const exportData = useCallback(async (exportOptions: Omit<ExportOptions, 'entity'>) => {

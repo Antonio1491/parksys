@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -244,7 +245,7 @@ const NewIncidentPage = () => {
         description: 'La incidencia ha sido reportada exitosamente.',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/incidents'] });
-      setLocation('/admin/incidents');
+      setLocation(ROUTES.admin.incidents.list);
     },
     onError: (error: any) => {
       toast({
@@ -381,7 +382,7 @@ const NewIncidentPage = () => {
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="ghost"
-            onClick={() => setLocation('/admin/incidents')}
+            onClick={() => setLocation(ROUTES.admin.incidents.list)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -1293,7 +1294,7 @@ const NewIncidentPage = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setLocation('/admin/incidents')}
+                    onClick={() => setLocation(ROUTES.admin.incidents.list)}
                     className="flex-1"
                   >
                     Cancelar
