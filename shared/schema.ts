@@ -829,6 +829,10 @@ export const incidents = pgTable("incidents", {
   reporteComunidad: text("reporte_comunidad"), // si fue un vecino, asociación o visitante
 });
 
+// ============================================
+// MÓDULO DE VOLUNTARIADO - ESTRUCTURA MEJORADA
+// ============================================
+
 // Tabla volunteers - Catálogo independiente alimentado desde /volunteers/register
 export const volunteers = pgTable("volunteers", {
   id: serial("id").primaryKey(),
@@ -854,7 +858,76 @@ export const volunteers = pgTable("volunteers", {
   updatedAt: timestamp("updated_at").notNull().defaultNow()
 });
 
+// Tabla de actividades de voluntariado (diferentes a actividades públicas)
+export const volunteerActivities = pgTable("volunteer_activities", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  parkId: integer("park_id").notNull().references(() => parks.id, { onDelete: "cascade" }),
+  activityDate: timestamp("activity_date").notNull(),
+  scheduledHours: decimal("scheduled_hours", { precision: 4, scale: 2 }),
+  maxVolunteers: integer("max_volunteers").default(10),
+  supervisorId: integer("supervisor_id").references(() => users.id, { onDelete: "set null" }),
+  status: text("status").default("planned"), // planned, in_progress, completed, cancelled
+  category: text("category"), // maintenance, events, education, sports, cultural, nature, other
+  requirements: text("requirements"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
+// Tabla de participaciones (relación voluntario-actividad)
+export const volunteerParticipations = pgTable("volunteer_participations", {
+  id: serial("id").primaryKey(),
+  volunteerId: integer("volunteer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  volunteerActivityId: integer("volunteer_activity_id").notNull().references(() => volunteerActivities.id, { onDelete: "cascade" }),
+
+  // Estado de la participación
+  registrationDate: timestamp("registration_date").notNull().defaultNow(),
+  attendanceStatus: text("attendance_status").default("registered"), // registered, confirmed, attended, absent, cancelled
+
+  // Registro de horas
+  hoursContributed: decimal("hours_contributed", { precision: 4, scale: 2 }),
+  checkInTime: timestamp("check_in_time"),
+  checkOutTime: timestamp("check_out_time"),
+
+  // Feedback
+  volunteerNotes: text("volunteer_notes"),
+  supervisorNotes: text("supervisor_notes"),
+  rating: integer("rating"),
+
+  // Metadata
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// RELACIONES
+// ============================================
+
+// Relaciones de volunteer_activities
+export const volunteerActivitiesRelations = relations(volunteerActivities, ({ one, many }) => ({
+  park: one(parks, {
+    fields: [volunteerActivities.parkId],
+    references: [parks.id],
+  }),
+  supervisor: one(users, {
+    fields: [volunteerActivities.supervisorId],
+    references: [users.id],
+  }),
+  participations: many(volunteerParticipations),
+}));
+
+// Relaciones de volunteer_participations
+export const volunteerParticipationsRelations = relations(volunteerParticipations, ({ one }) => ({
+  volunteer: one(users, {
+    fields: [volunteerParticipations.volunteerId],
+    references: [users.id],
+  }),
+  activity: one(volunteerActivities, {
+    fields: [volunteerParticipations.volunteerActivityId],
+    references: [volunteerActivities.id],
+  }),
+}));
 
 export const volunteerEvaluations = pgTable("volunteer_evaluations", {
   id: serial("id").primaryKey(),
@@ -1048,6 +1121,30 @@ export const insertVolunteerSchema = createInsertSchema(volunteers).omit({
   createdAt: true,
   updatedAt: true
 });
+
+export type VolunteerActivity = typeof volunteerActivities.$inferSelect;
+export type NewVolunteerActivity = typeof volunteerActivities.$inferInsert;
+
+export type VolunteerParticipation = typeof volunteerParticipations.$inferSelect;
+export type NewVolunteerParticipation = typeof volunteerParticipations.$inferInsert;
+
+// ============================================
+// SCHEMAS DE VALIDACIÓN
+// ============================================
+export const insertVolunteerActivitySchema = createInsertSchema(volunteerActivities).omit({ 
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertVolunteerParticipationSchema = createInsertSchema(volunteerParticipations).omit({ 
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertVolunteerActivity = z.infer<typeof insertVolunteerActivitySchema>;
+export type InsertVolunteerParticipation = z.infer<typeof insertVolunteerParticipationSchema>;
 
 export type VolunteerEvaluation = typeof volunteerEvaluations.$inferSelect;
 export type InsertVolunteerEvaluation = typeof volunteerEvaluations.$inferInsert;

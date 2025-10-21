@@ -681,7 +681,7 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
               </div>
             </div>
           ) : (
-            <div className="border rounded-md overflow-hidden">
+            <div>
               <Table>
                 <TableHeader>
                   <TableRow>
