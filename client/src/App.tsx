@@ -771,6 +771,23 @@ function Router() {
           </Suspense>
         </Route>
 
+        {/* Rutas del módulo de Órdenes de Trabajo */}
+        <Route path="/admin/work-orders">
+          <Suspense fallback={<div className="p-8 text-center">Cargando órdenes de trabajo...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/work-orders/index')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/work-orders/new">
+          <Suspense fallback={<div className="p-8 text-center">Cargando formulario de nueva orden...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/work-orders/new')))}
+          </Suspense>
+        </Route>
+        <Route path="/admin/work-orders/:id">
+          <Suspense fallback={<div className="p-8 text-center">Cargando detalles de orden de trabajo...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/work-orders/[id]')))}
+          </Suspense>
+        </Route>
+
         {/* Rutas del módulo de Almacén - Fixed imports */}
         <Route path="/admin/warehouse/dashboard">
           <Suspense fallback={<div className="p-8 text-center">Cargando dashboard del almacén...</div>}>
