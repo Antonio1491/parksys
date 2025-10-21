@@ -17,7 +17,7 @@ import { createParkEvaluationsTables } from "./create-park-evaluations-tables";
 import { db, pool } from "./db";
 import { incomeCategories, expenseCategories } from "../shared/finance-schema";
 import { eq, and, or, like, desc, sql } from "drizzle-orm";
-import { workOrders, workOrderMaterials, workOrderChecklist, workOrderAttachments, workOrderHistory } from "../shared/schema";
+import { workOrders, workOrderMaterials, workOrderChecklist, workOrderAttachments, workOrderHistory, requisitions, requisitionItems, consumables, parks, users } from "../shared/schema";
 import { registerInstructorInvitationRoutes } from "./instructorInvitationRoutes";
 import { registerInstructorApplicationRoutes } from "./instructorApplicationRoutes";
 import { registerAuditRoutes } from "./audit-routes";
@@ -2774,6 +2774,151 @@ app.post('/api/work-orders/:id/complete', async (req: Request, res: Response) =>
   } catch (error) {
     console.error('Error al completar orden:', error);
     res.status(500).json({ message: 'Error al completar orden' });
+  }
+});
+
+// ========== ENDPOINTS DE REQUISICIONES DE ALMACÉN ==========
+
+// GET - Listar requisiciones con filtros
+app.get('/api/warehouse/requisitions', async (req: Request, res: Response) => {
+  try {
+    const { search, status, priority } = req.query;
+    
+    let query = db
+      .select({
+        id: requisitions.id,
+        requisitionNumber: requisitions.requisitionNumber,
+        title: requisitions.title,
+        description: requisitions.description,
+        status: requisitions.status,
+        priority: requisitions.priority,
+        requestDate: requisitions.requestDate,
+        requiredDate: requisitions.requiredDate,
+        approvalDate: requisitions.approvalDate,
+        parkId: requisitions.parkId,
+        requestedById: requisitions.requestedById,
+        approvedById: requisitions.approvedById,
+        rejectionReason: requisitions.rejectionReason,
+      })
+      .from(requisitions)
+      .$dynamic();
+    
+    const conditions = [];
+    if (status) conditions.push(eq(requisitions.status, status as any));
+    if (priority) conditions.push(eq(requisitions.priority, priority as string));
+    if (search) {
+      conditions.push(
+        or(
+          like(requisitions.title, `%${search}%`),
+          like(requisitions.requisitionNumber, `%${search}%`),
+          like(requisitions.description, `%${search}%`)
+        )!
+      );
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)!);
+    }
+    
+    const allRequisitions = await query.orderBy(desc(requisitions.createdAt));
+    
+    // Obtener datos relacionados para cada requisición
+    const requisitionsWithData = await Promise.all(
+      allRequisitions.map(async (req) => {
+        const [requestedBy] = req.requestedById 
+          ? await db.select().from(users).where(eq(users.id, req.requestedById))
+          : [null];
+        
+        const [approvedBy] = req.approvedById
+          ? await db.select().from(users).where(eq(users.id, req.approvedById))
+          : [null];
+        
+        const [destinationPark] = req.parkId
+          ? await db.select().from(parks).where(eq(parks.id, req.parkId))
+          : [null];
+        
+        const items = await db
+          .select()
+          .from(requisitionItems)
+          .where(eq(requisitionItems.requisitionId, req.id));
+        
+        return {
+          ...req,
+          requestedBy,
+          approvedBy,
+          destinationPark,
+          items
+        };
+      })
+    );
+    
+    res.json(requisitionsWithData);
+  } catch (error) {
+    console.error('Error al obtener requisiciones:', error);
+    res.status(500).json({ message: 'Error al obtener requisiciones' });
+  }
+});
+
+// POST - Crear nueva requisición
+app.post('/api/warehouse/requisitions', async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    console.log('📥 [REQUISITION] Datos recibidos:', JSON.stringify(data, null, 2));
+    
+    // Generar número de requisición único
+    const year = new Date().getFullYear();
+    const lastRequisition = await db
+      .select()
+      .from(requisitions)
+      .where(like(requisitions.requisitionNumber, `REQ-${year}-%`))
+      .orderBy(desc(requisitions.id))
+      .limit(1);
+    
+    let nextNumber = 1;
+    if (lastRequisition.length > 0) {
+      const lastNumber = lastRequisition[0].requisitionNumber;
+      const match = lastNumber.match(/REQ-\d{4}-(\d+)/);
+      if (match) nextNumber = parseInt(match[1]) + 1;
+    }
+    
+    const requisitionNumber = `REQ-${year}-${String(nextNumber).padStart(4, '0')}`;
+    
+    // Crear requisición
+    const requisitionData = {
+      requisitionNumber,
+      title: data.title,
+      description: data.description || null,
+      requestedById: req.user?.id || data.requestedById,
+      parkId: data.parkId,
+      priority: data.priority || 'media',
+      requiredDate: data.requiredDate ? new Date(data.requiredDate) : null,
+      requestDate: new Date(),
+      status: 'draft' as const
+    };
+    
+    console.log('📝 [REQUISITION] Datos mapeados:', JSON.stringify(requisitionData, null, 2));
+    
+    const [newRequisition] = await db
+      .insert(requisitions)
+      .values(requisitionData)
+      .returning();
+    
+    // Crear items de requisición si se proporcionaron
+    if (data.items && Array.isArray(data.items) && data.items.length > 0) {
+      const itemsData = data.items.map((item: any) => ({
+        requisitionId: newRequisition.id,
+        consumableId: item.consumableId,
+        requestedQuantity: item.requestedQuantity,
+        notes: item.notes || null
+      }));
+      
+      await db.insert(requisitionItems).values(itemsData);
+    }
+    
+    res.status(201).json(newRequisition);
+  } catch (error) {
+    console.error('Error al crear requisición:', error);
+    res.status(500).json({ message: 'Error al crear requisición' });
   }
 });
 
