@@ -66,18 +66,9 @@ export default function NewInstructorPage() {
   });
 
   // Obtener lista de parques para selector
-  const getParkName = (activity: any) => {
-    // Primero intentar con el nombre directo si existe
-    if (activity.parkName) {
-      return activity.parkName;
-    }
-    // Luego mapear por ID usando parksMap
-    const parkId = activity.parkId || activity.park_id;
-    if (parkId && parksMap[parkId]) {
-      return parksMap[parkId].name;
-    }
-    return `Parque ${parkId}`;
-  };
+  const { data: parks = [] } = useQuery<any[]>({
+    queryKey: ['/api/parks'],
+  });
 
   // Mutación para crear instructor
   const createInstructorMutation = useMutation({
