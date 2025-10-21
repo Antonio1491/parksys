@@ -943,6 +943,38 @@ const AdminSidebarComplete: React.FC = () => {
               </NavItem>
             </CollapsibleSubmenu>
 
+            {/* ÓRDENES DE TRABAJO */}
+            <CollapsibleSubmenu
+              id="ordenes-trabajo"
+              title="Órdenes de Trabajo"
+              icon={<FileText className="h-4 w-4" />}
+              isExpanded={expandedSubmenus.includes('ordenes-trabajo')}
+              onToggle={toggleSubmenu}
+              isActive={isSubmenuActive('ordenes-trabajo')}
+            >
+              <NavItem 
+                href="/admin/work-orders" 
+                icon={<ClipboardList className="h-4 w-4" />}
+                active={location === '/admin/work-orders' || (location.startsWith('/admin/work-orders') && !location.includes('/new'))}
+              >
+                Listado
+              </NavItem>
+              <NavItem 
+                href="/admin/work-orders/new" 
+                icon={<Plus className="h-4 w-4" />}
+                active={location.startsWith('/admin/work-orders/new')}
+              >
+                Nueva Orden
+              </NavItem>
+              <NavItem 
+                href="/admin/work-orders/dashboard" 
+                icon={<BarChart3 className="h-4 w-4" />}
+                active={location.startsWith('/admin/work-orders/dashboard')}
+              >
+                Dashboard
+              </NavItem>
+            </CollapsibleSubmenu>
+
             {/* ALMACÉN */}
             <CollapsibleSubmenu
               id="almacen"
