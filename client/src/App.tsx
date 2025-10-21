@@ -668,7 +668,7 @@ function Router() {
               {React.createElement(React.lazy(() => import('@/pages/admin/volunteers/edit')))}
             </Suspense>
           </Route>
-          <Route path={ROUTES.admin.volunteers.participations} component={AdminVolunteerParticipations} />
+          <Route path={ROUTES.admin.volunteers.participations.list} component={AdminVolunteerParticipations} />
           <Route path={ROUTES.admin.volunteers.participations.view.path} component={AdminParticipationEdit} />
           <Route path={ROUTES.admin.volunteers.recognition}>
             <Suspense fallback={<div className="p-8 text-center">Cargando reconocimientos...</div>}>
