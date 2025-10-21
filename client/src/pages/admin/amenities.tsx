@@ -1002,7 +1002,28 @@ const AdminAmenitiesPage = () => {
           <TableBody>
             {paginatedAmenities?.map((amenity: Amenity) => (
               <TableRow 
-                key={amenity.id}>
+                key={amenity.id}
+                className="hover:bg-gray-50 transition-colors"
+              >
+                {selectionMode && (
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedAmenities.has(amenity.id)}
+                      onChange={(e) => {
+                        const newSelected = new Set(selectedAmenities);
+                        if (e.target.checked) {
+                          newSelected.add(amenity.id);
+                        } else {
+                          newSelected.delete(amenity.id);
+                        }
+                        setSelectedAmenities(newSelected);
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-[#00a587] focus:ring-[#00a587]"
+                    />
+                  </TableCell>
+                )}
+
                 <TableCell>
                   <AmenityIcon 
                     name={amenity.icon || 'park'} 
@@ -1013,7 +1034,7 @@ const AdminAmenitiesPage = () => {
                 </TableCell>
                 <TableCell className="font-medium">{amenity.name}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="bg-gray-100">
                     {getCategoryLabel(amenity.category || 'servicios')}
                   </Badge>
                 </TableCell>
@@ -1021,33 +1042,52 @@ const AdminAmenitiesPage = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleParksClick(amenity.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleParksClick(amenity.id);
+                    }}
                     className="p-2 h-auto hover:bg-blue-50"
                     disabled={!amenity.parksCount || amenity.parksCount === 0}
                   >
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer">
+                    <Badge 
+                      variant="outline" 
+                      className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer"
+                    >
                       {amenity.parksCount || 0} parques
                     </Badge>
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-green-50 text-green-700 border-green-200"
+                  >
                     {amenity.totalModules || 0} módulos
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      onClick={() => handleEditClick(amenity)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditClick(amenity);
+                      }}
+                      className="border bg-transparent text-gray-800 hover:text-white"
+                      title="Editar amenidad"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      onClick={() => handleDeleteClick(amenity)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(amenity);
+                      }}
+                      className="border bg-transparent text-red-800 hover:text-white"
+                      title="Eliminar amenidad"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

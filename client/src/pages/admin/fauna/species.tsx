@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { PageHeader } from '@/components/ui/page-header';
 import { 
   Search, 
   Plus, 
@@ -450,6 +451,9 @@ const FaunaSpeciesAdmin: React.FC = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
+        <PageHeader 
+          title="Gestión de Fauna" 
+          subtitle="Administra el catálogo de especies de fauna urbana." />
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Gestión de Fauna</h1>
