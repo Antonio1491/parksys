@@ -47,13 +47,13 @@ export default function NewRequisitionPage() {
   });
 
   // Queries
-  const { data: parksResponse } = useQuery({
+  const { data: parksResponse } = useQuery<{ data: any[] }>({
     queryKey: ['/api/parks'],
     retry: false,
   });
   const parks = parksResponse?.data || [];
 
-  const { data: consumables = [] } = useQuery({
+  const { data: consumables = [] } = useQuery<any[]>({
     queryKey: ['/api/warehouse/consumables'],
     retry: false,
   });
@@ -63,7 +63,7 @@ export default function NewRequisitionPage() {
     mutationFn: async (data: RequisitionFormData) => {
       return await apiRequest('/api/warehouse/requisitions', {
         method: 'POST',
-        body: JSON.stringify(data)
+        data: data
       });
     },
     onSuccess: () => {
