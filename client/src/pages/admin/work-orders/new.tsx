@@ -73,11 +73,11 @@ export default function NewWorkOrderPage() {
       description: descriptionFromUrl || '',
       type: 'correctivo',
       priority: 'normal',
-      parkId: parkIdFromUrl || '',
-      assetId: assetIdFromUrl || '',
-      incidentId: incidentIdFromUrl || '',
+      parkId: parkIdFromUrl || 'none',
+      assetId: assetIdFromUrl || 'none',
+      incidentId: incidentIdFromUrl || 'none',
       requestedById: '',
-      assignedToEmployeeId: '',
+      assignedToEmployeeId: 'none',
       scheduledStartDate: '',
       scheduledEndDate: '',
       estimatedCost: '',
@@ -162,7 +162,7 @@ export default function NewWorkOrderPage() {
   const safeAssets = Array.isArray(assets) ? assets.filter((a: any) => a?.id && a?.name) : [];
   const safeIncidents = Array.isArray(incidents) ? incidents.filter((i: any) => i?.id && i?.title) : [];
   const safeEmployees = Array.isArray(employees) ? employees.filter((e: any) => e?.id && e?.fullName) : [];
-  const safeUsers = Array.isArray(users) ? users.filter((u: any) => u?.id && u?.fullName) : [];
+  const safeUsers = Array.isArray(users) ? users.filter((u: any) => u?.id && (u?.fullName || u?.username)) : [];
 
   return (
     <AdminLayout title="Nueva Orden de Trabajo">

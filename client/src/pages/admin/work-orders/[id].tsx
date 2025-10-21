@@ -85,7 +85,7 @@ const getTypeLabel = (type: string) => {
 export default function WorkOrderDetailPage() {
   const [, params] = useRoute('/admin/work-orders/:id');
   const [, setLocation] = useLocation();
-  const workOrderId = params?.id ? parseInt(params.id) : 0;
+  const workOrderId = params?.id ? parseInt(params.id) : undefined;
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

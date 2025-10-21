@@ -2565,7 +2565,19 @@ app.get('/api/work-orders', async (req: Request, res: Response) => {
     const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
     const orders = await query.orderBy(desc(workOrders.createdAt)).limit(parseInt(limit as string)).offset(offset);
     
-    res.json(orders);
+    // Obtener el total de registros para la paginación
+    let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(workOrders).$dynamic();
+    if (conditions.length > 0) {
+      countQuery = countQuery.where(and(...conditions)!);
+    }
+    const [{ count }] = await countQuery;
+    
+    res.json({
+      workOrders: orders,
+      totalCount: count,
+      page: parseInt(page as string),
+      limit: parseInt(limit as string)
+    });
   } catch (error) {
     console.error('Error al obtener órdenes de trabajo:', error);
     res.status(500).json({ message: 'Error al obtener órdenes de trabajo' });
@@ -2576,6 +2588,11 @@ app.get('/api/work-orders', async (req: Request, res: Response) => {
 app.get('/api/work-orders/:id', async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
+    
+    // Validar que el ID sea un número válido
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'ID de orden de trabajo inválido' });
+    }
     
     const [order] = await db.select().from(workOrders).where(eq(workOrders.id, id));
     if (!order) {

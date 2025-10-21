@@ -80,6 +80,10 @@ export default function NewInstructorPage() {
     return [];
   }, [parksResponse]);
 
+  // 🔍 DEBUG - Eliminar después de verificar
+  console.log('Parks Response:', parksResponse);
+  console.log('Parks Array:', parks);
+
   // Mutación para crear instructor
   const createInstructorMutation = useMutation({
     mutationFn: async (data: InstructorFormData) => {
