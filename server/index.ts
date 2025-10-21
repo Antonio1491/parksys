@@ -2622,6 +2622,7 @@ app.get('/api/work-orders/:id', async (req: Request, res: Response) => {
 app.post('/api/work-orders', async (req: Request, res: Response) => {
   try {
     const data = req.body;
+    console.log('📥 [WORK-ORDER] Datos recibidos:', JSON.stringify(data, null, 2));
     
     // Generar folio único
     const year = new Date().getFullYear();
@@ -2656,6 +2657,8 @@ app.post('/api/work-orders', async (req: Request, res: Response) => {
       presupuestoAsignado: data.estimatedCost || null,
       creadoPor: req.user?.id
     };
+    
+    console.log('📝 [WORK-ORDER] Datos mapeados para inserción:', JSON.stringify(workOrderData, null, 2));
     
     const [newOrder] = await db.insert(workOrders).values(workOrderData).returning();
     
