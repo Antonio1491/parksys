@@ -2917,84 +2917,91 @@ app.get('/api/work-orders/stats/general', async (req: Request, res: Response) =>
 app.get('/api/work-orders/stats/dashboard', async (req: Request, res: Response) => {
   try {
     // Distribución por estado
-    const byStatus = await db.select({
-      estado: workOrders.estado,
-      count: sql<number>`count(*)::int`
-    })
-    .from(workOrders)
-    .groupBy(workOrders.estado);
+    const byStatusResult = await pool.query(`
+      SELECT estado, COUNT(*)::int as count
+      FROM work_orders
+      GROUP BY estado
+    `);
+    const byStatus = byStatusResult.rows;
 
     // Distribución por tipo
-    const byType = await db.select({
-      type: workOrders.tipo,
-      count: sql<number>`count(*)::int`
-    })
-    .from(workOrders)
-    .groupBy(workOrders.tipo);
+    const byTypeResult = await pool.query(`
+      SELECT tipo as type, COUNT(*)::int as count
+      FROM work_orders
+      GROUP BY tipo
+    `);
+    const byType = byTypeResult.rows;
 
     // Distribución por prioridad
-    const byPriority = await db.select({
-      priority: workOrders.prioridad,
-      count: sql<number>`count(*)::int`
-    })
-    .from(workOrders)
-    .groupBy(workOrders.prioridad);
+    const byPriorityResult = await pool.query(`
+      SELECT prioridad as priority, COUNT(*)::int as count
+      FROM work_orders
+      GROUP BY prioridad
+    `);
+    const byPriority = byPriorityResult.rows;
 
     // Costos
-    const costsResult = await db.select({
-      totalEstimado: sql<number>`COALESCE(SUM(costo_estimado), 0)`,
-      totalReal: sql<number>`COALESCE(SUM(costo_real), 0)`,
-      promedioEstimado: sql<number>`COALESCE(AVG(costo_estimado), 0)`,
-      promedioReal: sql<number>`COALESCE(AVG(costo_real), 0)`
-    })
-    .from(workOrders);
+    const costsResult = await pool.query(`
+      SELECT 
+        COALESCE(SUM(costo_estimado), 0) as "totalEstimado",
+        COALESCE(SUM(costo_real), 0) as "totalReal",
+        COALESCE(AVG(costo_estimado), 0) as "promedioEstimado",
+        COALESCE(AVG(costo_real), 0) as "promedioReal"
+      FROM work_orders
+    `);
+    const costs = costsResult.rows[0];
 
     // Top empleados por órdenes completadas
-    const topEmployees = await db.select({
-      employeeId: workOrders.asignadoAEmpleadoId,
-      employeeName: sql<string>`e.full_name`,
-      completedCount: sql<number>`count(*)::int`
-    })
-    .from(workOrders)
-    .leftJoin(sql`employees e`, sql`e.id = ${workOrders.asignadoAEmpleadoId}`)
-    .where(eq(workOrders.estado, 'completada'))
-    .groupBy(workOrders.asignadoAEmpleadoId, sql`e.full_name`)
-    .orderBy(sql`count(*) DESC`)
-    .limit(5);
+    const topEmployeesResult = await pool.query(`
+      SELECT 
+        wo.asignado_a_empleado_id as "employeeId",
+        e.full_name as "employeeName",
+        COUNT(*)::int as "completedCount"
+      FROM work_orders wo
+      LEFT JOIN employees e ON e.id = wo.asignado_a_empleado_id
+      WHERE wo.estado = 'completada' AND wo.asignado_a_empleado_id IS NOT NULL
+      GROUP BY wo.asignado_a_empleado_id, e.full_name
+      ORDER BY COUNT(*) DESC
+      LIMIT 5
+    `);
+    const topEmployees = topEmployeesResult.rows;
 
     // Tendencias mensuales (últimos 6 meses)
-    const monthlyTrends = await db.select({
-      month: sql<string>`TO_CHAR(created_at, 'YYYY-MM')`,
-      total: sql<number>`count(*)::int`,
-      completadas: sql<number>`count(*) FILTER (WHERE estado = 'completada')::int`
-    })
-    .from(workOrders)
-    .where(sql`created_at >= NOW() - INTERVAL '6 months'`)
-    .groupBy(sql`TO_CHAR(created_at, 'YYYY-MM')`)
-    .orderBy(sql`TO_CHAR(created_at, 'YYYY-MM') ASC`);
+    const monthlyTrendsResult = await pool.query(`
+      SELECT 
+        TO_CHAR(created_at, 'YYYY-MM') as month,
+        COUNT(*)::int as total,
+        COUNT(*) FILTER (WHERE estado = 'completada')::int as completadas
+      FROM work_orders
+      WHERE created_at >= NOW() - INTERVAL '6 months'
+      GROUP BY TO_CHAR(created_at, 'YYYY-MM')
+      ORDER BY TO_CHAR(created_at, 'YYYY-MM') ASC
+    `);
+    const monthlyTrends = monthlyTrendsResult.rows;
 
     // Tiempo promedio de resolución (en días)
-    const avgResolutionTime = await db.select({
-      avgDays: sql<number>`AVG(EXTRACT(EPOCH FROM (fecha_completada - created_at)) / 86400)`
-    })
-    .from(workOrders)
-    .where(sql`estado = 'completada' AND fecha_completada IS NOT NULL`);
+    const avgResolutionTimeResult = await pool.query(`
+      SELECT AVG(EXTRACT(EPOCH FROM (fecha_completada - created_at)) / 86400) as "avgDays"
+      FROM work_orders
+      WHERE estado = 'completada' AND fecha_completada IS NOT NULL
+    `);
+    const avgResolutionDays = avgResolutionTimeResult.rows[0]?.avgDays || 0;
 
     res.json({
       summary: {
-        total: byStatus.reduce((sum, item) => sum + item.count, 0),
-        pendientes: byStatus.find(s => s.estado === 'pendiente')?.count || 0,
-        en_proceso: byStatus.find(s => s.estado === 'en_proceso')?.count || 0,
-        completadas: byStatus.find(s => s.estado === 'completada')?.count || 0,
-        canceladas: byStatus.find(s => s.estado === 'cancelada')?.count || 0
+        total: byStatus.reduce((sum: number, item: any) => sum + item.count, 0),
+        pendientes: byStatus.find((s: any) => s.estado === 'pendiente')?.count || 0,
+        en_proceso: byStatus.find((s: any) => s.estado === 'en_proceso')?.count || 0,
+        completadas: byStatus.find((s: any) => s.estado === 'completada')?.count || 0,
+        canceladas: byStatus.find((s: any) => s.estado === 'cancelada')?.count || 0
       },
       byStatus,
       byType,
       byPriority,
-      costs: costsResult[0] || { totalEstimado: 0, totalReal: 0, promedioEstimado: 0, promedioReal: 0 },
-      topEmployees: topEmployees.filter(e => e.employeeId !== null),
+      costs,
+      topEmployees,
       monthlyTrends,
-      avgResolutionDays: avgResolutionTime[0]?.avgDays || 0
+      avgResolutionDays: parseFloat(avgResolutionDays) || 0
     });
   } catch (error) {
     console.error('Error al obtener estadísticas del dashboard:', error);
