@@ -782,6 +782,11 @@ function Router() {
             {React.createElement(React.lazy(() => import('@/pages/admin/work-orders/new')))}
           </Suspense>
         </Route>
+        <Route path="/admin/work-orders/dashboard">
+          <Suspense fallback={<div className="p-8 text-center">Cargando dashboard...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/work-orders/dashboard')))}
+          </Suspense>
+        </Route>
         <Route path="/admin/work-orders/:id">
           <Suspense fallback={<div className="p-8 text-center">Cargando detalles de orden de trabajo...</div>}>
             {React.createElement(React.lazy(() => import('@/pages/admin/work-orders/[id]')))}
