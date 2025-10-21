@@ -66,10 +66,9 @@ export default function NewInstructorPage() {
   });
 
   // Obtener lista de parques para selector
-  const { data: parks = [] } = useQuery({
+  const { data: parks = [] } = useQuery<any[]>({
     queryKey: ['/api/parks'],
   });
-  const parks = Array.isArray(parksData) ? parksData : [];
 
   // Mutación para crear instructor
   const createInstructorMutation = useMutation({
