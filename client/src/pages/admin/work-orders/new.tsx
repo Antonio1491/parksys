@@ -41,7 +41,9 @@ const workOrderSchema = z.object({
   priority: z.enum(['baja', 'normal', 'alta', 'urgente'], {
     required_error: 'La prioridad es obligatoria'
   }),
-  parkId: z.string().optional(),
+  parkId: z.string().refine((val) => val !== 'none' && val !== '', {
+    message: 'El parque es obligatorio'
+  }),
   assetId: z.string().optional(),
   incidentId: z.string().optional(),
   requestedById: z.string().min(1, 'El solicitante es obligatorio'),

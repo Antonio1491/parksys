@@ -854,19 +854,7 @@ export const volunteers = pgTable("volunteers", {
   updatedAt: timestamp("updated_at").notNull().defaultNow()
 });
 
-export const volunteerParticipations = pgTable("volunteer_participations", {
-  id: serial("id").primaryKey(),
-  volunteerId: integer("volunteer_id").notNull(),
-  activityId: integer("activity_id"),
-  parkId: integer("park_id").notNull(),
-  participationDate: date("participation_date").notNull(),
-  hoursServed: decimal("hours_served", { precision: 4, scale: 2 }).notNull(),
-  tasks: text("tasks").notNull(),
-  feedback: text("feedback"),
-  status: text("status").default("completed"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
-});
+
 
 export const volunteerEvaluations = pgTable("volunteer_evaluations", {
   id: serial("id").primaryKey(),
@@ -1056,15 +1044,6 @@ export type Volunteer = typeof volunteers.$inferSelect;
 export type InsertVolunteer = typeof volunteers.$inferInsert;
 
 export const insertVolunteerSchema = createInsertSchema(volunteers).omit({ 
-  id: true,
-  createdAt: true,
-  updatedAt: true
-});
-
-export type VolunteerParticipation = typeof volunteerParticipations.$inferSelect;
-export type InsertVolunteerParticipation = typeof volunteerParticipations.$inferInsert;
-
-export const insertVolunteerParticipationSchema = createInsertSchema(volunteerParticipations).omit({ 
   id: true,
   createdAt: true,
   updatedAt: true

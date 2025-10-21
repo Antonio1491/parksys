@@ -11,7 +11,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { replitObjectStorage } from './objectStorage-replit';
-import { volunteers, volunteerParticipations, volunteerEvaluations, volunteerRecognitions, users, parks } from "@shared/schema";
+import { volunteers, volunteerEvaluations, volunteerRecognitions, users, parks } from "@shared/schema";
 // Importamos nuestro nuevo módulo para actualizar los campos de voluntarios preservando valores
 import { 
   updateVolunteerFieldsPreserving, 
