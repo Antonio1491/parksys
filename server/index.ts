@@ -2943,10 +2943,10 @@ app.get('/api/work-orders/stats/dashboard', async (req: Request, res: Response) 
     // Costos
     const costsResult = await pool.query(`
       SELECT 
-        COALESCE(SUM(costo_estimado), 0) as "totalEstimado",
-        COALESCE(SUM(costo_real), 0) as "totalReal",
-        COALESCE(AVG(costo_estimado), 0) as "promedioEstimado",
-        COALESCE(AVG(costo_real), 0) as "promedioReal"
+        COALESCE(SUM(presupuesto_asignado), 0) as "totalEstimado",
+        COALESCE(SUM(costo_total), 0) as "totalReal",
+        COALESCE(AVG(presupuesto_asignado), 0) as "promedioEstimado",
+        COALESCE(AVG(costo_total), 0) as "promedioReal"
       FROM work_orders
     `);
     const costs = costsResult.rows[0];
@@ -2954,13 +2954,13 @@ app.get('/api/work-orders/stats/dashboard', async (req: Request, res: Response) 
     // Top empleados por órdenes completadas
     const topEmployeesResult = await pool.query(`
       SELECT 
-        wo.asignado_a_empleado_id as "employeeId",
+        wo.asignado_a_id as "employeeId",
         e.full_name as "employeeName",
         COUNT(*)::int as "completedCount"
       FROM work_orders wo
-      LEFT JOIN employees e ON e.id = wo.asignado_a_empleado_id
-      WHERE wo.estado = 'completada' AND wo.asignado_a_empleado_id IS NOT NULL
-      GROUP BY wo.asignado_a_empleado_id, e.full_name
+      LEFT JOIN employees e ON e.id = wo.asignado_a_id
+      WHERE wo.estado = 'completada' AND wo.asignado_a_id IS NOT NULL
+      GROUP BY wo.asignado_a_id, e.full_name
       ORDER BY COUNT(*) DESC
       LIMIT 5
     `);
