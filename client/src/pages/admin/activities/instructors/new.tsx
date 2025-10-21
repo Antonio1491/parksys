@@ -73,14 +73,20 @@ export default function NewInstructorPage() {
   // Manejar diferentes formatos de respuesta de la API
   const parks = React.useMemo(() => {
     if (!parksResponse) return [];
-    if (Array.isArray(parksResponse)) return parksResponse;
-    if (parksResponse && typeof parksResponse === 'object' && 'parks' in parksResponse) {
-      return Array.isArray(parksResponse.parks) ? parksResponse.parks : [];
+
+    // Si la respuesta tiene una propiedad 'data' con el array
+    if (parksResponse && typeof parksResponse === 'object' && 'data' in parksResponse) {
+      const parksArray = parksResponse.data;
+      return Array.isArray(parksArray) ? parksArray : [];
     }
+
+    // Si la respuesta es directamente un array
+    if (Array.isArray(parksResponse)) return parksResponse;
+
     return [];
   }, [parksResponse]);
-  
-  // 🔍 DEBUG - Eliminar después de verificar
+
+  // DEBUG - puedes eliminar estos console.logs después
   console.log('🔍 Parks Response:', parksResponse);
   console.log('🔍 Parks Array:', parks);
   console.log('🔍 Parks Length:', parks.length);

@@ -7008,7 +7008,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           caption: image.caption,
           isPrimary: image.isPrimary
         })) || [],
-        activities: activities.map(activity => ({
+        activities: activitiesData.map(activity => ({
           id: activity.id,
           title: activity.title,
           description: activity.description,
