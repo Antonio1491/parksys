@@ -2913,6 +2913,95 @@ app.get('/api/work-orders/stats/general', async (req: Request, res: Response) =>
   }
 });
 
+// GET - Estadísticas completas para dashboard
+app.get('/api/work-orders/stats/dashboard', async (req: Request, res: Response) => {
+  try {
+    // Distribución por estado
+    const byStatus = await db.select({
+      estado: workOrders.estado,
+      count: sql<number>`count(*)::int`
+    })
+    .from(workOrders)
+    .groupBy(workOrders.estado);
+
+    // Distribución por tipo
+    const byType = await db.select({
+      type: workOrders.tipo,
+      count: sql<number>`count(*)::int`
+    })
+    .from(workOrders)
+    .groupBy(workOrders.tipo);
+
+    // Distribución por prioridad
+    const byPriority = await db.select({
+      priority: workOrders.prioridad,
+      count: sql<number>`count(*)::int`
+    })
+    .from(workOrders)
+    .groupBy(workOrders.prioridad);
+
+    // Costos
+    const costsResult = await db.select({
+      totalEstimado: sql<number>`COALESCE(SUM(costo_estimado), 0)`,
+      totalReal: sql<number>`COALESCE(SUM(costo_real), 0)`,
+      promedioEstimado: sql<number>`COALESCE(AVG(costo_estimado), 0)`,
+      promedioReal: sql<number>`COALESCE(AVG(costo_real), 0)`
+    })
+    .from(workOrders);
+
+    // Top empleados por órdenes completadas
+    const topEmployees = await db.select({
+      employeeId: workOrders.asignadoAEmpleadoId,
+      employeeName: sql<string>`e.full_name`,
+      completedCount: sql<number>`count(*)::int`
+    })
+    .from(workOrders)
+    .leftJoin(sql`employees e`, sql`e.id = ${workOrders.asignadoAEmpleadoId}`)
+    .where(eq(workOrders.estado, 'completada'))
+    .groupBy(workOrders.asignadoAEmpleadoId, sql`e.full_name`)
+    .orderBy(sql`count(*) DESC`)
+    .limit(5);
+
+    // Tendencias mensuales (últimos 6 meses)
+    const monthlyTrends = await db.select({
+      month: sql<string>`TO_CHAR(created_at, 'YYYY-MM')`,
+      total: sql<number>`count(*)::int`,
+      completadas: sql<number>`count(*) FILTER (WHERE estado = 'completada')::int`
+    })
+    .from(workOrders)
+    .where(sql`created_at >= NOW() - INTERVAL '6 months'`)
+    .groupBy(sql`TO_CHAR(created_at, 'YYYY-MM')`)
+    .orderBy(sql`TO_CHAR(created_at, 'YYYY-MM') ASC`);
+
+    // Tiempo promedio de resolución (en días)
+    const avgResolutionTime = await db.select({
+      avgDays: sql<number>`AVG(EXTRACT(EPOCH FROM (fecha_completada - created_at)) / 86400)`
+    })
+    .from(workOrders)
+    .where(sql`estado = 'completada' AND fecha_completada IS NOT NULL`);
+
+    res.json({
+      summary: {
+        total: byStatus.reduce((sum, item) => sum + item.count, 0),
+        pendientes: byStatus.find(s => s.estado === 'pendiente')?.count || 0,
+        en_proceso: byStatus.find(s => s.estado === 'en_proceso')?.count || 0,
+        completadas: byStatus.find(s => s.estado === 'completada')?.count || 0,
+        canceladas: byStatus.find(s => s.estado === 'cancelada')?.count || 0
+      },
+      byStatus,
+      byType,
+      byPriority,
+      costs: costsResult[0] || { totalEstimado: 0, totalReal: 0, promedioEstimado: 0, promedioReal: 0 },
+      topEmployees: topEmployees.filter(e => e.employeeId !== null),
+      monthlyTrends,
+      avgResolutionDays: avgResolutionTime[0]?.avgDays || 0
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas del dashboard:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas del dashboard' });
+  }
+});
+
 // Main server startup function - DO NOT WRAP IN ASYNC IIFE TO PREVENT PROCESS EXIT
 function startServer() {
   console.log("🚀 [DEPLOYMENT] Iniciando servidor ParkSys con health checks prioritarios...");
