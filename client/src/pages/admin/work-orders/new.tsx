@@ -166,6 +166,9 @@ export default function NewWorkOrderPage() {
   const safeEmployees = Array.isArray(employees) ? employees.filter((e: any) => e?.id && e?.fullName) : [];
   const safeUsers = Array.isArray(users) ? users.filter((u: any) => u?.id && (u?.fullName || u?.username)) : [];
 
+  console.log('Parks Response:', { data: parks, isArray: Array.isArray(parks) });
+  console.log('Parks Array:', safeParks);
+
   return (
     <AdminLayout title="Nueva Orden de Trabajo">
       <div className="max-w-4xl mx-auto space-y-6">
