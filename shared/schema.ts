@@ -4958,6 +4958,165 @@ export const insertRoleAuditLogSchema = createInsertSchema(roleAuditLogs).omit({
   createdAt: true
 });
 
+// ========== MÓDULO DE ÓRDENES DE TRABAJO ==========
+
+// Tabla principal de órdenes de trabajo
+export const workOrders = pgTable("work_orders", {
+  id: serial("id").primaryKey(),
+  folio: varchar("folio", { length: 50 }).notNull().unique(), // Auto-generado: OT-2025-0001
+  
+  // CLASIFICACIÓN
+  tipo: varchar("tipo", { length: 50 }).notNull(), // correctivo, preventivo, mejora, emergencia
+  prioridad: varchar("prioridad", { length: 20 }).notNull().default("normal"), // baja, normal, alta, crítica
+  estado: varchar("estado", { length: 30 }).notNull().default("pendiente"), // pendiente, asignada, en_proceso, pausada, completada, cancelada
+  
+  // ORIGEN
+  origenTipo: varchar("origen_tipo", { length: 50 }), // incidencia, mantenimiento_preventivo, solicitud_directa
+  incidenciaId: integer("incidencia_id").references(() => incidents.id),
+  activoId: integer("activo_id").references(() => assets.id),
+  parkId: integer("park_id").notNull().references(() => parks.id),
+  
+  // DESCRIPCIÓN
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descripcionTrabajo: text("descripcion_trabajo").notNull(),
+  instruccionesEspeciales: text("instrucciones_especiales"),
+  
+  // ASIGNACIÓN
+  asignadoAId: integer("asignado_a_id").references(() => employees.id),
+  asignadoANombre: varchar("asignado_a_nombre", { length: 200 }), // Nombre de cuadrilla o equipo
+  departamento: varchar("departamento", { length: 100 }),
+  supervisorId: integer("supervisor_id").references(() => employees.id),
+  
+  // PLANIFICACIÓN
+  fechaSolicitud: timestamp("fecha_solicitud").notNull().defaultNow(),
+  fechaProgramada: timestamp("fecha_programada"),
+  fechaInicio: timestamp("fecha_inicio"),
+  fechaCompletada: timestamp("fecha_completada"),
+  horasEstimadas: decimal("horas_estimadas", { precision: 6, scale: 2 }),
+  horasReales: decimal("horas_reales", { precision: 6, scale: 2 }),
+  
+  // COSTOS
+  costoManoObra: decimal("costo_mano_obra", { precision: 10, scale: 2 }).default("0"),
+  costoMateriales: decimal("costo_materiales", { precision: 10, scale: 2 }).default("0"),
+  costoTotal: decimal("costo_total", { precision: 10, scale: 2 }).default("0"),
+  presupuestoAsignado: decimal("presupuesto_asignado", { precision: 10, scale: 2 }),
+  
+  // CIERRE
+  trabajoRealizado: text("trabajo_realizado"),
+  observaciones: text("observaciones"),
+  validadoPor: integer("validado_por").references(() => users.id),
+  fechaValidacion: timestamp("fecha_validacion"),
+  calificacion: integer("calificacion"), // 1-5 estrellas
+  
+  // CANCELACIÓN
+  motivoCancelacion: text("motivo_cancelacion"),
+  canceladoPor: integer("cancelado_por").references(() => users.id),
+  fechaCancelacion: timestamp("fecha_cancelacion"),
+  
+  // METADATOS
+  creadoPor: integer("creado_por").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Materiales consumidos en la orden de trabajo
+export const workOrderMaterials = pgTable("work_order_materials", {
+  id: serial("id").primaryKey(),
+  workOrderId: integer("work_order_id").notNull().references(() => workOrders.id, { onDelete: "cascade" }),
+  inventoryItemId: integer("inventory_item_id").references(() => inventoryItems.id),
+  nombreMaterial: varchar("nombre_material", { length: 255 }).notNull(),
+  cantidad: decimal("cantidad", { precision: 10, scale: 2 }).notNull(),
+  unidad: varchar("unidad", { length: 50 }).notNull(),
+  costoUnitario: decimal("costo_unitario", { precision: 10, scale: 2 }),
+  costoTotal: decimal("costo_total", { precision: 10, scale: 2 }),
+  estado: varchar("estado", { length: 30 }).default("solicitado"), // solicitado, reservado, consumido
+  notas: text("notas"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Checklist de tareas de la orden de trabajo
+export const workOrderChecklist = pgTable("work_order_checklist", {
+  id: serial("id").primaryKey(),
+  workOrderId: integer("work_order_id").notNull().references(() => workOrders.id, { onDelete: "cascade" }),
+  descripcion: text("descripcion").notNull(),
+  esObligatorio: boolean("es_obligatorio").default(false),
+  completado: boolean("completado").default(false),
+  completadoPor: integer("completado_por").references(() => users.id),
+  fechaCompletado: timestamp("fecha_completado"),
+  ordenIndex: integer("orden_index").default(0),
+  notas: text("notas"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Archivos adjuntos (evidencias: fotos antes/después, documentos)
+export const workOrderAttachments = pgTable("work_order_attachments", {
+  id: serial("id").primaryKey(),
+  workOrderId: integer("work_order_id").notNull().references(() => workOrders.id, { onDelete: "cascade" }),
+  tipo: varchar("tipo", { length: 50 }).notNull(), // foto_antes, foto_despues, documento, otro
+  nombreArchivo: varchar("nombre_archivo", { length: 255 }).notNull(),
+  urlArchivo: text("url_archivo").notNull(),
+  descripcion: text("descripcion"),
+  subidoPor: integer("subido_por").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Historial de cambios de estado
+export const workOrderHistory = pgTable("work_order_history", {
+  id: serial("id").primaryKey(),
+  workOrderId: integer("work_order_id").notNull().references(() => workOrders.id, { onDelete: "cascade" }),
+  campoModificado: varchar("campo_modificado", { length: 100 }), // estado, asignado_a, prioridad, etc.
+  valorAnterior: text("valor_anterior"),
+  valorNuevo: text("valor_nuevo"),
+  accion: varchar("accion", { length: 50 }).notNull(), // creada, asignada, iniciada, pausada, completada, cancelada
+  comentario: text("comentario"),
+  realizadoPor: integer("realizado_por").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Schemas de validación para órdenes de trabajo
+export const insertWorkOrderSchema = createInsertSchema(workOrders).omit({
+  id: true,
+  folio: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWorkOrderMaterialSchema = createInsertSchema(workOrderMaterials).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertWorkOrderChecklistSchema = createInsertSchema(workOrderChecklist).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertWorkOrderAttachmentSchema = createInsertSchema(workOrderAttachments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertWorkOrderHistorySchema = createInsertSchema(workOrderHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Tipos TypeScript para órdenes de trabajo
+export type WorkOrder = typeof workOrders.$inferSelect;
+export type InsertWorkOrder = z.infer<typeof insertWorkOrderSchema>;
+
+export type WorkOrderMaterial = typeof workOrderMaterials.$inferSelect;
+export type InsertWorkOrderMaterial = z.infer<typeof insertWorkOrderMaterialSchema>;
+
+export type WorkOrderChecklist = typeof workOrderChecklist.$inferSelect;
+export type InsertWorkOrderChecklist = z.infer<typeof insertWorkOrderChecklistSchema>;
+
+export type WorkOrderAttachment = typeof workOrderAttachments.$inferSelect;
+export type InsertWorkOrderAttachment = z.infer<typeof insertWorkOrderAttachmentSchema>;
+
+export type WorkOrderHistory = typeof workOrderHistory.$inferSelect;
+export type InsertWorkOrderHistory = z.infer<typeof insertWorkOrderHistorySchema>;
+
 // ===== SISTEMA ROBUSTO DE PERMISOS =====
 
 // Tabla de módulos del sistema
