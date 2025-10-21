@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { ClipboardList, Search, Plus, Eye, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import AdminLayout from "@/components/AdminLayout";
 import type { Requisition, RequisitionItem, User, Park } from "@shared/schema";
 
 export default function RequisitionsPage() {
+  const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [priorityFilter, setPriorityFilter] = useState<string>("");
@@ -79,7 +81,7 @@ export default function RequisitionsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Requisiciones</h1>
           <p className="text-muted-foreground">Solicitudes de materiales y suministros</p>
         </div>
-        <Button data-testid="button-add-requisition">
+        <Button onClick={() => navigate('/admin/warehouse/requisitions/new')} data-testid="button-add-requisition">
           <Plus className="h-4 w-4 mr-2" />
           Nueva Requisición
         </Button>
@@ -291,7 +293,7 @@ export default function RequisitionsPage() {
                 : "Comienza creando tu primera requisición de materiales"
               }
             </p>
-            <Button data-testid="button-add-first-requisition">
+            <Button onClick={() => navigate('/admin/warehouse/requisitions/new')} data-testid="button-add-first-requisition">
               <Plus className="h-4 w-4 mr-2" />
               Nueva Requisición
             </Button>
