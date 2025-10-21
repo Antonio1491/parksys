@@ -3,6 +3,7 @@ import { safeApiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, Users } from 'lucide-react';
+import ROUTES from '@/routes';
 
 interface EvaluationStats {
   total_evaluations: number;
@@ -43,7 +44,7 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-export default function ParkEvaluationsSectionSimple({ parkId, parkSlug }: ParkEvaluationsProps) {
+export default function ParkEvaluationsSectionSimple({ parkId }: ParkEvaluationsProps) {
   // Obtener estadísticas de evaluaciones
   const { data: stats } = useQuery<EvaluationStats>({
     queryKey: ['/api/parks', parkId, 'evaluation-stats'],
@@ -103,7 +104,7 @@ export default function ParkEvaluationsSectionSimple({ parkId, parkSlug }: ParkE
             <Button
               size="lg"
               className="bg-green-600 hover:bg-green-700 w-full max-w-md"
-              onClick={() => window.open(`/parque/${parkSlug}/evaluar`, '_blank')}
+              onClick={() => window.open(ROUTES.public.parkEvaluate.build(parkId), '_blank')}
             >
               <Star className="h-4 w-4 mr-2" />
               Evalúa este parque
@@ -114,7 +115,7 @@ export default function ParkEvaluationsSectionSimple({ parkId, parkSlug }: ParkE
                 variant="outline"
                 size="lg"
                 className="w-full max-w-md"
-                onClick={() => window.open(`/parque/${parkSlug}/evaluaciones`, '_blank')}
+                onClick={() => window.open(ROUTES.public.parkEvaluations.build(parkId), '_blank')}
               >
                 <Users className="h-4 w-4 mr-2" />
                 Ver evaluaciones ({Number(stats.total_evaluations) || 0})

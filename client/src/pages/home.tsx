@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { Map, ArrowRight, MapPin, Trees, Users, Calendar, Sparkles, TrendingUp, Zap, Leaf, Shield, Heart, BookOpen, GraduationCap, Target, Award, ChevronLeft, ChevronRight, Sprout, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -189,13 +190,13 @@ const Home: React.FC = () => {
 
             {/* Botones CTA */}
             <div className="flex flex-col gap-4 mb-12 items-start">
-              <Link href="/parks">
+              <Link href={ROUTES.public.parks}>
                 <Button size="lg" className="bg-[#a8bd7d] hover:bg-[#a8bd7d] text-white font-poppins font-semibold px-6 py-4 text-md rounded-xl transition-all duration-300 hover:scale-105 shadow-xl">
                   <Map className="mr-3 h-5 w-5" />
                   NUESTROS PARQUES
                 </Button>
               </Link>
-              <Link href="/activities">
+              <Link href={ROUTES.public.activities}>
                 <Button size="lg" className="bg-white border-2 border-white text-[#14b8a6] hover:bg-gray-50 hover:text-primary font-poppins font-semibold px-6 py-4 text-md rounded-xl transition-all duration-300 hover:scale-105 shadow-lg">
                   <Calendar className="mr-3 h-5 w-5" />
                   ACTIVIDADES
@@ -503,7 +504,7 @@ const Home: React.FC = () => {
               <span className="block text-[#14b8a6] text-4xl">Actividades</span>
               <span className="block text-[#00444f] text-4xl">Variadas</span>
             </h2>
-            <Link href="/activities">
+            <Link href={ROUTES.public.calendar}>
               <Button className="mt-4 px-4 py-2 bg-[#a8bd7d] text-white font-poppins font-bold rounded-xl shadow hover:bg-[#a8bd7d] transition">
                 <Calendar className="mr-2 h-4 w-4" />
                 VER CALENDARIO
@@ -512,7 +513,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tarjeta actividades */}
-          <div className="bg-gradient-to-br from-[#14b8a6] to-[#a8bd7d] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer" onClick={() => window.location.href = '/activities'}>
+          <div className="bg-gradient-to-br from-[#14b8a6] to-[#a8bd7d] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer" onClick={() => window.location.href = ROUTES.public.activities}>
             {activitiesLoading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -554,7 +555,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tarjeta instructores */}
-          <div className="bg-gradient-to-br from-[#a8bd7d] to-[#00444f] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer md:col-start-1" onClick={() => window.location.href = '/instructors'}>
+          <div className="bg-gradient-to-br from-[#a8bd7d] to-[#00444f] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer md:col-start-1" onClick={() => window.location.href = ROUTES.public.instructors}>
             {instructorsLoading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -655,7 +656,7 @@ const Home: React.FC = () => {
                 const colors = eventColors[index % eventColors.length];
                 
                 // Enlace dinámico usando el ID real del evento
-                const eventLink = `/event/${event.id}`;
+                const eventLink = ROUTES.public.eventDetail.build(event.id);
                 
                 return (
                   <Link key={event.id} href={eventLink}>
@@ -696,7 +697,7 @@ const Home: React.FC = () => {
           {/* Botón para ver todos los eventos si hay eventos disponibles */}
           {featuredEvents.length > 0 && (
             <div className="text-center">
-              <Link href="/events">
+              <Link href={ROUTES.public.events}>
                 <Button size="lg" className="bg-[#f4f5f7] hover:bg-[#f4f5f7] text-[#00444f] font-poppins font-semibold px-10 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl">
                   VER TODOS LOS EVENTOS
                 </Button>
@@ -730,9 +731,11 @@ const Home: React.FC = () => {
                   Únete a nuestras alianzas estratégicas y contribuye al desarrollo sostenible de los espacios públicos en México.
                 </p>
                 <div className="flex gap-4 justify-end">
-                  <Button size="lg" className="bg-white hover:bg-gray-50 font-bold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg" style={{ color: '#51a19f' }}>
+                  <Link href={ROUTES.public.volunteerRegister}>
+                    <Button size="lg" className="bg-white hover:bg-gray-50 font-bold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg" style={{ color: '#51a19f' }}>
                     Ser Voluntario
-                  </Button>
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

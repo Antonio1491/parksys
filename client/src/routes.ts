@@ -23,12 +23,12 @@ export const PUBLIC_ROUTES = {
     build: (slug: string) => `/parks/${slug}`, // ✅ Nuevo: nomenclatura en inglés
   },
   parkEvaluate: {
-    path: "/parks/:slug/evaluate",
-    build: (slug: string) => `/parks/${slug}/evaluate`, // ✅ Actualizado
+    path: "/parks/:id/evaluate",
+    build: (id: string) => `/parks/${id}/evaluate`, // ✅ Actualizado
   },
   parkEvaluations: {
-    path: "/parks/:parkSlug/evaluations",
-    build: (parkSlug: string) => `/parks/${parkSlug}/evaluations`, // ✅ Actualizado
+    path: "/parks/:id/evaluations",
+    build: (id: string) => `/parks/${id}/evaluations`, // ✅ Actualizado
   },
 
   activities: "/activities",
@@ -492,11 +492,17 @@ export const ADMIN_VOLUNTEERS = {
     path: "/admin/volunteers/edit/:id",
     build: (id: string | number) => `/admin/volunteers/edit/${id}`,
   },
-  participations: "/admin/volunteers/participations",
-  participationCreate: "/admin/volunteers/participations/new",
-  participationDetail: {
-    path: "/admin/volunteers/participations/:id",
-    build: (id: string | number) => `/admin/volunteers/participations/${id}`,
+  participations: {
+    list: "/admin/volunteers/participations",
+    create: "/admin/volunteers/participations/new",
+    view: {
+      path: "/admin/volunteers/participations/:id/view",
+      build: (id: string | number) => `/admin/volunteers/participations/${id}/view`,
+    },
+    edit: {
+      path: "/admin/volunteers/participations/:id/edit",
+      build: (id: string | number) => `/admin/volunteers/participations/${id}/edit`,
+    },
   },
   recognition: "/admin/volunteers/recognition",
   settings: "/admin/volunteers/settings",

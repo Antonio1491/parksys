@@ -1923,12 +1923,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ORDER BY count DESC
       `);
       
-      // Estado de conservación
+      // Estado de los parques
       const conservationStatusResult = await pool.query(`
-        SELECT conservation_status as status, COUNT(*) as count
+        SELECT status, COUNT(*) as count
         FROM parks
-        WHERE conservation_status IS NOT NULL
-        GROUP BY conservation_status
+        WHERE status IS NOT NULL
+        GROUP BY status
         ORDER BY count DESC
       `);
       
@@ -1947,7 +1947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const parksWithCoordinatesResult = await pool.query(`
         SELECT p.id, p.name, p.latitude, p.longitude, 
                p.municipality_text as municipality,
-               p.park_type as type, p.area, p.conservation_status as status
+               p.park_type as type, p.area, p.status
         FROM parks p
         WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
       `);

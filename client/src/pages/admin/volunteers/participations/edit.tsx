@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useParams, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,8 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar as CalendarIcon, Clock, Save, ArrowLeft, Loader2 } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
+import { Save, ArrowLeft, Loader2, Clock, CheckCircle } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -21,23 +21,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { toast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 
-// Esquema de validación para la edición de participaciones
+// Schema de validación para edición de participaciones
 const participationSchema = z.object({
-  activityName: z.string().min(3, { message: 'El nombre de la actividad es requerido' }),
-  parkId: z.coerce.number({ invalid_type_error: 'Seleccione un parque' }),
-  activityDate: z.date({ invalid_type_error: 'La fecha es requerida' }),
-  hoursContributed: z.coerce.number().min(1, { message: 'Las horas deben ser al menos 1' }),
-  supervisorId: z.coerce.number().optional().nullable(),
-  notes: z.string().optional().nullable(),
+  attendanceStatus: z.enum(['registered', 'confirmed', 'attended', 'absent', 'cancelled']),
+  hoursContributed: z.coerce.number().min(0).max(24).optional().nullable(),
+  checkInTime: z.string().optional().nullable(),
+  checkOutTime: z.string().optional().nullable(),
+  volunteerNotes: z.string().optional().nullable(),
+  supervisorNotes: z.string().optional().nullable(),
+  rating: z.coerce.number().min(1).max(5).optional().nullable(),
 });
 
 type FormValues = z.infer<typeof participationSchema>;
@@ -53,45 +49,47 @@ const ParticipationEdit: React.FC = () => {
     enabled: !!id,
   });
 
-  // Fetch volunteer data
-  const { data: volunteer } = useQuery({
-    queryKey: [`/api/volunteers/${participation?.volunteerId}`],
-    enabled: !!participation?.volunteerId,
-  });
-
-  // Fetch parks for dropdown
-  const { data: parks = [] } = useQuery({
-    queryKey: ['/api/parks'],
-  });
-
   // Form setup
   const form = useForm<FormValues>({
     resolver: zodResolver(participationSchema),
     defaultValues: {
-      activityName: '',
-      parkId: 0,
-      activityDate: new Date(),
-      hoursContributed: 1,
-      supervisorId: null,
-      notes: '',
+      attendanceStatus: 'registered',
+      hoursContributed: null,
+      checkInTime: null,
+      checkOutTime: null,
+      volunteerNotes: '',
+      supervisorNotes: '',
+      rating: null,
     },
     values: participation ? {
-      activityName: participation.activityName,
-      parkId: participation.parkId,
-      activityDate: new Date(participation.activityDate),
-      hoursContributed: participation.hoursContributed,
-      supervisorId: participation.supervisorId || null,
-      notes: participation.notes || '',
+      attendanceStatus: participation.attendanceStatus || 'registered',
+      hoursContributed: participation.hoursContributed || null,
+      checkInTime: participation.checkInTime ? format(new Date(participation.checkInTime), 'HH:mm') : null,
+      checkOutTime: participation.checkOutTime ? format(new Date(participation.checkOutTime), 'HH:mm') : null,
+      volunteerNotes: participation.volunteerNotes || '',
+      supervisorNotes: participation.supervisorNotes || '',
+      rating: participation.rating || null,
     } : undefined,
   });
 
   // Update participation mutation
   const updateParticipation = useMutation({
     mutationFn: (data: FormValues) => {
+      // Convertir tiempos a timestamps completos si existen
+      const payload = {
+        ...data,
+        checkInTime: data.checkInTime && participation?.activityDate 
+          ? `${participation.activityDate.split('T')[0]}T${data.checkInTime}:00Z` 
+          : null,
+        checkOutTime: data.checkOutTime && participation?.activityDate 
+          ? `${participation.activityDate.split('T')[0]}T${data.checkOutTime}:00Z` 
+          : null,
+      };
+
       return apiRequest({
         method: 'PUT',
         url: `/api/participations/${id}`,
-        data,
+        data: payload,
       });
     },
     onSuccess: () => {
@@ -102,7 +100,7 @@ const ParticipationEdit: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: [`/api/participations/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/participations/all'] });
       queryClient.invalidateQueries({ queryKey: [`/api/volunteers/${participation?.volunteerId}/participations`] });
-      setLocation('/admin/volunteers/participations');
+      setLocation(ROUTES.admin.volunteers.participations.list);
     },
     onError: (error) => {
       console.error('Error al actualizar participación:', error);
@@ -142,7 +140,7 @@ const ParticipationEdit: React.FC = () => {
           <Button 
             variant="outline" 
             className="mt-4"
-            onClick={() => setLocation('/admin/volunteers/participations')}
+            onClick={() => setLocation(ROUTES.admin.volunteers.participations.list)}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver al listado
@@ -159,107 +157,117 @@ const ParticipationEdit: React.FC = () => {
           <h1 className="text-3xl font-bold">Editar Participación</h1>
           <Button 
             variant="outline" 
-            onClick={() => setLocation('/admin/volunteers/participations')}
+            onClick={() => setLocation(ROUTES.admin.volunteers.participations.list)}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver
           </Button>
         </div>
 
-        {volunteer && (
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg mb-6 border border-blue-200">
-            <h2 className="font-bold text-lg text-blue-800">Voluntario</h2>
-            <p className="text-blue-700">
-              <span className="font-semibold">{volunteer.fullName}</span> - ID: {volunteer.id}
-            </p>
-          </div>
-        )}
+        {/* Información contextual */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-blue-800">Voluntario</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-semibold text-blue-900">{participation.volunteerName}</p>
+              <p className="text-sm text-blue-700">{participation.volunteerEmail}</p>
+              <p className="text-xs text-blue-600 mt-1">ID: {participation.volunteerId}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-green-800">Actividad</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-semibold text-green-900">{participation.activityName}</p>
+              <p className="text-sm text-green-700">{participation.parkName}</p>
+              <p className="text-xs text-green-600 mt-1">
+                {format(new Date(participation.activityDate), 'PPP', { locale: es })}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
         <Card>
           <CardHeader>
             <CardTitle>Datos de la Participación</CardTitle>
-            <CardDescription>Edite los detalles de la participación del voluntario en esta actividad.</CardDescription>
+            <CardDescription>
+              Edite los detalles de la participación del voluntario en esta actividad.
+            </CardDescription>
           </CardHeader>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="space-y-6">
+              {/* Estado de asistencia */}
+              <div className="space-y-2">
+                <Label htmlFor="attendanceStatus">Estado de Asistencia *</Label>
+                <Select
+                  value={form.watch('attendanceStatus')}
+                  onValueChange={(value) => form.setValue('attendanceStatus', value as any, {
+                    shouldValidate: true
+                  })}
+                >
+                  <SelectTrigger id="attendanceStatus">
+                    <SelectValue placeholder="Seleccionar estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="registered">Registrado</SelectItem>
+                    <SelectItem value="confirmed">Confirmado</SelectItem>
+                    <SelectItem value="attended">Asistió</SelectItem>
+                    <SelectItem value="absent">Ausente</SelectItem>
+                    <SelectItem value="cancelled">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.attendanceStatus && (
+                  <p className="text-sm text-red-500">{form.formState.errors.attendanceStatus.message}</p>
+                )}
+              </div>
+
+              {/* Horas y tiempos */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="activityName">Nombre de la Actividad</Label>
-                  <Input 
-                    id="activityName"
-                    placeholder="Nombre de la actividad" 
-                    {...form.register('activityName')}
-                  />
-                  {form.formState.errors.activityName && (
-                    <p className="text-sm text-red-500">{form.formState.errors.activityName.message}</p>
+                  <Label htmlFor="checkInTime">Hora de Entrada</Label>
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 text-gray-500 mr-2" />
+                    <Input 
+                      id="checkInTime"
+                      type="time" 
+                      {...form.register('checkInTime')}
+                    />
+                  </div>
+                  {form.formState.errors.checkInTime && (
+                    <p className="text-sm text-red-500">{form.formState.errors.checkInTime.message}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="parkId">Parque</Label>
-                  <Select
-                    value={form.watch('parkId')?.toString()}
-                    onValueChange={(value) => form.setValue('parkId', parseInt(value), {
-                      shouldValidate: true
-                    })}
-                  >
-                    <SelectTrigger id="parkId">
-                      <SelectValue placeholder="Seleccionar parque" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {parks.map((park: any) => (
-                        <SelectItem key={park.id} value={park.id.toString()}>
-                          {park.name || `Parque ID: ${park.id}`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {form.formState.errors.parkId && (
-                    <p className="text-sm text-red-500">{form.formState.errors.parkId.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="activityDate">Fecha de la Actividad</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {form.watch('activityDate') ? (
-                          format(form.watch('activityDate'), 'PPP', { locale: es })
-                        ) : (
-                          <span>Seleccione una fecha</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={form.watch('activityDate')}
-                        onSelect={(date) => form.setValue('activityDate', date || new Date(), {
-                          shouldValidate: true
-                        })}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  {form.formState.errors.activityDate && (
-                    <p className="text-sm text-red-500">{form.formState.errors.activityDate.message}</p>
+                  <Label htmlFor="checkOutTime">Hora de Salida</Label>
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 text-gray-500 mr-2" />
+                    <Input 
+                      id="checkOutTime"
+                      type="time" 
+                      {...form.register('checkOutTime')}
+                    />
+                  </div>
+                  {form.formState.errors.checkOutTime && (
+                    <p className="text-sm text-red-500">{form.formState.errors.checkOutTime.message}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="hoursContributed">Horas Contribuidas</Label>
                   <div className="flex items-center">
-                    <Clock className="h-4 w-4 text-gray-500 mr-2" />
+                    <CheckCircle className="h-4 w-4 text-gray-500 mr-2" />
                     <Input 
                       id="hoursContributed"
                       type="number" 
-                      min="1"
-                      placeholder="Número de horas" 
+                      step="0.5"
+                      min="0"
+                      max="24"
+                      placeholder="0.0" 
                       {...form.register('hoursContributed', { valueAsNumber: true })}
                     />
                   </div>
@@ -269,21 +277,65 @@ const ParticipationEdit: React.FC = () => {
                 </div>
               </div>
 
+              {/* Calificación */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Notas y observaciones</Label>
+                <Label htmlFor="rating">Calificación (1-5 estrellas)</Label>
+                <Select
+                  value={form.watch('rating')?.toString() || ''}
+                  onValueChange={(value) => form.setValue('rating', value ? parseInt(value) : null, {
+                    shouldValidate: true
+                  })}
+                >
+                  <SelectTrigger id="rating">
+                    <SelectValue placeholder="Seleccionar calificación" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Sin calificación</SelectItem>
+                    <SelectItem value="1">⭐ 1 estrella</SelectItem>
+                    <SelectItem value="2">⭐⭐ 2 estrellas</SelectItem>
+                    <SelectItem value="3">⭐⭐⭐ 3 estrellas</SelectItem>
+                    <SelectItem value="4">⭐⭐⭐⭐ 4 estrellas</SelectItem>
+                    <SelectItem value="5">⭐⭐⭐⭐⭐ 5 estrellas</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.rating && (
+                  <p className="text-sm text-red-500">{form.formState.errors.rating.message}</p>
+                )}
+              </div>
+
+              {/* Notas del voluntario */}
+              <div className="space-y-2">
+                <Label htmlFor="volunteerNotes">Notas del Voluntario</Label>
                 <Textarea 
-                  id="notes"
-                  placeholder="Notas sobre la participación" 
-                  rows={4}
-                  {...form.register('notes')}
+                  id="volunteerNotes"
+                  placeholder="Comentarios o reflexiones del voluntario sobre la actividad..." 
+                  rows={3}
+                  {...form.register('volunteerNotes')}
                 />
+                {form.formState.errors.volunteerNotes && (
+                  <p className="text-sm text-red-500">{form.formState.errors.volunteerNotes.message}</p>
+                )}
+              </div>
+
+              {/* Notas del supervisor */}
+              <div className="space-y-2">
+                <Label htmlFor="supervisorNotes">Notas del Supervisor</Label>
+                <Textarea 
+                  id="supervisorNotes"
+                  placeholder="Observaciones del supervisor sobre el desempeño del voluntario..." 
+                  rows={3}
+                  {...form.register('supervisorNotes')}
+                />
+                {form.formState.errors.supervisorNotes && (
+                  <p className="text-sm text-red-500">{form.formState.errors.supervisorNotes.message}</p>
+                )}
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setLocation('/admin/volunteers/participations')}
+                onClick={() => setLocation(ROUTES.admin.volunteers.participations.list)}
               >
                 Cancelar
               </Button>

@@ -838,34 +838,50 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
 
   // === RUTAS PARA PARTICIPACIONES ===
 
-  // Obtener todas las participaciones 
-  // Usamos un nombre diferente para el endpoint para evitar conflictos con la ruta parametrizada
-  apiRouter.get("/participations/all", async (_req: Request, res: Response) => {
+  // Obtener todas las participaciones de voluntarios
+  apiRouter.get("/participations/all", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      console.log("Obteniendo todas las participaciones");
+      console.log('Obteniendo todas las participaciones de voluntarios');
 
       const { pool } = await import("./db");
 
       const result = await pool.query(`
         SELECT 
-          id,
-          volunteer_id as "volunteerId",
-          activity_id as "activityId",
-          activity_name as "activityName",
-          activity_date as "activityDate",
-          hours_contributed as "hoursContributed",
-          park_id as "parkId",
-          supervisor_id as "supervisorId",
-          notes,
-          created_at as "createdAt"
-        FROM volunteer_participations
-        ORDER BY activity_date DESC NULLS LAST
+          vp.id,
+          vp.volunteer_id as "volunteerId",
+          vp.volunteer_activity_id as "volunteerActivityId",
+          vp.registration_date as "registrationDate",
+          vp.attendance_status as "attendanceStatus",
+          vp.hours_contributed as "hoursContributed",
+          vp.check_in_time as "checkInTime",
+          vp.check_out_time as "checkOutTime",
+          vp.volunteer_notes as "volunteerNotes",
+          vp.supervisor_notes as "supervisorNotes",
+          vp.rating,
+          vp.created_at as "createdAt",
+          vp.updated_at as "updatedAt",
+          -- Datos de la actividad
+          va.name as "activityName",
+          va.activity_date as "activityDate",
+          va.park_id as "parkId",
+          va.supervisor_id as "supervisorId",
+          va.category as "activityCategory",
+          -- Datos del parque
+          p.name as "parkName",
+          -- Datos del voluntario
+          u.full_name as "volunteerName",
+          u.email as "volunteerEmail"
+        FROM volunteer_participations vp
+        INNER JOIN volunteer_activities va ON vp.volunteer_activity_id = va.id
+        LEFT JOIN parks p ON va.park_id = p.id
+        LEFT JOIN users u ON vp.volunteer_id = u.id
+        ORDER BY vp.registration_date DESC
       `);
 
-      console.log(`Se encontraron ${result.rows.length} participaciones`);
+      console.log(`✅ Se encontraron ${result.rows.length} participaciones`);
       res.json(result.rows);
     } catch (error) {
-      console.error(`Error al obtener todas las participaciones:`, error);
+      console.error('❌ Error al obtener participaciones:', error);
       res.status(500).json({ 
         message: "Error al obtener participaciones",
         error: error instanceof Error ? error.message : "Error desconocido"
@@ -873,7 +889,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
     }
   });
 
-  // Obtener participaciones de un voluntario
+  // Obtener participaciones de un voluntario específico
   apiRouter.get("/volunteers/:id/participations", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const volunteerId = parseInt(req.params.id);
@@ -890,25 +906,35 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
         SELECT 
           vp.id,
           vp.volunteer_id as "volunteerId",
-          vp.activity_id as "activityId",
-          vp.activity_name as "activityName",
-          vp.activity_date as "activityDate",
+          vp.volunteer_activity_id as "volunteerActivityId",
+          vp.registration_date as "registrationDate",
+          vp.attendance_status as "attendanceStatus",
           vp.hours_contributed as "hoursContributed",
-          vp.park_id as "parkId",
-          vp.supervisor_id as "supervisorId",
-          vp.notes,
+          vp.check_in_time as "checkInTime",
+          vp.check_out_time as "checkOutTime",
+          vp.volunteer_notes as "volunteerNotes",
+          vp.supervisor_notes as "supervisorNotes",
+          vp.rating,
           vp.created_at as "createdAt",
+          vp.updated_at as "updatedAt",
+          -- Datos de la actividad
+          va.name as "activityName",
+          va.activity_date as "activityDate",
+          va.park_id as "parkId",
+          va.category as "activityCategory",
+          -- Datos del parque
           p.name as "parkName"
         FROM volunteer_participations vp
-        LEFT JOIN parks p ON vp.park_id = p.id
+        INNER JOIN volunteer_activities va ON vp.volunteer_activity_id = va.id
+        LEFT JOIN parks p ON va.park_id = p.id
         WHERE vp.volunteer_id = $1
-        ORDER BY vp.activity_date DESC NULLS LAST
+        ORDER BY vp.registration_date DESC
       `, [volunteerId]);
 
-      console.log(`Se encontraron ${result.rows.length} participaciones para voluntario ${volunteerId}`);
+      console.log(`✅ Se encontraron ${result.rows.length} participaciones para voluntario ${volunteerId}`);
       res.json(result.rows);
     } catch (error) {
-      console.error(`Error al obtener participaciones del voluntario ${req.params.id}:`, error);
+      console.error(`❌ Error al obtener participaciones del voluntario ${req.params.id}:`, error);
       res.status(500).json({ 
         message: "Error al obtener participaciones",
         error: error instanceof Error ? error.message : "Error desconocido"
@@ -1097,7 +1123,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
     }
   });
   
-  // Registrar nueva participación
+  // Registrar nueva participación de voluntario en una actividad
   apiRouter.post("/volunteers/:id/participations", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const volunteerId = parseInt(req.params.id);
@@ -1106,57 +1132,49 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
         return res.status(400).json({ message: "ID de voluntario no válido" });
       }
 
-      console.log(`Creando participación para voluntario ${volunteerId}:`, req.body);
+      const { volunteerActivityId, attendanceStatus, hoursContributed, volunteerNotes } = req.body;
 
-      // Validar campos requeridos
-      const { activityName, activityDate, hoursContributed, parkId, activityId, supervisorId, notes } = req.body;
-
-      if (!activityName || !activityDate || !hoursContributed || !parkId) {
-        return res.status(400).json({ 
-          message: "Campos requeridos faltantes: activityName, activityDate, hoursContributed, parkId" 
-        });
+      // Validación básica
+      if (!volunteerActivityId) {
+        return res.status(400).json({ message: "ID de actividad de voluntariado es requerido" });
       }
+
+      console.log(`Registrando participación para voluntario ${volunteerId} en actividad ${volunteerActivityId}`);
 
       const { pool } = await import("./db");
 
       const result = await pool.query(`
         INSERT INTO volunteer_participations (
           volunteer_id,
-          activity_id,
-          activity_name,
-          activity_date,
+          volunteer_activity_id,
+          registration_date,
+          attendance_status,
           hours_contributed,
-          park_id,
-          supervisor_id,
-          notes,
-          created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+          volunteer_notes,
+          created_at,
+          updated_at
+        ) VALUES ($1, $2, NOW(), $3, $4, $5, NOW(), NOW())
         RETURNING 
           id,
           volunteer_id as "volunteerId",
-          activity_id as "activityId",
-          activity_name as "activityName",
-          activity_date as "activityDate",
+          volunteer_activity_id as "volunteerActivityId",
+          registration_date as "registrationDate",
+          attendance_status as "attendanceStatus",
           hours_contributed as "hoursContributed",
-          park_id as "parkId",
-          supervisor_id as "supervisorId",
-          notes,
+          volunteer_notes as "volunteerNotes",
           created_at as "createdAt"
       `, [
         volunteerId,
-        activityId || null,
-        activityName,
-        activityDate,
-        hoursContributed,
-        parkId,
-        supervisorId || null,
-        notes || null
+        volunteerActivityId,
+        attendanceStatus || 'registered',
+        hoursContributed || null,
+        volunteerNotes || null
       ]);
 
       console.log(`✅ Participación creada exitosamente:`, result.rows[0]);
       res.status(201).json(result.rows[0]);
     } catch (error) {
-      console.error(`Error al crear participación para voluntario ${req.params.id}:`, error);
+      console.error(`❌ Error al crear participación para voluntario ${req.params.id}:`, error);
       res.status(500).json({ 
         message: "Error al registrar participación",
         error: error instanceof Error ? error.message : "Error desconocido"
@@ -1165,7 +1183,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
   });
   
   // Obtener una participación específica por ID
-  apiRouter.get("/participations/:id", async (req: Request, res: Response) => {
+  apiRouter.get("/participations/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const participationId = parseInt(req.params.id);
 
@@ -1181,19 +1199,31 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
         SELECT 
           vp.id,
           vp.volunteer_id as "volunteerId",
-          vp.activity_id as "activityId",
-          vp.activity_name as "activityName",
-          vp.activity_date as "activityDate",
+          vp.volunteer_activity_id as "volunteerActivityId",
+          vp.registration_date as "registrationDate",
+          vp.attendance_status as "attendanceStatus",
           vp.hours_contributed as "hoursContributed",
-          vp.park_id as "parkId",
-          vp.supervisor_id as "supervisorId",
-          vp.notes,
+          vp.check_in_time as "checkInTime",
+          vp.check_out_time as "checkOutTime",
+          vp.volunteer_notes as "volunteerNotes",
+          vp.supervisor_notes as "supervisorNotes",
+          vp.rating,
           vp.created_at as "createdAt",
-          v.full_name as "volunteerName",
-          p.name as "parkName"
+          vp.updated_at as "updatedAt",
+          -- Datos de la actividad
+          va.name as "activityName",
+          va.activity_date as "activityDate",
+          va.park_id as "parkId",
+          va.supervisor_id as "supervisorId",
+          -- Datos del parque
+          p.name as "parkName",
+          -- Datos del voluntario
+          u.full_name as "volunteerName",
+          u.email as "volunteerEmail"
         FROM volunteer_participations vp
-        LEFT JOIN volunteers v ON vp.volunteer_id = v.id
-        LEFT JOIN parks p ON vp.park_id = p.id
+        INNER JOIN volunteer_activities va ON vp.volunteer_activity_id = va.id
+        LEFT JOIN parks p ON va.park_id = p.id
+        LEFT JOIN users u ON vp.volunteer_id = u.id
         WHERE vp.id = $1
       `, [participationId]);
 
@@ -1204,7 +1234,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
       console.log(`✅ Participación encontrada:`, result.rows[0]);
       res.json(result.rows[0]);
     } catch (error) {
-      console.error(`Error al obtener participación ${req.params.id}:`, error);
+      console.error(`❌ Error al obtener participación ${req.params.id}:`, error);
       res.status(500).json({ 
         message: "Error al obtener datos de la participación",
         error: error instanceof Error ? error.message : "Error desconocido"
@@ -1212,7 +1242,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
     }
   });
   
-  // Actualizar una participación
+  // Actualizar una participación existente
   apiRouter.put("/participations/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const participationId = parseInt(req.params.id);
@@ -1221,87 +1251,395 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
         return res.status(400).json({ message: "ID de participación no válido" });
       }
 
-      console.log(`Actualizando participación ${participationId}:`, req.body);
+      console.log(`Actualizando participación ${participationId}`);
 
       const { pool } = await import("./db");
 
-      // Verificar si la participación existe
-      const checkResult = await pool.query(
-        'SELECT id, volunteer_id FROM volunteer_participations WHERE id = $1',
-        [participationId]
-      );
-
-      if (checkResult.rows.length === 0) {
-        return res.status(404).json({ message: "Participación no encontrada" });
-      }
-
-      // Preparar datos para actualización (solo campos permitidos)
-      const { activityName, activityDate, hoursContributed, parkId, activityId, supervisorId, notes } = req.body;
-
-      // Construir query dinámica solo con campos proporcionados
-      const updateFields: string[] = [];
+      // Construir query dinámico solo con campos presentes
+      const updates: string[] = [];
       const values: any[] = [];
       let paramIndex = 1;
 
-      if (activityName !== undefined) {
-        updateFields.push(`activity_name = $${paramIndex++}`);
-        values.push(activityName);
-      }
-      if (activityDate !== undefined) {
-        updateFields.push(`activity_date = $${paramIndex++}`);
-        values.push(activityDate);
-      }
-      if (hoursContributed !== undefined) {
-        updateFields.push(`hours_contributed = $${paramIndex++}`);
-        values.push(hoursContributed);
-      }
-      if (parkId !== undefined) {
-        updateFields.push(`park_id = $${paramIndex++}`);
-        values.push(parkId);
-      }
-      if (activityId !== undefined) {
-        updateFields.push(`activity_id = $${paramIndex++}`);
-        values.push(activityId);
-      }
-      if (supervisorId !== undefined) {
-        updateFields.push(`supervisor_id = $${paramIndex++}`);
-        values.push(supervisorId);
-      }
-      if (notes !== undefined) {
-        updateFields.push(`notes = $${paramIndex++}`);
-        values.push(notes);
+      const allowedFields = {
+        attendanceStatus: 'attendance_status',
+        hoursContributed: 'hours_contributed',
+        checkInTime: 'check_in_time',
+        checkOutTime: 'check_out_time',
+        volunteerNotes: 'volunteer_notes',
+        supervisorNotes: 'supervisor_notes',
+        rating: 'rating'
+      };
+
+      for (const [key, dbColumn] of Object.entries(allowedFields)) {
+        if (req.body[key] !== undefined) {
+          updates.push(`${dbColumn} = $${paramIndex}`);
+          values.push(req.body[key]);
+          paramIndex++;
+        }
       }
 
-      if (updateFields.length === 0) {
+      if (updates.length === 0) {
         return res.status(400).json({ message: "No hay campos para actualizar" });
       }
 
-      // Agregar ID al final de los valores
+      // Agregar updated_at
+      updates.push(`updated_at = NOW()`);
+
+      // Agregar ID al final
       values.push(participationId);
 
       const result = await pool.query(`
         UPDATE volunteer_participations 
-        SET ${updateFields.join(', ')}
+        SET ${updates.join(', ')}
         WHERE id = $${paramIndex}
         RETURNING 
           id,
           volunteer_id as "volunteerId",
-          activity_id as "activityId",
-          activity_name as "activityName",
-          activity_date as "activityDate",
+          volunteer_activity_id as "volunteerActivityId",
+          registration_date as "registrationDate",
+          attendance_status as "attendanceStatus",
           hours_contributed as "hoursContributed",
-          park_id as "parkId",
-          supervisor_id as "supervisorId",
-          notes,
-          created_at as "createdAt"
+          check_in_time as "checkInTime",
+          check_out_time as "checkOutTime",
+          volunteer_notes as "volunteerNotes",
+          supervisor_notes as "supervisorNotes",
+          rating,
+          created_at as "createdAt",
+          updated_at as "updatedAt"
       `, values);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Participación no encontrada" });
+      }
 
       console.log(`✅ Participación actualizada exitosamente:`, result.rows[0]);
       res.json(result.rows[0]);
     } catch (error) {
-      console.error(`Error al actualizar participación ${req.params.id}:`, error);
+      console.error(`❌ Error al actualizar participación ${req.params.id}:`, error);
       res.status(500).json({ 
         message: "Error al actualizar participación",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
+  // ============================================
+  // ENDPOINTS DE ACTIVIDADES DE VOLUNTARIADO
+  // ============================================
+
+  // Obtener todas las actividades de voluntariado
+  apiRouter.get("/volunteer-activities", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      console.log('Obteniendo todas las actividades de voluntariado');
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        SELECT 
+          va.id,
+          va.name,
+          va.description,
+          va.park_id as "parkId",
+          va.activity_date as "activityDate",
+          va.scheduled_hours as "scheduledHours",
+          va.max_volunteers as "maxVolunteers",
+          va.supervisor_id as "supervisorId",
+          va.status,
+          va.category,
+          va.requirements,
+          va.created_at as "createdAt",
+          va.updated_at as "updatedAt",
+          -- Datos del parque
+          p.name as "parkName",
+          -- Datos del supervisor
+          u.full_name as "supervisorName",
+          -- Contar participaciones registradas
+          COUNT(vp.id) as "registeredCount"
+        FROM volunteer_activities va
+        LEFT JOIN parks p ON va.park_id = p.id
+        LEFT JOIN users u ON va.supervisor_id = u.id
+        LEFT JOIN volunteer_participations vp ON va.id = vp.volunteer_activity_id
+        GROUP BY va.id, p.name, u.full_name
+        ORDER BY va.activity_date DESC
+      `);
+
+      console.log(`✅ Se encontraron ${result.rows.length} actividades de voluntariado`);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('❌ Error al obtener actividades de voluntariado:', error);
+      res.status(500).json({ 
+        message: "Error al obtener actividades de voluntariado",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
+  // Obtener una actividad de voluntariado específica
+  apiRouter.get("/volunteer-activities/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const activityId = parseInt(req.params.id);
+
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "ID de actividad no válido" });
+      }
+
+      console.log(`Obteniendo actividad de voluntariado ${activityId}`);
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        SELECT 
+          va.id,
+          va.name,
+          va.description,
+          va.park_id as "parkId",
+          va.activity_date as "activityDate",
+          va.scheduled_hours as "scheduledHours",
+          va.max_volunteers as "maxVolunteers",
+          va.supervisor_id as "supervisorId",
+          va.status,
+          va.category,
+          va.requirements,
+          va.created_at as "createdAt",
+          va.updated_at as "updatedAt",
+          -- Datos del parque
+          p.name as "parkName",
+          -- Datos del supervisor
+          u.full_name as "supervisorName",
+          u.email as "supervisorEmail",
+          -- Contar participaciones registradas
+          COUNT(vp.id) as "registeredCount"
+        FROM volunteer_activities va
+        LEFT JOIN parks p ON va.park_id = p.id
+        LEFT JOIN users u ON va.supervisor_id = u.id
+        LEFT JOIN volunteer_participations vp ON va.id = vp.volunteer_activity_id
+        WHERE va.id = $1
+        GROUP BY va.id, p.name, u.full_name, u.email
+      `, [activityId]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Actividad de voluntariado no encontrada" });
+      }
+
+      console.log(`✅ Actividad encontrada:`, result.rows[0]);
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(`❌ Error al obtener actividad de voluntariado ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: "Error al obtener actividad de voluntariado",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
+  // Crear nueva actividad de voluntariado
+  apiRouter.post("/volunteer-activities", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { 
+        name, 
+        description, 
+        parkId, 
+        activityDate, 
+        scheduledHours, 
+        maxVolunteers,
+        supervisorId,
+        status,
+        category,
+        requirements
+      } = req.body;
+
+      // Validación básica
+      if (!name || !parkId || !activityDate) {
+        return res.status(400).json({ 
+          message: "Faltan campos requeridos: name, parkId, activityDate" 
+        });
+      }
+
+      console.log(`Creando nueva actividad de voluntariado: ${name}`);
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        INSERT INTO volunteer_activities (
+          name,
+          description,
+          park_id,
+          activity_date,
+          scheduled_hours,
+          max_volunteers,
+          supervisor_id,
+          status,
+          category,
+          requirements,
+          created_at,
+          updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
+        RETURNING 
+          id,
+          name,
+          description,
+          park_id as "parkId",
+          activity_date as "activityDate",
+          scheduled_hours as "scheduledHours",
+          max_volunteers as "maxVolunteers",
+          supervisor_id as "supervisorId",
+          status,
+          category,
+          requirements,
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+      `, [
+        name,
+        description || null,
+        parkId,
+        activityDate,
+        scheduledHours || null,
+        maxVolunteers || 10,
+        supervisorId || null,
+        status || 'planned',
+        category || null,
+        requirements || null
+      ]);
+
+      console.log(`✅ Actividad de voluntariado creada:`, result.rows[0]);
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error('❌ Error al crear actividad de voluntariado:', error);
+      res.status(500).json({ 
+        message: "Error al crear actividad de voluntariado",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
+  // Actualizar actividad de voluntariado
+  apiRouter.put("/volunteer-activities/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const activityId = parseInt(req.params.id);
+
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "ID de actividad no válido" });
+      }
+
+      console.log(`Actualizando actividad de voluntariado ${activityId}`);
+
+      const { pool } = await import("./db");
+
+      // Construir query dinámico
+      const updates: string[] = [];
+      const values: any[] = [];
+      let paramIndex = 1;
+
+      const allowedFields = {
+        name: 'name',
+        description: 'description',
+        parkId: 'park_id',
+        activityDate: 'activity_date',
+        scheduledHours: 'scheduled_hours',
+        maxVolunteers: 'max_volunteers',
+        supervisorId: 'supervisor_id',
+        status: 'status',
+        category: 'category',
+        requirements: 'requirements'
+      };
+
+      for (const [key, dbColumn] of Object.entries(allowedFields)) {
+        if (req.body[key] !== undefined) {
+          updates.push(`${dbColumn} = $${paramIndex}`);
+          values.push(req.body[key]);
+          paramIndex++;
+        }
+      }
+
+      if (updates.length === 0) {
+        return res.status(400).json({ message: "No hay campos para actualizar" });
+      }
+
+      // Agregar updated_at
+      updates.push(`updated_at = NOW()`);
+
+      // Agregar ID al final
+      values.push(activityId);
+
+      const result = await pool.query(`
+        UPDATE volunteer_activities 
+        SET ${updates.join(', ')}
+        WHERE id = $${paramIndex}
+        RETURNING 
+          id,
+          name,
+          description,
+          park_id as "parkId",
+          activity_date as "activityDate",
+          scheduled_hours as "scheduledHours",
+          max_volunteers as "maxVolunteers",
+          supervisor_id as "supervisorId",
+          status,
+          category,
+          requirements,
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+      `, values);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Actividad de voluntariado no encontrada" });
+      }
+
+      console.log(`✅ Actividad de voluntariado actualizada:`, result.rows[0]);
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(`❌ Error al actualizar actividad de voluntariado ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: "Error al actualizar actividad de voluntariado",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
+  // Eliminar actividad de voluntariado
+  apiRouter.delete("/volunteer-activities/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const activityId = parseInt(req.params.id);
+
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "ID de actividad no válido" });
+      }
+
+      console.log(`Eliminando actividad de voluntariado ${activityId}`);
+
+      const { pool } = await import("./db");
+
+      // Verificar si tiene participaciones
+      const checkResult = await pool.query(`
+        SELECT COUNT(*) as count 
+        FROM volunteer_participations 
+        WHERE volunteer_activity_id = $1
+      `, [activityId]);
+
+      const participationCount = parseInt(checkResult.rows[0].count);
+
+      if (participationCount > 0) {
+        return res.status(400).json({ 
+          message: `No se puede eliminar la actividad porque tiene ${participationCount} participación(es) registrada(s)` 
+        });
+      }
+
+      const result = await pool.query(`
+        DELETE FROM volunteer_activities 
+        WHERE id = $1
+        RETURNING id
+      `, [activityId]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Actividad de voluntariado no encontrada" });
+      }
+
+      console.log(`✅ Actividad de voluntariado eliminada: ${activityId}`);
+      res.json({ message: "Actividad de voluntariado eliminada correctamente" });
+    } catch (error) {
+      console.error(`❌ Error al eliminar actividad de voluntariado ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: "Error al eliminar actividad de voluntariado",
         error: error instanceof Error ? error.message : "Error desconocido"
       });
     }

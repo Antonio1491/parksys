@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { ExtendedPark, Amenity } from '@shared/schema';
 import { MapPin, Clock, Star } from 'lucide-react';
@@ -107,7 +108,7 @@ function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksList
     
     return (
       <Link 
-        href={`/parque/${generateParkSlug(park.name, park.id)}`}
+        href={ROUTES.public.parkDetail.build(park.id)}
         className="group cursor-pointer"
       >
         <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">

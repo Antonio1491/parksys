@@ -87,13 +87,13 @@ const StarRating = ({ value, onChange, label }: StarRatingProps) => {
 };
 
 export default function ParkEvaluationForm() {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Extraer parkId del slug (formato: nombre-parque-id)
-  const parkId = slug ? slug.split('-').pop() : null;
+  // Extraer parkId
+  const parkId = id;
 
   // Obtener información del parque
   const { data: parkData, isLoading: parkLoading } = useQuery({
@@ -132,20 +132,26 @@ export default function ParkEvaluationForm() {
     mutationFn: async (evaluationData: EvaluationFormData) => {
       console.log('🚀 MUTATION: Iniciando envío de evaluación');
       console.log('🚀 MUTATION: Datos recibidos:', JSON.stringify(evaluationData, null, 2));
-      
-      if (!evaluationData || typeof evaluationData !== 'object') {
-        console.error('❌ MUTATION: Datos inválidos o vacíos');
-        throw new Error('Datos de evaluación inválidos');
-      }
-      
+
       const response = await apiRequest('/api/park-evaluations', {
         method: 'POST',
-        data: evaluationData, // Cambié 'body' por 'data'
+        data: evaluationData,
       });
-      
+
+      // Si la respuesta es HTML (error del servidor), lanza excepción
+      if (typeof response === 'string' && response.startsWith('<!DOCTYPE')) {
+        throw new Error('Respuesta HTML inesperada del servidor');
+      }
+
+      // Si la respuesta es vacía (204), también lanza excepción
+      if (!response || (typeof response === 'object' && Object.keys(response).length === 0)) {
+        throw new Error('Respuesta vacía del servidor');
+      }
+
       return response;
     },
     onSuccess: (data) => {
+      console.log('✅ MUTATION SUCCESS:', data);
       setIsSubmitted(true);
       toast({
         title: "¡Evaluación enviada!",
@@ -153,6 +159,7 @@ export default function ParkEvaluationForm() {
       });
     },
     onError: (error) => {
+      console.error('❌ MUTATION ERROR:', error);
       toast({
         title: "Error al enviar evaluación",
         description: "Hubo un problema al enviar tu evaluación. Inténtalo nuevamente.",

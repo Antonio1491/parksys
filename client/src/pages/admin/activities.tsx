@@ -1092,7 +1092,7 @@ const AdminActivities = () => {
                   <TableHeader>
                     <TableRow>
                       {selectionMode && (
-                        <TableHead className="w-[50px]">
+                        <TableHead className="w-12">
                           <Checkbox
                             checked={currentActivities.length > 0 && currentActivities.every(activity => selectedActivities.has(activity.id))}
                             onCheckedChange={(checked) => {
@@ -1176,7 +1176,7 @@ const AdminActivities = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className=" border bg-transparent text-red-800 hover:text-white"
+                              className="border bg-transparent text-red-800 hover:text-white"
                               onClick={() => handleDelete(activity)}
                             >
                               <Trash className="h-4 w-4" />

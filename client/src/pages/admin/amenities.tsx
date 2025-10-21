@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit, Trash2, FileUp, Filter, ArrowUpDown, Search, Activity } from "lucide-react";
+import { Plus, Edit, Trash2, FileUp, Filter, ArrowUpDown, Search, Activity, TrendingUp, MapPin, Layers, FolderTree, RefreshCw, CopyCheck, CheckSquare, Square } from "lucide-react";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,6 +109,12 @@ const AdminAmenitiesPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  // Estados para selección múltiple
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedAmenities, setSelectedAmenities] = useState<Set<number>>(new Set());
+
+  // Filtro adicional por parques
+  const [filterByParks, setFilterByParks] = useState<string>("all");
   
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -154,16 +160,36 @@ const AdminAmenitiesPage = () => {
 
   const amenities = amenitiesData?.allAmenities || [];
 
+  // Calcular métricas para las cards
+  const metrics = {
+    totalAmenities: amenities.length,
+    amenitiesInUse: amenities.filter((a: Amenity) => (a.parksCount || 0) > 0).length,
+    mostUsedAmenity: amenities.reduce((max: Amenity | null, current: Amenity) => {
+      if (!max) return current;
+      return (current.totalModules || 0) > (max.totalModules || 0) ? current : max;
+    }, null as Amenity | null),
+    totalCategories: new Set(amenities.map((a: Amenity) => a.category).filter(Boolean)).size
+  };
+
   // Filtrado y ordenamiento
   const filteredAndSortedAmenities = amenities
     .filter((amenity: Amenity) => {
       const matchesSearch = amenity.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = filterCategory === "all" || amenity.category === filterCategory;
-      return matchesSearch && matchesCategory;
+
+      // Filtro por parques
+      let matchesParks = true;
+      if (filterByParks === "with") {
+        matchesParks = (amenity.parksCount || 0) > 0;
+      } else if (filterByParks === "without") {
+        matchesParks = (amenity.parksCount || 0) === 0;
+      }
+
+      return matchesSearch && matchesCategory && matchesParks;
     })
     .sort((a: Amenity, b: Amenity) => {
       let aValue, bValue;
-      
+
       switch (sortBy) {
         case "name":
           aValue = a.name.toLowerCase();
@@ -180,7 +206,7 @@ const AdminAmenitiesPage = () => {
         default:
           return 0;
       }
-      
+
       if (sortOrder === "asc") {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       } else {
@@ -353,6 +379,36 @@ const AdminAmenitiesPage = () => {
     },
   });
 
+  // Funciones de selección múltiple
+  const handleSelectAllAmenities = () => {
+    const allIds = new Set(paginatedAmenities.map((amenity: Amenity) => amenity.id));
+    setSelectedAmenities(allIds);
+  };
+
+  const handleDeselectAllAmenities = () => {
+    setSelectedAmenities(new Set());
+    setSelectionMode(false);
+  };
+
+  const handleBulkDeleteAmenities = () => {
+    if (selectedAmenities.size === 0) return;
+
+    // Aquí implementarías la lógica de eliminación múltiple
+    // Por ahora, abrimos el diálogo para cada una
+    toast({
+      title: `Eliminar ${selectedAmenities.size} amenidades`,
+      description: "Funcionalidad en desarrollo",
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setFilterCategory("all");
+    setFilterByParks("all");
+    setSortBy("parksCount");
+    setSortOrder("desc");
+  };
+
   const handleEditClick = (amenity: Amenity) => {
     setCurrentAmenity(amenity);
     setFormData({
@@ -489,7 +545,7 @@ const AdminAmenitiesPage = () => {
             <DialogTrigger asChild>
               <Button variant="primary">
                 <Plus className="mr-2 h-4 w-4" />
-                Nueva Amenidad
+                Nuevo
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -751,26 +807,89 @@ const AdminAmenitiesPage = () => {
         ]}
       />
 
-      {/* Controles de filtrado y ordenamiento */}
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center">
-          {/* Búsqueda */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar amenidades..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 w-64"
-            />
+      {/* Cards de Métricas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Card 1: Total de Amenidades */}
+        <Card className="bg-[#ceefea] border-0 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total de Amenidades</p>
+              <p className="text-3xl font-bold text-[#00444f]">{metrics.totalAmenities}</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-[#00444f] flex items-center justify-center">
+              <Layers className="h-6 w-6 text-white" />
+            </div>
           </div>
+        </Card>
 
-          {/* Filtro por categoría */}
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
+        {/* Card 2: Amenidades en Uso */}
+        <Card className="bg-[#ceefea] border-0 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Amenidades en Uso</p>
+              <p className="text-3xl font-bold text-[#00444f]">{metrics.amenitiesInUse}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {((metrics.amenitiesInUse / metrics.totalAmenities) * 100).toFixed(0)}% del total
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-[#00444f] flex items-center justify-center">
+              <TrendingUp className="h-6 w-6 text-white" />
+            </div>
+          </div>
+        </Card>
+
+        {/* Card 3: Amenidad con Más Módulos */}
+        <Card className="bg-[#ceefea] border-0 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-gray-600 mb-1">Más Módulos</p>
+              <p className="text-xl font-bold text-[#00444f] truncate">
+                {metrics.mostUsedAmenity?.name || "N/A"}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {metrics.mostUsedAmenity?.totalModules || 0} módulos totales
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-[#00444f] flex items-center justify-center flex-shrink-0 ml-2">
+              <MapPin className="h-6 w-6 text-white" />
+            </div>
+          </div>
+        </Card>
+
+        {/* Card 4: Total de Categorías */}
+        <Card className="bg-[#ceefea] border-0 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total de Categorías</p>
+              <p className="text-3xl font-bold text-[#00444f]">{metrics.totalCategories}</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-[#00444f] flex items-center justify-center">
+              <FolderTree className="h-6 w-6 text-white" />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Barra de búsqueda y filtros - Diseño horizontal */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
+          {/* Lado izquierdo: Búsqueda y Filtros */}
+          <div className="flex flex-col md:flex-row gap-3 items-start md:items-center flex-1">
+            {/* Búsqueda */}
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Buscar amenidades..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-10 w-full"
+              />
+            </div>
+
+            {/* Filtro por categoría */}
             <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filtrar por categoría" />
+              <SelectTrigger className="w-full md:w-48 h-10">
+                <SelectValue placeholder="Todas las categorías" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas las categorías</SelectItem>
@@ -781,35 +900,90 @@ const AdminAmenitiesPage = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Filtro por parques */}
+            <Select value={filterByParks} onValueChange={setFilterByParks}>
+              <SelectTrigger className="w-full md:w-48 h-10">
+                <SelectValue placeholder="Todos los parques" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los parques</SelectItem>
+                <SelectItem value="with">Con parques asignados</SelectItem>
+                <SelectItem value="without">Sin parques asignados</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Botón Limpiar Filtros */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearFilters}
+              className="h-10 whitespace-nowrap"
+              title="Limpiar filtros"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Lado derecho: Botones de acción */}
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Botón de selección múltiple con dropdown */}
+            <div className="relative group">
+              <Button
+                variant={selectionMode ? 'default' : 'outline'}
+                size="sm"
+                className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-gray-100' : 'bg-gray-100 hover:bg-[#00a587]'}`}
+              >
+                <CopyCheck className={`h-5 w-5 ${selectionMode ? 'text-[#00a587]' : 'text-[#4b5b65]'}`} />
+              </Button>
+              {/* Dropdown menu con CSS hover */}
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-1">
+                  <button
+                    onClick={() => setSelectionMode(true)}
+                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                  >
+                    <CopyCheck className="h-4 w-4 mr-2" />
+                    Selección múltiple
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!selectionMode) {
+                        setSelectionMode(true);
+                      }
+                      handleSelectAllAmenities();
+                    }}
+                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                  >
+                    <CheckSquare className="h-5 w-5 mr-2" />
+                    Seleccionar todo
+                  </button>
+                  <button
+                    onClick={handleDeselectAllAmenities}
+                    className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                  >
+                    <Square className="h-4 w-4 mr-2" />
+                    Deseleccionar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Botón de eliminar */}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDeleteAmenities}
+              className="flex items-center h-11 w-11"
+              disabled={selectedAmenities.size === 0}
+            >
+              <Trash2 className="h-5 w-5" />
+              {selectedAmenities.size > 0 && (
+                <span className="ml-1 text-xs">({selectedAmenities.size})</span>
+              )}
+            </Button>
           </div>
         </div>
-
-        {/* Ordenamiento */}
-        <div className="flex items-center gap-2">
-          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-          <Select value={sortBy} onValueChange={(value: "name" | "parksCount" | "category") => setSortBy(value)}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name">Nombre</SelectItem>
-              <SelectItem value="parksCount">Parques</SelectItem>
-              <SelectItem value="category">Categoría</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-          >
-            {sortOrder === "asc" ? "↑" : "↓"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Estadísticas */}
-      <div className="mb-4 text-sm text-muted-foreground">
-        Página {currentPage} de {totalPages} - Mostrando {startIndex + 1}-{Math.min(endIndex, totalItems)} de {totalItems} amenidades
       </div>
 
       {/* Amenities Table with Parks Column */}
@@ -827,7 +1001,8 @@ const AdminAmenitiesPage = () => {
           </TableHeader>
           <TableBody>
             {paginatedAmenities?.map((amenity: Amenity) => (
-              <TableRow key={amenity.id}>
+              <TableRow 
+                key={amenity.id}>
                 <TableCell>
                   <AmenityIcon 
                     name={amenity.icon || 'park'} 

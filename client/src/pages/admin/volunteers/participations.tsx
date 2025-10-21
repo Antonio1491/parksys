@@ -24,20 +24,45 @@ import {
 } from "@/components/ui/select";
 import { 
   Calendar, Search, Filter, RefreshCw, Download, ArrowUpDown,
-  Clock, PlusCircle, FileEdit, FileX
+  Clock, PlusCircle, FileEdit, FileX, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import { Link } from 'wouter';
 import ROUTES from '@/routes';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+
+// Tipo actualizado para las participaciones
+interface Participation {
+  id: number;
+  volunteerId: number;
+  volunteerActivityId: number;
+  volunteerName: string;
+  volunteerEmail: string;
+  activityName: string;
+  activityDate: string;
+  activityCategory: string;
+  parkId: number;
+  parkName: string;
+  registrationDate: string;
+  attendanceStatus: string;
+  hoursContributed: number | null;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+  volunteerNotes: string | null;
+  supervisorNotes: string | null;
+  rating: number | null;
+}
 
 const ParticipationsList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [parkFilter, setParkFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
   // Fetch all participations
-  const { data: participations = [], isLoading, isError, refetch } = useQuery({
+  const { data: participations = [], isLoading, isError, refetch } = useQuery<Participation[]>({
     queryKey: ['/api/participations/all'],
   });
 
@@ -46,17 +71,22 @@ const ParticipationsList: React.FC = () => {
     queryKey: ['/api/parks'],
   });
 
-  // Filter participations based on search term and park
+  // Filter participations
   const filteredParticipations = participations.filter((participation: Participation) => {
     const matchesSearch = 
       searchTerm === '' || 
-      participation.activityName.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      participation.activityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      participation.volunteerName.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesPark = 
       parkFilter === 'all' || 
       participation.parkId.toString() === parkFilter;
-    
-    return matchesSearch && matchesPark;
+
+    const matchesStatus = 
+      statusFilter === 'all' || 
+      participation.attendanceStatus === statusFilter;
+
+    return matchesSearch && matchesPark && matchesStatus;
   });
 
   // Paginate participations
@@ -75,37 +105,72 @@ const ParticipationsList: React.FC = () => {
 
   // Export participations data as CSV
   const exportCSV = () => {
-    const headers = ['ID', 'Voluntario', 'Parque', 'Actividad', 'Fecha', 'Horas', 'Supervisor', 'Notas'];
+    const headers = ['ID', 'Voluntario', 'Actividad', 'Fecha', 'Parque', 'Estado', 'Horas', 'Check-in', 'Check-out'];
     const csvRows = [
       headers.join(','),
       ...filteredParticipations.map((participation: Participation) => [
         participation.id,
-        participation.volunteerId,
-        participation.parkId,
-        participation.activityName,
+        `"${participation.volunteerName}"`,
+        `"${participation.activityName}"`,
         participation.activityDate,
-        participation.hoursContributed,
-        participation.supervisorId || 'N/A',
-        participation.notes ? `"${participation.notes.replace(/"/g, '""')}"` : 'N/A'
+        `"${participation.parkName}"`,
+        participation.attendanceStatus,
+        participation.hoursContributed || 0,
+        participation.checkInTime || 'N/A',
+        participation.checkOutTime || 'N/A'
       ].join(','))
     ];
-    
+
     const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv' });
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
-    a.setAttribute('download', 'participaciones.csv');
+    a.setAttribute('download', `participaciones_${format(new Date(), 'yyyy-MM-dd')}.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
 
-  // Get park name by id
-  const getParkName = (parkId: number) => {
-    const park = parks.find((p: any) => p.id === parkId);
-    return park ? park.name : `Parque ID: ${parkId}`;
+  // Get status badge
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      registered: { label: 'Registrado', color: 'bg-blue-100 text-blue-800', icon: AlertCircle },
+      confirmed: { label: 'Confirmado', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
+      attended: { label: 'Asistió', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+      absent: { label: 'Ausente', color: 'bg-red-100 text-red-800', icon: XCircle },
+      cancelled: { label: 'Cancelado', color: 'bg-gray-100 text-gray-800', icon: XCircle },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.registered;
+    const Icon = config.icon;
+
+    return (
+      <Badge className={`${config.color} border-0`}>
+        <Icon className="h-3 w-3 mr-1" />
+        {config.label}
+      </Badge>
+    );
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: es });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Format time
+  const formatTime = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    try {
+      return format(new Date(dateString), 'HH:mm', { locale: es });
+    } catch {
+      return 'N/A';
+    }
   };
 
   return (
@@ -122,7 +187,7 @@ const ParticipationsList: React.FC = () => {
               <Download className="h-4 w-4 mr-2" />
               Exportar
             </Button>
-            <Link href={ROUTES.admin.volunteers.participationCreate}>
+            <Link href={ROUTES.admin.volunteers.participations.create}>
               <Button>
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Registrar Participación
@@ -134,34 +199,54 @@ const ParticipationsList: React.FC = () => {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Registro de Participaciones</CardTitle>
-            <CardDescription>Gestione las horas de participación de los voluntarios en actividades de los parques.</CardDescription>
+            <CardDescription>
+              Gestione las participaciones de voluntarios en actividades de voluntariado.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-between mb-4">
-              <div className="flex items-center space-x-2 w-1/2">
-                <div className="relative w-full">
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="flex-1">
+                <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                   <Input
                     type="search"
-                    placeholder="Buscar por actividad..."
+                    placeholder="Buscar por actividad o voluntario..."
                     className="pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <Select value={parkFilter} onValueChange={setParkFilter}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filtrar por parque" />
+
+              <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-500" />
+                  <Select value={parkFilter} onValueChange={setParkFilter}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Filtrar por parque" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los parques</SelectItem>
+                      {Array.isArray(parks) && parks.map((park: any) => (
+                        <SelectItem key={park.id} value={park.id.toString()}>
+                          {park.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue placeholder="Estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Array.isArray(parks) && parks.map((park: any) => (
-                      <SelectItem key={park.id} value={park.id.toString()}>
-                        {park.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="registered">Registrado</SelectItem>
+                    <SelectItem value="confirmed">Confirmado</SelectItem>
+                    <SelectItem value="attended">Asistió</SelectItem>
+                    <SelectItem value="absent">Ausente</SelectItem>
+                    <SelectItem value="cancelled">Cancelado</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -189,8 +274,7 @@ const ParticipationsList: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID Voluntario</TableHead>
-                      <TableHead>Parque</TableHead>
+                      <TableHead>Voluntario</TableHead>
                       <TableHead>Actividad</TableHead>
                       <TableHead>
                         <div className="flex items-center">
@@ -198,12 +282,9 @@ const ParticipationsList: React.FC = () => {
                           <ArrowUpDown className="ml-2 h-4 w-4" />
                         </div>
                       </TableHead>
-                      <TableHead>
-                        <div className="flex items-center">
-                          Horas
-                          <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </div>
-                      </TableHead>
+                      <TableHead>Parque</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead>Horas</TableHead>
                       <TableHead>Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -211,41 +292,46 @@ const ParticipationsList: React.FC = () => {
                     {paginatedParticipations.map((participation: Participation) => (
                       <TableRow key={participation.id}>
                         <TableCell>
-                          <Link href={`/admin/volunteers/${participation.volunteerId}`}>
-                            <Button variant="link" className="p-0 h-auto text-primary">
-                              #{participation.volunteerId}
-                            </Button>
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium">
-                            {getParkName(participation.parkId)}
+                          <div className="flex flex-col">
+                            <Link href={`/admin/volunteers/${participation.volunteerId}`}>
+                              <Button variant="link" className="p-0 h-auto text-primary font-medium">
+                                {participation.volunteerName}
+                              </Button>
+                            </Link>
+                            <span className="text-xs text-gray-500">{participation.volunteerEmail}</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div>
-                            {participation.activityId ? (
-                              <Link href={`/admin/activities/${participation.activityId}`}>
-                                <Button variant="link" className="p-0 h-auto">
-                                  {participation.activityName}
-                                </Button>
-                              </Link>
-                            ) : (
-                              participation.activityName
+                          <div className="flex flex-col">
+                            <span className="font-medium">{participation.activityName}</span>
+                            {participation.activityCategory && (
+                              <span className="text-xs text-gray-500">{participation.activityCategory}</span>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                            <span>{participation.activityDate}</span>
+                            <span>{formatDate(participation.activityDate)}</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge>
-                            <Clock className="h-3 w-3 mr-1" />
-                            {participation.hoursContributed} horas
-                          </Badge>
+                          <div className="font-medium">
+                            {participation.parkName}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(participation.attendanceStatus)}
+                        </TableCell>
+                        <TableCell>
+                          {participation.hoursContributed ? (
+                            <Badge variant="outline">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {participation.hoursContributed} hrs
+                            </Badge>
+                          ) : (
+                            <span className="text-gray-400 text-sm">Pendiente</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
@@ -277,7 +363,7 @@ const ParticipationsList: React.FC = () => {
                       className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <PaginationItem key={page}>
                       <PaginationLink 
@@ -292,7 +378,7 @@ const ParticipationsList: React.FC = () => {
                       </PaginationLink>
                     </PaginationItem>
                   ))}
-                  
+
                   <PaginationItem>
                     <PaginationNext 
                       href="#" 

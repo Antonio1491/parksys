@@ -31,7 +31,7 @@ import {
   Mail, 
   Phone,
   Award,
-  Calendar,
+  Trash,
   MapPin,
   RefreshCw,
   AlertCircle,
@@ -660,151 +660,149 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
         </Card>
 
         {/* Tabla de instructores */}
-        <div className="bg-white rounded-md shadow">
-          {isLoading ? (
-            <div className="text-center py-8">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
-              <p className="mt-2 text-gray-500">Cargando instructores...</p>
+
+        {isLoading ? (
+          <div className="text-center py-8">
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+            <p className="mt-2 text-gray-500">Cargando instructores...</p>
+          </div>
+        ) : isError ? (
+          <div className="text-center py-8">
+            <AlertCircle className="h-8 w-8 mx-auto text-red-500" />
+            <p className="mt-2 text-red-500">Error al cargar los instructores</p>
+            <Button variant="outline" size="sm" className="mt-2" onClick={() => refetch()}>
+              Reintentar
+            </Button>
+          </div>
+        ) : paginatedInstructors?.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-gray-500">
+              {instructors.length > 0 ? "No se encontraron instructores que coincidan con los criterios de búsqueda." : "No hay instructores registrados."}
             </div>
-          ) : isError ? (
-            <div className="text-center py-8">
-              <AlertCircle className="h-8 w-8 mx-auto text-red-500" />
-              <p className="mt-2 text-red-500">Error al cargar los instructores</p>
-              <Button variant="outline" size="sm" className="mt-2" onClick={() => refetch()}>
-                Reintentar
-              </Button>
-            </div>
-          ) : paginatedInstructors?.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-500">
-                {instructors.length > 0 ? "No se encontraron instructores que coincidan con los criterios de búsqueda." : "No hay instructores registrados."}
-              </div>
-            </div>
-          ) : (
-            <div className="border overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {selectionMode && (
-                      <TableHead className="w-12">
-                        <Checkbox
-                          checked={selectedInstructors.size === paginatedInstructors.length && paginatedInstructors.length > 0}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              handleSelectAllInstructors();
-                            } else {
-                              setSelectedInstructors(new Set());
-                            }
-                          }}
-                        />
-                      </TableHead>
-                    )}
-                    <TableHead>Nombre</TableHead>
-                    <TableHead>Contacto</TableHead>
-                    <TableHead>
-                      <div className="flex items-center">
-                        Estado
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                      </div>
+          </div>
+        ) : (
+          <div className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {selectionMode && (
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedInstructors.size === paginatedInstructors.length && paginatedInstructors.length > 0}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            handleSelectAllInstructors();
+                          } else {
+                            setSelectedInstructors(new Set());
+                          }
+                        }}
+                      />
                     </TableHead>
-                    <TableHead>Especialidades</TableHead>
-                    <TableHead>Experiencia</TableHead>
-                    <TableHead>Calificación</TableHead>
-                    <TableHead>Inicio</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedInstructors.map((instructor: Instructor) => (
-                    <TableRow key={instructor.id}>
-                      {selectionMode && (
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedInstructors.has(instructor.id)}
-                            onCheckedChange={(checked) => handleSelectInstructor(instructor.id, checked as boolean)}
-                          />
-                        </TableCell>
-                      )}
-                      <TableCell className="font-medium">
-                        <div className="flex items-center space-x-3">
-                          <Avatar>
-                            <AvatarImage src={instructor.profileImageUrl} />
-                            <AvatarFallback>
-                              {instructor.firstName?.[0] || 'I'}{instructor.lastName?.[0] || 'N'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            {instructor.firstName} {instructor.lastName}
-                            <div className="text-sm text-gray-500">
-                              {instructor.activitiesCount || 0} actividades
-                            </div>
-                          </div>
-                        </div>
+                  )}
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Contacto</TableHead>
+                  <TableHead>
+                    <div className="flex items-center">
+                      Estado
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead>Especialidades</TableHead>
+                  <TableHead>Actividades</TableHead>
+                  <TableHead>Experiencia</TableHead>
+                  <TableHead>Calificación</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedInstructors.map((instructor: Instructor) => (
+                  <TableRow 
+                    key={instructor.id}
+                    className={`${!selectionMode ? 'cursor-pointer hover:bg-gray-50' : ''} transition-colors`}
+                    onClick={() => !selectionMode && setLocation(ROUTES.admin.activities.instructors.view.build(instructor.id))}
+                    >
+                    {selectionMode && (
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedInstructors.has(instructor.id)}
+                          onCheckedChange={(checked) => handleSelectInstructor(instructor.id, checked as boolean)}
+                        />
                       </TableCell>
-                      <TableCell>
-                        <div>{instructor.email}</div>
-                        {instructor.phone && (
-                          <div className="text-muted-foreground text-xs">{instructor.phone}</div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {renderStatusBadge(instructor.status)}
-                      </TableCell>
-                      <TableCell>
-                        {formatSpecialties(instructor.specialties)}
-                      </TableCell>
-                      <TableCell>
+                    )}
+                    <TableCell className="font-medium">
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={instructor.profileImageUrl} />
+                          <AvatarFallback>
+                            {instructor.firstName?.[0] || 'I'}{instructor.lastName?.[0] || 'N'}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
-                          <div className="font-medium">{instructor.experienceYears} {instructor.experienceYears === 1 ? 'año' : 'años'}</div>
-                          {instructor.hourlyRate && (
-                            <div className="text-sm text-gray-600">
-                              ${instructor.hourlyRate}/hr
-                            </div>
-                          )}
+                          {instructor.firstName} {instructor.lastName}
+                          
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {instructor.rating ? renderStars(instructor.rating) : (
-                          <span className="text-gray-400 text-sm">Sin calificar</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>{instructor.email}</div>
+                      {instructor.phone && (
+                        <div className="text-muted-foreground text-xs">{instructor.phone}</div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {renderStatusBadge(instructor.status)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSpecialties(instructor.specialties)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-gray-500">
+                        {instructor.activitiesCount || 0} actividades
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{instructor.experienceYears} {instructor.experienceYears === 1 ? 'año' : 'años'}</div>
+                        {instructor.hourlyRate && (
+                          <div className="text-sm text-gray-600">
+                            ${instructor.hourlyRate}/hr
+                          </div>
                         )}
-                      </TableCell>
-                      <TableCell>{formatDate(instructor.createdAt)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setLocation(ROUTES.admin.activities.instructors.view.build(instructor.id))}
-                            title="Ver detalles"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setLocation(ROUTES.admin.activities.instructors.edit.build(instructor.id))}
-                            title="Editar instructor"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteClick(instructor.id)}
-                            title="Eliminar instructor"
-                            className="hover:bg-red-50 hover:text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {instructor.rating ? renderStars(instructor.rating) : (
+                        <span className="text-gray-400 text-sm">Sin calificar</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border bg-transparent text-gray-800 hover:text-white"
+                          onClick={() => setLocation(ROUTES.admin.activities.instructors.edit.build(instructor.id))}
+                          title="Editar instructor"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteClick(instructor.id)}
+                          title="Eliminar instructor"
+                          className="border bg-transparent text-red-800 hover:text-white"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
 
         {/* Paginación */}
         {totalPages > 1 && (

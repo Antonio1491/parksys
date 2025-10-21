@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -47,6 +48,7 @@ import PublicLayout from '@/components/PublicLayout';
 const greenFlagLogo = "/images/green-flag-logo.jpg";
 
 function ParkLandingPage() {
+  const { id } = useParams<{ id: string }>();
   const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
   const [selectedInstructor, setSelectedInstructor] = React.useState<any>(null);
@@ -92,7 +94,7 @@ function ParkLandingPage() {
   });
   
   // Extraer ID del slug (formato: nombre-parque-id)
-  const parkId = slug?.split('-').pop();
+  const parkId = id;
 
   const { data: park, isLoading, error } = useQuery<ExtendedPark>({
     queryKey: [`/api/parks/${parkId}/extended`],
@@ -382,7 +384,7 @@ function ParkLandingPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Parque no encontrado</h1>
           <p className="text-gray-600 mb-6">No pudimos encontrar la información de este parque.</p>
-          <Link href="/parks">
+          <Link href={ROUTES.public.parks}>
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver a parques
@@ -464,7 +466,7 @@ function ParkLandingPage() {
         
         {/* Navigation Link - Top Left */}
         <div className="absolute top-6 left-6 z-20">
-          <Link href="/parks" className="flex items-center gap-2 text-white hover:text-white/80 transition-colors">
+          <Link href={ROUTES.public.parks} className="flex items-center gap-2 text-white hover:text-white/80 transition-colors">
             <ArrowLeft className="h-4 w-4" />
             <span>Volver a parques</span>
           </Link>
@@ -781,7 +783,7 @@ function ParkLandingPage() {
                   <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                   <h3 className="text-lg font-semibold text-gray-600 mb-2">No hay actividades programadas</h3>
                   <p className="text-gray-500 mb-4">Próximamente se publicarán nuevos eventos y actividades</p>
-                  <Link href="/activities">
+                  <Link href={ROUTES.public.activities}>
                     <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-50">
                       <Calendar className="h-4 w-4 mr-2" />
                       Explorar todas las actividades
@@ -793,7 +795,7 @@ function ParkLandingPage() {
               {/* Enlace para ver todas las actividades */}
               {park.activities && park.activities.length > 0 && (
                 <div className="text-center pt-6 border-t mt-6">
-                  <Link href="/activities">
+                  <Link href={ROUTES.public.activities}>
                     <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-50">
                       <Calendar className="h-4 w-4 mr-2" />
                       Ver todas las actividades ({park.activities.length})
@@ -904,7 +906,7 @@ function ParkLandingPage() {
                 {/* Enlace a página de instructores */}
                 <div className="mt-6 text-center">
                   <Link 
-                    href="/instructors"
+                    href={ROUTES.public.instructors}
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md hover:shadow-lg"
                   >
                     <Users className="mr-2 h-5 w-5" />
@@ -1012,7 +1014,7 @@ function ParkLandingPage() {
                 {/* Enlace a página de voluntarios */}
                 <div className="mt-6 text-center">
                   <Link 
-                    href="/volunteers"
+                    href={ROUTES.public.volunteers}
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white font-medium rounded-lg hover:from-pink-700 hover:to-pink-800 transition-all duration-300 shadow-md hover:shadow-lg"
                   >
                     <Heart className="mr-2 h-5 w-5" />
@@ -1089,7 +1091,7 @@ function ParkLandingPage() {
                   
                   {/* Botón Ver todas las especies */}
                   <div className="text-center pt-6 border-t">
-                    <Link href="/tree-species">
+                    <Link href={ROUTES.public.treeSpecies}>
                       <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50">
                         <Trees className="h-4 w-4 mr-2" />
                         Ver todas las especies ({park.treeSpecies.length})
@@ -1102,7 +1104,7 @@ function ParkLandingPage() {
                   <Trees className="h-16 w-16 text-green-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-600 mb-2">No hay especies arbóreas registradas</h3>
                   <p className="text-gray-500 mb-4">Este parque aún no tiene especies arbóreas asignadas en el plan de arbolado urbano</p>
-                  <Link href="/tree-species">
+                  <Link href={ROUTES.public.treeSpecies}>
                     <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50">
                       <Trees className="h-4 w-4 mr-2" />
                       Explorar catálogo de especies
@@ -1130,7 +1132,7 @@ function ParkLandingPage() {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {park.concessions.map((concession, index) => (
-                      <Link key={`concession-${concession.id}-${index}`} href={`/concession/${concession.id}`}>
+                      <Link key={`concession-${concession.id}-${index}`} href={ROUTES.public.concessionDetail.build(concession.id)}>
                         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-blue-300 group">
                           {/* Imagen de la concesión */}
                           <div className="relative h-48 overflow-hidden">
@@ -1201,7 +1203,7 @@ function ParkLandingPage() {
                   </div>
                   
                   <div className="text-center pt-6 border-t">
-                    <Link href="/concessions">
+                    <Link href={ROUTES.public.concessions}>
                       <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
                         <Store className="h-4 w-4 mr-2" />
                         Ver todas las concesiones ({park.concessions.length})
@@ -1214,7 +1216,7 @@ function ParkLandingPage() {
                   <Store className="h-16 w-16 text-blue-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-600 mb-2">No hay concesiones activas</h3>
                   <p className="text-gray-500 mb-4">Este parque no tiene concesiones comerciales disponibles actualmente</p>
-                  <Link href="/concessions">
+                  <Link href={ROUTES.public.concessions}>
                     <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
                       <Store className="h-4 w-4 mr-2" />
                       Explorar todas las concesiones
@@ -1243,16 +1245,16 @@ function ParkLandingPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-green-700 mb-8">
-                    Organiza tu evento AMBU en este parque.
+                    Organiza tu evento en este parque.
                   </p>
                   <div className="space-y-6">
-                    <Link href="/admin/eventos-ambu/calendar">
+                    <Link href={ROUTES.public.reservations}>
                       <Button 
                         variant="outline" 
                         className="w-full bg-white hover:bg-green-50 text-green-700 border-green-300 hover:border-green-400"
                       >
                         <Calendar className="h-4 w-4 mr-2" />
-                        Ver Calendario de Eventos AMBU
+                        Proximamente
                       </Button>
                     </Link>
                   </div>
