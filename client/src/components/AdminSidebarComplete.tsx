@@ -863,7 +863,7 @@ const AdminSidebarComplete: React.FC = () => {
             }
             icon={<Wrench className="h-5 w-5" />}
             value="operations"
-            defaultOpen={location.startsWith('/admin/assets') || location.startsWith('/admin/incidents') || location.startsWith('/admin/volunteers')}
+            defaultOpen={location.startsWith('/admin/assets') || location.startsWith('/admin/incidents') || location.startsWith('/admin/work-orders') || location.startsWith('/admin/warehouse') || location.startsWith('/admin/volunteers')}
           >
             {/* ACTIVOS */}
             <CollapsibleSubmenu
