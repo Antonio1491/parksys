@@ -2639,11 +2639,25 @@ app.post('/api/work-orders', async (req: Request, res: Response) => {
     
     const folio = `OT-${year}-${String(nextNumber).padStart(4, '0')}`;
     
-    const [newOrder] = await db.insert(workOrders).values({
-      ...data,
+    // Mapear campos del frontend a la base de datos
+    const workOrderData: any = {
       folio,
+      tipo: data.type,
+      prioridad: data.priority || 'normal',
+      estado: 'pendiente',
+      parkId: data.parkId,
+      activoId: data.assetId || null,
+      incidenciaId: data.incidentId || null,
+      titulo: data.title,
+      descripcionTrabajo: data.description,
+      instruccionesEspeciales: data.notes || null,
+      asignadoAId: data.assignedToEmployeeId || null,
+      fechaProgramada: data.scheduledStartDate ? new Date(data.scheduledStartDate) : null,
+      presupuestoAsignado: data.estimatedCost || null,
       creadoPor: req.user?.id
-    }).returning();
+    };
+    
+    const [newOrder] = await db.insert(workOrders).values(workOrderData).returning();
     
     // Crear entrada en historial
     await db.insert(workOrderHistory).values({
