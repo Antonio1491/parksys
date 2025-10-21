@@ -69,6 +69,7 @@ export default function NewInstructorPage() {
   const { data: parks = [] } = useQuery({
     queryKey: ['/api/parks'],
   });
+  const parks = Array.isArray(parksData) ? parksData : [];
 
   // Mutación para crear instructor
   const createInstructorMutation = useMutation({
