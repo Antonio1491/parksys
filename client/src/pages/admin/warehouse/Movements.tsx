@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { ArrowUpDown, Search, Filter, TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import AdminLayout from "@/components/AdminLayout";
 import type { InventoryMovement, Consumable, User } from "@shared/schema";
 
 export default function MovementsPage() {
+  const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [movementType, setMovementType] = useState<string>("");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
@@ -72,7 +74,7 @@ export default function MovementsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Movimientos de Inventario</h1>
           <p className="text-muted-foreground">Historial de entradas, salidas y transferencias</p>
         </div>
-        <Button data-testid="button-add-movement">
+        <Button onClick={() => navigate('/admin/warehouse/movements/new')} data-testid="button-add-movement">
           <ArrowUpDown className="h-4 w-4 mr-2" />
           Registrar Movimiento
         </Button>
@@ -244,7 +246,7 @@ export default function MovementsPage() {
                 : "Comienza registrando el primer movimiento de inventario"
               }
             </p>
-            <Button data-testid="button-add-first-movement">
+            <Button onClick={() => navigate('/admin/warehouse/movements/new')} data-testid="button-add-first-movement">
               <ArrowUpDown className="h-4 w-4 mr-2" />
               Registrar Movimiento
             </Button>
