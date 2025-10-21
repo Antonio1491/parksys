@@ -1,0 +1,35 @@
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 Parks Response: {data: Array(0), isArray: true}
+injected.js:27 Parks Array: []
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🌐 [QUERY] GET /api/notifications/count
+injected.js:27 Parks Response: {data: Array(0), isArray: true}
+injected.js:27 Parks Array: []
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 Parks Response: {data: {…}, isArray: false}
+injected.js:27 Parks Array: []
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}

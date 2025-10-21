@@ -88,10 +88,13 @@ export default function NewWorkOrderPage() {
   });
 
   // Queries para obtener datos
-  const { data: parks = [] } = useQuery({
+  const { data: parksResponse } = useQuery({
     queryKey: ['/api/parks'],
     retry: false,
   });
+  
+  // Extraer el array de parques de la respuesta
+  const parks = parksResponse?.data || [];
 
   const { data: assets = [] } = useQuery({
     queryKey: ['/api/assets'],
@@ -165,9 +168,6 @@ export default function NewWorkOrderPage() {
   const safeIncidents = Array.isArray(incidents) ? incidents.filter((i: any) => i?.id && i?.title) : [];
   const safeEmployees = Array.isArray(employees) ? employees.filter((e: any) => e?.id && e?.fullName) : [];
   const safeUsers = Array.isArray(users) ? users.filter((u: any) => u?.id && (u?.fullName || u?.username)) : [];
-
-  console.log('Parks Response:', { data: parks, isArray: Array.isArray(parks) });
-  console.log('Parks Array:', safeParks);
 
   return (
     <AdminLayout title="Nueva Orden de Trabajo">
