@@ -60,15 +60,17 @@ export default function NewWorkOrderPage() {
 
   // Obtener parámetros de URL (si viene de un incidente o asset)
   const urlParams = new URLSearchParams(window.location.search);
-  const incidentIdFromUrl = urlParams.get('incidentId');
+  const incidentIdFromUrl = urlParams.get('fromIncident') || urlParams.get('incidentId');
   const assetIdFromUrl = urlParams.get('assetId');
   const parkIdFromUrl = urlParams.get('parkId');
+  const titleFromUrl = urlParams.get('title');
+  const descriptionFromUrl = urlParams.get('description');
 
   const form = useForm<WorkOrderFormData>({
     resolver: zodResolver(workOrderSchema),
     defaultValues: {
-      title: '',
-      description: '',
+      title: titleFromUrl || '',
+      description: descriptionFromUrl || '',
       type: 'correctivo',
       priority: 'normal',
       parkId: parkIdFromUrl || '',

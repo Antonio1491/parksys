@@ -628,6 +628,22 @@ const AssetDetailPage: React.FC = () => {
             Registrar Mantenimiento
           </Button>
           <Button 
+            onClick={() => {
+              const params = new URLSearchParams({
+                assetId: asset?.id?.toString() || '',
+                parkId: asset?.parkId?.toString() || '',
+                title: `Mantenimiento - ${asset?.name || 'Activo'}`,
+                description: `Orden de trabajo para el activo: ${asset?.name || 'Sin nombre'}`
+              });
+              setLocation(`/admin/work-orders/new?${params.toString()}`);
+            }}
+            variant="outline"
+            data-testid="create-work-order-btn"
+          >
+            <Wrench className="mr-2 h-4 w-4" />
+            Crear Orden de Trabajo
+          </Button>
+          <Button 
             onClick={() => window.location.href = ROUTES.admin.assets.edit.build(id)} 
             variant="outline"
             data-testid="edit-asset-btn"

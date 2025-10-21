@@ -19,7 +19,8 @@ import {
   Pause,
   AlertCircle,
   Trash2,
-  Plus
+  Plus,
+  ExternalLink
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -388,15 +389,48 @@ export default function WorkOrderDetailPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-gray-600">Parque</Label>
-                    <p className="mt-1">{workOrder.parkName || 'N/A'}</p>
+                    {workOrder.parkId ? (
+                      <Button
+                        variant="link"
+                        className="h-auto p-0 mt-1 text-blue-600 hover:text-blue-800"
+                        onClick={() => setLocation(`/admin/parks/${workOrder.parkId}`)}
+                      >
+                        {workOrder.parkName}
+                        <ExternalLink className="w-3 h-3 ml-1" />
+                      </Button>
+                    ) : (
+                      <p className="mt-1">N/A</p>
+                    )}
                   </div>
                   <div>
                     <Label className="text-gray-600">Activo</Label>
-                    <p className="mt-1">{workOrder.assetName || 'N/A'}</p>
+                    {workOrder.assetId ? (
+                      <Button
+                        variant="link"
+                        className="h-auto p-0 mt-1 text-blue-600 hover:text-blue-800"
+                        onClick={() => setLocation(`/admin/assets/${workOrder.assetId}`)}
+                      >
+                        {workOrder.assetName}
+                        <ExternalLink className="w-3 h-3 ml-1" />
+                      </Button>
+                    ) : (
+                      <p className="mt-1">N/A</p>
+                    )}
                   </div>
                   <div>
                     <Label className="text-gray-600">Incidente Relacionado</Label>
-                    <p className="mt-1">{workOrder.incidentTitle || 'N/A'}</p>
+                    {workOrder.incidentId ? (
+                      <Button
+                        variant="link"
+                        className="h-auto p-0 mt-1 text-blue-600 hover:text-blue-800"
+                        onClick={() => setLocation(`/admin/incidents/${workOrder.incidentId}`)}
+                      >
+                        {workOrder.incidentTitle}
+                        <ExternalLink className="w-3 h-3 ml-1" />
+                      </Button>
+                    ) : (
+                      <p className="mt-1">N/A</p>
+                    )}
                   </div>
                   <div>
                     <Label className="text-gray-600">Asignado a</Label>

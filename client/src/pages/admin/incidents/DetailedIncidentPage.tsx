@@ -23,7 +23,8 @@ import {
   ClipboardCheck,
   AlertCircle,
   CheckCircle2,
-  Ban
+  Ban,
+  Wrench
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -84,7 +85,9 @@ interface Incident {
   reporterName: string;
   reporterEmail: string;
   parkName: string;
+  parkId?: number;
   assetName?: string;
+  assetId?: number;
   assignedToUserId?: number;
   estimatedHours?: number;
   actualHours?: number;
@@ -775,7 +778,7 @@ const DetailedIncidentPage = () => {
               <TabsContent value="workflow">
                 <div className="space-y-4">
                   {/* Acciones rápidas */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="h-20">
@@ -912,6 +915,27 @@ const DetailedIncidentPage = () => {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
+
+                    <Button 
+                      variant="outline" 
+                      className="h-20"
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          fromIncident: incident.id.toString(),
+                          title: incident.title,
+                          description: incident.description,
+                          parkId: incident.parkId?.toString() || '',
+                          assetId: incident.assetId?.toString() || ''
+                        });
+                        setLocation(`/admin/work-orders/new?${params.toString()}`);
+                      }}
+                      data-testid="button-create-work-order"
+                    >
+                      <div className="text-center">
+                        <Wrench className="w-6 h-6 mx-auto mb-2" />
+                        <div>Crear Orden de Trabajo</div>
+                      </div>
+                    </Button>
                   </div>
                 </div>
               </TabsContent>

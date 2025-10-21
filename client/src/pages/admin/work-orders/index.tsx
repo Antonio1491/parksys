@@ -15,7 +15,9 @@ import {
   XCircle,
   Pause,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Link2,
+  Package
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -346,7 +348,21 @@ export default function WorkOrdersPage() {
                             </TableCell>
                             <TableCell>
                               <div>
-                                <div className="font-medium">{workOrder.title}</div>
+                                <div className="font-medium flex items-center gap-2">
+                                  {workOrder.title}
+                                  {workOrder.incidentId && (
+                                    <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+                                      <AlertCircle className="w-3 h-3 mr-1" />
+                                      Incidente
+                                    </Badge>
+                                  )}
+                                  {workOrder.assetId && (
+                                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                      <Package className="w-3 h-3 mr-1" />
+                                      Activo
+                                    </Badge>
+                                  )}
+                                </div>
                                 {workOrder.parkName && (
                                   <div className="text-sm text-gray-500">
                                     {workOrder.parkName}
