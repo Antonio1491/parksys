@@ -5023,7 +5023,7 @@ export const workOrders = pgTable("work_orders", {
 export const workOrderMaterials = pgTable("work_order_materials", {
   id: serial("id").primaryKey(),
   workOrderId: integer("work_order_id").notNull().references(() => workOrders.id, { onDelete: "cascade" }),
-  inventoryItemId: integer("inventory_item_id").references(() => inventoryItems.id),
+  inventoryItemId: integer("inventory_item_id").references(() => inventoryStock.id),
   nombreMaterial: varchar("nombre_material", { length: 255 }).notNull(),
   cantidad: decimal("cantidad", { precision: 10, scale: 2 }).notNull(),
   unidad: varchar("unidad", { length: 50 }).notNull(),
