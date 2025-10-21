@@ -2538,6 +2538,380 @@ async function initializeDatabaseAsync() {
   }, 30000); // 30 second delay to avoid blocking health checks
 }
 
+// ========== ENDPOINTS DE ÓRDENES DE TRABAJO ==========
+
+// GET - Listar órdenes de trabajo con filtros
+app.get('/api/work-orders', async (req: Request, res: Response) => {
+  try {
+    const { estado, prioridad, tipo, parkId, search, page = '1', limit = '50' } = req.query;
+    
+    let query = db.select().from(workOrders).$dynamic();
+    
+    const conditions = [];
+    if (estado) conditions.push(eq(workOrders.estado, estado as string));
+    if (prioridad) conditions.push(eq(workOrders.prioridad, prioridad as string));
+    if (tipo) conditions.push(eq(workOrders.tipo, tipo as string));
+    if (parkId) conditions.push(eq(workOrders.parkId, parseInt(parkId as string)));
+    if (search) conditions.push(or(
+      like(workOrders.folio, `%${search}%`),
+      like(workOrders.titulo, `%${search}%`)
+    )!);
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)!);
+    }
+    
+    const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+    const orders = await query.orderBy(desc(workOrders.createdAt)).limit(parseInt(limit as string)).offset(offset);
+    
+    res.json(orders);
+  } catch (error) {
+    console.error('Error al obtener órdenes de trabajo:', error);
+    res.status(500).json({ message: 'Error al obtener órdenes de trabajo' });
+  }
+});
+
+// GET - Obtener una orden por ID con detalles completos
+app.get('/api/work-orders/:id', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    
+    const [order] = await db.select().from(workOrders).where(eq(workOrders.id, id));
+    if (!order) {
+      return res.status(404).json({ message: 'Orden de trabajo no encontrada' });
+    }
+    
+    // Obtener datos relacionados
+    const materials = await db.select().from(workOrderMaterials).where(eq(workOrderMaterials.workOrderId, id));
+    const checklist = await db.select().from(workOrderChecklist).where(eq(workOrderChecklist.workOrderId, id)).orderBy(workOrderChecklist.ordenIndex);
+    const attachments = await db.select().from(workOrderAttachments).where(eq(workOrderAttachments.workOrderId, id));
+    const history = await db.select().from(workOrderHistory).where(eq(workOrderHistory.workOrderId, id)).orderBy(desc(workOrderHistory.createdAt));
+    
+    res.json({
+      ...order,
+      materials,
+      checklist,
+      attachments,
+      history
+    });
+  } catch (error) {
+    console.error('Error al obtener orden de trabajo:', error);
+    res.status(500).json({ message: 'Error al obtener orden de trabajo' });
+  }
+});
+
+// POST - Crear nueva orden de trabajo
+app.post('/api/work-orders', async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    
+    // Generar folio único
+    const year = new Date().getFullYear();
+    const lastOrder = await db.select().from(workOrders)
+      .where(like(workOrders.folio, `OT-${year}-%`))
+      .orderBy(desc(workOrders.id))
+      .limit(1);
+    
+    let nextNumber = 1;
+    if (lastOrder.length > 0) {
+      const lastFolio = lastOrder[0].folio;
+      const match = lastFolio.match(/OT-\d{4}-(\d+)/);
+      if (match) nextNumber = parseInt(match[1]) + 1;
+    }
+    
+    const folio = `OT-${year}-${String(nextNumber).padStart(4, '0')}`;
+    
+    const [newOrder] = await db.insert(workOrders).values({
+      ...data,
+      folio,
+      creadoPor: req.user?.id
+    }).returning();
+    
+    // Crear entrada en historial
+    await db.insert(workOrderHistory).values({
+      workOrderId: newOrder.id,
+      accion: 'creada',
+      comentario: 'Orden de trabajo creada',
+      realizadoPor: req.user?.id
+    });
+    
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error('Error al crear orden de trabajo:', error);
+    res.status(500).json({ message: 'Error al crear orden de trabajo' });
+  }
+});
+
+// PATCH - Actualizar orden de trabajo
+app.patch('/api/work-orders/:id', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const data = req.body;
+    
+    // Obtener orden actual para comparar cambios
+    const [currentOrder] = await db.select().from(workOrders).where(eq(workOrders.id, id));
+    if (!currentOrder) {
+      return res.status(404).json({ message: 'Orden de trabajo no encontrada' });
+    }
+    
+    const [updatedOrder] = await db.update(workOrders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(workOrders.id, id))
+      .returning();
+    
+    // Registrar cambios en historial
+    if (data.estado && data.estado !== currentOrder.estado) {
+      await db.insert(workOrderHistory).values({
+        workOrderId: id,
+        campoModificado: 'estado',
+        valorAnterior: currentOrder.estado,
+        valorNuevo: data.estado,
+        accion: data.estado,
+        comentario: data.comentario || `Estado cambiado a ${data.estado}`,
+        realizadoPor: req.user?.id
+      });
+    }
+    
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error al actualizar orden de trabajo:', error);
+    res.status(500).json({ message: 'Error al actualizar orden de trabajo' });
+  }
+});
+
+// DELETE - Cancelar orden de trabajo
+app.delete('/api/work-orders/:id', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { motivo } = req.body;
+    
+    await db.update(workOrders)
+      .set({
+        estado: 'cancelada',
+        motivoCancelacion: motivo,
+        canceladoPor: req.user?.id,
+        fechaCancelacion: new Date()
+      })
+      .where(eq(workOrders.id, id));
+    
+    await db.insert(workOrderHistory).values({
+      workOrderId: id,
+      accion: 'cancelada',
+      comentario: motivo || 'Orden de trabajo cancelada',
+      realizadoPor: req.user?.id
+    });
+    
+    res.json({ message: 'Orden cancelada exitosamente' });
+  } catch (error) {
+    console.error('Error al cancelar orden:', error);
+    res.status(500).json({ message: 'Error al cancelar orden' });
+  }
+});
+
+// POST - Completar orden de trabajo
+app.post('/api/work-orders/:id/complete', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { trabajoRealizado, observaciones, horasReales, calificacion } = req.body;
+    
+    const [updatedOrder] = await db.update(workOrders)
+      .set({
+        estado: 'completada',
+        trabajoRealizado,
+        observaciones,
+        horasReales,
+        fechaCompletada: new Date(),
+        validadoPor: req.user?.id,
+        fechaValidacion: new Date(),
+        calificacion
+      })
+      .where(eq(workOrders.id, id))
+      .returning();
+    
+    await db.insert(workOrderHistory).values({
+      workOrderId: id,
+      accion: 'completada',
+      comentario: `Orden completada. ${observaciones || ''}`,
+      realizadoPor: req.user?.id
+    });
+    
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error al completar orden:', error);
+    res.status(500).json({ message: 'Error al completar orden' });
+  }
+});
+
+// ========== ENDPOINTS DE MATERIALES ==========
+
+// GET - Materiales de una orden
+app.get('/api/work-orders/:id/materials', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const materials = await db.select().from(workOrderMaterials)
+      .where(eq(workOrderMaterials.workOrderId, id));
+    res.json(materials);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener materiales' });
+  }
+});
+
+// POST - Agregar material
+app.post('/api/work-orders/:id/materials', async (req: Request, res: Response) => {
+  try {
+    const workOrderId = parseInt(req.params.id);
+    const [material] = await db.insert(workOrderMaterials)
+      .values({ ...req.body, workOrderId })
+      .returning();
+    res.status(201).json(material);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al agregar material' });
+  }
+});
+
+// DELETE - Eliminar material
+app.delete('/api/work-orders/:orderId/materials/:materialId', async (req: Request, res: Response) => {
+  try {
+    const materialId = parseInt(req.params.materialId);
+    await db.delete(workOrderMaterials).where(eq(workOrderMaterials.id, materialId));
+    res.json({ message: 'Material eliminado' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar material' });
+  }
+});
+
+// ========== ENDPOINTS DE CHECKLIST ==========
+
+// GET - Checklist de una orden
+app.get('/api/work-orders/:id/checklist', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const items = await db.select().from(workOrderChecklist)
+      .where(eq(workOrderChecklist.workOrderId, id))
+      .orderBy(workOrderChecklist.ordenIndex);
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener checklist' });
+  }
+});
+
+// POST - Agregar item al checklist
+app.post('/api/work-orders/:id/checklist', async (req: Request, res: Response) => {
+  try {
+    const workOrderId = parseInt(req.params.id);
+    const [item] = await db.insert(workOrderChecklist)
+      .values({ ...req.body, workOrderId })
+      .returning();
+    res.status(201).json(item);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al agregar item' });
+  }
+});
+
+// PATCH - Marcar item como completado
+app.patch('/api/work-orders/:orderId/checklist/:itemId', async (req: Request, res: Response) => {
+  try {
+    const itemId = parseInt(req.params.itemId);
+    const { completado, notas } = req.body;
+    
+    const [item] = await db.update(workOrderChecklist)
+      .set({
+        completado,
+        notas,
+        completadoPor: completado ? req.user?.id : null,
+        fechaCompletado: completado ? new Date() : null
+      })
+      .where(eq(workOrderChecklist.id, itemId))
+      .returning();
+    
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar item' });
+  }
+});
+
+// DELETE - Eliminar item del checklist
+app.delete('/api/work-orders/:orderId/checklist/:itemId', async (req: Request, res: Response) => {
+  try {
+    const itemId = parseInt(req.params.itemId);
+    await db.delete(workOrderChecklist).where(eq(workOrderChecklist.id, itemId));
+    res.json({ message: 'Item eliminado' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar item' });
+  }
+});
+
+// ========== ENDPOINTS DE ADJUNTOS ==========
+
+// GET - Adjuntos de una orden
+app.get('/api/work-orders/:id/attachments', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    const attachments = await db.select().from(workOrderAttachments)
+      .where(eq(workOrderAttachments.workOrderId, id));
+    res.json(attachments);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener adjuntos' });
+  }
+});
+
+// POST - Agregar adjunto
+app.post('/api/work-orders/:id/attachments', async (req: Request, res: Response) => {
+  try {
+    const workOrderId = parseInt(req.params.id);
+    const [attachment] = await db.insert(workOrderAttachments)
+      .values({ ...req.body, workOrderId, subidoPor: req.user?.id })
+      .returning();
+    res.status(201).json(attachment);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al agregar adjunto' });
+  }
+});
+
+// DELETE - Eliminar adjunto
+app.delete('/api/work-orders/:orderId/attachments/:attachmentId', async (req: Request, res: Response) => {
+  try {
+    const attachmentId = parseInt(req.params.attachmentId);
+    await db.delete(workOrderAttachments).where(eq(workOrderAttachments.id, attachmentId));
+    res.json({ message: 'Adjunto eliminado' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar adjunto' });
+  }
+});
+
+// ========== ENDPOINTS DE ESTADÍSTICAS ==========
+
+// GET - Estadísticas generales
+app.get('/api/work-orders/stats/general', async (req: Request, res: Response) => {
+  try {
+    const { parkId } = req.query;
+    
+    let baseQuery = db.select({ estado: workOrders.estado, count: sql<number>`count(*)::int` })
+      .from(workOrders)
+      .$dynamic();
+    
+    if (parkId) {
+      baseQuery = baseQuery.where(eq(workOrders.parkId, parseInt(parkId as string)));
+    }
+    
+    const statusCounts = await baseQuery.groupBy(workOrders.estado);
+    
+    const stats = {
+      total: statusCounts.reduce((sum, item) => sum + item.count, 0),
+      pendientes: statusCounts.find(s => s.estado === 'pendiente')?.count || 0,
+      asignadas: statusCounts.find(s => s.estado === 'asignada')?.count || 0,
+      en_proceso: statusCounts.find(s => s.estado === 'en_proceso')?.count || 0,
+      completadas: statusCounts.find(s => s.estado === 'completada')?.count || 0,
+      canceladas: statusCounts.find(s => s.estado === 'cancelada')?.count || 0
+    };
+    
+    res.json(stats);
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas' });
+  }
+});
+
 // Main server startup function - DO NOT WRAP IN ASYNC IIFE TO PREVENT PROCESS EXIT
 function startServer() {
   console.log("🚀 [DEPLOYMENT] Iniciando servidor ParkSys con health checks prioritarios...");
