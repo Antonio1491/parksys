@@ -155,8 +155,8 @@ export default function WorkOrdersPage() {
     }],
   });
 
-  const workOrders = data?.workOrders || [];
-  const totalCount = data?.totalCount || 0;
+  const workOrders = (data as any)?.workOrders || [];
+  const totalCount = (data as any)?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   // Estadísticas rápidas
