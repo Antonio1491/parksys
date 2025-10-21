@@ -117,11 +117,11 @@ export default function NewWorkOrderPage() {
         description: data.description,
         type: data.type,
         priority: data.priority,
-        parkId: data.parkId ? parseInt(data.parkId) : null,
-        assetId: data.assetId ? parseInt(data.assetId) : null,
-        incidentId: data.incidentId ? parseInt(data.incidentId) : null,
+        parkId: data.parkId && data.parkId !== 'none' ? parseInt(data.parkId) : null,
+        assetId: data.assetId && data.assetId !== 'none' ? parseInt(data.assetId) : null,
+        incidentId: data.incidentId && data.incidentId !== 'none' ? parseInt(data.incidentId) : null,
         requestedById: parseInt(data.requestedById),
-        assignedToEmployeeId: data.assignedToEmployeeId ? parseInt(data.assignedToEmployeeId) : null,
+        assignedToEmployeeId: data.assignedToEmployeeId && data.assignedToEmployeeId !== 'none' ? parseInt(data.assignedToEmployeeId) : null,
         scheduledStartDate: data.scheduledStartDate || null,
         scheduledEndDate: data.scheduledEndDate || null,
         estimatedCost: data.estimatedCost ? parseFloat(data.estimatedCost) : null,
@@ -306,7 +306,7 @@ export default function NewWorkOrderPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Ninguno</SelectItem>
+                          <SelectItem value="none">Ninguno</SelectItem>
                           {safeParks.map((park: any) => (
                             <SelectItem key={park.id} value={park.id.toString()}>
                               {park.name}
@@ -332,7 +332,7 @@ export default function NewWorkOrderPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Ninguno</SelectItem>
+                          <SelectItem value="none">Ninguno</SelectItem>
                           {safeAssets.map((asset: any) => (
                             <SelectItem key={asset.id} value={asset.id.toString()}>
                               {asset.name} - {asset.assetTag}
@@ -358,7 +358,7 @@ export default function NewWorkOrderPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Ninguno</SelectItem>
+                          <SelectItem value="none">Ninguno</SelectItem>
                           {safeIncidents.map((incident: any) => (
                             <SelectItem key={incident.id} value={incident.id.toString()}>
                               {incident.title}
@@ -420,7 +420,7 @@ export default function NewWorkOrderPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Sin asignar</SelectItem>
+                          <SelectItem value="none">Sin asignar</SelectItem>
                           {safeEmployees.map((employee: any) => (
                             <SelectItem key={employee.id} value={employee.id.toString()}>
                               {employee.fullName}
