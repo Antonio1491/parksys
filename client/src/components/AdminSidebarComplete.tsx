@@ -424,7 +424,7 @@ const AdminSidebarComplete: React.FC = () => {
     if (location.startsWith('/admin/events') || location.startsWith('/admin/eventos-ambu')) return 'eventos';
     if (location.startsWith('/admin/space-reservations') || location.startsWith('/admin/dashboard-reservas')) return 'reservas';
     if (location.startsWith('/admin/amenities')) return 'amenidades';
-    if (location.startsWith('/admin/evaluaciones')) return 'evaluaciones';
+    if (location.startsWith('/admin/evaluations')) return 'evaluaciones';
     if (location.startsWith('/admin/roles') || location.startsWith('/admin/permissions') || location.startsWith('/admin/role-')) return 'roles-sistema';
     if (location.startsWith('/admin/assets')) return 'activos';
     if (location.startsWith('/admin/incidents')) return 'incidencias';
@@ -454,6 +454,7 @@ const AdminSidebarComplete: React.FC = () => {
       'visitantes': ['/admin/visitors'],
       'eventos': ['/admin/events', '/admin/eventos-ambu'],
       'reservas': ['/admin/space-reservations', '/admin/dashboard-reservas'],
+      'evaluaciones': ['/admin/evaluations'],
       'activos': ['/admin/assets'],
       'incidencias': ['/admin/incidents'],
       'almacen': ['/admin/warehouse'],
@@ -802,51 +803,51 @@ const AdminSidebarComplete: React.FC = () => {
               isActive={isSubmenuActive('evaluaciones')}
             >
               <NavItem 
-                href="/admin/evaluaciones/parques" 
+                href="/admin/evaluations/parks" 
                 icon={<MapPin className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluaciones/parques')}
+                active={location.startsWith('/admin/evaluations/parks')}
               >
                 Parques
               </NavItem>
               <NavItem 
-                href="/admin/evaluaciones/instructores" 
+                href="/admin/evaluations/instructors" 
                 icon={<UserCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluaciones/instructores')}
+                active={location.startsWith('/admin/evaluations/instructors')}
               >
                 Instructores
               </NavItem>
               <NavItem 
-                href="/admin/evaluaciones/voluntarios" 
+                href="/admin/evaluations/volunteers" 
                 icon={<Users className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluaciones/voluntarios')}
+                active={location.startsWith('/admin/evaluations/volunteers')}
               >
                 Voluntarios
               </NavItem>
               <NavItem 
-                href="/admin/evaluaciones/actividades" 
+                href="/admin/evaluations/activities" 
                 icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluaciones/actividades')}
+                active={location.startsWith('/admin/evaluations/activities')}
               >
                 Actividades
               </NavItem>
               <NavItem 
-                href="/admin/evaluaciones/concesionarios" 
+                href="/admin/evaluations/concessionaires" 
                 icon={<Building className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluaciones/concesionarios')}
+                active={location.startsWith('/admin/evaluations/concessionaires')}
               >
                 Concesionarios
               </NavItem>
               <NavItem 
-                href="/admin/evaluaciones/eventos" 
+                href="/admin/evaluations/events" 
                 icon={<Target className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluaciones/eventos')}
+                active={location.startsWith('/admin/evaluations/events')}
               >
                 Eventos
               </NavItem>
               <NavItem 
-                href="/admin/evaluaciones/criterios" 
+                href="/admin/evaluations/criteria" 
                 icon={<Settings className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluaciones/criterios')}
+                active={location.startsWith('/admin/evaluations/criteria')}
               >
                 Criterios
               </NavItem>
