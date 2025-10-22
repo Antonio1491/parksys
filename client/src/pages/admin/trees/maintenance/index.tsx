@@ -818,8 +818,7 @@ export default function TreeMaintenancePage() {
             <Button 
               key="new"
               variant="primary"
-              onClick={() => setOpen(true)}
-            >
+              onClick={() => setOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
             </Button>
           ]}
