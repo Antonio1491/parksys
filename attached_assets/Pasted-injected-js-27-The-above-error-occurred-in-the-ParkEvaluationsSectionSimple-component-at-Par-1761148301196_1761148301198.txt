@@ -1,0 +1,32 @@
+injected.js:27 The above error occurred in the <ParkEvaluationsSectionSimple> component:
+
+    at ParkEvaluationsSectionSimple (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ParkEvaluationsSectionSimple.tsx:49:56)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at main
+    at div
+    at PublicLayout (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/PublicLayout.tsx:19:40)
+    at ParkLandingPage (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/pages/ParkLandingPage.tsx:61:18)
+    at Suspense
+    at Route (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=3eba499a:338:16)
+    at Switch (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=3eba499a:394:17)
+    at div
+    at div
+    at Router (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/App.tsx?v=O83bsUK3o8zg-WaCwX36n:59:35)
+    at Provider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=3eba499a:38:15)
+    at TooltipProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=3eba499a:64:5)
+    at ProfileCompletionProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.dev/src/components/ProfileCompletionContext.tsx:169:45)
+    at QueryClientProvider (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=3eba499a:2881:3)
+    at App
+    at V (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…e/runner/workspace/node_modules/.vite/deps/next-themes.js?v=3eba499a:44:25)
+    at J (https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-uaauleor3l7s.spock.replit.d…e/runner/workspace/node_modules/.vite/deps/next-themes.js?v=3eba499a:42:18)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-RPCDYKBN.js?v=3eba499a:9129 Uncaught TypeError: stats.average_rating?.toFixed is not a function
+    at ParkEvaluationsSectionSimple (ParkEvaluationsSectionSimple.tsx:71:42)
+﻿
+

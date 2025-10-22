@@ -52,6 +52,8 @@ export default function ParkEvaluationsSectionSimple({ parkId }: ParkEvaluations
   });
 
   const hasEvaluations = stats && stats.average_rating && Number(stats.total_evaluations) > 0;
+  const avgRating = Number(stats?.average_rating) || 0;
+  const recommendationRate = Number(stats?.recommendation_rate) || 0;
 
   return (
     <Card>
@@ -68,10 +70,10 @@ export default function ParkEvaluationsSectionSimple({ parkId }: ParkEvaluations
               {/* Calificación promedio */}
               <div className="text-center">
                 <div className="text-3xl font-bold text-gray-900 mb-2">
-                  {stats.average_rating?.toFixed(1) || '0.0'}
+                  {avgRating.toFixed(1)}
                 </div>
                 <div className="flex justify-center mb-2">
-                  <StarRating rating={Math.round(stats.average_rating || 0)} />
+                  <StarRating rating={Math.round(avgRating)} />
                 </div>
                 <div className="text-sm text-gray-600">
                   Basado en {Number(stats.total_evaluations) || 0} evaluaciones
@@ -81,7 +83,7 @@ export default function ParkEvaluationsSectionSimple({ parkId }: ParkEvaluations
               {/* Tasa de recomendación */}
               <div className="text-center">
                 <div className="text-lg font-semibold text-green-600 mb-1">
-                  {stats.recommendation_rate}% Recomendado
+                  {recommendationRate.toFixed(0)}% Recomendado
                 </div>
                 <div className="text-sm text-gray-600">
                   De los visitantes que lo evaluaron
