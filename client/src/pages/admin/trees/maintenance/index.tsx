@@ -3,6 +3,7 @@ import AdminLayout from '@/components/AdminLayout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { PageHeader } from "@/components/ui/page-header";
 import {
   Card,
   CardContent,
@@ -808,26 +809,29 @@ export default function TreeMaintenancePage() {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto py-6">
+      <div className="space-y-6">
+        <PageHeader
+          title="Mantenimiento de Árboles"
+          subtitle="Gestiona y registra las actividades de mantenimiento realizadas en árboles"
+          icon={<Leaf className="h-6 w-6 text-white" />}
+          actions={[
+            <div className="flex gap-2">
+              <Button 
+                key="new"
+                variant="primary"
+                onClick={() => setOpen(true)}
+                <PlusCircle className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
+              </Button>
+            </div>
+          ]}
+          backgroundColor="bg-header-background"
+        />
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Wrench className="w-8 h-8 text-gray-900" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Mantenimiento</h1>
-                <p className="text-gray-600 mt-2">
-                  Gestiona y registra las actividades de mantenimiento realizadas en árboles
-                </p>
-              </div>
+              
             </div>
-            <Button 
-              onClick={() => setOpen(true)} 
-              className="bg-green-600 hover:bg-green-700"
-              data-testid="button-register-maintenance"
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Registrar Mantenimiento
-            </Button>
           </div>
         </Card>
 
