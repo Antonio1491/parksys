@@ -1,0 +1,83 @@
+📝 Datos procesados a enviar: {
+  "parkId": 94,
+  "evaluatorName": "Luis",
+  "isFrequentVisitor": false,
+  "wouldRecommend": true,
+  "cleanliness": 5,
+  "safety": 5,
+  "maintenance": 5,
+  "accessibility": 4,
+  "amenities": 5,
+  "activities": 4,
+  "staff": 4,
+  "naturalBeauty": 3,
+  "overallRating": 5
+}
+ParkEvaluationForm.tsx:258 ✅ Enviando evaluación con datos válidos...
+ParkEvaluationForm.tsx:133 🚀 MUTATION: Iniciando envío de evaluación
+ParkEvaluationForm.tsx:134 🚀 MUTATION: Datos recibidos: {
+  "parkId": 94,
+  "evaluatorName": "Luis",
+  "isFrequentVisitor": false,
+  "wouldRecommend": true,
+  "cleanliness": 5,
+  "safety": 5,
+  "maintenance": 5,
+  "accessibility": 4,
+  "amenities": 5,
+  "activities": 4,
+  "staff": 4,
+  "naturalBeauty": 3,
+  "overallRating": 5
+}
+queryClient.ts:182 🌐 [API REQUEST] POST /api/park-evaluations
+queryClient.ts:185 🎪 [DEBUG] Checking request: POST /api/park-evaluations
+queryClient.ts:195 📋 POST a /api/park-evaluations detectado
+queryClient.ts:196 📋 Data enviada: {
+  "parkId": 94,
+  "evaluatorName": "Luis",
+  "isFrequentVisitor": false,
+  "wouldRecommend": true,
+  "cleanliness": 5,
+  "safety": 5,
+  "maintenance": 5,
+  "accessibility": 4,
+  "amenities": 5,
+  "activities": 4,
+  "staff": 4,
+  "naturalBeauty": 3,
+  "overallRating": 5
+}
+queryClient.ts:197 📋 Headers: {
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjlkMjEzMGZlZjAyNTg3ZmQ4ODYxODg2OTgyMjczNGVmNzZhMTExNjUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1Nzk2NTkyNCwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzYxMTQ0MDk3LCJleHAiOjE3NjExNDc2OTcsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Sod9UEqkaUpCRb67QZuzNtw10tTHHs3MXdNtbqS9pjrnkwCyXgsLNzF656zOH9UCVGclurfeYNDoplUnuk8N-qlfsYYzek0LwBospLz-WoCMLnehWmAOvdzue7jI1ygpReSXAzqLn5fx0J3aifGHwJWbrtUwKguA9KIPOUMJr4x46BxfUEfnaWTWgCRbl_3eQSSKMLf-XSLciZZ0MJYN5yTvllM8jFNApIDBAdT7IjgrHhmpFrdq1_4B1FH91qjzK-y6CXXFcR6KNcU9vYl7Qf3FgCrxp9s7iXIclX0AFZ4TAyaF0VsRIZU8jAoVgl7rxPxBFoI_wFwYwWvlSQHS4A",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1",
+  "Content-Type": "application/json"
+}
+queryClient.ts:198 📋 Body preparado: {"parkId":94,"evaluatorName":"Luis","isFrequentVisitor":false,"wouldRecommend":true,"cleanliness":5,"safety":5,"maintenance":5,"accessibility":4,"amenities":5,"activities":4,"staff":4,"naturalBeauty":3,"overallRating":5}
+queryClient.ts:210 📋 Respuesta del servidor: 200 true
+ParkEvaluationForm.tsx:162 ❌ MUTATION ERROR: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+onError @ ParkEvaluationForm.tsx:162
+execute @ @tanstack_react-query.js?v=3eba499a:1268
+await in execute
+mutate @ @tanstack_react-query.js?v=3eba499a:2655
+(anonymous) @ @tanstack_react-query.js?v=3eba499a:3371
+onSubmit @ ParkEvaluationForm.tsx:259
+(anonymous) @ chunk-4BFJKWC4.js?v=3eba499a:1465
+await in (anonymous)
+callCallback2 @ chunk-RPCDYKBN.js?v=3eba499a:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=3eba499a:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=3eba499a:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=3eba499a:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=3eba499a:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=3eba499a:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=3eba499a:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=3eba499a:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=3eba499a:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=3eba499a:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=3eba499a:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=3eba499a:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=3eba499a:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=3eba499a:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=3eba499a:5449Understand this error

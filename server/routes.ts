@@ -84,7 +84,7 @@ import {
   insertActivitySchema, insertDocumentSchema, insertParkImageSchema,
   insertParkAmenitySchema, insertVolunteerSchema, ExtendedPark, Park, Municipality, Amenity, Activity, volunteers
 } from "@shared/schema";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { getParkByIdDirectly } from "./direct-park-queries";
 import { registerRoleRoutes } from "./roleRoutes";
@@ -7308,6 +7308,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   // ===== FIN ENDPOINTS DE MÉTRICAS DE PARQUES =====
+
+  // ===== ENDPOINTS DE EVALUACIONES DE PARQUES =====
+  
+  // POST /api/park-evaluations - Crear nueva evaluación de parque
+  apiRouter.post('/park-evaluations', async (req: Request, res: Response) => {
+    try {
+      console.log('📝 [PARK-EVALUATIONS] Recibiendo nueva evaluación:', req.body);
+      
+      // Validar datos con el schema
+      const validatedData = schema.insertParkEvaluationSchema.parse(req.body);
+      
+      // Insertar en la base de datos
+      const [newEvaluation] = await db.insert(schema.parkEvaluations)
+        .values({
+          ...validatedData,
+          status: 'pending', // Por defecto las evaluaciones requieren moderación
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      
+      console.log('✅ [PARK-EVALUATIONS] Evaluación creada exitosamente:', newEvaluation.id);
+      
+      res.status(201).json({
+        success: true,
+        data: newEvaluation,
+        message: 'Evaluación enviada exitosamente. Será revisada antes de publicarse.'
+      });
+    } catch (error) {
+      console.error('❌ [PARK-EVALUATIONS] Error creando evaluación:', error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          message: 'Datos de evaluación inválidos',
+          errors: error.errors
+        });
+      }
+      
+      res.status(500).json({
+        success: false,
+        message: 'Error al enviar la evaluación. Por favor intenta nuevamente.'
+      });
+    }
+  });
+
+  // GET /api/park-evaluations/:parkId - Obtener evaluaciones de un parque
+  apiRouter.get('/park-evaluations/:parkId', async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.parkId);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ success: false, message: 'ID de parque inválido' });
+      }
+      
+      // Obtener solo evaluaciones aprobadas para usuarios públicos
+      const evaluations = await db.select()
+        .from(schema.parkEvaluations)
+        .where(eq(schema.parkEvaluations.parkId, parkId));
+      
+      res.json({
+        success: true,
+        data: evaluations
+      });
+    } catch (error) {
+      console.error('❌ [PARK-EVALUATIONS] Error obteniendo evaluaciones:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener evaluaciones'
+      });
+    }
+  });
+  
+  // ===== FIN ENDPOINTS DE EVALUACIONES DE PARQUES =====
   
   // Ruta pública para obtener instructores activos
   publicRouter.get("/instructors", async (_req: Request, res: Response) => {

@@ -814,7 +814,7 @@ export default function TreeMaintenancePage() {
             <div className="flex items-center gap-2">
               <Wrench className="w-8 h-8 text-gray-900" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Mantenimiento de Árboles</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Mantenimiento</h1>
                 <p className="text-gray-600 mt-2">
                   Gestiona y registra las actividades de mantenimiento realizadas en árboles
                 </p>

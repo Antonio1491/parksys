@@ -5,6 +5,7 @@ import { useLocation } from 'wouter';
 import ROUTES from '@/routes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from "@/components/ui/page-header";
 import {
   Table,
   TableBody,
@@ -39,7 +40,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/components/AdminLayout';
-import { Leaf, Search, Plus, TreePine, Filter, CircleCheck, CircleAlert, Eye, Download, Upload, FileSpreadsheet, Trash2 } from 'lucide-react';
+import { Leaf, Search, Plus, TreePine, Filter, CircleCheck, CircleAlert, Eye, Download, Upload, FileSpreadsheet, Trash } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -664,127 +665,122 @@ function TreeSpeciesCatalog() {
 
   return (
     <AdminLayout>
-      <Helmet>
-        <title>Catálogo de Especies Arbóreas | Bosques Urbanos</title>
-        <meta name="description" content="Gestión y consulta del catálogo de especies arbóreas para parques y espacios públicos" />
-      </Helmet>
-      
-      <div className="container mx-auto px-4 py-6">
-        <Card className="p-4 bg-gray-50 mb-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Leaf className="w-8 h-8 text-gray-900" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Catálogo de Especies Arbóreas</h1>
-                <p className="text-gray-600 mt-2">
-                  Gestiona el catálogo de especies arbóreas para los parques y espacios públicos
-                </p>
+      <div className="space-y-6">
+        <PageHeader
+          title="Catálogo de Especies Arbóreas"
+          subtitle="Gestiona el catálogo de especies arbóreas para los parques y espacios públicos"
+          icon={<Leaf className="h-6 w-6 text-white" />}
+          actions={[
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2">
+                
+              <Button 
+                key="new"
+                variant="primary"
+                onClick={handleCreateNew}>
+                <Plus className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
+              </Button>
+                
+              <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    key="import"
+                    variant="secondary"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="mr-2 h-4 w-4" /> Importar
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Importar Especies desde CSV</DialogTitle>
+                    <DialogDescription>
+                      {csvPreview.length > 0 
+                        ? "Vista previa de los primeros 5 registros. Confirma para importar todos los datos."
+                        : "Selecciona un archivo CSV para importar especies o descarga la plantilla para ver el formato requerido."
+                      }
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  {csvPreview.length === 0 && (
+                    <div className="flex flex-col space-y-4 p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 mb-4">
+                          ¿Primera vez importando especies? Descarga la plantilla con ejemplos para ver el formato correcto.
+                        </p>
+                        <Button
+                          onClick={handleDownloadTemplate}
+                          variant="outline"
+                          className="border-green-600 text-green-600 hover:bg-green-50"
+                        >
+                          <Download className="mr-2 h-4 w-4" /> Descargar Plantilla CSV
+                        </Button>
+                      </div>
+                      <div className="text-center text-sm text-gray-500">
+                        La plantilla incluye todas las columnas disponibles y dos ejemplos (Ahuehuete y Jacaranda)
+                      </div>
+                    </div>
+                  )}
+
+                  {csvPreview.length > 0 && (
+                    <div className="space-y-4">
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Nombre Común</TableHead>
+                              <TableHead>Nombre Científico</TableHead>
+                              <TableHead>Familia</TableHead>
+                              <TableHead>Origen</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {csvPreview.map((row, index) => (
+                              <TableRow key={index}>
+                                <TableCell>{row.commonName || 'N/A'}</TableCell>
+                                <TableCell className="italic">{row.scientificName || 'N/A'}</TableCell>
+                                <TableCell>{row.family || 'N/A'}</TableCell>
+                                <TableCell>{row.origin || 'N/A'}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setIsImportDialogOpen(false);
+                            setCsvPreview([]);
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={handleConfirmImport}
+                          disabled={importMutation.isPending}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          {importMutation.isPending ? 'Importando...' : 'Confirmar Importación'}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+
+                <Button
+                  key="export"
+                  variant="tertiary"
+                  onClick={handleExportCsv}>
+                  <Download className="mr-2 h-4 w-4" /> Exportar
+                </Button>
               </div>
             </div>
-            <div className="flex gap-2">
-            <Button
-              onClick={handleExportCsv}
-              variant="outline"
-              className="border-green-600 text-green-600 hover:bg-green-50"
-            >
-              <Download className="mr-2 h-4 w-4" /> Exportar CSV
-            </Button>
-            
-            <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="mr-2 h-4 w-4" /> Importar CSV
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Importar Especies desde CSV</DialogTitle>
-                  <DialogDescription>
-                    {csvPreview.length > 0 
-                      ? "Vista previa de los primeros 5 registros. Confirma para importar todos los datos."
-                      : "Selecciona un archivo CSV para importar especies o descarga la plantilla para ver el formato requerido."
-                    }
-                  </DialogDescription>
-                </DialogHeader>
-                
-                {csvPreview.length === 0 && (
-                  <div className="flex flex-col space-y-4 p-4 border-2 border-dashed border-gray-300 rounded-lg">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-4">
-                        ¿Primera vez importando especies? Descarga la plantilla con ejemplos para ver el formato correcto.
-                      </p>
-                      <Button
-                        onClick={handleDownloadTemplate}
-                        variant="outline"
-                        className="border-green-600 text-green-600 hover:bg-green-50"
-                      >
-                        <Download className="mr-2 h-4 w-4" /> Descargar Plantilla CSV
-                      </Button>
-                    </div>
-                    <div className="text-center text-sm text-gray-500">
-                      La plantilla incluye todas las columnas disponibles y dos ejemplos (Ahuehuete y Jacaranda)
-                    </div>
-                  </div>
-                )}
-                
-                {csvPreview.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Nombre Común</TableHead>
-                            <TableHead>Nombre Científico</TableHead>
-                            <TableHead>Familia</TableHead>
-                            <TableHead>Origen</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {csvPreview.map((row, index) => (
-                            <TableRow key={index}>
-                              <TableCell>{row.commonName || 'N/A'}</TableCell>
-                              <TableCell className="italic">{row.scientificName || 'N/A'}</TableCell>
-                              <TableCell>{row.family || 'N/A'}</TableCell>
-                              <TableCell>{row.origin || 'N/A'}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                    
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setIsImportDialogOpen(false);
-                          setCsvPreview([]);
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        onClick={handleConfirmImport}
-                        disabled={importMutation.isPending}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        {importMutation.isPending ? 'Importando...' : 'Confirmar Importación'}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </DialogContent>
-            </Dialog>
-            
-            <Button onClick={handleCreateNew} className="bg-green-600 hover:bg-green-700">
-              <Plus className="mr-2 h-4 w-4" /> Nueva Especie
-            </Button>
-            </div>
-          </div>
-        </Card>
+          ]}
+          backgroundColor="bg-header-background"
+        />
 
         <input
           ref={fileInputRef}
@@ -1027,28 +1023,17 @@ function TreeSpeciesCatalog() {
                           <TableCell className="text-right">
                             <div className="flex gap-2 justify-end">
                               <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleViewDetails(species.id);
-                                }}
-                                className="text-green-600 hover:text-green-800 hover:bg-green-50"
-                              >
-                                <Eye className="h-4 w-4 mr-1" /> Ver
-                              </Button>
-                              <Button 
-                                variant="ghost" 
+                                variant="outline" 
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDelete(species);
                                 }}
-                                className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                                title="Eliminar especie"
+                                className="border bg-transparent text-red-800 hover:text-white"
                                 disabled={deleteMutation.isPending}
                               >
-                                <Trash2 className="h-4 w-4 mr-1" /> 
-                                {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+                                <Trash className="h-4 w-4" /> 
                               </Button>
                             </div>
                           </TableCell>
