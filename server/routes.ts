@@ -7506,6 +7506,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // GET /api/evaluations/parks - Obtener todas las evaluaciones de parques (admin)
+  apiRouter.get('/evaluations/parks', async (req: Request, res: Response) => {
+    try {
+      // Obtener todas las evaluaciones con información del parque
+      const evaluations = await db.execute(sql`
+        SELECT 
+          pe.*,
+          p.name as "parkName"
+        FROM park_evaluations pe
+        LEFT JOIN parks p ON pe.park_id = p.id
+        ORDER BY pe.created_at DESC
+      `);
+      
+      res.json(evaluations.rows || []);
+    } catch (error) {
+      console.error('❌ [EVALUATIONS] Error obteniendo evaluaciones:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener evaluaciones'
+      });
+    }
+  });
+
+  // PUT /api/evaluations/parks/:id - Actualizar estado de evaluación (moderar)
+  apiRouter.put('/evaluations/parks/:id', async (req: Request, res: Response) => {
+    try {
+      const evaluationId = Number(req.params.id);
+      const { status, moderationNotes } = req.body;
+      
+      if (isNaN(evaluationId)) {
+        return res.status(400).json({ success: false, message: 'ID inválido' });
+      }
+      
+      // Obtener ID del usuario moderador
+      const moderatorId = (req.user as any)?.id || null;
+      
+      // Actualizar la evaluación
+      const [updated] = await db.update(schema.parkEvaluations)
+        .set({
+          status,
+          moderatedBy: moderatorId,
+          moderatedAt: new Date(),
+          moderationNotes,
+          updatedAt: new Date()
+        })
+        .where(eq(schema.parkEvaluations.id, evaluationId))
+        .returning();
+      
+      res.json({
+        success: true,
+        data: updated
+      });
+    } catch (error) {
+      console.error('❌ [EVALUATIONS] Error actualizando evaluación:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al actualizar evaluación'
+      });
+    }
+  });
+
+  // DELETE /api/evaluations/parks/:id - Eliminar evaluación
+  apiRouter.delete('/evaluations/parks/:id', async (req: Request, res: Response) => {
+    try {
+      const evaluationId = Number(req.params.id);
+      
+      if (isNaN(evaluationId)) {
+        return res.status(400).json({ success: false, message: 'ID inválido' });
+      }
+      
+      await db.delete(schema.parkEvaluations)
+        .where(eq(schema.parkEvaluations.id, evaluationId));
+      
+      res.json({
+        success: true,
+        message: 'Evaluación eliminada correctamente'
+      });
+    } catch (error) {
+      console.error('❌ [EVALUATIONS] Error eliminando evaluación:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al eliminar evaluación'
+      });
+    }
+  });
   
   // ===== FIN ENDPOINTS DE EVALUACIONES DE PARQUES =====
   
