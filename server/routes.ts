@@ -10,7 +10,7 @@ import { isAuthenticated, hasMunicipalityAccess, hasParkAccess, requirePermissio
 import { handleProfileImageUpload } from "./api/profileImageUpload";
 import { saveProfileImage, getProfileImage } from "./profileImageCache";
 import { db, pool } from "./db";
-import { sql, eq } from "drizzle-orm";
+import { sql, eq, and, desc } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { deleteAllVolunteers, deleteVolunteer } from "./delete-all-volunteers";
 import * as schema from "@shared/schema";
@@ -7377,6 +7377,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: 'Error al obtener evaluaciones'
+      });
+    }
+  });
+
+  // GET /api/parks/:id/evaluations - Obtener evaluaciones aprobadas de un parque (paginadas)
+  apiRouter.get('/parks/:id/evaluations', async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ success: false, message: 'ID de parque inválido' });
+      }
+      
+      // Obtener solo evaluaciones aprobadas para la vista pública
+      const evaluations = await db.select()
+        .from(schema.parkEvaluations)
+        .where(
+          and(
+            eq(schema.parkEvaluations.parkId, parkId),
+            eq(schema.parkEvaluations.status, 'approved')
+          )
+        )
+        .orderBy(desc(schema.parkEvaluations.createdAt))
+        .limit(limit)
+        .offset(offset);
+      
+      // Contar total de evaluaciones aprobadas
+      const totalResult = await db.select({ count: sql<number>`count(*)` })
+        .from(schema.parkEvaluations)
+        .where(
+          and(
+            eq(schema.parkEvaluations.parkId, parkId),
+            eq(schema.parkEvaluations.status, 'approved')
+          )
+        );
+      
+      const total = Number(totalResult[0]?.count || 0);
+      
+      res.json({
+        success: true,
+        evaluations: evaluations.map(e => ({
+          ...e,
+          evaluator_name: e.evaluatorName,
+          evaluator_city: e.evaluatorCity,
+          overall_rating: e.overallRating,
+          would_recommend: e.wouldRecommend,
+          visit_date: e.visitDate,
+          visit_purpose: e.visitPurpose,
+          created_at: e.createdAt
+        })),
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error) {
+      console.error('❌ [PARK-EVALUATIONS] Error obteniendo evaluaciones:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener evaluaciones'
+      });
+    }
+  });
+
+  // GET /api/parks/:id/evaluation-stats - Obtener estadísticas de evaluaciones de un parque
+  apiRouter.get('/parks/:id/evaluation-stats', async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ success: false, message: 'ID de parque inválido' });
+      }
+      
+      // Obtener estadísticas solo de evaluaciones aprobadas
+      const statsResult = await db.execute(sql`
+        SELECT 
+          COUNT(*)::int as total_evaluations,
+          AVG(overall_rating)::numeric(3,2) as average_rating,
+          (COUNT(*) FILTER (WHERE would_recommend = true)::numeric / NULLIF(COUNT(*)::numeric, 0) * 100)::numeric(5,2) as recommendation_rate,
+          AVG(cleanliness)::numeric(3,2) as avg_cleanliness,
+          AVG(safety)::numeric(3,2) as avg_safety,
+          AVG(maintenance)::numeric(3,2) as avg_maintenance,
+          AVG(accessibility)::numeric(3,2) as avg_accessibility,
+          AVG(amenities)::numeric(3,2) as avg_amenities,
+          AVG(activities)::numeric(3,2) as avg_activities,
+          AVG(staff)::numeric(3,2) as avg_staff,
+          AVG(natural_beauty)::numeric(3,2) as avg_natural_beauty,
+          COUNT(*) FILTER (WHERE overall_rating = 5)::int as five_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 4)::int as four_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 3)::int as three_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 2)::int as two_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 1)::int as one_star_count
+        FROM park_evaluations
+        WHERE park_id = ${parkId} AND status = 'approved'
+      `);
+      
+      const stats = statsResult.rows[0] || {
+        total_evaluations: 0,
+        average_rating: 0,
+        recommendation_rate: 0,
+        avg_cleanliness: 0,
+        avg_safety: 0,
+        avg_maintenance: 0,
+        avg_accessibility: 0,
+        avg_amenities: 0,
+        avg_activities: 0,
+        avg_staff: 0,
+        avg_natural_beauty: 0,
+        five_star_count: 0,
+        four_star_count: 0,
+        three_star_count: 0,
+        two_star_count: 0,
+        one_star_count: 0
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error('❌ [PARK-EVALUATIONS] Error obteniendo estadísticas:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener estadísticas'
       });
     }
   });
