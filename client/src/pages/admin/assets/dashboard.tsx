@@ -146,13 +146,14 @@ const AssetsDashboard: React.FC = () => {
 
       <div className="flex justify-between items-center mb-6">
         <div>
-        <div className="flex space-x-2">
-          <Button onClick={() => setLocation('/admin/assets/inventory')}>
-            Ver Inventario
-          </Button>
-          <Button onClick={() => setLocation('/admin/assets/create')} variant="default">
-            Agregar Activo
-          </Button>
+          <div className="flex space-x-2">
+            <Button onClick={() => setLocation('/admin/assets/inventory')}>
+              Ver Inventario
+            </Button>
+            <Button onClick={() => setLocation('/admin/assets/create')} variant="default">
+              Agregar Activo
+            </Button>
+          </div>
         </div>
       </div>
 

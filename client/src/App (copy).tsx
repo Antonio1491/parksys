@@ -668,7 +668,12 @@ function Router() {
         <Route path="/admin/events" component={EventsIndex} />
         
 
-        
+        <Route path={ROUTES.admin.volunteers.activities.list}>
+          <Suspense fallback={<div className="p-8 text-center">Cargando actividades de voluntariado...</div>}>
+            {React.createElement(React.lazy(() => import('@/pages/admin/volunteers/activities')))}
+          </Suspense>
+        </Route>
+
 
 
         

@@ -524,12 +524,24 @@ function TreeInventoryPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        <PageHeader
+          title="Inventario de Árboles"
+          subtitle="Gestión y seguimiento de árboles individuales en los parques"
+          icon={<TreeDeciduous className="h-6 w-6 text-white" />}
+          actions={[
+            <Button 
+              key="new"
+              variant="primary"
+              onClick={handleAddTree}
+            >
+              <Plus className="mr-2 h-4 w-4" /> Nuevo
+            </Button>            
+          ]}
+          backgroundColor="bg-header-background"
+        />
         
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <TreeDeciduous className="w-8 h-8 text-gray-900" />
-            </div>
             <div className="flex gap-2">
             <Button
               onClick={handleExportCsv}
@@ -641,13 +653,7 @@ function TreeInventoryPage() {
                 )}
               </DialogContent>
             </Dialog>
-            
-            <Button 
-              onClick={handleAddTree}
-              className="bg-green-600 hover:bg-green-700 flex items-center"
-            >
-              <Plus className="mr-2 h-4 w-4" /> Agregar Árbol
-            </Button>
+                        
             </div>
             
             {/* Input oculto para selección de archivos */}

@@ -492,6 +492,18 @@ export const ADMIN_VOLUNTEERS = {
     path: "/admin/volunteers/edit/:id",
     build: (id: string | number) => `/admin/volunteers/edit/${id}`,
   },
+  activities: {
+    list: '/admin/volunteers/activities',
+    create: '/admin/volunteers/activities/new',
+    view: {
+      path: '/admin/volunteers/activities/:id/view',
+      build: (id: string | number) => `/admin/volunteers/activities/${id}/view`,
+    },
+    edit: {
+      path: '/admin/volunteers/activities/:id/edit',
+      build: (id: string | number) => `/admin/volunteers/activities/${id}/edit`,
+    },
+  },
   participations: {
     list: "/admin/volunteers/participations",
     create: "/admin/volunteers/participations/new",
