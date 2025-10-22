@@ -301,7 +301,7 @@ export default function ParkEvaluationForm() {
               Gracias por tu opinión sobre {parkData.name}. Tu evaluación será revisada y publicada pronto.
             </p>
             <div className="space-y-2">
-              <Button onClick={() => navigate(`/parque/${parkId}`)}>
+              <Button onClick={() => navigate(`/parks/${parkId}`)}>
                 Regresar a parque
               </Button>
               <Button variant="outline" onClick={() => navigate('/parks')}>
@@ -321,7 +321,7 @@ export default function ParkEvaluationForm() {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate(`/parque/${parkId}`)}
+            onClick={() => navigate(`/parks/${parkId}`)}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
