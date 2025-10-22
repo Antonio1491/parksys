@@ -4473,16 +4473,16 @@ export const insertParkEvaluationSchema = createInsertSchema(parkEvaluations).om
   moderatedAt: true,
   moderationNotes: true,
 }).extend({
-  // Validación de calificaciones (1-5)
-  cleanliness: z.number().min(1).max(5),
-  safety: z.number().min(1).max(5),
-  maintenance: z.number().min(1).max(5),
-  accessibility: z.number().min(1).max(5),
-  amenities: z.number().min(1).max(5),
-  activities: z.number().min(1).max(5),
-  staff: z.number().min(1).max(5),
-  naturalBeauty: z.number().min(1).max(5),
-  overallRating: z.number().min(1).max(5),
+  // Validación de calificaciones (1-5) - todas opcionales excepto overallRating
+  cleanliness: z.number().min(1).max(5).optional(),
+  safety: z.number().min(1).max(5).optional(),
+  maintenance: z.number().min(1).max(5).optional(),
+  accessibility: z.number().min(1).max(5).optional(),
+  amenities: z.number().min(1).max(5).optional(),
+  activities: z.number().min(1).max(5).optional(),
+  staff: z.number().min(1).max(5).optional(),
+  naturalBeauty: z.number().min(1).max(5).optional(),
+  overallRating: z.number().min(1).max(5), // Requerido - calificación general
   
   // Validación de campos opcionales
   evaluatorEmail: z.string().email().optional(),

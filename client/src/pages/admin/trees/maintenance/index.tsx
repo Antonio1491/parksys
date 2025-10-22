@@ -815,14 +815,12 @@ export default function TreeMaintenancePage() {
           subtitle="Gestiona y registra las actividades de mantenimiento realizadas en árboles"
           icon={<Leaf className="h-6 w-6 text-white" />}
           actions={[
-            <div className="flex gap-2">
               <Button 
                 key="new"
                 variant="primary"
                 onClick={() => setOpen(true)}
                 <PlusCircle className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
               </Button>
-            </div>
           ]}
           backgroundColor="bg-header-background"
         />
