@@ -823,21 +823,7 @@ const Home: React.FC = () => {
       
       {/* Footer inspirado en bosquesamg.mx */}
       <footer className="bg-gradient-to-b from-[#067f5f] to-[#00a587] text-white">
-        {/* Logo y descripción principal */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center mb-12">
-            <img 
-              src={logoImage} 
-              alt="Agencia Metropolitana de Bosques Urbanos" 
-              className="h-16 w-auto mx-auto mb-6 filter brightness-0 invert"
-            />
-            <h2 className="text-2xl font-bold mb-4">Agencia Metropolitana de Bosques Urbanos</h2>
-            <p className="text-lg text-emerald-100 max-w-3xl mx-auto">
-              Fortalecemos el tejido social a través de espacios verdes que conectan comunidades, 
-              promueven la sostenibilidad y mejoran la calidad de vida en nuestra área metropolitana.
-            </p>
-          </div>
-
           {/* Enlaces organizados en grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
             {/* Columna 1 */}
