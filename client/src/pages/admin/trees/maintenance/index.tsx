@@ -815,12 +815,13 @@ export default function TreeMaintenancePage() {
           subtitle="Gestiona y registra las actividades de mantenimiento realizadas en árboles"
           icon={<Leaf className="h-6 w-6 text-white" />}
           actions={[
-              <Button 
-                key="new"
-                variant="primary"
-                onClick={() => setOpen(true)}
-                <PlusCircle className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
-              </Button>
+            <Button 
+              key="new"
+              variant="primary"
+              onClick={() => setOpen(true)}
+            >
+              <PlusCircle className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
+            </Button>
           ]}
           backgroundColor="bg-header-background"
         />
@@ -925,8 +926,6 @@ export default function TreeMaintenancePage() {
             </div>
           </CardContent>
         </Card>
-
-
 
         {/* Selección de Árbol */}
         <Card className="mb-6">
