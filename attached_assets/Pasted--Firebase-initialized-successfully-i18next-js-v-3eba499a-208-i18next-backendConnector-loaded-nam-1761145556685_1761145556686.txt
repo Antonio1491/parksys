@@ -1,0 +1,126 @@
+🔥 Firebase initialized successfully
+i18next.js?v=3eba499a:208 i18next::backendConnector: loaded namespace common for language es Object
+i18next.js?v=3eba499a:208 i18next: languageChanged es
+i18next.js?v=3eba499a:208 i18next: initialized Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/parks/94/extended
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/parks/94/extended
+queryClient.ts:330 🌐 [QUERY] GET /api/roles/1/permissions
+queryClient.ts:330 🌐 [QUERY] GET /api/notifications/count
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+queryClient.ts:182 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+queryClient.ts:185 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+ParkEvaluationForm.tsx:245 📝 Datos procesados a enviar: {
+  "parkId": 94,
+  "evaluatorName": "Pedro",
+  "isFrequentVisitor": false,
+  "wouldRecommend": true,
+  "cleanliness": 5,
+  "safety": 4,
+  "maintenance": 5,
+  "accessibility": 4,
+  "amenities": 4,
+  "activities": 4,
+  "staff": 5,
+  "naturalBeauty": 5,
+  "overallRating": 5
+}
+ParkEvaluationForm.tsx:258 ✅ Enviando evaluación con datos válidos...
+ParkEvaluationForm.tsx:133 🚀 MUTATION: Iniciando envío de evaluación
+ParkEvaluationForm.tsx:134 🚀 MUTATION: Datos recibidos: {
+  "parkId": 94,
+  "evaluatorName": "Pedro",
+  "isFrequentVisitor": false,
+  "wouldRecommend": true,
+  "cleanliness": 5,
+  "safety": 4,
+  "maintenance": 5,
+  "accessibility": 4,
+  "amenities": 4,
+  "activities": 4,
+  "staff": 5,
+  "naturalBeauty": 5,
+  "overallRating": 5
+}
+queryClient.ts:182 🌐 [API REQUEST] POST /api/park-evaluations
+queryClient.ts:185 🎪 [DEBUG] Checking request: POST /api/park-evaluations
+queryClient.ts:195 📋 POST a /api/park-evaluations detectado
+queryClient.ts:196 📋 Data enviada: {
+  "parkId": 94,
+  "evaluatorName": "Pedro",
+  "isFrequentVisitor": false,
+  "wouldRecommend": true,
+  "cleanliness": 5,
+  "safety": 4,
+  "maintenance": 5,
+  "accessibility": 4,
+  "amenities": 4,
+  "activities": 4,
+  "staff": 5,
+  "naturalBeauty": 5,
+  "overallRating": 5
+}
+queryClient.ts:197 📋 Headers: {
+  "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjlkMjEzMGZlZjAyNTg3ZmQ4ODYxODg2OTgyMjczNGVmNzZhMTExNjUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTHVpcyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9wYXJrc3lzLWMzZDMwIiwiYXVkIjoicGFya3N5cy1jM2QzMCIsImF1dGhfdGltZSI6MTc1Nzk2NTkyNCwidXNlcl9pZCI6IkFnRGljdERxZHFVT285aEtVWWxYUFQzdDVCdjEiLCJzdWIiOiJBZ0RpY3REcWRxVU9vOWhLVVlsWFBUM3Q1QnYxIiwiaWF0IjoxNzYxMTQ0MDk3LCJleHAiOjE3NjExNDc2OTcsImVtYWlsIjoibHVpc0Bhc29jaWFjaW9uZXNwcm9mZXNpb25hbGVzLm9yZyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImx1aXNAYXNvY2lhY2lvbmVzcHJvZmVzaW9uYWxlcy5vcmciXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Sod9UEqkaUpCRb67QZuzNtw10tTHHs3MXdNtbqS9pjrnkwCyXgsLNzF656zOH9UCVGclurfeYNDoplUnuk8N-qlfsYYzek0LwBospLz-WoCMLnehWmAOvdzue7jI1ygpReSXAzqLn5fx0J3aifGHwJWbrtUwKguA9KIPOUMJr4x46BxfUEfnaWTWgCRbl_3eQSSKMLf-XSLciZZ0MJYN5yTvllM8jFNApIDBAdT7IjgrHhmpFrdq1_4B1FH91qjzK-y6CXXFcR6KNcU9vYl7Qf3FgCrxp9s7iXIclX0AFZ4TAyaF0VsRIZU8jAoVgl7rxPxBFoI_wFwYwWvlSQHS4A",
+  "X-User-Id": "1",
+  "X-User-Role": "admin",
+  "x-firebase-uid": "AgDictDqdqUOo9hKUYlXPT3t5Bv1",
+  "Content-Type": "application/json"
+}
+queryClient.ts:198 📋 Body preparado: {"parkId":94,"evaluatorName":"Pedro","isFrequentVisitor":false,"wouldRecommend":true,"cleanliness":5,"safety":4,"maintenance":5,"accessibility":4,"amenities":4,"activities":4,"staff":5,"naturalBeauty":5,"overallRating":5}
+queryClient.ts:210 📋 Respuesta del servidor: 201 true
+queryClient.ts:240 📋 Respuesta exitosa del servidor: {
+  "success": true,
+  "data": {
+    "id": 9,
+    "parkId": 94,
+    "evaluatorName": "Pedro",
+    "evaluatorEmail": null,
+    "evaluatorPhone": null,
+    "evaluatorCity": null,
+    "evaluatorAge": null,
+    "isFrequentVisitor": false,
+    "cleanliness": 5,
+    "safety": 4,
+    "maintenance": 5,
+    "accessibility": 4,
+    "amenities": 4,
+    "activities": 4,
+    "staff": 5,
+    "naturalBeauty": 5,
+    "overallRating": 5,
+    "comments": null,
+    "suggestions": null,
+    "wouldRecommend": true,
+    "visitDate": null,
+    "visitPurpose": null,
+    "visitDuration": null,
+    "status": "pending",
+    "moderatedBy": null,
+    "moderatedAt": null,
+    "moderationNotes": null,
+    "ipAddress": null,
+    "userAgent": null,
+    "createdAt": "2025-10-22T15:04:58.189Z",
+    "updatedAt": "2025-10-22T15:04:58.189Z"
+  },
+  "message": "Evaluación enviada exitosamente. Será revisada antes de publicarse."
+}
+ParkEvaluationForm.tsx:154 ✅ MUTATION SUCCESS: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+useUnifiedAuth.ts:155 🔧 [UNIFIED AUTH] Estado: Object
+queryClient.ts:330 🌐 [QUERY] GET /public-api/parks/94

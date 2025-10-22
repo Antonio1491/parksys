@@ -1569,6 +1569,7 @@ export const parkTypology = pgTable("park_typology", {
 export const parks = pgTable("parks", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  slug: text("slug").unique(), // URL-friendly identifier for public pages
   municipalityText: text("municipality_text"), // Campo para municipio como texto libre
   parkType: text("park_type").notNull(), // Campo legacy mantenido para retrocompatibilidad
   typologyId: integer("typology_id").references(() => parkTypology.id), // Relación con tipología oficial

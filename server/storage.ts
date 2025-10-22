@@ -214,7 +214,7 @@ export class DatabaseStorage implements IStorage {
     try {
       const result = await pool.query(`
         SELECT 
-          p.id, p.name, 
+          p.id, p.name, p.slug,
           p.municipality_text as "municipalityText",
           p.park_type as "parkType", p.description, p.address, 
           p.postal_code as "postalCode", p.latitude, p.longitude, 
