@@ -528,7 +528,7 @@ function TreeInventoryPage() {
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              < className="w-8 h-8 text-gray-900" />
+              <TreeDeciduous className="w-8 h-8 text-gray-900" />
             </div>
             <div className="flex gap-2">
             <Button
