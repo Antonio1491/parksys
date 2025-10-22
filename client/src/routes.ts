@@ -226,7 +226,7 @@ export const ADMIN_AMENITIES = {
 // ============================================
 
 export const ADMIN_TREES = {
-  list: "/admin/trees",
+  list: "/admin/trees/inventory",
   map: "/admin/trees/map",
   create: "/admin/trees/new",
   edit: {

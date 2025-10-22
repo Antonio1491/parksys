@@ -842,7 +842,7 @@ const Home: React.FC = () => {
             {/* Columna 2 */}
             <div className="space-y-3">
               <Link href="/parks" className="block text-white hover:text-[#bcd256] transition-colors">
-                Bosques Urbanos
+                Parques y Bosques Urbanos
               </Link>
               <Link href="/education" className="block text-white hover:text-[#bcd256] transition-colors">
                 Educación Ambiental
@@ -913,28 +913,27 @@ const Home: React.FC = () => {
               <div>
                 <h4 className="font-semibold text-[#bcd256] mb-2">Dirección</h4>
                 <p className="text-emerald-100 text-sm">
-                  Av. Alcalde 1351, Miraflores<br/>
-                  44270 Guadalajara, Jalisco
+                  Calle 16 100 e/ 5 y 18<br/>
+                  97132 Mérida, Yucatán
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-[#bcd256] mb-2">Contacto</h4>
                 <p className="text-emerald-100 text-sm">
-                  Tel: (33) 3837-4400<br/>
-                  bosques@guadalajara.gob.mx
+                  Tel: (999) 757 0503<br/>
+                  parquesdemexico@gmail.com
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-[#bcd256] mb-2">Horarios</h4>
                 <p className="text-emerald-100 text-sm">
                   Lunes a Viernes: 8:00 - 15:00<br/>
-                  Fines de semana: Espacios abiertos
                 </p>
               </div>
             </div>
             
             <div className="text-sm text-emerald-200">
-              © {new Date().getFullYear()} Agencia Metropolitana de Bosques Urbanos de Guadalajara. 
+              © {new Date().getFullYear()} Parques de México. 
               Todos los derechos reservados.
             </div>
           </div>

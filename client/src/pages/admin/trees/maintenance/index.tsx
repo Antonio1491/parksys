@@ -53,7 +53,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Search, 
-  PlusCircle, 
+  PlusCircle,
+  Plus,
   Download,
   Upload,
   FileSpreadsheet,
@@ -819,7 +820,7 @@ export default function TreeMaintenancePage() {
               key="new"
               variant="primary"
               onClick={() => setOpen(true)}>
-              <PlusCircle className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
+              <Plus className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
             </Button>
           ]}
           backgroundColor="bg-header-background"

@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   Select,
   SelectContent,
@@ -522,22 +523,12 @@ function TreeInventoryPage() {
 
   return (
     <AdminLayout>
-      <Helmet>
-        <title>Inventario de Árboles | Bosques Urbanos</title>
-        <meta name="description" content="Gestión del inventario de árboles en los parques municipales" />
-      </Helmet>
-      
-      <div className="container mx-auto px-4 py-6">
+      <div className="space-y-6">
+        
         <Card className="p-4 bg-gray-50 mb-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <TreeDeciduous className="w-8 h-8 text-gray-900" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Inventario de Árboles</h1>
-                <p className="text-gray-600 mt-2">
-                  Gestión y seguimiento de árboles individuales en los parques
-                </p>
-              </div>
+              < className="w-8 h-8 text-gray-900" />
             </div>
             <div className="flex gap-2">
             <Button
