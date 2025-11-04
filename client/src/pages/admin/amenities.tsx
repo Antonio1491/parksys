@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit, Trash2, FileUp, Filter, ArrowUpDown, Search, Activity, TrendingUp, MapPin, Layers, FolderTree, RefreshCw, CopyCheck, CheckSquare, Square } from "lucide-react";
+import { Plus, Edit, Trash2, FileUp, Filter, ArrowUpDown, Search, Activity, TrendingUp, MapPin, Layers, FolderTree, RefreshCw, CopyCheck, CheckSquare, Square, Download } from "lucide-react";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -409,6 +409,65 @@ const AdminAmenitiesPage = () => {
     setSortOrder("desc");
   };
 
+  // Función para exportar amenidades a CSV
+  const handleExportCSV = () => {
+    try {
+      // Preparar datos para exportar
+      const dataToExport = filteredAndSortedAmenities.map((amenity: Amenity) => ({
+        'ID': amenity.id,
+        'Nombre': amenity.name,
+        'Categoría': getCategoryLabel(amenity.category || 'servicios'),
+        'Tipo de Ícono': amenity.iconType === 'custom' ? 'Personalizado' : 'Sistema',
+        'Ícono': amenity.icon || 'park',
+        'Parques Asignados': amenity.parksCount || 0,
+        'Total Módulos': amenity.totalModules || 0,
+        'Fecha de Creación': new Date(amenity.createdAt).toLocaleDateString('es-MX')
+      }));
+
+      // Crear headers del CSV
+      const headers = Object.keys(dataToExport[0] || {});
+
+      // Crear filas del CSV
+      const csvContent = [
+        headers.join(','),
+        ...dataToExport.map(row => 
+          headers.map(header => {
+            const value = row[header as keyof typeof row];
+            // Escapar comas y comillas en los valores
+            return typeof value === 'string' && (value.includes(',') || value.includes('"'))
+              ? `"${value.replace(/"/g, '""')}"`
+              : value;
+          }).join(',')
+        )
+      ].join('\n');
+
+      // Crear blob y descargar
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', `amenidades_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Exportación exitosa",
+        description: `Se exportaron ${dataToExport.length} amenidades`,
+      });
+    } catch (error) {
+      console.error('Error al exportar:', error);
+      toast({
+        title: "Error al exportar",
+        description: "Ocurrió un error durante la exportación",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleEditClick = (amenity: Amenity) => {
     setCurrentAmenity(amenity);
     setFormData({
@@ -535,12 +594,6 @@ const AdminAmenitiesPage = () => {
         subtitle="Gestiona las amenidades disponibles para los parques"
         icon={<Activity />}
         actions={[
-          <Link key="importar" href="/admin/amenities-import">
-            <Button variant="outline">
-              <FileUp className="mr-2 h-4 w-4" />
-              Importar
-            </Button>
-          </Link>,
           <Dialog key="nueva-amenidad" open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="primary">
@@ -803,7 +856,22 @@ const AdminAmenitiesPage = () => {
                 </DialogFooter>
               </form>
             </DialogContent>
-          </Dialog>
+          </Dialog>,
+          <Link key="importar" href="/admin/amenities-import">
+            <Button variant="outline">
+              <FileUp className="mr-2 h-4 w-4" />
+              Importar
+            </Button>
+          </Link>,
+          <Button 
+            key="exportar"
+            variant="tertiary"
+            onClick={handleExportCSV}
+            disabled={amenities.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Exportar
+          </Button>
         ]}
       />
 
@@ -971,7 +1039,7 @@ const AdminAmenitiesPage = () => {
 
             {/* Botón de eliminar */}
             <Button
-              variant="destructive"
+              variant="outline"
               size="sm"
               onClick={handleBulkDeleteAmenities}
               className="flex items-center h-11 w-11"
@@ -1034,7 +1102,7 @@ const AdminAmenitiesPage = () => {
                 </TableCell>
                 <TableCell className="font-medium">{amenity.name}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className="bg-gray-400">
+                  <Badge variant="outline" className="bg-violet-50 border-violet-200 text-gray-800">
                     {getCategoryLabel(amenity.category || 'servicios')}
                   </Badge>
                 </TableCell>
@@ -1046,12 +1114,12 @@ const AdminAmenitiesPage = () => {
                       e.stopPropagation();
                       handleParksClick(amenity.id);
                     }}
-                    className="p-2 h-auto hover:bg-blue-50"
+                    className="hover:bg-blue-0 text-gray-800"
                     disabled={!amenity.parksCount || amenity.parksCount === 0}
                   >
                     <Badge 
                       variant="outline" 
-                      className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer"
+                      className="bg-blue-50 text-gray-800 border-blue-200 hover:bg-blue-100 cursor-pointer"
                     >
                       {amenity.parksCount || 0} parques
                     </Badge>
@@ -1059,8 +1127,8 @@ const AdminAmenitiesPage = () => {
                 </TableCell>
                 <TableCell>
                   <Badge 
-                    variant="secondary" 
-                    className="bg-green-50 text-green-700 border-green-200"
+                    variant="outline" 
+                    className="bg-green-50 text-gray-800 border-green-200"
                   >
                     {amenity.totalModules || 0} módulos
                   </Badge>

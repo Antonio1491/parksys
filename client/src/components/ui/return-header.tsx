@@ -56,14 +56,14 @@ const contextMap: { prefix: string; to: string; labelKey: string }[] = [
     labelKey: 'return.warehouse',
   },
   {
-    prefix: ROUTES.admin.volunteers.list,
-    to: ROUTES.admin.volunteers.list,
-    labelKey: 'return.volunteers',
-  },
-  {
     prefix: ROUTES.admin.volunteers.activities.list,
     to: ROUTES.admin.volunteers.activities.list,
     labelKey: 'return.volunteerActivities',
+  },
+  {
+    prefix: ROUTES.admin.volunteers.list,
+    to: ROUTES.admin.volunteers.list,
+    labelKey: 'return.volunteers',
   },
   {
     prefix: ROUTES.admin.events.list,

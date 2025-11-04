@@ -660,12 +660,7 @@ function TreeInventoryPage() {
       />
         
         <Card className="mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle>Filtros de Búsqueda</CardTitle>
-            <CardDescription>
-              Utiliza los filtros para encontrar árboles específicos
-            </CardDescription>
-          </CardHeader>
+          <CardHeader className="pb-0"></CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <form onSubmit={handleSearch} className="md:col-span-1">

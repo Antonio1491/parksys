@@ -427,7 +427,7 @@ export default function VolunteerActivitiesIndex() {
 
   return (
     <AdminLayout>
-    <div className="container mx-auto p-6">
+    <div className="mx-auto">
       {/* PageHeader con acciones */}
       <PageHeader
         title="Actividades de Voluntariado"
@@ -435,27 +435,25 @@ export default function VolunteerActivitiesIndex() {
         icon={<Boxes />}
         actions={[
             <Button
-              variant="outline"
+              variant="tertiary"
               onClick={handleExportCSV}
-              className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
             >
               <Download className="h-4 w-4 mr-2" />
               Exportar
             </Button>,
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setShowImportDialog(true)}
-              className="border-[#00a587] text-[#00a587] hover:bg-[#00a587] hover:text-white"
             >
               <Upload className="h-4 w-4 mr-2" />
               Importar
             </Button>,
             <Button
-              onClick={() => setLocation("/admin/volunteers/activities/new")}
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              variant="primary"
+              onClick={() => setLocation(ROUTES.admin.volunteers.activities.create)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Nueva Actividad
+              Nueva
             </Button> 
         ]}
       />

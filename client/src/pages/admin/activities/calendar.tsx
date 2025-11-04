@@ -130,8 +130,8 @@ export default function ActivitiesCalendarPage() {
   });
 
   // Obtener parques para filtro
-  const { data: parks = [] } = useQuery({
-    queryKey: ['/api/parks'],
+  const { data: parks = [] } = useQuery<any[]>({
+    queryKey: ['/api/parks/filter'],
     retry: 1,
   });
 
