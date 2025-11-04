@@ -932,7 +932,7 @@ const AdminActivities = () => {
         />
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-lg">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-start justify-start gap-3">
             <div className="relative flex-1 min-w-[280px] max-w-lg">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />
@@ -1179,7 +1179,7 @@ const AdminActivities = () => {
                               className="border bg-transparent text-red-800 hover:text-white"
                               onClick={() => handleDelete(activity)}
                             >
-                              <Trash className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>

@@ -1034,7 +1034,7 @@ const AdminAmenitiesPage = () => {
                 </TableCell>
                 <TableCell className="font-medium">{amenity.name}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className="bg-gray-100">
+                  <Badge variant="secondary" className="bg-gray-400">
                     {getCategoryLabel(amenity.category || 'servicios')}
                   </Badge>
                 </TableCell>

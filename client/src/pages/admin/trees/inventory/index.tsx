@@ -524,148 +524,140 @@ function TreeInventoryPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Inventario de Árboles"
-          subtitle="Gestión y seguimiento de árboles individuales en los parques"
-          icon={<TreeDeciduous className="h-6 w-6 text-white" />}
-          actions={[
-            <Button 
-              key="new"
-              variant="primary"
-              onClick={handleAddTree}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Nuevo
-            </Button>            
-          ]}
-          backgroundColor="bg-header-background"
-        />
-        
-        <Card className="p-4 bg-gray-50 mb-6">
-          <div className="flex justify-between items-center">
-            <div className="flex gap-2">
-            <Button
-              onClick={handleExportCsv}
-              variant="outline"
-              className="border-green-600 text-green-600 hover:bg-green-50"
-            >
-              <Download className="mr-2 h-4 w-4" /> Exportar CSV
-            </Button>
-            
-            <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="mr-2 h-4 w-4" /> Importar CSV
-                </Button>
-              </DialogTrigger>
-              
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>Importar Árboles desde CSV</DialogTitle>
-                  <DialogDescription>
-                    {csvPreview.length > 0 
-                      ? "Vista previa de los primeros 5 registros. Confirma para importar todos los datos."
-                      : "Selecciona un archivo CSV para importar árboles o descarga la plantilla para ver el formato requerido."
-                    }
-                  </DialogDescription>
-                </DialogHeader>
-                
-                {csvPreview.length === 0 && (
-                  <div className="flex flex-col space-y-4 p-4 border-2 border-dashed border-gray-300 rounded-lg">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-4">
-                        ¿Primera vez importando árboles? Descarga la plantilla con ejemplos para ver el formato correcto.
-                      </p>
-                      <Button
-                        onClick={handleDownloadTemplate}
-                        variant="outline"
-                        className="border-green-600 text-green-600 hover:bg-green-50"
-                      >
-                        <Download className="mr-2 h-4 w-4" /> Descargar Plantilla CSV
-                      </Button>
-                    </div>
-                    <div className="text-center text-sm text-gray-500">
-                      La plantilla incluye todas las columnas disponibles y dos ejemplos (Ahuehuete y Jacaranda)
-                    </div>
+      <PageHeader
+        title="Inventario de Árboles"
+        subtitle="Gestión y seguimiento de árboles individuales en los parques"
+        icon={<TreeDeciduous className="h-6 w-6 text-white" />}
+        actions={[
+          <Button 
+            key="new"
+            variant="primary"
+            onClick={handleAddTree}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Nuevo
+          </Button>,
+
+          <Button
+            key="export"
+            onClick={handleExportCsv}
+            variant="tertiary"
+          >
+            <Download className="mr-2 h-4 w-4" /> Exportar
+          </Button>,
+
+          <Dialog key="import" open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                key="import"
+                variant="outline"
+              >
+                <Upload className="mr-2 h-4 w-4" /> Importar
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>Importar Árboles desde CSV</DialogTitle>
+                <DialogDescription>
+                  {csvPreview.length > 0 
+                    ? "Vista previa de los primeros 5 registros. Confirma para importar todos los datos."
+                    : "Selecciona un archivo CSV para importar árboles o descarga la plantilla para ver el formato requerido."
+                  }
+                </DialogDescription>
+              </DialogHeader>
+
+              {csvPreview.length === 0 && (
+                <div className="flex flex-col space-y-4 p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-4">
+                      ¿Primera vez importando árboles? Descarga la plantilla con ejemplos para ver el formato correcto.
+                    </p>
+                    <Button
+                      onClick={handleDownloadTemplate}
+                      variant="outline"
+                      className="border-green-600 text-green-600 hover:bg-green-50"
+                    >
+                      <Download className="mr-2 h-4 w-4" /> Descargar Plantilla CSV
+                    </Button>
                   </div>
-                )}
-                
-                {csvPreview.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Código</TableHead>
-                            <TableHead>Especie ID</TableHead>
-                            <TableHead>Parque ID</TableHead>
-                            <TableHead>Estado Salud</TableHead>
-                            <TableHead>Altura</TableHead>
-                            <TableHead>Ubicación</TableHead>
+                  <div className="text-center text-sm text-gray-500">
+                    La plantilla incluye todas las columnas disponibles y dos ejemplos (Ahuehuete y Jacaranda)
+                  </div>
+                </div>
+              )}
+
+              {csvPreview.length > 0 && (
+                <div className="space-y-4">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Código</TableHead>
+                          <TableHead>Especie ID</TableHead>
+                          <TableHead>Parque ID</TableHead>
+                          <TableHead>Estado Salud</TableHead>
+                          <TableHead>Altura</TableHead>
+                          <TableHead>Ubicación</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {csvPreview.map((row, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{row.codigo || 'N/A'}</TableCell>
+                            <TableCell>{row.especie_id || 'N/A'}</TableCell>
+                            <TableCell>{row.parque_id || 'N/A'}</TableCell>
+                            <TableCell>{row.estado_salud || 'N/A'}</TableCell>
+                            <TableCell>{row.altura || 'N/A'}</TableCell>
+                            <TableCell>{row.descripcion_ubicacion || 'N/A'}</TableCell>
                           </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {csvPreview.map((row, index) => (
-                            <TableRow key={index}>
-                              <TableCell>{row.codigo || 'N/A'}</TableCell>
-                              <TableCell>{row.especie_id || 'N/A'}</TableCell>
-                              <TableCell>{row.parque_id || 'N/A'}</TableCell>
-                              <TableCell>{row.estado_salud || 'N/A'}</TableCell>
-                              <TableCell>{row.altura || 'N/A'}</TableCell>
-                              <TableCell>{row.descripcion_ubicacion || 'N/A'}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                    <div className="flex justify-end space-x-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setIsImportDialogOpen(false);
-                          setCsvPreview([]);
-                          if (fileInputRef.current) {
-                            fileInputRef.current.value = '';
-                          }
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        onClick={handleConfirmImport}
-                        disabled={importCsvMutation.isPending}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        {importCsvMutation.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Importando...
-                          </>
-                        ) : (
-                          'Confirmar Importación'
-                        )}
-                      </Button>
-                    </div>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                )}
-              </DialogContent>
-            </Dialog>
-                        
-            </div>
-            
-            {/* Input oculto para selección de archivos */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              style={{ display: 'none' }}
-            />
-          </div>
-        </Card>
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsImportDialogOpen(false);
+                        setCsvPreview([]);
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = '';
+                        }
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleConfirmImport}
+                      disabled={importCsvMutation.isPending}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      {importCsvMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Importando...
+                        </>
+                      ) : (
+                        'Confirmar Importación'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        ]}
+        backgroundColor="bg-header-background"
+      />
+
+      {/* Input oculto FUERA del PageHeader */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        onChange={handleFileUpload}
+        style={{ display: 'none' }}
+      />
         
         <Card className="mb-6">
           <CardHeader className="pb-3">

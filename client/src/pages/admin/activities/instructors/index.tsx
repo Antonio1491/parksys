@@ -643,13 +643,12 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
 
                 {/* Botón de eliminar */}
                 <Button
-                  variant="destructive"
                   size="sm"
                   onClick={handleBulkDeleteInstructors}
-                  className="flex items-center h-11 w-11"
+                  className="flex items-center h-11 w-11 bg-gray-100 border border-gray-200 hover:bg-red-100 text-red"
                   disabled={selectedInstructors.size === 0}
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-5 w-5 text-red-400" />
                   {selectedInstructors.size > 0 && (
                     <span className="ml-1 text-xs">({selectedInstructors.size})</span>
                   )}
@@ -793,7 +792,7 @@ Ana Martinez Silva,Ana,Martinez Silva,ana.martinez@email.com,5553456789,35,femen
                           title="Eliminar instructor"
                           className="border bg-transparent text-red-800 hover:text-white"
                         >
-                          <Trash className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>

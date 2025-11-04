@@ -671,13 +671,13 @@ const ActivityRegistrationsPage = () => {
 
                       {/* Botón para eliminar elementos independiente */}
                       <Button
-                        variant="destructive"
+
                         size="sm"
                         onClick={handleBulkDeleteActivities}
-                        className="flex items-center h-11 w-11"
+                        className="flex items-center h-11 w-11 bg-gray-100 border border-gray-200 hover:bg-red-100 text-red"
                         disabled={selectedActivities.size === 0}
                       >
-                        <Trash2 className="h-5 w-5" />
+                        <Trash2 className="h-5 w-5 text-red-400" />
                         {selectedActivities.size > 0 && (
                           <span className="ml-1 text-xs">({selectedActivities.size})</span>
                         )}

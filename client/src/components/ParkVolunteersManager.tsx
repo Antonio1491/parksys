@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Users, Mail, Phone, Search, Filter, User } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 
 /**
  * INTERFACES PARA TIPADO TYPESCRIPT
@@ -60,43 +61,12 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
   // Consulta para obtener voluntarios asignados al parque
   const { data: assignedVolunteers = [], isLoading: assignedLoading } = useQuery<Volunteer[]>({
     queryKey: [`/api/parks/${parkId}/volunteers`],
-    queryFn: async () => {
-      console.log('🔍 FRONTEND: Cargando voluntarios asignados para parque', parkId);
-      const response = await fetch(`/api/parks/${parkId}/volunteers`, {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
-      if (!response.ok) throw new Error('Error cargando voluntarios asignados');
-      const data = await response.json();
-      console.log('✅ FRONTEND: Voluntarios asignados cargados:', data);
-      return data;
-    },
     enabled: !!parkId
   });
 
   // Consulta para obtener todos los voluntarios disponibles
   const { data: allVolunteers = [], isLoading: allVolunteersLoading, error: allVolunteersError } = useQuery<Volunteer[]>({
-    queryKey: ['/api/volunteers'],
-    queryFn: async () => {
-      console.log('🔍 FRONTEND: Cargando TODOS los voluntarios disponibles');
-      const response = await fetch('/api/volunteers', {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
-      if (!response.ok) {
-        console.error('❌ FRONTEND: Error en respuesta de /api/volunteers:', response.status, response.statusText);
-        throw new Error(`Error cargando voluntarios disponibles: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('✅ FRONTEND: Todos los voluntarios cargados:', data.length, data);
-      return data;
-    }
+    queryKey: ['/api/volunteers']
   });
 
   // Filtrar voluntarios disponibles (excluir los ya asignados)
@@ -133,18 +103,10 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
   // Mutación para asignar voluntario al parque
   const assignVolunteerMutation = useMutation({
     mutationFn: async (volunteerId: number) => {
-      const response = await fetch(`/api/parks/${parkId}/volunteers`, {
+      return await apiRequest(`/api/parks/${parkId}/volunteers`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        },
-        body: JSON.stringify({ volunteerId })
+        data: { volunteerId }
       });
-      if (!response.ok) throw new Error('Error asignando voluntario');
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/volunteers`] });
@@ -166,16 +128,9 @@ export default function ParkVolunteersManager({ parkId }: ParkVolunteersManagerP
   // Mutación para remover voluntario del parque
   const removeVolunteerMutation = useMutation({
     mutationFn: async (volunteerId: number) => {
-      const response = await fetch(`/api/parks/${parkId}/volunteers/${volunteerId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
+      return await apiRequest(`/api/parks/${parkId}/volunteers/${volunteerId}`, {
+        method: 'DELETE'
       });
-      if (!response.ok) throw new Error('Error removiendo voluntario');
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/volunteers`] });
