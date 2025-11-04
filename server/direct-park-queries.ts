@@ -109,9 +109,9 @@ export async function getParksDirectly(filters?: any) {
                                columns.includes('primary') ? 'primary' : null;
           
           if (!imageUrlColumn) {
-            console.error("No se encontró una columna para la URL de imagen");
-            return;
-          }
+            console.error(`No se encontró una columna para la URL de imagen para parque ${park.id}`);
+            primaryImage = null; // Continuar sin imagen principal
+          } else {
           
           // Construir la consulta según los campos disponibles
           let imageQuery;
@@ -139,6 +139,7 @@ export async function getParksDirectly(filters?: any) {
             primaryImage = replitObjectStorage.normalizeUrl(imageResult.rows[0].image_url);
             console.log(`Imagen principal para parque ${park.id}:`, primaryImage);
           }
+          } // Cierre del else
         }
       } catch (err) {
         console.error(`Error al obtener imagen para parque ${park.id}:`, err);
