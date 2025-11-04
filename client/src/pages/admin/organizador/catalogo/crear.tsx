@@ -177,25 +177,19 @@ const CrearActividadPage = () => {
   const [location, setLocation] = useLocation();
 
   // Consulta para obtener la lista de parques
-  const { data: parquesResponse, isLoading: parquesLoading } = useQuery({
+  const { data: parques = [], isLoading: parquesLoading } = useQuery<any[]>({
     queryKey: ['/api/parks/filter'],
   });
   
-  const parques = Array.isArray(parquesResponse) ? parquesResponse : [];
-  
   // Consulta para obtener las categorías de actividades
-  const { data: categoriasResponse, isLoading: categoriasLoading } = useQuery({
+  const { data: categorias = [], isLoading: categoriasLoading } = useQuery<any[]>({
     queryKey: ['/api/activity-categories'],
   });
   
-  const categorias = Array.isArray(categoriasResponse) ? categoriasResponse : [];
-  
   // Consulta para obtener la lista de instructores
-  const { data: instructoresResponse, isLoading: instructoresLoading } = useQuery({
+  const { data: instructores = [], isLoading: instructoresLoading } = useQuery<any[]>({
     queryKey: ['/api/instructors'],
   });
-  
-  const instructores = Array.isArray(instructoresResponse) ? instructoresResponse : [];
 
   // Logging para diagnosticar
   console.log('🔧 Datos de instructores cargados:', { 

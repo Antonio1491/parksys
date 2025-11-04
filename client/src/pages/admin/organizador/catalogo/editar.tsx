@@ -175,10 +175,9 @@ const EditarActividadPage = () => {
   });
 
   // Consulta para obtener la lista de instructores
-  const { data: instructoresResponse, isLoading: isLoadingInstructores } = useQuery({
+  const { data: instructores = [], isLoading: isLoadingInstructores } = useQuery<any[]>({
     queryKey: ['/api/instructors']
   });
-  const instructores = Array.isArray(instructoresResponse?.data) ? instructoresResponse.data : [];
 
   // Consulta para obtener los datos de la actividad actual
   const { data: activity, isLoading: isLoadingActivity } = useQuery({
