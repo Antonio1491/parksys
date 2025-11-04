@@ -949,7 +949,7 @@ const AdminActivities = () => {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Filtrar por parque" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4}>
                   <SelectItem value="all">Todos los parques</SelectItem>
                   {Array.isArray(parksData) && parksData.map((park: any) => (
                     <SelectItem key={park.id} value={park.id.toString()}>
@@ -965,7 +965,7 @@ const AdminActivities = () => {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Filtrar por categoría" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4}>
                   <SelectItem value="all">Todas las categorías</SelectItem>
                   {Array.isArray(categoriesData) && categoriesData.map((category: any) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
