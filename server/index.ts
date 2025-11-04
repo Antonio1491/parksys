@@ -3240,22 +3240,17 @@ function startServer() {
   if (process.env.NODE_ENV === 'development') {
     criticalApiRouter.get("/parks/filter", async (req: any, res: any) => {
       try {
-        const { getParksDirectly } = await import('./direct-park-queries');
-        const filters: any = {};
+        const { pool } = await import("./db");
         
-        if (req.query.municipalityId) {
-          filters.municipalityId = Number(req.query.municipalityId);
-        }
+        // Simple and fast query - only id and name for dropdown filter
+        const result = await pool.query(`
+          SELECT id, name 
+          FROM parks 
+          ORDER BY name ASC
+        `);
         
-        const parks = await getParksDirectly(filters);
-        // Return simple array for filter dropdown (id, name only)
-        const parksList = parks?.map((park: any) => ({
-          id: park.id,
-          name: park.name
-        })) || [];
-        
-        console.log(`🏞️ [DEV-ONLY-FILTER] Returning ${parksList.length} parks for filter dropdown`);
-        return res.json(parksList);
+        console.log(`🏞️ [DEV-ONLY-FILTER] Returning ${result.rows.length} parks for filter dropdown`);
+        return res.json(result.rows);
       } catch (error) {
         console.error('❌ [DEV-ONLY-FILTER] Error in parks filter route:', error);
         return res.status(500).json({ message: "Error fetching parks for filter" });
