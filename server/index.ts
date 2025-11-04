@@ -3255,10 +3255,10 @@ function startServer() {
         })) || [];
         
         console.log(`🏞️ [DEV-ONLY-FILTER] Returning ${parksList.length} parks for filter dropdown`);
-        res.json(parksList);
+        return res.json(parksList);
       } catch (error) {
         console.error('❌ [DEV-ONLY-FILTER] Error in parks filter route:', error);
-        res.status(500).json({ message: "Error fetching parks for filter" });
+        return res.status(500).json({ message: "Error fetching parks for filter" });
       }
     });
   }
