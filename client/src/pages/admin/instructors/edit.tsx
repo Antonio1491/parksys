@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocation } from 'wouter';
+import { useLocation, useParams } from 'wouter';
 import { AdminLayout } from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,10 +48,10 @@ export default function EditInstructorPage() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const params = useParams();
   
-  // Extraer ID de la URL
-  const pathParts = location.split('/');
-  const id = pathParts[pathParts.length - 1];
+  // Extraer ID de la URL usando useParams
+  const id = params.id;
   
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [specialtyInput, setSpecialtyInput] = useState('');
@@ -79,8 +79,8 @@ export default function EditInstructorPage() {
   });
 
   // Obtener lista de parques para selector
-  const { data: parks = [] } = useQuery({
-    queryKey: ['/api/parks'],
+  const { data: parks = [] } = useQuery<any[]>({
+    queryKey: ['/api/parks/filter'],
   });
   
   // Debug: Log parks data
