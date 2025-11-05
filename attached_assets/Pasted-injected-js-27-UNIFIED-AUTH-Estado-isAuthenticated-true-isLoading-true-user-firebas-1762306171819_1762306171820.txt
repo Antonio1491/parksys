@@ -1,0 +1,137 @@
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🌐 [QUERY] GET /api/instructors
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🌐 [API REQUEST] GET /api/exports/instructors/config
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/exports/instructors/config
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔍 DEBUG: Parks data: []
+injected.js:27 🔍 DEBUG: Parks count: 0
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🌐 [QUERY] GET /api/instructors/edit
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:204  GET https://4db9107a-1fd2-47c3-aace-3499f16eb526-00-2l678zjdfeg77.sisko.replit.dev/api/instructors/edit 400 (Bad Request)
+apply @ injected.js:204
+(anonymous) @ queryClient.ts:332
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=e4c29ba5:850
+run @ @tanstack_react-query.js?v=e4c29ba5:500
+start @ @tanstack_react-query.js?v=e4c29ba5:542
+fetch @ @tanstack_react-query.js?v=e4c29ba5:937
+executeFetch_fn @ @tanstack_react-query.js?v=e4c29ba5:2244
+onSubscribe @ @tanstack_react-query.js?v=e4c29ba5:1948
+subscribe @ @tanstack_react-query.js?v=e4c29ba5:24
+(anonymous) @ @tanstack_react-query.js?v=e4c29ba5:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=e4c29ba5:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=e4c29ba5:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=e4c29ba5:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=e4c29ba5:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=e4c29ba5:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=e4c29ba5:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=e4c29ba5:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=e4c29ba5:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=e4c29ba5:19328
+workLoop @ chunk-RPCDYKBN.js?v=e4c29ba5:197
+flushWork @ chunk-RPCDYKBN.js?v=e4c29ba5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=e4c29ba5:384Understand this error
+injected.js:27 Query failed for: /api/instructors/edit Error: ID de instructor inválido
+    at queryClient.ts:356:15
+(anonymous) @ injected.js:27
+(anonymous) @ queryClient.ts:360
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=e4c29ba5:850
+run @ @tanstack_react-query.js?v=e4c29ba5:500
+start @ @tanstack_react-query.js?v=e4c29ba5:542
+fetch @ @tanstack_react-query.js?v=e4c29ba5:937
+executeFetch_fn @ @tanstack_react-query.js?v=e4c29ba5:2244
+onSubscribe @ @tanstack_react-query.js?v=e4c29ba5:1948
+subscribe @ @tanstack_react-query.js?v=e4c29ba5:24
+(anonymous) @ @tanstack_react-query.js?v=e4c29ba5:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=e4c29ba5:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=e4c29ba5:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=e4c29ba5:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=e4c29ba5:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=e4c29ba5:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=e4c29ba5:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=e4c29ba5:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=e4c29ba5:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=e4c29ba5:19328
+workLoop @ chunk-RPCDYKBN.js?v=e4c29ba5:197
+flushWork @ chunk-RPCDYKBN.js?v=e4c29ba5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=e4c29ba5:384Understand this error
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔍 DEBUG: Parks data: []
+injected.js:27 🔍 DEBUG: Parks count: 0
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: false, isLoading: true, user: null, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🌐 [API REQUEST] GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🎪 [DEBUG] Checking request: GET /api/auth/user-status/AgDictDqdqUOo9hKUYlXPT3t5Bv1
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: true, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 🔧 [UNIFIED AUTH] Estado: {isAuthenticated: true, isLoading: false, user: {…}, firebaseStatus: {…}, localStatus: {…}}
+injected.js:27 Query failed for: /api/parks TimeoutError: signal timed out
+(anonymous) @ injected.js:27
+(anonymous) @ queryClient.ts:360
+await in (anonymous)
+fetchFn @ @tanstack_react-query.js?v=e4c29ba5:850
+run @ @tanstack_react-query.js?v=e4c29ba5:500
+start @ @tanstack_react-query.js?v=e4c29ba5:542
+fetch @ @tanstack_react-query.js?v=e4c29ba5:937
+executeFetch_fn @ @tanstack_react-query.js?v=e4c29ba5:2244
+onSubscribe @ @tanstack_react-query.js?v=e4c29ba5:1948
+subscribe @ @tanstack_react-query.js?v=e4c29ba5:24
+(anonymous) @ @tanstack_react-query.js?v=e4c29ba5:3093
+subscribeToStore @ chunk-RPCDYKBN.js?v=e4c29ba5:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=e4c29ba5:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=e4c29ba5:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=e4c29ba5:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=e4c29ba5:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=e4c29ba5:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=e4c29ba5:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=e4c29ba5:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=e4c29ba5:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=e4c29ba5:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=e4c29ba5:19432
+commitRoot @ chunk-RPCDYKBN.js?v=e4c29ba5:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=e4c29ba5:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=e4c29ba5:18718
+workLoop @ chunk-RPCDYKBN.js?v=e4c29ba5:197
+flushWork @ chunk-RPCDYKBN.js?v=e4c29ba5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=e4c29ba5:384Understand this error
