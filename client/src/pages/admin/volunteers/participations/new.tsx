@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -34,7 +35,9 @@ import {
 } from "@/components/ui/popover";
 import { toast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
+import { ReturnHeader } from '@/components/ui/return-header';
 import { queryClient, apiRequest } from '@/lib/queryClient';
+import { useArrayQuery } from '@/hooks/useArrayQuery';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -55,15 +58,17 @@ const ParticipationCreate: React.FC = () => {
   const [openVolunteer, setOpenVolunteer] = useState(false);
   const [openActivity, setOpenActivity] = useState(false);
 
-  // Fetch volunteers (usuarios con rol voluntario)
-  const { data: volunteers = [], isLoading: isLoadingVolunteers } = useQuery({
-    queryKey: ['/api/volunteers'],
-  });
+  // Fetch volunteers usando useArrayQuery (maneja { data: [...] } automáticamente)
+  const { data: volunteers = [], isLoading: isLoadingVolunteers } = useArrayQuery(
+    '/api/volunteers',
+    'data'
+  );
 
-  // Fetch volunteer activities
-  const { data: activities = [], isLoading: isLoadingActivities } = useQuery({
-    queryKey: ['/api/volunteer-activities'],
-  });
+  // Fetch volunteer activities usando useArrayQuery
+  const { data: activities = [], isLoading: isLoadingActivities } = useArrayQuery(
+    '/api/volunteer-activities',
+    'data'
+  );
 
   // Form setup
   const form = useForm<FormValues>({
@@ -80,9 +85,8 @@ const ParticipationCreate: React.FC = () => {
   // Create participation mutation
   const createParticipation = useMutation({
     mutationFn: async (data: FormValues) => {
-      return apiRequest({
+      return apiRequest(`/api/volunteers/${data.volunteerId}/participations`, {
         method: 'POST',
-        url: `/api/volunteers/${data.volunteerId}/participations`,
         data: {
           volunteerActivityId: data.volunteerActivityId,
           attendanceStatus: data.attendanceStatus,
@@ -97,7 +101,7 @@ const ParticipationCreate: React.FC = () => {
         description: 'La participación se ha registrado correctamente.',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/participations/all'] });
-      setLocation('/admin/volunteers/participations');
+      setLocation(ROUTES.admin.volunteers.participations.list);
     },
     onError: (error) => {
       console.error('Error al crear participación:', error);
@@ -118,20 +122,25 @@ const ParticipationCreate: React.FC = () => {
     }
   };
 
-  // Get selected volunteer info
-  const selectedVolunteer = volunteers.find((v: any) => v.id === form.watch('volunteerId'));
+  // Get selected volunteer info - ahora activities es un array garantizado
+  const selectedVolunteer = Array.isArray(volunteers) 
+    ? volunteers.find((v: any) => v.id === form.watch('volunteerId'))
+    : null;
 
-  // Get selected activity info
-  const selectedActivity = activities.find((a: any) => a.id === form.watch('volunteerActivityId'));
+  // Get selected activity info - ahora activities es un array garantizado
+  const selectedActivity = Array.isArray(activities)
+    ? activities.find((a: any) => a.id === form.watch('volunteerActivityId'))
+    : null;
 
   return (
     <AdminLayout>
-      <div className="container mx-auto py-6 max-w-4xl">
+      <div className="mx-auto">
+        <ReturnHeader />
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Registrar Nueva Participación</h1>
           <Button 
             variant="outline" 
-            onClick={() => setLocation('/admin/volunteers/participations')}
+            onClick={() => setLocation(ROUTES.admin.volunteers.participations.list)}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver
@@ -174,7 +183,7 @@ const ParticipationCreate: React.FC = () => {
                         {isLoadingVolunteers ? "Cargando..." : "No se encontraron voluntarios."}
                       </CommandEmpty>
                       <CommandGroup className="max-h-64 overflow-auto">
-                        {volunteers.map((volunteer: any) => (
+                        {Array.isArray(volunteers) && volunteers.map((volunteer: any) => (
                           <CommandItem
                             key={volunteer.id}
                             value={`${volunteer.fullName || volunteer.full_name} ${volunteer.email}`}
@@ -228,7 +237,7 @@ const ParticipationCreate: React.FC = () => {
                         {isLoadingActivities ? "Cargando..." : "No se encontraron actividades."}
                       </CommandEmpty>
                       <CommandGroup className="max-h-64 overflow-auto">
-                        {activities.map((activity: any) => (
+                        {Array.isArray(activities) && activities.map((activity: any) => (
                           <CommandItem
                             key={activity.id}
                             value={`${activity.name} ${activity.parkName}`}
@@ -348,7 +357,7 @@ const ParticipationCreate: React.FC = () => {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setLocation('/admin/volunteers/participations')}
+                onClick={() => setLocation(ROUTES.admin.volunteers.participations.list)}
               >
                 Cancelar
               </Button>

@@ -149,7 +149,7 @@ export default function NewVolunteerActivity() {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 max-w-4xl">
+      <div className="mx-auto">
         {/* Header con navegación */}
         <ReturnHeader />
 

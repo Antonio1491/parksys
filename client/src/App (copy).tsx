@@ -506,7 +506,7 @@ function Router() {
           </Suspense>
         </Route>
 
-
+ 
           
         <Route path="/admin/activities" component={AdminActivities} /> // RUTA LEGACY
         <Route path="/admin/activities/management" component={AdminActivities} /> // RUTA LEGACY

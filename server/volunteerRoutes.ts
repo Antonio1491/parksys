@@ -1323,6 +1323,51 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
     }
   });
 
+  // Eliminar una participación de voluntario
+  apiRouter.delete("/volunteer-participations/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const participationId = parseInt(req.params.id);
+
+      if (isNaN(participationId)) {
+        return res.status(400).json({ message: "ID de participación no válido" });
+      }
+
+      console.log(`Eliminando participación ${participationId}`);
+
+      const { pool } = await import("./db");
+
+      // Primero verificar que existe
+      const checkResult = await pool.query(`
+        SELECT id, volunteer_id, volunteer_activity_id 
+        FROM volunteer_participations 
+        WHERE id = $1
+      `, [participationId]);
+
+      if (checkResult.rows.length === 0) {
+        return res.status(404).json({ message: "Participación no encontrada" });
+      }
+
+      // Eliminar la participación
+      const result = await pool.query(`
+        DELETE FROM volunteer_participations 
+        WHERE id = $1
+        RETURNING id
+      `, [participationId]);
+
+      console.log(`✅ Participación eliminada: ${participationId}`);
+      res.json({ 
+        message: "Participación eliminada correctamente",
+        id: result.rows[0].id
+      });
+    } catch (error) {
+      console.error(`❌ Error al eliminar participación ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: "Error al eliminar participación",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
   // ============================================
   // ENDPOINTS DE ACTIVIDADES DE VOLUNTARIADO
   // ============================================
@@ -1364,7 +1409,7 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
       `);
 
       console.log(`✅ Se encontraron ${result.rows.length} actividades de voluntariado`);
-      res.json(result.rows);
+      res.json({ data: result.rows });
     } catch (error) {
       console.error('❌ Error al obtener actividades de voluntariado:', error);
       res.status(500).json({ 
@@ -1427,6 +1472,56 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
       console.error(`❌ Error al obtener actividad de voluntariado ${req.params.id}:`, error);
       res.status(500).json({ 
         message: "Error al obtener actividad de voluntariado",
+        error: error instanceof Error ? error.message : "Error desconocido"
+      });
+    }
+  });
+
+  // Obtener participaciones de una actividad específica
+  apiRouter.get("/volunteer-activities/:id/participations", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const activityId = parseInt(req.params.id);
+
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "ID de actividad no válido" });
+      }
+
+      console.log(`Obteniendo participaciones para actividad ${activityId}`);
+
+      const { pool } = await import("./db");
+
+      const result = await pool.query(`
+        SELECT 
+          vp.id,
+          vp.volunteer_id as "volunteerId",
+          vp.volunteer_activity_id as "volunteerActivityId",
+          vp.registration_date as "registrationDate",
+          vp.attendance_status as "attendanceStatus",
+          vp.hours_contributed as "hoursContributed",
+          vp.check_in_time as "checkInTime",
+          vp.check_out_time as "checkOutTime",
+          vp.volunteer_notes as "volunteerNotes",
+          vp.supervisor_notes as "supervisorNotes",
+          vp.rating,
+          vp.created_at as "createdAt",
+          vp.updated_at as "updatedAt",
+          -- Datos del voluntario
+          u.id as "volunteerId",
+          u.full_name as "volunteerName",
+          u.email as "volunteerEmail",
+          u.phone as "volunteerPhone"
+        FROM volunteer_participations vp
+        INNER JOIN users u ON vp.volunteer_id = u.id
+        WHERE vp.volunteer_activity_id = $1
+        ORDER BY vp.registration_date DESC
+      `, [activityId]);
+
+      console.log(`✅ Se encontraron ${result.rows.length} participaciones para actividad ${activityId}`);
+      res.json({ data: result.rows });
+    } catch (error) {
+      console.error(`❌ Error al obtener participaciones de actividad ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: "Error al obtener participaciones",
         error: error instanceof Error ? error.message : "Error desconocido"
       });
     }

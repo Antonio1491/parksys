@@ -537,14 +537,6 @@ function TreeInventoryPage() {
             <Plus className="mr-2 h-4 w-4" /> Nuevo
           </Button>,
 
-          <Button
-            key="export"
-            onClick={handleExportCsv}
-            variant="tertiary"
-          >
-            <Download className="mr-2 h-4 w-4" /> Exportar
-          </Button>,
-
           <Dialog key="import" open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -645,7 +637,15 @@ function TreeInventoryPage() {
                 </div>
               )}
             </DialogContent>
-          </Dialog>
+          </Dialog>,
+
+          <Button
+            key="export"
+            onClick={handleExportCsv}
+            variant="tertiary"
+          >
+            <Download className="mr-2 h-4 w-4" /> Exportar
+          </Button>
         ]}
         backgroundColor="bg-header-background"
       />

@@ -61,6 +61,11 @@ const contextMap: { prefix: string; to: string; labelKey: string }[] = [
     labelKey: 'return.volunteerActivities',
   },
   {
+    prefix: ROUTES.admin.volunteers.participations.list,
+    to: ROUTES.admin.volunteers.participations.list,
+    labelKey: 'return.volunteerParticipations',
+  },
+  {
     prefix: ROUTES.admin.volunteers.list,
     to: ROUTES.admin.volunteers.list,
     labelKey: 'return.volunteers',
