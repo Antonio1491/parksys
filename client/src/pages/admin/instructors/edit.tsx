@@ -50,8 +50,14 @@ export default function EditInstructorPage() {
   const queryClient = useQueryClient();
   const params = useParams();
   
+  // Debug temporal
+  console.log('🔍 [EDIT-DEBUG] params:', params);
+  console.log('🔍 [EDIT-DEBUG] location:', location);
+  
   // Extraer ID de la URL usando useParams
   const id = params.id;
+  
+  console.log('🔍 [EDIT-DEBUG] id final:', id);
   
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [specialtyInput, setSpecialtyInput] = useState('');
