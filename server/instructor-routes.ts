@@ -299,6 +299,10 @@ export function registerInstructorRoutes(app: any, apiRouter: Router, publicApiR
     try {
       const instructorId = parseInt(req.params.id);
       
+      if (isNaN(instructorId)) {
+        return res.status(400).json({ message: 'ID de instructor inválido' });
+      }
+      
       const result = await db
         .select()
         .from(instructors)
