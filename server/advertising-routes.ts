@@ -126,7 +126,9 @@ router.get('/spaces', async (req, res) => {
       allowedFormats: row.allowed_formats,
       isActive: row.is_active,
       createdAt: row.created_at,
-      updatedAt: row.updated_at
+      updatedAt: row.updated_at,
+      name: row.name,
+      description: row.description,
     }));
     res.json({ success: true, data: spaces });
   } catch (error) {
@@ -138,22 +140,74 @@ router.get('/spaces', async (req, res) => {
 // Crear nuevo espacio
 router.post('/spaces', isAuthenticated, async (req, res) => {
   try {
-    const { spaceKey, name, description, dimensions, locationType, pageTypes, maxAds } = req.body;
-    
-    const [space] = await db.insert(adSpaces).values({
-      spaceKey,
-      name,
-      description,
-      dimensions,
-      locationType,
-      pageTypes,
-      maxAds: maxAds || 1
-    }).returning();
-    
-    res.json({ success: true, data: space });
+    const { 
+      name, 
+      description, 
+      pageType, 
+      position, 
+      dimensions, 
+      maxFileSize, 
+      allowedFormats, 
+      isActive 
+    } = req.body;
+
+    console.log('📝 Creando espacio:', req.body);
+
+    const result = await pool.query(
+      `INSERT INTO ad_spaces (
+         name,
+         description,
+         page_type,
+         position,
+         dimensions,
+         max_file_size,
+         allowed_formats,
+         is_active,
+         created_at,
+         updated_at
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING *`,
+      [
+        name,
+        description || null,
+        pageType,
+        position,
+        dimensions || null,
+        maxFileSize || 5242880,
+        allowedFormats, // Ya viene como array desde el frontend
+        isActive !== undefined ? isActive : true,
+        new Date(),
+        new Date()
+      ]
+    );
+
+    const space = result.rows[0];
+
+    // Mapear respuesta a camelCase
+    const response = {
+      id: space.id,
+      name: space.name,
+      description: space.description,
+      pageType: space.page_type,
+      position: space.position,
+      dimensions: space.dimensions,
+      maxFileSize: space.max_file_size,
+      allowedFormats: space.allowed_formats,
+      isActive: space.is_active,
+      createdAt: space.created_at,
+      updatedAt: space.updated_at
+    };
+
+    console.log('✅ Espacio creado:', response);
+
+    res.json({ success: true, data: response });
   } catch (error) {
-    console.error('Error creando espacio:', error);
-    res.status(500).json({ success: false, error: 'Error creando espacio' });
+    console.error('❌ Error creando espacio:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error creando espacio',
+      details: error.message 
+    });
   }
 });
 
@@ -161,30 +215,128 @@ router.post('/spaces', isAuthenticated, async (req, res) => {
 router.put('/spaces/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
-    const { isActive } = req.body;
-    
+    const { 
+      name, 
+      description, 
+      pageType, 
+      position, 
+      dimensions, 
+      maxFileSize, 
+      allowedFormats, 
+      isActive 
+    } = req.body;
+
+    console.log('📝 Actualizando espacio:', id, req.body);
+
     const result = await pool.query(
-      'UPDATE ad_spaces SET is_active = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
-      [isActive, id]
+      `UPDATE ad_spaces 
+       SET 
+         name = $1,
+         description = $2,
+         page_type = $3,
+         position = $4,
+         dimensions = $5,
+         max_file_size = $6,
+         allowed_formats = $7,
+         is_active = $8,
+         updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $9 
+       RETURNING *`,
+      [
+        name,
+        description || null,
+        pageType,
+        position,
+        dimensions || null,
+        maxFileSize || 5242880,
+        allowedFormats, // Ya viene como array desde el frontend
+        isActive !== undefined ? isActive : true,
+        parseInt(id)
+      ]
     );
-    
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Espacio no encontrado' });
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Espacio no encontrado' 
+      });
     }
-    
+
     const space = result.rows[0];
-    res.json({ success: true, data: {
+
+    // Mapear respuesta a camelCase
+    const response = {
       id: space.id,
       name: space.name,
+      description: space.description,
       pageType: space.page_type,
       position: space.position,
       dimensions: space.dimensions,
+      maxFileSize: space.max_file_size,
+      allowedFormats: space.allowed_formats,
       isActive: space.is_active,
+      createdAt: space.created_at,
       updatedAt: space.updated_at
-    }});
+    };
+
+    console.log('✅ Espacio actualizado:', response);
+
+    res.json({ success: true, data: response });
   } catch (error) {
-    console.error('Error actualizando espacio:', error);
-    res.status(500).json({ success: false, error: 'Error actualizando espacio' });
+    console.error('❌ Error actualizando espacio:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error actualizando espacio',
+      details: error.message 
+    });
+  }
+});
+
+// Eliminar espacio publicitario
+router.delete('/spaces/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log('🗑️ Eliminando espacio:', id);
+
+    // Verificar si hay placements activos usando este espacio
+    const placementsCheck = await pool.query(
+      'SELECT COUNT(*) as count FROM ad_placements WHERE ad_space_id = $1 AND is_active = true',
+      [parseInt(id)]
+    );
+
+    if (parseInt(placementsCheck.rows[0].count) > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No se puede eliminar el espacio porque tiene asignaciones activas' 
+      });
+    }
+
+    const result = await pool.query(
+      'DELETE FROM ad_spaces WHERE id = $1 RETURNING *',
+      [parseInt(id)]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Espacio no encontrado' 
+      });
+    }
+
+    console.log('✅ Espacio eliminado:', result.rows[0]);
+
+    res.json({ 
+      success: true, 
+      message: 'Espacio eliminado exitosamente' 
+    });
+  } catch (error) {
+    console.error('❌ Error eliminando espacio:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error eliminando espacio',
+      details: error.message 
+    });
   }
 });
 

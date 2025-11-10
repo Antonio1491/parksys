@@ -868,13 +868,18 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
           va.category as "activityCategory",
           -- Datos del parque
           p.name as "parkName",
-          -- Datos del voluntario
-          u.full_name as "volunteerName",
-          u.email as "volunteerEmail"
+          -- Datos del voluntario (✅ debe incluir profile_image_url)
+          v.full_name as "volunteerName",
+          v.email as "volunteerEmail",
+          v.phone as "volunteerPhone",
+          v.profile_image_url as "volunteerProfileImage",  -- ✅ AGREGAR ESTA LÍNEA
+          v.available_days as "volunteerAvailableDays",
+          v.interest_areas as "volunteerInterestAreas",
+          v.status as "volunteerStatus"
         FROM volunteer_participations vp
         INNER JOIN volunteer_activities va ON vp.volunteer_activity_id = va.id
         LEFT JOIN parks p ON va.park_id = p.id
-        LEFT JOIN users u ON vp.volunteer_id = u.id
+        LEFT JOIN volunteers v ON vp.volunteer_id = v.id
         ORDER BY vp.registration_date DESC
       `);
 
@@ -1143,6 +1148,53 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
 
       const { pool } = await import("./db");
 
+      // ✅ PASO 1: Obtener información de la actividad
+      const activityResult = await pool.query(`
+        SELECT max_volunteers 
+        FROM volunteer_activities 
+        WHERE id = $1
+      `, [volunteerActivityId]);
+
+      if (activityResult.rows.length === 0) {
+        return res.status(404).json({ message: 'Actividad no encontrada' });
+      }
+
+      const maxVolunteers = activityResult.rows[0].max_volunteers;
+
+      // ✅ PASO 2: Validar cupo disponible
+      if (maxVolunteers && maxVolunteers > 0) {
+        const countResult = await pool.query(`
+          SELECT COUNT(*) as count 
+          FROM volunteer_participations 
+          WHERE volunteer_activity_id = $1 
+          AND attendance_status != 'cancelled'
+        `, [volunteerActivityId]);
+
+        const currentCount = parseInt(countResult.rows[0].count);
+
+        if (currentCount >= maxVolunteers) {
+          return res.status(400).json({ 
+            message: 'La actividad ya alcanzó su cupo máximo de voluntarios',
+            currentCount,
+            maxVolunteers
+          });
+        }
+      }
+
+      // ✅ PASO 3: Verificar que el voluntario no esté ya registrado
+      const existingResult = await pool.query(`
+        SELECT id 
+        FROM volunteer_participations 
+        WHERE volunteer_id = $1 AND volunteer_activity_id = $2
+      `, [volunteerId, volunteerActivityId]);
+
+      if (existingResult.rows.length > 0) {
+        return res.status(400).json({ 
+          message: 'El voluntario ya está registrado en esta actividad' 
+        });
+      }
+
+      // ✅ PASO 4: Crear la participación
       const result = await pool.query(`
         INSERT INTO volunteer_participations (
           volunteer_id,
@@ -1217,13 +1269,18 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
           va.supervisor_id as "supervisorId",
           -- Datos del parque
           p.name as "parkName",
-          -- Datos del voluntario
-          u.full_name as "volunteerName",
-          u.email as "volunteerEmail"
+          -- Datos del voluntario (✅ debe incluir profile_image_url)
+          v.full_name as "volunteerName",
+          v.email as "volunteerEmail",
+          v.phone as "volunteerPhone",
+          v.profile_image_url as "volunteerProfileImage",  -- ✅ AGREGAR ESTA LÍNEA
+          v.available_days as "volunteerAvailableDays",
+          v.interest_areas as "volunteerInterestAreas",
+          v.status as "volunteerStatus"
         FROM volunteer_participations vp
         INNER JOIN volunteer_activities va ON vp.volunteer_activity_id = va.id
         LEFT JOIN parks p ON va.park_id = p.id
-        LEFT JOIN users u ON vp.volunteer_id = u.id
+        LEFT JOIN volunteers v ON vp.volunteer_id = v.id
         WHERE vp.id = $1
       `, [participationId]);
 
@@ -1506,12 +1563,16 @@ export function registerVolunteerRoutes(app: any, apiRouter: any, publicApiRoute
           vp.created_at as "createdAt",
           vp.updated_at as "updatedAt",
           -- Datos del voluntario
-          u.id as "volunteerId",
-          u.full_name as "volunteerName",
-          u.email as "volunteerEmail",
-          u.phone as "volunteerPhone"
+          v.id as "volunteerId",
+          v.full_name as "volunteerName",
+          v.email as "volunteerEmail",
+          v.phone as "volunteerPhone",
+          v.profile_image_url as "volunteerProfileImage",
+          v.available_days as "volunteerAvailableDays",
+          v.interest_areas as "volunteerInterestAreas",
+          v.status as "volunteerStatus"
         FROM volunteer_participations vp
-        INNER JOIN users u ON vp.volunteer_id = u.id
+        INNER JOIN volunteers v ON vp.volunteer_id = v.id
         WHERE vp.volunteer_activity_id = $1
         ORDER BY vp.registration_date DESC
       `, [activityId]);

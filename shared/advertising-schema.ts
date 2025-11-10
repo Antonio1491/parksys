@@ -2,6 +2,7 @@ import { pgTable, serial, varchar, text, timestamp, integer, boolean, decimal, j
 import { relations } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { sql } from 'drizzle-orm';
 import { users } from './schema';
 
 // Archivos multimedia para publicidad (almacenamiento híbrido)
@@ -40,15 +41,16 @@ export const adCampaigns = pgTable('ad_campaigns', {
 // Espacios publicitarios disponibles
 export const adSpaces = pgTable('ad_spaces', {
   id: serial('id').primaryKey(),
-  spaceKey: varchar('space_key', { length: 100 }).notNull().unique(), // header_banner, sidebar_primary, etc.
-  name: varchar('name', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }),
   description: text('description'),
   dimensions: varchar('dimensions', { length: 50 }), // 1200x90, 300x250, etc.
-  locationType: varchar('location_type', { length: 50 }).notNull(), // header, sidebar, footer, content, modal
-  pageTypes: jsonb('page_types').notNull(), // ['parks', 'species', 'activities', 'concessions', 'home']
-  maxAds: integer('max_ads').default(1), // Máximo número de anuncios simultáneos
-  status: varchar('status', { length: 50 }).notNull().default('active'),
-  createdAt: timestamp('created_at').defaultNow()
+  position: varchar('position', { length: 50 }).notNull(), // header, sidebar, footer, content, modal
+  pageType: varchar('page_type').notNull(), // ['parks', 'species', 'activities', 'concessions', 'home']
+  isActive: boolean('is_active').default(true),
+  maxFileSize: integer('max_file_size').default(5242880), // en bytes
+  allowedFormats: text('allowed_formats').array().default(sql`ARRAY['image/jpeg', 'image/png', 'image/gif']`),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
 });
 
 // Anuncios individuales

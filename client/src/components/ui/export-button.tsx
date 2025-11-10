@@ -64,8 +64,8 @@ export function ExportButton({
   if (!isReady || !config) {
     return (
       <Button variant={buttonVariant} size={size} disabled className={className}>
-        <Download className="mr-2 h-4 w-4" />
-        Exportar
+        <Download className="md:mr-2 h-4 w-4" />
+        <span className="hidden md:inline">Exportar</span>
       </Button>
     );
   }
@@ -107,8 +107,10 @@ export function ExportButton({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
           <Button variant={buttonVariant} size={size} disabled={disabled || isExporting} className={className}>
-            <Download className="mr-2 h-4 w-4" />
-            {isExporting ? 'Exportando...' : 'Exportar'}
+            <Download className="md:mr-2 h-4 w-4" />
+            <span className="hidden md:inline">
+              {isExporting ? 'Exportando...' : 'Exportar'}
+            </span>
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-full mx-4">

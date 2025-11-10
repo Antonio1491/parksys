@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useParams, useLocation } from 'wouter';
 import ROUTES from '@/routes';
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
+import { ReturnHeader } from '@/components/ui/return-header';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 
 // Schema de validación para edición de participaciones
@@ -64,31 +65,83 @@ const ParticipationEdit: React.FC = () => {
     values: participation ? {
       attendanceStatus: participation.attendanceStatus || 'registered',
       hoursContributed: participation.hoursContributed || null,
-      checkInTime: participation.checkInTime ? format(new Date(participation.checkInTime), 'HH:mm') : null,
-      checkOutTime: participation.checkOutTime ? format(new Date(participation.checkOutTime), 'HH:mm') : null,
+      // ✅ Extraer hora directamente del string sin conversión de zona horaria
+      checkInTime: participation.checkInTime 
+        ? participation.checkInTime.split('T')[1]?.substring(0, 5) 
+        : null,
+      checkOutTime: participation.checkOutTime 
+        ? participation.checkOutTime.split('T')[1]?.substring(0, 5) 
+        : null,
       volunteerNotes: participation.volunteerNotes || '',
       supervisorNotes: participation.supervisorNotes || '',
       rating: participation.rating || null,
     } : undefined,
   });
 
+  // 🎯 NUEVO: Calcular horas automáticamente cuando cambien los tiempos
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      // Solo calcular si cambiaron checkInTime o checkOutTime
+      if (name === 'checkInTime' || name === 'checkOutTime') {
+        const checkIn = value.checkInTime;
+        const checkOut = value.checkOutTime;
+
+        // Verificar que ambos tiempos estén completos
+        if (checkIn && checkOut && checkIn.length === 5 && checkOut.length === 5) {
+          const [inHours, inMinutes] = checkIn.split(':').map(Number);
+          const [outHours, outMinutes] = checkOut.split(':').map(Number);
+
+          // Convertir a minutos totales
+          const checkInMinutes = inHours * 60 + inMinutes;
+          let checkOutMinutes = outHours * 60 + outMinutes;
+
+          // Si checkout es menor que checkin, asumimos que cruzó medianoche
+          if (checkOutMinutes < checkInMinutes) {
+            checkOutMinutes += 24 * 60; // Agregar 24 horas en minutos
+          }
+
+          // Calcular diferencia en horas (con decimales)
+          const diffMinutes = checkOutMinutes - checkInMinutes;
+          const hours = diffMinutes / 60;
+
+          // Redondear a 0.5 horas (ej: 2.3 → 2.5, 2.7 → 2.5, 2.8 → 3.0)
+          const roundedHours = Math.round(hours * 2) / 2;
+
+          // Solo actualizar si es un valor válido (positivo y máximo 24 horas)
+          if (roundedHours > 0 && roundedHours <= 24) {
+            form.setValue('hoursContributed', roundedHours, { shouldValidate: false });
+            console.log(`⏱️ Horas calculadas: ${checkIn} - ${checkOut} = ${roundedHours} horas`);
+          } else if (roundedHours > 24) {
+            // Si es más de 24 horas, avisar al usuario
+            toast({
+              title: 'Advertencia',
+              description: 'El tiempo calculado excede 24 horas. Por favor verifica los horarios.',
+              variant: 'destructive',
+            });
+          }
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, toast]);
+
   // Update participation mutation
   const updateParticipation = useMutation({
     mutationFn: (data: FormValues) => {
-      // Convertir tiempos a timestamps completos si existen
+      // Convertir tiempos a timestamps SIN zona horaria (hora local)
       const payload = {
         ...data,
         checkInTime: data.checkInTime && participation?.activityDate 
-          ? `${participation.activityDate.split('T')[0]}T${data.checkInTime}:00Z` 
+          ? `${participation.activityDate.split('T')[0]}T${data.checkInTime}:00`
           : null,
         checkOutTime: data.checkOutTime && participation?.activityDate 
-          ? `${participation.activityDate.split('T')[0]}T${data.checkOutTime}:00Z` 
+          ? `${participation.activityDate.split('T')[0]}T${data.checkOutTime}:00`
           : null,
       };
 
-      return apiRequest({
+      return apiRequest(`/api/participations/${id}`, {
         method: 'PUT',
-        url: `/api/participations/${id}`,
         data: payload,
       });
     },
@@ -152,16 +205,10 @@ const ParticipationEdit: React.FC = () => {
 
   return (
     <AdminLayout>
+      <ReturnHeader />
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Editar Participación</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => setLocation(ROUTES.admin.volunteers.participations.list)}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver
-          </Button>
         </div>
 
         {/* Información contextual */}
@@ -281,16 +328,19 @@ const ParticipationEdit: React.FC = () => {
               <div className="space-y-2">
                 <Label htmlFor="rating">Calificación (1-5 estrellas)</Label>
                 <Select
-                  value={form.watch('rating')?.toString() || ''}
-                  onValueChange={(value) => form.setValue('rating', value ? parseInt(value) : null, {
-                    shouldValidate: true
-                  })}
+                  value={form.watch('rating')?.toString() || '0'}
+                  onValueChange={(value) => {
+                    const numValue = parseInt(value);
+                    form.setValue('rating', numValue === 0 ? null : numValue, {
+                      shouldValidate: true
+                    });
+                  }}
                 >
                   <SelectTrigger id="rating">
                     <SelectValue placeholder="Seleccionar calificación" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sin calificación</SelectItem>
+                    <SelectItem value="0">Sin calificación</SelectItem>
                     <SelectItem value="1">⭐ 1 estrella</SelectItem>
                     <SelectItem value="2">⭐⭐ 2 estrellas</SelectItem>
                     <SelectItem value="3">⭐⭐⭐ 3 estrellas</SelectItem>

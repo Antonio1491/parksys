@@ -259,15 +259,6 @@ export default function FixedAssetsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLocation('/admin/accounting/dashboard')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Volver al Módulo
-            </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                 <Building className="h-8 w-8 mr-3 text-blue-600" />

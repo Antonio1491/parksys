@@ -4,88 +4,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { SidebarSearch } from './SidebarSearch';
 import { adminSidebarStructure } from '@/config/adminSidebarStructure';
-import { sidebarSubmenus, sidebarMeta } from '@/config/sidebarSubmenus';
+import { sidebarSubmenus, sidebarMeta, navigableRoutes} from '@/config/sidebarSubmenus';
 import { sidebarModules } from '@/config/sidebarConfig';
 import {
   getActiveSubmenuFromLocation,
   getActiveModuleFromLocation,
 } from '@/utils/sidebarHelpers';
-const parksysLogo = "/parksys-logo-final.png";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { 
-  NotebookPen, 
-  Map, 
-  Calendar, 
-  FileText, 
-  MessageSquare, 
-  Bell, 
-  Users, 
-  Settings,
-  UserSearch,
-  Gift,
-  Tag,
-  BarChart3,
-  Package,
-  Shield,
-  Building,
-  CreditCard,
-  ClipboardCheck,
-  Boxes,
-  CalendarDays,
-  MapPin,
-  CalendarClock,
-  GraduationCap,
-  Award,
-  DollarSign,
-  TrendingUp,
-  Target,
-  ArrowRightLeft,
-  Calculator,
-  Megaphone,
-  Handshake,
-  Store,
-  ListChecks,
-  LayoutGrid,
-  FolderOpen,
-  FolderTree,
-  BookOpen,
-  TreePine,
-  Mail,
-  AlertTriangle,
-  Database,
-  Leaf,
-  HeartHandshake,
-  ClipboardList,
-  ChevronRight,
-  UserCheck,
-  Receipt,
-  Wrench,
-  Archive,
-  UserCog,
-  Plus,
-  Scale,
-  Grid,
-  Download,
-  Upload,
-  PackagePlus,
-  Trees,
-  List,
-  Shovel,
-  Binoculars,
-  Star,
-} from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 
-// Importaciones de utilidades y configuraciones - comentado temporalmente
-/*
-const [location] = useLocation();
-const activeModule = getActiveModuleFromLocation(location, sidebarModules);
-const activeSubmenu = getActiveSubmenuFromLocation(location, sidebarSubmenus);
-const { t } = useTranslation();
-*/
+const parksysLogo = "/parksys-logo-final.png";
 
+// Tipos
 interface NavItemProps {
   href: string;
   icon: React.ReactNode;
@@ -114,66 +47,14 @@ type CollapsibleSubmenuProps = {
   isActive?: boolean;
 };
 
-// Renderizar módulos y submenús - comentado temporalmente
-
-/*
-{adminSidebarStructure.map(({ moduleKey, labelKey, icon: Icon, submenus }) => (
-  <ModuleNav
-    key={moduleKey}
-    title={t(labelKey)}
-    icon={<Icon className="h-5 w-5" />}
-    value={moduleKey}
-    defaultOpen={activeModule === moduleKey}
-  >
-    {submenus.map(({ id: submenuId, type }) => {
-      const routes = sidebarSubmenus[submenuId];
-      const meta = sidebarMeta[submenuId];
-
-      if (type === 'link') {
-        const href = typeof routes[0] === 'string' ? routes[0] : routes[0](':id');
-        return (
-          <NavItem
-            key={submenuId}
-            href={href}
-            icon={<meta.icon className="h-4 w-4" />}
-            active={activeSubmenu === submenuId}
-          >
-            {t(meta.label)}
-          </NavItem>
-        );
-      }
-
-      return (
-        <CollapsibleSubmenu
-          key={submenuId}
-          id={submenuId}
-          title={t(meta.label)}
-          icon={<meta.icon className="h-4 w-4" />}
-          isActive={activeSubmenu === submenuId}
-          collapsible
-        >
-          {routes.map((route: string | ((id: string | number) => string)) => {
-            const href = typeof route === 'string' ? route : route(':id');
-            return (
-              <NavItem
-                key={href}
-                href={href}
-                icon={<meta.icon className="h-4 w-4" />}
-              >
-                {t(meta.label)}
-              </NavItem>
-            );
-          })}
-        </CollapsibleSubmenu>
-      );
-    })}
-  </ModuleNav>
-))}
-*/
-
+// Componente NavItem
 const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleColor }) => {
   const iconWithClass = React.cloneElement(icon as React.ReactElement, {
-    className: cn((icon as React.ReactElement).props.className, 'menu-icon', moduleColor || 'text-header-background')
+    className: cn(
+      (icon as React.ReactElement).props.className,
+      'menu-icon',
+      moduleColor || 'text-header-background'
+    ),
   });
 
   return (
@@ -194,84 +75,79 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, children, active, moduleC
   );
 };
 
-const ModuleNav: React.FC<ModuleNavProps> = ({ 
-  title,
-  icon,
-  children,
-  value,
-}) => {
-  // Define color schemes for each module - adapted for dark background #003D49
+// Componente ModuleNav con colores
+const ModuleNav: React.FC<ModuleNavProps> = ({ title, icon, children, value }) => {
+  // Esquemas de color para cada módulo
   const getModuleColors = (moduleValue: string) => {
-    const colorSchemes = {
-      'system': {
+    const colorSchemes: Record<string, { iconColor: string; textColor: string; hoverBg: string; bgColor: string }> = {
+      system: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#61B1A0'
+        bgColor: '#61B1A0',
       },
-      'gestion': {
-        iconColor: 'text-white',
-        textColor: 'text-white', 
-        hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#513C73'
-      },
-      'operations': {
+      gestion: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#B275B0'
+        bgColor: '#513C73',
       },
-      'admin-finance': {
+      operations: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#B3C077'
+        bgColor: '#B275B0',
       },
-      'mkt-comm': {
+      adminFinance: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#1E5AA6'
+        bgColor: '#B3C077',
       },
-      'hr': {
+      mktComm: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#198DCE'
+        bgColor: '#1E5AA6',
       },
-      'security': {
+      hr: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#90D3EC'
+        bgColor: '#198DCE',
       },
-      'public': {
+      configSecurity: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
-        bgColor: '#1E5AA6'
+        bgColor: '#90D3EC',
+      },
+    };
+
+    return (
+      colorSchemes[moduleValue] || {
+        iconColor: 'text-white',
+        textColor: 'text-white',
+        hoverBg: 'hover:bg-sidebar-hover',
+        bgColor: '#90D3EC',
       }
-    };
-    
-    return colorSchemes[moduleValue as keyof typeof colorSchemes] || {
-      iconColor: 'text-white',
-      textColor: 'text-white',
-      hoverBg: 'hover:bg-sidebar-hover',
-      bgColor: '#90D3EC'
-    };
+    );
   };
 
   const colors = getModuleColors(value);
-  
+
   const iconWithClass = React.cloneElement(icon as React.ReactElement, {
-    className: cn((icon as React.ReactElement).props.className, 'menu-icon', colors.iconColor)
+    className: cn((icon as React.ReactElement).props.className, 'menu-icon', colors.iconColor),
   });
 
   return (
     <AccordionItem value={value} className="border-0">
       <AccordionTrigger className={cn("py-2 hover:no-underline [&>svg]:text-white", colors.hoverBg)}>
         <div className={cn("flex items-center text-sm font-normal font-poppins", colors.textColor)}>
-          <div className="mr-2 flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: colors.bgColor }}>
+          <div
+            className="mr-2 flex items-center justify-center w-8 h-8 rounded-full"
+            style={{ backgroundColor: colors.bgColor }}
+          >
             {iconWithClass}
           </div>
           {title}
@@ -284,7 +160,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
               if (child.type === NavItem) {
                 return React.cloneElement(child, { moduleColor: colors.iconColor } as any);
               }
-              // Si es un div, procesar sus hijos recursivamente pero evitar bucles infinitos
+              // Procesar divs recursivamente
               if (child.type === 'div') {
                 const processedChildren = React.Children.map(child.props.children, (grandChild) => {
                   if (React.isValidElement(grandChild) && grandChild.type === NavItem) {
@@ -304,7 +180,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({
 };
 
 // Componente para submenús colapsables
-export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
+const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
   id,
   title,
   icon,
@@ -321,1241 +197,270 @@ export const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
     }
   };
 
-  return (
-    href ? (
-      <Link to={href}>
-        <button
-          onClick={handleClick}
-          className={cn(
-            'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
-            isActive
-              ? 'bg-sidebar-primary text-white'
-              : 'bg-transparent text-white hover:bg-sidebar-hover'
-          )}
-        >
-          <div className="flex items-center">
-            {icon &&
-              React.cloneElement(icon as React.ReactElement, {
-                className: 'h-4 w-4 text-white',
-              })}
-            <span className="ml-2">{title}</span>
-          </div>
-          {collapsible && (
-            <ChevronRight
-              className={cn(
-                'h-4 w-4 text-white transition-transform',
-                isExpanded && 'rotate-90'
-              )}
-            />
-          )}
-        </button>
-
-        {collapsible && isExpanded && (
-          <div className="pl-2 ml-2 space-y-1 mt-2">
-            {children}
-          </div>
-        )}
-      </Link>
-    ) : (
-      <div>
-        <button
-          onClick={handleClick}
-          className={cn(
-            'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
-            isActive
-              ? 'bg-header-background text-white'
-              : 'bg-transparent text-white hover:bg-sidebar-hover'
-          )}
-        >
-          <div className="flex items-center">
-            {icon &&
-              React.cloneElement(icon as React.ReactElement, {
-                className: 'h-4 w-4 text-white',
-              })}
-            <span className="ml-2">{title}</span>
-          </div>
-          {collapsible && (
-            <ChevronRight
-              className={cn(
-                'h-4 w-4 text-white transition-transform',
-                isExpanded && 'rotate-90'
-              )}
-            />
-          )}
-        </button>
-
-        {collapsible && isExpanded && (
-          <div className="pl-2 ml-2 space-y-1 mt-2">
-            {children}
-          </div>
-        )}
+  const content = (
+    <button
+      onClick={handleClick}
+      className={cn(
+        'w-full flex items-center justify-between p-2 text-sm font-light font-poppins rounded-lg transition-colors',
+        isActive
+          ? 'bg-header-background text-white'
+          : 'bg-transparent text-white hover:bg-sidebar-hover'
+      )}
+    >
+      <div className="flex items-center">
+        {icon &&
+          React.cloneElement(icon as React.ReactElement, {
+            className: 'h-4 w-4 text-white',
+          })}
+        <span className="ml-2">{title}</span>
       </div>
-    )
+      {collapsible && (
+        <ChevronRight
+          className={cn('h-4 w-4 text-white transition-transform', isExpanded && 'rotate-90')}
+        />
+      )}
+    </button>
+  );
+
+  return href ? (
+    <Link to={href}>
+      {content}
+      {collapsible && isExpanded && <div className="pl-2 ml-2 space-y-1 mt-2">{children}</div>}
+    </Link>
+  ) : (
+    <div>
+      {content}
+      {collapsible && isExpanded && <div className="pl-2 ml-2 space-y-1 mt-2">{children}</div>}
+    </div>
   );
 };
 
+// Componente principal del Sidebar
 const AdminSidebarComplete: React.FC = () => {
   const [location] = useLocation();
-  const { } = useAuth();
   const { t } = useTranslation('common');
-  
-  // Estados para controlar los submenús colapsables dentro de "Gestión"
+
+  // Estados
   const [expandedSubmenus, setExpandedSubmenus] = useState<string[]>([]);
-  
-  // Estado controlado para los acordeones principales
   const [openAccordions, setOpenAccordions] = useState<string[]>([]);
-  
-  // Función para manejar el toggle de submenús dentro de "Gestión"
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Obtener módulo y submenu activos
+  const activeModule = getActiveModuleFromLocation(location, sidebarModules);
+  const activeSubmenu = getActiveSubmenuFromLocation(location, sidebarSubmenus);
+
+  // Toggle de submenús
   const toggleSubmenu = (submenuId: string) => {
-    setExpandedSubmenus(prev => 
-      prev.includes(submenuId) 
-        ? prev.filter(id => id !== submenuId)
-        : [...prev, submenuId]
+    setExpandedSubmenus((prev) =>
+      prev.includes(submenuId) ? prev.filter((id) => id !== submenuId) : [...prev, submenuId]
     );
   };
 
-  // Determinar qué submenú debe estar abierto basado en la ruta actual
-  const getActiveSubmenu = () => {
-    if (location.startsWith('/admin/visitors')) return 'visitantes';
-    if (location.startsWith('/admin/parks')) return 'parques';
-    if (location.startsWith('/admin/trees')) return 'arbolado';
-    if (location.startsWith('/admin/fauna')) return 'fauna';
-    if (location.startsWith('/admin/organizador') || location.startsWith('/admin/activities') || location.startsWith('/admin/activities/instructors')) return 'actividades';
-    if (location.startsWith('/admin/events') || location.startsWith('/admin/eventos-ambu')) return 'eventos';
-    if (location.startsWith('/admin/space-reservations') || location.startsWith('/admin/dashboard-reservas')) return 'reservas';
-    if (location.startsWith('/admin/amenities')) return 'amenidades';
-    if (location.startsWith('/admin/evaluations')) return 'evaluaciones';
-    if (location.startsWith('/admin/roles') || location.startsWith('/admin/permissions') || location.startsWith('/admin/role-')) return 'roles-sistema';
-    if (location.startsWith('/admin/assets')) return 'activos';
-    if (location.startsWith('/admin/incidents')) return 'incidencias';
-    if (location.startsWith('/admin/warehouse')) return 'almacen';
-    if (location.startsWith('/admin/volunteers')) return 'voluntarios';
-    if (location.startsWith('/admin/finance')) return 'finanzas';
-    if (location.startsWith('/admin/accounting')) return 'contabilidad';
-    if (location.startsWith('/admin/concessions')) return 'concesiones';
-    if (location.startsWith('/admin/marketing')) return 'marketing';
-    if (location.startsWith('/admin/advertising')) return 'advertising';
-    if (location.startsWith('/admin/communications')) return 'communications';
-    // Rutas del módulo "Configuración y Seguridad"
-    if (location.startsWith('/admin/configuracion-seguridad/access/')) return 'control-acceso';
-    if (location.startsWith('/admin/configuracion-seguridad/policies')) return 'politicas';
-    if (location.startsWith('/admin/configuracion-seguridad/notifications')) return 'notificaciones';
-    if (location.startsWith('/admin/configuracion-seguridad/audit')) return 'auditoria';
-    if (location.startsWith('/admin/configuracion-seguridad/maintenance')) return 'mantenimiento-sistema';
-    if (location.startsWith('/admin/configuracion-seguridad/exports')) return 'mantenimiento-sistema';
-    return null;
-  };
-
-  // Función helper para determinar si un submenu está activo
-  const isSubmenuActive = (submenuId: string) => {
-    const routeMap: { [key: string]: string[] } = {
-      'actividades': ['/admin/activities', '/admin/organizador'],
-      'arbolado': ['/admin/trees'],
-      'visitantes': ['/admin/visitors'],
-      'eventos': ['/admin/events', '/admin/eventos-ambu'],
-      'reservas': ['/admin/space-reservations', '/admin/dashboard-reservas'],
-      'evaluaciones': ['/admin/evaluations'],
-      'activos': ['/admin/assets'],
-      'incidencias': ['/admin/incidents'],
-      'almacen': ['/admin/warehouse'],
-      'voluntarios': ['/admin/volunteers'],
-      'finanzas': ['/admin/finance'],
-      'contabilidad': ['/admin/accounting'],
-      'concesiones': ['/admin/concessions'],
-      'marketing': ['/admin/marketing'],
-      'advertising': ['/admin/advertising'],
-      'communications': ['/admin/communications'],
-      'control-acceso': ['/admin/configuracion-seguridad/access/'],
-      'auditoria': ['/admin/configuracion-seguridad/audit'],
-      'mantenimiento-sistema': ['/admin/configuracion-seguridad/maintenance']
-    };
-
-    const routes = routeMap[submenuId];
-    if (!routes) return false;
-    
-    return routes.some(route => location.startsWith(route));
-  };
-  
   // Inicializar submenús expandidos basado en la ruta actual
   useEffect(() => {
-    const activeSubmenu = getActiveSubmenu();
     if (activeSubmenu && !expandedSubmenus.includes(activeSubmenu)) {
       setExpandedSubmenus([activeSubmenu]);
     }
-  }, [location]);
+  }, [activeSubmenu]);
 
   // Mantener acordeones abiertos basado en la navegación
   useEffect(() => {
-    const activeModules = getActiveModule();
-    if (activeModules.length > 0) {
-      setOpenAccordions(prev => {
-        const newAccordions = Array.from(new Set([...prev, ...activeModules]));
-        return newAccordions;
-      });
+    if (activeModule && !openAccordions.includes(activeModule)) {
+      setOpenAccordions((prev) => Array.from(new Set([...prev, activeModule])));
     }
-  }, [location]);
-  
-  // Determinar qué módulo debe estar abierto basado en la ruta actual
-  const getActiveModule = () => {
-    // Rutas públicas
-    if (location.startsWith('/public/')) {
-      return ['public'];
-    }
-    
-    // Rutas que pertenecen al módulo "Gestión"
-    if (location.startsWith('/admin/visitors') || 
-        location.startsWith('/admin/parks') || 
-        location.startsWith('/admin/trees') || 
-        location.startsWith('/admin/fauna') || 
-        location.startsWith('/admin/organizador') || 
-        location.startsWith('/admin/activities') || 
-        location.startsWith('/admin/activities/instructors') || 
-        location.startsWith('/admin/events') || 
-        location.startsWith('/admin/eventos-ambu') || 
-        location.startsWith('/admin/space-reservations') ||
-        location.startsWith('/admin/dashboard-reservas') ||
-        location.startsWith('/admin/amenities') ||
-        location.startsWith('/admin/evaluaciones')) {
-      return ['gestion'];
-    }
-    
-    // Rutas que pertenecen al módulo "O & M"
-    if (location.startsWith('/admin/assets') || location.startsWith('/admin/incidents') || location.startsWith('/admin/warehouse') || location.startsWith('/admin/volunteers')) {
-      return ['operations'];
-    }
-    
-    // Rutas que pertenecen al módulo "Admin/Finanzas"
-    if (location.startsWith('/admin/finance') || location.startsWith('/admin/accounting') || location.startsWith('/admin/concessions')) {
-      return ['admin-finance'];
-    }
-    
-    // Rutas que pertenecen al módulo "Mkt & Comm"
-    if (location.startsWith('/admin/communications') || location.startsWith('/admin/marketing') || location.startsWith('/admin/advertising')) {
-      return ['mkt-comm'];
-    }
-    
-    // Rutas que pertenecen al módulo "Configuración y Seguridad"
-    if (location.startsWith('/admin/configuracion-seguridad/')) {
-      return ['config-security'];
-    }
-    
-    // Otros módulos
-    if (location.startsWith('/admin/hr')) return ['hr'];
-    if (location.startsWith('/admin/documents') || location.startsWith('/admin/comments')) return ['system'];
-    return []; // Sin módulos abiertos por defecto
-  };
-  
-  // Inicializar acordeones al montar el componente
-  useEffect(() => {
-    const activeModules = getActiveModule();
-    if (activeModules.length > 0) {
-      setOpenAccordions(activeModules);
-    }
-  }, []);
+  }, [activeModule]);
 
-  return (
-    <div className="fixed left-0 w-64 flex flex-col shadow-lg z-40 bg-sidebar" style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
-      {/* Barra de búsqueda */}
+  // Cerrar mobile sidebar al navegar
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location]);
+
+  // Renderizar submenús
+  const renderSubmenu = (submenuId: string, type: 'link' | 'group') => {
+    const meta = sidebarMeta[submenuId];
+    if (!meta) return null;
+
+    const IconComponent = meta.icon;
+    const submenuIcon = <IconComponent className="h-4 w-4" />;
+    const isActive = activeSubmenu === submenuId;
+
+    // Si es un link simple (sin hijos)
+    if (type === 'link') {
+      const routes = sidebarSubmenus[submenuId];
+      const href = typeof routes[0] === 'string' ? routes[0] : routes[0](':id');
+
+      return (
+        <CollapsibleSubmenu
+          key={submenuId}
+          id={submenuId}
+          title={t(meta.label)}
+          icon={submenuIcon}
+          href={href}
+          collapsible={false}
+          isExpanded={false}
+          onToggle={() => {}}
+          isActive={isActive}
+        />
+      );
+    }
+
+    // Si es un grupo (con hijos colapsables)
+    const navRoutes = navigableRoutes[submenuId] || [];
+
+    return (
+      <CollapsibleSubmenu
+        key={submenuId}
+        id={submenuId}
+        title={t(meta.label)}
+        icon={submenuIcon}
+        isActive={isActive}
+        isExpanded={expandedSubmenus.includes(submenuId)}
+        onToggle={toggleSubmenu}
+        collapsible
+      >
+        {navRoutes.map(({ route, labelKey, icon: RouteIcon }) => {
+          const isRouteActive = location.startsWith(route);
+          const routeIcon = <RouteIcon className="h-4 w-4" />;
+
+          return (
+            <NavItem 
+              key={route} 
+              href={route} 
+              icon={routeIcon}
+              active={isRouteActive}
+            >
+              {t(labelKey)}
+            </NavItem>
+          );
+        })}
+      </CollapsibleSubmenu>
+    );
+  };
+
+  // Contenido de navegación (compartido entre desktop y mobile)
+  const navigationContent = (
+    <Accordion
+      type="multiple"
+      value={openAccordions}
+      onValueChange={setOpenAccordions}
+      className="space-y-1"
+    >
+      {adminSidebarStructure.map(({ moduleKey, labelKey, icon: Icon, submenus }) => (
+        <ModuleNav key={moduleKey} title={t(labelKey)} icon={<Icon className="h-5 w-5" />} value={moduleKey}>
+          {submenus.map(({ id: submenuId, type }) => renderSubmenu(submenuId, type))}
+        </ModuleNav>
+      ))}
+    </Accordion>
+  );
+
+  // Footer (compartido entre desktop y mobile)
+  const footerContent = (
+    <div className="p-8 border-t border-header-background" style={{ backgroundColor: '#003D49' }}>
+      <div className="flex flex-col items-center justify-center gap-4">
+        <img
+          src={parksysLogo}
+          alt="ParkSys - Sistema de parques"
+          className="h-14 w-auto max-w-64 opacity-80 hover:opacity-100 transition-opacity pl-[5px] pr-[5px]"
+        />
+        <a
+          href="https://parquesdemexico.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 hover:bg-opacity-80 block text-center"
+          style={{
+            backgroundColor: '#003D49',
+            color: '#61B1A0',
+            border: '1px solid #61B1A0',
+          }}
+        >
+          By Parques de México
+        </a>
+      </div>
+    </div>
+  );
+
+  // Contenido del sidebar DESKTOP (con ScrollArea)
+  const sidebarContentDesktop = (
+    <>
       <div className="p-0">
         <SidebarSearch />
       </div>
-      {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-2">
-        <Accordion
-          type="multiple"
-          value={openAccordions}
-          onValueChange={setOpenAccordions}
-          className="space-y-1"
-        >          
-          {/* 1. GESTIÓN - MENÚ PRINCIPAL CON SUBMENÚS COLAPSABLES */}
-          <ModuleNav 
-            title="Gestión" 
-            icon={<FolderOpen className="h-5 w-5" />}
-            value="gestion"
-            defaultOpen={location.startsWith('/admin/visitors') || location.startsWith('/admin/parks') || location.startsWith('/admin/trees') || location.startsWith('/admin/organizador') || location.startsWith('/admin/activities') || location.startsWith('/admin/events') || location.startsWith('/admin/space-reservations') || location.startsWith('/admin/dashboard-reservas')}
-          >
-            {/* PARQUES */}
-            <CollapsibleSubmenu
-              id="parques"
-              title={t('navigation.parks')}
-              icon={<Trees className="h-4 w-4" />}
-              href="/admin/parks"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/parks')}
-            />
-
-            {/* ACTIVIDADES */}
-            <CollapsibleSubmenu
-              id="actividades"
-              title="Actividades"
-              icon={<Boxes className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('actividades')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('actividades')}
-            >
-              <NavItem 
-                href="/admin/activities/management" 
-                icon={<List className="h-4 w-4" />}
-                active={location.startsWith('/admin/activities/management')}
-              >
-                {t('navigation.listing')}
-              </NavItem>
-              <NavItem 
-                href="/admin/activities/calendar" 
-                icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/activities/calendar')}
-              >
-                Calendario
-              </NavItem>
-              <NavItem 
-                href="/admin/activities/categories" 
-                icon={<Tag className="h-4 w-4" />}
-                active={location.startsWith('/admin/activities/categories')}
-              >
-                Categorías
-              </NavItem>
-              <NavItem 
-                href="/admin/activities/registrations" 
-                icon={<UserCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/activities/registrations')}
-              >
-                Inscripciones
-              </NavItem>
-              <NavItem 
-                href="/admin/activities/instructors" 
-                icon={<GraduationCap className="h-4 w-4" />}
-                active={location.startsWith('/admin/activities/instructors')}
-              >
-                {t('navigation.instructors')}
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* AMENIDADES */}
-            <CollapsibleSubmenu
-              id="amenidades"
-              title="Amenidades"
-              icon={<Package className="h-4 w-4" />}
-              href="/admin/amenities"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/amenities')}
-            />
-
-            {/* ARBOLADO */}
-            <CollapsibleSubmenu
-              id="arbolado"
-              title="Arbolado"
-              icon={<TreePine className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('arbolado')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('arbolado')}
-            >
-              <NavItem 
-                href="/admin/trees/inventory" 
-                icon={<NotebookPen className="h-4 w-4" />}
-                active={location.startsWith('/admin/trees/inventory')}
-              >
-                {t('navigation.inventory')}
-              </NavItem>
-              <NavItem 
-                href="/admin/trees/species" 
-                icon={<Leaf className="h-4 w-4" />}
-                active={location.startsWith('/admin/trees/species')}
-              >
-                {t('navigation.species')}
-              </NavItem>
-              <NavItem 
-                href="/admin/trees/maintenance" 
-                icon={<Shovel className="h-4 w-4" />}
-                active={location.startsWith('/admin/trees/maintenance')}
-              >
-                {t('navigation.maintenance')}
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* FAUNA */}
-            <CollapsibleSubmenu
-              id="fauna"
-              title="Fauna"
-              icon={<Binoculars className="h-4 w-4" />}
-              href="/admin/fauna/species"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/fauna/species')}
-            />
-
-            {/* VISITANTES */}
-            <CollapsibleSubmenu
-              id="visitantes"
-              title="Visitantes"
-              icon={<Users className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('visitantes')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('visitantes')}
-            >
-              <NavItem 
-                href="/admin/visitors/count" 
-                icon={<UserSearch className="h-4 w-4" />}
-                active={location.startsWith('/admin/visitors/count')}
-              >
-                Conteo
-              </NavItem>
-
-
-              <NavItem 
-                href="/admin/visitors/feedback" 
-                icon={<MessageSquare className="h-4 w-4" />}
-                active={location.startsWith('/admin/visitors/feedback')}
-              >
-                Retroalimentación
-              </NavItem>
-            </CollapsibleSubmenu>
-            
-            {/* EVENTOS */}
-            <CollapsibleSubmenu
-              id="eventos"
-              title="Eventos"
-              icon={<CalendarDays className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('eventos')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('eventos')}
-            >
-              <NavItem 
-                href="/admin/events/categories" 
-                icon={<Tag className="h-4 w-4" />}
-                active={location.startsWith('/admin/events/categories')}
-              >
-                Categorías
-              </NavItem>
-              <NavItem 
-                href="/admin/events/list" 
-                icon={<List className="h-4 w-4" />}
-                active={location.startsWith('/admin/events/list')}
-              >
-                Listado
-              </NavItem>
-              <NavItem 
-                href="/admin/eventos-ambu/calendar" 
-                icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/eventos-ambu/calendar')}
-              >
-                Calendario
-              </NavItem>
-              <NavItem 
-                href="/admin/events/registrations" 
-                icon={<UserCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/events/registrations')}
-              >
-                Inscripciones
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* RESERVAS */}
-            <CollapsibleSubmenu
-              id="reservas"
-              title="Reservas"
-              icon={<CalendarClock className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('reservas')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('reservas')}
-            >
-              <NavItem 
-                href="/admin/space-reservations" 
-                icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/space-reservations')}
-              >
-                Reservas Activas
-              </NavItem>
-              <NavItem 
-                href="/admin/space-reservations/spaces" 
-                icon={<MapPin className="h-4 w-4" />}
-                active={location.startsWith('/admin/space-reservations/spaces')}
-              >
-                Espacios Disponibles
-              </NavItem>
-              <NavItem 
-                href="/admin/space-reservations/new" 
-                icon={<Plus className="h-4 w-4" />}
-                active={location.startsWith('/admin/space-reservations/new')}
-              >
-                Nueva Reserva
-              </NavItem>
-              <NavItem 
-                href="/admin/space-reservations/calendar" 
-                icon={<CalendarDays className="h-4 w-4" />}
-                active={location.startsWith('/admin/space-reservations/calendar')}
-              >
-                Cal. Reservas
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* EVALUACIONES */}
-            <CollapsibleSubmenu
-              id="evaluaciones"
-              title="Evaluaciones"
-              icon={<Star className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('evaluaciones')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('evaluaciones')}
-            >
-              <NavItem 
-                href="/admin/evaluations/parks" 
-                icon={<MapPin className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluations/parks')}
-              >
-                Parques
-              </NavItem>
-              <NavItem 
-                href="/admin/evaluations/instructors" 
-                icon={<UserCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluations/instructors')}
-              >
-                Instructores
-              </NavItem>
-              <NavItem 
-                href="/admin/evaluations/volunteers" 
-                icon={<Users className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluations/volunteers')}
-              >
-                Voluntarios
-              </NavItem>
-              <NavItem 
-                href="/admin/evaluations/activities" 
-                icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluations/activities')}
-              >
-                Actividades
-              </NavItem>
-              <NavItem 
-                href="/admin/evaluations/concessionaires" 
-                icon={<Building className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluations/concessionaires')}
-              >
-                Concesionarios
-              </NavItem>
-              <NavItem 
-                href="/admin/evaluations/events" 
-                icon={<Target className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluations/events')}
-              >
-                Eventos
-              </NavItem>
-              <NavItem 
-                href="/admin/evaluations/criteria" 
-                icon={<Settings className="h-4 w-4" />}
-                active={location.startsWith('/admin/evaluations/criteria')}
-              >
-                Criterios
-              </NavItem>
-            </CollapsibleSubmenu>
-          </ModuleNav>
-
-          {/* 3. O & M - OPERACIONES Y MANTENIMIENTO CON SUBMENÚS COLAPSABLES */}
-          <ModuleNav 
-            title={
-              <div className="flex items-center gap-2">
-                <span>O & M</span>
-                <span className="px-1.5 py-0.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full">BETA</span>
-              </div>
-            }
-            icon={<Wrench className="h-5 w-5" />}
-            value="operations"
-            defaultOpen={location.startsWith('/admin/assets') || location.startsWith('/admin/incidents') || location.startsWith('/admin/work-orders') || location.startsWith('/admin/warehouse') || location.startsWith('/admin/volunteers')}
-          >
-            {/* ACTIVOS */}
-            <CollapsibleSubmenu
-              id="activos"
-              title="Activos"
-              icon={<Package className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('activos')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('activos')}
-            >
-              <NavItem 
-                href="/admin/assets/categories" 
-                icon={<Tag className="h-4 w-4" />}
-                active={location.startsWith('/admin/assets/categories')}
-              >
-                Categorías
-              </NavItem>
-              <NavItem 
-                href="/admin/assets/inventory" 
-                icon={<Archive className="h-4 w-4" />}
-                active={location.startsWith('/admin/assets/inventory')}
-              >
-                {t('navigation.inventory')}
-              </NavItem>
-              <NavItem 
-                href="/admin/assets/map" 
-                icon={<Map className="h-4 w-4" />}
-                active={location.startsWith('/admin/assets/map')}
-              >
-                {t('navigation.map')}
-              </NavItem>
-              <NavItem 
-                href="/admin/assets/maintenance" 
-                icon={<Wrench className="h-4 w-4" />}
-                active={location.startsWith('/admin/assets/maintenance') && !location.includes('/calendar')}
-              >
-                {t('navigation.maintenance')}
-              </NavItem>
-              <NavItem 
-                href="/admin/assets/maintenance/calendar" 
-                icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/assets/maintenance/calendar')}
-              >
-                Cal. Mantenimiento
-              </NavItem>
-              <NavItem 
-                href="/admin/assets/assignments" 
-                icon={<UserCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/assets/assignments')}
-              >
-                {t('navigation.assignments')}
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* INCIDENCIAS */}
-            <CollapsibleSubmenu
-              id="incidencias"
-              title="Incidencias"
-              icon={<AlertTriangle className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('incidencias')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('incidencias')}
-            >
-              <NavItem 
-                href="/admin/incidents" 
-                icon={<ClipboardList className="h-4 w-4" />}
-                active={location.startsWith('/admin/incidents')}
-              >
-                {t('navigation.listing')}
-              </NavItem>
-              <NavItem 
-                href="/admin/incidents/categories" 
-                icon={<Tag className="h-4 w-4" />}
-                active={location.startsWith('/admin/incidents/categories')}
-              >
-                {t('navigation.categories')}
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* ÓRDENES DE TRABAJO */}
-            <CollapsibleSubmenu
-              id="ordenes-trabajo"
-              title="Órdenes de Trabajo"
-              icon={<FileText className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('ordenes-trabajo')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('ordenes-trabajo')}
-            >
-              <NavItem 
-                href="/admin/work-orders" 
-                icon={<ClipboardList className="h-4 w-4" />}
-                active={location === '/admin/work-orders' || (location.startsWith('/admin/work-orders') && !location.includes('/new'))}
-              >
-                Listado
-              </NavItem>
-              <NavItem 
-                href="/admin/work-orders/new" 
-                icon={<Plus className="h-4 w-4" />}
-                active={location.startsWith('/admin/work-orders/new')}
-              >
-                Nueva Orden
-              </NavItem>
-              <NavItem 
-                href="/admin/work-orders/dashboard" 
-                icon={<BarChart3 className="h-4 w-4" />}
-                active={location.startsWith('/admin/work-orders/dashboard')}
-              >
-                Dashboard
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* ALMACÉN */}
-            <CollapsibleSubmenu
-              id="almacen"
-              title="Almacén"
-              icon={<Archive className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('almacen')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('almacen')}
-            >
-              <NavItem 
-                href="/admin/warehouse/dashboard" 
-                icon={<BarChart3 className="h-4 w-4" />}
-                active={location.startsWith('/admin/warehouse/dashboard')}
-              >
-                Dashboard
-              </NavItem>
-              <NavItem 
-                href="/admin/warehouse/categories" 
-                icon={<Tag className="h-4 w-4" />}
-                active={location.startsWith('/admin/warehouse/categories')}
-              >
-                Categorías
-              </NavItem>
-              <NavItem 
-                href="/admin/warehouse/consumables" 
-                icon={<Package className="h-4 w-4" />}
-                active={location.startsWith('/admin/warehouse/consumables')}
-              >
-                Consumibles
-              </NavItem>
-              <NavItem 
-                href="/admin/warehouse/stock" 
-                icon={<Boxes className="h-4 w-4" />}
-                active={location.startsWith('/admin/warehouse/stock')}
-              >
-                Inventario
-              </NavItem>
-              <NavItem 
-                href="/admin/warehouse/movements" 
-                icon={<ArrowRightLeft className="h-4 w-4" />}
-                active={location.startsWith('/admin/warehouse/movements')}
-              >
-                Movimientos
-              </NavItem>
-              <NavItem 
-                href="/admin/warehouse/requisitions" 
-                icon={<ClipboardCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/warehouse/requisitions')}
-              >
-                Requisiciones
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* VOLUNTARIOS */}
-            <CollapsibleSubmenu
-              id="voluntarios"
-              title="Voluntarios"
-              icon={<HeartHandshake className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('voluntarios')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('voluntarios')}
-            >
-              <NavItem 
-                href="/admin/volunteers" 
-                icon={<Users className="h-4 w-4" />}
-                active={location.startsWith('/admin/volunteers')}
-              >
-                {t('navigation.listing')}
-              </NavItem>
-              <NavItem 
-                href="/admin/volunteers/register" 
-                icon={<Plus className="h-4 w-4" />}
-                active={location.startsWith('/admin/volunteers/register')}
-              >
-                Registro
-              </NavItem>
-
-              <NavItem 
-                href="/admin/volunteers/recognition" 
-                icon={<Award className="h-4 w-4" />}
-                active={location.startsWith('/admin/volunteers/recognition')}
-              >
-                Reconocimientos
-              </NavItem>
-            </CollapsibleSubmenu>
-          </ModuleNav>
-
-          {/* 4. ADMIN & FINANZAS */}
-          <ModuleNav 
-            title={
-              <div className="flex items-center gap-2">
-                <span>Admin & Finanzas</span>
-                <span className="px-1.5 py-0.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full">BETA</span>
-              </div>
-            }
-            icon={<DollarSign className="h-5 w-5" />}
-            value="admin-finance"
-            defaultOpen={location.startsWith('/admin/finance') || location.startsWith('/admin/accounting') || location.startsWith('/admin/concessions')}
-          >
-            {/* FINANZAS */}
-            <CollapsibleSubmenu
-              id="finanzas"
-              title="Finanzas"
-              icon={<Target className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('finanzas')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('finanzas')}
-            >
-              <NavItem 
-                href="/admin/finance/budget-planning" 
-                icon={<Target className="h-4 w-4" />}
-                active={location.startsWith('/admin/finance/budget-planning')}
-              >
-                Presupuestos
-              </NavItem>
-              <NavItem 
-                href="/admin/finance/cash-flow-matrix" 
-                icon={<LayoutGrid className="h-4 w-4" />}
-                active={location.startsWith('/admin/finance/cash-flow-matrix')}
-              >
-                {t('navigation.cashFlow')}
-              </NavItem>
-              <NavItem 
-                href="/admin/finance/calculadora-financiera" 
-                icon={<Calculator className="h-4 w-4" />}
-                active={location.startsWith('/admin/finance/calculadora-financiera')}
-              >
-                Calculadora Financiera
-              </NavItem>
-              <NavItem 
-                href="/admin/finance/pending-approval" 
-                icon={<ClipboardCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/finance/pending-approval')}
-              >
-                Aprobación de Actividades
-              </NavItem>
-              <NavItem 
-                href="/admin/payments" 
-                icon={<CreditCard className="h-4 w-4" />}
-                active={location.startsWith('/admin/payments')}
-              >
-                Registro de Pagos
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* CONTABILIDAD */}
-            <CollapsibleSubmenu
-              id="contabilidad"
-              title="Contabilidad"
-              icon={<BookOpen className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('contabilidad')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('contabilidad')}
-            >
-              <NavItem 
-                href="/admin/accounting/categories" 
-                icon={<FolderTree className="h-4 w-4" />}
-                active={location.startsWith('/admin/accounting/categories')}
-              >
-                Categorías
-              </NavItem>
-              <NavItem 
-                href="/admin/accounting/transactions" 
-                icon={<Receipt className="h-4 w-4" />}
-                active={location.startsWith('/admin/accounting/transactions')}
-              >
-                Transacciones
-              </NavItem>
-              <NavItem 
-                href="/admin/accounting/journal-entries" 
-                icon={<ClipboardList className="h-4 w-4" />}
-                active={location.startsWith('/admin/accounting/journal-entries')}
-              >
-                Asientos Contables
-              </NavItem>
-              <NavItem 
-                href="/admin/accounting/trial-balance" 
-                icon={<Scale className="h-4 w-4" />}
-                active={location.startsWith('/admin/accounting/trial-balance')}
-              >
-                Balanza
-              </NavItem>
-              <NavItem 
-                href="/admin/accounting/financial-statements" 
-                icon={<FileText className="h-4 w-4" />}
-                active={location.startsWith('/admin/accounting/financial-statements')}
-              >
-                Estados Financieros
-              </NavItem>
-              <NavItem 
-                href="/admin/accounting/integration" 
-                icon={<ArrowRightLeft className="h-4 w-4" />}
-                active={location.startsWith('/admin/accounting/integration')}
-              >
-                Integración
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* CONCESIONES */}
-            <CollapsibleSubmenu
-              id="concesiones"
-              title="Concesiones"
-              icon={<Store className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('concesiones')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('concesiones')}
-            >
-              <NavItem 
-                href="/admin/concessions/catalog" 
-                icon={<ListChecks className="h-4 w-4" />}
-                active={location.startsWith('/admin/concessions/catalog')}
-              >
-                Catálogo
-              </NavItem>
-              <NavItem 
-                href="/admin/concessions/concessionaires" 
-                icon={<Building className="h-4 w-4" />}
-                active={location.startsWith('/admin/concessions/concessionaires')}
-              >
-                Concesionarios
-              </NavItem>
-              <NavItem 
-                href="/admin/concessions/contracts" 
-                icon={<FileText className="h-4 w-4" />}
-                active={location.startsWith('/admin/concessions/contracts')}
-              >
-                {t('navigation.contracts')}
-              </NavItem>
-              <NavItem 
-                href="/admin/concessions/active" 
-                icon={<Handshake className="h-4 w-4" />}
-                active={location.startsWith('/admin/concessions/active')}
-              >
-                C. Activas
-              </NavItem>
-            </CollapsibleSubmenu>
-          </ModuleNav>
-
-          {/* 5. MKT & COMM */}
-          <ModuleNav 
-            title="Mkt & Comm" 
-            icon={<Megaphone className="h-5 w-5" />}
-            value="mkt-comm"
-            defaultOpen={location.startsWith('/admin/communications') || location.startsWith('/admin/marketing') || location.startsWith('/admin/advertising')}
-          >
-
-            {/* MARKETING */}
-            <CollapsibleSubmenu
-              id="marketing"
-              title="Marketing"
-              icon={<TrendingUp className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('marketing')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('marketing')}
-            >
-              <NavItem 
-                href="/admin/marketing/sponsors" 
-                icon={<Handshake className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/sponsors')}
-              >
-                Patrocinadores
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/contracts" 
-                icon={<FileText className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/contracts')}
-              >
-                Contratos
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/packages" 
-                icon={<PackagePlus className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/packages')}
-              >
-                Paquetes
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/benefits" 
-                icon={<Gift className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/benefits')}
-              >
-                Beneficios
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/events" 
-                icon={<Calendar className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/events')}
-              >
-                Eventos
-              </NavItem>
-              <NavItem 
-                href="/admin/marketing/assets" 
-                icon={<Package className="h-4 w-4" />}
-                active={location.startsWith('/admin/marketing/assets')}
-              >
-                Activos
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* ADVERTISING */}
-            <CollapsibleSubmenu
-              id="advertising"
-              title="Advertising"
-              icon={<Star className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('advertising')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('advertising')}
-            >
-              <NavItem 
-                href="/admin/advertising/spaces" 
-                icon={<LayoutGrid className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/spaces')}
-              >
-                Espacios
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/placements" 
-                icon={<MapPin className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/placements')}
-              >
-                Colocaciones
-              </NavItem>
-              <NavItem 
-                href="/admin/advertising/analytics" 
-                icon={<BarChart3 className="h-4 w-4" />}
-                active={location.startsWith('/admin/advertising/analytics')}
-              >
-                Métricas
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* COMMUNICATIONS */}
-            <CollapsibleSubmenu
-              id="communications"
-              title="Communications"
-              icon={<MessageSquare className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('communications')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('communications')}
-            >
-              <NavItem 
-                href="/admin/communications/templates" 
-                icon={<FileText className="h-4 w-4" />}
-                active={location.startsWith('/admin/communications/templates')}
-              >
-                Plantillas
-              </NavItem>
-              <NavItem 
-                href="/admin/communications/queue" 
-                icon={<ListChecks className="h-4 w-4" />}
-                active={location.startsWith('/admin/communications/queue')}
-              >
-                Cola de Emails
-              </NavItem>
-              <NavItem 
-                href="/admin/communications/bulk" 
-                icon={<Mail className="h-4 w-4" />}
-                active={location.startsWith('/admin/communications/bulk')}
-              >
-                Envío Masivo
-              </NavItem>
-            </CollapsibleSubmenu>
-          </ModuleNav>
-
-          {/* 6. RECURSOS HUMANOS */}
-          <ModuleNav 
-            title={
-              <div className="flex items-center gap-2">
-                <span>RH</span>
-                <span className="px-1.5 py-0.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full">BETA</span>
-              </div>
-            }
-            icon={<Users className="h-5 w-5" />}
-            value="hr"
-          >
-            <CollapsibleSubmenu
-              id="empleados"
-              title="Empleados"
-              icon={<Users className="h-5 w-5" />}
-              href="/admin/hr/employees"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/hr/employees')}
-            />
-
-            <CollapsibleSubmenu
-              id="nomina"
-              title="Nómina"
-              icon={<DollarSign className="h-5 w-5" />}
-              href="/admin/hr/payroll"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/hr/payroll')}
-            />
-
-            <CollapsibleSubmenu
-              id="vacaciones"
-              title="Vacaciones"
-              icon={<Calendar className="h-5 w-5" />}
-              href="/admin/hr/vacations"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/hr/vacations')}
-            />
-          </ModuleNav>
-
-          {/* 7. CONFIGURACIÓN Y SEGURIDAD */}
-          <ModuleNav 
-            title="Configuración" 
-            icon={<Settings className="h-5 w-5" />}
-            value="config-security"
-            defaultOpen={location.startsWith('/admin/configuracion-seguridad') || 
-                        location.startsWith('/admin/security') || 
-                        location.startsWith('/admin/settings') || 
-                        location.startsWith('/admin/users') || 
-                        location.startsWith('/admin/roles') || 
-                        location.startsWith('/admin/permissions') || 
-                        location.startsWith('/admin/role-assignments')}
-          >
-            {/* CONTROL DE ACCESO */}
-            <CollapsibleSubmenu
-              id="control-acceso"
-              title="Control de Acceso"
-              icon={<Shield className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('control-acceso')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('control-acceso')}
-            >
-              <NavItem 
-                href="/admin/configuracion-seguridad/access/roles" 
-                icon={<UserCog className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/access/roles')}
-              >
-                Gestión de Roles
-              </NavItem>
-              <NavItem 
-                href="/admin/configuracion-seguridad/access/permissions" 
-                icon={<Grid className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/access/permissions')}
-              >
-                Matriz de Permisos
-              </NavItem>
-
-              <NavItem 
-                href="/admin/configuracion-seguridad/access/users" 
-                icon={<Users className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/access/users')}
-              >
-                Gestión de Usuarios
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* POLÍTICAS */}
-            <CollapsibleSubmenu
-              id="politicas"
-              title="Políticas"
-              icon={<FileText className="h-4 w-4" />}
-              href="/admin/configuracion-seguridad/policies"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/configuracion-seguridad/policies')}
-            />
-
-            {/* NOTIFICACIONES */}
-            <CollapsibleSubmenu
-              id="notificaciones"
-              title="Notificaciones"
-              icon={<Bell className="h-4 w-4" />}
-              href="/admin/configuracion-seguridad/notifications"
-              collapsible={false}
-              isExpanded={false}
-              onToggle={() => {}}
-              isActive={location.startsWith('/admin/configuracion-seguridad/notifications')}
-            />
-
-            {/* AUDITORÍA */}
-            <CollapsibleSubmenu
-              id="auditoria"
-              title="Auditoría"
-              icon={<ClipboardList className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('auditoria')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('auditoria')}
-            >
-              <NavItem 
-                href="/admin/configuracion-seguridad/audit" 
-                icon={<ClipboardList className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/audit')}
-              >
-                Panel de Auditoría
-              </NavItem>
-              <NavItem 
-                href="/admin/configuracion-seguridad/audit/role-audits" 
-                icon={<UserCheck className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/audit/role-audits')}
-              >
-                Auditoría de Roles
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* MANTENIMIENTO */}
-            <CollapsibleSubmenu
-              id="mantenimiento-sistema"
-              title="Mantenimiento"
-              icon={<Database className="h-4 w-4" />}
-              isExpanded={expandedSubmenus.includes('mantenimiento-sistema')}
-              onToggle={toggleSubmenu}
-              isActive={isSubmenuActive('mantenimiento-sistema')}
-            >
-              <NavItem 
-                href="/admin/configuracion-seguridad/maintenance" 
-                icon={<Settings className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/maintenance')}
-              >
-                Panel de Mantenimiento
-              </NavItem>
-              <NavItem 
-                href="/admin/configuracion-seguridad/maintenance/backup" 
-                icon={<Download className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/maintenance/backup')}
-              >
-                Respaldos
-              </NavItem>
-              <NavItem 
-                href="/admin/configuracion-seguridad/maintenance/performance" 
-                icon={<TrendingUp className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/maintenance/performance')}
-              >
-                Rendimiento
-              </NavItem>
-              <NavItem 
-                href="/admin/configuracion-seguridad/maintenance/updates" 
-                icon={<Upload className="h-4 w-4" />}
-                active={location.startsWith('/admin/configuracion-seguridad/maintenance/updates')}
-              >
-                Actualizaciones
-              </NavItem>
-            </CollapsibleSubmenu>
-
-            {/* EXPORTACIONES */}
-            <CollapsibleSubmenu
-              id="exportaciones"
-              title="Exportaciones"
-              icon={<Download className="h-4 w-4" />}
-              href="/admin/configuracion-seguridad/exports"
-              collapsible={false}
-              isActive={location.startsWith('/admin/configuracion-seguridad/exports')}
-            />
-          </ModuleNav>
-
-        </Accordion>
+        {navigationContent}
       </ScrollArea>
-      {/* Footer con logo de ParkSys */}
-      <div className="p-8 border-t border-header-background" style={{ backgroundColor: '#003D49' }}>
-        <div className="flex flex-col items-center justify-center gap-4">
-          <img 
-            src={parksysLogo} 
-            alt="ParkSys - Sistema de parques" 
-            className="h-14 w-auto max-w-64 opacity-80 hover:opacity-100 transition-opacity pl-[5px] pr-[5px]"
-          />
-          <a 
-            href="https://parquesdemexico.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 hover:bg-opacity-80 block text-center"
-            style={{ 
-              backgroundColor: '#003D49',
-              color: '#61B1A0',
-              border: '1px solid #61B1A0'
-            }}
-          >
-            By Parques de México
-          </a>
-        </div>
+      {footerContent}
+    </>
+  );
+
+  // Contenido del sidebar MOBILE (scroll nativo)
+  const sidebarContentMobile = (
+    <>
+      {/* Barra de búsqueda - fija arriba */}
+      <div className="p-0 flex-shrink-0">
+        <SidebarSearch />
       </div>
-    </div>
+
+      {/* Navegación - scrolleable */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-2">
+        {navigationContent}
+      </div>
+
+      {/* Footer - fijo abajo */}
+      <div className="flex-shrink-0">
+        {footerContent}
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Botón de menú mobile - Inferior izquierdo */}
+      <button
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className={cn(
+          "fixed bottom-4 z-50 lg:hidden p-3 rounded-full bg-sidebar text-white shadow-lg transition-all duration-300",
+          isMobileOpen ? "left-[272px]" : "left-4"
+        )}
+        aria-label="Toggle menu"
+      >
+        {isMobileOpen ? (
+          <ChevronLeft className="h-6 w-6" />
+        ) : (
+          <ChevronRight className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* Overlay para mobile */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Desktop */}
+      <div
+        className="hidden lg:flex fixed left-0 w-64 flex-col shadow-lg z-40 bg-sidebar"
+        style={{ top: '80px', height: 'calc(100vh - 80px)' }}
+      >
+        {sidebarContentDesktop}
+      </div>
+
+      {/* Sidebar Mobile */}
+      <div
+        className={cn(
+          'fixed left-0 w-64 flex flex-col shadow-lg z-50 bg-sidebar transition-transform duration-300 lg:hidden',
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+        style={{ 
+          top: '0', 
+          height: '100vh',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        {sidebarContentMobile}
+      </div>
+    </>
   );
 };
 

@@ -41,6 +41,16 @@ const contextMap: { prefix: string; to: string; labelKey: string }[] = [
     labelKey: 'return.amenities',
   },
   {
+    prefix: ROUTES.admin.trees.species.list,
+    to: ROUTES.admin.trees.species.list,
+    labelKey: 'return.species',
+  },
+  {
+    prefix: ROUTES.admin.trees.list,
+    to: ROUTES.admin.trees.list,
+    labelKey: 'return.trees',
+  },
+  {
     prefix: ROUTES.admin.assets.list,
     to: ROUTES.admin.assets.list,
     labelKey: 'return.assets',

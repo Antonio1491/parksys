@@ -17,7 +17,7 @@ export const PageHeader = ({
   backgroundColor = 'bg-header-background',
 }: PageHeaderProps) => (
   <div
-    className={`mb-4 py-8 px-4 -mx-4 -mt-6 flex items-center justify-between ${backgroundColor}`}
+    className={`mb-4 py-4 md:py-8 px-4 -mx-4 -mt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0 ${backgroundColor}`}
   >
     {/* Sección izquierda: ícono + título + subtítulo */}
     <div className="flex items-start gap-2 mt-5">
@@ -36,11 +36,15 @@ export const PageHeader = ({
     </div>
 
     {/* Sección derecha: botones */}
-    <div className="flex gap-2 mt-8">
-      {actions.slice(0, 3).map((action, index) => (
-        <div key={index}>{action}</div>
-      ))}
-    </div>
+    {actions.length > 0 && (
+      <div className="flex flex-row gap-2 md:mt-8 self-end md:self-auto">
+        {actions.slice(0, 3).map((action, index) => (
+          <div key={index}>
+            {action}
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 );
 

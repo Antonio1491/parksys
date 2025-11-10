@@ -136,6 +136,7 @@ export const DASHBOARD_ROUTES = {
   evaluations: "/admin/dashboard/evaluations",
   assets: "/admin/dashboard/assets",
   incidents: "/admin/dashboard/incidents",
+  workOrders: "/admin/dashboard/work-orders",
   warehouse: "/admin/dashboard/warehouse",
   volunteers: "/admin/dashboard/volunteers",
   finance: "/admin/dashboard/finance",
@@ -167,21 +168,21 @@ export const ADMIN_PARKS = {
 // ============================================
 
 export const ADMIN_ACTIVITIES = {
-  list: "/admin/activities",
-  create: "/admin/activities/new",
+  list: "/admin/activities/catalog",
+  create: "/admin/activities/catalog/new",
   view: {
-    path: "/admin/activities/:id/view",
-    build: (id: string | number) => `/admin/activities/${id}/view`,
+    path: "/admin/activities/catalog/:id/view",
+    build: (id: string | number) => `/admin/activities/catalog/${id}/view`,
   },
   edit: {
-    path: "/admin/activities/:id/edit",
-    build: (id: string | number) => `/admin/activities/${id}/edit`,
+    path: "/admin/activities/catalog/:id/edit",
+    build: (id: string | number) => `/admin/activities/catalog/${id}/edit`,
   },
   calendar: "/admin/activities/calendar",
   registrations: "/admin/activities/registrations",
   registrationDetail: {
-    path: "/admin/activities/registrations/:id",
-    build: (id: string | number) => `/admin/activities/registrations/${id}`,
+    path: "/admin/activities/registrations/:id/view",
+    build: (id: string | number) => `/admin/activities/registrations/${id}/view`,
   },
   categories: {
     list: "/admin/activities/categories",
@@ -228,20 +229,24 @@ export const ADMIN_AMENITIES = {
 export const ADMIN_TREES = {
   list: "/admin/trees/inventory",
   map: "/admin/trees/map",
-  create: "/admin/trees/new",
+  create: "/admin/trees/inventory/new",
+  view: {
+    path: "/admin/trees/inventory/:id/view",
+    build: (id: string | number) => `/admin/trees/inventory/${id}/view`,
+  },
   edit: {
-    path: "/admin/trees/:id/edit",
-    build: (id: string | number) => `/admin/trees/${id}/edit`,
+    path: "/admin/trees/inventory/:id/edit",
+    build: (id: string | number) => `/admin/trees/inventory/${id}/edit`,
   },
   species: {
-    list: "/admin/trees/species",
-    create: "/admin/trees/species/new",
+    list: "/admin/trees/catalog",
+    create: "/admin/trees/catalog/new",
     view: {
-      path: "/admin/trees/species/:id/view",
-      build: (id: string | number) => `/admin/trees/species/${id}/view`,
+      path: "/admin/trees/catalog/:id/view",
+      build: (id: string | number) => `/admin/trees/catalog/${id}/view`,
     },
     edit: {
-      path: "/admin/trees/species/:id/edit",
+      path: "/admin/trees/catalog/:id/edit",
       build: (id: string | number) => `/admin/trees/species/${id}/edit`,
     },
   },
@@ -288,15 +293,15 @@ export const ADMIN_VISITORS = {
 // ============================================
 
 export const ADMIN_EVENTS = {
-  list: "/admin/events",
-  create: "/admin/events/new",
+  list: "/admin/events/catalog",
+  create: "/admin/events/catalog/new",
   view: {
-    path: "/admin/events/:id/view",
-    build: (id: string | number) => `/admin/events/${id}/view`,
+    path: "/admin/events/catalog/:id/view",
+    build: (id: string | number) => `/admin/events/catalog/${id}/view`,
   },
   edit: {
     path: "/admin/events/:id/edit",
-    build: (id: string | number) => `/admin/events/${id}/edit`,
+    build: (id: string | number) => `/admin/events/catalog/${id}/edit`,
   },
   registrations: "/admin/events/registrations",
   calendar: "/admin/events/calendar",
@@ -315,11 +320,11 @@ export const ADMIN_EVENTS = {
 // ============================================
 
 export const ADMIN_SPACE_RESERVATIONS = {
-  list: "/admin/space-reservations",
-  create: "/admin/space-reservations/new",
+  list: "/admin/space-reservations/management",
+  create: "/admin/space-reservations/management/new",
   edit: {
-    path: "/admin/space-reservations/:id/edit",
-    build: (id: string | number) => `/admin/space-reservations/${id}/edit`,
+    path: "/admin/space-reservations/management/:id/edit",
+    build: (id: string | number) => `/admin/space-reservations/management/${id}/edit`,
   },
   calendar: "/admin/space-reservations/calendar",
   spaces: {
@@ -360,16 +365,16 @@ export const ADMIN_EVALUATIONS = {
 // ============================================
 
 export const ADMIN_ASSETS = {
-  list: "/admin/assets",
+  list: "/admin/assets/inventory",
   map: "/admin/assets/map",
-  create: "/admin/assets/new",
+  create: "/admin/assets/inventory/new",
   view: {
-    path: "/admin/assets/:id/view",
-    build: (id: string | number) => `/admin/assets/${id}/view`,
+    path: "/admin/assets/inventory/:id/view",
+    build: (id: string | number) => `/admin/assets/inventory/${id}/view`,
   },
   edit: {
-    path: "/admin/assets/:id/edit",
-    build: (id: string | number) => `/admin/assets/${id}/edit`,
+    path: "/admin/assets/inventory/:id/edit",
+    build: (id: string | number) => `/admin/assets/inventory/${id}/edit`,
   },
   categories: {
     list: "/admin/assets/categories",
@@ -396,11 +401,11 @@ export const ADMIN_ASSETS = {
     },
   },
   maintenance: {
-    list: "/admin/assets/maintenance",
-    create: "/admin/assets/maintenance/new",
+    list: "/admin/assets/maintenance/management",
+    create: "/admin/assets/maintenance/management/new",
     edit: {
-      path: "/admin/assets/maintenance/:id/edit",
-      build: (id: string | number) => `/admin/assets/maintenance/${id}/edit`,
+      path: "/admin/assets/maintenance/management/:id/edit",
+      build: (id: string | number) => `/admin/assets/maintenance/management/${id}/edit`,
     },
     calendar: "/admin/assets/maintenance/calendar",
   },
@@ -411,15 +416,15 @@ export const ADMIN_ASSETS = {
 // ============================================
 
 export const ADMIN_INCIDENTS = {
-  list: "/admin/incidents",
-  create: "/admin/incidents/new",
+  list: "/admin/incidents/management",
+  create: "/admin/incidents/management/new",
   view: {
-    path: "/admin/incidents/:id/view",
-    build: (id: string | number) => `/admin/incidents/${id}/view`,
+    path: "/admin/incidents/management/:id/view",
+    build: (id: string | number) => `/admin/incidents/management/${id}/view`,
   },
   edit: {
-    path: "/admin/incidents/:id/edit",
-    build: (id: string | number) => `/admin/incidents/${id}/edit`,
+    path: "/admin/incidents/management/:id/edit",
+    build: (id: string | number) => `/admin/incidents/management/${id}/edit`,
   },
   categories: {
     list: "/admin/incidents/categories",
@@ -428,6 +433,19 @@ export const ADMIN_INCIDENTS = {
       path: "/admin/incidents/categories/:id/edit",
       build: (id: string | number) => `/admin/incidents/categories/${id}/edit`,
     },
+  },
+} as const;
+
+// ============================================
+// MÓDULO: ÓRDENES DE TRABAJO
+// ============================================
+
+export const ADMIN_WORK_ORDERS = {
+  list: "/admin/work-orders",
+  create: "/admin/work-orders/new",
+  view: {
+    path: "/admin/work-orders/:id/view",
+    build: (id: string | number) => `/admin/work-orders/${id}/view`,
   },
 } as const;
 
@@ -486,11 +504,11 @@ export const ADMIN_WAREHOUSE = {
 // ============================================
 
 export const ADMIN_VOLUNTEERS = {
-  list: "/admin/volunteers",
-  create: "/admin/volunteers/register",
+  list: "/admin/volunteers/management",
+  create: "/admin/volunteers/management/register",
   edit: {
-    path: "/admin/volunteers/edit/:id",
-    build: (id: string | number) => `/admin/volunteers/edit/${id}`,
+    path: "/admin/volunteers/management/edit/:id",
+    build: (id: string | number) => `/admin/volunteers/management/edit/${id}`,
   },
   activities: {
     list: '/admin/volunteers/activities',
@@ -528,7 +546,7 @@ export const ADMIN_FINANCE = {
   // Presupuesto
   budgetPlanning: "/admin/finance/budget-planning",
 
-  // Cédulas - fuera del sidebar
+  // Cédulas
   incomes: "/admin/finance/incomes",
   expenses: "/admin/finance/expenses",
 
@@ -1059,6 +1077,7 @@ export const ROUTES = {
     // Operación y Mantenimiento
     assets: ADMIN_ASSETS,
     incidents: ADMIN_INCIDENTS,
+    workOrders: ADMIN_WORK_ORDERS,
     warehouse: ADMIN_WAREHOUSE,
 
     // Personas

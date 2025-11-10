@@ -973,16 +973,16 @@ const AdminParksContent = () => {
               onClick={() => setLocation(ROUTES.admin.parks.create)}
               data-testid="button-new-park"
             >
-              <Plus className="w-4 h-4 mr-2 mr-2 stroke-[4]" />
-              Nuevo
+              <Plus className="w-4 h-4 md:mr-2 stroke-[4]" />
+              <span className="hidden md:inline">{t('actions.add')}</span>
             </Button>,
             <Button 
               variant="secondary" 
-              onClick={() => setLocation("/admin/parks-import")} // Cambiar a modal de importación
+              onClick={() => setLocation("/admin/parks-import")}
               data-testid="button-import-parks"
             >
-              <Upload className="h-4 w-4 mr-2" />
-              Importar
+              <Upload className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">{t('actions.import')}</span>
             </Button>,
             <ExportButton
               entity="parks"

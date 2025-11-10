@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ArrowLeft, Save, Loader2, Building2, Users, MapPin, Calendar, DollarSign, Phone, AlertTriangle } from 'lucide-react';
 import { Link } from 'wouter';
+import ROUTES from '@/routes';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
@@ -54,16 +55,19 @@ function ActiveConcessionForm() {
   const isEdit = !!id;
 
   // Obtener datos para formulario
-  const { data: concessionTypesData } = useQuery({
+  const { data: concessionTypesData, isLoading: loadingTypes } = useQuery({
     queryKey: ['/api/concession-types-active'],
+    staleTime: 5 * 60 * 1000, // 5 minutos
   });
 
-  const { data: concessionairesData } = useQuery({
+  const { data: concessionairesData, isLoading: loadingConcessionaires } = useQuery({
     queryKey: ['/api/concessionaires'],
+    staleTime: 5 * 60 * 1000,
   });
 
-  const { data: parksData } = useQuery({
-    queryKey: ['/api/parks?simple=true'],
+  const { data: parksData, isLoading: loadingParks } = useQuery({
+    queryKey: ['/api/parks-with-amenities'], // Endpoint simplificado sin importaciones dinámicas
+    staleTime: 5 * 60 * 1000,
   });
 
   // Obtener datos existentes si es edición
@@ -158,18 +162,18 @@ function ActiveConcessionForm() {
       submissionRef.current = false;
       processingRef.current.clear();
       setIsSubmitting(false);
-      
+
       toast({
         title: isEdit ? 'Concesión actualizada' : 'Concesión creada',
         description: `La concesión ${isEdit ? 'se ha actualizado' : 'se ha creado'} exitosamente.`
       });
       queryClient.invalidateQueries({ queryKey: ['/api/active-concessions'] });
-      
+
       if (!isEdit && response?.data?.id) {
         // Redirigir a gestión de imágenes después de crear
-        navigate(`/admin/concessions/active/${response.data.id}/images`);
+        navigate(ROUTES.admin.concessions.active.images.build(response.data.id));
       } else {
-        navigate('/admin/concessions/active');
+        navigate(ROUTES.admin.concessions.active.list);
       }
     },
     onError: (error: any) => {
@@ -177,7 +181,7 @@ function ActiveConcessionForm() {
       submissionRef.current = false;
       processingRef.current.clear();
       setIsSubmitting(false);
-      
+
       toast({
         title: 'Error',
         description: error.message || 'Ocurrió un error al guardar la concesión.',
@@ -194,25 +198,25 @@ function ActiveConcessionForm() {
 
   const onSubmit = (data: ActiveConcessionFormData) => {
     const now = Date.now();
-    
+
     // Capa 1: Verificar flag global de envío
     if (submissionRef.current) {
       console.log('🛑 [GUARD-1] Envío bloqueado por flag global');
       return;
     }
-    
+
     // Capa 2: Verificar estados de mutación y componente
     if (saveMutation.isPending || isSubmitting) {
       console.log('🛑 [GUARD-2] Operación ya en progreso, ignorando submit');
       return;
     }
-    
+
     // Capa 3: Debouncing temporal
     if (now - lastSubmitTime < 2000) {
       console.log('🛑 [GUARD-3] Envío demasiado rápido, ignorando submit');
       return;
     }
-    
+
     // Capa 4: Hash de datos para prevenir duplicados
     const dataHash = JSON.stringify(data);
     if (processingRef.current.has(dataHash)) {
@@ -253,16 +257,19 @@ function ActiveConcessionForm() {
       notes: data.notes,
       internalNotes: data.internalNotes
     };
-    
+
     console.log('✅ [PROTECTED-SUBMIT] Enviando concesión con protecciones activas:', mappedData);
     saveMutation.mutate(mappedData);
   };
 
   if (isEdit && loadingExisting) {
     return (
-      <AdminLayout title={isEdit ? "Editar Concesión Activa" : "Nueva Concesión Activa"}>
+      <AdminLayout title="Editar Concesión Activa">
         <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500"></div>
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500"></div>
+            <p className="text-gray-600">Cargando datos de la concesión...</p>
+          </div>
         </div>
       </AdminLayout>
     );
@@ -270,21 +277,73 @@ function ActiveConcessionForm() {
 
   const concessionTypes = concessionTypesData?.data || concessionTypesData || [];
   const concessionaires = concessionairesData || [];
-  const parks = parksData?.data || parksData || [];
+  const parks = Array.isArray(parksData) ? parksData : []; // El endpoint simplificado retorna directamente un array
+
+  // Logs de depuración
+  console.log('📊 Estado de carga:', {
+    loadingTypes,
+    loadingConcessionaires,
+    loadingParks,
+    loadingExisting: isEdit ? loadingExisting : 'N/A'
+  });
+  console.log('📦 Datos cargados:', {
+    concessionTypes: concessionTypes.length,
+    concessionaires: concessionaires.length,
+    parks: parks.length
+  });
 
   // Verificar que todos los datos estén cargados
-  const isDataLoading = !concessionTypesData || !concessionairesData || !parksData;
-  
+  const isDataLoading = loadingTypes || loadingConcessionaires || loadingParks;
+
   if (isDataLoading) {
     return (
       <AdminLayout title={isEdit ? "Editar Concesión Activa" : "Nueva Concesión Activa"}>
         <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500"></div>
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500"></div>
+            <p className="text-gray-600">Cargando datos del formulario...</p>
+          </div>
         </div>
       </AdminLayout>
     );
   }
 
+  // Validar que haya datos disponibles
+  if (concessionTypes.length === 0 || concessionaires.length === 0 || parks.length === 0) {
+    return (
+      <AdminLayout title={isEdit ? "Editar Concesión Activa" : "Nueva Concesión Activa"}>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="max-w-md bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-semibold text-yellow-900 mb-2">Datos Incompletos</h3>
+                <p className="text-yellow-800 text-sm mb-3">
+                  No se pudieron cargar todos los datos necesarios para el formulario:
+                </p>
+                <ul className="text-yellow-800 text-sm space-y-1 mb-4">
+                  {concessionTypes.length === 0 && <li>• Tipos de concesión</li>}
+                  {concessionaires.length === 0 && <li>• Concesionarios</li>}
+                  {parks.length === 0 && <li>• Parques</li>}
+                </ul>
+                <p className="text-yellow-800 text-sm">
+                  Por favor, verifica que estos catálogos tengan datos registrados antes de crear una concesión.
+                </p>
+                <div className="mt-4">
+                  <Link href={ROUTES.admin.concessions.active.list}>
+                    <Button variant="outline" size="sm">
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Volver al Listado
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
 
   return (
@@ -292,7 +351,7 @@ function ActiveConcessionForm() {
       <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/admin/concessions/active">
+        <Link href={ROUTES.admin.concessions.active.list}>
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver
@@ -815,7 +874,7 @@ function ActiveConcessionForm() {
 
           {/* Botones de Acción */}
           <div className="flex justify-end gap-4 pt-6 border-t">
-            <Link href="/admin/concessions/active">
+            <Link href={ROUTES.admin.concessions.active.list}>
               <Button variant="outline">Cancelar</Button>
             </Link>
             <Button 

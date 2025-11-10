@@ -88,17 +88,19 @@ export default function EditVolunteerActivity() {
     enabled: !!activityId,
   });
 
-  // Obtener lista de parques
-  const { data: parks = [], isLoading: isLoadingParks } = useArrayQuery(
-    "/api/parks",
-    "data"
+  // Obtener lista de parques - usando endpoint simplificado
+  const { data: parksData = [], isLoading: isLoadingParks } = useArrayQuery(
+    "/api/parks-with-amenities" // Este endpoint SÍ funciona según los logs
   );
 
+  const parks = Array.isArray(parksData) ? parksData : [];
+
   // Obtener lista de usuarios (supervisores)
-  const { data: users = [], isLoading: isLoadingUsers } = useArrayQuery(
-    "/api/users",
-    "data"
+  const { data: usersData = [], isLoading: isLoadingUsers } = useArrayQuery(
+    "/api/users"
   );
+
+  const users = Array.isArray(usersData) ? usersData : [];
 
   // Pre-llenar el formulario cuando se carguen los datos
   useEffect(() => {
@@ -500,12 +502,23 @@ export default function EditVolunteerActivity() {
                     <SelectItem value="loading" disabled>
                       Cargando usuarios...
                     </SelectItem>
+                  ) : users.length === 0 ? (
+                    <SelectItem value="empty" disabled>
+                      No hay usuarios disponibles
+                    </SelectItem>
                   ) : (
                     users
-                      .filter((user: any) => user.role === "admin" || user.role === "supervisor")
+                      .filter((user: any) => {
+                        // Filtrar por roleLevel (1 = super admin, 2 = admin, etc.)
+                        // O por roleName si prefieres
+                        return user.roleLevel <= 3; // Super admin, admin, y supervisor
+                      })
                       .map((user: any) => (
                         <SelectItem key={user.id} value={user.id.toString()}>
-                          {user.fullName || user.full_name || user.username}
+                          <div className="flex flex-col">
+                            <span>{user.fullName || user.username}</span>
+                            <span className="text-xs text-gray-500">{user.roleName}</span>
+                          </div>
                         </SelectItem>
                       ))
                   )}
@@ -541,8 +554,8 @@ export default function EditVolunteerActivity() {
           </Button>
           <Button
             type="submit"
+            variant="default"
             disabled={updateActivity.isPending}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
           >
             {updateActivity.isPending ? (
               <>
@@ -550,7 +563,7 @@ export default function EditVolunteerActivity() {
                 Actualizando...
               </>
             ) : (
-              "Guardar Cambios"
+              "Guardar"
             )}
           </Button>
         </div>

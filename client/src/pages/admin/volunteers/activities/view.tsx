@@ -5,7 +5,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import {
-  ArrowLeft,
   Calendar,
   MapPin,
   Users,
@@ -49,7 +48,8 @@ import { useToast } from "@/hooks/use-toast";
 import AdminLayout from "@/components/AdminLayout";
 import { ReturnHeader } from "@/components/ui/return-header";
 import { useArrayQuery } from "@/hooks/useArrayQuery";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
 
 export default function VolunteerActivityView() {
   const params = useParams();
@@ -321,6 +321,12 @@ export default function VolunteerActivityView() {
         </div>
         <div className="flex gap-2">
           <Button
+            onClick={() => setLocation(`${ROUTES.admin.volunteers.participations.create}?activityId=${activityId}`)}
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Inscribir Voluntario
+          </Button>
+          <Button
             variant="outline"
             onClick={() => setLocation(ROUTES.admin.volunteers.activities.edit.build(activityId))}
           >
@@ -496,14 +502,6 @@ export default function VolunteerActivityView() {
               </div>
             </CardContent>
           </Card>
-
-          <Button
-            onClick={() => setLocation(`${ROUTES.admin.volunteers.participations.create}?activityId=${activityId}`)}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
-          >
-            <UserPlus className="h-4 w-4 mr-2" />
-            Inscribir Voluntario
-          </Button>
         </div>
       </div>
 
@@ -564,7 +562,24 @@ export default function VolunteerActivityView() {
                     <TableRow key={participation.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold">
+                          {participation.volunteerProfileImage || participation.profileImageUrl ? (
+                            <img
+                              src={participation.volunteerProfileImage || participation.profileImageUrl}
+                              alt={participation.volunteerName || "Voluntario"}
+                              className="h-10 w-10 rounded-full object-cover border-2 border-green-200"
+                              onError={(e) => {
+                                // Fallback a inicial si la imagen falla
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <div 
+                            className={cn(
+                              "h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold",
+                              (participation.volunteerProfileImage || participation.profileImageUrl) && "hidden"
+                            )}
+                          >
                             {participation.volunteerName?.charAt(0) || "V"}
                           </div>
                           <div>
@@ -618,7 +633,7 @@ export default function VolunteerActivityView() {
                             variant="ghost"
                             size="sm"
                             onClick={() =>
-                              setLocation(ROUTES.admin.volunteers.participations.view.build(participation.id))
+                              setLocation(ROUTES.admin.volunteers.participations.edit.build(participation.id))
                             }
                           >
                             <Edit className="h-4 w-4" />

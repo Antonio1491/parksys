@@ -454,3 +454,15 @@
   margin-left: auto !important;
   margin-right: auto !important;
 }
+
+/* PageHeader: Solo mostrar iconos en móvil */
+@media (max-width: 768px) {
+  .page-header-action button span:not(.lucide) {
+    display: none;
+  }
+
+  .page-header-action button {
+    min-width: 2.5rem;
+    padding: 0.5rem;
+  }
+}

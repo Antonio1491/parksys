@@ -21,7 +21,7 @@ interface DatePickerProps {
 export function DatePicker({ 
   date, 
   setDate, 
-  placeholder = "Seleccionar fecha",
+  placeholder = "",
   className 
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +32,7 @@ export function DatePicker({
         <Button
           variant="outline"
           className={cn(
-            "justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal rounded-md",
             !date && "text-muted-foreground",
             className
           )}

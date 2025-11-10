@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MapPin, User, Phone, Mail, Building, Clock, ChevronLeft, ChevronRight, Plus, Search, Filter, Eye, Edit, Trash2, Images, RefreshCw, FileText } from 'lucide-react';
 import { Link } from 'wouter';
+import ROUTES from '@/routes';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/AdminLayout';
 
@@ -200,7 +201,7 @@ function ActiveConcessionsList() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Link href="/admin/concessions/active/new">
+              <Link href={ROUTES.admin.concessions.active.create}>
                 <Button className="bg-green-600 hover:bg-green-700 text-white gap-2">
                   <Plus size={16} />
                   Nueva Concesión Activa
@@ -378,12 +379,12 @@ function ActiveConcessionsList() {
                   <Eye className="h-4 w-4 mr-1" />
                   Ver
                 </Button>
-                <Link href={`/admin/concessions/active/${concession.id}/edit`}>
+                <Link href={ROUTES.admin.concessions.active.edit.build(concession.id)}>
                   <Button variant="outline" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href={`/admin/concessions/active/${concession.id}/images`}>
+                <Link href={ROUTES.admin.concessions.active.images.build(concession.id)}>
                   <Button variant="outline" size="sm" className="text-purple-600 hover:text-purple-700">
                     <Images className="h-4 w-4" />
                   </Button>
@@ -545,13 +546,13 @@ function ActiveConcessionsList() {
 
               {/* Acciones */}
               <div className="flex gap-4 pt-4 border-t">
-                <Link href={`/admin/concessions/active/${selectedConcession.id}/edit`}>
+                <Link href={ROUTES.admin.concessions.active.edit.build(selectedConcession.id)}>
                   <Button className="bg-blue-600 hover:bg-blue-700">
                     <Edit className="h-4 w-4 mr-2" />
                     Editar Concesión
                   </Button>
                 </Link>
-                <Link href={`/admin/concessions/active/${selectedConcession.id}/images`}>
+                <Link href={ROUTES.admin.concessions.active.images.build(selectedConcession.id)}>
                   <Button variant="outline">
                     Gestionar Imágenes ({selectedConcession.imageCount})
                   </Button>

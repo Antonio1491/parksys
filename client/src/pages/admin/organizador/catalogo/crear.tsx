@@ -386,6 +386,7 @@ const CrearActividadPage = () => {
           <div className="flex items-center gap-4">
             <Button
               type="submit"
+              className="bg-[#a0cc4d] hover:bg-[#ceefea] text-white"
               disabled={createMutation.isPending}
             >
               <Plus className="h-4 w-4 mr-2" />

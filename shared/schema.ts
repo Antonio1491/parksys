@@ -1953,7 +1953,7 @@ export const treesRelations = relations(trees, ({ one }) => ({
   park: one(parks, {
     fields: [trees.park_id],
     references: [parks.id],
-  })
+  }),
 }));
 
 export const treeMaintenancesRelations = relations(treeMaintenances, ({ one }) => ({
@@ -5389,6 +5389,4 @@ export type InsertSystemPermission = z.infer<typeof insertSystemPermissionSchema
 
 export type RolePermission = typeof rolePermissions.$inferSelect;
 export type InsertRolePermission = z.infer<typeof insertRolePermissionSchema>;
-
-
 

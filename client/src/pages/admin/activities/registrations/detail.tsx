@@ -84,7 +84,7 @@ interface Activity {
 }
 
 const ActivityRegistrationDetail = () => {
-  const [, params] = useRoute('/admin/activities/registrations/:id');
+  const [, params] = useRoute(ROUTES.admin.activities.registrationDetail.path);
   const [, setLocation] = useLocation();
   const activityId = params?.id ? parseInt(params.id) : null;
 
@@ -280,7 +280,7 @@ const ActivityRegistrationDetail = () => {
       <AdminLayout>
         <div className="text-center py-12">
           <p className="text-gray-600 mb-4">Actividad no encontrada</p>
-          <Button onClick={() => setLocation('/admin/activities/registrations')}>
+          <Button onClick={() => setLocation(ROUTES.admin.activities.registrations)}>
             Volver a inscripciones
           </Button>
         </div>

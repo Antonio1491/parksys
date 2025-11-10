@@ -31,6 +31,7 @@ export const adminSidebarStructure = [
     submenus: [
       { id: 'assets', type: 'group' },
       { id: 'incidents', type: 'group' },
+      { id: 'workOrders', type: 'link' },
       { id: 'warehouse', type: 'group' },
       { id: 'volunteers', type: 'group' },
     ],
@@ -63,14 +64,14 @@ export const adminSidebarStructure = [
       { id: 'employees', type: 'link' },
       { id: 'timeOff', type: 'link' },
       { id: 'training', type: 'link' },
-      { id: 'payroll', type: 'link' },
+      { id: 'payroll', type: 'group' },
       { id: 'timeTracking', type: 'link' },
       { id: 'wellness', type: 'link' },
     ],
   },
   {
     moduleKey: 'configSecurity',
-    labelKey: 'admin.security',
+    labelKey: 'admin.settings',
     icon: Shield,
     submenus: [
       { id: 'access', type: 'group' },

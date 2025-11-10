@@ -1298,6 +1298,56 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
     }
   });
 
+  // Eliminar árboles seleccionados (eliminación masiva)
+  apiRouter.post("/trees/bulk-delete", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { treeIds } = req.body;
+
+      // Validar que se recibieron IDs
+      if (!treeIds || !Array.isArray(treeIds) || treeIds.length === 0) {
+        return res.status(400).json({ 
+          message: "Se requiere un arreglo de IDs de árboles" 
+        });
+      }
+
+      // Validar que todos los IDs sean números
+      const validIds = treeIds.filter(id => !isNaN(Number(id)));
+      if (validIds.length === 0) {
+        return res.status(400).json({ 
+          message: "No se recibieron IDs válidos" 
+        });
+      }
+
+      // Eliminar mantenimientos asociados primero
+      const placeholders = validIds.map((_, i) => `$${i + 1}`).join(',');
+      await db.execute(sql.raw(`
+        DELETE FROM tree_maintenances 
+        WHERE tree_id IN (${placeholders})
+      `, validIds));
+
+      // Eliminar los árboles seleccionados
+      const result = await db.execute(sql.raw(`
+        DELETE FROM trees 
+        WHERE id IN (${placeholders})
+        RETURNING id
+      `, validIds));
+
+      const deletedCount = result.rows.length;
+
+      res.json({ 
+        success: true,
+        message: `Se eliminaron ${deletedCount} árbol(es) correctamente.`,
+        deletedCount: deletedCount
+      });
+    } catch (error) {
+      console.error("Error al eliminar árboles seleccionados:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Error al eliminar los árboles seleccionados" 
+      });
+    }
+  });
+
   // Obtener árboles por parque
   apiRouter.get("/parks/:id/trees", async (req: Request, res: Response) => {
     try {

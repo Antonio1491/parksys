@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from '@/components/ui/table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -23,14 +23,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { 
-  Calendar, Search, Filter, RefreshCw, Download, ArrowUpDown,
-  Clock, PlusCircle, FileEdit, FileX, CheckCircle, XCircle, AlertCircle
+  Calendar,
+  Search, 
+  Filter, 
+  RefreshCw,
+  Download,
+  ArrowUpDown,
+  Clock,
+  Plus,
+  Edit, 
+  FileX, 
+  CheckCircle, 
+  XCircle, 
+  AlertCircle,
+  Trash2
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
+import PageHeader from '@/components/ui/page-header';
 import { Link } from 'wouter';
 import ROUTES from '@/routes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { apiRequest } from '@/lib/queryClient';
 
 // Tipo actualizado para las participaciones
 interface Participation {
@@ -39,6 +64,7 @@ interface Participation {
   volunteerActivityId: number;
   volunteerName: string;
   volunteerEmail: string;
+  volunteerProfileImage?: string;
   activityName: string;
   activityDate: string;
   activityCategory: string;
@@ -55,10 +81,14 @@ interface Participation {
 }
 
 const ParticipationsList: React.FC = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [parkFilter, setParkFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [participationToDelete, setParticipationToDelete] = useState<Participation | null>(null);
   const pageSize = 10;
 
   // Fetch all participations
@@ -70,6 +100,44 @@ const ParticipationsList: React.FC = () => {
   const { data: parks = [] } = useQuery({
     queryKey: ['/api/parks'],
   });
+
+  // Delete participation mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (participationId: number) => {
+      return await apiRequest(`/api/volunteer-participations/${participationId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: '✅ Participación eliminada',
+        description: 'La participación se ha eliminado correctamente.',
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/participations/all'] });
+      setDeleteDialogOpen(false);
+      setParticipationToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: '❌ Error',
+        description: error.message || 'No se pudo eliminar la participación',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Handle delete click
+  const handleDeleteClick = (participation: Participation) => {
+    setParticipationToDelete(participation);
+    setDeleteDialogOpen(true);
+  };
+
+  // Confirm delete
+  const handleConfirmDelete = () => {
+    if (participationToDelete) {
+      deleteMutation.mutate(participationToDelete.id);
+    }
+  };
 
   // Filter participations
   const filteredParticipations = participations.filter((participation: Participation) => {
@@ -163,47 +231,39 @@ const ParticipationsList: React.FC = () => {
     }
   };
 
-  // Format time
-  const formatTime = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
-    try {
-      return format(new Date(dateString), 'HH:mm', { locale: es });
-    } catch {
-      return 'N/A';
-    }
-  };
-
   return (
     <AdminLayout>
-      <div className="container mx-auto py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Participaciones de Voluntarios</h1>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => refetch()}>
+      <div className="mx-auto">
+        <PageHeader 
+          title="Participaciones de Voluntarios"
+          subtitle="Gestione las participaciones de voluntarios en actividades de voluntariado."
+          icon={<Clock />}
+          actions={[
+            <Link href={ROUTES.admin.volunteers.participations.create} key="new">
+              <Button variant="primary">
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva
+              </Button>
+            </Link>,
+            <Button 
+              key="export"
+              variant="secondary" 
+              onClick={exportCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </Button>,
+            <Button 
+              key="refresh"
+              variant="tertiary" 
+              onClick={() => refetch()}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Actualizar
             </Button>
-            <Button variant="outline" onClick={exportCSV}>
-              <Download className="h-4 w-4 mr-2" />
-              Exportar
-            </Button>
-            <Link href={ROUTES.admin.volunteers.participations.create}>
-              <Button>
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Registrar Participación
-              </Button>
-            </Link>
-          </div>
-        </div>
+          ]}
+        />
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Registro de Participaciones</CardTitle>
-            <CardDescription>
-              Gestione las participaciones de voluntarios en actividades de voluntariado.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
             <div className="flex flex-col md:flex-row gap-4 mb-4">
               <div className="flex-1">
                 <div className="relative">
@@ -251,8 +311,9 @@ const ParticipationsList: React.FC = () => {
                 </Select>
               </div>
             </div>
-
-            {isLoading ? (
+          </CardHeader>
+          <CardContent>
+          {isLoading ? (
               <div className="text-center py-8">
                 <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
                 <p className="mt-2 text-gray-500">Cargando participaciones...</p>
@@ -292,13 +353,33 @@ const ParticipationsList: React.FC = () => {
                     {paginatedParticipations.map((participation: Participation) => (
                       <TableRow key={participation.id}>
                         <TableCell>
-                          <div className="flex flex-col">
-                            <Link href={`/admin/volunteers/${participation.volunteerId}`}>
-                              <Button variant="link" className="p-0 h-auto text-primary font-medium">
+                          <div className="flex items-center gap-3">
+                            {participation.volunteerProfileImage ? (
+                              <img
+                                src={participation.volunteerProfileImage}
+                                alt={participation.volunteerName}
+                                className="h-10 w-10 rounded-full object-cover border-2 border-blue-300"
+                                onError={(e) => {
+                                  // Fallback a inicial si la imagen falla
+                                  e.currentTarget.style.display = 'none';
+                                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                  if (fallback) fallback.classList.remove('hidden');
+                                }}
+                              />
+                            ) : null}
+                            <div 
+                              className={`h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold ${participation.volunteerProfileImage ? 'hidden' : ''}`}
+                            >
+                              {participation.volunteerName.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-medium text-sm text-gray-800">
                                 {participation.volunteerName}
-                              </Button>
-                            </Link>
-                            <span className="text-xs text-gray-500">{participation.volunteerEmail}</span>
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {participation.volunteerEmail}
+                              </span>
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -335,12 +416,23 @@ const ParticipationsList: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
-                            <Link href={`/admin/volunteers/participations/${participation.id}`}>
-                              <Button variant="outline" size="sm">
-                                <FileEdit className="h-3 w-3 mr-1" />
-                                Ver / Editar
+                            <Link href={ROUTES.admin.volunteers.participations.edit.build(participation.id)}>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-9 w-9"
+                              >
+                                <Edit className="h-4 w-4" />
                               </Button>
                             </Link>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-9 w-9 text-red-600 hover:bg-red-50"
+                              onClick={() => handleDeleteClick(participation)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -394,6 +486,30 @@ const ParticipationsList: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Dialog de Confirmación de Eliminación */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Eliminar participación?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta acción no se puede deshacer. Se eliminará permanentemente la participación de{" "}
+                <strong>{participationToDelete?.volunteerName}</strong> en la actividad{" "}
+                <strong>{participationToDelete?.activityName}</strong>.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
