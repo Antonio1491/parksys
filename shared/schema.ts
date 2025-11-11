@@ -5371,6 +5371,7 @@ export const insertRolePermissionSchema = createInsertSchema(rolePermissions).om
   grantedAt: true
 });
 
+
 // Tipos TypeScript para sistema de permisos
 export type PermissionModule = typeof permissionModules.$inferSelect;
 export type InsertPermissionModule = z.infer<typeof insertPermissionModuleSchema>;
@@ -5389,4 +5390,3 @@ export type InsertSystemPermission = z.infer<typeof insertSystemPermissionSchema
 
 export type RolePermission = typeof rolePermissions.$inferSelect;
 export type InsertRolePermission = z.infer<typeof insertRolePermissionSchema>;
-
