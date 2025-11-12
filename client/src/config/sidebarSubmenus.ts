@@ -480,7 +480,7 @@ export const navigableRoutes: Record<string, Array<{
   ],
   trees: [
     { route: ROUTES.admin.trees.list, labelKey: 'navigation.inventory', icon: NotebookPen },
-    { route: ROUTES.admin.trees.map, labelKey: 'navigation.map', icon: MapPin },
+    { route: ROUTES.admin.trees.map, labelKey: 'navigation.operation', icon: MapPin },
     { route: ROUTES.admin.trees.species.list, labelKey: 'navigation.species', icon: Leaf },
     { route: ROUTES.admin.trees.maintenance.list, labelKey: 'navigation.maintenance', icon: Shovel },
   ],

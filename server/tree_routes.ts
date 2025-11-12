@@ -18,6 +18,8 @@ import { fromZodError } from "zod-validation-error";
 import { sql } from 'drizzle-orm';
 import { getTreeInventory } from './tree_inventory_raw';
 import { getTreeMaintenanceStats } from './tree_maintenance_stats';
+import { registerTreeAreasRoutes } from "./tree_areas_routes";
+import { registerTreeLinksRoutes } from "./tree_links_routes";
 
 /**
  * Registra las rutas relacionadas con el módulo de arbolado
@@ -2286,4 +2288,10 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
       });
     }
   });
+  
+  // Registrar rutas de gestión de áreas
+  registerTreeAreasRoutes(app, apiRouter, isAuthenticated);
+
+  // Registrar rutas de vinculación de árboles
+  registerTreeLinksRoutes(app, apiRouter, isAuthenticated);
 }

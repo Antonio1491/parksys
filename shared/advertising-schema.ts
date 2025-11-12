@@ -43,49 +43,22 @@ export const adSpaces = pgTable('ad_spaces', {
 // De 16 campos → 15 campos
 // ============================================
 export const advertisements = pgTable('advertisements', {
-  // ============================================
-  // IDENTIFICACIÓN (2 campos)
-  // ============================================
   id: serial('id').primaryKey(),
   campaignId: integer('campaign_id').references(() => adCampaigns.id),
-
-  // ============================================
-  // CONTENIDO (2 campos)
-  // ============================================
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'), // ✅ Cambio: "content" → "description"
-
-  // ============================================
-  // MEDIA UNIFICADA (4 campos)
-  // ============================================
   // ✅ Cambio: Unificar imageUrl + videoUrl → mediaUrl
   mediaUrl: varchar('media_url', { length: 500 }),
   mediaType: varchar('media_type', { length: 20 }).notNull().default('image'), // "image", "video", "html"
   thumbnailUrl: varchar('thumbnail_url', { length: 500 }), // ✅ Nuevo: para videos
   duration: integer('duration'), // Para videos, en segundos
-
-  // ============================================
-  // CALL TO ACTION (2 campos)
-  // ============================================
   linkUrl: varchar('link_url', { length: 500 }),
   buttonText: varchar('button_text', { length: 100 }), // ✅ Nuevo: texto del CTA
-
-  // ============================================
-  // CONFIGURACIÓN (2 campos)
-  // ============================================
   // ✅ Cambio: "type" → "adType" para claridad
   adType: varchar('ad_type', { length: 50 }).notNull().default('banner'), // banner, video, native, institutional, commercial, promotional
   priority: integer('priority').default(5), // 1-10
-
-  // ============================================
-  // ESTADO (1 campo)
-  // ============================================
   // ✅ Cambio: Usar solo isActive, eliminar "status"
   isActive: boolean('is_active').default(true),
-
-  // ============================================
-  // TIMESTAMPS (2 campos)
-  // ============================================
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow()
 });

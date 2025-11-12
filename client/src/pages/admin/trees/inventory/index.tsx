@@ -39,13 +39,19 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Search, 
   Plus, 
-  Filter, 
+  Grid, 
   MapPin, 
   Eye, 
   TreeDeciduous, 
@@ -57,7 +63,7 @@ import {
   Loader2,
   Download,
   Upload,
-  FileSpreadsheet,
+  List,
   CopyCheck,
   CheckSquare,
   Square
@@ -93,6 +99,8 @@ interface TreeInventory {
   scientificName: string;
   parkId: number;
   parkName: string;
+  areaId: number | null;
+  areaName: string | null;
   latitude: string;
   longitude: string;
   plantingDate: string | null;
@@ -121,6 +129,9 @@ function TreeInventoryPage() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedTrees, setSelectedTrees] = useState<Set<number>>(new Set());
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [selectedArea, setSelectedArea] = useState('all');
+  const [selectedHealthStatus, setSelectedHealthStatus] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'map'>('table');
 
   // Consultar los parques para el filtro
   const { data: parksResponse, isLoading: isLoadingParks } = useQuery({
@@ -136,6 +147,20 @@ function TreeInventoryPage() {
   });
   
   const parks = parksResponse?.data || [];
+
+  const { data: areasResponse } = useQuery({
+    queryKey: ['/api/trees/areas'],
+    queryFn: async () => {
+      const response = await fetch('/api/trees/areas');
+      if (!response.ok) {
+        throw new Error('Error al cargar las áreas');
+      }
+      return response.json();
+    },
+    retry: 1,
+  });
+
+  const areas = areasResponse || [];
 
   // Consultar las especies para el filtro - solicitar todas las especies sin paginación
   const { data: speciesResponse, isLoading: isLoadingSpecies } = useQuery({
@@ -176,6 +201,10 @@ function TreeInventoryPage() {
       
       if (speciesFilter !== 'all') {
         url += `&speciesId=${speciesFilter}`;
+      }
+
+      if (selectedArea && selectedArea !== 'all') {
+        url += `&areaId=${selectedArea}`;
       }
       
       const response = await fetch(url);
@@ -738,6 +767,73 @@ function TreeInventoryPage() {
         onChange={handleFileUpload}
         style={{ display: 'none' }}
       />
+
+        {/* Cards de estadísticas */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Total de árboles</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">
+                    {treeInventory?.totalCount || 0}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <TreeDeciduous className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Áreas registradas</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">
+                    {areas?.length || 0}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <MapPin className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Árboles sanos</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">
+                    {treeInventory?.trees?.filter((t: any) => t.healthStatus === 'Bueno' || t.healthStatus === 'Excelente').length || 0}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <CircleCheck className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Requieren atención</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">
+                    {treeInventory?.trees?.filter((t: any) => t.healthStatus === 'Regular' || t.healthStatus === 'Malo' || t.healthStatus === 'Crítico').length || 0}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <CircleAlert className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         
         <Card className="mb-6">
           <CardHeader className="pb-0"></CardHeader>
@@ -811,6 +907,26 @@ function TreeInventoryPage() {
                     <SelectItem value="Regular">Regular</SelectItem>
                     <SelectItem value="Malo">Malo</SelectItem>
                     <SelectItem value="Crítico">Crítico</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro de área */}
+              <div className="min-w-[160px]">
+                <Select
+                  value={selectedArea}
+                  onValueChange={setSelectedArea}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filtrar por área" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las áreas</SelectItem>
+                    {areas?.map((area: any) => (
+                      <SelectItem key={area.id} value={area.id.toString()}>
+                        {area.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -891,190 +1007,200 @@ function TreeInventoryPage() {
           </CardContent>
         </Card>
 
-        <CardContent>
-          {isLoadingTrees ? (
+        {/* Tabs para registros y ubicación */}
+        <Tabs defaultValue="registros" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="registros">Registros</TabsTrigger>
+            <TabsTrigger value="ubicacion">Ubicación</TabsTrigger>
+          </TabsList>
 
-            // Estado de carga
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
-                </div>
-              </div>
-              <Skeleton className="h-[400px] w-full" />
-            </div>
-          ) : hasData ? (
+          <TabsContent value="registros">
+            <Card>
+              <CardContent>
+                {isLoadingTrees ? (
 
-            // Tabla con datos
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {selectionMode && (
-                      <TableHead className="w-12"></TableHead>
-                    )}
-                    <TableHead className="w-[120px]">Código</TableHead>
-                    <TableHead>Especie</TableHead>
-                    <TableHead>Parque</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Altura (m)</TableHead>
-                    <TableHead>DAP (cm)</TableHead>
-                    <TableHead>Última Inspección</TableHead>
-                    <TableHead>Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {treeInventory.data.map((tree: TreeInventory) => (
-                      <TableRow key={tree.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleViewDetails(tree.id)}>
+                  // Estado de carga
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-[250px]" />
+                        <Skeleton className="h-4 w-[200px]" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-[400px] w-full" />
+                  </div>
+                ) : hasData ? (
+
+                  // Tabla con datos
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
                         {selectionMode && (
-                          <TableCell onClick={(e) => e.stopPropagation()}>
-                            <Checkbox
-                              checked={selectedTrees.has(tree.id)}
-                              onCheckedChange={(checked) => handleSelectTree(tree.id, checked as boolean)}
-                            />
-                          </TableCell>
+                          <TableHead className="w-12"></TableHead>
                         )}
-                      <TableCell className="font-medium">{tree.code}</TableCell>
-                      <TableCell>
-                        <div className="font-medium">{tree.speciesName}</div>
-                        <div className="text-sm text-gray-500 italic">{tree.scientificName}</div>
-                      </TableCell>
-                      <TableCell>{tree.parkName}</TableCell>
-                      <TableCell>{getHealthStatusBadge(tree.healthStatus)}</TableCell>
-                      <TableCell>{tree.height ? `${tree.height} m` : '-'}</TableCell>
-                      <TableCell>{tree.diameter ? `${tree.diameter} cm` : '-'}</TableCell>
-                      <TableCell>{formatDate(tree.lastInspectionDate)}</TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewDetails(tree.id);
-                            }}
-                            className="bg-transparent text-gray-800"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Abrir mapa
-                              window.open(`https://www.google.com/maps/search/?api=1&query=${tree.latitude},${tree.longitude}`, '_blank');
-                            }}
-                            className="bg-transparent text-gray-800 border border-gray-200 hover:bg-[#ceefea]"
-                          >
-                            <MapPin className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        <TableHead className="w-[120px]">Código</TableHead>
+                        <TableHead>Especie</TableHead>
+                        <TableHead>Parque</TableHead>
+                        <TableHead>Área</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Altura (m)</TableHead>
+                        <TableHead>DAP (cm)</TableHead>
+                        <TableHead>Última Inspección</TableHead>
+                        <TableHead>Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {treeInventory.data.map((tree: TreeInventory) => (
+                        <TableRow key={tree.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleViewDetails(tree.id)}>
+                          {selectionMode && (
+                            <TableCell onClick={(e) => e.stopPropagation()}>
+                              <Checkbox
+                                checked={selectedTrees.has(tree.id)}
+                                onCheckedChange={(checked) => handleSelectTree(tree.id, checked as boolean)}
+                              />
+                            </TableCell>
+                          )}
+                          <TableCell className="font-medium">{tree.code}</TableCell>
+                          <TableCell>
+                            <div className="font-medium">{tree.speciesName}</div>
+                            <div className="text-sm text-gray-500 italic">{tree.scientificName}</div>
+                          </TableCell>
+                          <TableCell>{tree.parkName}</TableCell>
+                          <TableCell>{tree.areaName || '-'}</TableCell>
+                          <TableCell>{getHealthStatusBadge(tree.healthStatus)}</TableCell>
+                          <TableCell>{tree.height ? `${tree.height} m` : '-'}</TableCell>
+                          <TableCell>{tree.diameter ? `${tree.diameter} cm` : '-'}</TableCell>
+                          <TableCell>{formatDate(tree.lastInspectionDate)}</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewDetails(tree.id);
+                                }}
+                                className="bg-transparent text-gray-800"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(`https://www.google.com/maps/search/?api=1&query=${tree.latitude},${tree.longitude}`, '_blank');
+                                }}
+                                className="bg-transparent text-gray-800 border border-gray-200 hover:bg-[#ceefea]"
+                              >
+                                <MapPin className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500">No se encontraron árboles</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            {/* Paginación */}
+            {totalPages > 1 && (
+              <div className="mt-4 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setPage(Math.max(1, page - 1))}
+                        style={{ opacity: page === 1 ? 0.5 : 1, pointerEvents: page === 1 ? 'none' : 'auto' }}
+                      />
+                    </PaginationItem>
 
-              {/* Paginación */}
-              {totalPages > 1 && (
-                <div className="mt-4 flex justify-center">
-                  <Pagination>
-                    <PaginationContent>
+                    {/* Primera página */}
+                    {page > 2 && (
                       <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => setPage(Math.max(1, page - 1))}
-                          style={{ opacity: page === 1 ? 0.5 : 1, pointerEvents: page === 1 ? 'none' : 'auto' }}
-                        />
-                      </PaginationItem>
-
-                      {/* Primera página */}
-                      {page > 2 && (
-                        <PaginationItem>
-                          <PaginationLink onClick={() => handlePageChange(1)}>
-                            1
-                          </PaginationLink>
-                        </PaginationItem>
-                      )}
-
-                      {/* Elipsis si hay muchas páginas */}
-                      {page > 3 && (
-                        <PaginationItem>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )}
-
-                      {/* Página anterior si no es la primera */}
-                      {page > 1 && (
-                        <PaginationItem>
-                          <PaginationLink onClick={() => handlePageChange(page - 1)}>
-                            {page - 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )}
-
-                      {/* Página actual */}
-                      <PaginationItem>
-                        <PaginationLink isActive onClick={() => handlePageChange(page)}>
-                          {page}
+                        <PaginationLink onClick={() => handlePageChange(1)}>
+                          1
                         </PaginationLink>
                       </PaginationItem>
+                    )}
 
-                      {/* Página siguiente si no es la última */}
-                      {page < totalPages && (
-                        <PaginationItem>
-                          <PaginationLink onClick={() => handlePageChange(page + 1)}>
-                            {page + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )}
-
-                      {/* Elipsis si hay muchas páginas */}
-                      {page < totalPages - 2 && (
-                        <PaginationItem>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )}
-
-                      {/* Última página */}
-                      {page < totalPages - 1 && (
-                        <PaginationItem>
-                          <PaginationLink onClick={() => handlePageChange(totalPages)}>
-                            {totalPages}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )}
-
+                    {/* Elipsis si hay muchas páginas */}
+                    {page > 3 && (
                       <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => setPage(Math.min(totalPages, page + 1))}
-                          style={{ opacity: page === totalPages ? 0.5 : 1, pointerEvents: page === totalPages ? 'none' : 'auto' }}
-                        />
+                        <PaginationEllipsis />
                       </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+                    )}
+
+                    {/* Página anterior si no es la primera */}
+                    {page > 1 && (
+                      <PaginationItem>
+                        <PaginationLink onClick={() => handlePageChange(page - 1)}>
+                          {page - 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+
+                    {/* Página actual */}
+                    <PaginationItem>
+                      <PaginationLink isActive onClick={() => handlePageChange(page)}>
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+
+                    {/* Página siguiente si no es la última */}
+                    {page < totalPages && (
+                      <PaginationItem>
+                        <PaginationLink onClick={() => handlePageChange(page + 1)}>
+                          {page + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+
+                    {/* Elipsis si hay muchas páginas */}
+                    {page < totalPages - 2 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+
+                    {/* Última página */}
+                    {page < totalPages - 1 && (
+                      <PaginationItem>
+                        <PaginationLink onClick={() => handlePageChange(totalPages)}>
+                          {totalPages}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setPage(Math.min(totalPages, page + 1))}
+                        style={{ opacity: page === totalPages ? 0.5 : 1, pointerEvents: page === totalPages ? 'none' : 'auto' }}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="ubicacion">
+            <Card>
+              <CardContent className="p-6">
+                <div className="h-[600px] w-full bg-gray-100 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-500">Vista de mapa - En desarrollo</p>
                 </div>
-              )}
-            </>
-          ) : (
-            // No hay datos
-            <div className="text-center py-12">
-              <TreeDeciduous className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron árboles</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                No hay árboles registrados que coincidan con los criterios de búsqueda. Prueba a cambiar los filtros o agrega un nuevo árbol al inventario.
-              </p>
-              <Button 
-                onClick={handleAddTree}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Plus className="mr-2 h-4 w-4" /> Agregar Árbol
-              </Button>
-            </div>
-          )}
-        </CardContent>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
       
       {/* Bulk Delete Confirmation Dialog */}

@@ -915,6 +915,16 @@ function Router() {
               {React.createElement(React.lazy(() => import('@/pages/admin/advertising/advertisements')))}
             </Suspense>
           </Route>
+          <Route path={ROUTES.admin.advertising.advertisements.create}>
+            <Suspense fallback={<div className="p-8 text-center">Cargando anuncios...</div>}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/advertising/advertisements/new')))}
+            </Suspense>
+          </Route>
+          <Route path={ROUTES.admin.advertising.advertisements.edit.path}>
+            <Suspense fallback={<div className="p-8 text-center">Cargando anuncios...</div>}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/advertising/advertisements/edit')))}
+            </Suspense>
+          </Route>
           <Route path={ROUTES.admin.advertising.campaigns.list}>
             <Suspense fallback={<div className="p-8 text-center">Cargando campañas...</div>}>
               {React.createElement(React.lazy(() => import('@/pages/admin/advertising/campaigns')))}

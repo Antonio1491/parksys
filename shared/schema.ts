@@ -1631,6 +1631,7 @@ export const trees = pgTable("trees", {
   id: serial("id").primaryKey(),
   species_id: integer("species_id").references(() => treeSpecies.id),
   park_id: integer("park_id").references(() => parks.id),
+  area_id: integer("area_id").references(() => parkAreas.id, { onDelete: "set null" }),
   code: varchar("code", { length: 20 }).unique(), // Código único de identificación
   last_maintenance_date: date("last_maintenance_date"),
   created_by: integer("created_by"),
@@ -1945,7 +1946,7 @@ export const insertParkTreeSpeciesSchema = createInsertSchema(parkTreeSpecies).o
 export type InsertParkTreeSpecies = z.infer<typeof insertParkTreeSpeciesSchema>;
 
 // Relaciones
-export const treesRelations = relations(trees, ({ one }) => ({
+export const treesRelations = relations(trees, ({ one, many }) => ({
   species: one(treeSpecies, {
     fields: [trees.species_id],
     references: [treeSpecies.id],
@@ -1954,6 +1955,11 @@ export const treesRelations = relations(trees, ({ one }) => ({
     fields: [trees.park_id],
     references: [parks.id],
   }),
+  area: one(parkAreas, {
+    fields: [trees.area_id],
+    references: [parkAreas.id],
+  }),
+  maintenanceRecords: many(maintenanceRecords),
 }));
 
 export const treeMaintenancesRelations = relations(treeMaintenances, ({ one }) => ({
@@ -5371,6 +5377,182 @@ export const insertRolePermissionSchema = createInsertSchema(rolePermissions).om
   grantedAt: true
 });
 
+// ============================================
+// MÓDULO DE ARBOLADO - GESTIÓN DE ÁREAS Y MANTENIMIENTO
+// ============================================
+
+// Tabla: park_areas (Áreas de los parques)
+export const parkAreas = pgTable("park_areas", {
+  id: serial("id").primaryKey(),
+  parkId: integer("park_id").notNull().references(() => parks.id, { onDelete: "cascade" }),
+
+  // Información básica
+  name: varchar("name", { length: 255 }).notNull(),
+  code: varchar("code", { length: 50 }).notNull(),
+  codePrefix: varchar("code_prefix", { length: 10 }),
+  description: text("description"),
+  dimensions: varchar("dimensions", { length: 100 }),
+
+  // Multimedia
+  imageUrl: text("image_url"),
+
+  // Geolocalización
+  polygon: jsonb("polygon"),
+
+  // Configuración de vinculación automática
+  useGpsMatching: boolean("use_gps_matching").default(true),
+  useCodeMatching: boolean("use_code_matching").default(true),
+
+  // Estado
+  status: varchar("status", { length: 20 }).default("activa"),
+
+  // Auditoría
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabla: maintenance_schedules (Calendarios de mantenimiento)
+export const maintenanceSchedules = pgTable("maintenance_schedules", {
+  id: serial("id").primaryKey(),
+  areaId: integer("area_id").notNull().references(() => parkAreas.id, { onDelete: "cascade" }),
+
+  // Tipo de mantenimiento
+  maintenanceType: varchar("maintenance_type", { length: 50 }).notNull(),
+
+  // Configuración de frecuencia
+  frequencyMonths: integer("frequency_months").notNull(),
+  startDate: date("start_date").notNull(),
+
+  // Estado
+  isActive: boolean("is_active").default(true),
+
+  // Configuración visual
+  color: varchar("color", { length: 7 }),
+  icon: varchar("icon", { length: 50 }),
+
+  // Notas
+  notes: text("notes"),
+
+  // Auditoría
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabla: maintenance_records (Registros de mantenimiento)
+export const maintenanceRecords = pgTable("maintenance_records", {
+  id: serial("id").primaryKey(),
+
+  // Tipo y referencias
+  type: varchar("type", { length: 20 }).notNull(),
+  areaId: integer("area_id").references(() => parkAreas.id, { onDelete: "set null" }),
+  treeId: integer("tree_id").references(() => trees.id, { onDelete: "cascade" }),
+  scheduleId: integer("schedule_id").references(() => maintenanceSchedules.id, { onDelete: "set null" }),
+
+  // Datos del mantenimiento
+  maintenanceType: varchar("maintenance_type", { length: 50 }).notNull(),
+  scheduledDate: date("scheduled_date").notNull(),
+  completedDate: date("completed_date"),
+
+  // Estado y prioridad
+  status: varchar("status", { length: 20 }).default("programado").notNull(),
+  priority: varchar("priority", { length: 20 }).default("normal").notNull(),
+
+  // Personal asignado
+  assignedTo: integer("assigned_to").references(() => users.id, { onDelete: "set null" }),
+  completedBy: integer("completed_by").references(() => users.id, { onDelete: "set null" }),
+
+  // Detalles del trabajo
+  observations: text("observations"),
+  photos: jsonb("photos"),
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+
+  // Auto-programación
+  nextScheduledDate: date("next_scheduled_date"),
+
+  // Auditoría
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ============================================
+// RELACIONES
+// ============================================
+
+export const parkAreasRelations = relations(parkAreas, ({ one, many }) => ({
+  park: one(parks, {
+    fields: [parkAreas.parkId],
+    references: [parks.id],
+  }),
+  trees: many(trees),
+  maintenanceSchedules: many(maintenanceSchedules),
+  maintenanceRecords: many(maintenanceRecords),
+}));
+
+export const maintenanceSchedulesRelations = relations(maintenanceSchedules, ({ one, many }) => ({
+  area: one(parkAreas, {
+    fields: [maintenanceSchedules.areaId],
+    references: [parkAreas.id],
+  }),
+  maintenanceRecords: many(maintenanceRecords),
+}));
+
+export const maintenanceRecordsRelations = relations(maintenanceRecords, ({ one }) => ({
+  area: one(parkAreas, {
+    fields: [maintenanceRecords.areaId],
+    references: [parkAreas.id],
+  }),
+  tree: one(trees, {
+    fields: [maintenanceRecords.treeId],
+    references: [trees.id],
+  }),
+  schedule: one(maintenanceSchedules, {
+    fields: [maintenanceRecords.scheduleId],
+    references: [maintenanceSchedules.id],
+  }),
+  assignedUser: one(users, {
+    fields: [maintenanceRecords.assignedTo],
+    references: [users.id],
+  }),
+  completedByUser: one(users, {
+    fields: [maintenanceRecords.completedBy],
+    references: [users.id],
+  }),
+}));
+
+// ============================================
+// SCHEMAS DE VALIDACIÓN
+// ============================================
+
+export const insertParkAreaSchema = createInsertSchema(parkAreas).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertMaintenanceScheduleSchema = createInsertSchema(maintenanceSchedules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertMaintenanceRecordSchema = createInsertSchema(maintenanceRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+// ============================================
+// TIPOS TYPESCRIPT
+// ============================================
+
+export type ParkArea = typeof parkAreas.$inferSelect;
+export type InsertParkArea = z.infer<typeof insertParkAreaSchema>;
+
+export type MaintenanceSchedule = typeof maintenanceSchedules.$inferSelect;
+export type InsertMaintenanceSchedule = z.infer<typeof insertMaintenanceScheduleSchema>;
+
+export type MaintenanceRecord = typeof maintenanceRecords.$inferSelect;
+export type InsertMaintenanceRecord = z.infer<typeof insertMaintenanceRecordSchema>;
 
 // Tipos TypeScript para sistema de permisos
 export type PermissionModule = typeof permissionModules.$inferSelect;

@@ -41,6 +41,9 @@ import { registerTreeInventoryRoutes } from "./tree_inventory_routes";
 import { registerTreeStatsRoutes } from "./tree_stats_routes";
 import { registerTreeDetailsRoutes } from "./tree_details_route";
 import { registerTreeInventoryGeneratorRoutes } from "./tree-inventory-generator-routes";
+import parkAreasRoutes from "./routes/parkAreas";
+import treeMaintenanceRoutes from "./routes/treeMaintenance";
+import treeLinksRoutes from "./routes/treeLinks";
 // import { activityRouter } from "./activityRoutes"; // REMOVIDO: Evitar conflicto con activitiesRoutes.ts
 import directRouter from "./directRoutes";
 import { registerConcessionRoutes } from "./concession-routes";

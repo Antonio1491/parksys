@@ -247,7 +247,7 @@ export const ADMIN_TREES = {
     },
     edit: {
       path: "/admin/trees/catalog/:id/edit",
-      build: (id: string | number) => `/admin/trees/species/${id}/edit`,
+      build: (id: string | number) => `/admin/trees/catalog/${id}/edit`,
     },
   },
   maintenance: {
@@ -733,7 +733,7 @@ export const ADMIN_MARKETING = {
 } as const;
 
 // ============================================
-// MÓDULO: ADVERTISING - Sin TSX creados
+// MÓDULO: ADVERTISING
 // ============================================
 
 export const ADMIN_ADVERTISING = {

@@ -119,6 +119,7 @@ router.get('/spaces', async (req, res) => {
     const spaces = result.rows.map(row => ({
       id: row.id,
       name: row.name || `Espacio ${row.id}`,
+      description: row.description,
       pageType: row.page_type,
       position: row.position,
       dimensions: row.dimensions,
@@ -127,8 +128,7 @@ router.get('/spaces', async (req, res) => {
       isActive: row.is_active,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      name: row.name,
-      description: row.description,
+
     }));
     res.json({ success: true, data: spaces });
   } catch (error) {
@@ -347,24 +347,39 @@ router.delete('/spaces/:id', isAuthenticated, async (req, res) => {
 // Obtener todos los anuncios
 router.get('/advertisements', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM advertisements ORDER BY created_at DESC');
+    const result = await pool.query(`
+      SELECT 
+        a.*,
+        c.name as campaign_name,
+        c.client as campaign_client
+      FROM advertisements a
+      LEFT JOIN ad_campaigns c ON a.campaign_id = c.id
+      ORDER BY a.created_at DESC
+    `);
+
     const ads = result.rows.map(row => ({
       id: row.id,
+      campaignId: row.campaign_id,
       title: row.title,
       description: row.description,
-      imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
-      content: row.content,
-      targetUrl: row.content, // Asegurar que targetUrl existe para el formulario de assignments
-      button_text: row.button_text,
-      altText: row.alt_text,
-      campaignId: row.campaign_id,
+      mediaUrl: row.media_url,
+      mediaType: row.media_type,
+      thumbnailUrl: row.thumbnail_url,
+      duration: row.duration,
+      linkUrl: row.link_url,
+      buttonText: row.button_text,
+      adType: row.ad_type,
+      priority: row.priority,
       isActive: row.is_active,
-      mediaType: row.media_type || 'image',
-      storageType: row.storage_type || 'url',
-      duration: row.duration || 0,
       createdAt: row.created_at,
-      updatedAt: row.updated_at
+      updatedAt: row.updated_at,
+      // Relación con campaña
+      campaign: row.campaign_id ? {
+        name: row.campaign_name,
+        client: row.campaign_client
+      } : null
     }));
+
     res.json({ success: true, data: ads });
   } catch (error) {
     console.error('Error obteniendo anuncios:', error);
@@ -382,27 +397,33 @@ router.get('/space-mappings', async (req, res) => {
         asp.page_type,
         asp.position,
         asp.description,
+        asp.is_active as space_active,
         ads.id as ad_id,
         ads.title as ad_title,
-        ads.content as ad_content,
-        ads.image_url,
-        ads.content as link_url,
+        ads.description as ad_description,
+        ads.media_url,
+        ads.media_type,
+        ads.thumbnail_url,
+        ads.link_url,
+        ads.button_text,
+        ads.ad_type,
         ap.id as placement_id,
         ap.priority,
         ap.start_date,
         ap.end_date,
-        ap.is_active as placement_active,
-        asp.is_active as space_active
+        ap.page_type as placement_page_type,
+        ap.page_id as placement_page_id,
+        ap.is_active as placement_active
       FROM ad_spaces asp
       LEFT JOIN ad_placements ap ON asp.id = ap.ad_space_id AND ap.is_active = true
       LEFT JOIN advertisements ads ON ap.advertisement_id = ads.id
       ORDER BY asp.page_type, asp.position, asp.id
     `);
-    
-    res.json(mappings.rows);
+
+    res.json({ success: true, data: mappings.rows });
   } catch (error) {
     console.error('Error al obtener mapeo de espacios:', error);
-    res.status(500).json({ error: 'Error al obtener mapeo de espacios' });
+    res.status(500).json({ success: false, error: 'Error al obtener mapeo de espacios' });
   }
 });
 
@@ -410,26 +431,30 @@ router.get('/space-mappings', async (req, res) => {
 router.get('/campaigns/:campaignId/advertisements', async (req, res) => {
   try {
     const { campaignId } = req.params;
-    const result = await db.execute(sql`
+    const result = await pool.query(`
       SELECT * FROM advertisements 
-      WHERE campaign_id = ${parseInt(campaignId)}
+      WHERE campaign_id = $1
       ORDER BY created_at DESC
-    `);
+    `, [parseInt(campaignId)]);
+
     const ads = result.rows.map(row => ({
       id: row.id,
+      campaignId: row.campaign_id,
       title: row.title,
       description: row.description,
-      imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
-      content: row.content,
-      button_text: row.button_text,
-      campaignId: row.campaign_id,
-      startDate: row.start_date,
-      endDate: row.end_date,
+      mediaUrl: row.media_url,
+      mediaType: row.media_type,
+      thumbnailUrl: row.thumbnail_url,
+      duration: row.duration,
+      linkUrl: row.link_url,
+      buttonText: row.button_text,
+      adType: row.ad_type,
+      priority: row.priority,
       isActive: row.is_active,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }));
-    
+
     res.json({ success: true, data: ads });
   } catch (error) {
     console.error('Error obteniendo anuncios:', error);
@@ -437,139 +462,235 @@ router.get('/campaigns/:campaignId/advertisements', async (req, res) => {
   }
 });
 
+// Obtener anuncio por ID
+router.get('/advertisements/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT 
+        a.*,
+        c.name as campaign_name,
+        c.client as campaign_client
+      FROM advertisements a
+      LEFT JOIN ad_campaigns c ON a.campaign_id = c.id
+      WHERE a.id = $1
+    `, [parseInt(id)]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Anuncio no encontrado' });
+    }
+
+    const row = result.rows[0];
+    const ad = {
+      id: row.id,
+      campaignId: row.campaign_id,
+      title: row.title,
+      description: row.description,
+      mediaUrl: row.media_url,
+      mediaType: row.media_type,
+      thumbnailUrl: row.thumbnail_url,
+      duration: row.duration,
+      linkUrl: row.link_url,
+      buttonText: row.button_text,
+      adType: row.ad_type,
+      priority: row.priority,
+      isActive: row.is_active,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      campaign: row.campaign_id ? {
+        name: row.campaign_name,
+        client: row.campaign_client
+      } : null
+    };
+
+    res.json({ success: true, data: ad });
+  } catch (error) {
+    console.error('Error obteniendo anuncio:', error);
+    res.status(500).json({ success: false, error: 'Error obteniendo anuncio' });
+  }
+});
+
 // Crear nuevo anuncio
-router.post('/advertisements', isAuthenticated, upload.single('image'), async (req, res) => {
+router.post('/advertisements', isAuthenticated, async (req, res) => {
   try {
     const { 
-      campaign_id, 
-      title, 
-      description, 
-      content, 
-      image_url, 
-      button_text,
-      media_type, 
-      storage_type, 
-      duration, 
-      alt_text, 
-      is_active 
+      campaignId, title, description, mediaUrl, mediaType,
+      thumbnailUrl, duration, linkUrl, buttonText, adType,
+      priority, isActive
     } = req.body;
-    
-    console.log('Datos recibidos para crear anuncio:', req.body);
-    
-    // Usar SQL con SERIAL para generar ID automáticamente
+
+    console.log('📝 Creando anuncio:', req.body);
+
     const result = await pool.query(`
       INSERT INTO advertisements (
-        campaign_id, 
-        title, 
-        description, 
-        content, 
-        image_url, 
-        button_text,
-        media_type, 
-        storage_type, 
-        duration, 
-        alt_text, 
-        is_active,
-        created_at,
-        updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        campaign_id, title, description, media_url, media_type,
+        thumbnail_url, duration, link_url, button_text, ad_type,
+        priority, is_active
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
     `, [
-      campaign_id && campaign_id !== 0 ? parseInt(campaign_id) : null,
-      title || 'Anuncio sin título',
-      description || '',
-      content || '',
-      image_url || '',
-      button_text || '',
-      media_type || 'image',
-      storage_type || 'url',
-      duration ? parseInt(duration) : 0,
-      alt_text || '',
-      is_active !== undefined ? is_active : true,
-      new Date(),
-      new Date()
+      campaignId || null,
+      title,
+      description || null,
+      mediaUrl || null,
+      mediaType || 'image',
+      thumbnailUrl || null,
+      duration || null,
+      linkUrl || null,
+      buttonText || null,
+      adType || 'banner',
+      priority || 5,
+      isActive !== undefined ? isActive : true
     ]);
-    
-    res.json({ success: true, data: result.rows[0] });
+
+    const row = result.rows[0];
+    console.log('✅ Anuncio creado:', row.id);
+
+    res.json({ 
+      success: true, 
+      data: {
+        id: row.id,
+        campaignId: row.campaign_id,
+        title: row.title,
+        description: row.description,
+        mediaUrl: row.media_url,
+        mediaType: row.media_type,
+        thumbnailUrl: row.thumbnail_url,
+        duration: row.duration,
+        linkUrl: row.link_url,
+        buttonText: row.button_text,
+        adType: row.ad_type,
+        priority: row.priority,
+        isActive: row.is_active,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }
+    });
   } catch (error) {
-    console.error('Error creando anuncio:', error);
-    res.status(500).json({ success: false, error: 'Error creando anuncio' });
+    console.error('❌ Error creando anuncio:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error creando anuncio' 
+    });
   }
 });
 
 // Actualizar anuncio
-router.put('/advertisements/:id', isAuthenticated, upload.single('image'), async (req, res) => {
+router.put('/advertisements/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
-    const data = req.body;
-    
-    console.log('Datos recibidos para actualizar anuncio:', data);
-    
-    // Mapear los campos que vienen del frontend
-    const updateQuery = `
+    const {
+      campaignId,
+      title,
+      description,
+      mediaUrl,
+      mediaType,
+      thumbnailUrl,
+      duration,
+      linkUrl,
+      buttonText,
+      adType,
+      priority,
+      isActive
+    } = req.body;
+
+    console.log('Actualizando anuncio con datos:', req.body);
+
+    const result = await pool.query(`
       UPDATE advertisements 
       SET 
-        title = $1,
-        description = $2,
-        image_url = $3,
-        content = $4,
-        campaign_id = $5,
-        is_active = $6,
-        media_type = $7,
-        storage_type = $8,
-        duration = $9,
-        alt_text = $10,
-        button_text = $11,
+        campaign_id = $1,
+        title = $2,
+        description = $3,
+        media_url = $4,
+        media_type = $5,
+        thumbnail_url = $6,
+        duration = $7,
+        link_url = $8,
+        button_text = $9,
+        ad_type = $10,
+        priority = $11,
+        is_active = $12,
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $12
+      WHERE id = $13
       RETURNING *
-    `;
-    
-    const params = [
-      data.title || '',
-      data.description || '',
-      data.image_url || '',
-      data.content || '',
-      data.campaign_id || 1,
-      data.is_active !== undefined ? data.is_active : true,
-      data.media_type || 'image',
-      data.storage_type || 'url',
-      data.duration || 0,
-      data.alt_text || '',
-      data.button_text || '',
+    `, [
+      campaignId || null,
+      title,
+      description || null,
+      mediaUrl || null,
+      mediaType,
+      thumbnailUrl || null,
+      duration || null,
+      linkUrl || null,
+      buttonText || null,
+      adType,
+      priority || 5,
+      isActive !== undefined ? isActive : true,
       parseInt(id)
-    ];
-    
-    const result = await pool.query(updateQuery, params);
-    
+    ]);
+
     if (result.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Anuncio no encontrado' });
     }
-    
-    // Mapear respuesta a camelCase
-    const updatedAd = result.rows[0];
+
+    const row = result.rows[0];
     const response = {
-      id: updatedAd.id,
-      title: updatedAd.title,
-      description: updatedAd.description,
-      imageUrl: updatedAd.image_url,
-      content: updatedAd.content,
-      button_text: updatedAd.button_text,
-      campaignId: updatedAd.campaign_id,
-      isActive: updatedAd.is_active,
-      mediaType: updatedAd.media_type,
-      storageType: updatedAd.storage_type,
-      duration: updatedAd.duration,
-      altText: updatedAd.alt_text,
-      createdAt: updatedAd.created_at,
-      updatedAt: updatedAd.updated_at
+      id: row.id,
+      campaignId: row.campaign_id,
+      title: row.title,
+      description: row.description,
+      mediaUrl: row.media_url,
+      mediaType: row.media_type,
+      thumbnailUrl: row.thumbnail_url,
+      duration: row.duration,
+      linkUrl: row.link_url,
+      buttonText: row.button_text,
+      adType: row.ad_type,
+      priority: row.priority,
+      isActive: row.is_active,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
     };
-    
-    console.log('Anuncio actualizado exitosamente:', response);
+
     res.json({ success: true, data: response });
   } catch (error) {
     console.error('Error actualizando anuncio:', error);
-    res.status(500).json({ success: false, error: 'Error actualizando anuncio' });
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Eliminar anuncio
+router.delete('/advertisements/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log('🗑️ Eliminando anuncio:', id);
+
+    const result = await pool.query(
+      'DELETE FROM advertisements WHERE id = $1 RETURNING *',
+      [parseInt(id)]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Anuncio no encontrado' 
+      });
+    }
+
+    console.log('✅ Anuncio eliminado:', result.rows[0].id);
+
+    res.json({ 
+      success: true, 
+      message: 'Anuncio eliminado correctamente' 
+    });
+  } catch (error) {
+    console.error('❌ Error eliminando anuncio:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error eliminando anuncio' 
+    });
   }
 });
 
