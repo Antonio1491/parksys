@@ -1,364 +1,449 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X, Plus, Upload, Image, Video, Carousel, FileText } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { AlertCircle } from "lucide-react";
+import type { AdSpace, SpaceFormData } from "@/types/advertising";
+import {
+  PAGE_TYPE_OPTIONS,
+  POSITION_OPTIONS,
+  ALLOWED_FORMATS_OPTIONS,
+} from "@/types/advertising";
 
-const spaceSchema = z.object({
-  page_type: z.string().min(1, 'Tipo de página es requerido'),
-  position: z.string().min(1, 'Posición es requerida'),
-  page_identifier: z.string().optional(),
-  name: z.string().min(1, 'Nombre es requerido'),
+// Schema de validación
+const spaceFormSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
   description: z.string().optional(),
-  width: z.number().min(1, 'Ancho es requerido'),
-  height: z.number().min(1, 'Alto es requerido'),
-  category: z.string().min(1, 'Categoría es requerida'),
-  is_active: z.boolean(),
+  dimensions: z
+    .string()
+    .regex(/^\d+x\d+$/, "Formato inválido. Usa: 1200x90")
+    .optional()
+    .or(z.literal("")),
+  position: z.string().min(1, "La posición es requerida"),
+  pageType: z.string().min(1, "El tipo de página es requerido"),
+  maxFileSize: z
+    .string()
+    .regex(/^\d+$/, "Debe ser un número")
+    .optional()
+    .or(z.literal("")),
+  allowedFormats: z.array(z.string()).min(1, "Selecciona al menos un formato"),
+  isActive: z.boolean(),
 });
 
-type SpaceFormData = z.infer<typeof spaceSchema>;
-
 interface SpaceFormProps {
-  space?: any;
-  onSave: (data: SpaceFormData) => void;
+  space?: AdSpace | null;
+  onSubmit: (data: SpaceFormData) => void;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
-const SpaceForm: React.FC<SpaceFormProps> = ({ space, onSave, onCancel }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  
+export default function SpaceForm({
+  space,
+  onSubmit,
+  onCancel,
+  isSubmitting = false,
+}: SpaceFormProps) {
   const {
     register,
     handleSubmit,
     watch,
-    setValue,
+    control,
     formState: { errors },
   } = useForm<SpaceFormData>({
-    resolver: zodResolver(spaceSchema),
+    resolver: zodResolver(spaceFormSchema),
     defaultValues: {
-      page_type: space?.page_type || '',
-      position: space?.position || '',
-      page_identifier: space?.page_identifier || '',
-      name: space?.name || '',
-      description: space?.description || '',
-      width: space?.width || 300,
-      height: space?.height || 250,
-      category: space?.category || '',
-      is_active: space?.is_active ?? true,
+      name: space?.name || "",
+      description: space?.description || "",
+      dimensions: space?.dimensions || "",
+      position: space?.position || "",
+      pageType: space?.pageType || "",
+      maxFileSize: space?.maxFileSize?.toString() || "5242880", // 5MB default
+      allowedFormats: space?.allowedFormats || ["image/jpeg", "image/png"],
+      isActive: space?.isActive ?? true,
     },
   });
 
-  const watchedPageType = watch('page_type');
-  const watchedPosition = watch('position');
-  const watchedCategory = watch('category');
+  const watchedDimensions = watch("dimensions");
+  const watchedPageType = watch("pageType");
+  const watchedPosition = watch("position");
+  const watchedIsActive = watch("isActive");
+  const watchedAllowedFormats = watch("allowedFormats");
 
-  const pageTypes = [
-    { value: 'homepage', label: 'Página Principal', icon: '🏠' },
-    { value: 'parks', label: 'Parques', icon: '🌳' },
-    { value: 'activities', label: 'Actividades', icon: '🎯' },
-    { value: 'concessions', label: 'Concesiones', icon: '🏪' },
-    { value: 'instructors', label: 'Instructores', icon: '👨‍🏫' },
-    { value: 'volunteers', label: 'Voluntarios', icon: '🤝' },
-    { value: 'tree-species', label: 'Especies Arbóreas', icon: '🌲' },
-  ];
-
-  const positions = [
-    { value: 'header', label: 'Cabecera', description: 'Parte superior de la página' },
-    { value: 'sidebar', label: 'Barra lateral', description: 'Lateral derecho/izquierdo' },
-    { value: 'footer', label: 'Pie de página', description: 'Parte inferior' },
-    { value: 'hero', label: 'Hero/Banner', description: 'Sección principal destacada' },
-    { value: 'profile', label: 'Perfil', description: 'Dentro de perfiles individuales' },
-  ];
-
-  const categories = [
-    { value: 'institutional', label: 'Institucional', color: 'bg-blue-100 text-blue-800' },
-    { value: 'commercial', label: 'Comercial', color: 'bg-green-100 text-green-800' },
-  ];
-
-  const onSubmit = async (data: SpaceFormData) => {
-    setIsSubmitting(true);
-    try {
-      const method = space ? 'PUT' : 'POST';
-      const url = space 
-        ? `/api/advertising-management/spaces/${space.id}`
-        : '/api/advertising-management/spaces';
-      
-      await apiRequest(url, method, data);
-      
-      toast({ 
-        title: `Espacio ${space ? 'actualizado' : 'creado'} correctamente`,
-        description: `El espacio "${data.name}" ha sido ${space ? 'actualizado' : 'creado'} exitosamente.`
-      });
-      
-      onSave(data);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Hubo un error al procesar la solicitud',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  // Calcular preview de dimensiones
+  const getPreviewDimensions = () => {
+    if (!watchedDimensions) return null;
+    const match = watchedDimensions.match(/^(\d+)x(\d+)$/);
+    if (!match) return null;
+    const [, width, height] = match;
+    return {
+      width: Math.min(parseInt(width), 400),
+      height: Math.min(parseInt(height), 200),
+      original: { width: parseInt(width), height: parseInt(height) },
+    };
   };
+
+  const previewDimensions = getPreviewDimensions();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <Tabs defaultValue="basic" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="basic">Información Básica</TabsTrigger>
-          <TabsTrigger value="preview">Vista Previa</TabsTrigger>
-        </TabsList>
+      {/* Información básica */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Información Básica</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Nombre */}
+          <div>
+            <Label htmlFor="name">
+              Nombre del Espacio <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="name"
+              {...register("name")}
+              placeholder="Ej: Sidebar Principal - Parques"
+              className={errors.name ? "border-red-500" : ""}
+            />
+            {errors.name && (
+              <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.name.message}
+              </p>
+            )}
+          </div>
 
-        <TabsContent value="basic" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Información del Espacio</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Nombre del Espacio *</Label>
-                  <Input
-                    id="name"
-                    {...register('name')}
-                    placeholder="Ej: Sidebar Principal - Parques"
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-red-600">{errors.name.message}</p>
-                  )}
-                </div>
+          {/* Descripción */}
+          <div>
+            <Label htmlFor="description">Descripción</Label>
+            <Textarea
+              id="description"
+              {...register("description")}
+              placeholder="Describe el propósito y ubicación de este espacio..."
+              rows={3}
+            />
+            <p className="text-xs text-gray-600 mt-1">
+              Opcional: Ayuda a identificar el espacio fácilmente
+            </p>
+          </div>
 
-                <div>
-                  <Label htmlFor="page_type">Tipo de Página *</Label>
+          {/* Estado activo */}
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <Label htmlFor="isActive" className="font-medium">
+                Espacio Activo
+              </Label>
+              <p className="text-sm text-gray-600 mt-1">
+                Los espacios activos pueden recibir anuncios
+              </p>
+            </div>
+            <Controller
+              name="isActive"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  id="isActive"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Ubicación */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Ubicación del Espacio</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Tipo de página */}
+            <div>
+              <Label htmlFor="pageType">
+                Tipo de Página <span className="text-red-500">*</span>
+              </Label>
+              <Controller
+                name="pageType"
+                control={control}
+                render={({ field }) => (
                   <Select
-                    value={watchedPageType}
-                    onValueChange={(value) => setValue('page_type', value)}
+                    value={field.value || ""}
+                    onValueChange={field.onChange}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger
+                      className={errors.pageType ? "border-red-500" : ""}
+                    >
                       <SelectValue placeholder="Seleccionar página" />
                     </SelectTrigger>
                     <SelectContent>
-                      {pageTypes.map(type => (
-                        <SelectItem key={type.value} value={type.value}>
-                          <div className="flex items-center gap-2">
-                            <span>{type.icon}</span>
-                            <span>{type.label}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {PAGE_TYPE_OPTIONS.filter((opt) => opt.value !== "all").map(
+                        (option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
-                  {errors.page_type && (
-                    <p className="text-sm text-red-600">{errors.page_type.message}</p>
-                  )}
-                </div>
-              </div>
+                )}
+              />
+              {errors.pageType && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.pageType.message}
+                </p>
+              )}
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="position">Posición *</Label>
+            {/* Posición */}
+            <div>
+              <Label htmlFor="position">
+                Posición <span className="text-red-500">*</span>
+              </Label>
+              <Controller
+                name="position"
+                control={control}
+                render={({ field }) => (
                   <Select
-                    value={watchedPosition}
-                    onValueChange={(value) => setValue('position', value)}
+                    value={field.value || ""}
+                    onValueChange={field.onChange}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger
+                      className={errors.position ? "border-red-500" : ""}
+                    >
                       <SelectValue placeholder="Seleccionar posición" />
                     </SelectTrigger>
                     <SelectContent>
-                      {positions.map(pos => (
-                        <SelectItem key={pos.value} value={pos.value}>
-                          <div>
-                            <div className="font-medium">{pos.label}</div>
-                            <div className="text-sm text-gray-600">{pos.description}</div>
-                          </div>
+                      {POSITION_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.position && (
-                    <p className="text-sm text-red-600">{errors.position.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Categoría *</Label>
-                  <Select
-                    value={watchedCategory}
-                    onValueChange={(value) => setValue('category', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(cat => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          <div className="flex items-center gap-2">
-                            <Badge className={cat.color}>{cat.label}</Badge>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.category && (
-                    <p className="text-sm text-red-600">{errors.category.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="page_identifier">Identificador de Página</Label>
-                <Input
-                  id="page_identifier"
-                  {...register('page_identifier')}
-                  placeholder="Ej: park-detail, activity-list (opcional)"
-                />
-                <p className="text-sm text-gray-600 mt-1">
-                  Específica una página particular dentro del tipo seleccionado
+                )}
+              />
+              {errors.position && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.position.message}
                 </p>
-              </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-              <div>
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  {...register('description')}
-                  placeholder="Describe el propósito y ubicación de este espacio..."
-                  rows={3}
-                />
-              </div>
+      {/* Especificaciones técnicas */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Especificaciones Técnicas</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Dimensiones */}
+            <div>
+              <Label htmlFor="dimensions">Dimensiones (píxeles)</Label>
+              <Input
+                id="dimensions"
+                {...register("dimensions")}
+                placeholder="Ej: 1200x90"
+                className={errors.dimensions ? "border-red-500" : ""}
+              />
+              {errors.dimensions && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.dimensions.message}
+                </p>
+              )}
+              <p className="text-xs text-gray-600 mt-1">
+                Formato: ancho x alto (ej: 1200x90)
+              </p>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="width">Ancho (px) *</Label>
-                  <Input
-                    id="width"
-                    type="number"
-                    min="1"
-                    {...register('width', { valueAsNumber: true })}
-                  />
-                  {errors.width && (
-                    <p className="text-sm text-red-600">{errors.width.message}</p>
-                  )}
-                </div>
+            {/* Tamaño máximo de archivo */}
+            <div>
+              <Label htmlFor="maxFileSize">Tamaño Máximo (bytes)</Label>
+              <Input
+                id="maxFileSize"
+                {...register("maxFileSize")}
+                placeholder="5242880"
+                type="number"
+                className={errors.maxFileSize ? "border-red-500" : ""}
+              />
+              {errors.maxFileSize && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.maxFileSize.message}
+                </p>
+              )}
+              <p className="text-xs text-gray-600 mt-1">
+                Por defecto: 5MB (5242880 bytes)
+              </p>
+            </div>
+          </div>
 
-                <div>
-                  <Label htmlFor="height">Alto (px) *</Label>
-                  <Input
-                    id="height"
-                    type="number"
-                    min="1"
-                    {...register('height', { valueAsNumber: true })}
-                  />
-                  {errors.height && (
-                    <p className="text-sm text-red-600">{errors.height.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="is_active">Estado Activo</Label>
-                  <p className="text-sm text-gray-600">
-                    Espacios activos pueden recibir anuncios
-                  </p>
-                </div>
-                <Switch
-                  id="is_active"
-                  checked={watch('is_active')}
-                  onCheckedChange={(checked) => setValue('is_active', checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="preview" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Vista Previa del Espacio</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge className="bg-blue-100 text-blue-800">
-                      {watchedPageType || 'Sin página'}
-                    </Badge>
-                    <Badge className="bg-green-100 text-green-800">
-                      {watchedPosition || 'Sin posición'}
-                    </Badge>
-                    {watchedCategory && (
-                      <Badge className={categories.find(c => c.value === watchedCategory)?.color || 'bg-gray-100 text-gray-800'}>
-                        {categories.find(c => c.value === watchedCategory)?.label || watchedCategory}
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-600">
-                      <strong>Dimensiones:</strong> {watch('width') || 0} x {watch('height') || 0} px
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      <strong>Identificador:</strong> {watch('page_identifier') || 'No especificado'}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      <strong>Estado:</strong> {watch('is_active') ? 'Activo' : 'Inactivo'}
-                    </div>
-                  </div>
-
-                  {watch('width') && watch('height') && (
-                    <div className="mt-4">
-                      <div className="text-sm text-gray-600 mb-2">Simulación del espacio:</div>
-                      <div 
-                        className="border-2 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center text-gray-500 text-sm"
-                        style={{
-                          width: `${Math.min(watch('width') || 300, 400)}px`,
-                          height: `${Math.min(watch('height') || 250, 200)}px`,
+          {/* Formatos permitidos */}
+          <div>
+            <Label>
+              Formatos Permitidos <span className="text-red-500">*</span>
+            </Label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+              {ALLOWED_FORMATS_OPTIONS.map((format) => (
+                <Controller
+                  key={format.value}
+                  name="allowedFormats"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={format.value}
+                        checked={field.value.includes(format.value)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            field.onChange([...field.value, format.value]);
+                          } else {
+                            field.onChange(
+                              field.value.filter((v) => v !== format.value)
+                            );
+                          }
                         }}
+                      />
+                      <Label
+                        htmlFor={format.value}
+                        className="text-sm font-normal cursor-pointer"
                       >
-                        Espacio Publicitario
-                      </div>
+                        {format.label}
+                      </Label>
                     </div>
                   )}
+                />
+              ))}
+            </div>
+            {errors.allowedFormats && (
+              <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.allowedFormats.message}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Vista previa */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Vista Previa del Espacio</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Badges informativos */}
+            <div className="flex flex-wrap gap-2">
+              {watchedPageType && (
+                <Badge variant="outline">
+                  {PAGE_TYPE_OPTIONS.find((p) => p.value === watchedPageType)
+                    ?.label || watchedPageType}
+                </Badge>
+              )}
+              {watchedPosition && (
+                <Badge variant="secondary">
+                  {POSITION_OPTIONS.find((p) => p.value === watchedPosition)
+                    ?.label || watchedPosition}
+                </Badge>
+              )}
+              <Badge
+                variant={watchedIsActive ? "default" : "secondary"}
+                className={
+                  watchedIsActive
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-800"
+                }
+              >
+                {watchedIsActive ? "Activo" : "Inactivo"}
+              </Badge>
+            </div>
+
+            {/* Información técnica */}
+            <div className="text-sm space-y-1 text-gray-600">
+              <p>
+                <strong>Dimensiones:</strong>{" "}
+                {watchedDimensions || "No especificadas"}
+              </p>
+              <p>
+                <strong>Formatos:</strong>{" "}
+                {watchedAllowedFormats.length > 0
+                  ? watchedAllowedFormats
+                      .map((f) => f.split("/")[1]?.toUpperCase())
+                      .join(", ")
+                  : "Ninguno"}
+              </p>
+            </div>
+
+            {/* Preview visual */}
+            {previewDimensions && (
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <p className="text-sm text-gray-600 mb-3">
+                  Simulación del espacio (escala ajustada para visualización):
+                </p>
+                <div className="flex items-center justify-center">
+                  <div
+                    className="border-2 border-dashed border-gray-300 bg-white flex items-center justify-center text-gray-400 text-sm"
+                    style={{
+                      width: `${previewDimensions.width}px`,
+                      height: `${previewDimensions.height}px`,
+                    }}
+                  >
+                    <div className="text-center">
+                      <p className="font-medium">Espacio Publicitario</p>
+                      <p className="text-xs">
+                        {previewDimensions.original.width} x{" "}
+                        {previewDimensions.original.height} px
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
+      {/* Botones de acción */}
       <div className="flex justify-end gap-3">
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button
+          type="button"
+          variant="outline"
           onClick={onCancel}
           disabled={isSubmitting}
         >
           Cancelar
         </Button>
-        <Button 
-          type="submit" 
-          className="bg-[#00a587] hover:bg-[#067f5f]"
+        <Button
+          type="submit"
+          className="bg-[#00a587] hover:bg-[#008c72]"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Guardando...' : (space ? 'Actualizar' : 'Crear')} Espacio
+          {isSubmitting
+            ? "Guardando..."
+            : space
+            ? "Actualizar Espacio"
+            : "Crear Espacio"}
         </Button>
       </div>
     </form>
   );
-};
-
-export default SpaceForm;
+}

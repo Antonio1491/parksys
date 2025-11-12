@@ -92,7 +92,7 @@ export const sidebarSubmenus = {
   ],
   trees: [
     ROUTES.admin.trees.list,
-    ROUTES.admin.trees.map,
+    ROUTES.admin.trees.operation,
     ROUTES.admin.trees.create,
     ROUTES.admin.trees.species.list,
     ROUTES.admin.trees.species.create,
@@ -480,7 +480,7 @@ export const navigableRoutes: Record<string, Array<{
   ],
   trees: [
     { route: ROUTES.admin.trees.list, labelKey: 'navigation.inventory', icon: NotebookPen },
-    { route: ROUTES.admin.trees.map, labelKey: 'navigation.operation', icon: MapPin },
+    { route: ROUTES.admin.trees.operation, labelKey: 'navigation.operation', icon: MapPin },
     { route: ROUTES.admin.trees.species.list, labelKey: 'navigation.species', icon: Leaf },
     { route: ROUTES.admin.trees.maintenance.list, labelKey: 'navigation.maintenance', icon: Shovel },
   ],

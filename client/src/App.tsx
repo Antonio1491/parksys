@@ -405,9 +405,9 @@ function Router() {
               {React.createElement(React.lazy(() => import('@/pages/admin/trees/inventory/new')))}
             </Suspense>
           </Route>
-          <Route path={ROUTES.admin.trees.map}>
-            <Suspense fallback={<div className="p-8 text-center">Cargando mapa de árboles...</div>}>
-              {React.createElement(React.lazy(() => import('@/pages/admin/trees/map/fixed-map')))}
+          <Route path={ROUTES.admin.trees.operation}>
+            <Suspense fallback={<div className="p-8 text-center">Cargando gestión de áreas...</div>}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/trees/operation')))}
             </Suspense>
           </Route>
           <Route path={ROUTES.admin.trees.species.list}>
@@ -908,6 +908,16 @@ function Router() {
           <Route path={ROUTES.admin.advertising.spaces.list}>
             <Suspense fallback={<div className="p-8 text-center">Cargando gestión de espacios publicitarios...</div>}>
               {React.createElement(React.lazy(() => import('@/pages/admin/advertising/spaces')))}
+            </Suspense>
+          </Route>
+          <Route path={ROUTES.admin.advertising.spaces.create}>
+            <Suspense fallback={<div className="p-8 text-center">Cargando formulario de espacios...</div>}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/advertising/spaces/new')))}
+            </Suspense>
+          </Route>
+          <Route path={ROUTES.admin.advertising.spaces.edit.path}>
+            <Suspense fallback={<div className="p-8 text-center">Cargando formulario de espacios...</div>}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/advertising/spaces/edit')))}
             </Suspense>
           </Route>
           <Route path={ROUTES.admin.advertising.advertisements.list}>

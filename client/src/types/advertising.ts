@@ -1,4 +1,4 @@
-// src/types/advertising.ts
+// src/types/advertising.ts - ACTUALIZADO
 
 /**
  * Tipos e interfaces para el módulo de Advertising
@@ -121,28 +121,28 @@ export interface AdPlacement {
   id: number;
   advertisementId: number;
   adSpaceId: number;
-  
+
   // Targeting
   pageType: PageType;
   pageId?: number | null;
-  
+
   // Fechas
   startDate: string | Date;
   endDate: string | Date;
-  
+
   // Configuración
   priority: number;
   isActive: boolean;
-  
+
   // Programación horaria
   frequency: FrequencyType;
   scheduledDays?: DayOfWeek[] | null;
   scheduledHours?: number[] | null;
-  
+
   // Métricas
   impressions: number;
   clicks: number;
-  
+
   // Timestamps
   createdAt: string | Date;
   updatedAt: string | Date;
@@ -245,6 +245,7 @@ export interface SpaceFormData {
   pageType: string;
   isActive: boolean;
   maxFileSize: string;
+  allowedFormats: string[]; // ⬅️ AGREGADO
 }
 
 export interface PlacementFormData {
@@ -352,6 +353,23 @@ export const PAGE_TYPE_OPTIONS: { value: PageType; label: string }[] = [
   { value: "species", label: "Especies" },
   { value: "activities", label: "Actividades" },
   { value: "concessions", label: "Concesiones" },
+];
+
+// ⬇️ NUEVAS CONSTANTES AGREGADAS
+export const POSITION_OPTIONS: { value: string; label: string }[] = [
+  { value: "header", label: "Header" },
+  { value: "sidebar", label: "Barra Lateral" },
+  { value: "footer", label: "Footer" },
+  { value: "native", label: "Nativo" },
+  { value: "hero", label: "Hero" },
+  { value: "content", label: "Contenido" },
+];
+
+export const ALLOWED_FORMATS_OPTIONS: { value: string; label: string }[] = [
+  { value: "image/jpeg", label: "JPG" },
+  { value: "image/png", label: "PNG" },
+  { value: "image/webp", label: "WebP" },
+  { value: "image/gif", label: "GIF" },
 ];
 
 // ============================================

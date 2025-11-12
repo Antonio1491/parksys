@@ -228,7 +228,6 @@ export const ADMIN_AMENITIES = {
 
 export const ADMIN_TREES = {
   list: "/admin/trees/inventory",
-  map: "/admin/trees/map",
   create: "/admin/trees/inventory/new",
   view: {
     path: "/admin/trees/inventory/:id/view",
@@ -238,6 +237,7 @@ export const ADMIN_TREES = {
     path: "/admin/trees/inventory/:id/edit",
     build: (id: string | number) => `/admin/trees/inventory/${id}/edit`,
   },
+  operation: "/admin/trees/operation",
   species: {
     list: "/admin/trees/catalog",
     create: "/admin/trees/catalog/new",

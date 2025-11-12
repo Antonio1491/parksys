@@ -91,6 +91,11 @@ const contextMap: { prefix: string; to: string; labelKey: string }[] = [
     labelKey: 'return.spaceReservations',
   },
   {
+    prefix: ROUTES.admin.advertising.spaces.list,
+    to: ROUTES.admin.advertising.spaces.list,
+    labelKey: 'return.spaces',
+  },
+  {
     prefix: ROUTES.admin.advertising.advertisements.list,
     to: ROUTES.admin.advertising.advertisements.list,
     labelKey: 'return.advertisements',
