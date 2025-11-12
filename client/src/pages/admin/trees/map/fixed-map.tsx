@@ -671,6 +671,34 @@ function TreeMapPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Selector de parque */}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <MapPin className="h-5 w-5 text-[#00a587]" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-[#00444f] mb-2">Selecciona un parque</p>
+                <Select 
+                  value={selectedParkIdForAreas} 
+                  onValueChange={setSelectedParkIdForAreas}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Todos los parques" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los parques</SelectItem>
+                    {!isLoadingParks && parks && parks.map((park: any) => (
+                      <SelectItem key={park.id} value={park.id.toString()}>
+                        {park.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         
         <Tabs
           defaultValue="mapa"
