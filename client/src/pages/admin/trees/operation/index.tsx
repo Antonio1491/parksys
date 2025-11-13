@@ -137,9 +137,9 @@ function TreeMapPage() {
 
   // Consultar los parques para el filtro
   const { data: parks, isLoading: isLoadingParks } = useQuery({
-    queryKey: ["/api/parks"],
+    queryKey: ["/api/parks-with-amenities"],
     queryFn: async () => {
-      const response = await fetch("/api/parks");
+      const response = await fetch("/api/parks-with-amenities");
       if (!response.ok) {
         throw new Error("Error al cargar los parques");
       }

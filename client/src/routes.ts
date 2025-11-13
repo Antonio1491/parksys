@@ -238,6 +238,10 @@ export const ADMIN_TREES = {
     build: (id: string | number) => `/admin/trees/inventory/${id}/edit`,
   },
   operation: "/admin/trees/operation",
+  operationDetail: {
+    path: "/admin/trees/operation/:id/view",
+    build: (id: string | number) => `/admin/trees/operation/${id}/view`,
+  },
   species: {
     list: "/admin/trees/catalog",
     create: "/admin/trees/catalog/new",

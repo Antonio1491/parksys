@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
-import { Plus, Search, Filter, Edit, Trash2, Eye, AlertCircle, LayoutGrid } from "lucide-react";
+import { Plus, Search, Filter, Edit, Trash2, Eye, AlertCircle, LayoutGrid, LayoutPanelLeft, CheckCircle, XCircle, Globe } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -178,54 +178,66 @@ export default function SpacesPage() {
         />
 
         {/* Estadísticas rápidas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Total Espacios
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{spaces.length}</p>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Total de Espacios</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">{spaces.length}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <LayoutPanelLeft className="h-6 w-6 text-white" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Activos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-600">
-                {spaces.filter((s) => s.isActive).length}
-              </p>
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Activos</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">
+                    {spaces.filter((s) => s.isActive).length}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6 text-white" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Inactivos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-gray-400">
-                {spaces.filter((s) => !s.isActive).length}
-              </p>
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Inactivos</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">
+                    {spaces.filter((s) => !s.isActive).length}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <XCircle className="h-6 w-6 text-white" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Filtrados
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-blue-600">
-                {filteredSpaces.length}
-              </p>
+          <Card className="bg-[#ceefea] border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#00444f]">Tipos de Página</p>
+                  <p className="text-3xl font-bold text-[#00444f] mt-2">
+                    {new Set(spaces.map((s) => s.pageType)).size}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00a587] flex items-center justify-center">
+                  <Globe className="h-6 w-6 text-white" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

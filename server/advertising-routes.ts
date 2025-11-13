@@ -29,27 +29,88 @@ const upload = multer({ storage });
 // Obtener todas las campañas
 router.get('/campaigns', async (req, res) => {
   try {
-    const campaigns = await db.select().from(adCampaigns).orderBy(desc(adCampaigns.createdAt));
-    res.json({ success: true, data: campaigns });
+    const campaigns = await db
+      .select()
+      .from(adCampaigns)
+      .orderBy(desc(adCampaigns.createdAt));
+
+    // Convertir fechas PostgreSQL a ISO string sin cambiar timezone
+    const formattedCampaigns = campaigns.map(campaign => ({
+      ...campaign,
+      startDate: campaign.startDate 
+        ? String(campaign.startDate).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+      endDate: campaign.endDate 
+        ? String(campaign.endDate).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+      createdAt: campaign.createdAt 
+        ? String(campaign.createdAt).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+      updatedAt: campaign.updatedAt 
+        ? String(campaign.updatedAt).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+    }));
+
+    res.json({ success: true, data: formattedCampaigns });
   } catch (error) {
     console.error('Error obteniendo campañas:', error);
     res.status(500).json({ success: false, error: 'Error obteniendo campañas' });
   }
 });
 
+router.get('/campaigns/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [campaign] = await db
+      .select()
+      .from(adCampaigns)
+      .where(eq(adCampaigns.id, parseInt(id)));
+
+    if (!campaign) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Campaña no encontrada' 
+      });
+    }
+
+    // Convertir fechas PostgreSQL a ISO string sin cambiar timezone
+    const formattedCampaign = {
+      ...campaign,
+      startDate: campaign.startDate 
+        ? String(campaign.startDate).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+      endDate: campaign.endDate 
+        ? String(campaign.endDate).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+      createdAt: campaign.createdAt 
+        ? String(campaign.createdAt).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+      updatedAt: campaign.updatedAt 
+        ? String(campaign.updatedAt).replace(' ', 'T').replace('+00', '.000Z')
+        : null,
+    };
+
+    res.json({ success: true, data: formattedCampaign });
+  } catch (error) {
+    console.error('Error obteniendo campaña:', error);
+    res.status(500).json({ success: false, error: 'Error obteniendo campaña' });
+  }
+});
+
 // Crear nueva campaña
 router.post('/campaigns', isAuthenticated, async (req, res) => {
   try {
-    const { name, client, description, startDate, endDate, budget, priority } = req.body;
+    const { name, client, description, startDate, endDate, budget, priority, status } = req.body;
     
     const [campaign] = await db.insert(adCampaigns).values({
       name,
       client,
-      description,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      budget,
-      priority: priority || 0
+      description: description || null,
+      startDate: new Date(startDate + 'T00:00:00Z').toISOString(),
+      endDate: new Date(endDate + 'T23:59:59Z').toISOString(),
+      budget: budget ? budget.toString() : '0.00',
+      priority: priority || 'medium',
+      status: status || 'active'
     }).returning();
     
     res.json({ success: true, data: campaign });
@@ -66,19 +127,19 @@ router.put('/campaigns/:id', isAuthenticated, async (req, res) => {
     const { name, client, description, startDate, endDate, budget, priority, status } = req.body;
     
     const [campaign] = await db.update(adCampaigns)
-      .set({
-        name,
-        client,
-        description,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        budget,
-        priority,
-        status,
-        updatedAt: new Date()
-      })
-      .where(eq(adCampaigns.id, parseInt(id)))
-      .returning();
+    .set({
+      name,
+      client,
+      description: description || null,
+      startDate: new Date(startDate + 'T00:00:00Z').toISOString(),
+      endDate: new Date(endDate + 'T23:59:59Z').toISOString(),
+      budget: budget ? budget.toString() : '0.00',
+      priority,
+      status,
+      updatedAt: new Date()
+    })
+    .where(eq(adCampaigns.id, parseInt(id)))
+    .returning();
     
     res.json({ success: true, data: campaign });
   } catch (error) {
@@ -91,17 +152,32 @@ router.put('/campaigns/:id', isAuthenticated, async (req, res) => {
 router.delete('/campaigns/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
-    
-    // Eliminar anuncios relacionados y sus asignaciones
-    await db.delete(adPlacements).where(
-      sql`ad_id IN (SELECT id FROM advertisements WHERE campaign_id = ${parseInt(id)})`
-    );
-    await db.delete(advertisements).where(eq(advertisements.campaignId, parseInt(id)));
-    
-    // Eliminar campaña
-    await db.delete(adCampaigns).where(eq(adCampaigns.id, parseInt(id)));
-    
-    res.json({ success: true, message: 'Campaña eliminada exitosamente' });
+
+    // Primero eliminar placements de anuncios de esta campaña
+    const adsInCampaign = await db
+      .select({ id: advertisements.id })
+      .from(advertisements)
+      .where(eq(advertisements.campaignId, parseInt(id)));
+
+    const adIds = adsInCampaign.map(ad => ad.id);
+
+    if (adIds.length > 0) {
+      await db.delete(adPlacements)
+        .where(inArray(adPlacements.advertisementId, adIds));
+    }
+
+    // Luego eliminar anuncios de esta campaña
+    await db.delete(advertisements)
+      .where(eq(advertisements.campaignId, parseInt(id)));
+
+    // Finalmente eliminar la campaña
+    await db.delete(adCampaigns)
+      .where(eq(adCampaigns.id, parseInt(id)));
+
+    res.json({ 
+      success: true, 
+      message: 'Campaña eliminada exitosamente' 
+    });
   } catch (error) {
     console.error('Error eliminando campaña:', error);
     res.status(500).json({ success: false, error: 'Error eliminando campaña' });

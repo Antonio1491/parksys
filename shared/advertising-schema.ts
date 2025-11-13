@@ -12,11 +12,11 @@ export const adCampaigns = pgTable('ad_campaigns', {
   name: varchar('name', { length: 255 }).notNull(),
   client: varchar('client', { length: 255 }).notNull(),
   description: text('description'),
-  startDate: timestamp('start_date').notNull(),
-  endDate: timestamp('end_date').notNull(),
-  status: varchar('status', { length: 50 }).notNull().default('active'), // active, paused, completed, cancelled
-  budget: decimal('budget', { precision: 10, scale: 2 }),
-  priority: integer('priority').default(0),
+  startDate: timestamp('start_date', { withTimezone: true, mode: 'string' }).notNull(),
+  endDate: timestamp('end_date', { withTimezone: true, mode: 'string' }).notNull(),
+  status: varchar('status', { length: 50 }).notNull().default('active'),
+  budget: decimal('budget', { precision: 10, scale: 2 }).default('0.00'),
+  priority: varchar('priority', { length: 20 }).default('medium'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow()
 });
