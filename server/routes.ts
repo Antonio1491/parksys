@@ -66,6 +66,7 @@ import {
   generateImportTemplate, 
   processImportFile 
 } from "./api/parksImport";
+import { generateParkPrefix } from './code-generator';
 import { registerUserRoutes } from "./userRoutes";
 import { updateSkillsRouter } from "./updateSkills";
 import { registerEventRoutes } from "./events_routes";
@@ -2901,40 +2902,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/parks", async (req: Request, res: Response) => {
     try {
       console.log('🚀 Recibiendo petición de creación de parque:', req.body);
-      
-      // Map frontend field names to database schema fields
+
       const dataToValidate = {
         name: req.body.name,
-        municipalityText: req.body.municipality || req.body.municipalityText, // Map municipality -> municipalityText
-        parkType: req.body.parkType || 'urbano', // Default value for required field
+        municipalityText: req.body.municipality || req.body.municipalityText,
+        parkType: req.body.parkType || 'urbano',
         description: req.body.description,
         address: req.body.address,
         postalCode: req.body.postalCode,
         latitude: req.body.latitude,
-        longitude: req.body.longitude?.trim(), // Remove any whitespace
+        longitude: req.body.longitude?.trim(),
         area: req.body.area,
         foundationYear: req.body.foundationYear,
         administrator: req.body.administrator,
         contactPhone: req.body.contactPhone,
         contactEmail: req.body.contactEmail,
         certificaciones: req.body.certificaciones,
-        // Skip dailySchedule as it's not in the database schema
       };
-      
+
       console.log('🔧 Datos mapeados para validación:', dataToValidate);
-      
+
       const parkData = insertParkSchema.parse(dataToValidate);
       console.log('✅ Datos del parque validados:', parkData);
-      
-      // Crear el parque en la base de datos
-      const newPark = await storage.createPark(parkData);
-      console.log(`🏞️ Parque creado exitosamente: ${newPark.name} (ID: ${newPark.id})`);
-      
+
+      const codePrefix = await generateParkPrefix(parkData.name);
+      console.log('🔤 Código de parque generado:', codePrefix);
+
+      const newPark = await storage.createPark({
+        ...parkData,
+        code_prefix: codePrefix
+      });
+      console.log(`🏞️ Parque creado exitosamente: ${newPark.name} (ID: ${newPark.id}, Código: ${codePrefix})`);
+
       res.status(201).json(newPark);
-      
+
     } catch (error) {
       console.error('❌ Error creando parque:', error);
-      
+
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         console.error('🚨 Error de validación Zod:', validationError.message);
@@ -2944,7 +2948,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           details: error.issues 
         });
       }
-      
+
       res.status(500).json({ 
         message: "Error creating park",
         details: error?.message || "Unknown error"

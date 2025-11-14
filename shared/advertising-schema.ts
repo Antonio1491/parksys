@@ -95,25 +95,26 @@ export const adPlacements = pgTable('ad_placements', {
   pageType: varchar('page_type', { length: 50 }).notNull(), // parks, species, activities, concessions, home, all
   pageId: integer('page_id'), // ID específico de la página (opcional, null = todas las páginas del tipo)
 
-  // Programación
-  startDate: timestamp('start_date').notNull(),
-  endDate: timestamp('end_date').notNull(),
+  // Programación - ⚠️ ACTUALIZADO A TIMESTAMPTZ
+  startDate: timestamp('start_date', { withTimezone: true, mode: 'date' }).notNull(),
+  endDate: timestamp('end_date', { withTimezone: true, mode: 'date' }).notNull(),
 
   // Configuración
   priority: integer('priority').default(5),
   isActive: boolean('is_active').default(true),
 
-  // ✅ Programación horaria (movido desde advertisements)
+  // Programación horaria
   frequency: varchar('frequency', { length: 20 }).default('always'), // always, once_per_session, once_per_day, custom
   scheduledDays: text('scheduled_days').array(), // ['monday', 'tuesday', ...]
   scheduledHours: integer('scheduled_hours').array(), // [9, 10, 11, 12, ...]
 
-  // ✅ Métricas básicas (mover a ad_analytics para reporting detallado)
+  // Métricas básicas
   impressions: integer('impressions').default(0),
   clicks: integer('clicks').default(0),
 
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
+  // Timestamps
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).defaultNow()
 });
 
 // ============================================

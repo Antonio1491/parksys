@@ -771,119 +771,413 @@ router.delete('/advertisements/:id', isAuthenticated, async (req, res) => {
 });
 
 // ===================
-// ASIGNACIONES (PLACEMENTS)
+// ASIGNACIONES (PLACEMENTS) - ACTUALIZADO CON PATRÓN UTC
 // ===================
 
-// Obtener asignaciones activas
+// GET - Obtener todas las asignaciones con filtros
 router.get('/placements', async (req, res) => {
   try {
-    const { spaceId, pageType, position } = req.query;
-    
+    const { advertisementId, adSpaceId, pageType, isActive } = req.query;
+
     let query = `
       SELECT 
         ap.id,
         ap.advertisement_id,
         ap.ad_space_id,
-        ap.priority,
+        ap.page_type,
+        ap.page_id,
         ap.start_date,
         ap.end_date,
+        ap.priority,
         ap.is_active,
-        a.title,
-        a.description,
-        a.image_url,
-        a.content as target_url,
-        a.alt_text,
-        a.button_text,
-        a.media_type,
-        a.duration,
-        a.is_active as ad_is_active,
-        a.updated_at as ad_updated_at
+        ap.frequency,
+        ap.scheduled_days,
+        ap.scheduled_hours,
+        ap.impressions,
+        ap.clicks,
+        ap.created_at,
+        ap.updated_at,
+        a.title as ad_title,
+        a.media_url as ad_media_url,
+        a.media_type as ad_media_type,
+        ads.name as space_name,
+        ads.position as space_position
       FROM ad_placements ap
       LEFT JOIN advertisements a ON ap.advertisement_id = a.id
       LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
-      WHERE ap.is_active = true 
-        AND a.is_active = true
-        AND ads.is_active = true
-        AND ap.start_date <= CURRENT_DATE
-        AND ap.end_date >= CURRENT_DATE
+      WHERE 1=1
     `;
-    
+
     const params = [];
-    
-    if (spaceId) {
-      query += ` AND ads.id = $${params.length + 1}`;
-      params.push(spaceId);
+
+    if (advertisementId) {
+      params.push(parseInt(advertisementId as string));
+      query += ` AND ap.advertisement_id = $${params.length}`;
     }
-    
+
+    if (adSpaceId) {
+      params.push(parseInt(adSpaceId as string));
+      query += ` AND ap.ad_space_id = $${params.length}`;
+    }
+
     if (pageType) {
-      query += ` AND ads.page_type = $${params.length + 1}`;
       params.push(pageType);
+      query += ` AND ap.page_type = $${params.length}`;
     }
-    
-    if (position) {
-      query += ` AND ads.position = $${params.length + 1}`;
-      params.push(position);
+
+    if (isActive !== undefined) {
+      params.push(isActive === 'true');
+      query += ` AND ap.is_active = $${params.length}`;
     }
-    
-    query += ` ORDER BY ap.priority DESC LIMIT 10`;
-    
+
+    query += ` ORDER BY ap.priority DESC, ap.created_at DESC`;
+
     const result = await pool.query(query, params);
-    
-    // Formatear los datos para el frontend
-    const formattedData = result.rows.map(row => ({
+
+    // Mapear a camelCase con fechas en formato ISO
+    const placements = result.rows.map(row => ({
       id: row.id,
-      adSpaceId: row.ad_space_id,
       advertisementId: row.advertisement_id,
-      startDate: row.start_date,
-      endDate: row.end_date,
+      adSpaceId: row.ad_space_id,
+      pageType: row.page_type,
+      pageId: row.page_id,
+      startDate: row.start_date ? new Date(row.start_date).toISOString() : null,
+      endDate: row.end_date ? new Date(row.end_date).toISOString() : null,
+      priority: row.priority,
       isActive: row.is_active,
-      advertisement: {
-        id: row.advertisement_id,
-        title: row.title,
-        description: row.description,
-        imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
-        targetUrl: row.target_url,
-        altText: row.alt_text,
-        buttonText: row.button_text,
-        mediaType: row.media_type || 'image',
-        duration: row.duration,
-        isActive: row.ad_is_active,
-        updatedAt: row.ad_updated_at
-      }
+      frequency: row.frequency,
+      scheduledDays: row.scheduled_days,
+      scheduledHours: row.scheduled_hours,
+      impressions: row.impressions,
+      clicks: row.clicks,
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+      updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null,
+      advertisement: row.ad_title ? {
+        title: row.ad_title,
+        mediaUrl: row.ad_media_url,
+        mediaType: row.ad_media_type
+      } : null,
+      space: row.space_name ? {
+        name: row.space_name,
+        position: row.space_position
+      } : null
     }));
-    
-    res.json({ success: true, data: formattedData });
+
+    res.json({ success: true, data: placements });
   } catch (error) {
-    console.error('Error obteniendo asignaciones:', error);
-    res.status(500).json({ success: false, error: 'Error obteniendo asignaciones' });
+    console.error('Error obteniendo placements:', error);
+    res.status(500).json({ success: false, error: 'Error obteniendo placements' });
   }
 });
 
-// Crear nueva asignación
+// GET - Obtener un placement por ID
+router.get('/placements/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(`
+      SELECT 
+        ap.*,
+        a.title as ad_title,
+        ads.name as space_name
+      FROM ad_placements ap
+      LEFT JOIN advertisements a ON ap.advertisement_id = a.id
+      LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
+      WHERE ap.id = $1
+    `, [parseInt(id)]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Placement no encontrado' 
+      });
+    }
+
+    const row = result.rows[0];
+    const placement = {
+      id: row.id,
+      advertisementId: row.advertisement_id,
+      adSpaceId: row.ad_space_id,
+      pageType: row.page_type,
+      pageId: row.page_id,
+      startDate: row.start_date ? new Date(row.start_date).toISOString() : null,
+      endDate: row.end_date ? new Date(row.end_date).toISOString() : null,
+      priority: row.priority,
+      isActive: row.is_active,
+      frequency: row.frequency,
+      scheduledDays: row.scheduled_days,
+      scheduledHours: row.scheduled_hours,
+      impressions: row.impressions,
+      clicks: row.clicks,
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+      updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null,
+      advertisement: row.ad_title ? {
+        title: row.ad_title
+      } : null,
+      space: row.space_name ? {
+        name: row.space_name
+      } : null
+    };
+
+    res.json({ success: true, data: placement });
+  } catch (error) {
+    console.error('Error obteniendo placement:', error);
+    res.status(500).json({ success: false, error: 'Error obteniendo placement' });
+  }
+});
+
+// POST - Crear nuevo placement con validación
 router.post('/placements', isAuthenticated, async (req, res) => {
   try {
-    const { adId, spaceId, pageType, pageId, startDate, endDate } = req.body;
-    
+    const { 
+      advertisementId, 
+      adSpaceId, 
+      pageType, 
+      pageId,
+      startDate, 
+      endDate,
+      priority,
+      isActive,
+      frequency,
+      scheduledDays,
+      scheduledHours
+    } = req.body;
+
+    console.log('📝 Creando placement:', req.body);
+
+    // Validaciones básicas
+    if (!advertisementId || !adSpaceId || !pageType || !startDate || !endDate) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Campos requeridos: advertisementId, adSpaceId, pageType, startDate, endDate' 
+      });
+    }
+
+    // Validar que startDate sea menor que endDate
+    const start = new Date(startDate + 'T00:00:00Z');
+    const end = new Date(endDate + 'T23:59:59Z');
+
+    if (start >= end) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'La fecha de inicio debe ser anterior a la fecha de fin' 
+      });
+    }
+
     const result = await pool.query(`
-      INSERT INTO ad_placements 
-      (advertisement_id, ad_space_id, priority, start_date, end_date, is_active, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO ad_placements (
+        advertisement_id,
+        ad_space_id,
+        page_type,
+        page_id,
+        start_date,
+        end_date,
+        priority,
+        is_active,
+        frequency,
+        scheduled_days,
+        scheduled_hours,
+        impressions,
+        clicks,
+        created_at,
+        updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *
     `, [
-      parseInt(adId),
-      parseInt(spaceId),
-      1, // priority default
-      new Date(startDate),
-      new Date(endDate),
-      true,
-      new Date(),
-      new Date()
+      parseInt(advertisementId),
+      parseInt(adSpaceId),
+      pageType,
+      pageId ? parseInt(pageId) : null,
+      start.toISOString(),
+      end.toISOString(),
+      priority || 5,
+      isActive !== undefined ? isActive : true,
+      frequency || 'always',
+      scheduledDays || null,
+      scheduledHours || null,
+      0, // impressions inicial
+      0, // clicks inicial
+      new Date().toISOString(),
+      new Date().toISOString()
     ]);
-    
-    res.json({ success: true, data: result.rows[0] });
+
+    const row = result.rows[0];
+    const placement = {
+      id: row.id,
+      advertisementId: row.advertisement_id,
+      adSpaceId: row.ad_space_id,
+      pageType: row.page_type,
+      pageId: row.page_id,
+      startDate: row.start_date ? new Date(row.start_date).toISOString() : null,
+      endDate: row.end_date ? new Date(row.end_date).toISOString() : null,
+      priority: row.priority,
+      isActive: row.is_active,
+      frequency: row.frequency,
+      scheduledDays: row.scheduled_days,
+      scheduledHours: row.scheduled_hours,
+      impressions: row.impressions,
+      clicks: row.clicks,
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+      updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null
+    };
+
+    console.log('✅ Placement creado:', placement);
+
+    res.json({ success: true, data: placement });
   } catch (error) {
-    console.error('Error creando asignación:', error);
-    res.status(500).json({ success: false, error: 'Error creando asignación' });
+    console.error('❌ Error creando placement:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error creando placement',
+      details: error.message 
+    });
+  }
+});
+
+// PUT - Actualizar placement
+router.put('/placements/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      advertisementId, 
+      adSpaceId, 
+      pageType, 
+      pageId,
+      startDate, 
+      endDate,
+      priority,
+      isActive,
+      frequency,
+      scheduledDays,
+      scheduledHours
+    } = req.body;
+
+    console.log('📝 Actualizando placement:', id, req.body);
+
+    // Validaciones básicas
+    if (!advertisementId || !adSpaceId || !pageType || !startDate || !endDate) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Campos requeridos: advertisementId, adSpaceId, pageType, startDate, endDate' 
+      });
+    }
+
+    // Validar que startDate sea menor que endDate
+    const start = new Date(startDate + 'T00:00:00Z');
+    const end = new Date(endDate + 'T23:59:59Z');
+
+    if (start >= end) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'La fecha de inicio debe ser anterior a la fecha de fin' 
+      });
+    }
+
+    const result = await pool.query(`
+      UPDATE ad_placements 
+      SET 
+        advertisement_id = $1,
+        ad_space_id = $2,
+        page_type = $3,
+        page_id = $4,
+        start_date = $5,
+        end_date = $6,
+        priority = $7,
+        is_active = $8,
+        frequency = $9,
+        scheduled_days = $10,
+        scheduled_hours = $11,
+        updated_at = $12
+      WHERE id = $13
+      RETURNING *
+    `, [
+      parseInt(advertisementId),
+      parseInt(adSpaceId),
+      pageType,
+      pageId ? parseInt(pageId) : null,
+      start.toISOString(),
+      end.toISOString(),
+      priority || 5,
+      isActive !== undefined ? isActive : true,
+      frequency || 'always',
+      scheduledDays || null,
+      scheduledHours || null,
+      new Date().toISOString(),
+      parseInt(id)
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Placement no encontrado' 
+      });
+    }
+
+    const row = result.rows[0];
+    const placement = {
+      id: row.id,
+      advertisementId: row.advertisement_id,
+      adSpaceId: row.ad_space_id,
+      pageType: row.page_type,
+      pageId: row.page_id,
+      startDate: row.start_date ? new Date(row.start_date).toISOString() : null,
+      endDate: row.end_date ? new Date(row.end_date).toISOString() : null,
+      priority: row.priority,
+      isActive: row.is_active,
+      frequency: row.frequency,
+      scheduledDays: row.scheduled_days,
+      scheduledHours: row.scheduled_hours,
+      impressions: row.impressions,
+      clicks: row.clicks,
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+      updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null
+    };
+
+    console.log('✅ Placement actualizado:', placement);
+
+    res.json({ success: true, data: placement });
+  } catch (error) {
+    console.error('❌ Error actualizando placement:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error actualizando placement',
+      details: error.message 
+    });
+  }
+});
+
+// DELETE - Eliminar placement
+router.delete('/placements/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log('🗑️ Eliminando placement:', id);
+
+    const result = await pool.query(
+      'DELETE FROM ad_placements WHERE id = $1 RETURNING *',
+      [parseInt(id)]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Placement no encontrado' 
+      });
+    }
+
+    console.log('✅ Placement eliminado:', result.rows[0].id);
+
+    res.json({ 
+      success: true, 
+      message: 'Placement eliminado exitosamente' 
+    });
+  } catch (error) {
+    console.error('❌ Error eliminando placement:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error eliminando placement',
+      details: error.message 
+    });
   }
 });
 
