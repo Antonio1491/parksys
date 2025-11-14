@@ -6,7 +6,7 @@ import { Map, ArrowRight, MapPin, Trees, Users, Calendar, Sparkles, TrendingUp, 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ParkCard from '@/components/ParkCard';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 import { ExtendedPark } from '@shared/schema';
 const logoImage = "/images/logo-pdm.png";
 
@@ -206,6 +206,14 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Anuncio Header - Home */}
+      <div className="w-full max-w-7xl mx-auto px-4 py-4">
+        <AdSpaceIntelligent 
+          pageType="home" 
+          position="header" 
+        />
+      </div>
       
       {/* 🎯 FEATURED PARKS SECTION RENOVADO */}
       <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
@@ -820,8 +828,15 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* Anuncio Footer - Home */}
+      <div className="w-full max-w-7xl mx-auto px-4 py-8">
+        <AdSpaceIntelligent 
+          pageType="home" 
+          position="footer" 
+        />
+      </div>
       
-      {/* Footer inspirado en bosquesamg.mx */}
+      {/* Footer */}
       <footer className="bg-gradient-to-b from-[#067f5f] to-[#00a587] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Enlaces organizados en grid */}

@@ -1570,6 +1570,7 @@ export const parks = pgTable("parks", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   slug: text("slug").unique(), // URL-friendly identifier for public pages
+  codePrefix: varchar("code_prefix", { length: 2 }).unique(),
   municipalityText: text("municipality_text"), // Campo para municipio como texto libre
   parkType: text("park_type").notNull(), // Campo legacy mantenido para retrocompatibilidad
   typologyId: integer("typology_id").references(() => parkTypology.id), // Relación con tipología oficial
@@ -1599,6 +1600,7 @@ export const treeSpecies = pgTable("tree_species", {
   id: serial("id").primaryKey(),
   commonName: text("common_name").notNull(),
   scientificName: text("scientific_name").notNull(),
+  speciesCode: varchar("species_code", { length: 3 }).unique(),
   family: text("family"),
   origin: text("origin"), // Nativo, Introducido, etc.
   climateZone: text("climate_zone"),
@@ -1633,6 +1635,7 @@ export const trees = pgTable("trees", {
   park_id: integer("park_id").references(() => parks.id),
   area_id: integer("area_id").references(() => parkAreas.id, { onDelete: "set null" }),
   code: varchar("code", { length: 20 }).unique(), // Código único de identificación
+  treeCode: varchar("tree_code", { length: 25 }).unique(),
   last_maintenance_date: date("last_maintenance_date"),
   created_by: integer("created_by"),
   created_at: timestamp("created_at").notNull().defaultNow(),
@@ -5389,6 +5392,7 @@ export const parkAreas = pgTable("park_areas", {
   // Información básica
   name: varchar("name", { length: 255 }).notNull(),
   code: varchar("code", { length: 50 }).notNull(),
+  areaCode: varchar("area_code", { length: 10 }),
   codePrefix: varchar("code_prefix", { length: 10 }),
   description: text("description"),
   dimensions: varchar("dimensions", { length: 100 }),

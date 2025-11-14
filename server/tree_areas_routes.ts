@@ -6,6 +6,7 @@ import { Router, Request, Response } from "express";
 import { db } from './db';
 import { parkAreas, trees } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
+import { generateAreaCode } from './code-generator';
 
 /**
  * Registra las rutas relacionadas con áreas de parques
@@ -95,7 +96,6 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
       const {
         parkId,
         name,
-        code,
         description,
         dimensions,
         imageUrl,
@@ -104,31 +104,23 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
       } = req.body;
 
       // Validaciones
-      if (!parkId || !name || !code) {
+      if (!parkId || !name) {
         return res.status(400).json({
-          error: "Los campos parkId, name y code son obligatorios",
+          error: "Los campos parkId y name son obligatorios",
         });
       }
 
-      // Verificar que el código no exista
-      const existingArea = await db
-        .select()
-        .from(parkAreas)
-        .where(eq(parkAreas.code, code))
-        .limit(1);
-
-      if (existingArea.length > 0) {
-        return res.status(400).json({
-          error: `Ya existe un área con el código ${code}`,
-        });
-      }
+      // Generar código automáticamente
+      const areaCode = await generateAreaCode(name, Number(parkId));
+      console.log('🔤 Código de área generado:', areaCode);
 
       const newArea = await db
         .insert(parkAreas)
         .values({
           parkId: Number(parkId),
           name,
-          code,
+          code: areaCode,
+          areaCode: areaCode,
           description: description || null,
           dimensions: dimensions || null,
           imageUrl: imageUrl || null,
@@ -139,6 +131,7 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
         })
         .returning();
 
+      console.log(`✅ Área creada: ${name} (Código: ${areaCode})`);
       res.status(201).json(newArea[0]);
     } catch (error) {
       console.error("Error creating park area:", error);

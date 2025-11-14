@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { parks, tree_areas, trees, tree_species } from "@db/schema";
+import { parks, parkAreas, trees, treeSpecies } from "@shared/schema";
 import { eq, sql, and, isNull, desc } from "drizzle-orm";
 
 export async function generateParkPrefix(parkName: string): Promise<string> {
@@ -41,9 +41,9 @@ export async function generateParkPrefix(parkName: string): Promise<string> {
 
 async function checkPrefixExists(prefix: string): Promise<boolean> {
   const result = await db
-    .select({ code_prefix: parks.code_prefix })
+    .select({ codePrefix: parks.codePrefix })
     .from(parks)
-    .where(eq(parks.code_prefix, prefix))
+    .where(eq(parks.codePrefix, prefix))
     .limit(1);
 
   return result.length > 0;
@@ -54,18 +54,18 @@ export async function generateAreaCode(
   parkId: number
 ): Promise<string> {
   const park = await db
-    .select({ code_prefix: parks.code_prefix })
+    .select({ codePrefix: parks.codePrefix })
     .from(parks)
     .where(eq(parks.id, parkId))
     .limit(1);
 
-  if (!park.length || !park[0].code_prefix) {
+  if (!park.length || !park[0].codePrefix) {
     throw new Error(
       `El parque con ID ${parkId} no tiene un código prefijo asignado`
     );
   }
 
-  const parkPrefix = park[0].code_prefix;
+  const parkPrefix = park[0].codePrefix;
 
   const cleanName = areaName
     .replace(/^(zona|área|sector|sección)\s+/gi, '')
@@ -116,12 +116,12 @@ async function checkAreaCodeExists(
   parkId: number
 ): Promise<boolean> {
   const result = await db
-    .select({ area_code: tree_areas.area_code })
-    .from(tree_areas)
+    .select({ areaCode: parkAreas.areaCode })
+    .from(parkAreas)
     .where(
       and(
-        eq(tree_areas.area_code, areaCode),
-        eq(tree_areas.park_id, parkId)
+        eq(parkAreas.areaCode, areaCode),
+        eq(parkAreas.parkId, parkId)
       )
     )
     .limit(1);
@@ -184,9 +184,9 @@ export async function generateSpeciesCode(
 
 async function checkSpeciesCodeExists(speciesCode: string): Promise<boolean> {
   const result = await db
-    .select({ species_code: tree_species.species_code })
-    .from(tree_species)
-    .where(eq(tree_species.species_code, speciesCode))
+    .select({ speciesCode: treeSpecies.speciesCode })
+    .from(treeSpecies)
+    .where(eq(treeSpecies.speciesCode, speciesCode))
     .limit(1);
 
   return result.length > 0;
@@ -198,44 +198,44 @@ export async function generateTreeCode(
   parkId?: number | null
 ): Promise<string> {
   const species = await db
-    .select({ species_code: tree_species.species_code })
-    .from(tree_species)
-    .where(eq(tree_species.id, speciesId))
+    .select({ speciesCode: treeSpecies.speciesCode })
+    .from(treeSpecies)
+    .where(eq(treeSpecies.id, speciesId))
     .limit(1);
 
-  if (!species.length || !species[0].species_code) {
+  if (!species.length || !species[0].speciesCode) {
     throw new Error(
       `La especie con ID ${speciesId} no tiene un código asignado. Asigne un código antes de registrar árboles de esta especie.`
     );
   }
 
-  const speciesCode = species[0].species_code;
+  const speciesCode = species[0].speciesCode;
 
   if (areaId) {
     const area = await db
-      .select({ area_code: tree_areas.area_code })
-      .from(tree_areas)
-      .where(eq(tree_areas.id, areaId))
+      .select({ areaCode: parkAreas.areaCode })
+      .from(parkAreas)
+      .where(eq(parkAreas.id, areaId))
       .limit(1);
 
-    if (!area.length || !area[0].area_code) {
+    if (!area.length || !area[0].areaCode) {
       throw new Error(`El área con ID ${areaId} no tiene un código asignado`);
     }
 
-    const areaCode = area[0].area_code;
+    const areaCode = area[0].areaCode;
 
     const pattern = `${areaCode}-${speciesCode}-%`;
     const lastTree = await db
-      .select({ tree_code: trees.tree_code })
+      .select({ treeCode: trees.treeCode })
       .from(trees)
-      .where(sql`${trees.tree_code} LIKE ${pattern}`)
-      .orderBy(desc(trees.tree_code))
+      .where(sql`${trees.treeCode} LIKE ${pattern}`)
+      .orderBy(desc(trees.treeCode))
       .limit(1);
 
     let nextNumber = 1;
 
-    if (lastTree.length && lastTree[0].tree_code) {
-      const match = lastTree[0].tree_code.match(/-(\d+)$/);
+    if (lastTree.length && lastTree[0].treeCode) {
+      const match = lastTree[0].treeCode.match(/-(\d+)$/);
       if (match) {
         nextNumber = parseInt(match[1], 10) + 1;
       }
@@ -247,38 +247,38 @@ export async function generateTreeCode(
 
   if (parkId) {
     const park = await db
-      .select({ code_prefix: parks.code_prefix })
+      .select({ codePrefix: parks.codePrefix })
       .from(parks)
       .where(eq(parks.id, parkId))
       .limit(1);
 
-    if (!park.length || !park[0].code_prefix) {
+    if (!park.length || !park[0].codePrefix) {
       throw new Error(
         `El parque con ID ${parkId} no tiene un código prefijo asignado`
       );
     }
 
-    const parkPrefix = park[0].code_prefix;
+    const parkPrefix = park[0].codePrefix;
 
     const pattern = `${parkPrefix}-XX-${speciesCode}-%`;
     const lastTree = await db
-      .select({ tree_code: trees.tree_code })
+      .select({ treeCode: trees.treeCode })
       .from(trees)
       .where(
         and(
           eq(trees.park_id, parkId),
           isNull(trees.area_id),
           eq(trees.species_id, speciesId),
-          sql`${trees.tree_code} LIKE ${pattern}`
+          sql`${trees.treeCode} LIKE ${pattern}`
         )
       )
-      .orderBy(desc(trees.tree_code))
+      .orderBy(desc(trees.treeCode))
       .limit(1);
 
     let nextNumber = 1;
 
-    if (lastTree.length && lastTree[0].tree_code) {
-      const match = lastTree[0].tree_code.match(/-(\d+)$/);
+    if (lastTree.length && lastTree[0].treeCode) {
+      const match = lastTree[0].treeCode.match(/-(\d+)$/);
       if (match) {
         nextNumber = parseInt(match[1], 10) + 1;
       }
@@ -298,14 +298,14 @@ export async function detectAreaByCoordinates(
 ): Promise<number | null> {
   const areas = await db
     .select({
-      id: tree_areas.id,
-      polygon: tree_areas.polygon,
+      id: parkAreas.id,
+      polygon: parkAreas.polygon,
     })
-    .from(tree_areas)
+    .from(parkAreas)
     .where(
       and(
-        eq(tree_areas.park_id, parkId),
-        sql`${tree_areas.polygon} IS NOT NULL`
+        eq(parkAreas.parkId, parkId),
+        sql`${parkAreas.polygon} IS NOT NULL`
       )
     );
 
@@ -379,5 +379,3 @@ export function generateAreaCodePreview(
 
   return `${parkPrefix}-${areaLetters}`;
 }
-
-// Este archivo contiene todas las funciones que generan los códigos automáticamente. Este archivo hace toda la "magia" de generar códigos. Los endpoints que modificaremos en el siguiente paso usarán estas funciones. //

@@ -3,6 +3,7 @@ import { db, pool } from './db';
 import { trees, treeSpecies, parks, treeMaintenances } from '../shared/schema';
 import { eq, like, desc, and, or } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
+import { generateTreeCode, detectAreaByCoordinates } from './code-generator';
 
 /**
  * Rutas para el módulo de inventario de árboles
@@ -307,13 +308,12 @@ export function registerTreeInventoryRoutes(app: any, apiRouter: Router, isAuthe
     }
   });
 
-  // POST: Crear un nuevo árbol
   apiRouter.post('/trees', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const {
-        code,
         speciesId,
         parkId,
+        areaId,
         latitude,
         longitude,
         plantingDate,
@@ -333,87 +333,55 @@ export function registerTreeInventoryRoutes(app: any, apiRouter: Router, isAuthe
         locationDescription,
         imageUrl,
       } = req.body;
-      
-      // Verificar campos requeridos (código ya no es obligatorio)
+
       if (!speciesId || !parkId || !latitude || !longitude) {
         return res.status(400).json({ 
           message: 'Los campos especie, parque, latitud y longitud son obligatorios' 
         });
       }
-      
-      // Verificar que la especie exista usando SQL directo
+
       const speciesResult = await pool.query('SELECT id FROM tree_species WHERE id = $1', [speciesId]);
-      
+
       if (speciesResult.rows.length === 0) {
         return res.status(400).json({ message: 'La especie seleccionada no existe' });
       }
-      
-      // Verificar que el parque exista usando SQL directo
+
       const parkResult = await pool.query('SELECT id, name FROM parks WHERE id = $1', [parkId]);
-      
+
       if (parkResult.rows.length === 0) {
         return res.status(400).json({ message: 'El parque seleccionado no existe' });
       }
-      
-      const parkExists = parkResult.rows[0];
-      
-      // Función para generar código único
-      async function generateUniqueTreeCode(speciesName, parkName) {
-        const speciesCode = speciesName.substring(0, 3).toUpperCase();
-        const parkCode = parkName.substring(0, 3).toUpperCase();
-        let attempts = 0;
-        
-        while (attempts < 10) {
-          const randomNumber = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-          const generatedCode = `${speciesCode}-${parkCode}-${randomNumber}`;
-          
-          // Verificar si el código ya existe usando SQL directo
-          const result = await pool.query('SELECT id FROM trees WHERE code = $1', [generatedCode]);
-            
-          if (result.rows.length === 0) {
-            return generatedCode;
-          }
-          attempts++;
-        }
-        
-        throw new Error('No se pudo generar un código único después de 10 intentos');
+
+      let finalAreaId = areaId;
+
+      if (!finalAreaId && latitude && longitude) {
+        finalAreaId = await detectAreaByCoordinates(
+          parseFloat(latitude), 
+          parseFloat(longitude), 
+          parkId
+        );
+        console.log('📍 Área detectada por coordenadas:', finalAreaId);
       }
-      
-      // Generar código automáticamente si no se proporciona
-      let finalCode = code;
-      if (!code) {
-        // Obtener nombre de la especie para generar código usando SQL directo
-        const speciesResult = await pool.query('SELECT common_name FROM tree_species WHERE id = $1', [speciesId]);
-        
-        if (speciesResult.rows.length > 0) {
-          finalCode = await generateUniqueTreeCode(speciesResult.rows[0].common_name, parkExists.name);
-        } else {
-          return res.status(400).json({ message: 'Error al obtener información de la especie' });
-        }
-      } else {
-        // Si se proporciona código, verificar que no esté duplicado
-        const codeResult = await pool.query('SELECT id FROM trees WHERE code = $1', [code]);
-        
-        if (codeResult.rows.length > 0) {
-          return res.status(400).json({ message: 'Ya existe un árbol con ese código identificador' });
-        }
-      }
-      
-      // Crear el nuevo árbol usando SQL directo
+
+      const treeCode = await generateTreeCode(speciesId, finalAreaId, parkId);
+      console.log('🔤 Código de árbol generado:', treeCode);
+
       const insertResult = await pool.query(`
         INSERT INTO trees (
-          code, species_id, park_id, latitude, longitude, 
+          code, tree_code, species_id, park_id, area_id, latitude, longitude, 
           planting_date, development_stage, age_estimate, height, trunk_diameter, 
           canopy_coverage, health_status, condition, has_hollows, has_exposed_roots, 
           has_pests, notes, last_maintenance_date, is_protected, location_description, 
           image_url, created_by
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24
         ) RETURNING *
       `, [
-        finalCode,
+        treeCode,
+        treeCode,
         speciesId,
         parkId,
+        finalAreaId || null,
         latitude,
         longitude,
         plantingDate || null,
@@ -432,13 +400,17 @@ export function registerTreeInventoryRoutes(app: any, apiRouter: Router, isAuthe
         isProtected || false,
         locationDescription || null,
         imageUrl || null,
-        1 // Por ahora usuario por defecto
+        1
       ]);
-      
+
+      console.log(`✅ Árbol creado: ${treeCode} en área ${finalAreaId || 'sin área'}`);
       res.status(201).json(insertResult.rows[0]);
     } catch (error) {
       console.error('Error al crear árbol:', error);
-      res.status(500).json({ message: 'Error al crear el árbol en el inventario' });
+      res.status(500).json({ 
+        message: 'Error al crear el árbol en el inventario',
+        details: error instanceof Error ? error.message : 'Error desconocido'
+      });
     }
   });
 

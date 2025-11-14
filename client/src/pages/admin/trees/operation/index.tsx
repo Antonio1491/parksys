@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -127,7 +128,6 @@ function TreeMapPage() {
     name: "",
     description: "",
     parkId: "",
-    areaCode: "",
     dimensions: "",
     latitude: "",
     longitude: "",
@@ -135,15 +135,15 @@ function TreeMapPage() {
     isActive: true,
   });
 
-  // Consultar los parques para el filtro
   const { data: parks, isLoading: isLoadingParks } = useQuery({
-    queryKey: ["/api/parks-with-amenities"],
+    queryKey: ["/api/parks"],
     queryFn: async () => {
-      const response = await fetch("/api/parks-with-amenities");
+      const response = await fetch("/api/parks?simple=true");
       if (!response.ok) {
         throw new Error("Error al cargar los parques");
       }
-      return response.json();
+      const result = await response.json();
+      return result.data || result;
     },
   });
 
@@ -176,20 +176,30 @@ function TreeMapPage() {
   });
 
   // Mutación para crear área
-  const createAreaMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await fetch("/api/trees/areas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Error al crear área");
-      }
-      return response.json();
-    },
+    const createAreaMutation = useMutation({
+      mutationFn: async (data: any) => {
+        return apiRequest("/api/trees/areas", {
+          method: "POST",
+          data: data,
+        });
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["/api/trees/areas"] });
+        toast({
+          title: "Área creada",
+          description: "El área se creó exitosamente",
+        });
+        setIsCreateDialogOpen(false);
+        resetForm();
+      },
+      onError: (error: Error) => {
+        toast({
+          title: "Error",
+          description: error.message || "No se pudo crear el área",
+          variant: "destructive",
+        });
+      },
+    });
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/trees/areas"] });
       toast({
@@ -1375,18 +1385,37 @@ function TreeMapPage() {
                 </Select>
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="areaCode">Código/Prefijo</Label>
-                <Input
-                  id="areaCode"
-                  value={formData.areaCode}
-                  onChange={(e) => setFormData({ ...formData, areaCode: e.target.value })}
-                  placeholder="Ej: ZN, JP, AD"
-                />
-                <p className="text-xs text-gray-500">
-                  Prefijo para identificar árboles (ej: ZN-001, ZN-002)
-                </p>
-              </div>
+              {/* Preview del código */}
+              {formData.name && formData.parkId && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm font-medium text-green-800 mb-1">
+                    Código del área:
+                  </p>
+                  <p className="text-2xl font-bold text-green-900">
+                    {(() => {
+                      const park = parks?.find((p: any) => p.id.toString() === formData.parkId);
+                      if (!park?.code_prefix) return "Esperando código del parque...";
+
+                      const cleanName = formData.name
+                        .replace(/^(zona|área|sector|sección)\s+/gi, '')
+                        .trim()
+                        .toUpperCase();
+
+                      if (cleanName.length < 2) return `${park.code_prefix}-??`;
+
+                      const words = cleanName.split(/\s+/);
+                      const areaLetters = words.length >= 2 
+                        ? words[0][0] + words[1][0]
+                        : cleanName.substring(0, 2);
+
+                      return `${park.code_prefix}-${areaLetters}`;
+                    })()}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-2">
+                    Este código se generará automáticamente al guardar
+                  </p>
+                </div>
+              )}
 
               <div className="grid gap-2">
                 <Label htmlFor="dimensions">Dimensiones (hectáreas)</Label>
@@ -1527,16 +1556,6 @@ function TreeMapPage() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="edit-areaCode">Código/Prefijo</Label>
-                <Input
-                  id="edit-areaCode"
-                  value={formData.areaCode}
-                  onChange={(e) => setFormData({ ...formData, areaCode: e.target.value })}
-                  placeholder="Ej: ZN, JP, AD"
-                />
               </div>
 
               <div className="grid gap-2">

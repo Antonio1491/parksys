@@ -140,7 +140,7 @@ const useSpaceMapping = (pageType: string, position: string) => {
   return useQuery({
     queryKey: ['space-mapping', pageType, position],
     queryFn: async () => {
-      const response = await fetch(`/api/advertising-management/space-mapping?pageType=${pageType}&position=${position}`);
+      const response = await fetch(`/api/advertising/space-mapping?pageType=${pageType}&position=${position}`);
       if (!response.ok) throw new Error('Error al obtener mapeo de espacios');
       const data = await response.json();
       return data.success ? data.data : [];
@@ -157,25 +157,23 @@ const useAdPlacements = (spaceId: number, pageType: string, position: string, en
       // Verificar cache primero
       const cached = cacheManager.get(pageType, position);
       if (cached) {
-        // Cache hit silencioso
         return cached;
       }
 
-      const response = await fetch(`/api/advertising-management/placements?spaceId=${spaceId}&pageType=${pageType}&active=true`);
+      const response = await fetch(`/api/advertising/placements?adSpaceId=${spaceId}&pageType=${pageType}&isActive=true`);
       if (!response.ok) throw new Error('Error al cargar asignaciones');
-      
+
       const result = await response.json();
       const placements = result.success ? result.data : [];
-      
+
       // Guardar en cache
       cacheManager.set(pageType, position, placements);
-      // Datos guardados en caché silenciosamente
-      
+
       return placements;
     },
     enabled,
-    staleTime: 30000,  // 30 segundos
-    gcTime: 120000,    // 2 minutos
+    staleTime: 30000,
+    gcTime: 120000,
     refetchOnWindowFocus: false,
   });
 };
@@ -302,7 +300,7 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
 
   const trackImpression = async (placementId: number) => {
     try {
-      await fetch('/api/advertising-management/track-impression', {
+      await fetch('/api/advertising/track-impression', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -320,7 +318,7 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
 
   const trackClick = async (placementId: number) => {
     try {
-      await fetch('/api/advertising-management/track-click', {
+      await fetch('/api/advertising/track-click', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

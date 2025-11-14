@@ -20,6 +20,7 @@ import { getTreeInventory } from './tree_inventory_raw';
 import { getTreeMaintenanceStats } from './tree_maintenance_stats';
 import { registerTreeAreasRoutes } from "./tree_areas_routes";
 import { registerTreeLinksRoutes } from "./tree_links_routes";
+import { generateSpeciesCode } from './code-generator';
 
 /**
  * Registra las rutas relacionadas con el módulo de arbolado
@@ -737,20 +738,18 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
     }
   });
 
-  // Importar especies de árboles desde CSV
   apiRouter.post("/tree-species/import/csv", isAuthenticated, async (req: Request, res: Response) => {
     try {
       console.log("=== IMPORTACIÓN CSV DEBUG ===");
-      
+
       const { data } = req.body;
-      
+
       if (!data || !Array.isArray(data) || data.length === 0) {
         return res.status(400).json({ message: "No se recibieron datos válidos" });
       }
-      
+
       console.log(`📊 Procesando ${data.length} filas`);
-      
-      // Mapeo de familias mexicanas a nombres comunes reales
+
       const familyToCommonName = {
         'Cupressaceae': 'Ciprés',
         'Bignoniaceae': 'Jacaranda',
@@ -764,7 +763,6 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         'Burseraceae': 'Copal'
       };
 
-      // Mapeo de familias a nombres científicos más específicos
       const familyToScientificName = {
         'Cupressaceae': 'Cupressus sempervirens',
         'Bignoniaceae': 'Jacaranda mimosifolia',
@@ -777,11 +775,10 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         'Moraceae': 'Ficus benjamina',
         'Burseraceae': 'Bursera simaruba'
       };
-      
-      // Función para corregir acentos mal codificados
+
       const fixEncoding = (text: string): string => {
         if (!text) return text;
-        
+
         return text
           .replace(/Ã¡/g, 'á')
           .replace(/Ã©/g, 'é') 
@@ -791,56 +788,46 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
           .replace(/Ã±/g, 'ñ')
           .replace(/Ã\u00D1/g, 'Ñ');
       };
-      
+
       let imported = 0;
       const errors: string[] = [];
-      
+
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
-        
+
         try {
-          // Detectar formato: nuevo (nombre_comun) vs viejo (family)
           const isNewFormat = row.nombre_comun !== undefined;
-          
+
           let insertData;
           if (isNewFormat) {
-            // MAPEO CORREGIDO BASADO EN COLUMNAS REALES DEL CSV
-            // Según análisis: descripción=H, beneficios=I, mantenimiento=J, vida=K, clima=L, suelo=M, agua=N, sol=O, usos=Q
             insertData = {
               common_name: fixEncoding(row.nombre_comun || 'Sin nombre'),
               scientific_name: fixEncoding(row.nombre_cientifico || 'Sin clasificar'),
               family: fixEncoding(row.familia || 'Sin familia'), 
               origin: fixEncoding(row.origen || 'Desconocido'),
-              growth_rate: fixEncoding(row.ritmo_crecimiento || 'Medio'), // Columna E
+              growth_rate: fixEncoding(row.ritmo_crecimiento || 'Medio'),
               is_endangered: row.amenazada === 'si' || row.amenazada === 'sí',
-              
-              // CORRECCIÓN DEL MAPEO DESORDENADO
-              description: fixEncoding(row.descripcion) || null, // Columna H - CORRECTO
-              ecological_benefits: fixEncoding(row.beneficios_ecologicos) || null, // Columna I - CORRECTO  
-              maintenance_requirements: fixEncoding(row.requisitos_mantenimiento) || null, // Columna J - CORRECTO
+              description: fixEncoding(row.descripcion) || null,
+              ecological_benefits: fixEncoding(row.beneficios_ecologicos) || null,
+              maintenance_requirements: fixEncoding(row.requisitos_mantenimiento) || null,
               lifespan: (() => {
                 if (!row.esperanza_vida) return null;
                 const lifespanStr = row.esperanza_vida.toString();
                 const match = lifespanStr.match(/(\d+)/);
                 return match ? parseInt(match[1]) : null;
-              })(), // Columna K - CORRECTO
-              climate_zone: fixEncoding(row.zona_climatica) || null, // Columna L - CORRECTO
-              soil_requirements: fixEncoding(row.requisitos_suelo) || null, // Columna M - CORRECTO
-              water_requirements: fixEncoding(row.requisitos_agua) || null, // Columna N - CORRECTO
-              sun_requirements: fixEncoding(row.requisitos_sol) || null, // Columna O - CORRECTO
-              common_uses: fixEncoding(row.usos_comunes) || null, // Columna Q - CORRECTO
-              
-              // URL de imagen sigue igual
+              })(),
+              climate_zone: fixEncoding(row.zona_climatica) || null,
+              soil_requirements: fixEncoding(row.requisitos_suelo) || null,
+              water_requirements: fixEncoding(row.requisitos_agua) || null,
+              sun_requirements: fixEncoding(row.requisitos_sol) || null,
+              common_uses: fixEncoding(row.usos_comunes) || null,
               image_url: row.url_imagen || null,
-              
-              // Valor ornamental desde la columna correcta
               ornamental_value: fixEncoding(row.valor_ornamental) || null
             };
           } else {
-            // Formato simple con nombres reales mexicanos
             const family = row.family || 'Sin familia';
             const origin = row.origin || 'Desconocido';
-            
+
             insertData = {
               common_name: (familyToCommonName as any)[family] || `Árbol de ${family}`,
               scientific_name: (familyToScientificName as any)[family] || `${family} sp.`,
@@ -852,7 +839,7 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
               maintenance_requirements: 'Mantenimiento regular, poda anual',
               ecological_benefits: 'Purificación del aire, sombra natural, hábitat para fauna',
               image_url: null,
-              life_expectancy: Math.floor(Math.random() * 50) + 30, // 30-80 años
+              life_expectancy: Math.floor(Math.random() * 50) + 30,
               climate_zone: 'Templado a subtropical',
               soil_requirements: 'Suelo bien drenado',
               water_requirements: 'Riego moderado',
@@ -862,14 +849,16 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
             };
           }
 
+          const speciesCode = await generateSpeciesCode(insertData.common_name, insertData.scientific_name);
+
           const result = await db.execute(sql`
             INSERT INTO tree_species (
-              common_name, scientific_name, family, origin, growth_rate,
+              common_name, scientific_name, species_code, family, origin, growth_rate,
               is_endangered, description, maintenance_requirements, ecological_benefits, 
               image_url, lifespan, climate_zone, soil_requirements, 
               water_requirements, sun_requirements, ornamental_value, common_uses
             ) VALUES (
-              ${insertData.common_name}, ${insertData.scientific_name}, 
+              ${insertData.common_name}, ${insertData.scientific_name}, ${speciesCode},
               ${insertData.family}, ${insertData.origin}, ${insertData.growth_rate},
               ${insertData.is_endangered}, ${insertData.description}, 
               ${insertData.maintenance_requirements}, ${insertData.ecological_benefits},
@@ -1042,7 +1031,6 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
     }
   });
 
-  // Crear nueva especie de árbol (requiere autenticación)
   apiRouter.post("/tree-species", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { 
@@ -1051,25 +1039,26 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         lifespan, climateZone, soilRequirements, waterRequirements, 
         sunRequirements, ornamentalValue, commonUses 
       } = req.body;
-      
-      // Validación básica de datos
+
       if (!commonName || !scientificName) {
         return res.status(400).json({ 
           message: "El nombre común y científico son obligatorios" 
         });
       }
-      
-      // Insertar la nueva especie usando nombres de columnas correctos del esquema
+
+      const speciesCode = await generateSpeciesCode(commonName, scientificName);
+      console.log('🔤 Código de especie generado:', speciesCode);
+
       const result = await db.execute(sql`
         INSERT INTO tree_species (
-          common_name, scientific_name, family, origin, growth_rate, 
+          common_name, scientific_name, species_code, family, origin, growth_rate, 
           image_url, description, is_endangered, ecological_benefits, 
           maintenance_requirements, lifespan, climate_zone, 
           soil_requirements, water_requirements, sun_requirements, 
           ornamental_value, common_uses, created_at, updated_at
         ) 
         VALUES (
-          ${commonName}, ${scientificName}, ${family || null}, ${origin || null}, 
+          ${commonName}, ${scientificName}, ${speciesCode}, ${family || null}, ${origin || null}, 
           ${growthRate || null}, ${imageUrl || null}, ${description || null}, 
           ${isEndangered || false}, ${ecologicalBenefits || null}, 
           ${maintenanceRequirements || null}, ${lifespan || null}, ${climateZone || null},
@@ -1078,7 +1067,9 @@ export function registerTreeRoutes(app: any, apiRouter: Router, isAuthenticated:
         )
         RETURNING *
       `);
-      
+
+      console.log(`✅ Especie creada: ${commonName} (Código: ${speciesCode})`);
+
       res.status(201).json(result.rows[0]);
     } catch (error) {
       console.error("Error al crear especie de árbol:", error);

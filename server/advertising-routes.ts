@@ -417,6 +417,59 @@ router.delete('/spaces/:id', isAuthenticated, async (req, res) => {
 });
 
 // ===================
+// SPACE MAPPING (para componente público)
+// ===================
+
+// Obtener espacios mapeados para una página/posición específica
+router.get('/space-mapping', async (req, res) => {
+  try {
+    const { pageType, position } = req.query;
+
+    if (!pageType || !position) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'pageType y position son requeridos' 
+      });
+    }
+
+    const result = await pool.query(`
+      SELECT 
+        id as space_id,
+        name,
+        page_type,
+        position,
+        dimensions,
+        is_active
+      FROM ad_spaces
+      WHERE page_type = $1 
+        AND position = $2 
+        AND is_active = true
+      ORDER BY id ASC
+      LIMIT 1
+    `, [pageType, position]);
+
+    // Formatear respuesta para el frontend
+    const mappings = result.rows.map(row => ({
+      spaceId: row.space_id,
+      name: row.name,
+      pageType: row.page_type,
+      position: row.position,
+      dimensions: row.dimensions,
+      isActive: row.is_active,
+      fallbackBehavior: 'hide' // Valor por defecto
+    }));
+
+    res.json({ success: true, data: mappings });
+  } catch (error) {
+    console.error('Error obteniendo space mapping:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error obteniendo mapeo de espacios' 
+    });
+  }
+});
+
+// ===================
 // ANUNCIOS
 // ===================
 
@@ -774,21 +827,119 @@ router.delete('/advertisements/:id', isAuthenticated, async (req, res) => {
 // ASIGNACIONES (PLACEMENTS) - ACTUALIZADO CON PATRÓN UTC
 // ===================
 
-// GET - Obtener todas las asignaciones con filtros
+// Obtener asignaciones activas
 router.get('/placements', async (req, res) => {
   try {
-    const { advertisementId, adSpaceId, pageType, isActive } = req.query;
+    // Aceptar tanto spaceId como adSpaceId para compatibilidad
+    const spaceId = req.query.spaceId || req.query.adSpaceId;
+    const { pageType, position, active } = req.query;
+
+    console.log(`🔍 GET /placements - Params:`, { spaceId, pageType, position, active });
 
     let query = `
       SELECT 
         ap.id,
         ap.advertisement_id,
         ap.ad_space_id,
-        ap.page_type,
-        ap.page_id,
+        ap.priority,
         ap.start_date,
         ap.end_date,
+        ap.is_active,
+        ap.frequency,
+        a.id as ad_id,
+        a.title,
+        a.description,
+        a.media_url as image_url,
+        a.link_url as target_url,
+        a.button_text,
+        a.media_type,
+        a.duration,
+        a.is_active as ad_is_active,
+        a.updated_at as ad_updated_at,
+        ads.dimensions
+      FROM ad_placements ap
+      LEFT JOIN advertisements a ON ap.advertisement_id = a.id
+      LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
+      WHERE ap.is_active = true 
+        AND a.is_active = true
+        AND ads.is_active = true
+        AND ap.start_date <= CURRENT_DATE
+        AND ap.end_date >= CURRENT_DATE
+    `;
+
+    const params = [];
+
+    if (spaceId) {
+      query += ` AND ads.id = $${params.length + 1}`;
+      params.push(parseInt(spaceId));
+    }
+
+    if (pageType) {
+      query += ` AND ads.page_type = $${params.length + 1}`;
+      params.push(pageType);
+    }
+
+    if (position) {
+      query += ` AND ads.position = $${params.length + 1}`;
+      params.push(position);
+    }
+
+    query += ` ORDER BY ap.priority DESC LIMIT 10`;
+
+    console.log(`📊 Query SQL:`, query);
+    console.log(`📊 Params:`, params);
+
+    const result = await pool.query(query, params);
+
+    console.log(`✅ Placements encontrados: ${result.rows.length}`);
+
+    // Formatear los datos para el frontend
+    const formattedData = result.rows.map(row => ({
+      id: row.id,
+      spaceId: row.ad_space_id,
+      advertisementId: row.advertisement_id,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      isActive: row.is_active,
+      priority: row.priority,
+      frequency: row.frequency || 'always',
+      spaceDimensions: row.dimensions,
+      advertisement: {
+        id: row.ad_id,
+        title: row.title,
+        description: row.description,
+        imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : null,
+        targetUrl: row.target_url,
+        buttonText: row.button_text,
+        mediaType: row.media_type || 'image',
+        duration: row.duration,
+        isActive: row.ad_is_active,
+        updatedAt: row.ad_updated_at
+      }
+    }));
+
+    res.json({ success: true, data: formattedData });
+  } catch (error) {
+    console.error('❌ Error obteniendo placements:', error);
+    res.status(500).json({ success: false, error: 'Error obteniendo placements' });
+  }
+});
+
+// Obtener placements para el admin (con todos los datos)
+router.get('/placements/admin', async (req, res) => {
+  try {
+    console.log('🔍 GET /placements/admin');
+
+    const result = await pool.query(`
+      SELECT 
+        ap.id,
+        ap.advertisement_id,
+        ap.ad_space_id,
+        ap.page_type,
+        ap.page_id,
         ap.priority,
+        ap.start_date,
+        ap.end_date,
         ap.is_active,
         ap.frequency,
         ap.scheduled_days,
@@ -798,74 +949,47 @@ router.get('/placements', async (req, res) => {
         ap.created_at,
         ap.updated_at,
         a.title as ad_title,
-        a.media_url as ad_media_url,
-        a.media_type as ad_media_type,
         ads.name as space_name,
+        ads.page_type as space_page_type,
         ads.position as space_position
       FROM ad_placements ap
       LEFT JOIN advertisements a ON ap.advertisement_id = a.id
       LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
-      WHERE 1=1
-    `;
+      ORDER BY ap.created_at DESC
+    `);
 
-    const params = [];
+    console.log(`✅ Admin placements encontrados: ${result.rows.length}`);
 
-    if (advertisementId) {
-      params.push(parseInt(advertisementId as string));
-      query += ` AND ap.advertisement_id = $${params.length}`;
-    }
-
-    if (adSpaceId) {
-      params.push(parseInt(adSpaceId as string));
-      query += ` AND ap.ad_space_id = $${params.length}`;
-    }
-
-    if (pageType) {
-      params.push(pageType);
-      query += ` AND ap.page_type = $${params.length}`;
-    }
-
-    if (isActive !== undefined) {
-      params.push(isActive === 'true');
-      query += ` AND ap.is_active = $${params.length}`;
-    }
-
-    query += ` ORDER BY ap.priority DESC, ap.created_at DESC`;
-
-    const result = await pool.query(query, params);
-
-    // Mapear a camelCase con fechas en formato ISO
-    const placements = result.rows.map(row => ({
+    const formattedData = result.rows.map(row => ({
       id: row.id,
       advertisementId: row.advertisement_id,
       adSpaceId: row.ad_space_id,
       pageType: row.page_type,
       pageId: row.page_id,
-      startDate: row.start_date ? new Date(row.start_date).toISOString() : null,
-      endDate: row.end_date ? new Date(row.end_date).toISOString() : null,
       priority: row.priority,
+      startDate: row.start_date,
+      endDate: row.end_date,
       isActive: row.is_active,
-      frequency: row.frequency,
+      frequency: row.frequency || 'always',
       scheduledDays: row.scheduled_days,
       scheduledHours: row.scheduled_hours,
-      impressions: row.impressions,
-      clicks: row.clicks,
-      createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
-      updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null,
-      advertisement: row.ad_title ? {
-        title: row.ad_title,
-        mediaUrl: row.ad_media_url,
-        mediaType: row.ad_media_type
-      } : null,
-      space: row.space_name ? {
+      impressions: row.impressions || 0,
+      clicks: row.clicks || 0,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      advertisement: {
+        title: row.ad_title
+      },
+      space: {
         name: row.space_name,
+        pageType: row.space_page_type,
         position: row.space_position
-      } : null
+      }
     }));
 
-    res.json({ success: true, data: placements });
+    res.json({ success: true, data: formattedData });
   } catch (error) {
-    console.error('Error obteniendo placements:', error);
+    console.error('❌ Error obteniendo admin placements:', error);
     res.status(500).json({ success: false, error: 'Error obteniendo placements' });
   }
 });
@@ -1528,20 +1652,37 @@ router.delete('/assignments/:id', isAuthenticated, async (req, res) => {
 router.post('/track-impression', async (req, res) => {
   try {
     const { placementId } = req.body;
-    
+
     if (!placementId) {
       return res.status(400).json({
         success: false,
         error: 'placementId es requerido'
       });
     }
-    
-    // Registrar la impresión (por ahora solo log)
+
+    // 1. Incrementar contador en ad_placements
+    await pool.query(`
+      UPDATE ad_placements 
+      SET impressions = impressions + 1,
+          updated_at = NOW()
+      WHERE id = $1
+    `, [parseInt(placementId)]);
+
+    // 2. Registrar en ad_analytics (tabla diaria)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    await pool.query(`
+      INSERT INTO ad_analytics (placement_id, date, impressions, clicks, conversions, created_at, updated_at)
+      VALUES ($1, $2, 1, 0, 0, NOW(), NOW())
+      ON CONFLICT (placement_id, date) 
+      DO UPDATE SET 
+        impressions = ad_analytics.impressions + 1,
+        updated_at = NOW()
+    `, [parseInt(placementId), today]);
+
     console.log(`📊 Impresión registrada para placement ID: ${placementId}`);
-    
-    // Aquí podrías insertar en una tabla de analytics si existe
-    // await pool.query('INSERT INTO ad_impressions (placement_id, timestamp) VALUES ($1, NOW())', [placementId]);
-    
+
     res.json({
       success: true,
       message: 'Impresión registrada'
@@ -1559,20 +1700,37 @@ router.post('/track-impression', async (req, res) => {
 router.post('/track-click', async (req, res) => {
   try {
     const { placementId } = req.body;
-    
+
     if (!placementId) {
       return res.status(400).json({
         success: false,
         error: 'placementId es requerido'
       });
     }
-    
-    // Registrar el click (por ahora solo log)
+
+    // 1. Incrementar contador en ad_placements
+    await pool.query(`
+      UPDATE ad_placements 
+      SET clicks = clicks + 1,
+          updated_at = NOW()
+      WHERE id = $1
+    `, [parseInt(placementId)]);
+
+    // 2. Registrar en ad_analytics (tabla diaria)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    await pool.query(`
+      INSERT INTO ad_analytics (placement_id, date, impressions, clicks, conversions, created_at, updated_at)
+      VALUES ($1, $2, 0, 1, 0, NOW(), NOW())
+      ON CONFLICT (placement_id, date) 
+      DO UPDATE SET 
+        clicks = ad_analytics.clicks + 1,
+        updated_at = NOW()
+    `, [parseInt(placementId), today]);
+
     console.log(`🖱️ Click registrado para placement ID: ${placementId}`);
-    
-    // Aquí podrías insertar en una tabla de analytics si existe
-    // await pool.query('INSERT INTO ad_clicks (placement_id, timestamp) VALUES ($1, NOW())', [placementId]);
-    
+
     res.json({
       success: true,
       message: 'Click registrado'

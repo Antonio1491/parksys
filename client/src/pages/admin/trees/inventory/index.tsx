@@ -240,36 +240,6 @@ function TreeInventoryPage() {
     setSpeciesFilter('all');
   };
 
-  // Mutación para limpiar el inventario de árboles
-  const clearInventoryMutation = useMutation({
-    mutationFn: async () => {
-      return apiRequest('/api/trees/delete-all', {
-        method: 'DELETE',
-      });
-    },
-    onSuccess: (response) => {
-      toast({
-        title: "Inventario limpiado",
-        description: response.message || "Todos los árboles han sido eliminados del inventario",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/trees'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error al limpiar inventario",
-        description: error.message || "No se pudieron eliminar todos los árboles",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Manejar limpiado del inventario
-  const handleClearInventory = () => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar TODOS los árboles del inventario?\n\nEsta acción eliminará todos los registros de árboles y sus mantenimientos asociados.\n\nEsta acción no se puede deshacer.')) {
-      clearInventoryMutation.mutate();
-    }
-  };
-
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
     mutationFn: async (treeIds: number[]) => {
