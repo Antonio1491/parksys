@@ -827,110 +827,14 @@ router.delete('/advertisements/:id', isAuthenticated, async (req, res) => {
 // ASIGNACIONES (PLACEMENTS) - ACTUALIZADO CON PATRÓN UTC
 // ===================
 
-// Obtener asignaciones activas
+// Obtener placements para el admin (con todos los datos)
 router.get('/placements', async (req, res) => {
   try {
-    // Aceptar tanto spaceId como adSpaceId para compatibilidad
-    const spaceId = req.query.spaceId || req.query.adSpaceId;
-    const { pageType, position, active } = req.query;
+    const { isActive } = req.query;
 
-    console.log(`🔍 GET /placements - Params:`, { spaceId, pageType, position, active });
+    console.log('🔍 GET /placements (admin)');
 
     let query = `
-      SELECT 
-        ap.id,
-        ap.advertisement_id,
-        ap.ad_space_id,
-        ap.priority,
-        ap.start_date,
-        ap.end_date,
-        ap.is_active,
-        ap.frequency,
-        a.id as ad_id,
-        a.title,
-        a.description,
-        a.media_url as image_url,
-        a.link_url as target_url,
-        a.button_text,
-        a.media_type,
-        a.duration,
-        a.is_active as ad_is_active,
-        a.updated_at as ad_updated_at,
-        ads.dimensions
-      FROM ad_placements ap
-      LEFT JOIN advertisements a ON ap.advertisement_id = a.id
-      LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
-      WHERE ap.is_active = true 
-        AND a.is_active = true
-        AND ads.is_active = true
-        AND ap.start_date <= CURRENT_DATE
-        AND ap.end_date >= CURRENT_DATE
-    `;
-
-    const params = [];
-
-    if (spaceId) {
-      query += ` AND ads.id = $${params.length + 1}`;
-      params.push(parseInt(spaceId));
-    }
-
-    if (pageType) {
-      query += ` AND ads.page_type = $${params.length + 1}`;
-      params.push(pageType);
-    }
-
-    if (position) {
-      query += ` AND ads.position = $${params.length + 1}`;
-      params.push(position);
-    }
-
-    query += ` ORDER BY ap.priority DESC LIMIT 10`;
-
-    console.log(`📊 Query SQL:`, query);
-    console.log(`📊 Params:`, params);
-
-    const result = await pool.query(query, params);
-
-    console.log(`✅ Placements encontrados: ${result.rows.length}`);
-
-    // Formatear los datos para el frontend
-    const formattedData = result.rows.map(row => ({
-      id: row.id,
-      spaceId: row.ad_space_id,
-      advertisementId: row.advertisement_id,
-      startDate: row.start_date,
-      endDate: row.end_date,
-      isActive: row.is_active,
-      priority: row.priority,
-      frequency: row.frequency || 'always',
-      spaceDimensions: row.dimensions,
-      advertisement: {
-        id: row.ad_id,
-        title: row.title,
-        description: row.description,
-        imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : null,
-        targetUrl: row.target_url,
-        buttonText: row.button_text,
-        mediaType: row.media_type || 'image',
-        duration: row.duration,
-        isActive: row.ad_is_active,
-        updatedAt: row.ad_updated_at
-      }
-    }));
-
-    res.json({ success: true, data: formattedData });
-  } catch (error) {
-    console.error('❌ Error obteniendo placements:', error);
-    res.status(500).json({ success: false, error: 'Error obteniendo placements' });
-  }
-});
-
-// Obtener placements para el admin (con todos los datos)
-router.get('/placements/admin', async (req, res) => {
-  try {
-    console.log('🔍 GET /placements/admin');
-
-    const result = await pool.query(`
       SELECT 
         ap.id,
         ap.advertisement_id,
@@ -955,8 +859,19 @@ router.get('/placements/admin', async (req, res) => {
       FROM ad_placements ap
       LEFT JOIN advertisements a ON ap.advertisement_id = a.id
       LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
-      ORDER BY ap.created_at DESC
-    `);
+    `;
+
+    const params = [];
+
+    // Filtro opcional por estado activo
+    if (isActive !== undefined) {
+      query += ` WHERE ap.is_active = $1`;
+      params.push(isActive === 'true');
+    }
+
+    query += ` ORDER BY ap.created_at DESC`;
+
+    const result = await pool.query(query, params);
 
     console.log(`✅ Admin placements encontrados: ${result.rows.length}`);
 
@@ -989,7 +904,7 @@ router.get('/placements/admin', async (req, res) => {
 
     res.json({ success: true, data: formattedData });
   } catch (error) {
-    console.error('❌ Error obteniendo admin placements:', error);
+    console.error('❌ Error obteniendo placements:', error);
     res.status(500).json({ success: false, error: 'Error obteniendo placements' });
   }
 });
@@ -1417,59 +1332,98 @@ router.get('/analytics/campaigns/:campaignId', async (req, res) => {
 // API PÚBLICA PARA PÁGINAS
 // ===================
 
-// Obtener anuncios para una página específica
+// Obtener anuncios para páginas públicas (usado por AdSpaceIntelligent)
 router.get('/public/ads', async (req, res) => {
   try {
-    const { pageType, pageId, spaceKey } = req.query;
-    
-    // Construir condiciones dinámicamente
-    const conditions = [
-      eq(adPlacements.isActive, true),
-      lte(adPlacements.startDate, new Date()),
-      gte(adPlacements.endDate, new Date())
-    ];
-    
-    if (pageType) {
-      conditions.push(eq(adPlacements.pageType, pageType as string));
-    }
-    
-    if (pageId) {
-      conditions.push(
-        sql`(${adPlacements.pageId} = ${parseInt(pageId as string)} OR ${adPlacements.pageId} IS NULL)`
-      );
-    }
-    
-    if (spaceKey) {
-      conditions.push(eq(adSpaces.spaceKey, spaceKey as string));
+    const { pageType, position, spaceId } = req.query;
+
+    console.log(`🔍 GET /public/ads - Params:`, { pageType, position, spaceId });
+
+    let query = `
+      SELECT 
+        ap.id,
+        ap.advertisement_id,
+        ap.ad_space_id,
+        ap.priority,
+        ap.start_date,
+        ap.end_date,
+        ap.is_active,
+        ap.frequency,
+        a.id as ad_id,
+        a.title,
+        a.description,
+        a.media_url as image_url,
+        a.link_url as target_url,
+        a.button_text,
+        a.media_type,
+        a.duration,
+        a.is_active as ad_is_active,
+        a.updated_at as ad_updated_at,
+        ads.dimensions
+      FROM ad_placements ap
+      LEFT JOIN advertisements a ON ap.advertisement_id = a.id
+      LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
+      WHERE ap.is_active = true 
+        AND a.is_active = true
+        AND ads.is_active = true
+        AND ap.start_date <= CURRENT_DATE
+        AND ap.end_date >= CURRENT_DATE
+    `;
+
+    const params = [];
+
+    if (spaceId) {
+      query += ` AND ads.id = $${params.length + 1}`;
+      params.push(parseInt(spaceId as string));
     }
 
-    const query = db.select({
-      id: adPlacements.id,
+    if (pageType) {
+      query += ` AND ads.page_type = $${params.length + 1}`;
+      params.push(pageType);
+    }
+
+    if (position) {
+      query += ` AND ads.position = $${params.length + 1}`;
+      params.push(position);
+    }
+
+    query += ` ORDER BY ap.priority DESC LIMIT 10`;
+
+    console.log(`📊 Query SQL:`, query);
+    console.log(`📊 Params:`, params);
+
+    const result = await pool.query(query, params);
+
+    console.log(`✅ Placements públicos encontrados: ${result.rows.length}`);
+
+    // Formatear datos para el frontend
+    const formattedData = result.rows.map(row => ({
+      id: row.id,
+      spaceId: row.ad_space_id,
+      advertisementId: row.advertisement_id,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      isActive: row.is_active,
+      priority: row.priority,
+      frequency: row.frequency || 'always',
+      spaceDimensions: row.dimensions,
       advertisement: {
-        id: advertisements.id,
-        title: advertisements.title,
-        content: advertisements.content,
-        imageUrl: advertisements.imageUrl,
-        linkUrl: advertisements.linkUrl,
-        type: advertisements.type,
-        priority: advertisements.priority
-      },
-      space: {
-        spaceKey: adSpaces.spaceKey,
-        name: adSpaces.name,
-        dimensions: adSpaces.dimensions,
-        locationType: adSpaces.locationType
+        id: row.ad_id,
+        title: row.title,
+        description: row.description,
+        imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : null,
+        targetUrl: row.target_url,
+        buttonText: row.button_text,
+        mediaType: row.media_type || 'image',
+        duration: row.duration,
+        isActive: row.ad_is_active,
+        updatedAt: row.ad_updated_at
       }
-    }).from(adPlacements)
-      .leftJoin(advertisements, eq(adPlacements.adId, advertisements.id))
-      .leftJoin(adSpaces, eq(adPlacements.spaceId, adSpaces.id))
-      .where(and(...conditions));
-    
-    const ads = await query.orderBy(desc(advertisements.priority));
-    
-    res.json({ success: true, data: ads });
+    }));
+
+    res.json({ success: true, data: formattedData });
   } catch (error) {
-    console.error('Error obteniendo anuncios públicos:', error);
+    console.error('❌ Error obteniendo anuncios públicos:', error);
     res.status(500).json({ success: false, error: 'Error obteniendo anuncios públicos' });
   }
 });

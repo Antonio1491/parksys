@@ -346,13 +346,16 @@ export const CAMPAIGN_STATUS_OPTIONS: { value: CampaignStatus; label: string }[]
   { value: "cancelled", label: "Cancelada" },
 ];
 
-export const PAGE_TYPE_OPTIONS: { value: PageType; label: string }[] = [
+export const PAGE_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "all", label: "Todas las páginas" },
   { value: "home", label: "Inicio" },
   { value: "parks", label: "Parques" },
   { value: "species", label: "Especies" },
   { value: "activities", label: "Actividades" },
+  { value: "activity-detail", label: "Detalle de Actividad" },
+  { value: "events", label: "Eventos" },
   { value: "concessions", label: "Concesiones" },
+  { value: "volunteers", label: "Voluntarios" },
 ];
 
 // ⬇️ NUEVAS CONSTANTES AGREGADAS

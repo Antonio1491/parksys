@@ -18,7 +18,9 @@ import {
   Heart
 } from "lucide-react";
 import { Link } from "wouter";
+import ROUTES from "@/routes";
 import { EventRegistrationForm } from '@/components/EventRegistrationForm';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 
 interface Event {
   id: number;
@@ -132,7 +134,7 @@ const EventDetail = () => {
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Evento no encontrado</h1>
             <p className="text-gray-600 mb-6">El evento que buscas no existe o ha sido eliminado.</p>
             <Button asChild>
-              <Link href="/events">
+              <Link href={ROUTES.public.events}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver a eventos
               </Link>
@@ -161,7 +163,7 @@ const EventDetail = () => {
           <div className="max-w-6xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Button variant="ghost" asChild className="hover:bg-green-50">
-                <Link href="/events">
+                <Link href={ROUTES.public.events}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Volver a eventos
                 </Link>

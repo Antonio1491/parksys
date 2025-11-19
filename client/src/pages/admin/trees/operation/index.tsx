@@ -128,6 +128,7 @@ function TreeMapPage() {
     name: "",
     description: "",
     parkId: "",
+    areaCode: "",
     dimensions: "",
     latitude: "",
     longitude: "",
@@ -176,30 +177,13 @@ function TreeMapPage() {
   });
 
   // Mutación para crear área
-    const createAreaMutation = useMutation({
-      mutationFn: async (data: any) => {
-        return apiRequest("/api/trees/areas", {
-          method: "POST",
-          data: data,
-        });
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["/api/trees/areas"] });
-        toast({
-          title: "Área creada",
-          description: "El área se creó exitosamente",
-        });
-        setIsCreateDialogOpen(false);
-        resetForm();
-      },
-      onError: (error: Error) => {
-        toast({
-          title: "Error",
-          description: error.message || "No se pudo crear el área",
-          variant: "destructive",
-        });
-      },
-    });
+  const createAreaMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("/api/trees/areas", {
+        method: "POST",
+        data: data,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/trees/areas"] });
       toast({
@@ -334,7 +318,7 @@ function TreeMapPage() {
       maintenanceFilter,
     ],
     queryFn: async () => {
-      let url = "/api/trees?limit=1000"; // Solicitamos un límite alto para mostrar más árboles en el mapa
+      let url = "/api/trees?limit=1000";
 
       if (parkFilter !== "all") {
         url += `&parkId=${parkFilter}`;
@@ -360,7 +344,6 @@ function TreeMapPage() {
   // Inicializar el mapa cuando el componente se monte
   useEffect(() => {
     const initMap = () => {
-      // Ubicación por defecto (Guadalajara, Jalisco)
       const defaultCenter = { lat: 20.6597, lng: -103.3496 };
 
       const mapElement = document.getElementById("tree-map");
@@ -383,8 +366,6 @@ function TreeMapPage() {
     if (!mapLoaded && window.google && window.google.maps) {
       initMap();
     } else if (!window.google || !window.google.maps) {
-      // Si la API de Google Maps no está cargada, utilizamos una solución alternativa
-      // Marcamos como cargado para mostrar el estado alternativo
       setMapLoaded(true);
     }
   }, [mapCenter, mapLoaded]);
@@ -400,16 +381,13 @@ function TreeMapPage() {
       window.google &&
       window.google.maps
     ) {
-      // Limpiar marcadores existentes
       markers.forEach((marker) => marker.setMap(null));
       const newMarkers = [];
 
-      // Filtrar los árboles según la categoría seleccionada
       let filteredTrees = [...treeInventory.data];
 
       if (categoryFilter !== "all") {
         filteredTrees = filteredTrees.filter((tree: TreeInventory) => {
-          // Categorizar árboles según su plantingDate (edad)
           const plantingDate = tree.plantingDate
             ? new Date(tree.plantingDate)
             : null;
@@ -436,7 +414,6 @@ function TreeMapPage() {
         });
       }
 
-      // Filtrar árboles según el criterio de mantenimiento
       if (maintenanceFilter !== "all") {
         filteredTrees = filteredTrees.filter((tree: TreeInventory) => {
           const lastInspection = tree.lastInspectionDate
@@ -444,7 +421,6 @@ function TreeMapPage() {
             : null;
           const now = new Date();
 
-          // Calcular la diferencia en meses
           const monthsDiff = lastInspection
             ? Math.floor(
                 (now.getTime() - lastInspection.getTime()) /
@@ -454,17 +430,14 @@ function TreeMapPage() {
 
           switch (maintenanceFilter) {
             case "urgente":
-              // Árboles sin inspección en más de 12 meses o en estado crítico
               return (
                 monthsDiff === null ||
                 monthsDiff > 12 ||
                 tree.healthStatus.toLowerCase() === "crítico"
               );
             case "pendiente":
-              // Árboles sin inspección entre 6 y 12 meses
               return monthsDiff !== null && monthsDiff >= 6 && monthsDiff <= 12;
             case "reciente":
-              // Árboles inspeccionados en los últimos 6 meses
               return monthsDiff !== null && monthsDiff < 6;
             default:
               return true;
@@ -472,7 +445,6 @@ function TreeMapPage() {
         });
       }
 
-      // Añadir nuevos marcadores para los árboles filtrados
       filteredTrees.forEach((tree: TreeInventory) => {
         if (tree.latitude && tree.longitude) {
           try {
@@ -480,7 +452,6 @@ function TreeMapPage() {
             const lng = parseFloat(tree.longitude);
 
             if (!isNaN(lat) && !isNaN(lng)) {
-              // Determinar el color del marcador según el estado de salud
               let markerIcon = "";
               switch (tree.healthStatus.toLowerCase()) {
                 case "bueno":
@@ -511,11 +482,9 @@ function TreeMapPage() {
                 icon: markerIcon,
               });
 
-              // Añadir evento de clic al marcador
               marker.addListener("click", () => {
                 setSelectedTree(tree);
 
-                // Crear una ventana de información
                 const infoWindow = new window.google.maps.InfoWindow({
                   content: `
                     <div style="padding: 10px; max-width: 200px;">
@@ -541,7 +510,6 @@ function TreeMapPage() {
 
       setMarkers(newMarkers);
 
-      // Si es la primera carga y tenemos árboles, centramos el mapa en el primer árbol
       if (newMarkers.length > 0 && !mapCenter) {
         const firstTree = treeInventory.data[0];
         try {
@@ -566,7 +534,6 @@ function TreeMapPage() {
     maintenanceFilter,
   ]);
 
-  // Usamos useEffect para evitar re-renders infinitos al mostrar el toast
   React.useEffect(() => {
     if (error) {
       toast({
@@ -578,7 +545,6 @@ function TreeMapPage() {
     }
   }, [error, toast]);
 
-  // Función para limpiar todos los filtros
   const clearAllFilters = () => {
     setParkFilter("all");
     setSpeciesFilter("all");
@@ -587,7 +553,6 @@ function TreeMapPage() {
     setMaintenanceFilter("all");
   };
 
-  // Función para calcular estadísticas por categoría
   const getCategoryStats = () => {
     if (!treeInventory || !treeInventory.data) return {};
 
@@ -597,7 +562,6 @@ function TreeMapPage() {
     let atRisk = 0;
 
     treeInventory.data.forEach((tree: TreeInventory) => {
-      // Categorizar árboles según su plantingDate (edad)
       const plantingDate = tree.plantingDate
         ? new Date(tree.plantingDate)
         : null;
@@ -630,7 +594,6 @@ function TreeMapPage() {
     };
   };
 
-  // Función para calcular estadísticas por estado de salud
   const getHealthStats = () => {
     if (!treeInventory || !treeInventory.data) return {};
 
@@ -664,7 +627,6 @@ function TreeMapPage() {
     };
   };
 
-  // Función para calcular estadísticas por mantenimiento
   const getMaintenanceStats = () => {
     if (!treeInventory || !treeInventory.data) return {};
 
@@ -678,7 +640,6 @@ function TreeMapPage() {
         : null;
       const now = new Date();
 
-      // Calcular la diferencia en meses
       const monthsDiff = lastInspection
         ? Math.floor(
             (now.getTime() - lastInspection.getTime()) /
@@ -746,12 +707,10 @@ function TreeMapPage() {
     }
   };
 
-  // Obtener estadísticas
   const categoryStats = getCategoryStats();
   const healthStats = getHealthStats();
   const maintenanceStats = getMaintenanceStats();
 
-  // Funciones para manejo de selección
   const handleClearFilters = () => {
     setSelectedParkIdForAreas("all");
     setSearchQuery("");
@@ -777,7 +736,6 @@ function TreeMapPage() {
     }
   };
 
-  // Filtrar áreas por búsqueda
   const filteredAreas = areas?.filter(area => {
     const matchesSearch = searchQuery === "" || 
       area.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -811,10 +769,10 @@ function TreeMapPage() {
       description: area.description || "",
       parkId: area.parkId.toString(),
       areaCode: area.areaCode || "",
-      dimensions: "", // Agregar cuando esté en la BD
-      latitude: "", // Agregar cuando esté en la BD
-      longitude: "", // Agregar cuando esté en la BD
-      responsiblePerson: "", // Agregar cuando esté en la BD
+      dimensions: "",
+      latitude: "",
+      longitude: "",
+      responsiblePerson: "",
       isActive: area.isActive,
     });
     setIsEditDialogOpen(true);
@@ -823,7 +781,6 @@ function TreeMapPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-
         <PageHeader
           icon={MapPin}
           title="Gestión de Áreas"
@@ -1087,7 +1044,6 @@ function TreeMapPage() {
             </CardContent>
           </Card>
         ) : viewMode === 'grid' ? (
-          // Vista de Grid
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAreas.map((area) => (
               <Card 
@@ -1109,7 +1065,6 @@ function TreeMapPage() {
                   }
                 }}
               >
-                {/* Checkbox de selección */}
                 {selectionMode && (
                   <div className="absolute top-2 left-2 z-10">
                     <div className={`h-6 w-6 rounded border-2 flex items-center justify-center ${
@@ -1124,7 +1079,6 @@ function TreeMapPage() {
                   </div>
                 )}
 
-                {/* Imagen placeholder */}
                 <div className="h-48 bg-gradient-to-br from-[#ceefea] to-[#00a587] relative">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <MapPin className="h-16 w-16 text-white/50" />
@@ -1137,7 +1091,6 @@ function TreeMapPage() {
                 </div>
 
                 <CardContent className="p-4">
-                  {/* Título y código */}
                   <div className="mb-3">
                     <h3 className="font-semibold text-lg text-gray-900 group-hover:text-[#00a587] transition-colors">
                       {area.name}
@@ -1147,7 +1100,6 @@ function TreeMapPage() {
                     )}
                   </div>
 
-                  {/* Información */}
                   <div className="space-y-2 mb-4">
                     {area.parkName && (
                       <div className="flex items-center text-sm text-gray-600">
@@ -1161,14 +1113,12 @@ function TreeMapPage() {
                     </div>
                   </div>
 
-                  {/* Descripción */}
                   {area.description && (
                     <p className="text-sm text-gray-500 line-clamp-2 mb-4">
                       {area.description}
                     </p>
                   )}
 
-                  {/* Botones de acción */}
                   {!selectionMode && (
                     <div className="flex gap-2 pt-3 border-t">
                       <Button
@@ -1203,8 +1153,6 @@ function TreeMapPage() {
             ))}
           </div>
         ) : (
-
-          // Vista de Lista
           <Card>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -1335,8 +1283,8 @@ function TreeMapPage() {
             </CardContent>
           </Card>
         )}
-
       </div>
+
       {/* Modal Crear Área */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -1346,13 +1294,13 @@ function TreeMapPage() {
               Crea una nueva área o zona dentro de un parque
             </DialogDescription>
           </DialogHeader>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              createAreaMutation.mutate({
-                ...formData,
-                parkId: parseInt(formData.parkId),
-              });
-            }}>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            createAreaMutation.mutate({
+              ...formData,
+              parkId: parseInt(formData.parkId),
+            });
+          }}>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nombre del Área *</Label>
@@ -1513,20 +1461,19 @@ function TreeMapPage() {
               Actualiza la información del área
             </DialogDescription>
           </DialogHeader>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (selectedArea) {
-                editAreaMutation.mutate({
-                  id: selectedArea.id,
-                  data: {
-                    ...formData,
-                    parkId: parseInt(formData.parkId),
-                  },
-                });
-              }
-            }}>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (selectedArea) {
+              editAreaMutation.mutate({
+                id: selectedArea.id,
+                data: {
+                  ...formData,
+                  parkId: parseInt(formData.parkId),
+                },
+              });
+            }
+          }}>
             <div className="grid gap-4 py-4">
-              {/* Mismos campos que crear */}
               <div className="grid gap-2">
                 <Label htmlFor="edit-name">Nombre del Área *</Label>
                 <Input
@@ -1644,7 +1591,6 @@ function TreeMapPage() {
           </form>
         </DialogContent>
       </Dialog>
-
     </AdminLayout>
   );
 }

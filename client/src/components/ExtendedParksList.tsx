@@ -15,23 +15,6 @@ interface ExtendedParksListProps {
   onParkSelect: (park: ExtendedPark) => void;
 }
 
-// Función para generar slug del parque
-const generateParkSlug = (parkName: string, parkId: number) => {
-  return parkName
-    .toLowerCase()
-    .replace(/[áàäâ]/g, 'a')
-    .replace(/[éèëê]/g, 'e')
-    .replace(/[íìïî]/g, 'i')
-    .replace(/[óòöô]/g, 'o')
-    .replace(/[úùüû]/g, 'u')
-    .replace(/[ñ]/g, 'n')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-    + '-' + parkId;
-};
-
 function ExtendedParksList({ parks, isLoading, onParkSelect }: ExtendedParksListProps) {
   // Función para verificar si el parque tiene certificaciones
   const hasCertifications = (park: ExtendedPark) => {

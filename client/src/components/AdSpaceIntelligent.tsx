@@ -31,6 +31,7 @@ interface SpaceMapping {
   isActive: boolean;
   priority: number;
   fallbackBehavior: 'hide' | 'placeholder' | 'alternative';
+  dimensions?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -160,7 +161,7 @@ const useAdPlacements = (spaceId: number, pageType: string, position: string, en
         return cached;
       }
 
-      const response = await fetch(`/api/advertising/placements?adSpaceId=${spaceId}&pageType=${pageType}&isActive=true`);
+      const response = await fetch(`/api/advertising/public/ads?spaceId=${spaceId}&pageType=${pageType}&position=${position}`);
       if (!response.ok) throw new Error('Error al cargar asignaciones');
 
       const result = await response.json();
@@ -202,6 +203,13 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
     if (!spaceMappings || spaceMappings.length === 0) return null;
     return spaceMappings.find((mapping: SpaceMapping) => mapping.isActive) || spaceMappings[0];
   }, [spaceMappings]);
+
+  // Calcular dimensiones del espacio
+  const spaceDimensions = useMemo(() => {
+    if (!primaryMapping?.dimensions) return null;
+    const [width, height] = primaryMapping.dimensions.split('x').map(Number);
+    return { width, height };
+  }, [primaryMapping]);
 
   // Obtener asignaciones para el espacio mapeado
   const { 
@@ -411,9 +419,10 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
   // Aplicar configuración de layout
   const layoutStyles: React.CSSProperties = {
     ...layoutConfig.customStyles,
-    maxWidth: layoutConfig.maxWidth,
-    minHeight: layoutConfig.minHeight,
+    maxWidth: layoutConfig.maxWidth || (spaceDimensions ? `${spaceDimensions.width}px` : '100%'),
+    minHeight: layoutConfig.minHeight || (spaceDimensions ? `${spaceDimensions.height}px` : 'auto'),
     aspectRatio: layoutConfig.aspectRatio,
+    width: '100%',
   };
 
   return (
@@ -438,18 +447,26 @@ const AdSpaceIntelligent: React.FC<AdSpaceIntelligentProps> = ({
           <video
             src={mediaUrl}
             className="w-full h-full object-cover"
+            style={{ 
+              maxHeight: spaceDimensions ? `${spaceDimensions.height}px` : 'auto',
+              height: spaceDimensions ? `${spaceDimensions.height}px` : '100%'
+            }}
             autoPlay
             muted
             loop
             playsInline
           />
         ) : (
-          <img
-            src={mediaUrl}
-            alt={advertisement.altText || advertisement.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
+      <img
+        src={mediaUrl}
+        alt={advertisement.altText || advertisement.title}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        style={{ 
+          maxHeight: spaceDimensions ? `${spaceDimensions.height}px` : 'auto',
+          height: spaceDimensions ? `${spaceDimensions.height}px` : '100%'
+        }}
+        loading="lazy"
+      />
         )}
         
         {/* Overlay con información */}

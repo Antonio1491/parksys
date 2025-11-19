@@ -69,7 +69,7 @@ export default function NewSpacePage() {
 
   // Obtener lista de parques
   const { data: parksData = [], isLoading: parksLoading } = useQuery<Park[]>({
-    queryKey: ["/api/parks?simple=true"],
+    queryKey: ["/api/parks-with-amenities"],
   });
 
   // Asegurar que parks es siempre un array

@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, MapPin, Clock, Users, Tag, BookOpen, User, X, Filter, Activity, Trees, Phone, Mail } from 'lucide-react';
 import PublicLayout from '@/components/PublicLayout';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 const heroImage = "/jardin-japones.jpg";
 
 // Tipo para las actividades

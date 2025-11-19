@@ -9,13 +9,43 @@ import { es } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { ActivityPaymentForm } from '@/components/ActivityPaymentForm';
+import { apiRequest } from '@/lib/queryClient';
+import { 
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  DollarSign,
+  ArrowLeft,
+  Star,
+  User,
+  Activity,
+  Tag,
+  Info,
+  Mail,
+  Phone,
+  Package,
+  CheckCircle,
+  AlertCircle,
+  Award,
+  MessageSquare,
+  ExternalLink,
+  Navigation,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
+import PublicInstructorEvaluationForm from '@/components/PublicInstructorEvaluationForm';
 
 // Configurar Stripe con opciones para México
 const stripeOptions = {
   locale: 'es' as const,
 };
-import { ActivityPaymentForm } from '@/components/ActivityPaymentForm';
-import { apiRequest } from '@/lib/queryClient';
 
 // Configuraciones de colores para estados
 const statusColors = {
@@ -105,43 +135,7 @@ interface ActivityImage {
   caption?: string;
   fileSize?: number;
 }
-import { 
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  DollarSign,
-  ArrowLeft,
-  Star,
-  User,
-  Activity,
-  Tag,
-  Info,
-  Mail,
-  Phone,
-  CreditCard,
-  Package,
-  CheckCircle,
-  AlertCircle,
-  Award,
-  MessageSquare,
-  ExternalLink,
-  Navigation,
-  Eye
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DialogTrigger } from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import AdSpace from '@/components/AdSpace';
-import PublicInstructorEvaluationForm from '@/components/PublicInstructorEvaluationForm';
+
 
 // Initialize Stripe with options for Mexico
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '', {
@@ -1090,11 +1084,10 @@ function ActivityDetailPage() {
               </Card>
             )}
 
-            {/* Espacio Publicitario - Diseño Tipo Tarjeta */}
-            <AdSpace 
-              spaceId="11" 
-              position="card" 
+            {/* Espacio publicitario - Sidebar */}
+            <AdSpaceIntelligent 
               pageType="activity-detail" 
+              position="sidebar"
             />
 
 

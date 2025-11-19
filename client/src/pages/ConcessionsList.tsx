@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 const heroImage = "/images/concessions-hero.jpg";
 
 interface Concession {
@@ -345,13 +345,6 @@ export default function ConcessionsList() {
             </Button>
           </div>
         )}
-
-        {/* Banner Publicitario al Final */}
-        <div className="flex justify-center mb-8">
-          <div className="max-w-2xl w-full">
-            <AdSpace spaceId="35" position="banner" pageType="concessions" />
-          </div>
-        </div>
       </div>
 
       {/* Sección Necesitas más Información */}

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { format } from 'date-fns';
@@ -11,8 +12,6 @@ import {
   Users,
   Search,
   Filter,
-  ArrowLeft,
-  Star,
   Heart,
   ExternalLink,
   Activity,
@@ -22,8 +21,6 @@ import {
   Trophy,
   Phone,
   Mail,
-  ChevronLeft,
-  ChevronRight,
   Grid3X3,
   List
 } from 'lucide-react';
@@ -34,9 +31,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 
 interface ActivityData {
   id: number;
@@ -105,7 +101,7 @@ function HorizontalActivityCard({
   currentIndex: number;
 }) {
   const handleActivityClick = () => {
-    window.location.href = `/activity/${activity.id}`;
+    window.location.href = (ROUTES.public.activityDetail.build(activity.id));
   };
 
   const categoryColor = categoryColors[activity.category as keyof typeof categoryColors] || 'bg-gray-100 text-gray-800 border-gray-200';
@@ -695,6 +691,14 @@ function ActivitiesPage() {
         </div>
       </section>
 
+        {/* Anuncio Header - Activities */}
+        <section className="max-w-7xl mx-auto px-4 py-6">
+          <AdSpaceIntelligent 
+            pageType="activities" 
+            position="header"
+          />
+        </section>
+
       {/* Actividades */}
       <section className="max-w-7xl mx-auto px-4 py-8">
         <div>
@@ -805,15 +809,13 @@ function ActivitiesPage() {
         </div>
       </section>
 
-      {/* Ad Space - ID 6 */}
-      <section className="max-w-7xl mx-auto px-4 py-6">
-        <AdSpace 
-          spaceId="6" 
-          position="banner" 
-          pageType="activities" 
-          className=""
-        />
-      </section>
+        {/* Anuncio Footer - Activities */}
+        <section className="max-w-7xl mx-auto px-4 py-8">
+          <AdSpaceIntelligent 
+            pageType="activities" 
+            position="footer"
+          />
+        </section>
 
       {/* Sección de Contacto */}
       <section className="bg-gray-50 py-12">

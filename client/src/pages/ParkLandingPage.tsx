@@ -23,9 +23,7 @@ import {
   User,
   ExternalLink,
   Users,
-  Heart,
-  GraduationCap,
-  Star
+  Heart
 } from 'lucide-react';
 import { ExtendedPark } from '@shared/schema';
 import { Badge } from '@/components/ui/badge';
@@ -38,10 +36,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import AmenityIcon from '@/components/ui/amenity-icon';
 import TreeSpeciesIcon from '@/components/ui/tree-species-icon';
-import TreePhotoViewer from '@/components/TreePhotoViewer';
-import PublicInstructorEvaluationForm from '@/components/PublicInstructorEvaluationForm';
 import ParkEvaluationsSectionSimple from '@/components/ParkEvaluationsSectionSimple';
 import PublicLayout from '@/components/PublicLayout';
 
@@ -51,8 +46,6 @@ function ParkLandingPage() {
   const { id } = useParams<{ id: string }>();
   const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
-  const [selectedInstructor, setSelectedInstructor] = React.useState<any>(null);
-  const [selectedVolunteer, setSelectedVolunteer] = React.useState<any>(null);
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
   const [isImageModalOpen, setIsImageModalOpen] = React.useState(false);
   const [selectedSpeciesData, setSelectedSpeciesData] = React.useState<any>(null);

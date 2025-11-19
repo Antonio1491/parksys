@@ -126,8 +126,6 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
           imageUrl: imageUrl || null,
           polygon: polygon || null,
           status,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         })
         .returning();
 

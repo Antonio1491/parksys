@@ -5,10 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Map, ArrowRight, MapPin, Trees, Users, Calendar, Sparkles, TrendingUp, Zap, Leaf, Shield, Heart, BookOpen, GraduationCap, Target, Award, ChevronLeft, ChevronRight, Sprout, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import ParkCard from '@/components/ParkCard';
 import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 import { ExtendedPark } from '@shared/schema';
-const logoImage = "/images/logo-pdm.png";
 
 const Home: React.FC = () => {
   // Estado para forzar actualización de anuncios estáticos
@@ -179,7 +177,7 @@ const Home: React.FC = () => {
               Conoce los
             </h1>
             <h1 className="text-5xl md:text-6xl lg:text-6xl font-poppins font-black text-white mb-6 leading-tight">
-            <span className="text-header-background">PARQUES</span> DE MÉXICO
+            <span className="text-header-background">PARQUES</span> EN MÉXICO
             </h1>
             
             {/* Subtítulo */}

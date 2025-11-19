@@ -51,6 +51,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function PlacementsPage() {
+  console.log("🎨 PlacementsPage renderizado");
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -63,15 +64,18 @@ export default function PlacementsPage() {
   const [filterActive, setFilterActive] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch placements
-  const { data: placementsData, isLoading } = useQuery({
+  // Fetch placements para admin
+  const { data: placementsData, isLoading, error } = useQuery({
     queryKey: ["/api/advertising/placements", filterActive],
     queryFn: async () => {
+      console.log("🔍 Ejecutando query de placements admin"); // ⬅️ AGREGAR LOG
       let url = "/api/advertising/placements";
 
       if (filterActive !== "all") {
         url += `?isActive=${filterActive === "active"}`;
       }
+
+      console.log("📡 URL:", url); // ⬅️ AGREGAR LOG
 
       const response = await fetch(url, {
         credentials: "include",
@@ -83,7 +87,14 @@ export default function PlacementsPage() {
 
       return response.json();
     },
+    retry: false, // ⬅️ AGREGAR: No reintentar en caso de error
+    staleTime: 0, // ⬅️ AGREGAR: No usar caché
   });
+
+  // ⬅️ AGREGAR: Log del error si existe
+  if (error) {
+    console.error("❌ Error en query:", error);
+  }
 
   const placements = placementsData?.data || [];
 

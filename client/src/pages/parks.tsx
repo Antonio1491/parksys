@@ -204,46 +204,11 @@ const Parks: React.FC = () => {
 
         {/* Sin paginación - todos los parques se muestran */}
 
-        {/* Banner publicitario que respeta el contenedor */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden mt-8 mb-8 border">
-          <div className="relative h-[150px]">
-            {/* Banner de Gatorade como ejemplo directo */}
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-orange-500 to-orange-600">
-              <div className="flex items-center justify-between w-full px-8">
-                <div className="text-white">
-                  <h2 className="text-4xl font-black mb-2">GATORADE</h2>
-                  <p className="text-lg font-semibold opacity-90">FUEL YOUR FIRE</p>
-                  <p className="text-sm mt-2">¡Hidratación que potencia tu rendimiento!</p>
-                </div>
-                <div className="text-right text-white">
-                  <div className="w-16 h-24 bg-white/20 rounded-lg flex flex-col items-center justify-center mb-2">
-                    <div className="w-10 h-16 bg-orange-400 rounded-md relative">
-                      <div className="w-8 h-3 bg-white rounded-sm absolute top-1 left-1"></div>
-                      <div className="text-xs text-white font-bold absolute top-4 left-2">G</div>
-                    </div>
-                  </div>
-                  <p className="text-xs opacity-80">Bebida deportiva</p>
-                </div>
-                <div className="absolute top-4 right-4 opacity-30 text-2xl">
-                  ⚡ ⚡ ⚡
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Espacio Publicitario - Footer */}
         <div className="mt-8 mb-6">
           <AdSpaceIntelligent 
             pageType="parks" 
             position="footer" 
-            layoutConfig={{
-              responsive: true,
-              maxWidth: "100%",
-              minHeight: "80px"
-            }}
-            enableAnalytics={true}
-            className="w-full"
           />
         </div>
       </div>

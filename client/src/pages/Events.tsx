@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
+import ROUTES from '@/routes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar, MapPin, Clock, Users, Search, Filter, Grid, List, Star, Eye, Phone, Mail, CheckCircle, Tag, Trees } from 'lucide-react';
@@ -9,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 import PublicLayout from '@/components/PublicLayout';
 const heroImage = "/image-transformer.webp";
 
@@ -280,6 +281,15 @@ const Events: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Anuncio Header - Events */}
+        <section className="max-w-7xl mx-auto px-4 py-6">
+          <AdSpaceIntelligent 
+            pageType="events" 
+            position="header"
+          />
+        </section>
+        
         {/* Lista de eventos */}
         {filteredEvents.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
@@ -298,7 +308,7 @@ const Events: React.FC = () => {
             : 'space-y-4'
           }>
             {filteredEvents.map((event: Event) => (
-              <Link key={event.id} href={`/event/${event.id}`}>
+              <Link key={event.id} href={ROUTES.public.eventDetail.build(event.id)}>
                 <Card className={viewMode === 'list' 
                   ? "hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500" 
                   : "group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden border border-gray-200"}>
@@ -501,38 +511,15 @@ const Events: React.FC = () => {
             ))}
           </div>
         )}
-
-        {/* Banner publicitario customizado */}
-        <div className="my-8">
-          <div className="relative w-full h-32 bg-cover bg-center bg-no-repeat rounded-xl overflow-hidden shadow-lg group hover:shadow-xl transition-shadow duration-300" 
-               style={{ 
-                 backgroundImage: `url(https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)`
-               }}>
-            {/* Overlay para mejorar legibilidad */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/30"></div>
-            
-            {/* Contenido */}
-            <div className="relative h-full flex items-center justify-between px-8">
-              {/* Título a la izquierda */}
-              <div className="text-white">
-                <h3 className="text-2xl font-bold mb-1 drop-shadow-lg">Parks for Life</h3>
-                <p className="text-green-200 text-sm drop-shadow-md">Green Spaces Alliance</p>
-              </div>
-              
-              {/* Logo a la derecha */}
-              <div className="flex-shrink-0">
-                <div className="w-24 h-20 bg-white/95 rounded-lg flex items-center justify-center shadow-lg group-hover:bg-white transition-colors p-2">
-                  <img 
-                    src="/attached_assets/image_1755011394402.png" 
-                    alt="Parks for Life Logo" 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
+
+        {/* Anuncio Footer - Events */}
+        <section className="max-w-7xl mx-auto px-4 py-8">
+          <AdSpaceIntelligent 
+            pageType="events" 
+            position="footer"
+          />
+        </section>
 
       {/* Sección de información de contacto */}
       <section className="bg-gray-50 py-12">

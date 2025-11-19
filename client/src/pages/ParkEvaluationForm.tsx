@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Star, StarIcon, MapPin, Clock, User, MessageCircle, Send, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Star, MapPin, Clock, User, MessageCircle, Send, CheckCircle, ArrowLeft } from 'lucide-react';
 
 const evaluationSchema = z.object({
   parkId: z.number(),
@@ -280,7 +281,7 @@ export default function ParkEvaluationForm() {
             <p className="text-gray-600 mb-4">
               No se pudo encontrar el parque especificado.
             </p>
-            <Button onClick={() => navigate('/parks')}>
+            <Button onClick={() => navigate(ROUTES.public.parks)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver a parques
             </Button>
@@ -301,10 +302,10 @@ export default function ParkEvaluationForm() {
               Gracias por tu opinión sobre {parkData.name}. Tu evaluación será revisada y publicada pronto.
             </p>
             <div className="space-y-2">
-              <Button onClick={() => navigate(`/parks/${parkId}`)}>
+              <Button onClick={() => navigate(ROUTES.public.parkDetail.build(parkId))}>
                 Regresar a parque
               </Button>
-              <Button variant="outline" onClick={() => navigate('/parks')}>
+              <Button variant="outline" onClick={() => navigate(ROUTES.public.parks)}>
                 Otros parques
               </Button>
             </div>
@@ -321,7 +322,7 @@ export default function ParkEvaluationForm() {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate(`/parks/${parkId}`)}
+            onClick={() => navigate(ROUTES.public.parkDetail.build(parkId))}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

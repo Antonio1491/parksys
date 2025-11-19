@@ -289,8 +289,7 @@ export function registerEventRoutes(app: any, apiRouter: Router, isAuthenticated
           .select({ 
             id: parks.id, 
             name: parks.name, 
-            municipalityId: parks.municipalityId, 
-            parkType: parks.parkType 
+            parkType: parks.parkType
           })
           .from(parks)
           .where(eq(parks.id, relation.parkId));

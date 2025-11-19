@@ -9,6 +9,7 @@ import { es } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 
 // Configurar Stripe con opciones para México
 const stripeOptions = {

@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { 
   Calendar,
   Clock,
@@ -34,10 +33,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 
 interface ReservableSpace {
   id: number;
@@ -306,7 +303,7 @@ function ReservationsPage() {
 
   // Obtener parques para filtros
   const { data: parksResponse } = useQuery<{data: any[]}>({
-    queryKey: ['/api/parks'],
+    queryKey: ['/api/parks-with-amenities'],
   });
   const parksData = parksResponse?.data || [];
 
@@ -598,13 +595,6 @@ function ReservationsPage() {
               Enviar mensaje
             </Button>
           </div>
-        </div>
-      </section>
-
-      {/* Publicidad inferior */}
-      <section className="py-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <AdSpace spaceId={2} position="banner" pageType="parks" />
         </div>
       </section>
       </div>
