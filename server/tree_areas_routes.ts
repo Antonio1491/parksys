@@ -119,7 +119,6 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
         .values({
           parkId: Number(parkId),
           name,
-          code: areaCode,
           areaCode: areaCode,
           description: description || null,
           dimensions: dimensions || null,

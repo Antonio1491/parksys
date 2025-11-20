@@ -220,6 +220,7 @@ export const ADMIN_AMENITIES = {
     path: "/admin/amenities/:id/edit",
     build: (id: string | number) => `/admin/amenities/${id}/edit`,
   },
+  import: "/admin/amenities/import",
 } as const;
 
 // ============================================
@@ -991,7 +992,7 @@ export const ADMIN_PROFILE = {
   main: "/admin/settings",
 
   // Ajustes de usuario (rediseñar con base firebase)
-  profile: "/admin/settings/profile",
+  settings: "/admin/settings/profile",
 
   activity: "/admin/user-activity",
   notifications: "/admin/user-notifications", // ✅ AGREGAR

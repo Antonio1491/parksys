@@ -1641,6 +1641,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: schema.parks.name,
           address: schema.parks.address,
           area: schema.parks.area,
+          codePrefix: schema.parks.codePrefix,
           parkType: schema.parks.parkType
         })
         .from(schema.parks);

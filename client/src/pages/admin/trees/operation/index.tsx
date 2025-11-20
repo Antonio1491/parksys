@@ -137,14 +137,13 @@ function TreeMapPage() {
   });
 
   const { data: parks, isLoading: isLoadingParks } = useQuery({
-    queryKey: ["/api/parks"],
+    queryKey: ["/api/parks-with-amenities"],
     queryFn: async () => {
-      const response = await fetch("/api/parks?simple=true");
+      const response = await fetch("/api/parks-with-amenities");
       if (!response.ok) {
         throw new Error("Error al cargar los parques");
       }
-      const result = await response.json();
-      return result.data || result;
+      return response.json();
     },
   });
 
