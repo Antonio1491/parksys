@@ -122,8 +122,7 @@ export interface AdPlacement {
   advertisementId: number;
   adSpaceId: number;
 
-  // Targeting
-  pageType: PageType;
+  // Targeting - pageType se obtiene del space
   pageId?: number | null;
 
   // Fechas
@@ -251,7 +250,7 @@ export interface SpaceFormData {
 export interface PlacementFormData {
   advertisementId: string;
   adSpaceId: string;
-  pageType: PageType;
+  // pageType se hereda del space seleccionado
   pageId: string;
   startDate: string;
   endDate: string;

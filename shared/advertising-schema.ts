@@ -91,8 +91,7 @@ export const adPlacements = pgTable('ad_placements', {
   advertisementId: integer('advertisement_id').references(() => advertisements.id).notNull(),
   adSpaceId: integer('ad_space_id').references(() => adSpaces.id).notNull(),
 
-  // Targeting
-  pageType: varchar('page_type', { length: 50 }).notNull(), // parks, species, activities, concessions, home, all
+  // Targeting - pageType se hereda del space mediante JOIN
   pageId: integer('page_id'), // ID específico de la página (opcional, null = todas las páginas del tipo)
 
   // Programación - ⚠️ ACTUALIZADO A TIMESTAMPTZ

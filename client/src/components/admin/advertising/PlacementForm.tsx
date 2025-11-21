@@ -16,9 +16,6 @@ import { useQuery } from "@tanstack/react-query";
 import type { 
   AdPlacement, 
   PlacementFormData,
-  FrequencyType,
-  DayOfWeek,
-  PageType 
 } from "@/types/advertising";
 import { FREQUENCY_OPTIONS, DAYS_OF_WEEK } from "@/types/advertising";
 
@@ -29,7 +26,7 @@ import { FREQUENCY_OPTIONS, DAYS_OF_WEEK } from "@/types/advertising";
 const placementSchema = z.object({
   advertisementId: z.string().min(1, "Selecciona un anuncio"),
   adSpaceId: z.string().min(1, "Selecciona un espacio"),
-  pageType: z.string().min(1, "Selecciona un tipo de página"),
+  // pageType se hereda del space seleccionado
   pageId: z.string().optional(),
   startDate: z.string().min(1, "Selecciona fecha de inicio"),
   endDate: z.string().min(1, "Selecciona fecha de fin"),
@@ -196,7 +193,6 @@ export function PlacementForm({
     defaultValues: {
       advertisementId: placement?.advertisementId?.toString() || "",
       adSpaceId: placement?.adSpaceId?.toString() || "",
-      pageType: placement?.pageType || "all",
       pageId: placement?.pageId?.toString() || "",
       startDate: placement?.startDate 
         ? new Date(placement.startDate).toISOString().split('T')[0] 
@@ -317,33 +313,7 @@ export function PlacementForm({
 
       {/* Sección 3: Configuración */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {/* Page Type */}
-        <div className="space-y-2">
-          <Label htmlFor="pageType">
-            Tipo de Página <span className="text-destructive">*</span>
-          </Label>
-          <Select
-            value={form.watch("pageType")}
-            onValueChange={(value) => form.setValue("pageType", value)}
-          >
-            <SelectTrigger id="pageType">
-              <SelectValue placeholder="Selecciona tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              {PAGE_TYPE_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {form.formState.errors.pageType && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.pageType.message}
-            </p>
-          )}
-        </div>
-
+        
         {/* Priority */}
         <div className="space-y-2">
           <Label htmlFor="priority">

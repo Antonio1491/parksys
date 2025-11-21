@@ -47,7 +47,7 @@ export function PlacementDialog({
         body: JSON.stringify({
           advertisementId: parseInt(data.advertisementId),
           adSpaceId: parseInt(data.adSpaceId),
-          pageType: data.pageType,
+          // pageType se obtiene del space en el backend
           pageId: data.pageId ? parseInt(data.pageId) : null,
           startDate: data.startDate,
           endDate: data.endDate,
@@ -109,7 +109,7 @@ export function PlacementDialog({
         body: JSON.stringify({
           advertisementId: parseInt(data.advertisementId),
           adSpaceId: parseInt(data.adSpaceId),
-          pageType: data.pageType,
+          // pageType se obtiene del space en el backend
           pageId: data.pageId ? parseInt(data.pageId) : null,
           startDate: data.startDate,
           endDate: data.endDate,

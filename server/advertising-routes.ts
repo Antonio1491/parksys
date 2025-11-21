@@ -839,7 +839,6 @@ router.get('/placements', async (req, res) => {
         ap.id,
         ap.advertisement_id,
         ap.ad_space_id,
-        ap.page_type,
         ap.page_id,
         ap.priority,
         ap.start_date,
@@ -854,7 +853,7 @@ router.get('/placements', async (req, res) => {
         ap.updated_at,
         a.title as ad_title,
         ads.name as space_name,
-        ads.page_type as space_page_type,
+        ads.page_type as page_type,
         ads.position as space_position
       FROM ad_placements ap
       LEFT JOIN advertisements a ON ap.advertisement_id = a.id
@@ -919,6 +918,7 @@ router.get('/placements/:id', async (req, res) => {
         ap.*,
         a.title as ad_title,
         ads.name as space_name
+        ads.page_type as page_type
       FROM ad_placements ap
       LEFT JOIN advertisements a ON ap.advertisement_id = a.id
       LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
@@ -971,7 +971,6 @@ router.post('/placements', isAuthenticated, async (req, res) => {
     const { 
       advertisementId, 
       adSpaceId, 
-      pageType, 
       pageId,
       startDate, 
       endDate,
@@ -985,10 +984,10 @@ router.post('/placements', isAuthenticated, async (req, res) => {
     console.log('📝 Creando placement:', req.body);
 
     // Validaciones básicas
-    if (!advertisementId || !adSpaceId || !pageType || !startDate || !endDate) {
+    if (!advertisementId || !adSpaceId || !startDate || !endDate) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Campos requeridos: advertisementId, adSpaceId, pageType, startDate, endDate' 
+        error: 'Campos requeridos: advertisementId, adSpaceId, startDate, endDate' 
       });
     }
 
@@ -1007,7 +1006,6 @@ router.post('/placements', isAuthenticated, async (req, res) => {
       INSERT INTO ad_placements (
         advertisement_id,
         ad_space_id,
-        page_type,
         page_id,
         start_date,
         end_date,
@@ -1020,12 +1018,11 @@ router.post('/placements', isAuthenticated, async (req, res) => {
         clicks,
         created_at,
         updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       RETURNING *
     `, [
       parseInt(advertisementId),
       parseInt(adSpaceId),
-      pageType,
       pageId ? parseInt(pageId) : null,
       start.toISOString(),
       end.toISOString(),
@@ -1040,12 +1037,20 @@ router.post('/placements', isAuthenticated, async (req, res) => {
       new Date().toISOString()
     ]);
 
+    // Al retornar, obtener pageType del space
     const row = result.rows[0];
+
+    // Obtener el pageType del space
+    const spaceResult = await pool.query(
+      'SELECT page_type FROM ad_spaces WHERE id = $1',
+      [row.ad_space_id]
+    );
+    
     const placement = {
       id: row.id,
       advertisementId: row.advertisement_id,
       adSpaceId: row.ad_space_id,
-      pageType: row.page_type,
+      pageType: spaceResult.rows[0]?.page_type,
       pageId: row.page_id,
       startDate: row.start_date ? new Date(row.start_date).toISOString() : null,
       endDate: row.end_date ? new Date(row.end_date).toISOString() : null,
@@ -1079,8 +1084,7 @@ router.put('/placements/:id', isAuthenticated, async (req, res) => {
     const { id } = req.params;
     const { 
       advertisementId, 
-      adSpaceId, 
-      pageType, 
+      adSpaceId,  
       pageId,
       startDate, 
       endDate,
@@ -1094,10 +1098,10 @@ router.put('/placements/:id', isAuthenticated, async (req, res) => {
     console.log('📝 Actualizando placement:', id, req.body);
 
     // Validaciones básicas
-    if (!advertisementId || !adSpaceId || !pageType || !startDate || !endDate) {
+    if (!advertisementId || !adSpaceId || !startDate || !endDate) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Campos requeridos: advertisementId, adSpaceId, pageType, startDate, endDate' 
+        error: 'Campos requeridos: advertisementId, adSpaceId, startDate, endDate' 
       });
     }
 
@@ -1117,22 +1121,20 @@ router.put('/placements/:id', isAuthenticated, async (req, res) => {
       SET 
         advertisement_id = $1,
         ad_space_id = $2,
-        page_type = $3,
-        page_id = $4,
-        start_date = $5,
-        end_date = $6,
-        priority = $7,
-        is_active = $8,
-        frequency = $9,
-        scheduled_days = $10,
-        scheduled_hours = $11,
-        updated_at = $12
-      WHERE id = $13
+        page_id = $3,
+        start_date = $4,
+        end_date = $5,
+        priority = $6,
+        is_active = $7,
+        frequency = $8,
+        scheduled_days = $9,
+        scheduled_hours = $10,
+        updated_at = $11
+      WHERE id = $12
       RETURNING *
     `, [
       parseInt(advertisementId),
       parseInt(adSpaceId),
-      pageType,
       pageId ? parseInt(pageId) : null,
       start.toISOString(),
       end.toISOString(),
@@ -1152,12 +1154,19 @@ router.put('/placements/:id', isAuthenticated, async (req, res) => {
       });
     }
 
+    // Al retornar, obtener pageType del space
     const row = result.rows[0];
+
+    const spaceResult = await pool.query(
+      'SELECT page_type FROM ad_spaces WHERE id = $1',
+      [row.ad_space_id]
+    );
+    
     const placement = {
       id: row.id,
       advertisementId: row.advertisement_id,
       adSpaceId: row.ad_space_id,
-      pageType: row.page_type,
+      pageType: spaceResult.rows[0]?.page_type,
       pageId: row.page_id,
       startDate: row.start_date ? new Date(row.start_date).toISOString() : null,
       endDate: row.end_date ? new Date(row.end_date).toISOString() : null,
@@ -1359,7 +1368,8 @@ router.get('/public/ads', async (req, res) => {
         a.duration,
         a.is_active as ad_is_active,
         a.updated_at as ad_updated_at,
-        ads.dimensions
+        ads.dimensions,
+        ads.page_type as page_type
       FROM ad_placements ap
       LEFT JOIN advertisements a ON ap.advertisement_id = a.id
       LEFT JOIN ad_spaces ads ON ap.ad_space_id = ads.id
