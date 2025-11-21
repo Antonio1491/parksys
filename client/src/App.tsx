@@ -1121,7 +1121,7 @@ function Router() {
 
           {/* Ruta para el calendario de actividades */}
           <Route path="/admin/activities/calendar">
-            <Suspense fallback={<LoadingPage messageKey="loading.calendario de actividades..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.activityCalendar" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/activities/calendar')))}
             </Suspense>
           </Route>
@@ -1133,56 +1133,56 @@ function Router() {
           <Route path="/admin/events/categories" component={EventCategoriesPage} />
           <Route path="/admin/events/registrations" component={EventRegistrationsPage} />
           <Route path="/admin/events/list">
-            <Suspense fallback={<LoadingPage messageKey="loading.listado de eventos..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.events" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/events/EventsList')))}
             </Suspense>
           </Route>
 
           {/* Rutas de sistema */}
           <Route path="/admin/system/email-settings">
-            <Suspense fallback={<LoadingPage messageKey="loading.configuración de email..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.emailSettings" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/system/email-settings')))}
             </Suspense>
           </Route>
           <Route path="/admin/system/backup">
-            <Suspense fallback={<LoadingPage messageKey="loading.sistema de respaldos..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.backups" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/system/backup')))}
             </Suspense>
           </Route>
           <Route path="/admin/system/performance">
-            <Suspense fallback={<LoadingPage messageKey="loading.monitor de rendimiento..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.performance" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/system/performance')))}
             </Suspense>
           </Route>
 
           {/* Rutas de comunicaciones legacy */}
           <Route path="/admin/communications">
-            <Suspense fallback={<LoadingPage messageKey="loading.dashboard de comunicaciones..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.dashboardCommunications" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/communications')))}
             </Suspense>
           </Route>
           <Route path="/admin/communications/templates">
-            <Suspense fallback={<LoadingPage messageKey="loading.plantillas..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.templates" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/communications/templates')))}
             </Suspense>
           </Route>
           <Route path="/admin/communications/queue">
-            <Suspense fallback={<LoadingPage messageKey="loading.cola de emails..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.emailQueue" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/communications/queue')))}
             </Suspense>
           </Route>
           <Route path="/admin/communications/campaigns">
-            <Suspense fallback={<LoadingPage messageKey="loading.campañas..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.campaigns" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/communications/campaigns')))}
             </Suspense>
           </Route>
           <Route path="/admin/communications/bulk">
-            <Suspense fallback={<LoadingPage messageKey="loading.envío masivo..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.bulk" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/communications/bulk')))}
             </Suspense>
           </Route>
           <Route path="/admin/communications/analytics">
-            <Suspense fallback={<LoadingPage messageKey="loading.análisis..." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.analytics" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/communications/analytics')))}
             </Suspense>
           </Route>

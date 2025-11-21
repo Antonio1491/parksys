@@ -84,13 +84,20 @@ export const PUBLIC_ROUTES = {
   // Acceso a registro por invitación
   instructorRegister: "/instructors/register",
 
-  // Páginas del footer
+  // Páginas del footer - SIN COMPONENTES
   about: "/about",
   contact: "/contact",
   privacy: "/privacy",
   terms: "/terms",
   faq: "/faq",
   help: "/help",
+  education: "/education",
+  wildlifeRescue: "/wildlife-rescue",
+  transparency: "/transparency",
+  bids: "/bids",
+  blog: "/blog",
+  reports: "/reports",
+  suggestions: "/suggestions",
 } as const;
 
 // ============================================

@@ -204,17 +204,10 @@ function TreeMapPage() {
   // Mutación para editar área
   const editAreaMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      const response = await fetch(`/api/trees/areas/${id}`, {
+      return apiRequest(`/api/trees/areas/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
+        data: data,
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Error al editar área");
-      }
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/trees/areas"] });
@@ -238,15 +231,9 @@ function TreeMapPage() {
   // Mutación para eliminar área
   const deleteAreaMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/trees/areas/${id}`, {
+      return apiRequest(`/api/trees/areas/${id}`, {
         method: "DELETE",
-        credentials: "include",
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Error al eliminar área");
-      }
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/trees/areas"] });
@@ -264,23 +251,15 @@ function TreeMapPage() {
     },
   });
 
-  // Mutación para eliminar múltiples áreas
   const deleteBulkAreasMutation = useMutation({
     mutationFn: async (ids: number[]) => {
       const results = await Promise.all(
         ids.map(id =>
-          fetch(`/api/trees/areas/${id}`, {
+          apiRequest(`/api/trees/areas/${id}`, {
             method: "DELETE",
-            credentials: "include",
           })
         )
       );
-
-      const errors = results.filter(r => !r.ok);
-      if (errors.length > 0) {
-        throw new Error(`No se pudieron eliminar ${errors.length} área(s)`);
-      }
-
       return results;
     },
     onSuccess: () => {
@@ -1082,7 +1061,7 @@ function TreeMapPage() {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <MapPin className="h-16 w-16 text-white/50" />
                   </div>
-                  {!area.isActive && (
+                  {area.status === 'inactiva' && (
                     <div className="absolute top-2 right-2">
                       <Badge variant="secondary">Inactiva</Badge>
                     </div>
@@ -1241,8 +1220,8 @@ function TreeMapPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge variant={area.isActive ? "default" : "secondary"}>
-                            {area.isActive ? "Activa" : "Inactiva"}
+                          <Badge variant={area.status === 'activa' ? "default" : "secondary"}>
+                            {area.status === 'activa' ? "Activa" : "Inactiva"}
                           </Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -1293,13 +1272,19 @@ function TreeMapPage() {
               Crea una nueva área o zona dentro de un parque
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            createAreaMutation.mutate({
-              ...formData,
-              parkId: parseInt(formData.parkId),
-            });
-          }}>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              createAreaMutation.mutate({
+                parkId: parseInt(formData.parkId),
+                name: formData.name,
+                description: formData.description,
+                dimensions: formData.dimensions,
+                latitude: formData.latitude,
+                longitude: formData.longitude,
+                responsiblePerson: formData.responsiblePerson,
+                status: formData.isActive ? 'activa' : 'inactiva',
+              });
+            }}>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nombre del Área *</Label>
@@ -1466,8 +1451,14 @@ function TreeMapPage() {
               editAreaMutation.mutate({
                 id: selectedArea.id,
                 data: {
-                  ...formData,
                   parkId: parseInt(formData.parkId),
+                  name: formData.name,
+                  description: formData.description,
+                  dimensions: formData.dimensions,
+                  latitude: formData.latitude,
+                  longitude: formData.longitude,
+                  responsiblePerson: formData.responsiblePerson,
+                  status: formData.isActive ? 'activa' : 'inactiva',
                 },
               });
             }
