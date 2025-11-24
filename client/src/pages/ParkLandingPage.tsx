@@ -357,17 +357,6 @@ function ParkLandingPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando información del parque...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error || !park) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
@@ -441,7 +430,6 @@ function ParkLandingPage() {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-gray-50">
       {/* Hero Image Section con Header Navigation Superpuesto */}
       <div className="relative h-[600px] overflow-hidden">
         {mainImage ? (
@@ -1861,7 +1849,6 @@ function ParkLandingPage() {
           </div>
         </div>
       )}
-    </div>
     </PublicLayout>
   );
 }

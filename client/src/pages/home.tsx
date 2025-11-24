@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 import { ExtendedPark } from '@shared/schema';
-import Footer from '@/components/Footer';
+import PublicLayout from '@/components/PublicLayout';
 
 const Home: React.FC = () => {
   // Estado para forzar actualización de anuncios estáticos
@@ -156,7 +156,7 @@ const Home: React.FC = () => {
   };
   
   return (
-    <main className="flex-1">
+    <PublicLayout>
       {/* 🌟 HERO SECTION - Inspirado en bosquesamg.mx */}
       <section className="relative min-h-screen bg-black overflow-hidden">
         {/* Imagen de fondo */}
@@ -834,10 +834,7 @@ const Home: React.FC = () => {
           position="footer" 
         />
       </div>
-      
-      {/* Footer */}
-      <Footer />
-    </main>
+    </PublicLayout>
   );
 };
 

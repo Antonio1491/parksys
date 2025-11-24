@@ -46,6 +46,7 @@ import {
   Square
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { ROUTES } from "@/routes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -1039,7 +1040,7 @@ function TreeMapPage() {
                     }
                     setSelectedAreas(newSelected);
                   } else {
-                    console.log("Ver área", area.id);
+                    setLocation(ROUTES.admin.trees.operationDetail.build(area.id));
                   }
                 }}
               >
@@ -1190,7 +1191,7 @@ function TreeMapPage() {
                             }
                             setSelectedAreas(newSelected);
                           } else {
-                            console.log("Ver área", area.id);
+                              setLocation(ROUTES.admin.trees.operationDetail.build(area.id));
                           }
                         }}
                       >

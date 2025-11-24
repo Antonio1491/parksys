@@ -99,6 +99,11 @@ const contextMap: { prefix: string; to: string; labelKey: string }[] = [
     prefix: ROUTES.admin.advertising.advertisements.list,
     to: ROUTES.admin.advertising.advertisements.list,
     labelKey: 'return.advertisements',
+  },
+  {
+    prefix: ROUTES.admin.trees.operation,
+    to: ROUTES.admin.trees.operation,
+    labelKey: 'return.areas',
   }
   // Puedes agregar más rutas aquí siguiendo la misma estructura
 ];

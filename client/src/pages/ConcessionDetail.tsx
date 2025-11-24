@@ -3,9 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { MapPin, Phone, Mail, Calendar, Building2, Clock, ArrowLeft, Store, User, FileText, X } from "lucide-react";
+import { 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Calendar, 
+  Building2, 
+  Clock, 
+  ArrowLeft, 
+  Store, 
+  User, 
+  FileText, 
+  X 
+} from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState, useEffect } from "react";
+import PublicLayout from '@/components/PublicLayout';
 import SimpleMap from "@/components/SimpleMap";
 
 interface ConcessionImage {
@@ -87,20 +100,6 @@ export default function ConcessionDetail() {
   const coordinates = concession?.coordinates ? parseCoordinates(concession.coordinates) : null;
   console.log('Final coordinates for map:', coordinates);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/4 mb-4"></div>
-            <div className="h-64 bg-gray-300 rounded-lg mb-6"></div>
-            <div className="h-48 bg-gray-300 rounded-lg"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (error || !concession) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
@@ -150,6 +149,7 @@ export default function ConcessionDetail() {
   };
 
   return (
+    <PublicLayout>
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b">
@@ -427,5 +427,6 @@ export default function ConcessionDetail() {
         </Dialog>
       )}
     </div>
+    </PublicLayout>
   );
 }

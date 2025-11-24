@@ -15,7 +15,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Star, MapPin, Clock, User, MessageCircle, Send, CheckCircle, ArrowLeft } from 'lucide-react';
+import { 
+  Star, 
+  MapPin, 
+  Clock, 
+  User, 
+  MessageCircle, 
+  Send, 
+  CheckCircle, 
+  ArrowLeft 
+} from 'lucide-react';
+import PublicLayout from '@/components/PublicLayout';
 
 const evaluationSchema = z.object({
   parkId: z.number(),
@@ -58,6 +68,7 @@ const StarRating = ({ value, onChange, label }: StarRatingProps) => {
   const [hoverValue, setHoverValue] = useState(0);
 
   return (
+    
     <div className="space-y-2">
       <Label className="text-sm font-medium">{label}</Label>
       <div className="flex items-center gap-1">
@@ -260,19 +271,11 @@ export default function ParkEvaluationForm() {
     createEvaluation.mutate(processedData);
   };
 
-  if (parkLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando información del parque...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (!parkData) {
     return (
+      <PublicLayout 
+        showFooter={false}
+        >
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6 text-center">
@@ -288,11 +291,15 @@ export default function ParkEvaluationForm() {
           </CardContent>
         </Card>
       </div>
+      </PublicLayout>
     );
   }
 
   if (isSubmitted) {
     return (
+      <PublicLayout 
+        showFooter={false}
+        >
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6 text-center">
@@ -312,10 +319,14 @@ export default function ParkEvaluationForm() {
           </CardContent>
         </Card>
       </div>
+      </PublicLayout> 
     );
   }
 
   return (
+    <PublicLayout 
+      showFooter={false}
+      >
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
@@ -764,5 +775,6 @@ export default function ParkEvaluationForm() {
         </Form>
       </div>
     </div>
+    </PublicLayout>
   );
 }

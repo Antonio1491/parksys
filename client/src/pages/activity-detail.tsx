@@ -40,6 +40,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DialogTrigger } from '@/components/ui/dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
+import PublicLayout from '@/components/PublicLayout';
 import PublicInstructorEvaluationForm from '@/components/PublicInstructorEvaluationForm';
 
 // Configurar Stripe con opciones para México
@@ -395,17 +396,6 @@ function ActivityDetailPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando detalles de la actividad...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error || !activity) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
@@ -428,6 +418,7 @@ function ActivityDetailPage() {
   const primaryImage = images?.find((img: ActivityImage) => img.isPrimary) || images?.[0];
 
   return (
+    <PublicLayout >
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
@@ -1206,107 +1197,8 @@ function ActivityDetailPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer institucional */}
-      <footer className="bg-gradient-to-b from-[#067f5f] to-[#00a587] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Enlaces organizados en columnas */}
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-8 mb-8">
-            <div>
-              <h4 className="font-semibold text-[#bcd256] mb-4">Parques</h4>
-              <ul className="space-y-2 text-sm text-emerald-100">
-                <li><a href="/parks" className="hover:text-white transition-colors">Directorio</a></li>
-                <li><a href="/activities" className="hover:text-white transition-colors">Actividades</a></li>
-                <li><a href="/tree-species" className="hover:text-white transition-colors">Arbolado</a></li>
-                <li><a href="/concessions" className="hover:text-white transition-colors">Concesiones</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-[#bcd256] mb-4">Comunidad</h4>
-              <ul className="space-y-2 text-sm text-emerald-100">
-                <li><a href="/volunteers" className="hover:text-white transition-colors">Voluntarios</a></li>
-                <li><a href="/instructors" className="hover:text-white transition-colors">Instructores</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Eventos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Noticias</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-[#bcd256] mb-4">Servicios</h4>
-              <ul className="space-y-2 text-sm text-emerald-100">
-                <li><a href="#" className="hover:text-white transition-colors">Mantenimiento</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Consultoría</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Capacitación</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Evaluación</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-[#bcd256] mb-4">Recursos</h4>
-              <ul className="space-y-2 text-sm text-emerald-100">
-                <li><a href="#" className="hover:text-white transition-colors">Guías</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Manuales</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Biblioteca</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Investigación</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-[#bcd256] mb-4">Transparencia</h4>
-              <ul className="space-y-2 text-sm text-emerald-100">
-                <li><a href="#" className="hover:text-white transition-colors">Informes</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Presupuesto</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Licitaciones</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Auditoría</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-[#bcd256] mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-emerald-100">
-                <li><a href="#" className="hover:text-white transition-colors">Términos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacidad</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookies</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Accesibilidad</a></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Información de contacto */}
-          <div className="border-t border-emerald-500/30 pt-8 text-center">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div>
-                <h4 className="font-semibold text-[#bcd256] mb-2">Dirección</h4>
-                <p className="text-emerald-100 text-sm">
-                  Av. Alcalde 1351, Miraflores<br/>
-                  44270 Guadalajara, Jalisco
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-[#bcd256] mb-2">Contacto</h4>
-                <p className="text-emerald-100 text-sm">
-                  Tel: (33) 3837-4400<br/>
-                  bosques@guadalajara.gob.mx
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-[#bcd256] mb-2">Horarios</h4>
-                <p className="text-emerald-100 text-sm">
-                  Lunes a Viernes: 8:00 - 15:00<br/>
-                  Fines de semana: Espacios abiertos
-                </p>
-              </div>
-            </div>
-            
-            <div className="text-sm text-emerald-200">
-              © {new Date().getFullYear()} Agencia Metropolitana de Bosques Urbanos de Guadalajara. 
-              Todos los derechos reservados.
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
+    </PublicLayout>
   );
 }
 

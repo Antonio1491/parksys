@@ -12,7 +12,6 @@ import { ROUTES } from '@/routes';
 // COMPONENTES REUTILIZABLES
 // ============================================
 import LoadingPage from "@/components/LoadingPage";
-import Header from "@/components/Header";
 
 // ============================================
 // PÁGINAS CON CARGA INMEDIATA (Critical Path)
@@ -117,13 +116,9 @@ import AdminComments from "@/pages/admin/comments";
 
 function Router() {
   const [location, setLocation] = useLocation();
-  const isVentasRoute = location === '/ventas' || location === '/landing' || location === '/sales';
-  const isAdminRoute = location.startsWith('/admin');
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isVentasRoute && !isAdminRoute && <Header />}
-      <div className={!isVentasRoute && !isAdminRoute ? "pt-20" : ""}>
         <Switch>
 
           {/* ========================================== */}
@@ -515,6 +510,11 @@ function Router() {
           <Route path={ROUTES.admin.trees.operation}>
             <Suspense fallback={<LoadingPage messageKey="loading.areasManagement" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/trees/operation')))}
+            </Suspense>
+          </Route>
+          <Route path={ROUTES.admin.trees.operationDetail.path}>
+            <Suspense fallback={<LoadingPage messageKey="loading.areaDetail" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/trees/operation/[id]/view')))}
             </Suspense>
           </Route>
           <Route path={ROUTES.admin.trees.species.list}>
@@ -1406,7 +1406,6 @@ function Router() {
           <Route component={NotFound} />
 
         </Switch>
-      </div>
     </div>
   );
 }

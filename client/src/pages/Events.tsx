@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 import PublicLayout from '@/components/PublicLayout';
+
 const heroImage = "/image-transformer.webp";
 
 interface Event {

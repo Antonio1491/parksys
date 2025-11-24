@@ -79,7 +79,6 @@ import {
   Trophy,
   Trees
 } from 'lucide-react';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -93,7 +92,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
 
 // Schema para el formulario de reserva
 const reservationSchema = z.object({
@@ -197,17 +195,6 @@ function SpaceDetailPage() {
       });
     },
   });
-
-  if (spaceLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando detalles del espacio...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!space) {
     return (
@@ -563,9 +550,6 @@ function SpaceDetailPage() {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Publicidad lateral */}
-              <AdSpace placementId={3} />
             </div>
           </div>
         </div>

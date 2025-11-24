@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db, pool } from './db';
-import { adCampaigns, adSpaces, advertisements, adPlacements, adAnalytics } from '../shared/advertising-schema';
-import { eq, and, gte, lte, desc, asc, sql } from 'drizzle-orm';
+import { adCampaigns, advertisements, adPlacements, adAnalytics } from '../shared/advertising-schema';
+import { eq, gte, lte, desc, asc, sql } from 'drizzle-orm';
 import multer from 'multer';
 import path from 'path';
 import { isAuthenticated } from './middleware/auth';
@@ -516,46 +516,6 @@ router.get('/advertisements', async (req, res) => {
   }
 });
 
-// Obtener mapeo completo de espacios publicitarios y anuncios
-router.get('/space-mappings', async (req, res) => {
-  try {
-    const mappings = await pool.query(`
-      SELECT 
-        asp.id as space_id,
-        asp.name as space_name,
-        asp.page_type,
-        asp.position,
-        asp.description,
-        asp.is_active as space_active,
-        ads.id as ad_id,
-        ads.title as ad_title,
-        ads.description as ad_description,
-        ads.media_url,
-        ads.media_type,
-        ads.thumbnail_url,
-        ads.link_url,
-        ads.button_text,
-        ads.ad_type,
-        ap.id as placement_id,
-        ap.priority,
-        ap.start_date,
-        ap.end_date,
-        ap.page_type as placement_page_type,
-        ap.page_id as placement_page_id,
-        ap.is_active as placement_active
-      FROM ad_spaces asp
-      LEFT JOIN ad_placements ap ON asp.id = ap.ad_space_id AND ap.is_active = true
-      LEFT JOIN advertisements ads ON ap.advertisement_id = ads.id
-      ORDER BY asp.page_type, asp.position, asp.id
-    `);
-
-    res.json({ success: true, data: mappings.rows });
-  } catch (error) {
-    console.error('Error al obtener mapeo de espacios:', error);
-    res.status(500).json({ success: false, error: 'Error al obtener mapeo de espacios' });
-  }
-});
-
 // Obtener anuncios por campaña
 router.get('/campaigns/:campaignId/advertisements', async (req, res) => {
   try {
@@ -917,7 +877,7 @@ router.get('/placements/:id', async (req, res) => {
       SELECT 
         ap.*,
         a.title as ad_title,
-        ads.name as space_name
+        ads.name as space_name,
         ads.page_type as page_type
       FROM ad_placements ap
       LEFT JOIN advertisements a ON ap.advertisement_id = a.id
@@ -1229,90 +1189,6 @@ router.delete('/placements/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-// ===================
-// ANALYTICS
-// ===================
-
-// Registrar impresión
-router.post('/analytics/impression', async (req, res) => {
-  try {
-    const { placementId } = req.body;
-    
-    // Incrementar contador de impresiones
-    await pool.query(`
-      UPDATE ad_placements 
-      SET impressions = impressions + 1 
-      WHERE id = $1
-    `, [parseInt(placementId)]);
-    
-    // Registrar en analytics diario
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    await pool.query(`
-      INSERT INTO ad_analytics (placement_id, date, impressions, clicks, conversions, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      ON CONFLICT (placement_id, date) 
-      DO UPDATE SET 
-        impressions = ad_analytics.impressions + 1,
-        updated_at = $7
-    `, [
-      parseInt(placementId),
-      today,
-      1,
-      0,
-      0,
-      new Date(),
-      new Date()
-    ]);
-    
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error registrando impresión:', error);
-    res.status(500).json({ success: false, error: 'Error registrando impresión' });
-  }
-});
-
-// Registrar click
-router.post('/analytics/click', async (req, res) => {
-  try {
-    const { placementId } = req.body;
-    
-    // Incrementar contador de clicks
-    await pool.query(`
-      UPDATE ad_placements 
-      SET clicks = clicks + 1 
-      WHERE id = $1
-    `, [parseInt(placementId)]);
-    
-    // Registrar en analytics diario
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    await pool.query(`
-      INSERT INTO ad_analytics (placement_id, date, impressions, clicks, conversions, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      ON CONFLICT (placement_id, date) 
-      DO UPDATE SET 
-        clicks = ad_analytics.clicks + 1,
-        updated_at = $7
-    `, [
-      parseInt(placementId),
-      today,
-      0,
-      1,
-      0,
-      new Date(),
-      new Date()
-    ]);
-    
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error registrando click:', error);
-    res.status(500).json({ success: false, error: 'Error registrando click' });
-  }
-});
-
 // Obtener analytics por campaña
 router.get('/analytics/campaigns/:campaignId', async (req, res) => {
   try {
@@ -1435,176 +1311,6 @@ router.get('/public/ads', async (req, res) => {
   } catch (error) {
     console.error('❌ Error obteniendo anuncios públicos:', error);
     res.status(500).json({ success: false, error: 'Error obteniendo anuncios públicos' });
-  }
-});
-
-// ===================
-// ASSIGNMENTS ENDPOINTS
-// ===================
-
-// Obtener todas las asignaciones
-router.get('/assignments', async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        ap.id,
-        ap.ad_space_id,
-        ap.advertisement_id,
-        ap.start_date,
-        ap.end_date,
-        ap.priority,
-        ap.is_active,
-        ap.created_at,
-        asp.name as space_name,
-        asp.page_type,
-        asp.position,
-        asp.dimensions,
-        ads.title as ad_title,
-        ads.description as ad_description,
-        ads.image_url,
-        ads.content as target_url,
-        ads.is_active as ad_is_active
-      FROM ad_placements ap
-      LEFT JOIN ad_spaces asp ON ap.ad_space_id = asp.id
-      LEFT JOIN advertisements ads ON ap.advertisement_id = ads.id
-      ORDER BY ap.created_at DESC
-    `);
-    
-    const assignments = result.rows.map(row => ({
-      id: row.id,
-      adSpaceId: row.ad_space_id,
-      advertisementId: row.advertisement_id,
-      startDate: row.start_date,
-      endDate: row.end_date,
-      frequency: 'always', // Default value since column doesn't exist
-      priority: row.priority,
-      isActive: row.is_active,
-      createdAt: row.created_at,
-      space: {
-        id: row.ad_space_id,
-        name: row.space_name,
-        pageType: row.page_type,
-        position: row.position,
-        dimensions: row.dimensions,
-      },
-      advertisement: {
-        id: row.advertisement_id,
-        title: row.ad_title,
-        description: row.ad_description,
-        imageUrl: row.image_url ? replitObjectStorage.normalizeUrl(row.image_url) : row.image_url,
-        targetUrl: row.target_url,
-        isActive: row.ad_is_active,
-      }
-    }));
-    
-    res.json({ success: true, data: assignments });
-  } catch (error) {
-    console.error('Error obteniendo asignaciones:', error);
-    res.status(500).json({ success: false, error: 'Error obteniendo asignaciones' });
-  }
-});
-
-// Crear nueva asignación
-router.post('/assignments', isAuthenticated, async (req, res) => {
-  try {
-    const { ad_space_id, advertisement_id, start_date, end_date, frequency, priority, is_active } = req.body;
-    
-    // Validar que los IDs sean números válidos
-    const spaceId = parseInt(ad_space_id);
-    const advertisementId = parseInt(advertisement_id);
-    
-    if (isNaN(spaceId) || isNaN(advertisementId)) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Los IDs de espacio y anuncio deben ser números válidos' 
-      });
-    }
-    
-    const result = await pool.query(`
-      INSERT INTO ad_placements (
-        ad_space_id, 
-        advertisement_id, 
-        start_date, 
-        end_date, 
-        priority, 
-        is_active,
-        created_at,
-        updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING *
-    `, [
-      spaceId,
-      advertisementId,
-      new Date(start_date),
-      new Date(end_date),
-      priority || 5,
-      is_active !== undefined ? is_active : true,
-      new Date(),
-      new Date()
-    ]);
-    
-    res.json({ success: true, data: result.rows[0] });
-  } catch (error) {
-    console.error('Error creando asignación:', error);
-    res.status(500).json({ success: false, error: 'Error creando asignación' });
-  }
-});
-
-// Actualizar asignación
-router.put('/assignments/:id', isAuthenticated, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { ad_space_id, advertisement_id, start_date, end_date, frequency, priority, is_active } = req.body;
-    
-    const result = await pool.query(`
-      UPDATE ad_placements 
-      SET 
-        ad_space_id = $1,
-        advertisement_id = $2,
-        start_date = $3,
-        end_date = $4,
-        priority = $5,
-        is_active = $6,
-        updated_at = $7
-      WHERE id = $8
-      RETURNING *
-    `, [
-      parseInt(ad_space_id),
-      parseInt(advertisement_id),
-      new Date(start_date),
-      new Date(end_date),
-      priority,
-      is_active,
-      new Date(),
-      parseInt(id)
-    ]);
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Asignación no encontrada' });
-    }
-    
-    res.json({ success: true, data: result.rows[0] });
-  } catch (error) {
-    console.error('Error actualizando asignación:', error);
-    res.status(500).json({ success: false, error: 'Error actualizando asignación' });
-  }
-});
-
-// Eliminar asignación
-router.delete('/assignments/:id', isAuthenticated, async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const result = await pool.query('DELETE FROM ad_placements WHERE id = $1 RETURNING *', [parseInt(id)]);
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Asignación no encontrada' });
-    }
-    
-    res.json({ success: true, message: 'Asignación eliminada exitosamente' });
-  } catch (error) {
-    console.error('Error eliminando asignación:', error);
-    res.status(500).json({ success: false, error: 'Error eliminando asignación' });
   }
 });
 

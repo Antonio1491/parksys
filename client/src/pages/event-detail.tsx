@@ -108,24 +108,6 @@ const EventDetail = () => {
     return 'Precio no especificado';
   };
 
-  if (isLoading) {
-    return (
-      <PublicLayout>
-        <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-300 rounded mb-6"></div>
-              <div className="h-64 bg-gray-300 rounded-lg mb-6"></div>
-              <div className="h-4 bg-gray-300 rounded mb-4"></div>
-              <div className="h-4 bg-gray-300 rounded mb-4 w-2/3"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-            </div>
-          </div>
-        </div>
-      </PublicLayout>
-    );
-  }
-
   if (error || !event) {
     return (
       <PublicLayout>

@@ -23,7 +23,7 @@ export default function LoadingPage({
   return (
     <div className="flex items-center justify-center min-h-[400px] w-full">
       <div className="flex flex-col items-center space-y-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-green-600 mx-auto mb-4"></div>
         <p className="text-sm text-muted-foreground">{t(messageKey)}</p>
       </div>
     </div>
@@ -42,7 +42,7 @@ export function LoadingPageCompact({
   return (
     <div className="flex items-center justify-center p-8">
       <div className="flex items-center space-x-3">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
         <p className="text-sm text-muted-foreground">{t(messageKey)}</p>
       </div>
     </div>
