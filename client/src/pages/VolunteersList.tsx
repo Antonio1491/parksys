@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +21,7 @@ import {
   Filter
 } from 'lucide-react';
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 const volunteerHeroImage = "/images/volunteer-hero.jpg";
 
 interface Volunteer {
@@ -166,21 +167,6 @@ export default function VolunteersList() {
     const cleaned = area.toLowerCase().trim();
     return colorMap[cleaned] || 'bg-gray-100 text-gray-800 hover:bg-gray-200';
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Cargando voluntarios...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -582,17 +568,6 @@ export default function VolunteersList() {
                   </Button>
                 </div>
               )}
-        </div>
-      </section>
-
-      {/* 5. Banner publicitario */}
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <AdSpace 
-            spaceId="37"
-            pageType="volunteers"
-            position="banner"
-          />
         </div>
       </section>
 

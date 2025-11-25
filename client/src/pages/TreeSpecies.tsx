@@ -27,8 +27,10 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/components/PublicLayout';
 import { Link, useLocation } from 'wouter';
+import ROUTES from '@/routes';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
+
 const parkImage = "/images/park-lake-bridge.jpg";
-import AdSpace from '@/components/AdSpace';
 
 interface TreeSpecies {
   id: number;
@@ -86,7 +88,7 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
 
   if (viewMode === 'list') {
     return (
-      <Link href={`/tree-species/${species.id}`}>
+      <Link href={ROUTES.public.treeSpeciesDetail.build(species.id)}>
         <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer">
         <CardContent className="p-6">
           <div className="flex gap-6">
@@ -195,7 +197,7 @@ function TreeSpeciesCard({ species, viewMode }: { species: TreeSpecies; viewMode
   }
 
   return (
-    <Link href={`/tree-species/${species.id}`}>
+    <Link href={ROUTES.public.treeSpeciesDetail.build(species.id)}>
       <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer">
         <CardContent className="p-0">
         {/* Imagen */}
@@ -367,53 +369,9 @@ export default function TreeSpecies() {
     setCurrentPage(1);
   }, [searchTerm, originFilter, growthRateFilter, parkFilter]);
 
-  if (isLoading) {
-    return (
-      <PublicLayout>
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <div className="h-8 bg-gray-200 rounded w-96 mx-auto mb-4 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-64 mx-auto animate-pulse"></div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <Card key={i}>
-                  <CardContent className="p-0">
-                    <Skeleton className="h-48 w-full" />
-                    <div className="p-4 space-y-2">
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="h-3 w-1/2" />
-                      <Skeleton className="h-3 w-full" />
-                      <Skeleton className="h-3 w-full" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </PublicLayout>
-    );
-  }
-
   return (
     <PublicLayout>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-        {/* Header Ad Space - Oculto */}
-        {/* 
-        <div className="w-full bg-white border-b">
-          <div className="max-w-6xl mx-auto px-4 py-2">
-            <AdSpace 
-              spaceId="4" 
-              position="header" 
-              pageType="tree-species" 
-              className="w-full"
-            />
-          </div>
-        </div>
-        */}
 
         {/* Hero Section con imagen */}
         <div className="relative h-96 overflow-hidden">
@@ -620,11 +578,6 @@ export default function TreeSpecies() {
               </p>
             </div>
           )}
-          
-          {/* Banner Publicitario */}
-          <div className="mt-12 mb-8">
-            <AdSpace spaceId="36" position="banner" pageType="tree-species" />
-          </div>
         </div>
 
         {/* Sección de Contacto */}

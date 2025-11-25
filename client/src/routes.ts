@@ -78,11 +78,9 @@ export const PUBLIC_ROUTES = {
 
   instructors: "/instructors",
   instructorProfile: {
-    path: "/instructor/:id",
-    build: (id: string | number) => `/instructor/${id}`,
+    path: "/instructors/:id",
+    build: (id: string | number) => `/instructors/${id}`,
   },
-  // Acceso a registro por invitación
-  instructorRegister: "/instructors/register",
 
   // Páginas del footer - SIN COMPONENTES
   about: "/about",

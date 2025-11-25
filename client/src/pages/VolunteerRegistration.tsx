@@ -12,9 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import ROUTES from "@/routes";
 import { Users, Upload, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { z } from "zod";
+import PublicLayout from "@/components/PublicLayout";
 
 // Esquema de validación que coincide con el endpoint del backend
 const volunteerSchema = z.object({
@@ -127,7 +129,7 @@ export default function VolunteerRegistration() {
       description: "Tu solicitud ha sido enviada. Te contactaremos pronto para confirmar tu registro.",
     });
     queryClient.invalidateQueries({ queryKey: ["/api/volunteers"] });
-    setLocation("/volunteers");
+    setLocation(ROUTES.public.volunteers);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,6 +179,9 @@ export default function VolunteerRegistration() {
 
 
   return (
+    <PublicLayout
+      showFooter={false}
+    >
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
@@ -543,7 +548,7 @@ export default function VolunteerRegistration() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setLocation("/volunteers")}
+                    onClick={() => setLocation(ROUTES.public.volunteers)}
                     className="flex-1"
                   >
                     Cancelar
@@ -576,5 +581,6 @@ export default function VolunteerRegistration() {
         </div>
       </div>
     </div>
+    </PublicLayout>
   );
 }

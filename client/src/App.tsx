@@ -66,7 +66,6 @@ const VolunteerRegistration = lazy(() => import('@/pages/VolunteerRegistration')
 // Instructores
 const Instructors = lazy(() => import('@/pages/instructors'));
 const PublicInstructorProfile = lazy(() => import('@/pages/PublicInstructorProfile'));
-const InstructorRegistration = lazy(() => import('@/pages/public/instructor-registration'));
 
 // ============================================
 // DASHBOARDS ADMINISTRATIVOS CON LAZY LOADING
@@ -274,7 +273,7 @@ function Router() {
           {/* ========== INSTRUCTORES ========== */}
 
           <Route path={ROUTES.public.instructors}>
-            <Suspense fallback={<LoadingPage messageKey="loading.instructors." />}>
+            <Suspense fallback={<LoadingPage messageKey="loading.instructors" />}>
               <Instructors />
             </Suspense>
           </Route>
@@ -282,12 +281,6 @@ function Router() {
           <Route path={ROUTES.public.instructorProfile.path}>
             <Suspense fallback={<LoadingPage messageKey="loading.instructorProfile" />}>
               <PublicInstructorProfile />
-            </Suspense>
-          </Route>
-
-          <Route path={ROUTES.public.instructorRegister}>
-            <Suspense fallback={<LoadingPage messageKey="loading.instructorForm" />}>
-              <InstructorRegistration />
             </Suspense>
           </Route>
 

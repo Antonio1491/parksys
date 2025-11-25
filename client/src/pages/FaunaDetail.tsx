@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useParams } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { 
   ArrowLeft, 
@@ -26,7 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 
 interface FaunaSpecies {
   id: number;
@@ -93,19 +94,6 @@ export default function FaunaDetail() {
     enabled: !!id
   });
 
-  if (isLoading) {
-    return (
-      <PublicLayout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando información de la especie...</p>
-          </div>
-        </div>
-      </PublicLayout>
-    );
-  }
-
   if (error || !species) {
     return (
       <PublicLayout>
@@ -118,7 +106,7 @@ export default function FaunaDetail() {
             <p className="text-gray-600 mb-6">
               La especie que buscas no está disponible o fue removida del catálogo.
             </p>
-            <Link href="/fauna">
+            <Link href={ROUTES.public.fauna}>
               <Button>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver a Fauna
@@ -140,7 +128,7 @@ export default function FaunaDetail() {
         {/* Botón de regreso */}
         <div className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 py-4">
-            <Link href="/fauna">
+            <Link href={ROUTES.public.fauna}>
               <Button
                 variant="ghost"
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
@@ -506,9 +494,6 @@ export default function FaunaDetail() {
                   </Button>
                 </CardContent>
               </Card>
-
-              {/* Publicidad lateral */}
-              <AdSpace placement="lateral" />
             </div>
           </div>
         </div>

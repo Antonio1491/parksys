@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, TreePine, Users, Calendar, Droplets, Sun, Mountain, Leaf, Home } from 'lucide-react';
 import { useLocation, Link } from 'wouter';
+import ROUTES from '@/routes';
 import { useState } from 'react';
+import PublicLayout from '@/components/PublicLayout';
+
 const logoImage = "/images/logo-ambu.png";
 
 interface TreeSpecies {
@@ -72,26 +75,9 @@ export default function TreeSpeciesDetail() {
     enabled: !!id
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="h-32 bg-gray-200 rounded"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (!speciesData) {
     return (
+      <PublicLayout>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
         <Card className="max-w-md mx-auto">
           <CardHeader>
@@ -101,26 +87,28 @@ export default function TreeSpeciesDetail() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate('/tree-species')} className="w-full">
+            <Button onClick={() => navigate(ROUTES.public.treeSpecies)} className="w-full">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Volver al catálogo
             </Button>
           </CardContent>
         </Card>
       </div>
+      </PublicLayout>
     );
   }
 
   const { species, census, totalTrees, totalParks } = speciesData;
 
   return (
+    <PublicLayout>
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header con navegación */}
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate('/tree-species')}
+            onClick={() => navigate(ROUTES.public.treeSpecies)}
             className="mb-4 text-green-600 hover:text-green-700"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -325,21 +313,6 @@ export default function TreeSpeciesDetail() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Espacio para publicidad */}
-            <Card className="bg-gradient-to-r from-blue-100 to-green-100 border-dashed border-2 border-blue-300">
-              <CardContent className="p-6 text-center">
-                <div className="text-blue-600 mb-2">
-                  <Home className="w-8 h-8 mx-auto" />
-                </div>
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">
-                  Espacio Publicitario
-                </h3>
-                <p className="text-blue-700 text-sm">
-                  Área reservada para anuncios relacionados con jardinería o medio ambiente
-                </p>
-              </CardContent>
-            </Card>
           </div>
         )}
 
@@ -392,144 +365,9 @@ export default function TreeSpeciesDetail() {
             </Card>
           </div>
         )}
-
-        {/* Espacio final para publicidad */}
-        <div className="mt-8">
-          <Card className="bg-gradient-to-r from-purple-100 to-pink-100 border-dashed border-2 border-purple-300">
-            <CardContent className="p-6 text-center">
-              <div className="text-purple-600 mb-2">
-                <TreePine className="w-8 h-8 mx-auto" />
-              </div>
-              <h3 className="text-lg font-semibold text-purple-800 mb-2">
-                Espacio Publicitario Premium
-              </h3>
-              <p className="text-purple-700 text-sm">
-                Área destacada para anuncios institucionales o patrocinadores premium
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        
       </div>
-
-      {/* Footer institucional */}
-      <footer className="bg-gradient-to-b from-[#067f5f] to-[#00a587] text-white">
-        <div className="container mx-auto px-4 py-12">
-          {/* Enlaces organizados en grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
-            {/* Columna 1 */}
-            <div className="space-y-3">
-              <Link href="/" className="block text-white hover:text-[#bcd256] transition-colors">
-                Inicio
-              </Link>
-              <Link href="/about" className="block text-white hover:text-[#bcd256] transition-colors">
-                Nosotros
-              </Link>
-              <Link href="/activities" className="block text-white hover:text-[#bcd256] transition-colors">
-                Eventos
-              </Link>
-            </div>
-
-            {/* Columna 2 */}
-            <div className="space-y-3">
-              <Link href="/parks" className="block text-white hover:text-[#bcd256] transition-colors">
-                Bosques Urbanos
-              </Link>
-              <Link href="/education" className="block text-white hover:text-[#bcd256] transition-colors">
-                Educación Ambiental
-              </Link>
-              <Link href="/wildlife-rescue" className="block text-white hover:text-[#bcd256] transition-colors">
-                Rescate de Fauna
-              </Link>
-            </div>
-
-            {/* Columna 3 */}
-            <div className="space-y-3">
-              <Link href="/transparency" className="block text-white hover:text-[#bcd256] transition-colors">
-                Transparencia
-              </Link>
-              <Link href="/bids" className="block text-white hover:text-[#bcd256] transition-colors">
-                Licitaciones
-              </Link>
-              <Link href="/blog" className="block text-white hover:text-[#bcd256] transition-colors">
-                Blog
-              </Link>
-            </div>
-
-            {/* Columna 4 */}
-            <div className="space-y-3">
-              <Link href="/faq" className="block text-white hover:text-[#bcd256] transition-colors">
-                Preguntas Frecuentes
-              </Link>
-              <Link href="/help" className="block text-white hover:text-[#bcd256] transition-colors">
-                Quiero Ayudar
-              </Link>
-              <Link href="/contact" className="block text-white hover:text-[#bcd256] transition-colors">
-                Contacto
-              </Link>
-            </div>
-
-            {/* Columna 5 - Servicios */}
-            <div className="space-y-3">
-              <h4 className="font-semibold text-[#bcd256] mb-2">Servicios</h4>
-              <Link href="/instructors" className="block text-white hover:text-[#bcd256] transition-colors">
-                Instructores
-              </Link>
-              <Link href="/concessions" className="block text-white hover:text-[#bcd256] transition-colors">
-                Concesiones
-              </Link>
-              <Link href="/tree-species" className="block text-white hover:text-[#bcd256] transition-colors">
-                Especies Arbóreas
-              </Link>
-            </div>
-
-            {/* Columna 6 - Participación */}
-            <div className="space-y-3">
-              <h4 className="font-semibold text-[#bcd256] mb-2">Participa</h4>
-              <Link href="/volunteers" className="block text-white hover:text-[#bcd256] transition-colors">
-                Voluntariado
-              </Link>
-              <Link href="/reports" className="block text-white hover:text-[#bcd256] transition-colors">
-                Reportar Incidentes
-              </Link>
-              <Link href="/suggestions" className="block text-white hover:text-[#bcd256] transition-colors">
-                Sugerencias
-              </Link>
-            </div>
-          </div>
-
-          {/* Información de contacto */}
-          <div className="border-t border-emerald-500/30 pt-8 text-center">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div>
-                <h4 className="font-semibold text-[#bcd256] mb-2">Dirección</h4>
-                <p className="text-emerald-100 text-sm">
-                  Av. Alcalde 1351, Miraflores<br/>
-                  44270 Guadalajara, Jalisco
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-[#bcd256] mb-2">Contacto</h4>
-                <p className="text-emerald-100 text-sm">
-                  Tel: (33) 3837-4400<br/>
-                  bosques@guadalajara.gob.mx
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-[#bcd256] mb-2">Horarios</h4>
-                <p className="text-emerald-100 text-sm">
-                  Lunes a Viernes: 8:00 - 15:00<br/>
-                  Fines de semana: Espacios abiertos
-                </p>
-              </div>
-            </div>
-            
-            <div className="text-sm text-emerald-200">
-              © {new Date().getFullYear()} Agencia Metropolitana de Bosques Urbanos de Guadalajara. 
-              Todos los derechos reservados.
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
+    </PublicLayout>
   );
 }

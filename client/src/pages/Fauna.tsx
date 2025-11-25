@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Fish, 
@@ -31,7 +32,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 
 interface FaunaSpecies {
   id: number;
@@ -180,7 +181,7 @@ function SpeciesCard({ species, viewMode }: { species: FaunaSpecies; viewMode: '
                     </Badge>
                   )}
                 </div>
-                <Link href={`/fauna/${species.id}`}>
+                <Link href={ROUTES.public.faunaDetail.build(species.id)}>
                   <Button size="sm" variant="outline">
                     <Eye className="h-4 w-4 mr-1" />
                     Ver Detalles
@@ -265,7 +266,7 @@ function SpeciesCard({ species, viewMode }: { species: FaunaSpecies; viewMode: '
           </div>
         </div>
         
-        <Link href={`/fauna/${species.id}`}>
+        <Link href={ROUTES.public.faunaDetail.build(species.id)}>
           <Button className="w-full" size="sm">
             <Eye className="h-4 w-4 mr-2" />
             Ver Ficha Completa
@@ -529,13 +530,6 @@ export default function Fauna() {
                 Reportar Avistamiento
               </Button>
             </div>
-          </div>
-        </section>
-
-        {/* 5. Sección de adspace */}
-        <section className="py-12 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4">
-            <AdSpace spaceId="37" position="banner" pageType="fauna" />
           </div>
         </section>
 

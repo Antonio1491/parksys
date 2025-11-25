@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'wouter';
+import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { 
   ArrowLeft, 
@@ -21,9 +22,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import PublicInstructorEvaluationForm from '@/components/PublicInstructorEvaluationForm';
 import InstructorEvaluationsList from '@/components/InstructorEvaluationsList';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import PublicLayout from '@/components/PublicLayout';
 
 interface Instructor {
   id: number;
@@ -51,17 +53,6 @@ function PublicInstructorProfile() {
     enabled: !!instructorId && instructorId > 0,
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-green-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando perfil del instructor...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error || !instructor) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
@@ -71,7 +62,7 @@ function PublicInstructorProfile() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Instructor no encontrado</h1>
           <p className="text-gray-600 mb-6">No pudimos encontrar la información de este instructor.</p>
-          <Link href="/instructors">
+          <Link href={ROUTES.public.instructors}>
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver a instructores
@@ -93,11 +84,12 @@ function PublicInstructorProfile() {
     : [];
 
   return (
+    <PublicLayout>
     <div className="min-h-screen bg-gray-50">
       {/* Header Navigation */}
       <div className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <Link href="/instructors">
+          <Link href={ROUTES.public.instructors}>
             <Button variant="ghost" className="mb-2">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver a instructores
@@ -254,11 +246,6 @@ function PublicInstructorProfile() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Espacio Publicitario - Debajo de Información del Instructor */}
-            <div className="mt-6">
-              <AdSpace spaceId="13" position="card" pageType="instructor-profile" />
-            </div>
           </div>
 
           {/* Evaluaciones y Bio */}
@@ -337,6 +324,7 @@ function PublicInstructorProfile() {
         </div>
       </div>
     </div>
+    </PublicLayout>
   );
 }
 

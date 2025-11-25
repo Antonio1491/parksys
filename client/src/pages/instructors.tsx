@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Search, Filter, Grid, List, Star, Phone, Mail, Award, Clock, User, MessageSquare, Users, MapPin, Trees, Calendar } from 'lucide-react';
 import PublicInstructorEvaluationForm from '@/components/PublicInstructorEvaluationForm';
 import PublicLayout from '@/components/PublicLayout';
-import AdSpace from '@/components/AdSpace';
+import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
+import ROUTES from '@/routes';
 
 const heroImage = "/images/instructor-hero.jpg";
 
@@ -212,19 +213,6 @@ const InstructorsPage: React.FC = () => {
       </div>
     );
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando instructores...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <PublicLayout>
@@ -740,7 +728,7 @@ const InstructorsPage: React.FC = () => {
                     asChild 
                     className="flex-1 bg-gradient-to-r from-primary to-primary-600"
                   >
-                    <a href={`/instructor/${selectedInstructor.id}`} target="_blank" rel="noopener noreferrer">
+                    <a href={ROUTES.public.instructorProfile.build(selectedInstructor.id)} target="_blank" rel="noopener noreferrer">
                       Ver Perfil Completo
                     </a>
                   </Button>
@@ -750,17 +738,6 @@ const InstructorsPage: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
-
-
-
-      {/* AdSpace 37 - Ajustado al ancho del grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-8">
-        <AdSpace 
-          spaceId={37}
-          pageType="instructors"
-          position="banner"
-        />
-      </div>
 
       {/* Sección de Contacto */}
       <section className="bg-gray-50 py-12">
