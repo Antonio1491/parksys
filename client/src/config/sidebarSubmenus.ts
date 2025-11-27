@@ -64,6 +64,7 @@ interface SubmenuMeta {
   label: string;
   icon: LucideIcon;
   permissionSlugs: string[];
+  permissionPrefix?: string;
 }
 
 // Estructura de rutas por submenu
@@ -308,160 +309,208 @@ export const sidebarSubmenus = {
 
 // Metadata de submenús (íconos y labels principales)
 export const sidebarMeta: Record<string, SubmenuMeta> = {
+  // === MANAGEMENT ===
   parks: {
     label: 'navigation.parks',
     icon: Trees,
     permissionSlugs: ['parks.view'],
+    permissionPrefix: 'management:parks',
   },
   activities: {
     label: 'navigation.activities',
     icon: Boxes,
     permissionSlugs: ['activities.view'],
+    permissionPrefix: 'management:activities',
   },
   amenities: {
     label: 'navigation.amenities',
     icon: Package,
     permissionSlugs: ['amenities.view'],
+    permissionPrefix: 'management:amenities',
   },
   trees: {
     label: 'navigation.trees',
     icon: TreePine,
     permissionSlugs: ['trees.view'],
+    permissionPrefix: 'management:trees',
   },
   fauna: {
     label: 'navigation.fauna',
     icon: Binoculars,
     permissionSlugs: ['fauna.view'],
+    permissionPrefix: 'management:fauna',
   },
   visitors: {
     label: 'navigation.visitors',
     icon: Users,
     permissionSlugs: ['visitors.view'],
+    permissionPrefix: 'management:visitors',
   },
   events: {
     label: 'navigation.events',
     icon: CalendarDays,
     permissionSlugs: ['events.view'],
+    permissionPrefix: 'management:events',
   },
   spaceReservations: {
     label: 'navigation.reservations',
     icon: CalendarClock,
     permissionSlugs: ['reservations.view'],
+    permissionPrefix: 'management:reservations',
   },
   evaluations: {
     label: 'navigation.evaluations',
     icon: Star,
     permissionSlugs: ['evaluations.view'],
+    permissionPrefix: 'management:evaluations',
   },
+
+  // === OPERATIONS ===
   assets: {
     label: 'navigation.assets',
     icon: Package,
     permissionSlugs: ['assets.view'],
+    permissionPrefix: 'operations:assets',
   },
   incidents: {
     label: 'navigation.incidents',
     icon: AlertTriangle,
     permissionSlugs: ['incidents.view'],
+    permissionPrefix: 'operations:incidents',
   },
   workOrders: {
     label: 'navigation.workOrders',
     icon: FileText,
     permissionSlugs: ['workOrders.view'],
+    permissionPrefix: 'operations:work-orders',
   },
   warehouse: {
     label: 'navigation.warehouse',
     icon: Archive,
     permissionSlugs: ['warehouse.view'],
+    permissionPrefix: 'operations:warehouse',
   },
   volunteers: {
     label: 'navigation.volunteers',
     icon: HeartHandshake,
     permissionSlugs: ['volunteers.view'],
+    permissionPrefix: 'operations:volunteers',
   },
+
+  // === ADMIN-FINANCE ===
   finance: {
     label: 'navigation.finance',
     icon: DollarSign,
     permissionSlugs: ['finance.view'],
+    permissionPrefix: 'admin-finance:finance',
   },
   accounting: {
     label: 'navigation.accounting',
     icon: Calculator,
     permissionSlugs: ['accounting.view'],
+    permissionPrefix: 'admin-finance:accounting',
   },
   concessions: {
     label: 'navigation.concessions',
     icon: Store,
     permissionSlugs: ['concessions.view'],
+    permissionPrefix: 'admin-finance:concessions',
   },
+
+  // === MKT-COMM ===
   marketing: {
     label: 'navigation.marketing',
     icon: Megaphone,
     permissionSlugs: ['marketing.view'],
+    permissionPrefix: 'mkt-comm:marketing',
   },
   advertising: {
     label: 'navigation.advertising',
     icon: BarChart3,
     permissionSlugs: ['advertising.view'],
+    permissionPrefix: 'mkt-comm:advertising',
   },
   communications: {
     label: 'navigation.communications',
     icon: Mail,
     permissionSlugs: ['communications.view'],
+    permissionPrefix: 'mkt-comm:communications',
   },
+
+  // === HR ===
   employees: {
     label: 'navigation.employees',
     icon: UserCog,
     permissionSlugs: ['employees.view'],
+    permissionPrefix: 'hr:employees',
   },
   timeOff: {
     label: 'navigation.timeOff',
     icon: Calendar,
     permissionSlugs: ['timeOff.view'],
+    permissionPrefix: 'hr:time-off',
   },
   training: {
     label: 'navigation.training',
     icon: GraduationCap,
     permissionSlugs: ['training.view'],
+    permissionPrefix: 'hr:training',
   },
   payroll: {
     label: 'navigation.payroll',
     icon: DollarSign,
     permissionSlugs: ['payroll.view'],
+    permissionPrefix: 'hr:payroll',
   },
   timeTracking: {
     label: 'navigation.timeTracking',
     icon: Clock,
     permissionSlugs: ['timeTracking.view'],
+    permissionPrefix: 'hr:time-tracking',
   },
   wellness: {
     label: 'navigation.wellness',
     icon: Heart,
     permissionSlugs: ['wellness.view'],
+    permissionPrefix: 'hr:wellness',
   },
+
+  // === CONFIG-SECURITY ===
   access: {
     label: 'navigation.access',
     icon: Shield,
-    permissionSlugs: ['settings.access.view'],
+    permissionSlugs: ['access.view'],
+    permissionPrefix: 'config-security:access-control',
   },
   policies: {
     label: 'navigation.policies',
-    icon: ClipboardList,
-    permissionSlugs: ['settings.policies.view'],
+    icon: FileText,
+    permissionSlugs: ['policies.view'],
+    permissionPrefix: 'config-security:policies',
   },
   notifications: {
     label: 'navigation.notifications',
     icon: Bell,
-    permissionSlugs: ['settings.notifications.view'],
+    permissionSlugs: ['notifications.view'],
+    permissionPrefix: 'config-security:notifications',
   },
   audit: {
     label: 'navigation.audit',
-    icon: ClipboardCheck,
-    permissionSlugs: ['settings.audit.view'],
+    icon: ClipboardList,
+    permissionSlugs: ['audit.view'],
+    permissionPrefix: 'config-security:audit',
   },
   maintenance: {
     label: 'navigation.maintenance',
+    icon: Settings,
+    permissionSlugs: ['maintenance.view'],
+    permissionPrefix: 'config-security:system-maintenance',
+  },
+  exports: {
+    label: 'navigation.exports',
     icon: Download,
-    permissionSlugs: ['settings.maintenance.view'],
+    permissionSlugs: ['exports.view'],
+    permissionPrefix: 'config-security:exports',
   },
 };
 

@@ -2,7 +2,7 @@ import { deriveSidebarModules } from '@/utils/sidebarHelpers';
 import { sidebarSubmenus } from './sidebarSubmenus';
 
 const moduleMap = {
-  gestion: ['parks', 'activities', 'amenities', 'trees', 'fauna', 'visitors', 'events', 'spaceReservations', 'evaluations'],
+  management: ['parks', 'activities', 'amenities', 'trees', 'fauna', 'visitors', 'events', 'spaceReservations', 'evaluations'],
   operations: ['assets', 'incidents', 'workOrders', 'warehouse', 'volunteers'],
   adminFinance: ['finance', 'accounting', 'concessions'],
   mktComm: ['marketing', 'advertising', 'communications'],

@@ -135,6 +135,7 @@ function TreeMapPage() {
     longitude: "",
     responsiblePerson: "",
     isActive: true,
+    imageUrl: "",
   });
 
   const { data: parks, isLoading: isLoadingParks } = useQuery({
@@ -733,6 +734,7 @@ function TreeMapPage() {
       longitude: "",
       responsiblePerson: "",
       isActive: true,
+      imageUrl: "",
     });
   };
 
@@ -753,6 +755,7 @@ function TreeMapPage() {
       longitude: "",
       responsiblePerson: "",
       isActive: area.isActive,
+      imageUrl: area.imageUrl || "",
     });
     setIsEditDialogOpen(true);
   };
@@ -1283,6 +1286,7 @@ function TreeMapPage() {
                 latitude: formData.latitude,
                 longitude: formData.longitude,
                 responsiblePerson: formData.responsiblePerson,
+                imageUrl: formData.imageUrl,
                 status: formData.isActive ? 'activa' : 'inactiva',
               });
             }}>
@@ -1404,6 +1408,29 @@ function TreeMapPage() {
                 />
               </div>
 
+              {/* Imagen del área */}
+              <div className="grid gap-2">
+                <Label htmlFor="imageUrl">Imagen del Área (URL)</Label>
+                <Input
+                  id="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                />
+                {formData.imageUrl && (
+                  <div className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Vista previa"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -1459,6 +1486,7 @@ function TreeMapPage() {
                   latitude: formData.latitude,
                   longitude: formData.longitude,
                   responsiblePerson: formData.responsiblePerson,
+                  imageUrl: formData.imageUrl, 
                   status: formData.isActive ? 'activa' : 'inactiva',
                 },
               });
@@ -1548,6 +1576,29 @@ function TreeMapPage() {
                   placeholder="Describe el área..."
                   rows={3}
                 />
+              </div>
+
+              {/* Imagen del área */}
+              <div className="grid gap-2">
+                <Label htmlFor="edit-imageUrl">Imagen del Área (URL)</Label>
+                <Input
+                  id="edit-imageUrl"
+                  value={formData.imageUrl}
+                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                />
+                {formData.imageUrl && (
+                  <div className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Vista previa"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-2">

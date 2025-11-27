@@ -7,6 +7,8 @@ import { db } from './db';
 import { parkAreas, trees } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { generateAreaCode } from './code-generator';
+import multer from 'multer';
+import { replitObjectStorage } from './objectStorage-replit';
 
 /**
  * Registra las rutas relacionadas con áreas de parques
@@ -14,6 +16,23 @@ import { generateAreaCode } from './code-generator';
  * @param apiRouter Router de la API
  * @param isAuthenticated Middleware de autenticación
  */
+
+// Configurar multer para imágenes de áreas
+const areaImageUpload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Formato de archivo no válido. Solo se permiten JPG, PNG, GIF y WEBP'));
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB
+  }
+});
+
 export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthenticated: any) {
   console.log("🌳 Registrando rutas de áreas de parques");
 
@@ -62,13 +81,34 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
     try {
       const { id } = req.params;
 
-      const area = await db
-        .select()
-        .from(parkAreas)
-        .where(eq(parkAreas.id, Number(id)))
-        .limit(1);
+      // Obtener área con nombre del parque usando SQL directo
+      const result = await db.execute(sql`
+        SELECT 
+          pa.id,
+          pa.park_id,
+          pa.name,
+          pa.code,
+          pa.area_code,
+          pa.code_prefix,
+          pa.description,
+          pa.dimensions,
+          pa.image_url,
+          pa.polygon,
+          pa.use_gps_matching,
+          pa.use_code_matching,
+          pa.status,
+          pa.created_at,
+          pa.updated_at,
+          p.name as park_name
+        FROM park_areas pa
+        LEFT JOIN parks p ON pa.park_id = p.id
+        WHERE pa.id = ${Number(id)}
+        LIMIT 1
+      `);
 
-      if (!area || area.length === 0) {
+      const areas = result.rows || result;
+
+      if (!areas || areas.length === 0) {
         return res.status(404).json({ error: "Área no encontrada" });
       }
 
@@ -78,8 +118,25 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
         .from(trees)
         .where(eq(trees.area_id, Number(id)));
 
+      // Mapear campos para el frontend (camelCase)
+      const area = areas[0];
       res.json({
-        ...area[0],
+        id: area.id,
+        parkId: area.park_id,
+        name: area.name,
+        code: area.code || area.area_code,
+        areaCode: area.area_code,
+        codePrefix: area.code_prefix,
+        description: area.description,
+        dimensions: area.dimensions,
+        imageUrl: area.image_url,
+        polygon: area.polygon,
+        useGpsMatching: area.use_gps_matching,
+        useCodeMatching: area.use_code_matching,
+        status: area.status,
+        createdAt: area.created_at,
+        updatedAt: area.updated_at,
+        parkName: area.park_name,
         treeCount: Number(treeCount[0]?.count || 0),
       });
     } catch (error) {
@@ -139,7 +196,7 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
   // ============================================
   // PUT /trees/areas/:id - Actualizar área
   // ============================================
-  apiRouter.put("/trees/areas/:id", isAuthenticated, async (req: Request, res: Response) => {
+  apiRouter.put("/trees/areas/:id", isAuthenticated, areaImageUpload.single('imageFile'), async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       const {
@@ -179,6 +236,31 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
         }
       }
 
+      // Manejar imagen
+      let finalImageUrl = imageUrl !== undefined ? imageUrl : existingArea[0].imageUrl;
+
+      // Si se subió un archivo, guardarlo en Object Storage
+      if (req.file) {
+        try {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          const extension = req.file.originalname.split('.').pop();
+          const filename = `area-${id}-${uniqueSuffix}.${extension}`;
+
+          // Subir a Replit Object Storage
+          await replitObjectStorage.uploadFromBuffer(
+            `park-areas/${filename}`,
+            req.file.buffer,
+            req.file.mimetype
+          );
+
+          finalImageUrl = `/api/object-storage/park-areas/${filename}`;
+          console.log(`✅ Imagen de área guardada: ${finalImageUrl}`);
+        } catch (uploadError) {
+          console.error("Error subiendo imagen:", uploadError);
+          // Continuar sin la imagen si falla
+        }
+      }
+
       const updatedArea = await db
         .update(parkAreas)
         .set({
@@ -187,7 +269,7 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
           code: code || existingArea[0].code,
           description: description !== undefined ? description : existingArea[0].description,
           dimensions: dimensions !== undefined ? dimensions : existingArea[0].dimensions,
-          imageUrl: imageUrl !== undefined ? imageUrl : existingArea[0].imageUrl,
+          imageUrl: finalImageUrl,
           polygon: polygon !== undefined ? polygon : existingArea[0].polygon,
           status: status || existingArea[0].status,
           updatedAt: new Date(),

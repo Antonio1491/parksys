@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useParams, Link } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { apiRequest } from '@/lib/queryClient';
 import ROUTES from '@/routes';
+import { useToast } from '@/hooks/use-toast';
 
 // Components
 import AdminLayout from '@/components/AdminLayout';
@@ -13,6 +14,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Table,
   TableBody,
   TableCell,
@@ -20,6 +29,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // Icons
 import {
@@ -32,7 +51,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  User,
+  Trash2,
   Hash,
   Clock,
   Download,
@@ -81,6 +100,91 @@ export default function AreaDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [treesPage, setTreesPage] = useState(1);
   const treesPerPage = 10;
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    parkId: '',
+    dimensions: '',
+    status: 'activa',
+    imageUrl: '', 
+  });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  // Cargar parques para el selector
+  const { data: parks } = useQuery({
+    queryKey: ['/api/parks-with-amenities'],
+    queryFn: async () => {
+      const response = await fetch('/api/parks-with-amenities');
+      if (!response.ok) throw new Error('Error al cargar parques');
+      return response.json();
+    },
+  });
+
+  // Mutation para editar área
+  const editAreaMutation = useMutation({
+    mutationFn: async (data: any) => {
+      // Si hay archivo, enviar como FormData
+      if (imageFile) {
+        const formDataToSend = new FormData();
+        formDataToSend.append('imageFile', imageFile);
+        formDataToSend.append('name', data.name);
+        formDataToSend.append('description', data.description || '');
+        formDataToSend.append('parkId', data.parkId.toString());
+        formDataToSend.append('dimensions', data.dimensions || '');
+        formDataToSend.append('status', data.status);
+
+        const response = await fetch(`/api/trees/areas/${id}`, {
+          method: 'PUT',
+          body: formDataToSend,
+        });
+
+        if (!response.ok) throw new Error('Error al actualizar el área');
+        return response.json();
+      }
+
+      // Si no hay archivo, enviar como JSON
+      return apiRequest(`/api/trees/areas/${id}`, {
+        method: 'PUT',
+        data: data,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trees/areas', id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/trees/areas'] });
+      toast({
+        title: 'Área actualizada',
+        description: 'Los cambios se guardaron exitosamente',
+      });
+      setIsEditDialogOpen(false);
+      setImageFile(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'No se pudo actualizar el área',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Función para abrir el modal de edición
+  const handleEdit = () => {
+    if (area) {
+      setFormData({
+        name: area.name || '',
+        description: area.description || '',
+        parkId: area.parkId?.toString() || '',
+        dimensions: area.dimensions || '',
+        status: area.status || 'activa',
+        imageUrl: area.imageUrl || '',
+        });
+      setImageFile(null);
+      setIsEditDialogOpen(true);
+    }
+  };
 
   // Fetch area details
   const { data: area, isLoading: isLoadingArea } = useQuery<ParkArea>({
@@ -162,12 +266,13 @@ export default function AreaDetailPage() {
           {/* Botones de acción */}
           <div className="absolute top-12 right-12 z-10">
             <div className="flex gap-2">
-              <Link href={`/admin/trees/operation/${area.id}/edit`}>
-                <Button className="bg-[#a0cc4d] hover:bg-[#00a884] text-white hover:text-white">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Editar
-                </Button>
-              </Link>
+              <Button 
+                onClick={handleEdit}
+                className="bg-[#a0cc4d] hover:bg-[#00a884] text-white hover:text-white"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Editar
+              </Button>
               <Button
                 onClick={() => console.log('Exportar área')}
                 className="bg-[#00444f] hover:bg-[#00a587] text-white hover:text-white"
@@ -225,7 +330,7 @@ export default function AreaDetailPage() {
                       Código
                     </p>
                     <p className="text-sm text-gray-900 font-medium mt-1 font-mono">
-                      {area.code || 'N/A'}
+                      {area.code || area.areaCode || 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -245,18 +350,24 @@ export default function AreaDetailPage() {
                   </div>
                 </div>
 
-                {/* Responsable */}
+                {/* Estado */}
                 <div className="flex items-start gap-3">
                   <div className="p-2 border-2 border-[#00444f] rounded-full">
-                    <User className="h-5 w-5 text-[#00444f]" />
+                    <Calendar className="h-5 w-5 text-[#00444f]" />
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase font-medium">
-                      Responsable
+                      Estado
                     </p>
-                    <p className="text-sm text-gray-900 font-medium mt-1">
-                      {area.responsiblePerson || 'No asignado'}
-                    </p>
+                    <Badge 
+                      className={`mt-1 ${
+                        area.status === 'activa' 
+                          ? 'bg-green-500 hover:bg-green-600' 
+                          : 'bg-gray-500 hover:bg-gray-600'
+                      }`}
+                    >
+                      {area.status === 'activa' ? 'Activa' : 'Inactiva'}
+                    </Badge>
                   </div>
                 </div>
               </div>
@@ -356,75 +467,11 @@ export default function AreaDetailPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="info" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="info">Información</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="trees">Árboles ({totalTrees})</TabsTrigger>
             <TabsTrigger value="map">Mapa</TabsTrigger>
             <TabsTrigger value="maintenance">Mantenimientos (0)</TabsTrigger>
           </TabsList>
-
-          {/* Tab: Información */}
-          <TabsContent value="info" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Información General</CardTitle>
-                <CardDescription>Datos detallados del área</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Columna izquierda */}
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Nombre del Área</p>
-                      <p className="font-medium">{area.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Código</p>
-                      <p className="font-mono font-medium">{area.code}</p>
-                    </div>
-                    {area.codePrefix && (
-                      <div>
-                        <p className="text-sm text-gray-500">Prefijo de Código</p>
-                        <p className="font-mono">{area.codePrefix}</p>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-sm text-gray-500">Descripción</p>
-                      <p>{area.description || 'Sin descripción'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Dimensiones</p>
-                      <p>{area.dimensions ? `${area.dimensions} hectáreas` : 'No especificadas'}</p>
-                    </div>
-                  </div>
-
-                  {/* Columna derecha */}
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Vinculación por GPS</p>
-                      <Badge variant={area.useGpsMatching ? 'default' : 'secondary'}>
-                        {area.useGpsMatching ? 'Activa' : 'Inactiva'}
-                      </Badge>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Vinculación por Código</p>
-                      <Badge variant={area.useCodeMatching ? 'default' : 'secondary'}>
-                        {area.useCodeMatching ? 'Activa' : 'Inactiva'}
-                      </Badge>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Fecha de Creación</p>
-                      <p>{area.createdAt ? new Date(area.createdAt).toLocaleDateString('es-MX') : '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Última Actualización</p>
-                      <p>{area.updatedAt ? new Date(area.updatedAt).toLocaleDateString('es-MX') : '-'}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           {/* Tab: Árboles */}
           <TabsContent value="trees" className="space-y-4">
@@ -564,6 +611,176 @@ export default function AreaDetailPage() {
           </TabsContent>
         </Tabs>
       </div>
+      {/* Modal Editar Área */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Área</DialogTitle>
+            <DialogDescription>
+              Actualiza la información del área
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              editAreaMutation.mutate({
+                parkId: parseInt(formData.parkId),
+                name: formData.name,
+                description: formData.description,
+                dimensions: formData.dimensions,
+                status: formData.status,
+                imageUrl: formData.imageUrl,
+              });
+            }}
+          >
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-name">Nombre del Área *</Label>
+                <Input
+                  id="edit-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Ej: Zona Norte, Jardín Principal"
+                  required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-parkId">Parque *</Label>
+                <Select
+                  value={formData.parkId}
+                  onValueChange={(value) => setFormData({ ...formData, parkId: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un parque" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {parks && parks.map((park: any) => (
+                      <SelectItem key={park.id} value={park.id.toString()}>
+                        {park.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-dimensions">Dimensiones (hectáreas)</Label>
+                <Input
+                  id="edit-dimensions"
+                  type="number"
+                  step="0.01"
+                  value={formData.dimensions}
+                  onChange={(e) => setFormData({ ...formData, dimensions: e.target.value })}
+                  placeholder="Ej: 2.5"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-description">Descripción</Label>
+                <Textarea
+                  id="edit-description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe el área..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-status">Estado</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="activa">Activa</SelectItem>
+                    <SelectItem value="inactiva">Inactiva</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Imagen del área */}
+              <div className="grid gap-2">
+                <Label>Imagen del Área</Label>
+
+                {/* Vista previa */}
+                {(formData.imageUrl || imageFile) && (
+                  <div className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={imageFile ? URL.createObjectURL(imageFile) : formData.imageUrl}
+                      alt="Vista previa"
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => {
+                        setFormData({ ...formData, imageUrl: '' });
+                        setImageFile(null);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Subir archivo */}
+                <div>
+                  <Label className="text-sm text-gray-600">Subir archivo</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImageFile(file);
+                        setFormData({ ...formData, imageUrl: '' });
+                      }
+                    }}
+                  />
+                </div>
+
+                <div className="text-center text-sm text-gray-500">- O -</div>
+
+                {/* URL externa */}
+                <div>
+                  <Label className="text-sm text-gray-600">URL de imagen</Label>
+                  <Input
+                    value={formData.imageUrl}
+                    onChange={(e) => {
+                      setFormData({ ...formData, imageUrl: e.target.value });
+                      if (e.target.value) setImageFile(null);
+                    }}
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#00a587] hover:bg-[#00a587]/90"
+                disabled={editAreaMutation.isPending}
+              >
+                {editAreaMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

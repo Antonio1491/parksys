@@ -9,7 +9,7 @@ import {
 
 export const adminSidebarStructure = [
   {
-    moduleKey: 'gestion',
+    moduleKey: 'management',
     labelKey: 'admin.management',
     icon: FolderOpen,
     submenus: [

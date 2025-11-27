@@ -3213,28 +3213,6 @@ function startServer() {
   
   // Create API router for immediate registration
   const criticalApiRouter = express.Router();
-  
-  // DISABLED: Public parks route disabled in production for security
-  // Only enable in development environment
-  if (process.env.NODE_ENV === 'development') {
-    criticalApiRouter.get("/parks", async (req: any, res: any) => {
-      try {
-        const { getParksDirectly } = await import('./direct-park-queries');
-        const filters: any = {};
-        
-        if (req.query.municipalityId) {
-          filters.municipalityId = Number(req.query.municipalityId);
-        }
-        
-        const parks = await getParksDirectly(filters);
-        console.log(`🏞️ [DEV-ONLY] Returning ${parks?.length || 0} parks via critical route`);
-        return res.json({ data: parks || [] });
-      } catch (error) {
-        console.error('❌ [DEV-ONLY] Error in parks route:', error);
-        return res.status(500).json({ message: "Error fetching parks" });
-      }
-    });
-  }
 
   // DISABLED: Public parks filter route disabled in production for security
   if (process.env.NODE_ENV === 'development') {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useTranslation } from 'react-i18next';
 import { SidebarSearch } from './SidebarSearch';
 import { adminSidebarStructure } from '@/config/adminSidebarStructure';
@@ -239,6 +239,70 @@ const CollapsibleSubmenu: React.FC<CollapsibleSubmenuProps> = ({
 const AdminSidebarComplete: React.FC = () => {
   const [location] = useLocation();
   const { t } = useTranslation('common');
+  const { user } = useUnifiedAuth();
+  const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});
+  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
+
+  // Verificar si es Super Admin
+  const isSuperAdmin = user?.roleId === 1 || user?.role === 'super-admin';
+
+  // Cargar permisos del usuario
+  useEffect(() => {
+    const loadPermissions = async () => {
+      if (!user?.id) return;
+
+      // Super Admin no necesita cargar permisos
+      if (isSuperAdmin) {
+        setPermissionsLoaded(true);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/users/${user.id}/permissions`, {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.permissions) {
+            // Filtrar metadata y source, quedarnos solo con los permisos
+            const { metadata, source, userId, all, ...perms } = data.permissions;
+            setUserPermissions(perms);
+          }
+        }
+      } catch (error) {
+        console.error('Error cargando permisos:', error);
+      } finally {
+        setPermissionsLoaded(true);
+      }
+    };
+
+    loadPermissions();
+  }, [user?.id, isSuperAdmin]);
+
+  // Función para verificar acceso a submenu
+  const canAccessSubmenu = (submenuId: string): boolean => {
+    // Super Admin ve todo
+    if (isSuperAdmin) return true;
+
+    // Si los permisos no han cargado, no mostrar nada aún
+    if (!permissionsLoaded) return false;
+
+    // Verificar si tiene permissionPrefix definido
+    const meta = sidebarMeta[submenuId];
+    if (!meta?.permissionPrefix) return true; // Si no tiene prefix, mostrar
+
+    // Convertir formato: 'gestion:parques' → 'gestion.parques'
+    const permissionKey = meta.permissionPrefix.replace(':', '.');
+
+    // Verificar si tiene algún permiso para este módulo
+    return permissionKey in userPermissions;
+  };
+
+  // Verificar si un módulo tiene al menos un submenu visible
+  const hasVisibleSubmenus = (submenus: Array<{id: string, type: string}>): boolean => {
+    return submenus.some(({ id }) => canAccessSubmenu(id));
+  };
 
   // Estados
   const [expandedSubmenus, setExpandedSubmenus] = useState<string[]>([]);
@@ -345,11 +409,15 @@ const AdminSidebarComplete: React.FC = () => {
       onValueChange={setOpenAccordions}
       className="space-y-1"
     >
-      {adminSidebarStructure.map(({ moduleKey, labelKey, icon: Icon, submenus }) => (
-        <ModuleNav key={moduleKey} title={t(labelKey)} icon={<Icon className="h-5 w-5" />} value={moduleKey}>
-          {submenus.map(({ id: submenuId, type }) => renderSubmenu(submenuId, type))}
-        </ModuleNav>
-      ))}
+      {adminSidebarStructure
+        .filter(({ submenus }) => hasVisibleSubmenus(submenus))
+        .map(({ moduleKey, labelKey, icon: Icon, submenus }) => (
+          <ModuleNav key={moduleKey} title={t(labelKey)} icon={<Icon className="h-5 w-5" />} value={moduleKey}>
+            {submenus
+              .filter(({ id }) => canAccessSubmenu(id))
+              .map(({ id: submenuId, type }) => renderSubmenu(submenuId, type))}
+          </ModuleNav>
+        ))}
     </Accordion>
   );
 

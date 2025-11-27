@@ -145,7 +145,10 @@
     "settings": "Carregando configurações...",
     "reports": "Carregando relatórios...",
     "analytics": "Carregando análises...",
-    "test": "Carregando página de testes..."
+    "test": "Carregando página de testes...",
+    "saving": "Salvando...",
+    "deleting": "Excluindo...",
+    "processing": "Processando..."
   },
   "footer": {
     "mainNav": "Navegação",
@@ -181,5 +184,33 @@
     "hours": "Horários",
     "schedule": "Segunda a Sexta: 8:00 - 15:00",
     "copyright": "© {{year}} Parques de México. Todos os direitos reservados."
+  },
+  "error": {
+    "title": "Ocorreu um erro",
+    "generic": "Não foi possível completar a operação. Por favor, tente novamente.",
+    "retry": "Tentar novamente",
+    "tryAgain": "Tentar de novo",
+    "network": "Erro de conexão. Verifique sua conexão com a internet.",
+    "unauthorized": "Você não tem permissão para realizar esta ação.",
+    "notFound": "O recurso solicitado não existe.",
+    "serverError": "Erro do servidor. Tente novamente mais tarde.",
+    "publicMessage": "Estamos trabalhando para resolver",
+    "publicSecondary": "Por favor, tente novamente em alguns minutos"
+  },
+  "empty": {
+    "title": "Sem resultados",
+    "description": "Nenhum item encontrado para exibir.",
+    "noParks": "Nenhum parque disponível no momento",
+    "noParksPublic": "Em breve haverá mais espaços verdes",
+    "noActivities": "Nenhuma atividade disponível",
+    "noActivitiesPublic": "Novas atividades em breve",
+    "noEvents": "Nenhum evento programado",
+    "noEventsPublic": "Novos eventos serão anunciados em breve",
+    "noTrees": "Nenhuma árvore registrada",
+    "noFauna": "Nenhum registro de fauna",
+    "noVolunteers": "Nenhum voluntário registrado",
+    "noConcessions": "Nenhuma concessão ativa",
+    "noResults": "Nenhum resultado encontrado",
+    "noResultsPublic": "Tente ajustar seus critérios de busca"
   }
 }

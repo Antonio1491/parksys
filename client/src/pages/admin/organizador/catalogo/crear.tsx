@@ -178,7 +178,7 @@ const CrearActividadPage = () => {
 
   // Consulta para obtener la lista de parques
   const { data: parques = [], isLoading: parquesLoading } = useQuery<any[]>({
-    queryKey: ['/api/parks/filter'],
+    queryKey: ['/api/parks?variant=list'],
   });
   
   // Consulta para obtener las categorías de actividades

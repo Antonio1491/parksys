@@ -670,3 +670,336 @@ export async function getParkByIdDirectly(parkId: number) {
     throw error;
   }
 }
+
+// ============================================================
+// VARIANTES OPTIMIZADAS PARA GET /api/parks
+// ============================================================
+
+/**
+ * Variante LIST - Para dropdowns y selects
+ * Solo devuelve id y name
+ * 1 sola query, muy rápido
+ */
+export async function getParksListVariant(): Promise<{ id: number; name: string }[]> {
+  try {
+    const result = await pool.query(`
+      SELECT id, name
+      FROM parks
+      WHERE is_deleted = false OR is_deleted IS NULL
+      ORDER BY name
+    `);
+    return result.rows;
+  } catch (error) {
+    console.error("Error en getParksListVariant:", error);
+    return [];
+  }
+}
+
+/**
+ * Variante CARD - Para tarjetas/grids en UI
+ * Incluye: id, name, tipo, dirección, área, imagen primaria, tipología
+ * 1 sola query con subquery para imagen
+ */
+export async function getParksCardVariant(filters?: {
+  parkType?: string;
+  postalCode?: string;
+  search?: string;
+  amenities?: number[];
+}): Promise<any[]> {
+  try {
+    let queryStr = `
+      SELECT 
+        p.id,
+        p.name,
+        p.park_type as "parkType",
+        p.address,
+        p.area,
+        p.latitude,
+        p.longitude,
+        p.status,
+        pt.name as "typologyName",
+        pt.code as "typologyCode",
+        (
+          SELECT pi.image_url 
+          FROM park_images pi 
+          WHERE pi.park_id = p.id 
+          ORDER BY pi.is_primary DESC NULLS LAST, pi.id ASC
+          LIMIT 1
+        ) as "primaryImage"
+      FROM parks p
+      LEFT JOIN park_typology pt ON p.typology_id = pt.id
+      WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
+    `;
+
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    // Aplicar filtros
+    if (filters?.parkType) {
+      queryStr += ` AND p.park_type = $${paramIndex++}`;
+      params.push(filters.parkType);
+    }
+
+    if (filters?.postalCode) {
+      queryStr += ` AND p.postal_code = $${paramIndex++}`;
+      params.push(filters.postalCode);
+    }
+
+    if (filters?.search) {
+      queryStr += ` AND (
+        p.name ILIKE $${paramIndex} OR
+        COALESCE(p.description, '') ILIKE $${paramIndex} OR
+        p.address ILIKE $${paramIndex}
+      )`;
+      params.push(`%${filters.search}%`);
+      paramIndex++;
+    }
+
+    // Filtro de amenidades
+    if (filters?.amenities && filters.amenities.length > 0) {
+      queryStr += ` AND p.id IN (
+        SELECT pa.park_id 
+        FROM park_amenities pa 
+        WHERE pa.amenity_id = ANY($${paramIndex})
+        GROUP BY pa.park_id 
+        HAVING COUNT(DISTINCT pa.amenity_id) = $${paramIndex + 1}
+      )`;
+      params.push(filters.amenities);
+      params.push(filters.amenities.length);
+      paramIndex += 2;
+    }
+
+    queryStr += ` ORDER BY p.name`;
+
+    const result = await pool.query(queryStr, params);
+
+    // Normalizar URLs de imágenes
+    return result.rows.map(park => ({
+      ...park,
+      primaryImage: park.primaryImage ? replitObjectStorage.normalizeUrl(park.primaryImage) : null,
+      typology: park.typologyName ? {
+        name: park.typologyName,
+        code: park.typologyCode
+      } : null
+    }));
+
+  } catch (error) {
+    console.error("Error en getParksCardVariant:", error);
+    return [];
+  }
+}
+
+/**
+ * Variante FULL - Datos completos con amenidades y actividades
+ * Optimizada: usa agregación JSON en lugar de loops N+1
+ * 1 query principal + 2 queries de agregación
+ */
+export async function getParksFullVariant(filters?: {
+  parkType?: string;
+  postalCode?: string;
+  search?: string;
+  municipality?: string;
+  amenities?: number[];
+}): Promise<any[]> {
+  try {
+    // 1. Query principal de parques con tipología
+    let queryStr = `
+      SELECT 
+        p.id, p.name,
+        p.municipality_text as "municipalityText",
+        p.park_type as "parkType", 
+        p.description, 
+        p.address, 
+        p.postal_code as "postalCode", 
+        p.latitude, 
+        p.longitude, 
+        p.area, 
+        p.foundation_year as "foundationYear",
+        p.administrator, 
+        p.status,
+        p.regulation_url as "regulationUrl", 
+        p.opening_hours as "openingHours", 
+        p.contact_email as "contactEmail", 
+        p.contact_phone as "contactPhone",
+        p.video_url as "videoUrl", 
+        p.certificaciones, 
+        p.typology_id as "typologyId",
+        pt.name as "typologyName", 
+        pt.code as "typologyCode",
+        pt.normative_reference as "typologyNormativeReference", 
+        pt.country as "typologyCountry",
+        pt.min_area as "typologyMinArea", 
+        pt.max_area as "typologyMaxArea"
+      FROM parks p
+      LEFT JOIN park_typology pt ON p.typology_id = pt.id
+      WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
+    `;
+
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    // Aplicar filtros
+    if (filters?.parkType) {
+      queryStr += ` AND p.park_type = $${paramIndex++}`;
+      params.push(filters.parkType);
+    }
+
+    if (filters?.postalCode) {
+      queryStr += ` AND p.postal_code = $${paramIndex++}`;
+      params.push(filters.postalCode);
+    }
+
+    if (filters?.search) {
+      queryStr += ` AND (
+        p.name ILIKE $${paramIndex} OR
+        COALESCE(p.description, '') ILIKE $${paramIndex} OR
+        p.address ILIKE $${paramIndex}
+      )`;
+      params.push(`%${filters.search}%`);
+      paramIndex++;
+    }
+
+    if (filters?.amenities && filters.amenities.length > 0) {
+      queryStr += ` AND p.id IN (
+        SELECT pa.park_id 
+        FROM park_amenities pa 
+        WHERE pa.amenity_id = ANY($${paramIndex})
+        GROUP BY pa.park_id 
+        HAVING COUNT(DISTINCT pa.amenity_id) = $${paramIndex + 1}
+      )`;
+      params.push(filters.amenities);
+      params.push(filters.amenities.length);
+      paramIndex += 2;
+    }
+
+    queryStr += ` ORDER BY p.name`;
+
+    const parksResult = await pool.query(queryStr, params);
+    const parks = parksResult.rows;
+
+    if (parks.length === 0) {
+      return [];
+    }
+
+    // Obtener IDs de parques para las siguientes queries
+    const parkIds = parks.map(p => p.id);
+
+    // 2. Query de imágenes primarias (todas de una vez)
+    const imagesResult = await pool.query(`
+      SELECT DISTINCT ON (park_id)
+        park_id as "parkId",
+        image_url as "imageUrl"
+      FROM park_images
+      WHERE park_id = ANY($1)
+      ORDER BY park_id, is_primary DESC, id ASC
+    `, [parkIds]);
+
+    // Crear mapa de imágenes por park_id
+    const imagesMap = new Map<number, string>();
+    for (const img of imagesResult.rows) {
+      imagesMap.set(img.parkId, replitObjectStorage.normalizeUrl(img.imageUrl));
+    }
+
+    // 3. Query de amenidades (todas de una vez)
+    const amenitiesResult = await pool.query(`
+      SELECT 
+        pa.park_id as "parkId",
+        a.id,
+        a.name,
+        a.icon,
+        a.custom_icon_url as "customIconUrl",
+        pa.module_name as "moduleName",
+        pa.status
+      FROM park_amenities pa
+      INNER JOIN amenities a ON pa.amenity_id = a.id
+      WHERE pa.park_id = ANY($1)
+      ORDER BY a.name
+    `, [parkIds]);
+
+    // Crear mapa de amenidades por park_id
+    const amenitiesMap = new Map<number, any[]>();
+    for (const amenity of amenitiesResult.rows) {
+      const parkId = amenity.parkId;
+      if (!amenitiesMap.has(parkId)) {
+        amenitiesMap.set(parkId, []);
+      }
+      amenitiesMap.get(parkId)!.push({
+        id: amenity.id,
+        name: amenity.name,
+        icon: amenity.icon,
+        customIconUrl: amenity.customIconUrl,
+        moduleName: amenity.moduleName,
+        status: amenity.status
+      });
+    }
+
+    // 4. Query de actividades (todas de una vez) - solo cuenta y próximas
+    const activitiesResult = await pool.query(`
+      SELECT 
+        park_id as "parkId",
+        COUNT(*) as "totalActivities",
+        COUNT(*) FILTER (WHERE start_date >= CURRENT_DATE) as "upcomingActivities"
+      FROM activities
+      WHERE park_id = ANY($1)
+      GROUP BY park_id
+    `, [parkIds]);
+
+    // Crear mapa de conteo de actividades
+    const activitiesMap = new Map<number, { total: number; upcoming: number }>();
+    for (const act of activitiesResult.rows) {
+      activitiesMap.set(act.parkId, {
+        total: parseInt(act.totalActivities),
+        upcoming: parseInt(act.upcomingActivities)
+      });
+    }
+
+    // 5. Ensamblar resultado final
+    return parks.map(park => {
+      const typology = park.typologyId ? {
+        id: park.typologyId,
+        name: park.typologyName,
+        code: park.typologyCode,
+        normativeReference: park.typologyNormativeReference,
+        country: park.typologyCountry,
+        minArea: park.typologyMinArea,
+        maxArea: park.typologyMaxArea
+      } : undefined;
+
+      return {
+        id: park.id,
+        name: park.name,
+        municipalityText: park.municipalityText,
+        parkType: park.parkType,
+        description: park.description,
+        address: park.address,
+        postalCode: park.postalCode,
+        latitude: park.latitude,
+        longitude: park.longitude,
+        area: park.area,
+        foundationYear: park.foundationYear,
+        administrator: park.administrator,
+        status: park.status,
+        regulationUrl: park.regulationUrl,
+        openingHours: park.openingHours,
+        contactEmail: park.contactEmail,
+        contactPhone: park.contactPhone,
+        videoUrl: park.videoUrl,
+        certificaciones: park.certificaciones,
+        // Campos enriquecidos
+        primaryImage: imagesMap.get(park.id) || null,
+        mainImageUrl: imagesMap.get(park.id) || null,
+        amenities: amenitiesMap.get(park.id) || [],
+        activitiesCount: activitiesMap.get(park.id) || { total: 0, upcoming: 0 },
+        typology: typology,
+        // Campos de compatibilidad
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        active: true
+      };
+    });
+
+  } catch (error) {
+    console.error("Error en getParksFullVariant:", error);
+    return [];
+  }
+}

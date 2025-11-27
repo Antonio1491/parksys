@@ -305,7 +305,10 @@
     "settings": "Loading settings...",
     "reports": "Loading reports...",
     "analytics": "Loading analytics...",
-    "test": "Loading test page..."
+    "test": "Loading test page...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "processing": "Processing..."
   },
   "footer": {
     "mainNav": "Navigation",
@@ -339,7 +342,35 @@
     "phone": "Tel: (999) 757 0503",
     "email": "parquesdemexico@gmail.com",
     "hours": "Hours",
-    "schedule": "Monday to Friday: 8:00 AM - 3:00 PM",
+    "schedule": "Monday to Friday: 8:00 AM - 5:00 PM",
     "copyright": "© {{year}} Parques de México. All rights reserved."
+  },
+  "error": {
+    "title": "An error occurred",
+    "generic": "Could not complete the operation. Please try again.",
+    "retry": "Retry",
+    "tryAgain": "Try again",
+    "network": "Connection error. Check your internet connection.",
+    "unauthorized": "You don't have permission to perform this action.",
+    "notFound": "The requested resource does not exist.",
+    "serverError": "Server error. Please try again later.",
+    "publicMessage": "We're working to fix this",
+    "publicSecondary": "Please try again in a few minutes"
+  },
+  "empty": {
+    "title": "No results",
+    "description": "No items found to display.",
+    "noParks": "No parks available at this time",
+    "noParksPublic": "More green spaces coming soon",
+    "noActivities": "No activities available",
+    "noActivitiesPublic": "New activities coming soon",
+    "noEvents": "No scheduled events",
+    "noEventsPublic": "New events will be announced soon",
+    "noTrees": "No trees registered",
+    "noFauna": "No fauna records",
+    "noVolunteers": "No volunteers registered",
+    "noConcessions": "No active concessions",
+    "noResults": "No results found",
+    "noResultsPublic": "Try adjusting your search criteria"
   }
 }

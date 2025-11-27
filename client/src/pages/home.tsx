@@ -2,12 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import ROUTES from '@/routes';
 import { useQuery } from '@tanstack/react-query';
-import { Map, ArrowRight, MapPin, Trees, Users, Calendar, Sparkles, TrendingUp, Zap, Leaf, Shield, Heart, BookOpen, GraduationCap, Target, Award, ChevronLeft, ChevronRight, Sprout, Handshake } from 'lucide-react';
+import { 
+  Map, 
+  ArrowRight,  
+  Trees, 
+  Users, 
+  Calendar, 
+  GraduationCap, 
+  Award, 
+  ChevronLeft, 
+  ChevronRight, 
+  Sprout,
+  Star,
+  Handshake 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AdSpaceIntelligent from '@/components/AdSpaceIntelligent';
 import { ExtendedPark } from '@shared/schema';
 import PublicLayout from '@/components/PublicLayout';
+import LoadingState from '@/components/LoadingState';
+import ErrorState from '@/components/ErrorState';
+import EmptyState from '@/components/EmptyState';
 
 const Home: React.FC = () => {
   // Estado para forzar actualización de anuncios estáticos
@@ -40,27 +56,27 @@ const Home: React.FC = () => {
   }, []);
   
   // Fetch a few featured parks
-  const { data: parksResponse, isLoading } = useQuery<ExtendedPark[]>({
+  const { data: parksResponse, isLoading, error: parksError, refetch: refetchParks } = useQuery<ExtendedPark[]>({
     queryKey: ['/api/parks'],
   });
   
   // Fetch sponsors para la sección de patrocinadores
-  const { data: sponsors = [], isLoading: sponsorsLoading } = useQuery<any[]>({
+  const { data: sponsors = [], isLoading: sponsorsLoading, error: sponsorsError, refetch: refetchSponsors } = useQuery<any[]>({
     queryKey: ['/api/sponsors'],
   });
   
   // Fetch eventos para la sección de eventos
-  const { data: eventsResponse = [], isLoading: eventsLoading } = useQuery<any[]>({
+  const { data: eventsResponse = [], isLoading: eventsLoading, error: eventsError, refetch: refetchEvents } = useQuery<any[]>({
     queryKey: ['/api/events'],
   });
 
   // Fetch activities para la sección de actividades
-  const { data: activitiesResponse = [], isLoading: activitiesLoading } = useQuery<any[]>({
+  const { data: activitiesResponse = [], isLoading: activitiesLoading, error: activitiesError, refetch: refetchActivities } = useQuery<any[]>({
     queryKey: ['/api/activities-summary-data'],
   });
 
   // Fetch instructors para la sección de instructores
-  const { data: instructorsResponse = [], isLoading: instructorsLoading } = useQuery<any[]>({
+  const { data: instructorsResponse = [], isLoading: instructorsLoading, error: instructorsError, refetch: refetchInstructors } = useQuery<any[]>({
     queryKey: ['/public-api/instructors/public'],
   });
   
@@ -234,13 +250,21 @@ const Home: React.FC = () => {
           <div className="relative mb-12 h-[520px] w-screen left-1/2 transform -translate-x-1/2">
             <div className="flex items-center h-full w-full overflow-hidden">
               {isLoading ? (
-                // Loading skeleton
-                <div className="flex w-full h-full items-center justify-center">
-                  <div className="w-[50vw] h-full">
-                    <Card className="animate-pulse rounded-4xl overflow-hidden h-full w-full">
-                    </Card>
-                  </div>
-                </div>
+                <LoadingState 
+                  variant="public" 
+                  message="Descubriendo parques..." 
+                  minHeight="520px"
+                  size="lg"
+                />
+              ) : parksError ? (
+                <ErrorState 
+                  variant="public"
+                  title="No pudimos cargar los parques"
+                  message="Estamos trabajando para solucionarlo"
+                  secondaryText="Por favor, intenta de nuevo en unos minutos"
+                  onRetry={refetchParks}
+                  size="lg"
+                />
               ) : featuredParks.length > 0 ? (
                 <div className="flex items-center h-full w-full">
                   {/* Carousel container con vista de 3 tarjetas */}
@@ -326,17 +350,16 @@ const Home: React.FC = () => {
                     )}
                   </div>
                 </div>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Trees className="h-12 w-12 text-gray-400" />
-                    </div>
-                    <p className="text-xl text-gray-500 mb-4">No hay parques disponibles en este momento</p>
-                    <p className="text-gray-400">Pronto estarán disponibles más espacios verdes</p>
-                  </div>
-                </div>
-              )}
+    ) : (
+      <EmptyState
+        variant="public"
+        icon={<Trees className="h-12 w-12" />}
+        title="No hay parques disponibles en este momento"
+        description="Estamos trabajando para traerte los mejores espacios"
+        secondaryText="Pronto estarán disponibles más espacios verdes"
+        size="lg"
+      />
+    )}
             </div>
             
             {/* Controles de navegación */}
@@ -372,7 +395,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 🏛️ SISTEMA DE PARQUES DE MEXICO SECTION */}
+      {/* 🏛️ SISTEMA DE PARQUES EN MEXICO SECTION */}
       <section className="py-20 bg-[#00444f]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -380,7 +403,7 @@ const Home: React.FC = () => {
               <span style={{ fontFamily: 'Guttery, Georgia, Times, serif', color: '#f4f5f7', fontWeight: '300' }}>Somos el</span><br />
               <span style={{ color: '#f4f5f7' }}>Sistema</span><br />
               <span style={{ color: '#14b8a6' }}>Parques</span>
-              <span style={{ color: '#a8bd7d' }}> de México</span>
+              <span style={{ color: '#a8bd7d' }}> en México</span>
             </h2>
             <p className="text-lg font-poppins font-regular text-[#f4f5f7] max-w-4xl mx-auto leading-relaxed">
               Una red que integra y fortalece los espacios públicos del país, reconociendo a<br />
@@ -520,10 +543,21 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tarjeta actividades */}
-          <div className="bg-gradient-to-br from-[#14b8a6] to-[#a8bd7d] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer" onClick={() => window.location.href = ROUTES.public.activities}>
+          <div 
+            className="bg-gradient-to-br from-[#14b8a6] to-[#a8bd7d] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer" 
+            onClick={() => window.location.href = ROUTES.public.activities}
+          >
             {activitiesLoading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            ) : activitiesError ? (
+              <div className="flex items-center justify-center h-full text-center">
+                <div>
+                  <Calendar className="h-8 w-8 mx-auto mb-2 opacity-75" />
+                  <div className="font-semibold">Error al cargar</div>
+                  <div className="text-sm opacity-90">Toca para reintentar</div>
+                </div>
               </div>
             ) : featuredActivities.length > 0 ? (
               <div className="h-full flex flex-col justify-between">
@@ -562,10 +596,21 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tarjeta instructores */}
-          <div className="bg-gradient-to-br from-[#a8bd7d] to-[#00444f] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer md:col-start-1" onClick={() => window.location.href = ROUTES.public.instructors}>
+          <div 
+            className="bg-gradient-to-br from-[#a8bd7d] to-[#00444f] rounded-xl h-40 p-6 text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer md:col-start-1" 
+            onClick={() => window.location.href = ROUTES.public.instructors}
+          >
             {instructorsLoading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            ) : instructorsError ? (
+              <div className="flex items-center justify-center h-full text-center">
+                <div>
+                  <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-75" />
+                  <div className="font-semibold">Error al cargar</div>
+                  <div className="text-sm opacity-90">Toca para reintentar</div>
+                </div>
               </div>
             ) : featuredInstructors.length > 0 ? (
               <div className="h-full flex flex-col justify-between">
@@ -651,6 +696,18 @@ const Home: React.FC = () => {
                 </div>
               ))}
             </div>
+          ) : eventsError ? (
+            <div className="text-center text-white py-12">
+              <Calendar className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <p className="text-xl mb-2">No pudimos cargar los eventos</p>
+              <p className="text-lg opacity-75 mb-4">Hubo un problema al conectar con el servidor</p>
+              <button 
+                onClick={(e) => { e.preventDefault(); refetchEvents(); }}
+                className="px-6 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-white"
+              >
+                Reintentar
+              </button>
+            </div>
           ) : featuredEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {featuredEvents.map((event: any, index: number) => {
@@ -661,10 +718,10 @@ const Home: React.FC = () => {
                   { bg: 'bg-purple-100/90', icon: 'text-purple-600', text: 'text-purple-600' }
                 ];
                 const colors = eventColors[index % eventColors.length];
-                
+
                 // Enlace dinámico usando el ID real del evento
                 const eventLink = ROUTES.public.eventDetail.build(event.id);
-                
+
                 return (
                   <Link key={event.id} href={eventLink}>
                     <div className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 h-[500px] flex flex-col cursor-pointer">
@@ -773,10 +830,22 @@ const Home: React.FC = () => {
                   </div>
                 </div>
               ))
+            ) : sponsorsError ? (
+              // Error state
+              <div className="col-span-full text-center py-8">
+                <div className="text-gray-400 text-4xl mb-4">⚠️</div>
+                <p className="text-gray-500 mb-2">No pudimos cargar los patrocinadores</p>
+                <button 
+                  onClick={() => refetchSponsors()}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Reintentar
+                </button>
+              </div>
             ) : sponsors.length > 0 ? (
               // Mostrar patrocinadores reales
               sponsors
-                .filter((sponsor: any) => sponsor.status === 'activo' && sponsor.logo) // Solo activos con logo
+                .filter((sponsor: any) => sponsor.status === 'activo' && sponsor.logo)
                 .map((sponsor: any, index: number) => (
                   <div key={sponsor.id || index} className="group">
                     <div 
@@ -794,7 +863,6 @@ const Home: React.FC = () => {
                             alt={`Logo de ${sponsor.name}`}
                             className="w-full h-20 mx-auto object-contain rounded-lg"
                             onError={(e) => {
-                              // Fallback si la imagen no carga
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
                               target.nextElementSibling?.classList.remove('hidden');

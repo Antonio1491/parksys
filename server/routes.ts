@@ -1459,58 +1459,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(exportRoutes);
   console.log('✅ Rutas de exportación registradas');
 
-  // Get all parks with option to filter
+  // Get all parks with option to filter - OPTIMIZADO CON VARIANTES
   apiRouter.get("/parks", async (req: Request, res: Response) => {
+    console.log("🚀 [PARKS] Endpoint llamado, query:", req.query);
     try {
-      // Importamos la función de consulta directa que maneja las imágenes
-      const { getParksDirectly } = await import('./direct-park-queries');
-      
-      // Preparamos los filtros basados en los parámetros de la consulta
+      const { 
+        getParksListVariant, 
+        getParksCardVariant, 
+        getParksFullVariant,
+        getParksDirectly 
+      } = await import('./direct-park-queries');
+
+      // Determinar variante solicitada
+      const variant = String(req.query.variant || 'full').toLowerCase();
+
+      console.log(`📊 [PARKS] Variante solicitada: ${variant}`);
+
+      // Variante LIST - Para dropdowns
+      if (variant === 'list') {
+        const parks = await getParksListVariant();
+        console.log(`📊 [PARKS-LIST] Devolviendo ${parks.length} parques`);
+        return res.json(parks);
+      }
+
+      // Preparar filtros para otras variantes
       const filters: any = {};
-      
+
       if (req.query.parkType) {
         filters.parkType = String(req.query.parkType);
       }
-      
+
       if (req.query.postalCode) {
         filters.postalCode = String(req.query.postalCode);
       }
-      
+
       if (req.query.municipality) {
         filters.municipality = String(req.query.municipality);
       }
-      
+
       if (req.query.search) {
         filters.search = String(req.query.search);
       }
-      
-      // Filtro de amenidades - convertir string de IDs separados por comas a array de números
+
+      // Filtro de amenidades
       if (req.query.amenities) {
         const amenityIds = String(req.query.amenities)
           .split(',')
           .map(id => parseInt(id.trim()))
           .filter(id => !isNaN(id));
-        
+
         if (amenityIds.length > 0) {
           filters.amenities = amenityIds;
         }
       }
-      
-      // Obtenemos los parques con sus imágenes y amenidades
-      const parks = await getParksDirectly(filters);
-      
-      // Si la consulta viene específicamente para formularios (tiene parámetro 'simple'), devolver solo id y name
-      if (req.query.simple === 'true') {
-        const simplifiedParks = parks.map(park => ({
-          id: park.id,
-          name: park.name,
-          location: park.location
-        }));
-        res.json(simplifiedParks);
-      } else {
-        // Para la administración, devolver datos completos
-        res.json({ data: parks });
+
+      // Variante CARD - Para grids de tarjetas
+      if (variant === 'card') {
+        const parks = await getParksCardVariant(filters);
+        console.log(`📊 [PARKS-CARD] Devolviendo ${parks.length} parques`);
+        return res.json({ data: parks });
       }
+
+      // Variante FULL (default) - Datos completos optimizados
+      if (variant === 'full' || variant === 'optimized') {
+        const parks = await getParksFullVariant(filters);
+        console.log(`📊 [PARKS-FULL] Devolviendo ${parks.length} parques`);
+        return res.json({ data: parks });
+      }
+
+      // Variante LEGACY - Mantiene comportamiento anterior (para compatibilidad)
+      if (variant === 'legacy') {
+        const parks = await getParksDirectly(filters);
+
+        if (req.query.simple === 'true') {
+          const simplifiedParks = parks.map(park => ({
+            id: park.id,
+            name: park.name,
+            location: park.location
+          }));
+          return res.json(simplifiedParks);
+        }
+
+        return res.json({ data: parks });
+      }
+
+      // Default: usar FULL optimizado
+      const parks = await getParksFullVariant(filters);
+      console.log(`📊 [PARKS-DEFAULT] Devolviendo ${parks.length} parques`);
+      res.json({ data: parks });
+
     } catch (error) {
       console.error("Error al obtener parques:", error);
       res.status(500).json({ message: "Error fetching parks" });

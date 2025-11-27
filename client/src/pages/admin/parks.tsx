@@ -403,8 +403,8 @@ const AdminParksContent = () => {
     isError: isErrorParks,
     refetch: refetchParks
   } = useQuery<{data: Park[]}>({
-    queryKey: ['/api/parks'],
-    queryFn: () => apiRequest('/api/parks'),
+    queryKey: ['/api/parks?variant=full'],
+    queryFn: () => apiRequest('/api/parks?variant=full'),
     refetchOnWindowFocus: false,    // DEPLOYMENT FIX: Disabled to prevent deployment hanging
     refetchInterval: false,        // DEPLOYMENT FIX: Disabled auto-refresh to prevent deployment hanging
     staleTime: 10000,              // ✅ Datos frescos por 10 segundos
@@ -413,8 +413,8 @@ const AdminParksContent = () => {
 
   // Fetch parks with images for better visual display
   const { data: parksWithImagesResponse } = useQuery<{data: any[]}>({
-    queryKey: ['/api/parks-with-images'], 
-    queryFn: () => apiRequest('/api/parks-with-images'),
+    queryKey: ['/api/parks?variant=card'], 
+    queryFn: () => apiRequest('/api/parks?variant=card'),
     staleTime: 30000, // Cache for 30 seconds
   });
   
