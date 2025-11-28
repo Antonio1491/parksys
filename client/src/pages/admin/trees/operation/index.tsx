@@ -97,6 +97,7 @@ interface ParkArea {
   createdAt: string;
   updatedAt: string;
   treeCount?: number;
+  imageUrl?: string;
 }
 
 function TreeMapPage() {
@@ -1062,9 +1063,17 @@ function TreeMapPage() {
                 )}
 
                 <div className="h-48 bg-gradient-to-br from-[#ceefea] to-[#00a587] relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <MapPin className="h-16 w-16 text-white/50" />
-                  </div>
+                  {area.imageUrl ? (
+                    <img
+                      src={area.imageUrl}
+                      alt={area.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <MapPin className="h-16 w-16 text-white/50" />
+                    </div>
+                  )}
                   {area.status === 'inactiva' && (
                     <div className="absolute top-2 right-2">
                       <Badge variant="secondary">Inactiva</Badge>

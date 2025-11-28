@@ -86,7 +86,7 @@ const ModuleNav: React.FC<ModuleNavProps> = ({ title, icon, children, value }) =
         hoverBg: 'hover:bg-sidebar-hover',
         bgColor: '#61B1A0',
       },
-      gestion: {
+      management: {
         iconColor: 'text-white',
         textColor: 'text-white',
         hoverBg: 'hover:bg-sidebar-hover',
