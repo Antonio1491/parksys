@@ -103,7 +103,8 @@ export const PUBLIC_ROUTES = {
 // ============================================
 
 export const AUTH_ROUTES = {
-  login: "/login",
+  login: "/admin/login",
+  accessDenied: "/admin/access-denied",
 
   // Duplicidad adminLogin: '/admin/login',
   // Obsolete resetPassword: '/admin/reset-password',
@@ -166,6 +167,7 @@ export const ADMIN_PARKS = {
     path: "/admin/parks/:id/edit",
     build: (id: string | number) => `/admin/parks/${id}/edit`,
   },
+  import: "/admin/parks/import",
 } as const;
 
 // ============================================

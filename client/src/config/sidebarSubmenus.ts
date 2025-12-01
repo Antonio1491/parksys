@@ -93,8 +93,9 @@ export const sidebarSubmenus = {
   ],
   trees: [
     ROUTES.admin.trees.list,
-    ROUTES.admin.trees.operation,
     ROUTES.admin.trees.create,
+    ROUTES.admin.trees.operation,
+    ROUTES.admin.trees.operationDetail.path,
     ROUTES.admin.trees.species.list,
     ROUTES.admin.trees.species.create,
     ROUTES.admin.trees.maintenance.list,

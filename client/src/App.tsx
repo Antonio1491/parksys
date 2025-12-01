@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileCompletionProvider } from "@/components/ProfileCompletionContext";
 import "./i18n";
 import { ROUTES } from '@/routes';
+import { AdminRouteGuard, AdminLoadingGuard, AccessDeniedPage } from '@/components/AdminRouteWrapper';
 
 // ============================================
 // COMPONENTES REUTILIZABLES
@@ -118,6 +119,10 @@ function Router() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Guard de permisos - se ejecuta en cada cambio de ruta */}
+      <AdminRouteGuard />
+      {/* Loading overlay mientras se verifican permisos */}
+      <AdminLoadingGuard />
         <Switch>
 
           {/* ========================================== */}
@@ -285,10 +290,11 @@ function Router() {
           </Route>
 
           {/* ========================================== */}
-          {/* AUTENTICACIÓN                              */}
+          {/* AUTENTICACIÓN Y ACCESO DENEGADO            */}
           {/* ========================================== */}
 
           <Route path={ROUTES.auth.login} component={AdminLogin} />
+          <Route path={ROUTES.auth.accessDenied} component={AccessDeniedPage} />
 
           {/* ========================================== */}
           {/* DASHBOARDS ADMINISTRATIVOS ✅ REFACTORIZADOS */}
@@ -420,6 +426,11 @@ function Router() {
           <Route path={ROUTES.admin.parks.edit.path}>
             <Suspense fallback={<LoadingPage messageKey="loading.parkManagement" />}>
               {React.createElement(React.lazy(() => import('@/pages/admin/park-manage')))}
+            </Suspense>
+          </Route>
+          <Route path={ROUTES.admin.parks.import}>
+            <Suspense fallback={<LoadingPage messageKey="loading.parkManagement" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/parks-import')))}
             </Suspense>
           </Route>
 
@@ -1394,11 +1405,10 @@ function Router() {
               {React.createElement(React.lazy(() => import('@/pages/help/ActividadesManual')))}
             </Suspense>
           </Route>
-
+      
           {/* 404 - Not Found */}
           <Route component={NotFound} />
-
-        </Switch>
+      </Switch>
     </div>
   );
 }

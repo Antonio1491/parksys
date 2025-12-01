@@ -6,7 +6,8 @@ import path from "path";
 import fs from "fs";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { isAuthenticated, hasMunicipalityAccess, hasParkAccess, requirePermission, requireAdmin } from "./middleware/auth";
+import { requirePermission } from './middleware/requirePermission';
+import { isAuthenticated, hasMunicipalityAccess, hasParkAccess, requireAdmin } from "./middleware/auth";
 import { handleProfileImageUpload } from "./api/profileImageUpload";
 import { saveProfileImage, getProfileImage } from "./profileImageCache";
 import { db, pool } from "./db";
@@ -2937,7 +2938,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new park - Simplified version without automation
-  apiRouter.post("/parks", async (req: Request, res: Response) => {
+  apiRouter.post("/parks", isAuthenticated, requirePermission('management:parks:parks:create'),
+                 async (req: Request, res: Response) => {
     try {
       console.log('🚀 Recibiendo petición de creación de parque:', req.body);
 
@@ -2995,7 +2997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Import parks from Excel/CSV - Version robusta con manejo de errores
-  apiRouter.post("/parks/import", isAuthenticated, upload.single('file'), async (req: Request, res: Response) => {
+  apiRouter.post("/parks/import", isAuthenticated, requirePermission('management:parks:parks:create'), upload.single('file'), async (req: Request, res: Response) => {
     try {
       console.log("🚀 [ROUTES] Iniciando importación de parques");
       console.log("📁 [ROUTES] Archivo recibido:", req.file ? req.file.filename : "No hay archivo");
@@ -3035,7 +3037,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Ruta normal para actualizar un parque (con verificación de permisos)
-  apiRouter.put("/parks/:id", isAuthenticated, async (req: Request, res: Response) => {
+  apiRouter.put("/parks/:id", isAuthenticated, requirePermission('management:parks:parks:edit'), async (req: Request, res: Response) => {
     try {
       console.log(`🔄 [PUT /parks/:id] Petición recibida para parque: ${req.params.id}`);
       console.log("🔄 [PUT /parks/:id] Datos del cuerpo:", JSON.stringify(req.body));
@@ -3065,57 +3067,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ENDPOINT DE PRUEBA PARA CERTIFICACIONES
-  apiRouter.put("/test/parks/:id/certificaciones", async (req: Request, res: Response) => {
-    console.log("🚀 ENDPOINT DE PRUEBA CERTIFICACIONES EJECUTÁNDOSE");
-    console.log("Park ID:", req.params.id);
-    console.log("Body:", req.body);
-    
-    try {
-      const result = await pool.query(
-        'UPDATE parks SET certificaciones = $1, updated_at = NOW() WHERE id = $2 RETURNING certificaciones',
-        [req.body.certificaciones, Number(req.params.id)]
-      );
-      
-      if (result.rows.length > 0) {
-        console.log("✅ CERTIFICACIONES ACTUALIZADAS:", result.rows[0].certificaciones);
-        return res.json({ success: true, certificaciones: result.rows[0].certificaciones });
-      } else {
-        return res.status(404).json({ error: "Park not found" });
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-  });
-
-  // RUTA ESPECIAL PARA DESARROLLO - Sin verificación de permisos y con actualización directa a BD
-  apiRouter.put("/dev/parks/:id", async (req: Request, res: Response) => {
-    try {
-      console.log("=== DESARROLLO - Actualizando parque directamente ===");
-      console.log("Park ID:", req.params.id);
-      console.log("Datos recibidos:", req.body);
-      
-      const parkId = Number(req.params.id);
-      const parkData = req.body;
-      
-      // Actualizar usando el storage directamente
-      const updatedPark = await storage.updatePark(parkId, parkData);
-      
-      if (!updatedPark) {
-        return res.status(404).json({ message: "Park not found" });
-      }
-      
-      console.log("✅ PARQUE ACTUALIZADO EXITOSAMENTE");
-      return res.json(updatedPark);
-    } catch (error) {
-      console.error("Error updating park:", error);
-      res.status(500).json({ message: "Error updating park" });
-    }
-  });
-
-  // Delete a park (admin/municipality only)
-  apiRouter.delete("/parks/:id", isAuthenticated, async (req: Request, res: Response) => {
+   // Delete a park (admin/municipality only)
+  apiRouter.delete("/parks/:id", isAuthenticated, requirePermission('management:parks:parks:delete'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
       console.log(`Solicitud de eliminación para parque ${parkId}`);
@@ -3169,39 +3122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Ruta temporal de desarrollo para eliminar parques sin autenticación
-  apiRouter.delete("/dev/parks/:id", async (req: Request, res: Response) => {
-    try {
-      const parkId = Number(req.params.id);
-      console.log(`Eliminación de desarrollo para parque ${parkId}`);
-      
-      // Usar una transacción con CASCADE para eliminar todo
-      await db.execute(sql`
-        BEGIN;
-        SET session_replication_role = replica;
-        DELETE FROM trees WHERE park_id = ${parkId};
-        DELETE FROM tree_inventory WHERE park_id = ${parkId};
-        DELETE FROM tree_maintenances WHERE park_id = ${parkId};
-        DELETE FROM park_amenities WHERE park_id = ${parkId};
-        DELETE FROM park_images WHERE park_id = ${parkId};
-        DELETE FROM activities WHERE park_id = ${parkId};
-        DELETE FROM incidents WHERE park_id = ${parkId};
-        DELETE FROM comments WHERE park_id = ${parkId};
-        DELETE FROM parks WHERE id = ${parkId};
-        SET session_replication_role = DEFAULT;
-        COMMIT;
-      `);
-      
-      console.log(`Parque ${parkId} eliminado exitosamente (desarrollo)`);
-      res.status(200).json({ message: "Park deleted successfully" });
-    } catch (error) {
-      console.error("Error al eliminar parque:", error);
-      await db.execute(sql`ROLLBACK;`);
-      res.status(500).json({ message: "Error deleting park", error: error.message });
-    }
-  });
-
-  // Get all amenities - Con DISTINCT para evitar duplicados
+    // Get all amenities - Con DISTINCT para evitar duplicados
   apiRouter.get("/amenities", async (_req: Request, res: Response) => {
     try {
       console.log("[AMENITIES] Obteniendo todas las amenidades...");
@@ -3588,7 +3509,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update specific amenity in a park
-  apiRouter.put("/parks/:parkId/amenities/:amenityId", async (req: Request, res: Response) => {
+  apiRouter.put("/parks/:parkId/amenities/:amenityId", isAuthenticated, requirePermission('management:parks:parks:edit'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.parkId);
       const amenityId = Number(req.params.amenityId);
@@ -3623,7 +3544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete specific amenity from a park
-  apiRouter.delete("/parks/:parkId/amenities/:amenityId", async (req: Request, res: Response) => {
+  apiRouter.delete("/parks/:parkId/amenities/:amenityId", isAuthenticated, requirePermission('management:parks:parks:delete'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.parkId);
       const parkAmenityId = Number(req.params.amenityId); // Este es el ID del registro park_amenities, no el amenity_id
@@ -3648,80 +3569,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test endpoint for amenities - different path to avoid conflicts
-  apiRouter.get("/test-amenities/:parkId", async (req: Request, res: Response) => {
-    console.log(`[TEST AMENITIES] Ejecutándose para parque ${req.params.parkId}`);
-    
-    try {
-      const parkId = Number(req.params.parkId);
-      console.log(`[TEST AMENITIES] Buscando amenidades para parque ${parkId}`);
-      
-      const result = await pool.query(`
-        SELECT 
-          pa.id,
-          pa.park_id as "parkId",
-          pa.amenity_id as "amenityId",
-          pa.module_name as "moduleName",
-          pa.location_latitude as "locationLatitude",
-          pa.location_longitude as "locationLongitude", 
-          pa.surface_area as "surfaceArea",
-          pa.status,
-          pa.description,
-          a.name as "amenityName",
-          a.icon as "amenityIcon"
-        FROM park_amenities pa
-        INNER JOIN amenities a ON pa.amenity_id = a.id
-        WHERE pa.park_id = $1
-        ORDER BY a.name
-      `, [parkId]);
-      
-      console.log(`[TEST AMENITIES] Resultado: ${result.rows.length} amenidades encontradas`);
-      if (result.rows.length > 0) {
-        console.log(`[TEST AMENITIES] Primera amenidad:`, result.rows[0]);
-      }
-      
-      res.json({
-        success: true,
-        parkId: parkId,
-        count: result.rows.length,
-        amenities: result.rows
-      });
-    } catch (error) {
-      console.error("[TEST AMENITIES] Error completo:", error);
-      res.status(500).json({ success: false, error: "Error fetching park amenities" });
-    }
-  });
-
-  // Test endpoint without auth
-  apiRouter.post("/test/parks/:id/amenities", async (req: Request, res: Response) => {
-    try {
-      const parkId = Number(req.params.id);
-      const amenityId = Number(req.body.amenityId);
-      
-      console.log("TEST - Datos recibidos:", { parkId, amenityId, body: req.body });
-      
-      const result = await db.execute(`
-        INSERT INTO park_amenities (park_id, amenity_id, module_name, location_latitude, location_longitude, surface_area, status, description)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING *
-      `, [parkId, amenityId, req.body.moduleName || '', req.body.locationLatitude || null, req.body.locationLongitude || null, req.body.surfaceArea || null, req.body.status || 'Activa', req.body.description || '']);
-      
-      console.log("TEST - Resultado:", result);
-      res.status(201).json(result.rows[0]);
-    } catch (error) {
-      console.error("TEST - Error:", error);
-      res.status(500).json({ 
-        message: "Test error",
-        details: error.message 
-      });
-    }
-  });
-
   // NOTA: Endpoint duplicado eliminado - usando el endpoint principal de línea 1423
   // que incluye certificaciones y todos los campos necesarios
 
   // Bulk delete parks
-  apiRouter.post("/parks/bulk-delete", async (req: Request, res: Response) => {
+  apiRouter.post("/parks/bulk-delete", isAuthenticated, requirePermission('management:parks:parks:delete'), async (req: Request, res: Response) => {
     try {
       const { parkIds } = req.body;
       
@@ -4066,7 +3918,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Add amenity to park
-  apiRouter.post("/parks/:parkId/amenities", async (req: Request, res: Response) => {
+  apiRouter.post("/parks/:parkId/amenities", isAuthenticated, requirePermission('management:parks:parks:edit'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.parkId);
       const { amenityId, moduleName, surfaceArea, status, description } = req.body;
@@ -4106,32 +3958,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error asignando amenidad al parque:", error);
       res.status(500).json({ message: "Error al asignar amenidad al parque" });
-    }
-  });
-
-  // Este endpoint fue eliminado para evitar duplicación con /parks/:id/amenities
-
-  // Remove an amenity from a park (admin/municipality only)
-  apiRouter.delete("/parks/:parkId/amenities/:amenityId", async (req: Request, res: Response) => {
-    try {
-      const parkId = Number(req.params.parkId);
-      const amenityId = Number(req.params.amenityId);
-      
-      // Delete the park amenity relationship
-      const result = await pool.query(`
-        DELETE FROM park_amenities 
-        WHERE park_id = $1 AND amenity_id = $2
-        RETURNING *
-      `, [parkId, amenityId]);
-      
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: "Amenidad no encontrada en este parque" });
-      }
-      
-      res.json({ message: "Amenidad removida correctamente del parque" });
-    } catch (error) {
-      console.error("Error removiendo amenidad del parque:", error);
-      res.status(500).json({ message: "Error al remover amenidad del parque" });
     }
   });
 
@@ -4197,7 +4023,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Asignar voluntario a un parque
-  apiRouter.post("/parks/:id/volunteers", isAuthenticated, async (req: Request, res: Response) => {
+  apiRouter.post("/parks/:id/volunteers", isAuthenticated, requirePermission('management:parks:parks:edit'), async (req: Request, res: Response) => {
     try {
       const parkId = parseInt(req.params.id);
       const { volunteerId } = req.body;
@@ -4269,7 +4095,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Remover voluntario de un parque
-  apiRouter.delete("/parks/:id/volunteers/:volunteerId", async (req: Request, res: Response) => {
+  apiRouter.delete("/parks/:id/volunteers/:volunteerId", isAuthenticated, requirePermission('management:parks:parks:edit'), async (req: Request, res: Response) => {
     try {
       const parkId = parseInt(req.params.id);
       const volunteerId = parseInt(req.params.volunteerId);
@@ -4329,7 +4155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Add an image to a park (admin/municipality only) - ✅ UPDATED FOR OBJECT STORAGE & FORMDATA  
-  apiRouter.post("/parks/:id/images", isAuthenticated, parkImageUpload.single('image'), async (req: Request, res: Response) => {
+  apiRouter.post("/parks/:id/images", isAuthenticated, requirePermission('management:parks:parks:edit'), parkImageUpload.single('image'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.id);
       console.log(`🔄 [PARK-IMAGES] POST request para parque ${parkId}`);
@@ -4459,7 +4285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete an image from a park (admin/municipality only)
-  apiRouter.delete("/parks/:parkId/images/:imageId", isAuthenticated, async (req: Request, res: Response) => {
+  apiRouter.delete("/parks/:parkId/images/:imageId", isAuthenticated, requirePermission('management:parks:parks:edit'), async (req: Request, res: Response) => {
     try {
       const parkId = Number(req.params.parkId);
       const imageId = Number(req.params.imageId);
@@ -4787,37 +4613,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       console.error(`❌ Error eliminando documento ${req.params.documentId}:`, error);
-      res.status(500).json({ message: "Error removing document from park" });
-    }
-  });
-
-  // Ruta especial para eliminar documentos durante el desarrollo (sin autenticación)
-  apiRouter.delete("/dev/parks/:parkId/documents/:documentId", async (req: Request, res: Response) => {
-    try {
-      const parkId = Number(req.params.parkId);
-      const documentId = Number(req.params.documentId);
-      
-      // Verificamos que el documento pertenezca al parque especificado
-      const document = await storage.getDocument(documentId);
-      if (!document) {
-        return res.status(404).json({ message: "Document not found" });
-      }
-      
-      if (document.parkId !== parkId) {
-        return res.status(400).json({ 
-          message: "El documento no pertenece al parque especificado" 
-        });
-      }
-      
-      const result = await storage.deleteDocument(documentId);
-      
-      if (!result) {
-        return res.status(404).json({ message: "Document not found" });
-      }
-      
-      res.status(204).send();
-    } catch (error) {
-      console.error(error);
       res.status(500).json({ message: "Error removing document from park" });
     }
   });
@@ -5189,15 +4984,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("🎯 Error al obtener actividades:", error);
       res.status(500).json({ message: "Error al recuperar actividades" });
     }
-  });
-
-
-  
-  // TEST ENDPOINT - Sin middleware de autenticación
-  apiRouter.post("/activities-test", async (req: Request, res: Response) => {
-    console.log("🧪 TEST ENDPOINT ALCANZADO");
-    console.log("🧪 Body:", JSON.stringify(req.body, null, 2));
-    res.status(200).json({ message: "Test endpoint funcionando", data: req.body });
   });
 
   // Helper function para mapear categorías

@@ -978,7 +978,7 @@ const AdminParksContent = () => {
             </Button>,
             <Button 
               variant="secondary" 
-              onClick={() => setLocation("/admin/parks-import")}
+              onClick={() => setLocation(ROUTES.admin.parks.import)}
               data-testid="button-import-parks"
             >
               <Upload className="h-4 w-4 md:mr-2" />
