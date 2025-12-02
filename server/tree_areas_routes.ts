@@ -9,6 +9,8 @@ import { eq, sql } from "drizzle-orm";
 import { generateAreaCode } from './code-generator';
 import multer from 'multer';
 import { replitObjectStorage } from './objectStorage-replit';
+import path from 'path';
+import fs from 'fs';
 
 /**
  * Registra las rutas relacionadas con áreas de parques
@@ -241,23 +243,32 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
 
       // Si se subió un archivo, guardarlo en Object Storage
       if (req.file) {
+        console.log(`📤 [AREA-IMG] Procesando imagen para área ${id}: ${req.file.originalname}`);
+
         try {
+          // 1. INTENTAR REPLIT OBJECT STORAGE (persistente)
+          console.log('📤 [AREA-IMG] Intentando Replit Object Storage...');
+          const storedFilename = await replitObjectStorage.uploadFile(req.file.buffer, req.file.originalname);
+          finalImageUrl = replitObjectStorage.getPublicUrl(storedFilename);
+          finalImageUrl = replitObjectStorage.normalizeUrl(finalImageUrl);
+          console.log(`✅ [AREA-IMG] Object Storage exitoso: ${finalImageUrl}`);
+
+        } catch (objectStorageError) {
+          console.log('⚠️ [AREA-IMG] Object Storage falló, usando filesystem...', objectStorageError);
+
+          // 2. FALLBACK A FILESYSTEM (carpeta persistente)
+          const uploadDir = path.join(process.cwd(), 'uploads', 'area-images');
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-          const extension = req.file.originalname.split('.').pop();
-          const filename = `area-${id}-${uniqueSuffix}.${extension}`;
+          const filename = `area-${id}-${uniqueSuffix}${path.extname(req.file.originalname)}`;
+          const filePath = path.join(uploadDir, filename);
 
-          // Subir a Replit Object Storage
-          await replitObjectStorage.uploadFromBuffer(
-            `park-areas/${filename}`,
-            req.file.buffer,
-            req.file.mimetype
-          );
-
-          finalImageUrl = `/api/object-storage/park-areas/${filename}`;
-          console.log(`✅ Imagen de área guardada: ${finalImageUrl}`);
-        } catch (uploadError) {
-          console.error("Error subiendo imagen:", uploadError);
-          // Continuar sin la imagen si falla
+          fs.writeFileSync(filePath, req.file.buffer);
+          finalImageUrl = `/uploads/area-images/${filename}`;
+          console.log(`✅ [AREA-IMG] Filesystem usado: ${finalImageUrl}`);
         }
       }
 
