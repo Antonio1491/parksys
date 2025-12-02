@@ -2,13 +2,16 @@
  * GESTOR COMPLETO DE MULTIMEDIA PARA PARQUES
  * ========================================
  * 
- * Componente integral para gestión de imágenes y documentos
+ * Componente integral para gestión de imágenes, documentos y videos
  * con soporte para subida de archivos y URLs externas
+ * 
+ * ACTUALIZADO: Usa autenticación Firebase real en lugar de tokens hardcodeados
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,8 +32,14 @@ import {
   Plus,
   Video,
   Play,
-  Link
+  Link,
+  MoreVertical,
+  Loader2
 } from 'lucide-react';
+
+// ============================================================================
+// TIPOS
+// ============================================================================
 
 interface ParkImage {
   id: number;
@@ -74,6 +83,75 @@ interface ParkMultimediaManagerProps {
   parkId: number;
 }
 
+// ============================================================================
+// HELPER: Obtener headers de autenticación Firebase
+// ============================================================================
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {};
+
+  try {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const idToken = await currentUser.getIdToken();
+      headers['Authorization'] = `Bearer ${idToken}`;
+    }
+  } catch (error) {
+    console.warn('Error getting Firebase ID token:', error);
+  }
+
+  // Obtener información de usuario almacenada
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    try {
+      const userObj = JSON.parse(storedUser);
+      headers['X-User-Id'] = userObj.id?.toString() || '1';
+      headers['X-User-Role'] = userObj.role || 'admin';
+
+      // Firebase UID para bypass durante migración
+      if (userObj.firebaseUid) {
+        headers['x-firebase-uid'] = userObj.firebaseUid;
+      }
+    } catch (e) {
+      console.error('Error parsing stored user:', e);
+    }
+  }
+
+  return headers;
+}
+
+/**
+ * Fetch autenticado con Firebase
+ */
+async function authenticatedFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const authHeaders = await getAuthHeaders();
+
+  const mergedHeaders: Record<string, string> = {
+    ...authHeaders,
+  };
+
+  // No agregar Content-Type si es FormData (el browser lo agrega automáticamente con boundary)
+  if (options.body && !(options.body instanceof FormData)) {
+    mergedHeaders['Content-Type'] = 'application/json';
+  }
+
+  // Merge con headers existentes si los hay
+  if (options.headers) {
+    const existingHeaders = options.headers as Record<string, string>;
+    Object.assign(mergedHeaders, existingHeaders);
+  }
+
+  return fetch(url, {
+    ...options,
+    headers: mergedHeaders,
+    credentials: 'include',
+  });
+}
+
+// ============================================================================
+// COMPONENTE PRINCIPAL
+// ============================================================================
+
 export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -91,7 +169,6 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   // Estados para nuevos documentos
   const [newDocumentFile, setNewDocumentFile] = useState<File | null>(null);
-  const [newDocumentUrl, setNewDocumentUrl] = useState('');
   const [newDocumentTitle, setNewDocumentTitle] = useState('');
   const [newDocumentDescription, setNewDocumentDescription] = useState('');
   const [newDocumentCategory, setNewDocumentCategory] = useState('general');
@@ -104,43 +181,41 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const [isVideoFeatured, setIsVideoFeatured] = useState(false);
   const [videoUploadType, setVideoUploadType] = useState<'file' | 'url'>('file');
 
-  // Función para limpiar formulario de imagen
-  const resetImageForm = () => {
+  // ============================================================================
+  // FUNCIONES DE RESET
+  // ============================================================================
+
+  const resetImageForm = useCallback(() => {
     setNewImageFile(null);
     setNewImageUrl('');
     setNewImageCaption('');
     setIsPrimaryImage(false);
-  };
+  }, []);
 
-  // Función para limpiar formulario de documento
-  const resetDocumentForm = () => {
+  const resetDocumentForm = useCallback(() => {
     setNewDocumentFile(null);
-    setNewDocumentUrl('');
     setNewDocumentTitle('');
     setNewDocumentDescription('');
     setNewDocumentCategory('general');
-  };
+  }, []);
 
-  const resetVideoForm = () => {
+  const resetVideoForm = useCallback(() => {
     setNewVideoFile(null);
     setNewVideoUrl('');
     setNewVideoTitle('');
     setNewVideoDescription('');
     setIsVideoFeatured(false);
     setVideoUploadType('file');
-  };
+  }, []);
 
-  // Consultas para obtener datos
+  // ============================================================================
+  // QUERIES
+  // ============================================================================
+
   const { data: images = [], isLoading: imagesLoading } = useQuery<ParkImage[]>({
     queryKey: [`/api/parks/${parkId}/images`],
     queryFn: async () => {
-      const response = await fetch(`/api/parks/${parkId}/images`, {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
+      const response = await authenticatedFetch(`/api/parks/${parkId}/images`);
       if (!response.ok) throw new Error('Error cargando imágenes');
       return response.json();
     },
@@ -151,13 +226,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
   const { data: documents = [], isLoading: documentsLoading } = useQuery<ParkDocument[]>({
     queryKey: [`/api/parks/${parkId}/documents`],
     queryFn: async () => {
-      const response = await fetch(`/api/parks/${parkId}/documents`, {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
+      const response = await authenticatedFetch(`/api/parks/${parkId}/documents`);
       if (!response.ok) throw new Error('Error cargando documentos');
       return response.json();
     },
@@ -165,16 +234,10 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     gcTime: 0
   });
 
-  const { data: videos = [], isLoading: videosLoading, error: videosError } = useQuery<ParkVideo[]>({
+  const { data: videos = [], isLoading: videosLoading } = useQuery<ParkVideo[]>({
     queryKey: [`/api/parks/${parkId}/videos`],
     queryFn: async () => {
-      const response = await fetch(`/api/parks/${parkId}/videos`, {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
+      const response = await authenticatedFetch(`/api/parks/${parkId}/videos`);
       if (!response.ok) throw new Error('Error cargando videos');
       return response.json();
     },
@@ -182,33 +245,32 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     gcTime: 0
   });
 
-  // Mutaciones para imágenes
+  // ============================================================================
+  // MUTACIONES - IMÁGENES
+  // ============================================================================
+
   const uploadImageMutation = useMutation({
     mutationFn: async (data: FormData | { imageUrl: string; caption: string; isPrimary: boolean }) => {
       if (data instanceof FormData) {
-        const response = await fetch(`/api/parks/${parkId}/images`, {
+        const response = await authenticatedFetch(`/api/parks/${parkId}/images`, {
           method: 'POST',
-          headers: {
-            'Authorization': 'Bearer direct-token-1750522117022',
-            'X-User-Id': '1',
-            'X-User-Role': 'super_admin'
-          },
           body: data
         });
         if (!response.ok) throw new Error('Error subiendo imagen');
         return response.json();
       } else {
-        const response = await apiRequest(`/api/parks/${parkId}/images`, {
+        const response = await authenticatedFetch(`/api/parks/${parkId}/images`, {
           method: 'POST',
-          data: { ...data, _environment: 'production', _isUrl: true }
+          body: JSON.stringify(data)
         });
+        if (!response.ok) throw new Error('Error subiendo imagen');
         return response.json();
       }
     },
     onSuccess: () => {
       toast({
-        title: "✅ Imagen guardada exitosamente",
-        description: "Su imagen ha sido almacenada con persistencia garantizada.",
+        title: "✅ Imagen guardada",
+        description: "La imagen se ha agregado correctamente.",
         className: "bg-green-50 border-green-200 text-green-800"
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
@@ -216,10 +278,10 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
       resetImageForm();
       setIsImageDialogOpen(false);
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "No se pudo subir la imagen. Intente nuevamente.",
+        description: error.message || "No se pudo subir la imagen.",
         variant: "destructive",
       });
     },
@@ -227,26 +289,24 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const setPrimaryImageMutation = useMutation({
     mutationFn: async (imageId: number) => {
-      const response = await apiRequest(`/api/park-images/${imageId}/set-primary`, {
-        method: 'POST',
-        data: {}
+      const response = await authenticatedFetch(`/api/parks/${parkId}/images/${imageId}/set-primary`, {
+        method: 'PUT',
+        body: JSON.stringify({})
       });
-      return response;
+      if (!response.ok) throw new Error('Error estableciendo imagen principal');
+      return response.json();
     },
     onSuccess: () => {
       toast({
-        title: "⭐ Imagen principal actualizada",
-        description: "¡Nueva imagen principal establecida exitosamente!",
-        className: "bg-yellow-50 border-yellow-200 text-yellow-800"
+        title: "Imagen principal actualizada",
+        description: "Se ha establecido la nueva imagen principal.",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
-      queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/images`] });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudo establecer como imagen principal.",
+        description: "No se pudo actualizar la imagen principal.",
         variant: "destructive",
       });
     },
@@ -254,47 +314,58 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const deleteImageMutation = useMutation({
     mutationFn: async (imageId: number) => {
-      const response = await apiRequest(`/api/park-images/${imageId}`, {
+      const response = await authenticatedFetch(`/api/parks/${parkId}/images/${imageId}`, {
         method: 'DELETE'
       });
+      if (!response.ok) throw new Error('Error eliminando imagen');
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
-      queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/images`] });
-    },
-  });
-
-  // Mutaciones para documentos
-  const uploadDocumentMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await fetch(`/api/parks/${parkId}/documents`, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        },
-        body: data
-      });
-      if (!response.ok) throw new Error('Error subiendo documento');
-      return response.json();
-    },
-    onSuccess: () => {
       toast({
-        title: "Documento subido",
-        description: "El documento se ha agregado exitosamente al parque.",
+        title: "Imagen eliminada",
+        description: "La imagen se ha eliminado correctamente.",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
-      resetDocumentForm();
-      setIsDocumentDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/images`] });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudo subir el documento. Intente nuevamente.",
+        description: "No se pudo eliminar la imagen.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // ============================================================================
+  // MUTACIONES - DOCUMENTOS
+  // ============================================================================
+
+  const uploadDocumentMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      const response = await authenticatedFetch(`/api/parks/${parkId}/documents`, {
+        method: 'POST',
+        body: data
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error subiendo documento');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "✅ Documento subido",
+        description: "El documento se ha agregado correctamente.",
+        className: "bg-green-50 border-green-200 text-green-800"
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
+      resetDocumentForm();
+      setIsDocumentDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo subir el documento.",
         variant: "destructive",
       });
     },
@@ -302,9 +373,10 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const deleteDocumentMutation = useMutation({
     mutationFn: async (documentId: number) => {
-      const response = await apiRequest(`/api/park-documents/${documentId}`, {
+      const response = await authenticatedFetch(`/api/parks/${parkId}/documents/${documentId}`, {
         method: 'DELETE'
       });
+      if (!response.ok) throw new Error('Error eliminando documento');
       return response;
     },
     onSuccess: () => {
@@ -313,10 +385,8 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
         description: "El documento se ha eliminado correctamente.",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
-      queryClient.refetchQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
     },
     onError: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/documents`] });
       toast({
         title: "Error",
         description: "No se pudo eliminar el documento.",
@@ -325,50 +395,48 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     },
   });
 
-  // Mutaciones para videos
+  // ============================================================================
+  // MUTACIONES - VIDEOS
+  // ============================================================================
+
   const uploadVideoMutation = useMutation({
     mutationFn: async (data: FormData | { videoUrl: string; title: string; description: string; isFeatured: boolean; videoType: string }) => {
       if (data instanceof FormData) {
-        const response = await fetch(`/api/parks/${parkId}/videos`, {
+        const response = await authenticatedFetch(`/api/parks/${parkId}/videos`, {
           method: 'POST',
-          headers: {
-            'Authorization': 'Bearer direct-token-1750522117022',
-            'X-User-Id': '1',
-            'X-User-Role': 'super_admin'
-          },
           body: data
         });
-        if (!response.ok) throw new Error('Error subiendo video');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Error subiendo video');
+        }
         return response.json();
       } else {
-        const response = await fetch(`/api/parks/${parkId}/videos`, {
+        const response = await authenticatedFetch(`/api/parks/${parkId}/videos`, {
           method: 'POST',
-          headers: {
-            'Authorization': 'Bearer direct-token-1750522117022',
-            'X-User-Id': '1',
-            'X-User-Role': 'super_admin',
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error('Error subiendo video');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Error subiendo video');
+        }
         return response.json();
       }
     },
     onSuccess: () => {
       toast({
-        title: "Video subido",
-        description: "El video se ha agregado exitosamente al parque.",
+        title: "✅ Video agregado",
+        description: "El video se ha agregado correctamente.",
+        className: "bg-green-50 border-green-200 text-green-800"
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/videos`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
       resetVideoForm();
       setIsVideoDialogOpen(false);
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "No se pudo subir el video. Intente nuevamente.",
+        description: error.message || "No se pudo agregar el video.",
         variant: "destructive",
       });
     },
@@ -376,30 +444,24 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const setFeaturedVideoMutation = useMutation({
     mutationFn: async (videoId: number) => {
-      const response = await fetch(`/api/park-videos/${videoId}/set-featured`, {
+      const response = await authenticatedFetch(`/api/parks/${parkId}/videos/${videoId}/set-featured`, {
         method: 'POST',
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin',
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({})
       });
-      if (!response.ok) throw new Error('Error actualizando video destacado');
+      if (!response.ok) throw new Error('Error estableciendo video destacado');
       return response.json();
     },
     onSuccess: () => {
       toast({
         title: "Video destacado actualizado",
-        description: "Se ha establecido el nuevo video destacado del parque.",
+        description: "Se ha establecido el nuevo video destacado.",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/videos`] });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "No se pudo establecer el video destacado.",
+        description: "No se pudo actualizar el video destacado.",
         variant: "destructive",
       });
     },
@@ -407,16 +469,11 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
 
   const deleteVideoMutation = useMutation({
     mutationFn: async (videoId: number) => {
-      const response = await fetch(`/api/park-videos/${videoId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
+      const response = await authenticatedFetch(`/api/parks/${parkId}/videos/${videoId}`, {
+        method: 'DELETE'
       });
       if (!response.ok) throw new Error('Error eliminando video');
-      return response.json();
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -434,11 +491,14 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     },
   });
 
-  // Funciones de manejo
-  const handleImageSubmit = () => {
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleImageSubmit = async () => {
     if (newImageFile) {
       const formData = new FormData();
-      formData.append('imageFile', newImageFile);
+      formData.append('image', newImageFile);
       formData.append('caption', newImageCaption);
       formData.append('isPrimary', isPrimaryImage.toString());
       uploadImageMutation.mutate(formData);
@@ -451,24 +511,8 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     }
   };
 
-  const handleDocumentSubmit = () => {
-    if (!newDocumentTitle.trim()) {
-      toast({
-        title: "Error",
-        description: "El título del documento es requerido.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!newDocumentFile) {
-      toast({
-        title: "Error", 
-        description: "Debe seleccionar un archivo para subir.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleDocumentSubmit = async () => {
+    if (!newDocumentFile || !newDocumentTitle.trim()) return;
 
     const formData = new FormData();
     formData.append('document', newDocumentFile);
@@ -479,44 +523,16 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     uploadDocumentMutation.mutate(formData);
   };
 
-  const handleVideoSubmit = () => {
-    if (!newVideoTitle.trim()) {
-      toast({
-        title: "Error",
-        description: "El título del video es requerido.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (videoUploadType === 'file') {
-      if (!newVideoFile) {
-        toast({
-          title: "Error",
-          description: "Debe seleccionar un archivo de video para subir.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+  const handleVideoSubmit = async () => {
+    if (videoUploadType === 'file' && newVideoFile) {
       const formData = new FormData();
       formData.append('video', newVideoFile);
       formData.append('title', newVideoTitle);
       formData.append('description', newVideoDescription);
       formData.append('isFeatured', isVideoFeatured.toString());
-      formData.append('videoType', 'file');
-
       uploadVideoMutation.mutate(formData);
-    } else {
-      if (!newVideoUrl.trim()) {
-        toast({
-          title: "Error",
-          description: "La URL del video es requerida.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+    } else if (videoUploadType === 'url' && newVideoUrl) {
+      // Detectar tipo de video
       let videoType = 'external';
       if (newVideoUrl.includes('youtube.com') || newVideoUrl.includes('youtu.be')) {
         videoType = 'youtube';
@@ -534,42 +550,55 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
     }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  // ============================================================================
+  // HELPERS
+  // ============================================================================
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType?.includes('pdf')) return '📄';
+    if (fileType?.includes('word') || fileType?.includes('doc')) return '📝';
+    if (fileType?.includes('excel') || fileType?.includes('sheet')) return '📊';
+    if (fileType?.includes('powerpoint') || fileType?.includes('presentation')) return '📽️';
+    return '📎';
   };
+
+  const formatFileSize = (bytes: number) => {
+    if (!bytes) return 'N/A';
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`;
+  };
+
+  const getVideoThumbnail = (video: ParkVideo) => {
+    if (video.thumbnailUrl) return video.thumbnailUrl;
+
+    // Extraer thumbnail de YouTube
+    if (video.videoUrl?.includes('youtube.com') || video.videoUrl?.includes('youtu.be')) {
+      let videoId = null;
+
+      // Formato: youtube.com/watch?v=VIDEO_ID
+      if (video.videoUrl.includes('watch?v=')) {
+        videoId = video.videoUrl.split('watch?v=')[1]?.split('&')[0];
+      }
+      // Formato: youtu.be/VIDEO_ID
+      else if (video.videoUrl.includes('youtu.be/')) {
+        videoId = video.videoUrl.split('youtu.be/')[1]?.split('?')[0];
+      }
+
+      if (videoId) {
+        return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+      }
+    }
+
+    return null;
+  };
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
     <div className="space-y-6">
-      {/* Header con botón flotante */}
-      <div className="flex justify-end -mt-16 mb-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-[#a0cc4d] hover:bg-[#00a884] text-white hover:text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => setIsImageDialogOpen(true)}>
-              <ImageIcon className="h-4 w-4 mr-2 text-gray-800" />
-              Agregar Imagen
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsDocumentDialogOpen(true)}>
-              <FileText className="h-4 w-4 mr-2 text-gray-800" />
-              Agregar Documento
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsVideoDialogOpen(true)}>
-              <Video className="h-4 w-4 mr-2 text-gray-800" />
-              Agregar Video
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
       <Tabs defaultValue="images" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="images" className="flex items-center gap-2">
@@ -586,115 +615,129 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
           </TabsTrigger>
         </TabsList>
 
-        {/* PESTAÑA DE IMÁGENES */}
+        {/* TAB DE IMÁGENES */}
         <TabsContent value="images" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">Galería de Imágenes</h3>
+            <Button onClick={() => setIsImageDialogOpen(true)} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar Imagen
+            </Button>
+          </div>
 
           {imagesLoading ? (
-            <div className="text-center py-8">Cargando imágenes...</div>
-          ) : images.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No hay imágenes para este parque
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
+          ) : images.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-gray-500">
+                <ImageIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>No hay imágenes agregadas</p>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {images.map((image) => (
-                <Card key={image.id} className="overflow-hidden">
-                  <div className="relative">
+                <Card key={image.id} className="overflow-hidden group relative">
+                  <div className="aspect-square relative">
                     <img
                       src={image.imageUrl}
-                      alt={image.caption}
-                      className="w-full h-48 object-cover"
+                      alt={image.caption || 'Imagen del parque'}
+                      className="w-full h-full object-cover"
                     />
                     {image.isPrimary && (
-                      <Badge className="absolute top-2 left-2 bg-yellow-500 text-yellow-900">
-                        <Star className="h-3 w-3 mr-1 fill-yellow-600 text-yellow-600" />
+                      <Badge className="absolute top-2 left-2 bg-yellow-500">
+                        <Star className="h-3 w-3 mr-1" />
+                        Principal
                       </Badge>
                     )}
-                  </div>
-                  <CardContent className="p-4">
-                    <p className="text-sm text-gray-600 mb-3">{image.caption}</p>
-                    <div className="flex gap-2">
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => window.open(image.imageUrl, '_blank')}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       {!image.isPrimary && (
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="secondary"
                           onClick={() => setPrimaryImageMutation.mutate(image.id)}
-                          disabled={setPrimaryImageMutation.isPending}
-                          className="border-gray-400 text-gray-800 hover:bg-yellow-100"
                         >
-                          <Star className="h-3 w-3 hover:fill-yellow-500" />
+                          <Star className="h-4 w-4" />
                         </Button>
                       )}
                       <Button
                         size="sm"
-                        variant="outline"
-                        onClick={() => window.open(image.imageUrl, '_blank')}
-                        className="border-gray-400 text-gray-800 hover:bg-gray-200"
-                      >
-                        <Eye className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
+                        variant="destructive"
                         onClick={() => deleteImageMutation.mutate(image.id)}
-                        disabled={deleteImageMutation.isPending}
-                        className="border-gray-400 text-gray-800 hover:bg-gray-200"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </CardContent>
+                  </div>
+                  {image.caption && (
+                    <CardContent className="p-2">
+                      <p className="text-sm text-gray-600 truncate">{image.caption}</p>
+                    </CardContent>
+                  )}
                 </Card>
               ))}
             </div>
           )}
         </TabsContent>
 
-        {/* PESTAÑA DE DOCUMENTOS */}
+        {/* TAB DE DOCUMENTOS */}
         <TabsContent value="documents" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">Documentos del Parque</h3>
+            <Button onClick={() => setIsDocumentDialogOpen(true)} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar Documento
+            </Button>
+          </div>
 
           {documentsLoading ? (
-            <div className="text-center py-8">Cargando documentos...</div>
-          ) : documents.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No hay documentos para este parque
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
+          ) : documents.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-gray-500">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>No hay documentos agregados</p>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {documents.map((document) => (
-                <Card key={document.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-blue-500" />
-                        <div>
-                          <h4 className="font-medium">{document.title}</h4>
-                          <p className="text-xs text-gray-500 capitalize">{document.category}</p>
-                        </div>
+            <div className="space-y-2">
+              {documents.map((doc) => (
+                <Card key={doc.id}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{getFileIcon(doc.fileType)}</span>
+                      <div>
+                        <p className="font-medium">{doc.title}</p>
+                        <p className="text-sm text-gray-500">
+                          {doc.category} • {formatFileSize(doc.fileSize)}
+                        </p>
                       </div>
-                      <Badge variant="outline">{formatFileSize(document.fileSize)}</Badge>
                     </div>
-
-                    {document.description && (
-                      <p className="text-sm text-gray-600 mb-3">{document.description}</p>
-                    )}
-
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => window.open(document.fileUrl, '_blank')}
+                        onClick={() => window.open(doc.fileUrl, '_blank')}
                       >
-                        <Download className="h-3 w-3 mr-1" />
-                        Ver
+                        <Download className="h-4 w-4" />
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => deleteDocumentMutation.mutate(document.id)}
-                        disabled={deleteDocumentMutation.isPending}
+                        onClick={() => deleteDocumentMutation.mutate(doc.id)}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </CardContent>
@@ -704,82 +747,84 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
           )}
         </TabsContent>
 
-        {/* PESTAÑA DE VIDEOS */}
+        {/* TAB DE VIDEOS */}
         <TabsContent value="videos" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">Videos del Parque</h3>
+            <Button onClick={() => setIsVideoDialogOpen(true)} size="sm" className="bg-purple-600 hover:bg-purple-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar Video
+            </Button>
+          </div>
 
           {videosLoading ? (
-            <div className="text-center py-8">Cargando videos...</div>
-          ) : videosError ? (
-            <div className="text-red-500 text-center py-8">
-              Error al cargar videos
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
           ) : videos.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No hay videos para este parque
-            </div>
+            <Card>
+              <CardContent className="py-8 text-center text-gray-500">
+                <Video className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>No hay videos agregados</p>
+              </CardContent>
+            </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {videos.map((video) => (
                 <Card key={video.id} className="overflow-hidden">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                          {video.videoType === 'youtube' ? (
-                            <Play className="h-4 w-4 text-purple-600" />
-                          ) : (
-                            <Video className="h-4 w-4 text-purple-600" />
-                          )}
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{video.title}</h4>
-                          <p className="text-xs text-gray-500 capitalize">
-                            {video.videoType === 'youtube' ? 'YouTube' : 
-                             video.videoType === 'vimeo' ? 'Vimeo' : 
-                             video.videoType === 'file' ? 'Archivo' : 'Externo'}
-                          </p>
-                        </div>
+                  <div className="aspect-video relative bg-gray-100">
+                    {getVideoThumbnail(video) ? (
+                      <img
+                        src={getVideoThumbnail(video)!}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Play className="h-12 w-12 text-gray-400" />
                       </div>
-                      {video.isFeatured && (
-                        <Badge variant="default" className="bg-purple-100 text-purple-800">
-                          <Star className="h-3 w-3 mr-1 fill-current" />
-                          Destacado
-                        </Badge>
-                      )}
-                    </div>
-
-                    {video.description && (
-                      <p className="text-sm text-gray-600 mb-3">{video.description}</p>
                     )}
-
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(video.videoUrl, '_blank')}
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        Ver
-                      </Button>
-                      {!video.isFeatured && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setFeaturedVideoMutation.mutate(video.id)}
-                          disabled={setFeaturedVideoMutation.isPending}
-                          className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                    {video.isFeatured && (
+                      <Badge className="absolute top-2 left-2 bg-purple-600">
+                        <Star className="h-3 w-3 mr-1" />
+                        Destacado
+                      </Badge>
+                    )}
+                  </div>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{video.title || 'Sin título'}</p>
+                        {video.description && (
+                          <p className="text-sm text-gray-500 truncate">{video.description}</p>
+                        )}
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="ghost">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => window.open(video.videoUrl, '_blank')}>
+                            <Play className="h-4 w-4 mr-2" />
+                            Reproducir
+                          </DropdownMenuItem>
+                          {!video.isFeatured && (
+                            <DropdownMenuItem onClick={() => setFeaturedVideoMutation.mutate(video.id)}>
+                              <Star className="h-4 w-4 mr-2" />
+                              Destacar
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem 
+                            onClick={() => deleteVideoMutation.mutate(video.id)}
+                            className="text-red-600"
                           >
-                          <Star className="h-3 w-3" />
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => deleteVideoMutation.mutate(video.id)}
-                        disabled={deleteVideoMutation.isPending}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </CardContent>
                 </Card>
@@ -788,6 +833,10 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
           )}
         </TabsContent>
       </Tabs>
+
+      {/* ================================================================== */}
+      {/* DIÁLOGOS */}
+      {/* ================================================================== */}
 
       {/* DIÁLOGO DE IMAGEN */}
       <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
@@ -837,16 +886,25 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
                 id="isPrimary"
                 checked={isPrimaryImage}
                 onChange={(e) => setIsPrimaryImage(e.target.checked)}
+                className="h-4 w-4"
               />
               <label htmlFor="isPrimary" className="text-sm">Establecer como imagen principal</label>
             </div>
           </div>
           <DialogFooter>
+            <Button variant="outline" onClick={() => setIsImageDialogOpen(false)}>
+              Cancelar
+            </Button>
             <Button 
               onClick={handleImageSubmit}
               disabled={(!newImageFile && !newImageUrl) || uploadImageMutation.isPending}
             >
-              {uploadImageMutation.isPending ? 'Subiendo...' : 'Agregar Imagen'}
+              {uploadImageMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Subiendo...
+                </>
+              ) : 'Agregar Imagen'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -860,7 +918,7 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Título</label>
+              <label className="text-sm font-medium mb-2 block">Título *</label>
               <Input
                 value={newDocumentTitle}
                 onChange={(e) => setNewDocumentTitle(e.target.value)}
@@ -868,18 +926,14 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Archivo del Documento *</label>
+              <label className="text-sm font-medium mb-2 block">Archivo *</label>
               <Input
                 type="file"
                 accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  setNewDocumentFile(file || null);
-                }}
-                required
+                onChange={(e) => setNewDocumentFile(e.target.files?.[0] || null)}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Formatos permitidos: PDF, DOC, DOCX, TXT, XLS, XLSX, PPT, PPTX (máx. 10MB)
+                Formatos: PDF, DOC, DOCX, TXT, XLS, XLSX, PPT, PPTX (máx. 10MB)
               </p>
             </div>
             <div>
@@ -907,11 +961,19 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
             </div>
           </div>
           <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDocumentDialogOpen(false)}>
+              Cancelar
+            </Button>
             <Button 
               onClick={handleDocumentSubmit}
               disabled={!newDocumentFile || !newDocumentTitle.trim() || uploadDocumentMutation.isPending}
             >
-              {uploadDocumentMutation.isPending ? 'Subiendo...' : 'Agregar Documento'}
+              {uploadDocumentMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Subiendo...
+                </>
+              ) : 'Agregar Documento'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -961,12 +1023,12 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
               <div>
                 <label className="text-sm font-medium mb-2 block">URL del Video</label>
                 <Input
-                  placeholder="https://youtube.com/watch?v=... o https://vimeo.com/..."
+                  placeholder="https://youtube.com/watch?v=..."
                   value={newVideoUrl}
                   onChange={(e) => setNewVideoUrl(e.target.value)}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Soporta YouTube, Vimeo y otras URLs de video
+                  Soporta YouTube, Vimeo y otras URLs
                 </p>
               </div>
             )}
@@ -1009,10 +1071,20 @@ export default function ParkMultimediaManager({ parkId }: ParkMultimediaManagerP
             </Button>
             <Button 
               onClick={handleVideoSubmit}
-              disabled={uploadVideoMutation.isPending}
+              disabled={
+                (videoUploadType === 'file' && !newVideoFile) ||
+                (videoUploadType === 'url' && !newVideoUrl) ||
+                !newVideoTitle.trim() ||
+                uploadVideoMutation.isPending
+              }
               className="bg-purple-600 hover:bg-purple-700"
             >
-              {uploadVideoMutation.isPending ? 'Subiendo...' : 'Agregar Video'}
+              {uploadVideoMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Subiendo...
+                </>
+              ) : 'Agregar Video'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,7 +3,7 @@ import { pool } from '../db';
 import { storage } from '../storage';
 import { isAuthenticated } from '../middleware/auth';
 import { requirePermission } from '../middleware/requirePermission';
-import { parkImageUpload, documentUpload, videoUpload, memoryUpload } from '../middleware/uploads';
+import { parkImageUpload, documentUpload, videoUpload, memoryUpload } from '../middleware/upload';
 import { insertParkSchema } from '@shared/schema';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
@@ -853,10 +853,11 @@ router.post('/:id/documents',
 
       const documentData = {
         parkId,
-        name: req.body.name || req.file.originalname,
-        documentUrl: `/uploads/documents/${req.file.filename}`,
-        documentType: req.body.documentType || 'other',
-        description: req.body.description
+        title: req.body.title || req.file.originalname,
+        fileUrl: `/uploads/documents/${req.file.filename}`,
+        fileType: req.file.mimetype || 'application/octet-stream', 
+        description: req.body.description || '',
+        uploadedById: req.user?.id || null
       };
 
       const newDocument = await storage.createDocument(documentData);

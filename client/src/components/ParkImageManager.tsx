@@ -167,7 +167,7 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
   // Set primary image mutation
   const setPrimaryMutation = useMutation({
     mutationFn: async (imageId: number) => {
-      const response = await apiRequest(`/api/park-images/${imageId}/set-primary`, {
+      const response = await apiRequest(`/api/parks/${parkId}/images/${imageId}/set-primary`, {
         method: "POST",
         data: {}
       });
@@ -210,7 +210,7 @@ export function ParkImageManager({ parkId }: ParkImageManagerProps) {
         }
       }
       
-      const response = await fetch(`/api/park-images/${imageId}`, {
+      const response = await fetch(`/api/parks/${parkId}/images/${imageId}`, {
         method: "DELETE",
         headers: {
           "Authorization": storedToken ? `Bearer ${storedToken}` : "Bearer direct-token-1754063087518",
