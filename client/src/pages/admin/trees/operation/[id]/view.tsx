@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { apiRequest } from '@/lib/queryClient';
 import ROUTES from '@/routes';
 import { useToast } from '@/hooks/use-toast';
+import { AreaTreesMap } from '@/components/AreaTreesMap';
 
 // Components
 import AdminLayout from '@/components/AdminLayout';
@@ -93,6 +94,8 @@ interface Tree {
   diameter?: number;
   park_id?: number;
   area_id?: number;
+  latitude?: string | number;
+  longitude?: string | number;
 }
 
 export default function AreaDetailPage() {
@@ -205,6 +208,16 @@ export default function AreaDetailPage() {
     },
     enabled: !!id,
   });
+
+  // Fetch maintenances for this area
+  const { data: maintenancesData, isLoading: isLoadingMaintenances } = useQuery<{ data: any[]; total: number }>({
+    queryKey: ['/api/trees/areas', id, 'maintenances'],
+    queryFn: () => apiRequest(`/api/trees/areas/${id}/maintenances`),
+    enabled: !!id,
+  });
+
+  const maintenances = maintenancesData?.data || [];
+  const totalMaintenances = maintenancesData?.total || 0;
 
   const trees = treesData?.trees || [];
   const totalTrees = treesData?.total || area?.treeCount || 0;
@@ -412,7 +425,7 @@ export default function AreaDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Mantenimientos</p>
-                  <p className="text-3xl font-bold text-[#00444f]">0</p>
+                  <p className="text-3xl font-bold text-[#00444f]">{totalMaintenances}</p>
                 </div>
               </div>
             </CardContent>
@@ -470,7 +483,7 @@ export default function AreaDetailPage() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="trees">Árboles ({totalTrees})</TabsTrigger>
             <TabsTrigger value="map">Mapa</TabsTrigger>
-            <TabsTrigger value="maintenance">Mantenimientos (0)</TabsTrigger>
+            <TabsTrigger value="maintenance">Mantenimientos ({totalMaintenances})</TabsTrigger>
           </TabsList>
 
           {/* Tab: Árboles */}
@@ -572,21 +585,22 @@ export default function AreaDetailPage() {
             </Card>
           </TabsContent>
 
+          
           {/* Tab: Mapa */}
           <TabsContent value="map" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Mapa del Área</CardTitle>
-                <CardDescription>Visualización geográfica del área y sus árboles</CardDescription>
+                <CardDescription>
+                  Ubicación geográfica de los {totalTrees} árboles en {area.name}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <MapIcon className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                    <p className="font-medium">Mapa en desarrollo</p>
-                    <p className="text-sm">Próximamente podrás visualizar el área y sus árboles en el mapa</p>
-                  </div>
-                </div>
+                <AreaTreesMap 
+                  trees={trees} 
+                  areaName={area.name}
+                  height="450px"
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -595,17 +609,86 @@ export default function AreaDetailPage() {
           <TabsContent value="maintenance" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Calendario de Mantenimientos</CardTitle>
-                <CardDescription>Programación de mantenimientos del área</CardDescription>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Historial de Mantenimientos</CardTitle>
+                    <CardDescription>
+                      Mantenimientos realizados a los árboles de esta área
+                    </CardDescription>
+                  </div>
+                  <Link href={ROUTES.admin.trees.maintenance.list}>
+                    <Button variant="outline" size="sm">
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Gestionar Mantenimientos
+                    </Button>
+                  </Link>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <Wrench className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                    <p className="font-medium">Mantenimientos en desarrollo</p>
-                    <p className="text-sm">Próximamente podrás gestionar los calendarios de mantenimiento</p>
+                {isLoadingMaintenances ? (
+                  <div className="space-y-2">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-12 bg-gray-200 rounded animate-pulse" />
+                    ))}
                   </div>
-                </div>
+                ) : maintenances.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Wrench className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                    <p className="font-medium">No hay mantenimientos registrados</p>
+                    <p className="text-sm mt-1">
+                      Los mantenimientos de los árboles de esta área aparecerán aquí
+                    </p>
+                    <Link href={ROUTES.admin.trees.maintenance.list}>
+                      <Button variant="outline" className="mt-4">
+                        <Wrench className="h-4 w-4 mr-2" />
+                        Ir a Mantenimientos
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Árbol</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Fecha</TableHead>
+                        <TableHead>Realizado por</TableHead>
+                        <TableHead>Notas</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {maintenances.map((maint: any) => (
+                        <TableRow key={maint.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-mono text-sm">{maint.treeCode}</p>
+                              <p className="text-xs text-gray-500">{maint.speciesName}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-green-50 text-green-700">
+                              {maint.maintenanceType}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {maint.maintenanceDate 
+                              ? new Date(maint.maintenanceDate).toLocaleDateString('es-MX', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric'
+                                })
+                              : '-'
+                            }
+                          </TableCell>
+                          <TableCell>{maint.performedBy || '-'}</TableCell>
+                          <TableCell className="max-w-[200px] truncate">
+                            {maint.notes || maint.description || '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

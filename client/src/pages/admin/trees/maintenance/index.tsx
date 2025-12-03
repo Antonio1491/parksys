@@ -813,7 +813,7 @@ export default function TreeMaintenancePage() {
       <div className="space-y-6">
         <PageHeader
           title="Mantenimiento de Árboles"
-          subtitle="Gestiona y registra las actividades de mantenimiento realizadas en árboles"
+          subtitle="Gestiona y registra las actividades de mantenimiento realizadas en árboles."
           icon={<Leaf className="h-6 w-6 text-white" />}
           actions={[
             <Button 
@@ -821,6 +821,13 @@ export default function TreeMaintenancePage() {
               variant="primary"
               onClick={() => setOpen(true)}>
               <Plus className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
+            </Button>,
+            <Button 
+              key="export"
+              variant="outline"
+              onClick={exportToCSV}
+              disabled={!filteredMaintenances || filteredMaintenances.length === 0}>
+              <Download className="mr-2 h-4 w-4" /> Exportar
             </Button>
           ]}
           backgroundColor="bg-header-background"

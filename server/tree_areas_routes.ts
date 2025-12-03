@@ -365,4 +365,59 @@ export function registerTreeAreasRoutes(app: any, apiRouter: Router, isAuthentic
       res.status(500).json({ error: "Error al obtener los árboles del área" });
     }
   });
+
+  // ============================================
+  // GET /trees/areas/:id/maintenances - Mantenimientos del área
+  // ============================================
+  apiRouter.get("/trees/areas/:id/maintenances", async (req: Request, res: Response) => {
+    try {
+      const areaId = parseInt(req.params.id);
+
+      if (isNaN(areaId)) {
+        return res.status(400).json({ error: "ID de área inválido" });
+      }
+
+      // Obtener mantenimientos de todos los árboles del área
+      const result = await db.execute(sql`
+        SELECT 
+          tm.id,
+          tm.tree_id,
+          tm.maintenance_type,
+          tm.maintenance_date,
+          tm.description,
+          tm.performed_by,
+          tm.notes,
+          tm.next_maintenance_date,
+          tm.created_at,
+          t.code as tree_code,
+          ts.common_name as species_name,
+          ts.scientific_name
+        FROM tree_maintenances tm
+        INNER JOIN trees t ON tm.tree_id = t.id
+        LEFT JOIN tree_species ts ON t.species_id = ts.id
+        WHERE t.area_id = ${areaId}
+        ORDER BY tm.maintenance_date DESC
+      `);
+
+      const maintenances = (result.rows || []).map((m: any) => ({
+        id: m.id,
+        treeId: m.tree_id,
+        treeCode: m.tree_code,
+        maintenanceType: m.maintenance_type,
+        maintenanceDate: m.maintenance_date,
+        description: m.description,
+        performedBy: m.performed_by,
+        notes: m.notes,
+        nextMaintenanceDate: m.next_maintenance_date,
+        createdAt: m.created_at,
+        speciesName: m.species_name,
+        scientificName: m.scientific_name
+      }));
+
+      res.json({ data: maintenances, total: maintenances.length });
+    } catch (error) {
+      console.error("Error fetching area maintenances:", error);
+      res.status(500).json({ error: "Error al obtener mantenimientos del área" });
+    }
+  });
 }
