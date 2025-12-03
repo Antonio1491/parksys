@@ -53,13 +53,13 @@ import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Search, 
-  PlusCircle,
+  FileSpreadsheet,
   Plus,
   Download,
   Upload,
-  FileSpreadsheet,
-  Grid3X3,
-  List,
+  Brush,
+  CopyCheck,
+  CheckSquare,
   Eye,
   Edit,
   Trash2,
@@ -73,7 +73,8 @@ import {
   Info,
   MapPin,
   Leaf,
-  Settings
+  Settings,
+  Square
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
@@ -157,6 +158,10 @@ export default function TreeMaintenancePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Estados para selección múltiple
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedMaintenances, setSelectedMaintenances] = useState<Set<number>>(new Set());
+
   // Cargar datos de árboles para el selector
   const { data: treesResponse, isLoading: loadingTrees } = useQuery({
     queryKey: ['/api/trees'],
@@ -209,7 +214,7 @@ export default function TreeMaintenancePage() {
     setSelectedTreeId(null);
   }, [selectedParkId, selectedSpeciesId]);
 
-
+  
 
   // Cargar todos los mantenimientos
   const { data: maintenances, isLoading: loadingMaintenances } = useQuery({
@@ -615,6 +620,39 @@ export default function TreeMaintenancePage() {
     setDeleteModal(true);
   };
 
+  // Funciones de selección múltiple
+  const handleSelectAllMaintenances = () => {
+    if (filteredMaintenances) {
+      const allIds = new Set(filteredMaintenances.map((m: any) => m.id));
+      setSelectedMaintenances(allIds);
+    }
+  };
+
+  const handleDeselectAllMaintenances = () => {
+    setSelectedMaintenances(new Set());
+  };
+
+  const handleToggleSelection = (id: number) => {
+    const newSelection = new Set(selectedMaintenances);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    setSelectedMaintenances(newSelection);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedMaintenances.size === 0) return;
+
+    // Por ahora solo elimina uno por uno
+    for (const id of selectedMaintenances) {
+      await deleteMaintenanceMutation.mutateAsync(id);
+    }
+    setSelectedMaintenances(new Set());
+    setSelectionMode(false);
+  };
+
   // Función para borrar mantenimiento
   const deleteMaintenanceMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -813,7 +851,7 @@ export default function TreeMaintenancePage() {
       <div className="space-y-6">
         <PageHeader
           title="Mantenimiento de Árboles"
-          subtitle="Gestiona y registra las actividades de mantenimiento realizadas en árboles."
+          subtitle="Gestiona y registra las actividades de mantenimiento realizadas en árboles"
           icon={<Leaf className="h-6 w-6 text-white" />}
           actions={[
             <Button 
@@ -823,8 +861,14 @@ export default function TreeMaintenancePage() {
               <Plus className="mr-2 h-4 w-4 stroke-[4]" /> Nuevo
             </Button>,
             <Button 
+              key="import"
+              variant="secondary"
+              onClick={() => setImportModal(true)}>
+              <Upload className="mr-2 h-4 w-4" /> Importar
+            </Button>,
+            <Button 
               key="export"
-              variant="outline"
+              variant="tertiary"
               onClick={exportToCSV}
               disabled={!filteredMaintenances || filteredMaintenances.length === 0}>
               <Download className="mr-2 h-4 w-4" /> Exportar
@@ -833,285 +877,308 @@ export default function TreeMaintenancePage() {
           backgroundColor="bg-header-background"
         />
 
-        {/* Filtros Avanzados */}
+        {/* Filtros */}
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filtros Avanzados para Selección de Árboles
-            </CardTitle>
-            <CardDescription>
-              Máximo 50 resultados - Filtra por parque, especie y estado para encontrar árboles específicos
-            </CardDescription>
-          </CardHeader>
+          <CardHeader className="pb-0"></CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="park-filter">Parque</Label>
-                <Select
-                  value={selectedParkId}
-                  onValueChange={setSelectedParkId}
-                >
+            <div className="flex items-start justify-start gap-3">
+
+              {/* Buscador */}
+              <div className="relative flex-1 min-w-[280px] max-w-lg">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />
+                <Input
+                  type="search"
+                  placeholder="Buscar por código, parque o especie..."
+                  className="pl-10 w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              {/* Filtro de tipo */}
+              <div className="min-w-[180px]">
+                <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un parque" />
+                    <SelectValue placeholder="Tipo de mantenimiento" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos los parques</SelectItem>
-                    {loadingParks ? (
-                      <SelectItem value="loading" disabled>Cargando...</SelectItem>
-                    ) : (
-                      parks?.map((park) => (
-                        <SelectItem key={park.id} value={park.id.toString()}>
-                          {park.name}
-                        </SelectItem>
-                      ))
-                    )}
+                    <SelectItem value="all">Todos los tipos</SelectItem>
+                    <SelectItem value="Poda">Poda</SelectItem>
+                    <SelectItem value="Riego">Riego</SelectItem>
+                    <SelectItem value="Fertilización">Fertilización</SelectItem>
+                    <SelectItem value="Control de plagas">Control de plagas</SelectItem>
+                    <SelectItem value="Inspección">Inspección</SelectItem>
+                    <SelectItem value="Limpieza">Limpieza</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="species-filter">Especie</Label>
-                <Select
-                  value={selectedSpeciesId}
-                  onValueChange={setSelectedSpeciesId}
-                >
+
+              {/* Filtro de parque */}
+              <div className="min-w-[180px]">
+                <Select value={filterPark} onValueChange={setFilterPark}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona una especie" />
+                    <SelectValue placeholder="Filtrar por parque" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todas las especies</SelectItem>
-                    {species?.map((specie) => (
-                      <SelectItem key={specie.id} value={specie.id.toString()}>
-                        {specie.commonName}
+                    <SelectItem value="all">Todos los parques</SelectItem>
+                    {parks?.map((park: any) => (
+                      <SelectItem key={park.id} value={park.name}>
+                        {park.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="health-filter">Estado de Salud</Label>
-                <Select
-                  value={selectedHealthStatus}
-                  onValueChange={setSelectedHealthStatus}
+
+              {/* Botón limpiar filtros */}
+              <div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-10 h-10 bg-gray-100" 
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilterType('all');
+                    setFilterPark('all');
+                  }}
+                  title="Limpiar filtros"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los estados</SelectItem>
-                    <SelectItem value="Excelente">Excelente</SelectItem>
-                    <SelectItem value="Bueno">Bueno</SelectItem>
-                    <SelectItem value="Regular">Regular</SelectItem>
-                    <SelectItem value="Malo">Malo</SelectItem>
-                    <SelectItem value="Crítico">Crítico</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Brush className="h-4 w-4 text-[#4b5b65]" />
+                </Button>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="search-trees">Búsqueda</Label>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Código o nombre..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8"
-                  />
+
+              {/* Espaciador para empujar botones a la derecha */}
+              <div className="ml-auto flex items-center gap-2">
+                {/* Botón de selección con menú desplegable */}
+                <div className="relative group">
+                  <Button
+                    variant={selectionMode ? 'default' : 'outline'}
+                    size="sm"
+                    className={`flex items-center h-10 w-10 ${selectionMode ? 'bg-primary text-white hover:bg-[#00a587]' : 'bg-gray-100 hover:bg-[#00a587]'}`}
+                    title="Opciones de selección"
+                  >
+                    <CopyCheck className="h-5 w-5 text-[#4b5b65]" />
+                  </Button>
+
+                  {/* Dropdown menu con CSS hover */}
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="py-1">
+                      <button
+                        onClick={() => setSelectionMode(true)}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                      >
+                        <CopyCheck className="h-4 w-4 mr-2" />
+                        Selección múltiple
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (!selectionMode) {
+                            setSelectionMode(true);
+                          }
+                          handleSelectAllMaintenances();
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                      >
+                        <CheckSquare className="h-4 w-4 mr-2" />
+                        Seleccionar todo
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleDeselectAllMaintenances();
+                          setSelectionMode(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 flex items-center"
+                      >
+                        <Square className="h-4 w-4 mr-2" />
+                        Deseleccionar
+                      </button>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Botón para eliminar elementos seleccionados */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  className="flex items-center h-10 w-10 bg-[#ededed] text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  disabled={selectedMaintenances.size === 0}
+                  title="Eliminar seleccionados"
+                >
+                  <Trash2 className="h-5 w-5" />
+                  {selectedMaintenances.size > 0 && (
+                    <span className="ml-1">({selectedMaintenances.size})</span>
+                  )}
+                </Button>
               </div>
-            </div>
-            
-            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-              <Info className="h-4 w-4" />
-              <span>
-                {filteredTrees.length} árboles encontrados
-                {filteredTrees.length === 50 && " (límite alcanzado)"}
-              </span>
             </div>
           </CardContent>
         </Card>
 
         {/* Tabla de mantenimientos */}
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle>Registros de Mantenimiento</CardTitle>
-                <CardDescription>
-                  {filteredMaintenances?.length} {filteredMaintenances?.length === 1 ? 'registro' : 'registros'} de mantenimiento
-                </CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={downloadTemplate}
-                  data-testid="button-download-template"
-                >
-                  <FileSpreadsheet className="h-4 w-4 mr-2" />
-                  Plantilla
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={exportToCSV}
-                  disabled={!filteredMaintenances || filteredMaintenances.length === 0}
-                  data-testid="button-export-csv"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Exportar CSV
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setImportModal(true)}
-                  data-testid="button-import-csv"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Importar CSV
-                </Button>
-              </div>
+        <CardContent>
+          {loadingMaintenances ? (
+            <div className="space-y-2">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
             </div>
-          </CardHeader>
-          <CardContent>
-            {loadingMaintenances ? (
-              <div className="space-y-2">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
-              </div>
-            ) : filteredMaintenances?.length === 0 ? (
-              <div className="text-center py-6">
-                <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <h3 className="text-lg font-medium">No hay registros de mantenimiento</h3>
-                <p className="text-muted-foreground">
-                  {searchTerm || filterType !== 'all' || filterPark !== 'all'
-                    ? 'No se encontraron registros con los filtros aplicados'
-                    : 'Registra el primer mantenimiento haciendo clic en "Registrar Mantenimiento"'}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Código</TableHead>
-                        <TableHead>Parque</TableHead>
-                        <TableHead>Especie</TableHead>
-                        <TableHead>Tipo</TableHead>
-                        <TableHead>Fecha</TableHead>
-                        <TableHead>Realizado por</TableHead>
-                        <TableHead className="w-[120px]">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedMaintenances?.map((maintenance) => (
-                        <TableRow key={maintenance.id}>
-                          <TableCell className="font-medium">{maintenance.treeCode}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3 text-muted-foreground" />
-                              {maintenance.parkName}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Leaf className="h-3 w-3 text-green-600" />
-                              {maintenance.speciesName}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="bg-green-50 text-green-700">
-                              {maintenance.maintenanceType}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3 text-muted-foreground" />
-                              {format(new Date(maintenance.maintenanceDate), 'dd MMM yyyy', { locale: es })}
-                            </div>
-                          </TableCell>
-                          <TableCell>{maintenance.performedByName || 'Usuario ' + maintenance.performedBy}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleView(maintenance)}
-                                className="h-8 w-8"
-                                data-testid={`button-view-maintenance-${maintenance.id}`}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEdit(maintenance)}
-                                className="h-8 w-8"
-                                data-testid={`button-edit-maintenance-${maintenance.id}`}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDelete(maintenance)}
-                                className="h-8 w-8 text-red-600 hover:text-red-700"
-                                data-testid={`button-delete-maintenance-${maintenance.id}`}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                {/* Paginación */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                      Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredMaintenances?.length || 0)} de {filteredMaintenances?.length || 0} registros
-                    </div>
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+          ) : filteredMaintenances?.length === 0 ? (
+            <div className="text-center py-6">
+              <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+              <h3 className="text-lg font-medium">No hay registros de mantenimiento</h3>
+              <p className="text-muted-foreground">
+                {searchTerm || filterType !== 'all' || filterPark !== 'all'
+                  ? 'No se encontraron registros con los filtros aplicados'
+                  : 'Registra el primer mantenimiento haciendo clic en "Registrar Mantenimiento"'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {selectionMode && (
+                      <TableHead className="w-[50px]">
+                        <Checkbox
+                          checked={selectedMaintenances.size === filteredMaintenances?.length && filteredMaintenances?.length > 0}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              handleSelectAllMaintenances();
+                            } else {
+                              handleDeselectAllMaintenances();
+                            }
+                          }}
+                        />
+                      </TableHead>
+                    )}
+                    <TableHead>Código</TableHead>
+                    <TableHead>Parque</TableHead>
+                    <TableHead>Especie</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Realizado por</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedMaintenances?.map((maintenance) => (
+                    <TableRow 
+                      key={maintenance.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => {
+                        if (selectionMode) {
+                          handleToggleSelection(maintenance.id);
+                        } else {
+                           handleView(maintenance);
+                         }
+                      }}
+                    >
+                      {selectionMode && (
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={selectedMaintenances.has(maintenance.id)}
+                            onCheckedChange={() => handleToggleSelection(maintenance.id)}
                           />
-                        </PaginationItem>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <PaginationItem key={page}>
-                            <PaginationLink
-                              onClick={() => setCurrentPage(page)}
-                              isActive={currentPage === page}
-                              className="cursor-pointer"
-                            >
-                              {page}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
+                        </TableCell>
+                      )}
+                      <TableCell className="font-medium">{maintenance.treeCode}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3 text-muted-foreground" />
+                          {maintenance.parkName}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Leaf className="h-3 w-3 text-green-600" />
+                          {maintenance.speciesName}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="bg-green-50 text-green-700">
+                          {maintenance.maintenanceType}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 text-muted-foreground" />
+                          {format(new Date(maintenance.maintenanceDate), 'dd MMM yyyy', { locale: es })}
+                        </div>
+                      </TableCell>
+                      <TableCell>{maintenance.performedByName || 'Usuario ' + maintenance.performedBy}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-2 justify-end">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(maintenance);
+                            }}
+                            title="Editar mantenimiento"
+                            className="border bg-transparent text-gray-800"
+                          >
+                            <Edit className="h-4 w-4" /> 
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(maintenance);
+                            }}
+                            title="Eliminar mantenimiento"
+                            className="border bg-transparent text-gray-800"
+                            disabled={deleteMaintenanceMutation.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" /> 
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Paginación */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredMaintenances?.length || 0)} de {filteredMaintenances?.length || 0} registros
                   </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
       </div>
 
       {/* Modal de Agregar Mantenimiento - Versión Avanzada */}
@@ -1813,20 +1880,32 @@ export default function TreeMaintenancePage() {
               Importa múltiples registros de mantenimiento desde un archivo CSV
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="bg-blue-50 p-4 rounded-lg">
               <h4 className="font-medium text-blue-900 mb-2">Instrucciones:</h4>
-              <ol className="text-sm text-blue-800 space-y-1">
-                <li>1. Descarga la plantilla CSV haciendo clic en el botón "Plantilla"</li>
-                <li>2. Completa la plantilla con los datos de mantenimiento</li>
-                <li>3. Asegúrate de que los códigos de árbol existan en el sistema</li>
-                <li>4. Selecciona el archivo CSV completado y haz clic en "Importar"</li>
+              <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                <li>Descarga la plantilla CSV haciendo clic en el botón de abajo</li>
+                <li>Completa la plantilla con los datos de mantenimiento</li>
+                <li>Asegúrate de que los códigos de árbol existan en el sistema</li>
+                <li>Selecciona el archivo CSV completado y haz clic en "Importar"</li>
               </ol>
             </div>
-            
+
+            {/* Botón descargar plantilla */}
+            <Button
+              variant="outline"
+              onClick={downloadTemplate}
+              className="w-full"
+            >
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              Descargar Plantilla CSV
+            </Button>
+
+            <Separator />
+
             <div className="space-y-2">
-              <Label htmlFor="csv-file">Archivo CSV</Label>
+              <Label htmlFor="csv-file">Seleccionar archivo CSV</Label>
               <Input
                 id="csv-file"
                 type="file"
@@ -1834,7 +1913,7 @@ export default function TreeMaintenancePage() {
                 onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
               />
             </div>
-            
+
             {csvFile && (
               <div className="bg-green-50 p-3 rounded-lg">
                 <p className="text-sm text-green-800">
@@ -1846,7 +1925,7 @@ export default function TreeMaintenancePage() {
               </div>
             )}
           </div>
-          
+
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => {
               setImportModal(false);

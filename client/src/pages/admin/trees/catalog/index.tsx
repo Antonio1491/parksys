@@ -1378,11 +1378,11 @@ function TreeSpeciesCatalog() {
                         <TableCell>
                           {species.isEndangered ? (
                             <Badge variant="outline" className="inline-flex items-center gap-1 bg-[#af5252] text-white text-xs px-2 py-0.5">
-                              <CircleAlert className="h-3 w-3" /> Amenazada
+                              Amenazada
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="inline-flex items-center gap-1 bg-[#75cc81] text-white text-xs px-2 py-0.5">
-                              <CircleCheck className="h-3 w-3" /> Normal
+                              Normal
                             </Badge>
                           )}
                         </TableCell>

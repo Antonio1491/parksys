@@ -1235,6 +1235,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  apiRouter.get('/parks/:parkId/events', async (req: Request, res: Response) => {
+    try {
+      const parkId = parseInt(req.params.parkId);
+      
+      // First get the park name to search in location field
+      const parkResult = await pool.query('SELECT name FROM parks WHERE id = $1', [parkId]);
+      if (parkResult.rows.length === 0) {
+        return res.json([]);
+      }
+      
+      const parkName = parkResult.rows[0].name;
+      
+      // Search for events that mention this park in their location
+      const eventsQuery = await pool.query(
+        `SELECT * FROM events 
+         WHERE LOWER(location) LIKE LOWER($1) 
+         ORDER BY start_date ASC`,
+        [`%${parkName}%`]
+      );
+      res.json(eventsQuery.rows);
+    } catch (error) {
+      console.error('Error fetching park events:', error);
+      res.json([]); // Return empty array instead of error to prevent breaking the UI
+    }
+  });
+
   // API endpoint for eventos AMBU calendar
   apiRouter.get('/eventos-ambu', async (req: Request, res: Response) => {
     try {
@@ -1434,6 +1460,495 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registrar rutas de exportación
   app.use(exportRoutes);
   console.log('✅ Rutas de exportación registradas');
+
+  // Parks with amenities 
+  apiRouter.get("/parks-with-amenities", async (_req: Request, res: Response) => {
+    try {
+      const parks = await db
+        .select({
+          id: schema.parks.id,
+          name: schema.parks.name,
+          address: schema.parks.address,
+          area: schema.parks.area,
+          codePrefix: schema.parks.codePrefix,
+          parkType: schema.parks.parkType
+        })
+        .from(schema.parks);
+      
+      res.json(parks);
+    } catch (error) {
+      console.error("Error getting parks with amenities:", error);
+      res.status(500).json({ error: "Error al obtener parques con amenidades" });
+    }
+  });
+
+  // GET /api/parks/summary?ids=... - Consolidated endpoint to get all metrics for multiple parks (DEBE IR ANTES DE /parks/:id)
+  apiRouter.get('/parks/summary', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      console.log('🔥 [PARKS-SUMMARY] Iniciando endpoint');
+      console.log('🔥 [PARKS-SUMMARY] Query params:', req.query);
+      const idsParam = req.query.ids as string;
+      
+      if (!idsParam) {
+        return res.status(400).json({ message: 'Missing ids parameter' });
+      }
+
+      const parkIds = idsParam.split(',').map(id => Number(id.trim())).filter(id => !isNaN(id));
+      
+      if (parkIds.length === 0) {
+        return res.status(400).json({ message: 'No valid park IDs provided' });
+      }
+
+      // Optimized queries using SQL aggregation for better performance
+      const summary: Record<number, any> = {};
+
+      // Initialize all parks in summary
+      parkIds.forEach(id => {
+        summary[id] = {
+          metrics: null,
+          incidents: { total: 0, priorityBreakdown: { high: 0, medium: 0, low: 0 } },
+          assets: { total: 0, typeBreakdown: { preventive: 0, corrective: 0, emergency: 0 } },
+          reports: { total: 0, typeBreakdown: { complaint: 0, suggestion: 0, compliment: 0 } },
+          schedule: { total: 0, breakdown: { activities: 0, events: 0 } }
+        };
+      });
+
+      // 1. Get metrics (using aggregated query for all parks at once)
+      const metricsQuery = `
+        SELECT 
+          park_id,
+          ROUND(AVG(overall_rating), 1) as average_rating,
+          COUNT(*) as total_evaluations,
+          ROUND(AVG(cleanliness), 1) as avg_cleanliness,
+          ROUND(AVG(safety), 1) as avg_safety,
+          ROUND(AVG(maintenance), 1) as avg_maintenance,
+          ROUND(AVG(accessibility), 1) as avg_accessibility,
+          ROUND(AVG(amenities), 1) as avg_amenities,
+          ROUND(AVG(activities), 1) as avg_activities,
+          ROUND(AVG(staff), 1) as avg_staff,
+          ROUND(AVG(natural_beauty), 1) as avg_natural_beauty
+        FROM park_evaluations 
+        WHERE park_id = ANY($1)
+        GROUP BY park_id
+      `;
+      const metricsResult = await pool.query(metricsQuery, [parkIds]);
+      
+      metricsResult.rows.forEach((row: any) => {
+        summary[row.park_id].metrics = {
+          averageRating: row.average_rating || 0,
+          totalEvaluations: parseInt(row.total_evaluations) || 0,
+          ratingBreakdown: {
+            cleanliness: row.avg_cleanliness || 0,
+            safety: row.avg_safety || 0,
+            maintenance: row.avg_maintenance || 0,
+            accessibility: row.avg_accessibility || 0,
+            amenities: row.avg_amenities || 0,
+            activities: row.avg_activities || 0,
+            staff: row.avg_staff || 0,
+            naturalBeauty: row.avg_natural_beauty || 0
+          }
+        };
+      });
+
+      // 2. Get pending incidents (aggregated by park and priority)
+      const incidentsQuery = `
+        SELECT 
+          park_id,
+          priority,
+          COUNT(*) as count
+        FROM incidents 
+        WHERE park_id = ANY($1) 
+        AND status NOT IN ('resolved', 'closed', 'cancelled')
+        GROUP BY park_id, priority
+      `;
+      const incidentsResult = await pool.query(incidentsQuery, [parkIds]);
+      
+      incidentsResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const priority = row.priority;
+        const count = parseInt(row.count);
+        
+        summary[parkId].incidents.total += count;
+        if (priority === 'high') summary[parkId].incidents.priorityBreakdown.high = count;
+        else if (priority === 'medium') summary[parkId].incidents.priorityBreakdown.medium = count;
+        else if (priority === 'low') summary[parkId].incidents.priorityBreakdown.low = count;
+      });
+
+      // 3. Get assets in maintenance (aggregated by park and type)
+      const assetsQuery = `
+        SELECT 
+          a.park_id,
+          am.maintenance_type,
+          COUNT(*) as count
+        FROM asset_maintenances am
+        INNER JOIN assets a ON am.asset_id = a.id
+        WHERE a.park_id = ANY($1)
+        AND am.status IN ('scheduled', 'in_progress')
+        GROUP BY a.park_id, am.maintenance_type
+      `;
+      const assetsResult = await pool.query(assetsQuery, [parkIds]);
+      
+      assetsResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const maintenanceType = row.maintenance_type;
+        const count = parseInt(row.count);
+        
+        summary[parkId].assets.total += count;
+        if (maintenanceType === 'preventive') summary[parkId].assets.typeBreakdown.preventive = count;
+        else if (maintenanceType === 'corrective') summary[parkId].assets.typeBreakdown.corrective = count;
+        else if (maintenanceType === 'emergency') summary[parkId].assets.typeBreakdown.emergency = count;
+      });
+
+      // 4. Get pending reports (aggregated by park and type)
+      const reportsQuery = `
+        SELECT 
+          park_id,
+          form_type,
+          COUNT(*) as count
+        FROM park_feedback 
+        WHERE park_id = ANY($1)
+        AND status IN ('pending', 'under_review')
+        GROUP BY park_id, form_type
+      `;
+      const reportsResult = await pool.query(reportsQuery, [parkIds]);
+      
+      reportsResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const formType = row.form_type;
+        const count = parseInt(row.count);
+        
+        summary[parkId].reports.total += count;
+        if (formType === 'report_problem') summary[parkId].reports.typeBreakdown.complaint = count;
+        else if (formType === 'suggest_improvement') summary[parkId].reports.typeBreakdown.suggestion = count;
+        else if (formType === 'share') summary[parkId].reports.typeBreakdown.compliment = count;
+      });
+
+      // 5. Get upcoming schedule (aggregated by park and type)
+      const now = new Date();
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(now.getDate() + 30);
+
+      const scheduleQuery = `
+        SELECT 
+          park_id,
+          'activity' as type,
+          COUNT(*) as count
+        FROM activities 
+        WHERE park_id = ANY($1)
+        AND start_date >= $2 AND start_date <= $3
+        GROUP BY park_id
+        
+        UNION ALL
+        
+        SELECT 
+          p.id as park_id,
+          'event' as type,
+          COUNT(*) as count
+        FROM events e
+        INNER JOIN parks p ON p.id = ANY($1)
+        WHERE e.location ILIKE '%' || p.name || '%'
+        AND e.start_date >= $2 AND e.start_date <= $3
+        GROUP BY p.id
+      `;
+      const scheduleResult = await pool.query(scheduleQuery, [parkIds, now, thirtyDaysFromNow]);
+      
+      scheduleResult.rows.forEach((row: any) => {
+        const parkId = row.park_id;
+        const type = row.type;
+        const count = parseInt(row.count);
+        
+        summary[parkId].schedule.total += count;
+        if (type === 'activity') summary[parkId].schedule.breakdown.activities = count;
+        else if (type === 'event') summary[parkId].schedule.breakdown.events = count;
+      });
+
+      res.json(summary);
+    } catch (error) {
+      console.error('Error fetching parks summary:', error);
+      res.status(500).json({ message: 'Error fetching parks summary' });
+    }
+  });
+
+  // Get detailed park information with all related data
+  apiRouter.get("/parks/:id/details", async (req: Request, res: Response) => {
+    try {
+      const parkId = parseInt(req.params.id);
+      console.log(`[DETAILS] Obteniendo detalles del parque ${parkId}`);
+      
+      // Get basic park information
+      const park = await storage.getPark(parkId);
+      if (!park) {
+        return res.status(404).json({ error: "Parque no encontrado" });
+      }
+      console.log(`[DETAILS] Parque encontrado: ${park.name}`);
+
+      // Get extended park data to include amenities and images
+      const extendedParks = await storage.getExtendedParks();
+      const extendedPark = extendedParks.find(p => p.id === parkId);
+
+      // Get park amenities (from extended park data)
+      const amenities = extendedPark?.amenities || [];
+
+      // Get park images (from extended park data)  
+      const images = extendedPark?.images || [];
+
+      // Use simplified queries for other data that don't require complex joins
+      const activities = await storage.getAllActivities();
+      const parkActivities = activities.filter(activity => activity.parkId === parkId).slice(0, 20);
+
+      // Get trees data with statistics for this park
+      const treesQuery = await pool.query(
+        'SELECT id, species_id, condition, planting_date, last_maintenance_date, location_description, code FROM trees WHERE park_id = $1',
+        [parkId]
+      );
+      const parkTrees = treesQuery.rows;
+      
+      // Get tree statistics
+      const treeStatsQuery = await pool.query(
+        `SELECT 
+          COUNT(*) as total,
+          COUNT(CASE WHEN condition = 'Bueno' THEN 1 END) as good,
+          COUNT(CASE WHEN condition = 'Regular' THEN 1 END) as regular,
+          COUNT(CASE WHEN condition = 'Malo' THEN 1 END) as bad
+        FROM trees WHERE park_id = $1`,
+        [parkId]
+      );
+      const treeStats = treeStatsQuery.rows[0];
+
+      // Get volunteers data for this park - usar solo columnas existentes
+      const volunteersQuery = await pool.query(
+        `SELECT 
+          id, 
+          full_name, 
+          email, 
+          phone, 
+          skills, 
+          status, 
+          preferred_park_id,
+          available_hours,
+          previous_experience,
+          age,
+          gender,
+          created_at,
+          profile_image_url,
+          address,
+          emergency_contact,
+          emergency_phone,
+          legal_consent,
+          interest_areas,
+          available_days
+        FROM volunteers 
+        WHERE preferred_park_id = $1 AND status = 'active'
+        ORDER BY created_at DESC`,
+        [parkId]
+      );
+      const parkVolunteers = volunteersQuery.rows;
+
+      // Get incidents data for this park
+      const incidentsQuery = await pool.query(
+        'SELECT id, title, severity, status, created_at FROM incidents WHERE park_id = $1 ORDER BY created_at DESC LIMIT 10',
+        [parkId]
+      );
+      const incidents = incidentsQuery.rows.map((incident: any) => ({
+        id: incident.id,
+        title: incident.title,
+        status: incident.status,
+        priority: incident.severity,
+        createdAt: incident.created_at.toISOString()
+      }));
+      const incidentsCount = incidents.length;
+
+      // Get evaluations data for this park
+      const evaluationsQuery = await pool.query(
+        'SELECT AVG(overall_rating) as avg_rating FROM park_evaluations WHERE park_id = $1',
+        [parkId]
+      );
+      const averageEvaluation = parseFloat(evaluationsQuery.rows[0].avg_rating) || 0;
+
+      // Get assets data for this park
+      const assetsQuery = await pool.query(
+        'SELECT id, name, category_id, condition, location_description as location, acquisition_date, last_maintenance_date FROM assets WHERE park_id = $1',
+        [parkId]
+      );
+      const assets = assetsQuery.rows;
+
+      // Get active concessions for this park
+      const concessionsQuery = await pool.query(
+        'SELECT COUNT(*) as count FROM active_concessions WHERE park_id = $1',
+        [parkId]
+      );
+      const activeConcessions = parseInt(concessionsQuery.rows[0]?.count || 0);
+
+      // Get feedback count for this park from park_feedback table
+      let totalFeedback = 0;
+      try {
+        const feedbackQuery = await pool.query(
+          'SELECT COUNT(*) as count FROM park_feedback WHERE park_id = $1',
+          [parkId]
+        );
+        totalFeedback = parseInt(feedbackQuery.rows[0]?.count || 0);
+        console.log(`[DETAILS] Feedback encontrado para parque ${parkId}: ${totalFeedback}`);
+      } catch (error) {
+        console.log('Error obteniendo feedback, usando valor 0:', error);
+        totalFeedback = 0;
+      }
+
+      // Get evaluations count for this park
+      const evaluationsCountQuery = await pool.query(
+        'SELECT COUNT(*) as count FROM park_evaluations WHERE park_id = $1',
+        [parkId]
+      );
+      const totalEvaluations = parseInt(evaluationsCountQuery.rows[0]?.count || 0);
+
+      // Get reservations count for this park by joining with reservable_spaces
+      let totalReservations = 0;
+      try {
+        const reservationsQuery = await pool.query(
+          `SELECT COUNT(*) as count 
+           FROM space_reservations sr 
+           JOIN reservable_spaces rs ON sr.space_id = rs.id 
+           WHERE rs.park_id = $1`,
+          [parkId]
+        );
+        totalReservations = parseInt(reservationsQuery.rows[0]?.count || 0);
+        console.log(`[DETAILS] Reservas encontradas para parque ${parkId}: ${totalReservations}`);
+      } catch (error) {
+        console.log('Error obteniendo reservas, usando valor 0:', error);
+        totalReservations = 0;
+      }
+
+      // Get events count for this park using event_parks relationship table
+      let totalEvents = 0;
+      try {
+        const eventsQuery = await pool.query(
+          `SELECT COUNT(*) as count 
+           FROM event_parks ep 
+           JOIN events e ON ep.event_id = e.id 
+           WHERE ep.park_id = $1 
+           AND e.start_date >= CURRENT_DATE`,
+          [parkId]
+        );
+        totalEvents = parseInt(eventsQuery.rows[0]?.count || 0);
+        console.log(`[DETAILS] Eventos encontrados para parque ${parkId}: ${totalEvents}`);
+      } catch (error) {
+        console.log('Error obteniendo eventos, usando valor 0:', error);
+        totalEvents = 0;
+      }
+
+      // For now, we'll use empty arrays for data we don't have direct access to
+      const documents: any[] = [];
+
+      // Calculate statistics
+      const stats = {
+        totalActivities: parkActivities.length,
+        activeVolunteers: parkVolunteers.filter(v => v.status === 'active').length,
+        totalTrees: parseInt(treeStats.total),
+        totalAssets: assets.length,
+        averageEvaluation: averageEvaluation,
+        pendingIncidents: incidentsCount,
+        activeConcessions: activeConcessions,
+        totalFeedback: totalFeedback,
+        totalEvaluations: totalEvaluations,
+        totalReservations: totalReservations,
+        totalEvents: totalEvents
+      };
+      
+      console.log(`[DETAILS] Estadísticas calculadas:`, stats);
+
+      // Build response
+      const response = {
+        id: park.id,
+        name: park.name,
+        location: park.location,
+        openingHours: park.openingHours || "Sin horarios definidos",
+        description: park.description || "Sin descripción disponible",
+        municipality: park.municipalityText ? { name: park.municipalityText } : { name: "Sin municipio" },
+        certificaciones: park.certificaciones,
+        amenities: amenities.map((amenity: any) => ({
+          id: amenity.id,
+          name: amenity.name,
+          icon: amenity.icon,
+          description: amenity.description
+        })),
+        activities: parkActivities.map((activity: any) => ({
+          id: activity.id,
+          title: activity.title,
+          description: activity.description || "",
+          startDate: activity.startDate.toISOString(),
+          instructorName: activity.instructorName || "",
+          participantCount: activity.participantCount || 0
+        })),
+        trees: {
+          data: parkTrees.map((tree: any) => ({
+            id: tree.id,
+            speciesId: tree.species_id,
+            condition: tree.condition || "bueno",
+            plantedDate: tree.planting_date?.toISOString(),
+            lastMaintenance: tree.last_maintenance_date?.toISOString(),
+            locationDescription: tree.location_description,
+            code: tree.code
+          })),
+          stats: {
+            total: parseInt(treeStats.total),
+            good: parseInt(treeStats.good),
+            regular: parseInt(treeStats.regular),
+            bad: parseInt(treeStats.bad)
+          }
+        },
+        assets: assets.map((asset: any) => ({
+          id: asset.id,
+          name: asset.name,
+          type: asset.category_id || "Sin categoría",
+          condition: asset.condition,
+          location: asset.location,
+          acquisitionDate: asset.acquisition_date?.toISOString(),
+          lastMaintenanceDate: asset.last_maintenance_date?.toISOString()
+        })),
+        incidents: incidents,
+        documents: documents,
+        images: images.map((img: any) => ({
+          id: img.id,
+          imageUrl: img.imageUrl,
+          caption: img.caption,
+          isPrimary: img.isPrimary
+        })),
+        evaluations: [], // Can be implemented when we have evaluations
+        volunteers: parkVolunteers.map((volunteer: any) => ({
+          id: volunteer.id,
+          fullName: volunteer.full_name || "Sin nombre",
+          firstName: '', // No disponible en esta tabla
+          lastName: '', // No disponible en esta tabla
+          email: volunteer.email || '',
+          phone: volunteer.phone || '',
+          skills: volunteer.skills || '',
+          status: volunteer.status || 'active',
+          availability: volunteer.available_hours || '',
+          experience: volunteer.previous_experience || '',
+          age: volunteer.age || null,
+          gender: volunteer.gender || '',
+          createdAt: volunteer.created_at ? volunteer.created_at.toISOString() : new Date().toISOString(),
+          profileImageUrl: volunteer.profile_image_url || null,
+          address: volunteer.address || '',
+          emergencyContactName: volunteer.emergency_contact || '',
+          emergencyContactPhone: volunteer.emergency_phone || '',
+          legalConsent: volunteer.legal_consent || false,
+          isActive: volunteer.status === 'active',
+          preferredPark: park.name,
+          hoursLogged: 0, // Esto podría venir de una tabla separada de horas
+          lastActivity: volunteer.created_at ? volunteer.created_at.toISOString() : null,
+          notes: '',
+          interestAreas: Array.isArray(volunteer.interest_areas) ? volunteer.interest_areas.join(', ') : 'Sin áreas de interés especificadas',
+          availableDays: Array.isArray(volunteer.available_days) ? volunteer.available_days.join(', ') : 'Sin días especificados'
+        })),
+        stats
+      };
+
+      res.json(response);
+    } catch (error) {
+      console.error("Error fetching park details:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
 
   // Get all amenities - Con DISTINCT para evitar duplicados
   apiRouter.get("/amenities", async (_req: Request, res: Response) => {
@@ -1785,6 +2300,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get amenities for a specific park - FIXED VERSION SIN DUPLICADOS
+  apiRouter.get("/parks/:id/amenities", async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      console.log(`DEBUG: Endpoint /parks/${parkId}/amenities llamado - Devolviendo park_amenities`);
+      
+      // Consulta simplificada para evitar duplicados
+      const result = await pool.query(`
+        SELECT 
+          pa.id,
+          pa.park_id as "parkId",
+          pa.amenity_id as "amenityId",
+          pa.module_name as "moduleName",
+          pa.location_latitude as "locationLatitude",
+          pa.location_longitude as "locationLongitude",
+          pa.surface_area as "surfaceArea",
+          pa.status,
+          pa.description,
+          a.name as "amenityName",
+          a.icon as "amenityIcon",
+          a.custom_icon_url as "customIconUrl"
+        FROM park_amenities pa
+        INNER JOIN amenities a ON pa.amenity_id = a.id
+        WHERE pa.park_id = $1
+        ORDER BY a.name
+      `, [parkId]);
+      
+      console.log(`DEBUG: Amenidades encontradas para parque ${parkId}:`, result.rows.length);
+      res.setHeader('Content-Type', 'application/json');
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching park amenities:", error);
+      res.status(500).json({ message: "Error fetching park amenities" });
+    }
+  });
+
+  // NOTA: Endpoint duplicado eliminado - usando el endpoint principal de línea 1423
+  // que incluye certificaciones y todos los campos necesarios
+
+  // Add an amenity to a park (admin/municipality only)
+  app.post("/api/parks/:id/amenities", async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      const amenityId = Number(req.body.amenityId);
+      const moduleName = req.body.moduleName || '';
+      const locationLatitude = req.body.locationLatitude || null;
+      const locationLongitude = req.body.locationLongitude || null;
+      const surfaceArea = req.body.surfaceArea || null;
+      const status = req.body.status || 'Activa';
+      const description = req.body.description || '';
+      
+      console.log("Datos recibidos:", { parkId, amenityId, moduleName, locationLatitude, locationLongitude, surfaceArea, status, description });
+      
+      // Usar SQL directo con parámetros para seguridad
+      const result = await pool.query(`
+        INSERT INTO park_amenities (park_id, amenity_id, module_name, location_latitude, location_longitude, surface_area, status, description)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *
+      `, [parkId, amenityId, moduleName, locationLatitude, locationLongitude, surfaceArea, status, description]);
+      
+      console.log("Resultado de inserción:", result.rows[0]);
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error("Error al agregar amenidad:", error);
+      res.status(500).json({ 
+        message: "Error adding amenity to park",
+        details: error.message 
+      });
+    }
+  });
+
   // Import amenities from file (admin only)
   apiRouter.post("/amenities/import", upload.single('file'), async (req: Request, res: Response) => {
     try {
@@ -2005,6 +2591,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Agregamos las rutas de los parques
   registerParkRoutes(app);
 
+  // Get images for a specific park
+  apiRouter.get("/parks/:id/images", async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      const images = await storage.getParkImages(parkId);
+      
+      // Mapear las columnas de la base de datos a los nombres esperados por el frontend
+      const mappedImages = images.map(img => ({
+        id: img.id,
+        parkId: img.parkId,
+        imageUrl: img.imageUrl, // Usar directamente 'imageUrl'
+        caption: img.caption,
+        isPrimary: img.isPrimary,
+        createdAt: img.createdAt
+      }));
+      
+      res.json(mappedImages);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching park images" });
+    }
+  });
+
+  // Alternative route for direct image deletion (used by frontend)
+  apiRouter.delete("/park-images/:imageId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const imageId = Number(req.params.imageId);
+      console.log(`🗑️ DELETE: Eliminando imagen ${imageId}`);
+      
+      // Obtener la imagen para verificar que existe y obtener info del parque
+      const image = await storage.getParkImage(imageId);
+      if (!image) {
+        console.log(`❌ DELETE: Imagen ${imageId} no encontrada`);
+        return res.status(404).json({ message: "Image not found" });
+      }
+      
+      console.log(`📍 DELETE: Imagen ${imageId} pertenece al parque ${image.parkId}`);
+      
+      // Eliminar la imagen del sistema de archivos si existe
+      if (image.imageUrl && image.imageUrl.startsWith('/uploads/')) {
+        try {
+          const filePath = path.join(process.cwd(), image.imageUrl);
+          
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+            console.log(`🗂️ DELETE: Archivo físico eliminado: ${filePath}`);
+          }
+        } catch (fileError) {
+          console.error(`⚠️ DELETE: Error eliminando archivo físico:`, fileError);
+          // Continuar con la eliminación de la base de datos aunque falle el archivo
+        }
+      }
+      
+      // Eliminar la imagen de la base de datos
+      const result = await storage.deleteParkImage(imageId);
+      
+      if (!result) {
+        console.log(`❌ DELETE: No se pudo eliminar imagen ${imageId} de la base de datos`);
+        return res.status(404).json({ message: "Image not found in database" });
+      }
+      
+      console.log(`✅ DELETE: Imagen ${imageId} eliminada exitosamente`);
+      res.status(204).send();
+    } catch (error) {
+      console.error(`💥 DELETE: Error eliminando imagen ${req.params.imageId}:`, error);
+      res.status(500).json({ message: "Error removing image" });
+    }
+  });
+
+  // ARREGLAR: Establecer imagen principal (la ruta que el frontend espera)
+  apiRouter.post('/park-images/:id/set-primary', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const imageId = parseInt(req.params.id);
+      console.log(`🔧 [FIX] Estableciendo imagen ${imageId} como principal`);
+      
+      // Obtener la imagen para verificar que existe y obtener el parkId
+      const image = await storage.getParkImage(imageId);
+      if (!image) {
+        console.log(`❌ [FIX] Imagen ${imageId} no encontrada`);
+        return res.status(404).json({ error: 'Imagen no encontrada' });
+      }
+      
+      const parkId = image.parkId;
+      console.log(`🔧 [FIX] Imagen pertenece al parque ${parkId}`);
+      
+      // Desmarcar todas las imágenes como principales para este parque
+      const parkImages = await storage.getParkImages(parkId);
+      for (const parkImage of parkImages) {
+        if (parkImage.isPrimary) {
+          await storage.updateParkImage(parkImage.id, { isPrimary: false });
+        }
+      }
+      console.log(`🔧 [FIX] Desmarcadas todas las imágenes principales del parque ${parkId}`);
+      
+      // Marcar esta imagen como principal
+      const updatedImage = await storage.updateParkImage(imageId, { isPrimary: true });
+      
+      console.log(`✅ [FIX] Imagen ${imageId} establecida como principal:`, updatedImage);
+      res.json({ 
+        message: 'Imagen establecida como principal',
+        image: updatedImage
+      });
+      
+    } catch (error) {
+      console.error('❌ [FIX] Error estableciendo imagen principal:', error);
+      res.status(500).json({ error: 'Error al establecer imagen principal' });
+    }
+  });
+  
+  // Eliminar documento de parque (producción)
+  apiRouter.delete("/park-documents/:documentId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const documentId = Number(req.params.documentId);
+      console.log(`🗑️ DELETE /park-documents/${documentId} - Iniciando eliminación`);
+      console.log(`🔍 Usuario autenticado:`, { id: req.user.id, role: req.user.role });
+      
+      // Verificamos que el documento existe y obtenemos su parkId
+      const document = await storage.getDocument(documentId);
+      if (!document) {
+        console.log(`❌ Documento ${documentId} no encontrado`);
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      console.log(`📋 Documento encontrado:`, { id: document.id, parkId: document.parkId, title: document.title });
+
+      console.log(`✅ Permisos verificados, procediendo a eliminar documento ${documentId}`);
+      const result = await storage.deleteDocument(documentId);
+      
+      if (!result) {
+        console.log(`❌ No se pudo eliminar el documento ${documentId}`);
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      console.log(`✅ Documento ${documentId} eliminado exitosamente`);
+      res.status(204).send();
+    } catch (error) {
+      console.error(`❌ Error eliminando documento ${req.params.documentId}:`, error);
+      res.status(500).json({ message: "Error removing document from park" });
+    }
+  });
+
   // Get all documents
   apiRouter.get("/documents", async (_req: Request, res: Response) => {
     try {
@@ -2025,6 +2752,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all activities
+  // REMOVIDO - Endpoint duplicado reemplazado por el siguiente
+
+  // Get activities for a specific park
+  apiRouter.get("/parks/:id/activities", async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      const activities = await storage.getParkActivities(parkId);
+      res.json(activities);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching park activities" });
+    }
+  });
+  
   // Endpoint NUEVO para obtener todas las actividades con imágenes
   apiRouter.get("/actividades-fotos", async (_req: Request, res: Response) => {
     try {
@@ -2480,6 +3222,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add an activity to a park (admin/municipality only)
+  apiRouter.post("/parks/:id/activities", isAuthenticated, hasParkAccess, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      console.log("Datos recibidos en POST /parks/:id/activities:", req.body);
+      
+      // Extraer los datos
+      const { startDate, endDate, ...otherData } = req.body;
+      
+      // Convertir las fechas explícitamente a objetos Date
+      let parsedStartDate: Date;
+      let parsedEndDate: Date | undefined;
+      
+      try {
+        parsedStartDate = new Date(startDate);
+        if (endDate) {
+          parsedEndDate = new Date(endDate);
+        }
+      } catch (e) {
+        console.error("Error al convertir fechas:", e);
+        return res.status(400).json({ message: "Formato de fecha inválido" });
+      }
+      
+      // Verificar que la fecha de inicio es válida
+      if (isNaN(parsedStartDate.getTime())) {
+        return res.status(400).json({ message: "La fecha de inicio no es válida" });
+      }
+      
+      // Verificar que la fecha de fin es válida (si existe)
+      if (parsedEndDate && isNaN(parsedEndDate.getTime())) {
+        return res.status(400).json({ message: "La fecha de fin no es válida" });
+      }
+      
+      // Crear el objeto con los datos procesados
+      const activityData = { 
+        ...otherData, 
+        parkId,
+        startDate: parsedStartDate,
+        ...(parsedEndDate && { endDate: parsedEndDate })
+      };
+      
+      console.log("Datos procesados:", activityData);
+      
+      const data = insertActivitySchema.parse(activityData);
+      const result = await storage.createActivity(data);
+      
+      res.status(201).json(result);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        console.error("Error de validación Zod:", error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      console.error("Error al crear actividad:", error);
+      res.status(500).json({ message: "Error adding activity to park" });
+    }
+  });
+  
   // Update an activity (admin/municipality only)
   apiRouter.put("/activities/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
@@ -2581,6 +3381,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Error eliminando actividad" });
+    }
+  });
+
+  // Get comments for a specific park
+  apiRouter.get("/parks/:id/comments", async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      const approvedOnly = req.query.approvedOnly === 'true';
+      
+      const comments = await storage.getParkComments(parkId, approvedOnly);
+      res.json(comments);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching park comments" });
+    }
+  });
+
+  // Add a comment to a park (public)
+  apiRouter.post("/parks/:id/comments", async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      const commentData = { ...req.body, parkId, approved: autoApprove };
+      
+      const data = insertCommentSchema.parse(commentData);
+      const result = await storage.createComment(data);
+      
+      res.status(201).json(result);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      console.error(error);
+      res.status(500).json({ message: "Error adding comment to park" });
     }
   });
 
@@ -2688,6 +3523,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Report an incident for a park (public)
+  apiRouter.post("/parks/:id/incidents", async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      const incidentData = { ...req.body, parkId };
+      
+      const data = insertIncidentSchema.parse(incidentData);
+      const result = await storage.createIncident(data);
+      
+      res.status(201).json(result);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      console.error(error);
+      res.status(500).json({ message: "Error reporting incident" });
+    }
+  });
+  
   // Get incidents statistics
   apiRouter.get("/incidents/stats", async (req: Request, res: Response) => {
     try {
@@ -3496,6 +4351,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get incidents for a specific park
+  apiRouter.get("/parks/:id/incidents", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      // Verificamos que el usuario tenga acceso al parque si no es super_admin
+      if (req.user.role !== 'super_admin') {
+        const park = await storage.getPark(parkId);
+        if (!park) {
+          return res.status(404).json({ message: "Park not found" });
+        }
+      }
+      
+      const incidents = await storage.getParkIncidents(parkId);
+      
+      res.json(incidents);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching park incidents" });
+    }
+  });
+
   // Import incidents from CSV
   apiRouter.post("/incidents/import", upload.single('file'), async (req: Request, res: Response) => {
     try {
@@ -3666,7 +4543,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add the parks list endpoint to the main API router for frontend compatibility
+  apiRouter.get("/public/parks/list", async (_req: Request, res: Response) => {
+    try {
+      // Get basic park data for dropdowns/forms
+      const parks = await storage.getParks({ includeDeleted: false });
+      const parkList = parks.map(park => ({
+        id: park.id,
+        name: park.name
+      }));
+      
+      res.json(parkList);
+    } catch (error) {
+      console.error("Error fetching parks list:", error);
+      res.status(500).json({ 
+        status: "error", 
+        message: "Error fetching parks list" 
+      });
+    }
+  });
+
   // Continuamos usando el mismo publicRouter definido antes
+  
+  // Get simple parks list for forms and dropdowns
+  publicRouter.get("/parks/list", async (_req: Request, res: Response) => {
+    try {
+      // Get basic park data for dropdowns/forms
+      const parks = await storage.getParks({ includeDeleted: false });
+      const parkList = parks.map(park => ({
+        id: park.id,
+        name: park.name
+      }));
+      
+      res.json(parkList);
+    } catch (error) {
+      console.error("Error fetching parks list:", error);
+      res.status(500).json({ 
+        status: "error", 
+        message: "Error fetching parks list" 
+      });
+    }
+  });
   
   // Get basic park data - limited information for public consumption
   publicRouter.get("/parks", async (_req: Request, res: Response) => {
@@ -3697,6 +4614,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get detailed park view for admin
+  apiRouter.get("/parks/:id/view", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      // Get activities for this park
+      const activitiesData = await db.select()
+        .from(activities)
+        .where(eq(activities.parkId, parkId));
+      
+      // Get trees data if table exists
+      let treesData = [];
+      try {
+        treesData = await db.select().from(trees).where(eq(trees.parkId, parkId));
+      } catch (e) {
+        // Tree table might not exist yet
+      }
+      
+      // Get volunteers data if table exists
+      let volunteersData = [];
+      try {
+        volunteersData = await db.select().from(volunteers).where(eq(volunteers.preferredParkId, parkId));
+      } catch (e) {
+        // Volunteers table might not exist yet
+      }
+      
+      // Get multimedia data (images and documents)
+      let images = [];
+      let documents = [];
+      try {
+        const imagesResult = await db.execute(
+          'SELECT id, park_id as "parkId", image_url as "imageUrl", is_primary as "isPrimary", caption FROM park_images WHERE park_id = $1 ORDER BY is_primary DESC',
+          [parkId]
+        );
+        images = Array.isArray(imagesResult) ? imagesResult : (imagesResult.rows || []);
+        
+        const documentsResult = await db.execute(
+          'SELECT id, park_id as "parkId", title, file_url as "fileUrl", file_type as "fileType", description, category, created_at as "createdAt" FROM park_documents WHERE park_id = $1 ORDER BY created_at DESC',
+          [parkId]
+        );
+        documents = Array.isArray(documentsResult) ? documentsResult : (documentsResult.rows || []);
+      } catch (e) {
+        console.log('Error fetching multimedia data:', e);
+      }
+      
+      // Placeholder arrays for other data types
+      const amenities = [];
+      const incidents = [];
+      const evaluations = [];
+      
+      // Calculate stats
+      const stats = {
+        totalActivities: activitiesData.length,
+        activeVolunteers: volunteersData.filter((v: any) => v.isActive).length,
+        totalTrees: treesData.length,
+        averageEvaluation: evaluations.length > 0 ? evaluations.reduce((acc: number, evaluation: any) => acc + evaluation.score, 0) / evaluations.length : 0,
+        pendingIncidents: incidents.filter((inc: any) => inc.status === 'pending' || inc.status === 'open').length
+      };
+      
+      const result = {
+        ...park,
+        municipality: municipality,
+        amenities: amenities,
+        activities: activitiesData,
+        trees: treesData,
+        volunteers: volunteersData,
+        incidents: incidents,
+        documents: documents,
+        images: images,
+        evaluations: evaluations,
+        stats: stats
+      };
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching park view:", error);
+      res.status(500).json({ message: "Error fetching park data" });
+    }
+  });
+
   // Get detailed information about a specific park
   publicRouter.get("/parks/:id", async (req: Request, res: Response) => {
     try {
@@ -3775,6 +4772,503 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // ===== NUEVOS ENDPOINTS DE MÉTRICAS DE PARQUES =====
+  
+  // GET /api/parks/:id/metrics - Evaluación promedio del parque
+  apiRouter.get('/parks/:id/metrics', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ message: 'Invalid park ID' });
+      }
+
+      // Obtener evaluaciones del parque para calcular promedio
+      const evaluationsResult = await db.select({
+        overallRating: parkEvaluations.overallRating,
+        cleanliness: parkEvaluations.cleanliness,
+        safety: parkEvaluations.safety,
+        maintenance: parkEvaluations.maintenance,
+        accessibility: parkEvaluations.accessibility,
+        amenities: parkEvaluations.amenities,
+        activities: parkEvaluations.activities,
+        staff: parkEvaluations.staff,
+        naturalBeauty: parkEvaluations.naturalBeauty
+      })
+      .from(parkEvaluations)
+      .where(eq(parkEvaluations.parkId, parkId));
+
+      if (evaluationsResult.length === 0) {
+        return res.json({
+          averageRating: null,
+          totalEvaluations: 0,
+          ratingBreakdown: null
+        });
+      }
+
+      // Calcular promedio general
+      const totalRatings = evaluationsResult.reduce((sum, evaluation) => sum + (evaluation.overallRating || 0), 0);
+      const averageRating = totalRatings / evaluationsResult.length;
+
+      // Calcular promedios por categoría
+      const categoryAverages = {
+        cleanliness: evaluationsResult.reduce((sum, e) => sum + (e.cleanliness || 0), 0) / evaluationsResult.length,
+        safety: evaluationsResult.reduce((sum, e) => sum + (e.safety || 0), 0) / evaluationsResult.length,
+        maintenance: evaluationsResult.reduce((sum, e) => sum + (e.maintenance || 0), 0) / evaluationsResult.length,
+        accessibility: evaluationsResult.reduce((sum, e) => sum + (e.accessibility || 0), 0) / evaluationsResult.length,
+        amenities: evaluationsResult.reduce((sum, e) => sum + (e.amenities || 0), 0) / evaluationsResult.length,
+        activities: evaluationsResult.reduce((sum, e) => sum + (e.activities || 0), 0) / evaluationsResult.length,
+        staff: evaluationsResult.reduce((sum, e) => sum + (e.staff || 0), 0) / evaluationsResult.length,
+        naturalBeauty: evaluationsResult.reduce((sum, e) => sum + (e.naturalBeauty || 0), 0) / evaluationsResult.length
+      };
+
+      res.json({
+        averageRating: Math.round(averageRating * 10) / 10,
+        totalEvaluations: evaluationsResult.length,
+        ratingBreakdown: categoryAverages
+      });
+    } catch (error) {
+      console.error('Error fetching park metrics:', error);
+      res.status(500).json({ message: 'Error fetching park metrics' });
+    }
+  });
+
+  // GET /api/parks/:id/pending-incidents - Incidencias pendientes
+  apiRouter.get('/parks/:id/pending-incidents', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ message: 'Invalid park ID' });
+      }
+
+      // Obtener incidencias pendientes (status diferente de 'resolved' o 'closed')
+      const pendingIncidents = await db.select({
+        id: incidents.id,
+        title: incidents.title,
+        incidentType: incidents.incidentType,
+        status: incidents.status,
+        priority: incidents.priority,
+        createdAt: incidents.createdAt
+      })
+      .from(incidents)
+      .where(eq(incidents.parkId, parkId));
+
+      // Filtrar solo las pendientes
+      const pending = pendingIncidents.filter(incident => 
+        incident.status !== 'resolved' && 
+        incident.status !== 'closed' && 
+        incident.status !== 'cancelled'
+      );
+
+      // Contar por prioridad
+      const priorityCount = {
+        high: pending.filter(i => i.priority === 'high').length,
+        medium: pending.filter(i => i.priority === 'medium').length,
+        low: pending.filter(i => i.priority === 'low').length
+      };
+
+      res.json({
+        total: pending.length,
+        incidents: pending,
+        priorityBreakdown: priorityCount
+      });
+    } catch (error) {
+      console.error('Error fetching pending incidents:', error);
+      res.status(500).json({ message: 'Error fetching pending incidents' });
+    }
+  });
+
+  // GET /api/parks/:id/assets-in-maintenance - Activos en mantenimiento
+  apiRouter.get('/parks/:id/assets-in-maintenance', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ message: 'Invalid park ID' });
+      }
+
+      // Obtener activos en mantenimiento del parque
+      const assetsInMaintenance = await db.select({
+        assetId: assets.id,
+        assetName: assets.name,
+        maintenanceId: assetMaintenances.id,
+        maintenanceType: assetMaintenances.maintenanceType,
+        status: assetMaintenances.status,
+        date: assetMaintenances.date,
+        nextMaintenanceDate: assetMaintenances.nextMaintenanceDate
+      })
+      .from(assetMaintenances)
+      .innerJoin(assets, eq(assetMaintenances.assetId, assets.id))
+      .where(eq(assets.parkId, parkId));
+
+      // Filtrar solo los que están en mantenimiento activo
+      const activeMaintenance = assetsInMaintenance.filter(maintenance => 
+        maintenance.status === 'scheduled' || 
+        maintenance.status === 'in_progress'
+      );
+
+      // Contar por tipo de mantenimiento
+      const typeCount = {
+        preventive: activeMaintenance.filter(m => m.maintenanceType === 'preventive').length,
+        corrective: activeMaintenance.filter(m => m.maintenanceType === 'corrective').length,
+        emergency: activeMaintenance.filter(m => m.maintenanceType === 'emergency').length
+      };
+
+      res.json({
+        total: activeMaintenance.length,
+        assets: activeMaintenance,
+        typeBreakdown: typeCount
+      });
+    } catch (error) {
+      console.error('Error fetching assets in maintenance:', error);
+      res.status(500).json({ message: 'Error fetching assets in maintenance' });
+    }
+  });
+
+  // GET /api/parks/:id/reports - Reportes pendientes (usando visitor feedback)
+  apiRouter.get('/parks/:id/reports', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ message: 'Invalid park ID' });
+      }
+
+      // Obtener feedback de visitantes pendiente de revisión
+      const pendingReports = await pool.query(`
+        SELECT 
+          id,
+          name as "visitorName",
+          form_type as "feedbackType",
+          message,
+          status,
+          created_at as "createdAt"
+        FROM park_feedback 
+        WHERE park_id = $1 
+        AND status IN ('pending', 'under_review')
+        ORDER BY created_at DESC
+      `, [parkId]);
+
+      // Contar por tipo
+      const typeCount = {
+        complaint: pendingReports.rows.filter((r: any) => r.feedbackType === 'complaint').length,
+        suggestion: pendingReports.rows.filter((r: any) => r.feedbackType === 'suggestion').length,
+        compliment: pendingReports.rows.filter((r: any) => r.feedbackType === 'compliment').length
+      };
+
+      res.json({
+        total: pendingReports.rows.length,
+        reports: pendingReports.rows,
+        typeBreakdown: typeCount
+      });
+    } catch (error) {
+      console.error('Error fetching pending reports:', error);
+      res.status(500).json({ message: 'Error fetching pending reports' });
+    }
+  });
+
+  // GET /api/parks/:id/upcoming-schedule - Actividades y eventos programados
+  apiRouter.get('/parks/:id/upcoming-schedule', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ message: 'Invalid park ID' });
+      }
+
+      const now = new Date();
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(now.getDate() + 30);
+
+      // Obtener actividades próximas
+      const upcomingActivities = await db.select({
+        id: activities.id,
+        title: activities.title,
+        startDate: activities.startDate,
+        endDate: activities.endDate,
+        category: activities.category,
+        type: sql<string>`'activity'`.as('type')
+      })
+      .from(activities)
+      .where(eq(activities.parkId, parkId));
+
+      // Obtener eventos próximos que mencionen el parque en su ubicación
+      const parkResult = await db.select({ name: parks.name })
+        .from(parks)
+        .where(eq(parks.id, parkId))
+        .limit(1);
+
+      let upcomingEvents: any[] = [];
+      if (parkResult.length > 0) {
+        const parkName = parkResult[0].name;
+        
+        const eventsQuery = await pool.query(`
+          SELECT 
+            id,
+            title,
+            start_date as "startDate",
+            end_date as "endDate",
+            event_type as "eventType",
+            'event' as type
+          FROM events 
+          WHERE (location ILIKE $1 OR location ILIKE $2)
+          AND start_date >= $3
+          AND start_date <= $4
+          ORDER BY start_date ASC
+        `, [`%${parkName}%`, `%${parkId}%`, now.toISOString(), thirtyDaysFromNow.toISOString()]);
+        
+        upcomingEvents = eventsQuery.rows;
+      }
+
+      // Filtrar actividades próximas
+      const filteredActivities = upcomingActivities.filter(activity => {
+        const startDate = new Date(activity.startDate);
+        return startDate >= now && startDate <= thirtyDaysFromNow;
+      });
+
+      // Combinar y ordenar por fecha
+      const allUpcoming = [...filteredActivities, ...upcomingEvents]
+        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+      res.json({
+        total: allUpcoming.length,
+        schedule: allUpcoming,
+        breakdown: {
+          activities: filteredActivities.length,
+          events: upcomingEvents.length
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching upcoming schedule:', error);
+      res.status(500).json({ message: 'Error fetching upcoming schedule' });
+    }
+  });
+
+
+  // ===== FIN ENDPOINTS DE MÉTRICAS DE PARQUES =====
+
+  // ===== ENDPOINTS DE EVALUACIONES DE PARQUES =====
+  
+  // POST /api/park-evaluations - Crear nueva evaluación de parque
+  apiRouter.post('/park-evaluations', async (req: Request, res: Response) => {
+    try {
+      console.log('📝 [PARK-EVALUATIONS] Recibiendo nueva evaluación:', req.body);
+      
+      // Validar datos con el schema
+      const validatedData = schema.insertParkEvaluationSchema.parse(req.body);
+      
+      // Insertar en la base de datos
+      const [newEvaluation] = await db.insert(schema.parkEvaluations)
+        .values({
+          ...validatedData,
+          status: 'pending', // Por defecto las evaluaciones requieren moderación
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      
+      console.log('✅ [PARK-EVALUATIONS] Evaluación creada exitosamente:', newEvaluation.id);
+      
+      res.status(201).json({
+        success: true,
+        data: newEvaluation,
+        message: 'Evaluación enviada exitosamente. Será revisada antes de publicarse.'
+      });
+    } catch (error) {
+      console.error('❌ [PARK-EVALUATIONS] Error creando evaluación:', error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          message: 'Datos de evaluación inválidos',
+          errors: error.errors
+        });
+      }
+      
+      res.status(500).json({
+        success: false,
+        message: 'Error al enviar la evaluación. Por favor intenta nuevamente.'
+      });
+    }
+  });
+
+  // GET /api/park-evaluations/:parkId - Obtener evaluaciones de un parque
+  apiRouter.get('/park-evaluations/:parkId', async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.parkId);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ success: false, message: 'ID de parque inválido' });
+      }
+      
+      // Obtener solo evaluaciones aprobadas para usuarios públicos
+      const evaluations = await db.select()
+        .from(schema.parkEvaluations)
+        .where(eq(schema.parkEvaluations.parkId, parkId));
+      
+      res.json({
+        success: true,
+        data: evaluations
+      });
+    } catch (error) {
+      console.error('❌ [PARK-EVALUATIONS] Error obteniendo evaluaciones:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener evaluaciones'
+      });
+    }
+  });
+
+  // GET /api/parks/:id/evaluation-stats - Obtener estadísticas de evaluaciones de un parque
+  apiRouter.get('/parks/:id/evaluation-stats', async (req: Request, res: Response) => {
+    try {
+      const parkId = Number(req.params.id);
+      
+      if (isNaN(parkId)) {
+        return res.status(400).json({ success: false, message: 'ID de parque inválido' });
+      }
+      
+      // Obtener estadísticas solo de evaluaciones aprobadas
+      const statsResult = await db.execute(sql`
+        SELECT 
+          COUNT(*)::int as total_evaluations,
+          AVG(overall_rating)::numeric(3,2) as average_rating,
+          (COUNT(*) FILTER (WHERE would_recommend = true)::numeric / NULLIF(COUNT(*)::numeric, 0) * 100)::numeric(5,2) as recommendation_rate,
+          AVG(cleanliness)::numeric(3,2) as avg_cleanliness,
+          AVG(safety)::numeric(3,2) as avg_safety,
+          AVG(maintenance)::numeric(3,2) as avg_maintenance,
+          AVG(accessibility)::numeric(3,2) as avg_accessibility,
+          AVG(amenities)::numeric(3,2) as avg_amenities,
+          AVG(activities)::numeric(3,2) as avg_activities,
+          AVG(staff)::numeric(3,2) as avg_staff,
+          AVG(natural_beauty)::numeric(3,2) as avg_natural_beauty,
+          COUNT(*) FILTER (WHERE overall_rating = 5)::int as five_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 4)::int as four_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 3)::int as three_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 2)::int as two_star_count,
+          COUNT(*) FILTER (WHERE overall_rating = 1)::int as one_star_count
+        FROM park_evaluations
+        WHERE park_id = ${parkId} AND status = 'approved'
+      `);
+      
+      const stats = statsResult.rows[0] || {
+        total_evaluations: 0,
+        average_rating: 0,
+        recommendation_rate: 0,
+        avg_cleanliness: 0,
+        avg_safety: 0,
+        avg_maintenance: 0,
+        avg_accessibility: 0,
+        avg_amenities: 0,
+        avg_activities: 0,
+        avg_staff: 0,
+        avg_natural_beauty: 0,
+        five_star_count: 0,
+        four_star_count: 0,
+        three_star_count: 0,
+        two_star_count: 0,
+        one_star_count: 0
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error('❌ [PARK-EVALUATIONS] Error obteniendo estadísticas:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener estadísticas'
+      });
+    }
+  });
+
+  // GET /api/evaluations/parks - Obtener todas las evaluaciones de parques (admin)
+  apiRouter.get('/evaluations/parks', async (req: Request, res: Response) => {
+    try {
+      // Obtener todas las evaluaciones con información del parque
+      const evaluations = await db.execute(sql`
+        SELECT 
+          pe.*,
+          p.name as "parkName"
+        FROM park_evaluations pe
+        LEFT JOIN parks p ON pe.park_id = p.id
+        ORDER BY pe.created_at DESC
+      `);
+      
+      res.json(evaluations.rows || []);
+    } catch (error) {
+      console.error('❌ [EVALUATIONS] Error obteniendo evaluaciones:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener evaluaciones'
+      });
+    }
+  });
+
+  // PUT /api/evaluations/parks/:id - Actualizar estado de evaluación (moderar)
+  apiRouter.put('/evaluations/parks/:id', async (req: Request, res: Response) => {
+    try {
+      const evaluationId = Number(req.params.id);
+      const { status, moderationNotes } = req.body;
+      
+      if (isNaN(evaluationId)) {
+        return res.status(400).json({ success: false, message: 'ID inválido' });
+      }
+      
+      // Obtener ID del usuario moderador
+      const moderatorId = (req.user as any)?.id || null;
+      
+      // Actualizar la evaluación
+      const [updated] = await db.update(schema.parkEvaluations)
+        .set({
+          status,
+          moderatedBy: moderatorId,
+          moderatedAt: new Date(),
+          moderationNotes,
+          updatedAt: new Date()
+        })
+        .where(eq(schema.parkEvaluations.id, evaluationId))
+        .returning();
+      
+      res.json({
+        success: true,
+        data: updated
+      });
+    } catch (error) {
+      console.error('❌ [EVALUATIONS] Error actualizando evaluación:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al actualizar evaluación'
+      });
+    }
+  });
+
+  // DELETE /api/evaluations/parks/:id - Eliminar evaluación
+  apiRouter.delete('/evaluations/parks/:id', async (req: Request, res: Response) => {
+    try {
+      const evaluationId = Number(req.params.id);
+      
+      if (isNaN(evaluationId)) {
+        return res.status(400).json({ success: false, message: 'ID inválido' });
+      }
+      
+      await db.delete(schema.parkEvaluations)
+        .where(eq(schema.parkEvaluations.id, evaluationId));
+      
+      res.json({
+        success: true,
+        message: 'Evaluación eliminada correctamente'
+      });
+    } catch (error) {
+      console.error('❌ [EVALUATIONS] Error eliminando evaluación:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al eliminar evaluación'
+      });
+    }
+  });
+  
+  // ===== FIN ENDPOINTS DE EVALUACIONES DE PARQUES =====
   
   // Ruta pública para obtener instructores activos
   publicRouter.get("/instructors", async (_req: Request, res: Response) => {
