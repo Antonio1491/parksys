@@ -58,6 +58,8 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Tipos para los árboles del inventario
 interface TreeInventory {
@@ -1144,135 +1146,122 @@ function TreeMapPage() {
             ))}
           </div>
         ) : (
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      {selectionMode && (
-                        <th className="px-4 py-3 text-left w-12">
-                          <input
-                            type="checkbox"
-                            checked={filteredAreas.length > 0 && filteredAreas.every(area => selectedAreas.has(area.id))}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                handleSelectAllAreas();
-                              } else {
-                                handleDeselectAllAreas();
-                              }
-                            }}
-                            className="h-4 w-4 rounded border-gray-300"
-                          />
-                        </th>
-                      )}
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Nombre
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Parque
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Código
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Árboles
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Estado
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Acciones
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {filteredAreas.map((area) => (
-                      <tr 
-                        key={area.id} 
-                        className={`hover:bg-gray-50 cursor-pointer ${
-                          selectedAreas.has(area.id) ? 'bg-[#ceefea]' : ''
-                        }`}
-                        onClick={() => {
-                          if (selectionMode) {
-                            const newSelected = new Set(selectedAreas);
-                            if (newSelected.has(area.id)) {
-                              newSelected.delete(area.id);
-                            } else {
-                              newSelected.add(area.id);
-                            }
-                            setSelectedAreas(newSelected);
-                          } else {
-                              setLocation(ROUTES.admin.trees.operationDetail.build(area.id));
-                          }
-                        }}
-                      >
-                        {selectionMode && (
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <input
-                              type="checkbox"
-                              checked={selectedAreas.has(area.id)}
-                              onChange={() => {}}
-                              className="h-4 w-4 rounded border-gray-300"
-                            />
-                          </td>
-                        )}
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">{area.name}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-600">{area.parkName || '-'}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-600">{area.areaCode || '-'}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center text-sm text-gray-600">
-                            <TreeDeciduous className="h-4 w-4 text-[#00a587] mr-1" />
-                            {area.treeCount || 0}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge variant={area.status === 'activa' ? "default" : "secondary"}>
-                            {area.status === 'activa' ? "Activa" : "Inactiva"}
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {!selectionMode && (
-                            <div className="flex gap-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEdit(area);
-                                }}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (confirm(`¿Estás seguro de eliminar el área "${area.name}"?`)) {
-                                    deleteAreaMutation.mutate(area.id);
-                                  }
-                                }}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="rounded-xl overflow-hidden">
+  <Table>
+    <TableHeader>
+      <TableRow>
+        {selectionMode && (
+          <TableHead className="w-[50px]">
+            <Checkbox
+              checked={filteredAreas.length > 0 && filteredAreas.every(area => selectedAreas.has(area.id))}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  handleSelectAllAreas();
+                } else {
+                  handleDeselectAllAreas();
+                }
+              }}
+            />
+          </TableHead>
+        )}
+        <TableHead>Nombre</TableHead>
+        <TableHead>Parque</TableHead>
+        <TableHead>Código</TableHead>
+        <TableHead>Árboles</TableHead>
+        <TableHead>Estado</TableHead>
+        <TableHead className="text-right">Acciones</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {filteredAreas.map((area) => (
+        <TableRow 
+          key={area.id}
+          className={`cursor-pointer hover:bg-muted/50 transition-colors ${
+            selectedAreas.has(area.id) ? 'bg-[#ceefea]' : ''
+          }`}
+          onClick={() => {
+            if (selectionMode) {
+              const newSelected = new Set(selectedAreas);
+              if (newSelected.has(area.id)) {
+                newSelected.delete(area.id);
+              } else {
+                newSelected.add(area.id);
+              }
+              setSelectedAreas(newSelected);
+            } else {
+              setLocation(ROUTES.admin.trees.operationDetail.build(area.id));
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label={`Ver detalles del área ${area.name}`}
+        >
+          {selectionMode && (
+            <TableCell onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                checked={selectedAreas.has(area.id)}
+                onCheckedChange={() => {
+                  const newSelected = new Set(selectedAreas);
+                  if (newSelected.has(area.id)) {
+                    newSelected.delete(area.id);
+                  } else {
+                    newSelected.add(area.id);
+                  }
+                  setSelectedAreas(newSelected);
+                }}
+              />
+            </TableCell>
+          )}
+          <TableCell>
+            <p className="font-medium">{area.name}</p>
+          </TableCell>
+          <TableCell>{area.parkName || '-'}</TableCell>
+          <TableCell>{area.areaCode || '-'}</TableCell>
+          <TableCell>
+            <div className="flex items-center">
+              <TreeDeciduous className="h-4 w-4 text-[#00a587] mr-1" />
+              {area.treeCount || 0}
+            </div>
+          </TableCell>
+          <TableCell>
+            <Badge variant={area.status === 'activa' ? "default" : "secondary"}>
+              {area.status === 'activa' ? "Activa" : "Inactiva"}
+            </Badge>
+          </TableCell>
+          <TableCell className="text-right">
+            {!selectionMode && (
+              <div 
+                className="flex justify-end space-x-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
+                  onClick={() => handleEdit(area)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-transparent text-destructive hover:text-destructive hover:bg-destructive/10 h-11 w-11"
+                  onClick={() => {
+                    if (confirm(`¿Estás seguro de eliminar el área "${area.name}"?`)) {
+                      deleteAreaMutation.mutate(area.id);
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</div>
         )}
       </div>
 

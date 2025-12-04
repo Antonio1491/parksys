@@ -216,12 +216,12 @@ const AdminParksContent = () => {
   const [parkToDelete, setParkToDelete] = useState<Park | null>(null);
   const [parkDependencies, setParkDependencies] = useState<ParkDependencies | null>(null);
   const [loadingDependencies, setLoadingDependencies] = useState(false);
-  
+
   // Bulk delete states
   const [selectedParks, setSelectedParks] = useState<Set<number>>(new Set());
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   const [bulkDeleteDependencies, setBulkDeleteDependencies] = useState<{[key: number]: ParkDependencies} | null>(null);
-  
+
   // Pagination and view states
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -351,7 +351,7 @@ const AdminParksContent = () => {
               ⭐ {metrics.averageRating.toFixed(1)} ({metrics.totalEvaluations} eval.)
             </Badge>
           )}
-          
+
           {/* Badge de estado del parque */}
           <Badge 
             variant="status" 
@@ -415,7 +415,7 @@ const AdminParksContent = () => {
     queryFn: () => apiRequest('/api/parks?variant=card'),
     staleTime: 30000, // Cache for 30 seconds
   });
-  
+
   const parks = parksResponse?.data || [];
   // Mapear los datos para que coincidan con la interfaz esperada
   const parksWithImages = React.useMemo(() => {
@@ -434,9 +434,7 @@ const AdminParksContent = () => {
   const fetchParkDependencies = async (parkId: number) => {
     setLoadingDependencies(true);
     try {
-      const response = await fetch(`/api/parks/${parkId}/dependencies`);
-      if (!response.ok) throw new Error('Error al obtener dependencias');
-      const dependencies = await response.json();
+      const dependencies = await apiRequest(`/api/parks/${parkId}/dependencies`);
       setParkDependencies(dependencies);
     } catch (error) {
       console.error('Error fetching dependencies:', error);
@@ -509,7 +507,7 @@ const AdminParksContent = () => {
       const matchesSearch = searchQuery === '' || 
         park.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         park.address.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       return matchesSearch;
     }).sort((a, b) => a.name.localeCompare(b.name));
   }, [parksWithImages, searchQuery]);
@@ -591,7 +589,7 @@ const AdminParksContent = () => {
             <ChevronLeft className="h-4 w-4" />
             Anterior
           </Button>
-          
+
           {pages.map(page => (
             <Button
               key={page}
@@ -603,7 +601,7 @@ const AdminParksContent = () => {
               {page}
             </Button>
           ))}
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -802,13 +800,13 @@ const AdminParksContent = () => {
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               <div className="space-y-2">
                 <div className="flex items-center font-poppins text-sm text-gray-600">
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <div className="flex gap-2">
                   <Button
@@ -827,7 +825,7 @@ const AdminParksContent = () => {
                     Editar
                   </Button>
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -886,22 +884,19 @@ const AdminParksContent = () => {
   const handleBulkDeleteClick = async () => {
     if (selectedParks.size === 0) return;
     setShowBulkDeleteDialog(true);
-    
+
     // Fetch dependencies for all selected parks
     setLoadingDependencies(true);
     const dependencies: {[key: number]: ParkDependencies} = {};
-    
+
     for (const parkId of Array.from(selectedParks)) {
       try {
-        const response = await fetch(`/api/parks/${parkId}/dependencies`);
-        if (response.ok) {
-          dependencies[parkId] = await response.json();
-        }
+        dependencies[parkId] = await apiRequest(`/api/parks/${parkId}/dependencies`);
       } catch (error) {
         console.error(`Error fetching dependencies for park ${parkId}:`, error);
       }
     }
-    
+
     setBulkDeleteDependencies(dependencies);
     setLoadingDependencies(false);
   };
@@ -994,7 +989,7 @@ const AdminParksContent = () => {
             />,
           ]}
         />
-                  
+
         <Toolbar
           // Búsqueda
           searchQuery={searchQuery}
@@ -1016,7 +1011,7 @@ const AdminParksContent = () => {
           // Eliminación bulk
           onBulkDelete={handleBulkDeleteClick}
         />
-        
+
         {/* Parks content */}
         {currentParks.length === 0 ? (
           <div className="text-center py-12">
@@ -1041,40 +1036,44 @@ const AdminParksContent = () => {
         <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar {selectedParks.size} parque{selectedParks.size > 1 ? 's' : ''}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción eliminará permanentemente los parques seleccionados y todos sus datos asociados.
-              {loadingDependencies && (
-                <div className="mt-4 text-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mx-auto"></div>
-                  <p className="mt-2 text-sm">Analizando dependencias...</p>
-                </div>
-              )}
-              {bulkDeleteDependencies && Object.keys(bulkDeleteDependencies).length > 0 && (
-                <div className="mt-4 p-4 bg-yellow-50 rounded-md max-h-60 overflow-y-auto">
-                  <h4 className="font-medium text-yellow-800 mb-2">Dependencias que serán eliminadas:</h4>
-                  <div className="space-y-2 text-sm text-yellow-700">
-                    {Object.entries(bulkDeleteDependencies).map(([parkId, deps]) => {
-                      const park = parks.find(p => p.id.toString() === parkId);
-                      const totalDeps = deps.total || 0;
-                      return totalDeps > 0 ? (
-                        <div key={parkId} className="border-l-2 border-yellow-300 pl-2">
-                          <div className="font-medium">{park?.name || `Parque ${parkId}`} ({totalDeps} registros):</div>
-                          <div className="ml-2 text-xs">
-                            {deps.trees > 0 && <span className="mr-2">🌳 {deps.trees} árboles</span>}
-                            {deps.activities > 0 && <span className="mr-2">🏃 {deps.activities} actividades</span>}
-                            {deps.amenities > 0 && <span className="mr-2">🛠️ {deps.amenities} amenidades</span>}
-                            {deps.assets > 0 && <span className="mr-2">📦 {deps.assets} activos</span>}
-                            {deps.images > 0 && <span className="mr-2">📸 {deps.images} imágenes</span>}
-                            {deps.documents > 0 && <span className="mr-2">📄 {deps.documents} documentos</span>}
-                            {deps.evaluations > 0 && <span className="mr-2">⭐ {deps.evaluations} evaluaciones</span>}
-                            {deps.incidents > 0 && <span className="mr-2">⚠️ {deps.incidents} incidencias</span>}
-                          </div>
-                        </div>
-                      ) : null;
-                    })}
+            <AlertDialogDescription asChild>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Esta acción eliminará permanentemente los parques seleccionados y todos sus datos asociados.
+                </p>
+                {loadingDependencies && (
+                  <div className="mt-4 text-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mx-auto"></div>
+                    <p className="mt-2 text-sm">Analizando dependencias...</p>
                   </div>
-                </div>
-              )}
+                )}
+                {bulkDeleteDependencies && Object.keys(bulkDeleteDependencies).length > 0 && (
+                  <div className="mt-4 p-4 bg-yellow-50 rounded-md max-h-60 overflow-y-auto">
+                    <h4 className="font-medium text-yellow-800 mb-2">Dependencias que serán eliminadas:</h4>
+                    <div className="space-y-2 text-sm text-yellow-700">
+                      {Object.entries(bulkDeleteDependencies).map(([parkId, deps]) => {
+                        const park = parks.find(p => p.id.toString() === parkId);
+                        const totalDeps = deps.total || 0;
+                        return totalDeps > 0 ? (
+                          <div key={parkId} className="border-l-2 border-yellow-300 pl-2">
+                            <div className="font-medium">{park?.name || `Parque ${parkId}`} ({totalDeps} registros):</div>
+                            <div className="ml-2 text-xs">
+                              {deps.trees > 0 && <span className="mr-2">🌳 {deps.trees} árboles</span>}
+                              {deps.activities > 0 && <span className="mr-2">🏃 {deps.activities} actividades</span>}
+                              {deps.amenities > 0 && <span className="mr-2">🛠️ {deps.amenities} amenidades</span>}
+                              {deps.assets > 0 && <span className="mr-2">📦 {deps.assets} activos</span>}
+                              {deps.images > 0 && <span className="mr-2">📸 {deps.images} imágenes</span>}
+                              {deps.documents > 0 && <span className="mr-2">📄 {deps.documents} documentos</span>}
+                              {deps.evaluations > 0 && <span className="mr-2">⭐ {deps.evaluations} evaluaciones</span>}
+                              {deps.incidents > 0 && <span className="mr-2">⚠️ {deps.incidents} incidencias</span>}
+                            </div>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1095,33 +1094,37 @@ const AdminParksContent = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar parque?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción eliminará permanentemente el parque "{parkToDelete?.name}" y todos sus datos asociados.
-              {loadingDependencies && (
-                <div className="mt-4 text-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
-                  <p className="mt-2 text-sm text-gray-600">Verificando dependencias...</p>
-                </div>
-              )}
-              {parkDependencies && (
-                <div className="mt-4 p-4 bg-yellow-50 rounded-md">
-                  <h4 className="font-medium text-yellow-800 mb-2">Datos que serán eliminados:</h4>
-                  <div className="text-sm text-yellow-700 space-y-1">
-                    {parkDependencies.trees > 0 && <div>• {parkDependencies.trees} árboles</div>}
-                    {parkDependencies.treeMaintenances > 0 && <div>• {parkDependencies.treeMaintenances} mantenimientos de árboles</div>}
-                    {parkDependencies.activities > 0 && <div>• {parkDependencies.activities} actividades</div>}
-                    {parkDependencies.incidents > 0 && <div>• {parkDependencies.incidents} incidentes</div>}
-                    {parkDependencies.amenities > 0 && <div>• {parkDependencies.amenities} amenidades</div>}
-                    {parkDependencies.images > 0 && <div>• {parkDependencies.images} imágenes</div>}
-                    {parkDependencies.assets > 0 && <div>• {parkDependencies.assets} activos</div>}
-                    {parkDependencies.volunteers > 0 && <div>• {parkDependencies.volunteers} asignaciones de voluntarios</div>}
-                    {parkDependencies.instructors > 0 && <div>• {parkDependencies.instructors} asignaciones de instructores</div>}
-                    {parkDependencies.evaluations > 0 && <div>• {parkDependencies.evaluations} evaluaciones</div>}
-                    {parkDependencies.documents > 0 && <div>• {parkDependencies.documents} documentos</div>}
-                    <div className="font-medium mt-2">Total: {parkDependencies.total} registros asociados</div>
+            <AlertDialogDescription asChild>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Esta acción eliminará permanentemente el parque "{parkToDelete?.name}" y todos sus datos asociados.
+                </p>
+                {loadingDependencies && (
+                  <div className="mt-4 text-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                    <p className="mt-2 text-sm text-gray-600">Verificando dependencias...</p>
                   </div>
-                </div>
-              )}
+                )}
+                {parkDependencies && (
+                  <div className="mt-4 p-4 bg-yellow-50 rounded-md">
+                    <h4 className="font-medium text-yellow-800 mb-2">Datos que serán eliminados:</h4>
+                    <div className="text-sm text-yellow-700 space-y-1">
+                      {parkDependencies.trees > 0 && <div>• {parkDependencies.trees} árboles</div>}
+                      {parkDependencies.treeMaintenances > 0 && <div>• {parkDependencies.treeMaintenances} mantenimientos de árboles</div>}
+                      {parkDependencies.activities > 0 && <div>• {parkDependencies.activities} actividades</div>}
+                      {parkDependencies.incidents > 0 && <div>• {parkDependencies.incidents} incidentes</div>}
+                      {parkDependencies.amenities > 0 && <div>• {parkDependencies.amenities} amenidades</div>}
+                      {parkDependencies.images > 0 && <div>• {parkDependencies.images} imágenes</div>}
+                      {parkDependencies.assets > 0 && <div>• {parkDependencies.assets} activos</div>}
+                      {parkDependencies.volunteers > 0 && <div>• {parkDependencies.volunteers} asignaciones de voluntarios</div>}
+                      {parkDependencies.instructors > 0 && <div>• {parkDependencies.instructors} asignaciones de instructores</div>}
+                      {parkDependencies.evaluations > 0 && <div>• {parkDependencies.evaluations} evaluaciones</div>}
+                      {parkDependencies.documents > 0 && <div>• {parkDependencies.documents} documentos</div>}
+                      <div className="font-medium mt-2">Total: {parkDependencies.total} registros asociados</div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

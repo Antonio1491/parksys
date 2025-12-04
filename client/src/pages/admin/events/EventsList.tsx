@@ -34,7 +34,8 @@ import {
   Square,
   ChevronLeft,
   ChevronRight,
-  ImageIcon
+  ImageIcon,
+  CalendarDays,
 } from 'lucide-react';
 
 // Interfaces
@@ -626,7 +627,7 @@ const EventsList: React.FC = () => {
         <PageHeader 
           title="Listado de eventos"
           subtitle="Eventos registrados en el sistema"
-          icon={<List />}
+          icon={<CalendarDays />}
           actions={[
             <Button
               key="new-event"

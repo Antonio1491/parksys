@@ -906,24 +906,24 @@ const AdminActivities = () => {
           actions={[
             <Button
               key="nuevo"
+              variant="primary"
               onClick={() => setLocation(ROUTES.admin.activities.create)}
-              className="bg-[#a0cc4d] hover:bg-[#00a587] text-white hover:text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Nuevo
             </Button>,
             <Button
               key="importar"
+              variant="secondary"
               onClick={() => setShowImportDialog(true)}
-              className="bg-white border-[#f4f5f7v] text-[#00444f] hover:bg-[#00a587] hover:text-white"
             >
               <Upload className="h-4 w-4 mr-2" />
               Importar
             </Button>,
             <Button
               key="exportar"
+              variant="tertiary"
               onClick={handleExportCSV}
-              className="bg-[#00444f] text-[#ffffff] hover:bg-[#00a587] hover:text-white"
             >
               <Download className="h-4 w-4 mr-2" />
               Exportar

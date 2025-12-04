@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageHeader } from '@/components/ui/page-header';
+import { Toolbar } from '@/components/ui/toolbar';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { 
-  Search, 
   Plus, 
   Edit, 
   Trash2, 
-  Eye, 
-  Grid3X3, 
-  List, 
-  Download, 
+  Download,
   Upload,
-  Heart,
+  AlertTriangle,
+  PawPrint,
+  Bird,
   Fish,
   Bug,
   Rabbit,
@@ -27,23 +35,20 @@ import {
   ChevronRight,
   FileDown,
   FileUp,
-  AlertTriangle,
-  Info
+  ImageIcon
 } from 'lucide-react';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { insertFaunaSpeciesSchema, type FaunaSpecies } from '@shared/schema';
+import { type FaunaSpecies } from '@shared/schema';
 import { z } from 'zod';
-
-// Para el formulario, usamos un esquema que NO valida - solo manejamos la limpieza en handleUpdate
-const updateFaunaSpeciesSchema = z.any();
-import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/AdminLayout';
 import { apiRequest } from '@/lib/queryClient';
 import { ImageUploader } from '@/components/ImageUploader';
+
+// Schema permisivo para formulario
+const updateFaunaSpeciesSchema = z.any();
 
 interface FaunaSpeciesWithPagination {
   data: FaunaSpecies[];
@@ -56,29 +61,46 @@ interface FaunaSpeciesWithPagination {
 }
 
 const FaunaSpeciesAdmin: React.FC = () => {
+  // ========== ESTADOS ==========
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [conservationFilter, setConservationFilter] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Estados de dialogs
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState<FaunaSpecies | null>(null);
+
+  // Estados de importación
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
-  
+
+  // Estados de selección múltiple
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+
   const itemsPerPage = 9;
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // ========== FILTROS ==========
+  const hasActiveFilters = categoryFilter !== 'all' || conservationFilter !== 'all';
+
+  const handleClearFilters = () => {
+    setCategoryFilter('all');
+    setConservationFilter('all');
+  };
 
   // Reset página cuando cambian los filtros
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, categoryFilter, conservationFilter]);
 
-  // Query para obtener especies de fauna
+  // ========== QUERIES ==========
   const { data: speciesResponse, isLoading } = useQuery<FaunaSpeciesWithPagination>({
     queryKey: ['/api/fauna/species', currentPage, itemsPerPage, searchTerm, categoryFilter, conservationFilter],
     queryFn: async () => {
@@ -89,27 +111,26 @@ const FaunaSpeciesAdmin: React.FC = () => {
         category: categoryFilter,
         conservation_status: conservationFilter
       });
-      
+
       const response = await fetch(`/api/fauna/species?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar especies');
-      }
-      
+
+      if (!response.ok) throw new Error('Error al cargar especies');
       return response.json();
     }
   });
 
-  // Query para estadísticas
   const { data: stats } = useQuery({
     queryKey: ['/api/fauna/stats']
   });
 
-  // Formulario para crear/editar especies
+  const species = speciesResponse?.data || [];
+  const pagination = speciesResponse?.pagination;
+
+  // ========== FORMULARIO ==========
   const form = useForm({
     resolver: zodResolver(updateFaunaSpeciesSchema),
     defaultValues: {
@@ -142,12 +163,9 @@ const FaunaSpeciesAdmin: React.FC = () => {
     }
   });
 
-  // Mutaciones
+  // ========== MUTACIONES ==========
   const createMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/fauna/species', {
-      method: 'POST',
-      data: data
-    }),
+    mutationFn: (data: any) => apiRequest('/api/fauna/species', { method: 'POST', data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fauna/species'] });
       queryClient.invalidateQueries({ queryKey: ['/api/fauna/stats'] });
@@ -155,18 +173,14 @@ const FaunaSpeciesAdmin: React.FC = () => {
       form.reset();
       toast({ title: 'Especie creada exitosamente' });
     },
-    onError: (error) => {
-      console.error('Error creating species:', error);
+    onError: () => {
       toast({ title: 'Error al crear la especie', variant: 'destructive' });
     }
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/fauna/species/${id}`, {
-        method: 'PUT',
-        data: data
-      }),
+      apiRequest(`/api/fauna/species/${id}`, { method: 'PUT', data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fauna/species'] });
       queryClient.invalidateQueries({ queryKey: ['/api/fauna/stats'] });
@@ -174,8 +188,7 @@ const FaunaSpeciesAdmin: React.FC = () => {
       form.reset();
       toast({ title: 'Especie actualizada exitosamente' });
     },
-    onError: (error) => {
-      console.error('Error updating species:', error);
+    onError: () => {
       toast({ title: 'Error al actualizar la especie', variant: 'destructive' });
     }
   });
@@ -192,46 +205,38 @@ const FaunaSpeciesAdmin: React.FC = () => {
     }
   });
 
-  const species = speciesResponse?.data || [];
-  const pagination = speciesResponse?.pagination;
-
-  // Funciones de manejo
-  const handleCreate = (data: any) => {
-    console.log('Datos del formulario:', data);
-    // Filtrar campos vacíos y enviar solo los que tienen valor
+  // ========== HANDLERS ==========
+  const cleanFormData = (data: any) => {
     const cleanData: any = {
       commonName: data.commonName,
       scientificName: data.scientificName,
       family: data.family,
       category: data.category,
       conservationStatus: data.conservationStatus || 'estable',
-      isNocturnal: data.isNocturnal || false,
-      isMigratory: data.isMigratory || false,
-      isEndangered: data.isEndangered || false,
-      commonLocations: data.commonLocations || [],
+      isNocturnal: Boolean(data.isNocturnal),
+      isMigratory: Boolean(data.isMigratory),
+      isEndangered: Boolean(data.isEndangered),
+      commonLocations: Array.isArray(data.commonLocations) ? data.commonLocations : [],
       iconColor: data.iconColor || '#16a085',
       iconType: data.iconType || 'system'
     };
 
-    // Añadir campos opcionales solo si tienen valor
-    if (data.habitat) cleanData.habitat = data.habitat;
-    if (data.description) cleanData.description = data.description;
-    if (data.behavior) cleanData.behavior = data.behavior;
-    if (data.diet) cleanData.diet = data.diet;
-    if (data.reproductionPeriod) cleanData.reproductionPeriod = data.reproductionPeriod;
-    if (data.sizeCm) cleanData.sizeCm = data.sizeCm;
-    if (data.weightGrams) cleanData.weightGrams = data.weightGrams;
-    if (data.lifespan) cleanData.lifespan = data.lifespan;
-    if (data.imageUrl) cleanData.imageUrl = data.imageUrl;
-    if (data.photoUrl) cleanData.photoUrl = data.photoUrl;
-    if (data.photoCaption) cleanData.photoCaption = data.photoCaption;
-    if (data.ecologicalImportance) cleanData.ecologicalImportance = data.ecologicalImportance;
-    if (data.threats) cleanData.threats = data.threats;
-    if (data.protectionMeasures) cleanData.protectionMeasures = data.protectionMeasures;
-    if (data.observationTips) cleanData.observationTips = data.observationTips;
-    if (data.bestObservationTime) cleanData.bestObservationTime = data.bestObservationTime;
-    console.log('Datos limpiados:', cleanData);
-    createMutation.mutate(cleanData);
+    // Campos opcionales
+    const optionalFields = ['habitat', 'description', 'behavior', 'diet', 'reproductionPeriod', 
+      'sizeCm', 'weightGrams', 'imageUrl', 'photoUrl', 'photoCaption', 'ecologicalImportance', 
+      'threats', 'protectionMeasures', 'observationTips', 'bestObservationTime'];
+
+    optionalFields.forEach(field => {
+      if (data[field]) cleanData[field] = data[field];
+    });
+
+    if (data.lifespan) cleanData.lifespan = Number(data.lifespan) || 0;
+
+    return cleanData;
+  };
+
+  const handleCreate = (data: any) => {
+    createMutation.mutate(cleanFormData(data));
   };
 
   const handleEdit = (speciesData: FaunaSpecies) => {
@@ -241,22 +246,8 @@ const FaunaSpeciesAdmin: React.FC = () => {
   };
 
   const handleUpdate = (data: any) => {
-    console.log('🔄 HANDLE UPDATE EJECUTÁNDOSE - Datos recibidos:', data);
-    console.log('🔍 Selected species:', selectedSpecies);
-    
-    if (!selectedSpecies) {
-      console.error('❌ No hay especie seleccionada para actualizar');
-      toast({
-        title: 'Error',
-        description: 'No hay especie seleccionada para actualizar',
-        variant: 'destructive'
-      });
-      return;
-    }
+    if (!selectedSpecies) return;
 
-    console.log('✅ Especie seleccionada encontrada, procesando actualización...');
-    
-    // Validar campos requeridos manualmente
     if (!data.commonName || !data.scientificName || !data.family || !data.category) {
       toast({
         title: 'Error',
@@ -265,46 +256,9 @@ const FaunaSpeciesAdmin: React.FC = () => {
       });
       return;
     }
-    
-    // Remover campos que no deben ser enviados (como id, createdAt, updatedAt)
-    const { id, createdAt, updatedAt, ...formData } = data;
-    
-    // Filtrar y limpiar datos similares a handleCreate
-    const cleanData = {
-      commonName: formData.commonName,
-      scientificName: formData.scientificName,
-      family: formData.family,
-      category: formData.category,
-      conservationStatus: formData.conservationStatus || 'estable',
-      isNocturnal: Boolean(formData.isNocturnal),
-      isMigratory: Boolean(formData.isMigratory),
-      isEndangered: Boolean(formData.isEndangered),
-      commonLocations: Array.isArray(formData.commonLocations) ? formData.commonLocations : [],
-      iconColor: formData.iconColor || '#16a085',
-      iconType: formData.iconType || 'system'
-    };
 
-    // Añadir campos opcionales solo si tienen valor
-    if (formData.habitat) cleanData.habitat = formData.habitat;
-    if (formData.description) cleanData.description = formData.description;
-    if (formData.behavior) cleanData.behavior = formData.behavior;
-    if (formData.diet) cleanData.diet = formData.diet;
-    if (formData.reproductionPeriod) cleanData.reproductionPeriod = formData.reproductionPeriod;
-    if (formData.sizeCm) cleanData.sizeCm = formData.sizeCm;
-    if (formData.weightGrams) cleanData.weightGrams = formData.weightGrams;
-    if (formData.lifespan) cleanData.lifespan = Number(formData.lifespan) || 0;
-    if (formData.imageUrl) cleanData.imageUrl = formData.imageUrl;
-    if (formData.photoUrl) cleanData.photoUrl = formData.photoUrl;
-    if (formData.photoCaption) cleanData.photoCaption = formData.photoCaption;
-    if (formData.ecologicalImportance) cleanData.ecologicalImportance = formData.ecologicalImportance;
-    if (formData.threats) cleanData.threats = formData.threats;
-    if (formData.protectionMeasures) cleanData.protectionMeasures = formData.protectionMeasures;
-    if (formData.observationTips) cleanData.observationTips = formData.observationTips;
-    if (formData.bestObservationTime) cleanData.bestObservationTime = formData.bestObservationTime;
-    
-    console.log('📋 Datos de actualización limpiados:', cleanData);
-    console.log('🚀 Ejecutando mutación con ID:', selectedSpecies.id);
-    updateMutation.mutate({ id: selectedSpecies.id, data: cleanData });
+    const { id, createdAt, updatedAt, ...formData } = data;
+    updateMutation.mutate({ id: selectedSpecies.id, data: cleanFormData(formData) });
   };
 
   const handleDelete = (id: number) => {
@@ -313,19 +267,48 @@ const FaunaSpeciesAdmin: React.FC = () => {
     }
   };
 
-  // Funciones de importación CSV
+  const handleView = (speciesData: FaunaSpecies) => {
+    setSelectedSpecies(speciesData);
+    setIsViewDialogOpen(true);
+  };
+
+  // ========== SELECCIÓN MÚLTIPLE ==========
+  const handleSelectAll = () => {
+    const newSelected = new Set(species.map(sp => sp.id));
+    setSelectedItems(newSelected);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedItems(new Set());
+  };
+
+  const handleToggleSelect = (id: number) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedItems(newSelected);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedItems.size === 0) return;
+    if (confirm(`¿Eliminar ${selectedItems.size} especie(s) seleccionada(s)?`)) {
+      selectedItems.forEach(id => deleteMutation.mutate(id));
+      setSelectedItems(new Set());
+      setSelectionMode(false);
+    }
+  };
+
+  // ========== IMPORTACIÓN CSV ==========
   const handleImportCSV = async () => {
     if (!importFile) {
-      toast({
-        title: 'Error',
-        description: 'Por favor selecciona un archivo CSV',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Selecciona un archivo CSV', variant: 'destructive' });
       return;
     }
 
     setIsImporting(true);
-    
     try {
       const formData = new FormData();
       formData.append('csvFile', importFile);
@@ -333,40 +316,22 @@ const FaunaSpeciesAdmin: React.FC = () => {
       const response = await fetch('/api/fauna/import-csv', {
         method: 'POST',
         body: formData,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
 
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: 'Importación exitosa',
-          description: result.message
-        });
-        
-        // Refrescar datos
+        toast({ title: 'Importación exitosa', description: result.message });
         queryClient.invalidateQueries({ queryKey: ['/api/fauna/species'] });
         queryClient.invalidateQueries({ queryKey: ['/api/fauna/stats'] });
-        
-        // Cerrar diálogo y limpiar
         setIsImportDialogOpen(false);
         setImportFile(null);
       } else {
-        toast({
-          title: 'Error en importación',
-          description: result.error,
-          variant: 'destructive'
-        });
+        toast({ title: 'Error en importación', description: result.error, variant: 'destructive' });
       }
     } catch (error) {
-      console.error('Error importing CSV:', error);
-      toast({
-        title: 'Error',
-        description: 'Error al importar el archivo CSV',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Error al importar el archivo CSV', variant: 'destructive' });
     } finally {
       setIsImporting(false);
     }
@@ -375,68 +340,70 @@ const FaunaSpeciesAdmin: React.FC = () => {
   const handleDownloadTemplate = async () => {
     try {
       const response = await fetch('/api/fauna/csv-template', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
 
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.style.display = 'none';
         a.href = url;
         a.download = 'plantilla_fauna_especies.csv';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        
-        toast({
-          title: 'Plantilla descargada',
-          description: 'La plantilla CSV se ha descargado correctamente'
-        });
-      } else {
-        throw new Error('Error al descargar plantilla');
+        toast({ title: 'Plantilla descargada' });
       }
     } catch (error) {
-      console.error('Error downloading template:', error);
-      toast({
-        title: 'Error',
-        description: 'Error al descargar la plantilla CSV',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Error al descargar plantilla', variant: 'destructive' });
     }
   };
 
-  const handleView = (speciesData: FaunaSpecies) => {
-    setSelectedSpecies(speciesData);
-    setIsViewDialogOpen(true);
-  };
-
-  // Función para obtener el ícono de categoría
+  // ========== HELPERS DE UI ==========
   const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'aves': return <Heart className="h-5 w-5 text-blue-600" />;
-      case 'mamiferos': return <Rabbit className="h-5 w-5 text-green-600" />;
-      case 'insectos': return <Bug className="h-5 w-5 text-yellow-600" />;
-      case 'vida_acuatica': return <Fish className="h-5 w-5 text-teal-600" />;
-      default: return <Heart className="h-5 w-5 text-gray-600" />;
-    }
+    const icons: Record<string, React.ReactNode> = {
+      'aves': <Bird className="h-4 w-4" />,
+      'mamiferos': <Rabbit className="h-4 w-4" />,
+      'insectos': <Bug className="h-4 w-4" />,
+      'vida_acuatica': <Fish className="h-4 w-4" />
+    };
+    return icons[category] || <PawPrint className="h-4 w-4" />;
   };
 
-  // Función para obtener el color del badge de estado de conservación
-  const getConservationStatusColor = (status: string) => {
-    switch (status) {
-      case 'estable': return 'bg-green-100 text-green-800';
-      case 'vulnerable': return 'bg-yellow-100 text-yellow-800';
-      case 'en_peligro': return 'bg-orange-100 text-orange-800';
-      case 'en_peligro_critico': return 'bg-red-100 text-red-800';
-      case 'extinto_local': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+  const getCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      'aves': 'Aves',
+      'mamiferos': 'Mamíferos',
+      'insectos': 'Insectos',
+      'vida_acuatica': 'Vida Acuática'
+    };
+    return labels[category] || category;
   };
 
+  const getConservationBadgeClass = (status: string) => {
+    const classes: Record<string, string> = {
+      'estable': 'bg-green-100 text-green-800',
+      'vulnerable': 'bg-yellow-100 text-yellow-800',
+      'en_peligro': 'bg-orange-100 text-orange-800',
+      'en_peligro_critico': 'bg-red-100 text-red-800',
+      'extinto_local': 'bg-gray-100 text-gray-800'
+    };
+    return classes[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getConservationLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      'estable': 'Estable',
+      'vulnerable': 'Vulnerable',
+      'en_peligro': 'En Peligro',
+      'en_peligro_critico': 'Peligro Crítico',
+      'extinto_local': 'Extinto Local'
+    };
+    return labels[status] || status;
+  };
+
+  // ========== LOADING ==========
   if (isLoading) {
     return (
       <AdminLayout>
@@ -450,264 +417,162 @@ const FaunaSpeciesAdmin: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <PageHeader 
-          title="Gestión de Fauna" 
-          subtitle="Administra el catálogo de especies de fauna urbana." />
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setIsImportDialogOpen(true)}>
-              <FileUp className="h-4 w-4 mr-2" />
+        {/* ========== PAGE HEADER ========== */}
+        <PageHeader
+          title="Catálogo de Fauna"
+          subtitle="Especies de fauna que habitan en los parques urbanos."
+          icon={<Bird />}
+          actions={[
+            <Button
+              key="nuevo"
+              variant="primary"
+              onClick={() => setIsCreateDialogOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo
+            </Button>,
+            <Button
+              key="importar"
+              variant="secondary"
+              onClick={() => setIsImportDialogOpen(true)}
+            >
+              <Upload className="h-4 w-4 mr-2" />
               Importar
-            </Button>
-            <Button variant="outline" size="sm">
-              <FileDown className="h-4 w-4 mr-2" />
+            </Button>,
+            <Button
+              key="exportar"
+              variant="tertiary"
+            >
+              <Download className="h-4 w-4 mr-2" />
               Exportar
             </Button>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nueva Especie
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Crear Nueva Especie</DialogTitle>
-                  <DialogDescription>
-                    Agrega una nueva especie al catálogo de fauna
-                  </DialogDescription>
-                </DialogHeader>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit((data) => {
-                    console.log('SUBMIT EJECUTADO', data);
-                    handleCreate(data);
-                  })} className="space-y-4">
-                    {/* Subida de Imagen */}
-                    <div className="space-y-2">
-                      <Label>Fotografía de la Especie</Label>
-                      <ImageUploader
-                        currentImageUrl={form.watch('photoUrl')}
-                        onImageUploaded={(url) => form.setValue('photoUrl', url)}
-                      />
-                    </div>
+          ]}
+        />
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="commonName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nombre Común</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Nombre común de la especie" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="scientificName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nombre Científico</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Nombre científico" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="family"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Familia</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Familia taxonómica" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Categoría</FormLabel>
-                            <Select value={field.value} onValueChange={field.onChange}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Seleccionar categoría" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="aves">Aves</SelectItem>
-                                <SelectItem value="mamiferos">Mamíferos</SelectItem>
-                                <SelectItem value="insectos">Insectos</SelectItem>
-                                <SelectItem value="vida_acuatica">Vida Acuática</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="habitat"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Hábitat</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Hábitat natural" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Descripción</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Descripción de la especie" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="behavior"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Comportamiento</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Comportamiento de la especie" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="flex justify-end gap-2">
-                      <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                        Cancelar
-                      </Button>
-                      <Button 
-                        type="submit" 
-                        disabled={createMutation.isPending}
-                        onClick={() => console.log('BOTÓN CLICKEADO', form.formState.errors)}
-                      >
-                        {createMutation.isPending ? 'Creando...' : 'Crear Especie'}
-                      </Button>
-                    </div>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-
-        {/* Estadísticas */}
+        {/* ========== STATS CARDS ========== */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Especies</CardTitle>
-                <Heart className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.data.total}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Aves</CardTitle>
-                <Heart className="h-4 w-4 text-blue-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.data.byCategory.find(c => c.category === 'aves')?.count || 0}
+          <div className="grid grid-cols-4 gap-4">
+            {/* Total Especies - 1/4 */}
+            <Card className="border-0 shadow-sm" style={{ backgroundColor: '#ceefea' }}>
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-[#00444f]">Total Especies</span>
+                  <div className="rounded-full p-2" style={{ backgroundColor: '#00444f' }}>
+                    <PawPrint className="h-4 w-4 text-white" />
+                  </div>
                 </div>
+                <div className="text-2xl font-bold text-[#00444f]">{stats.data?.total || 0}</div>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Mamíferos</CardTitle>
-                <Rabbit className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.data.byCategory.find(c => c.category === 'mamiferos')?.count || 0}
+
+            {/* En Peligro - 1/4 */}
+            <Card className="border-0 shadow-sm" style={{ backgroundColor: '#ceefea' }}>
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-[#00444f]">En Peligro</span>
+                  <div className="rounded-full p-2" style={{ backgroundColor: '#00444f' }}>
+                    <AlertTriangle className="h-4 w-4 text-white" />
+                  </div>
                 </div>
+                <div className="text-2xl font-bold text-[#00444f]">{stats.data?.endangered || 0}</div>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Vida Acuática</CardTitle>
-                <Fish className="h-4 w-4 text-teal-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.data.byCategory.find(c => c.category === 'vida_acuatica')?.count || 0}
+
+            {/* Por Categoría - 2/4 */}
+            <Card className="border-0 shadow-sm col-span-2" style={{ backgroundColor: '#ceefea' }}>
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#00444f]">Por Categoría</span>
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Insectos</CardTitle>
-                <Bug className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.data.byCategory.find(c => c.category === 'insectos')?.count || 0}
+                <div className="grid grid-cols-4 gap-4">
+                  {/* Aves */}
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-full p-2" style={{ backgroundColor: '#00444f' }}>
+                      <Bird className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-[#00444f]">
+                        {stats.data?.byCategory?.find((c: any) => c.category === 'aves')?.count || 0}
+                      </div>
+                      <div className="text-xs text-[#00444f]/70">Aves</div>
+                    </div>
+                  </div>
+
+                  {/* Mamíferos */}
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-full p-2" style={{ backgroundColor: '#00444f' }}>
+                      <Rabbit className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-[#00444f]">
+                        {stats.data?.byCategory?.find((c: any) => c.category === 'mamiferos')?.count || 0}
+                      </div>
+                      <div className="text-xs text-[#00444f]/70">Mamíferos</div>
+                    </div>
+                  </div>
+
+                  {/* Vida Acuática */}
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-full p-2" style={{ backgroundColor: '#00444f' }}>
+                      <Fish className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-[#00444f]">
+                        {stats.data?.byCategory?.find((c: any) => c.category === 'vida_acuatica')?.count || 0}
+                      </div>
+                      <div className="text-xs text-[#00444f]/70">Acuática</div>
+                    </div>
+                  </div>
+
+                  {/* Insectos */}
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-full p-2" style={{ backgroundColor: '#00444f' }}>
+                      <Bug className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-[#00444f]">
+                        {stats.data?.byCategory?.find((c: any) => c.category === 'insectos')?.count || 0}
+                      </div>
+                      <div className="text-xs text-[#00444f]/70">Insectos</div>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">En Peligro</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-red-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.data.endangered}</div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Filtros */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col lg:flex-row gap-4 items-center">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Buscar especies..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
+        {/* ========== TOOLBAR ========== */}
+        <Toolbar
+          // Búsqueda
+          searchQuery={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder="Buscar especies..."
+
+          // Vista
+          viewMode={viewMode}
+          onViewModeChange={(mode) => setViewMode(mode as 'cards' | 'table')}
+          availableViewModes={['cards', 'table']}
+
+          // Selección múltiple
+          selectionMode={selectionMode}
+          selectedCount={selectedItems.size}
+          onToggleSelection={() => setSelectionMode(!selectionMode)}
+          onSelectAll={handleSelectAll}
+          onDeselectAll={handleDeselectAll}
+
+          // Eliminación bulk
+          onBulkDelete={handleBulkDelete}
+
+          // Filtros
+          filters={
+            <>
+              {/* Filtro por categoría */}
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Categoría" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="pointer-events-auto z-[999]">
                   <SelectItem value="all">Todas las categorías</SelectItem>
                   <SelectItem value="aves">Aves</SelectItem>
                   <SelectItem value="mamiferos">Mamíferos</SelectItem>
@@ -716,11 +581,12 @@ const FaunaSpeciesAdmin: React.FC = () => {
                 </SelectContent>
               </Select>
 
+              {/* Filtro por estado de conservación */}
               <Select value={conservationFilter} onValueChange={setConservationFilter}>
-                <SelectTrigger className="w-[200px]">
+                <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Estado Conservación" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="pointer-events-auto z-[999]">
                   <SelectItem value="all">Todos los estados</SelectItem>
                   <SelectItem value="estable">Estable</SelectItem>
                   <SelectItem value="vulnerable">Vulnerable</SelectItem>
@@ -729,141 +595,279 @@ const FaunaSpeciesAdmin: React.FC = () => {
                   <SelectItem value="extinto_local">Extinto Local</SelectItem>
                 </SelectContent>
               </Select>
+            </>
+          }
+          onClearFilters={handleClearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
 
-              <div className="flex border rounded-lg">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="rounded-r-none"
-                >
-                  <Grid3X3 className="h-4 w-4" />
+        {/* ========== CONTENIDO ========== */}
+        {species.length === 0 ? (
+          <div className="py-16 flex justify-center">
+            <div className="text-center">
+              <PawPrint className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 mb-2">No se encontraron especies</p>
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={handleClearFilters}>
+                  Limpiar filtros
                 </Button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* ===== VISTA CARDS ===== */}
+            {viewMode === 'cards' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {species.map((sp) => (
+                  <div 
+                    key={sp.id} 
+                    className="bg-white border rounded-2xl hover:shadow-md hover:border-[#00444f] transition-all duration-200 overflow-hidden flex flex-col cursor-pointer"
+                    onClick={() => handleView(sp)}
+                  >
+                    {/* Imagen */}
+                    <div className="relative h-48 bg-gray-100 flex-shrink-0">
+                      {selectionMode && (
+                        <div 
+                          className="absolute top-2 right-2 z-10"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Checkbox
+                            checked={selectedItems.has(sp.id)}
+                            onCheckedChange={() => handleToggleSelect(sp.id)}
+                            className="bg-white/80 data-[state=checked]:bg-[#00a587]"
+                          />
+                        </div>
+                      )}
+                      {sp.photoUrl ? (
+                        <img 
+                          src={sp.photoUrl}
+                          alt={sp.commonName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                          <div className="text-center">
+                            <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-500">Sin imagen</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Contenido */}
+                    <div className="flex flex-col flex-1">
+                      <div className="p-4 pb-2">
+                        <div className="mb-2 flex items-start justify-between">
+                          <div className="flex-1 mr-2">
+                            <h3 className="font-poppins font-bold text-gray-900 line-clamp-1">
+                              {sp.commonName}
+                            </h3>
+                            <p className="text-sm text-gray-500 italic line-clamp-1">
+                              {sp.scientificName}
+                            </p>
+                          </div>
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
+                            #{sp.id}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge variant="secondary" className="text-xs">
+                            {getCategoryLabel(sp.category)}
+                          </Badge>
+                          <Badge className={`text-xs ${getConservationBadgeClass(sp.conservationStatus)}`}>
+                            {getConservationLabel(sp.conservationStatus)}
+                          </Badge>
+                          {sp.isEndangered && (
+                            <Badge variant="destructive" className="text-xs">
+                              <AlertTriangle className="h-3 w-3 mr-1" />
+                              Peligro
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="p-4 pt-2 flex-1">
+                        <p className="text-sm text-gray-600 line-clamp-2">
+                          {sp.description || 'Sin descripción disponible'}
+                        </p>
+                      </div>
+
+                      {/* Botones de acción */}
+                      <div className="p-4 pt-0 mt-auto">
+                        <div className="flex justify-between items-center pt-3 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(sp);
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(sp.id);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ===== VISTA TABLA ===== */}
+            {viewMode === 'table' && (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {selectionMode && (
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={species.length > 0 && species.every(sp => selectedItems.has(sp.id))}
+                          onCheckedChange={(checked) => {
+                            if (checked) handleSelectAll();
+                            else handleDeselectAll();
+                          }}
+                        />
+                      </TableHead>
+                    )}
+                    <TableHead className="w-[60px]">ID</TableHead>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Categoría</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Familia</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {species.map((sp) => (
+                    <TableRow 
+                      key={sp.id} 
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleView(sp)}
+                    >
+                      {selectionMode && (
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={selectedItems.has(sp.id)}
+                            onCheckedChange={() => handleToggleSelect(sp.id)}
+                          />
+                        </TableCell>
+                      )}
+                      <TableCell className="font-medium">#{sp.id}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{sp.commonName}</p>
+                          <p className="text-sm text-gray-500 italic">{sp.scientificName}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="text-xs">
+                          {getCategoryLabel(sp.category)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={`text-xs ${getConservationBadgeClass(sp.conservationStatus)}`}>
+                          {getConservationLabel(sp.conservationStatus)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{sp.family || '-'}</TableCell>
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border bg-transparent text-gray-600 hover:text-gray-800 hover:bg-[#ceefea]"
+                            onClick={() => handleEdit(sp)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border bg-transparent text-red-800 hover:text-red-800 hover:bg-[#ceefea]"
+                            onClick={() => handleDelete(sp.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+              </>
+            )}
+
+        {/* ========== PAGINACIÓN ========== */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Mostrando {Math.min((pagination.page - 1) * pagination.limit + 1, pagination.total)}-
+                {Math.min(pagination.page * pagination.limit, pagination.total)} de {pagination.total} especies
+              </div>
+
+              <div className="flex items-center gap-2">
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant="outline"
                   size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="rounded-l-none"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
                 >
-                  <List className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </Button>
+
+                <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded">
+                  <span className="text-sm text-gray-600">Página</span>
+                  <span className="bg-[#00a587] text-white px-2 py-1 rounded text-sm font-medium">
+                    {currentPage}
+                  </span>
+                  <span className="text-sm text-gray-600">de {pagination.totalPages}</span>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage >= pagination.totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  Siguiente
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Lista de especies */}
-        <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
-          {species.map((sp) => (
-            <Card key={sp.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getCategoryIcon(sp.category)}
-                    <CardTitle className="text-lg">{sp.commonName}</CardTitle>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => handleView(sp)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(sp)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(sp.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <CardDescription className="italic">{sp.scientificName}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <Badge variant="secondary" className="capitalize">
-                      {sp.category.replace('_', ' ')}
-                    </Badge>
-                    <Badge className={getConservationStatusColor(sp.conservationStatus)}>
-                      {sp.conservationStatus.replace('_', ' ')}
-                    </Badge>
-                  </div>
-                  {sp.isEndangered && (
-                    <Badge variant="destructive" className="text-xs">
-                      <AlertTriangle className="h-3 w-3 mr-1" />
-                      En Peligro
-                    </Badge>
-                  )}
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {sp.description || 'Sin descripción disponible'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Paginación */}
-        {pagination && (
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              Mostrando {((pagination.page - 1) * pagination.limit) + 1} a{' '}
-              {Math.min(pagination.page * pagination.limit, pagination.total)} de{' '}
-              {pagination.total} especies
-            </div>
-            <div className="flex gap-2 items-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  console.log(`🔄 Navegando a página anterior desde ${currentPage}`);
-                  setCurrentPage(currentPage - 1);
-                }}
-                disabled={currentPage <= 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Anterior
-              </Button>
-              
-              <span className="px-3 py-1 bg-primary text-primary-foreground rounded text-sm">
-                {currentPage} de {pagination.totalPages}
-              </span>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  console.log(`🔄 Navegando a página siguiente desde ${currentPage}`);
-                  setCurrentPage(currentPage + 1);
-                }}
-                disabled={currentPage >= pagination.totalPages}
-              >
-                Siguiente
-                <ChevronRight className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         )}
 
-        {/* Diálogo de Edición */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        {/* ========== DIALOG CREAR ========== */}
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Editar Especie</DialogTitle>
-              <DialogDescription>
-                Modifica los datos de la especie seleccionada
-              </DialogDescription>
+              <DialogTitle className="flex items-center gap-2">
+                <Bird className="h-5 w-5 text-[#00444f]" />
+                Crear Nueva Especie
+              </DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={(e) => {
-                console.log('🔄 Form onSubmit ejecutándose');
-                console.log('📋 Form errors:', form.formState.errors);
-                console.log('📋 Form values:', form.getValues());
-                try {
-                  form.handleSubmit(handleUpdate)(e);
-                } catch (error) {
-                  console.error('❌ Error en handleSubmit:', error);
-                }
-              }} className="space-y-4">
-                {/* Subida de Imagen */}
+              <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-4">
+                {/* Imagen */}
                 <div className="space-y-2">
                   <Label>Fotografía de la Especie</Label>
                   <ImageUploader
@@ -878,9 +882,9 @@ const FaunaSpeciesAdmin: React.FC = () => {
                     name="commonName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nombre Común</FormLabel>
+                        <FormLabel>Nombre Común *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Nombre común de la especie" {...field} />
+                          <Input placeholder="Ej: Colibrí Cola de Oro" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -891,9 +895,9 @@ const FaunaSpeciesAdmin: React.FC = () => {
                     name="scientificName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nombre Científico</FormLabel>
+                        <FormLabel>Nombre Científico *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Nombre científico" {...field} />
+                          <Input placeholder="Ej: Chrysuronia oenone" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -907,9 +911,9 @@ const FaunaSpeciesAdmin: React.FC = () => {
                     name="family"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Familia</FormLabel>
+                        <FormLabel>Familia *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Familia taxonómica" {...field} />
+                          <Input placeholder="Ej: Trochilidae" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -920,7 +924,7 @@ const FaunaSpeciesAdmin: React.FC = () => {
                     name="category"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Categoría</FormLabel>
+                        <FormLabel>Categoría *</FormLabel>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <FormControl>
                             <SelectTrigger>
@@ -940,19 +944,45 @@ const FaunaSpeciesAdmin: React.FC = () => {
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="habitat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hábitat</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Hábitat natural" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="conservationStatus"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado de Conservación</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar estado" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="estable">Estable</SelectItem>
+                            <SelectItem value="vulnerable">Vulnerable</SelectItem>
+                            <SelectItem value="en_peligro">En Peligro</SelectItem>
+                            <SelectItem value="en_peligro_critico">Peligro Crítico</SelectItem>
+                            <SelectItem value="extinto_local">Extinto Local</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="habitat"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hábitat</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Bosques tropicales" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -961,7 +991,11 @@ const FaunaSpeciesAdmin: React.FC = () => {
                     <FormItem>
                       <FormLabel>Descripción</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Descripción de la especie" {...field} />
+                        <Textarea 
+                          placeholder="Descripción general de la especie..." 
+                          className="min-h-[80px]"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -970,168 +1004,232 @@ const FaunaSpeciesAdmin: React.FC = () => {
 
                 <FormField
                   control={form.control}
-                  name="conservationStatus"
+                  name="behavior"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Estado de Conservación</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar estado" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="estable">Estable</SelectItem>
-                          <SelectItem value="vulnerable">Vulnerable</SelectItem>
-                          <SelectItem value="en_peligro">En Peligro</SelectItem>
-                          <SelectItem value="en_peligro_critico">Peligro Crítico</SelectItem>
-                          <SelectItem value="extinto_local">Extinto Local</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Comportamiento</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Comportamiento típico de la especie..." 
+                          className="min-h-[60px]"
+                          {...field} 
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                <DialogFooter>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsCreateDialogOpen(false)}
+                  >
                     Cancelar
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={updateMutation.isPending}
+                    disabled={createMutation.isPending}
+                    className="bg-[#00a587] hover:bg-[#007a5e]"
                   >
-                    {updateMutation.isPending ? 'Actualizando...' : 'Actualizar Especie'}
+                    {createMutation.isPending ? 'Creando...' : 'Crear Especie'}
                   </Button>
-                </div>
+                </DialogFooter>
               </form>
             </Form>
           </DialogContent>
         </Dialog>
 
-        {/* Diálogo de Importación CSV */}
-        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-          <DialogContent className="max-w-2xl">
+        {/* ========== DIALOG EDITAR ========== */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <FileUp className="h-5 w-5" />
-                Importar Especies desde CSV
+                <Bird className="border rounded-full h-5 w-5 text-[#00444f]" />
+                Editar Especie
               </DialogTitle>
               <DialogDescription>
-                Sube un archivo CSV con la información de las especies de fauna para importación masiva
+                Modifica los datos de la especie seleccionada
               </DialogDescription>
             </DialogHeader>
-
-            <div className="space-y-6">
-              {/* Descarga de plantilla */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-2">📋 Descargar Plantilla</h3>
-                <p className="text-sm text-blue-800 mb-3">
-                  Descarga la plantilla CSV con el formato correcto y ejemplos de datos.
-                </p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleDownloadTemplate}
-                  className="border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  <FileDown className="h-4 w-4 mr-2" />
-                  Descargar Plantilla CSV
-                </Button>
-              </div>
-
-              {/* Selección de archivo */}
-              <div className="space-y-3">
-                <Label htmlFor="csv-file">Seleccionar archivo CSV</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <input
-                    id="csv-file"
-                    type="file"
-                    accept=".csv"
-                    onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                    className="hidden"
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleUpdate)} className="space-y-4">
+                {/* Imagen */}
+                <div className="space-y-2">
+                  <Label>Fotografía de la Especie</Label>
+                  <ImageUploader
+                    currentImageUrl={form.watch('photoUrl')}
+                    onImageUploaded={(url) => form.setValue('photoUrl', url)}
                   />
-                  
-                  {importFile ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-center text-green-600">
-                        <FileUp className="h-8 w-8 mr-2" />
-                        <span className="font-medium">{importFile.name}</span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Tamaño: {(importFile.size / 1024).toFixed(2)} KB
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById('csv-file')?.click()}
-                      >
-                        Cambiar archivo
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-center text-gray-400">
-                        <FileUp className="h-8 w-8 mr-2" />
-                        <span>Arrastra tu archivo CSV aquí</span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => document.getElementById('csv-file')?.click()}
-                      >
-                        Seleccionar archivo
-                      </Button>
-                    </div>
-                  )}
                 </div>
-              </div>
 
-              {/* Información importante */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Información Importante</h3>
-                <ul className="text-sm text-yellow-800 space-y-1">
-                  <li>• El archivo debe estar en formato CSV con codificación UTF-8</li>
-                  <li>• Los campos obligatorios son: nombre_común y nombre_científico</li>
-                  <li>• Las categorías válidas son: aves, mamiferos, insectos, vida_acuatica</li>
-                  <li>• Los valores booleanos se escriben como: true/false, sí/no, 1/0</li>
-                  <li>• Si hay errores, se mostrará un reporte detallado</li>
-                </ul>
-              </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="commonName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre Común *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nombre común de la especie" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="scientificName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre Científico *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nombre científico" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              {/* Botones de acción */}
-              <div className="flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setIsImportDialogOpen(false);
-                    setImportFile(null);
-                  }}
-                  disabled={isImporting}
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  onClick={handleImportCSV}
-                  disabled={!importFile || isImporting}
-                >
-                  {isImporting ? (
-                    <>
-                      <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
-                      Importando...
-                    </>
-                  ) : (
-                    <>
-                      <FileUp className="h-4 w-4 mr-2" />
-                      Importar Especies
-                    </>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="family"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Familia *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Familia taxonómica" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Categoría *</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar categoría" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="aves">Aves</SelectItem>
+                            <SelectItem value="mamiferos">Mamíferos</SelectItem>
+                            <SelectItem value="insectos">Insectos</SelectItem>
+                            <SelectItem value="vida_acuatica">Vida Acuática</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="conservationStatus"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado de Conservación</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar estado" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="estable">Estable</SelectItem>
+                            <SelectItem value="vulnerable">Vulnerable</SelectItem>
+                            <SelectItem value="en_peligro">En Peligro</SelectItem>
+                            <SelectItem value="en_peligro_critico">Peligro Crítico</SelectItem>
+                            <SelectItem value="extinto_local">Extinto Local</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="habitat"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hábitat</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Hábitat natural" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descripción</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Descripción de la especie" 
+                          className="min-h-[80px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </Button>
-              </div>
-            </div>
+                />
+
+                <FormField
+                  control={form.control}
+                  name="behavior"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Comportamiento</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Comportamiento de la especie" 
+                          className="min-h-[60px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <DialogFooter>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsEditDialogOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={updateMutation.isPending}
+                    className="bg-[#00a587] hover:bg-[#007a5e]"
+                  >
+                    {updateMutation.isPending ? 'Actualizando...' : 'Guardar Cambios'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
 
-        {/* Diálogo de Visualización */}
+        {/* ========== DIALOG VER DETALLE ========== */}
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -1143,12 +1241,12 @@ const FaunaSpeciesAdmin: React.FC = () => {
                 {selectedSpecies?.scientificName}
               </DialogDescription>
             </DialogHeader>
-            
+
             {selectedSpecies && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Imagen */}
+                {/* Columna izquierda: Imagen y badges */}
                 <div className="space-y-4">
-                  {selectedSpecies.photoUrl && (
+                  {selectedSpecies.photoUrl ? (
                     <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                       <img 
                         src={selectedSpecies.photoUrl}
@@ -1156,14 +1254,21 @@ const FaunaSpeciesAdmin: React.FC = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
+                  ) : (
+                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <ImageIcon className="h-16 w-16 text-gray-300 mx-auto mb-2" />
+                        <p className="text-gray-500">Sin imagen</p>
+                      </div>
+                    </div>
                   )}
-                  
-                  <div className="flex gap-2">
-                    <Badge variant="secondary" className="capitalize">
-                      {selectedSpecies.category.replace('_', ' ')}
+
+                  <div className="flex gap-2 flex-wrap">
+                    <Badge variant="secondary">
+                      {getCategoryLabel(selectedSpecies.category)}
                     </Badge>
-                    <Badge className={getConservationStatusColor(selectedSpecies.conservationStatus)}>
-                      {selectedSpecies.conservationStatus.replace('_', ' ')}
+                    <Badge className={getConservationBadgeClass(selectedSpecies.conservationStatus)}>
+                      {getConservationLabel(selectedSpecies.conservationStatus)}
                     </Badge>
                     {selectedSpecies.isEndangered && (
                       <Badge variant="destructive">
@@ -1171,71 +1276,6 @@ const FaunaSpeciesAdmin: React.FC = () => {
                         En Peligro
                       </Badge>
                     )}
-                  </div>
-                </div>
-
-                {/* Información */}
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Información Básica</h3>
-                    <div className="mt-2 space-y-2 text-sm">
-                      <div><strong>Familia:</strong> {selectedSpecies.family}</div>
-                      <div><strong>Hábitat:</strong> {selectedSpecies.habitat || 'No especificado'}</div>
-                      {selectedSpecies.sizeCm && (
-                        <div><strong>Tamaño:</strong> {selectedSpecies.sizeCm} cm</div>
-                      )}
-                      {selectedSpecies.weightGrams && (
-                        <div><strong>Peso:</strong> {selectedSpecies.weightGrams} gramos</div>
-                      )}
-                      {selectedSpecies.lifespan && selectedSpecies.lifespan > 0 && (
-                        <div><strong>Esperanza de vida:</strong> {selectedSpecies.lifespan} años</div>
-                      )}
-                    </div>
-                  </div>
-
-                  {selectedSpecies.description && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Descripción</h3>
-                      <p className="mt-2 text-sm text-gray-600">{selectedSpecies.description}</p>
-                    </div>
-                  )}
-
-                  {selectedSpecies.behavior && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Comportamiento</h3>
-                      <p className="mt-2 text-sm text-gray-600">{selectedSpecies.behavior}</p>
-                    </div>
-                  )}
-
-                  {selectedSpecies.diet && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Dieta</h3>
-                      <p className="mt-2 text-sm text-gray-600">{selectedSpecies.diet}</p>
-                    </div>
-                  )}
-
-                  {selectedSpecies.ecologicalImportance && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Importancia Ecológica</h3>
-                      <p className="mt-2 text-sm text-gray-600">{selectedSpecies.ecologicalImportance}</p>
-                    </div>
-                  )}
-
-                  {selectedSpecies.threats && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Amenazas</h3>
-                      <p className="mt-2 text-sm text-red-600">{selectedSpecies.threats}</p>
-                    </div>
-                  )}
-
-                  {selectedSpecies.observationTips && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Consejos de Observación</h3>
-                      <p className="mt-2 text-sm text-gray-600">{selectedSpecies.observationTips}</p>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2 pt-4">
                     {selectedSpecies.isNocturnal && (
                       <Badge variant="outline">Nocturno</Badge>
                     )}
@@ -1244,14 +1284,228 @@ const FaunaSpeciesAdmin: React.FC = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Columna derecha: Información */}
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Información Básica</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Familia:</span>
+                        <span className="font-medium">{selectedSpecies.family || '-'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Hábitat:</span>
+                        <span className="font-medium">{selectedSpecies.habitat || '-'}</span>
+                      </div>
+                      {selectedSpecies.sizeCm && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Tamaño:</span>
+                          <span className="font-medium">{selectedSpecies.sizeCm} cm</span>
+                        </div>
+                      )}
+                      {selectedSpecies.weightGrams && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Peso:</span>
+                          <span className="font-medium">{selectedSpecies.weightGrams} g</span>
+                        </div>
+                      )}
+                      {selectedSpecies.lifespan && Number(selectedSpecies.lifespan) > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Esperanza de vida:</span>
+                          <span className="font-medium">{selectedSpecies.lifespan} años</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {selectedSpecies.description && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Descripción</h4>
+                      <p className="text-sm text-gray-600">{selectedSpecies.description}</p>
+                    </div>
+                  )}
+
+                  {selectedSpecies.behavior && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Comportamiento</h4>
+                      <p className="text-sm text-gray-600">{selectedSpecies.behavior}</p>
+                    </div>
+                  )}
+
+                  {selectedSpecies.diet && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Dieta</h4>
+                      <p className="text-sm text-gray-600">{selectedSpecies.diet}</p>
+                    </div>
+                  )}
+
+                  {selectedSpecies.ecologicalImportance && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Importancia Ecológica</h4>
+                      <p className="text-sm text-gray-600">{selectedSpecies.ecologicalImportance}</p>
+                    </div>
+                  )}
+
+                  {selectedSpecies.threats && (
+                    <div>
+                      <h4 className="font-semibold text-red-700 mb-2">Amenazas</h4>
+                      <p className="text-sm text-red-600">{selectedSpecies.threats}</p>
+                    </div>
+                  )}
+
+                  {selectedSpecies.observationTips && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Consejos de Observación</h4>
+                      <p className="text-sm text-gray-600">{selectedSpecies.observationTips}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+                Cerrar
+              </Button>
+              <Button 
+                onClick={() => {
+                  setIsViewDialogOpen(false);
+                  if (selectedSpecies) handleEdit(selectedSpecies);
+                }}
+                className="bg-[#00a587] hover:bg-[#007a5e]"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Editar
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 
-      </div>
-    </AdminLayout>
-  );
-};
+        {/* ========== DIALOG IMPORTAR CSV ========== */}
+                <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <FileUp className="h-5 w-5" />
+                        Importar Especies desde CSV
+                      </DialogTitle>
+                      <DialogDescription>
+                        Sube un archivo CSV con la información de las especies de fauna
+                      </DialogDescription>
+                    </DialogHeader>
 
-export default FaunaSpeciesAdmin;
+                    <div className="space-y-6">
+                      {/* Descargar plantilla */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 className="font-semibold text-blue-900 mb-2">📋 Descargar Plantilla</h4>
+                        <p className="text-sm text-blue-800 mb-3">
+                          Descarga la plantilla CSV con el formato correcto y ejemplos de datos.
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={handleDownloadTemplate}
+                          className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                        >
+                          <FileDown className="h-4 w-4 mr-2" />
+                          Descargar Plantilla
+                        </Button>
+                      </div>
+
+                      {/* Selección de archivo */}
+                      <div className="space-y-3">
+                        <Label>Seleccionar archivo CSV</Label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                          <input
+                            id="csv-file"
+                            type="file"
+                            accept=".csv"
+                            onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+
+                          {importFile ? (
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-center text-green-600">
+                                <FileUp className="h-8 w-8 mr-2" />
+                                <span className="font-medium">{importFile.name}</span>
+                              </div>
+                              <p className="text-sm text-gray-600">
+                                Tamaño: {(importFile.size / 1024).toFixed(2)} KB
+                              </p>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => document.getElementById('csv-file')?.click()}
+                              >
+                                Cambiar archivo
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-center text-gray-400">
+                                <FileUp className="h-8 w-8 mr-2" />
+                                <span>Arrastra tu archivo CSV aquí</span>
+                              </div>
+                              <Button
+                                variant="outline"
+                                onClick={() => document.getElementById('csv-file')?.click()}
+                              >
+                                Seleccionar archivo
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Información importante */}
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h4 className="font-semibold text-yellow-900 mb-2">⚠️ Información Importante</h4>
+                        <ul className="text-sm text-yellow-800 space-y-1">
+                          <li>• El archivo debe estar en formato CSV con codificación UTF-8</li>
+                          <li>• Los campos obligatorios son: nombre_común y nombre_científico</li>
+                          <li>• Las categorías válidas son: aves, mamiferos, insectos, vida_acuatica</li>
+                          <li>• Los valores booleanos se escriben como: true/false, sí/no, 1/0</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <DialogFooter>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setIsImportDialogOpen(false);
+                          setImportFile(null);
+                        }}
+                        disabled={isImporting}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button 
+                        onClick={handleImportCSV}
+                        disabled={!importFile || isImporting}
+                        className="bg-[#00a587] hover:bg-[#007a5e]"
+                      >
+                        {isImporting ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                            Importando...
+                          </>
+                        ) : (
+                          <>
+                            <FileUp className="h-4 w-4 mr-2" />
+                            Importar Especies
+                          </>
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+              </div>
+            </AdminLayout>
+          );
+        };
+
+        export default FaunaSpeciesAdmin;
