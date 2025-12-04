@@ -1186,7 +1186,7 @@ function TreeMapPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200">
                     {filteredAreas.map((area) => (
                       <tr 
                         key={area.id} 

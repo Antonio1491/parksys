@@ -7,9 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
-// NOTA CRÍTICA: NO IMPORTAR Select, SelectContent, SelectItem, SelectTrigger, SelectValue
-// El usuario específicamente NO quiere filtros en esta página
-
+import { Toolbar } from '@/components/ui/toolbar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
@@ -620,7 +618,6 @@ const AdminParksContent = () => {
     );
   };
 
-  // Render table view with specific fields: Nombre, Área, Dirección, Administrador
   const renderParksTable = () => {
     // Helper function to format area
     const formatArea = (area: number) => {
@@ -661,9 +658,23 @@ const AdminParksContent = () => {
           </TableHeader>
           <TableBody>
             {currentParks.map((park: Park) => (
-              <TableRow key={park.id}>
+              <TableRow 
+                key={park.id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => setLocation(ROUTES.admin.parks.view.build(park.id))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setLocation(ROUTES.admin.parks.view.build(park.id));
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Ver detalles del parque ${park.name}`}
+                data-testid={`row-park-table-${park.id}`}
+              >
                 {selectionMode && (
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedParks.has(park.id)}
                       onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
@@ -685,16 +696,10 @@ const AdminParksContent = () => {
                 </TableCell>
                 <TableCell>{(park as any).administrator || 'Sin asignar'}</TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
-                      onClick={() => setLocation(ROUTES.admin.parks.view.build(park.id))}
-                      data-testid={`button-view-park-table-${park.id}`}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                  <div 
+                    className="flex justify-end space-x-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -722,7 +727,6 @@ const AdminParksContent = () => {
       </div>
     );
   };
-
   // Render grid view
   const renderGridView = () => {
     return (
@@ -962,7 +966,7 @@ const AdminParksContent = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header con título */}
+        {/* Header de la página de parques */}
         <PageHeader
           title="Parques"
           subtitle="Gestión General del Sistema"
@@ -991,126 +995,27 @@ const AdminParksContent = () => {
           ]}
         />
                   
-        {/* BARRA DE BÚSQUEDA Y CONTROLES */}
-        <div 
-          className="bg-white p-2 rounded-xl border"
-          data-no-filters="true"
-          id="search-section-no-filters"
-        >
-          <div className="space-y-0">
-            <div className="flex items-center justify-between w-full px-2 py-2">
-              <div className="relative flex-1 max-w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-5 text-gray-600" />
-                <input
-                  type="text"
-                  placeholder="Buscar parques..."
-                  className="w-full font-poppins font-regular text-sm pl-10 pr-10 py-2 border border-gray-300 rounded-xl"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery && (
-                  <button 
-                    onClick={handleClearSearch} 
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                    aria-label="Limpiar búsqueda"
-                  >
-                    <X className="h-4 w-4 text-gray-400" />
-                  </button>
-                )}
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                {/* 1. Botón para cambiar los modos de visualización del grid */}
-                <div className="ml-auto">
-                  <div className="flex border rounded-lg p-1 bg-gray-100">
-                    <Button
-                      variant={viewMode === 'cards' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => setViewMode('cards')}
-                      className={`${viewMode === 'cards' ? 'bg-primary text-white' : 'text-foreground'}`}
-                      data-testid="button-view-cards"
-                    >
-                      <Grid className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === 'table' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => setViewMode('table')}
-                      className={`${viewMode === 'table' ? 'bg-primary text-white' : 'text-foreground'}`}
-                      data-testid="button-view-table"
-                    >
-                      <List className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+        <Toolbar
+          // Búsqueda
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Buscar parques..."
 
-                {/* 2. Botón de selección con menú desplegable */}
-                <div className="relative group">
-                  <Button
-                    variant={selectionMode ? 'default' : 'outline'}
-                    size="sm"
-                    className={`flex items-center h-11 w-11 ${selectionMode ? 'bg-primary text-white hover-[#00a587]' : 'bg-gray-100 hover:bg-[#00a587]'}`}
-                    data-testid="button-selection-toggle"
-                  >
-                    <CopyCheck className="h-5 w-5 text-[#4b5b65] hover-white" />
-                  </Button>
+          // Vista
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          availableViewModes={['cards', 'table']}
 
-                  {/* Dropdown menu con CSS hover */}
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="py-1">
-                      <button
-                        onClick={() => setSelectionMode(true)}
-                        className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
-                        data-testid="menu-enable-selection"
-                      >
-                        <CopyCheck className="h-4 w-4 mr-2" />
-                        Selección múltiple
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (!selectionMode) {
-                            setSelectionMode(true);
-                          }
-                          handleSelectAllParks();
-                        }}
-                        className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
-                        data-testid="menu-select-all"
-                      >
-                        <CheckSquare className="h-4 w-4 mr-2" />
-                        Seleccionar todo
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleDeselectAllParks();
-                          setSelectionMode(false);
-                        }}
-                        className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
-                        data-testid="menu-deselect-all"
-                      >
-                        <Square className="h-4 w-4 mr-2" />
-                        Deseleccionar
-                      </button>
-                    </div>
-                  </div>
-                </div>
+          // Selección múltiple
+          selectionMode={selectionMode}
+          selectedCount={selectedParks.size}
+          onToggleSelection={() => setSelectionMode(!selectionMode)}
+          onSelectAll={handleSelectAllParks}
+          onDeselectAll={handleDeselectAllParks}
 
-                {/* 3. Botón para eliminar elementos independiente */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleBulkDeleteClick}
-                  className="flex items-center h-11 min-w-11 bg-[#ededed] text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  disabled={selectedParks.size === 0}
-                  data-testid="button-delete-selected"
-                >
-                  <Trash2 className="h-5 w-5" />
-                  {selectedParks.size > 0 ? ` (${selectedParks.size})` : ''}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* ===== FIN SECCIÓN BÚSQUEDA SIN FILTROS ===== */}
+          // Eliminación bulk
+          onBulkDelete={handleBulkDeleteClick}
+        />
         
         {/* Parks content */}
         {currentParks.length === 0 ? (

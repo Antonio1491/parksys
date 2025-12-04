@@ -1,41 +1,3 @@
-/**
- * =============================================================================
- * PARKS ROUTES - MÓDULO CONSOLIDADO DE RUTAS DE PARQUES
- * =============================================================================
- * 
- * Este archivo contiene TODAS las rutas relacionadas con parques:
- * - CRUD de parques
- * - Multimedia (imágenes, videos, documentos)
- * - Amenidades
- * - Voluntarios
- * - Evaluaciones
- * - Métricas y estadísticas
- * - Comentarios e incidentes
- * - Rutas públicas
- * 
- * Estructura:
- * 1. IMPORTS Y CONFIGURACIÓN
- * 2. RUTAS PÚBLICAS - LISTADOS
- * 3. RUTAS PÚBLICAS - CONSULTAS POR ID
- * 4. RUTAS PÚBLICAS - SUBRECURSOS
- * 5. RUTAS PROTEGIDAS - CRUD PARQUES
- * 6. RUTAS PROTEGIDAS - MÉTRICAS Y SUMMARY
- * 7. RUTAS PROTEGIDAS - AMENIDADES
- * 8. RUTAS PROTEGIDAS - IMÁGENES
- * 9. RUTAS PROTEGIDAS - DOCUMENTOS
- * 10. RUTAS PROTEGIDAS - VIDEOS
- * 11. RUTAS PROTEGIDAS - VOLUNTARIOS
- * 12. RUTAS PROTEGIDAS - COMENTARIOS
- * 13. RUTAS PROTEGIDAS - INCIDENTES
- * 14. RUTAS PROTEGIDAS - EVALUACIONES
- * 15. RUTAS PROTEGIDAS - ACTIVIDADES Y EVENTOS
- * 16. API PÚBLICA (public-api)
- * 17. EXPORT
- * 
- * @version 2.0.0 - Consolidado
- * @date 2024-12
- */
-
 import { Router, Request, Response } from 'express';
 import { pool, db } from '../db';
 import { storage } from '../storage';
@@ -265,288 +227,7 @@ router.get('/export/xlsx', async (req: Request, res: Response) => {
 });
 
 // =============================================================================
-// SECCIÓN 2: RUTAS PÚBLICAS - CONSULTAS POR ID
-// =============================================================================
-
-/**
- * GET /parks/:id - Obtener un parque por ID
- */
-router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-
-    // Evitar conflicto con rutas como /parks/summary
-    if (isNaN(parkId)) {
-      return res.status(400).json({ message: 'Invalid park ID' });
-    }
-
-    const { getParkByIdDirectly } = await import('../direct-park-queries');
-    const park = await getParkByIdDirectly(parkId);
-
-    if (!park) {
-      return res.status(404).json({ message: 'Park not found' });
-    }
-
-    res.json(park);
-  } catch (error) {
-    console.error('Error al obtener parque:', error);
-    res.status(500).json({ message: 'Error fetching park' });
-  }
-});
-
-/**
- * GET /parks/:id/extended - Datos extendidos del parque (con amenidades e imágenes)
- */
-router.get('/:id/extended', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-
-    if (isNaN(parkId) || parkId <= 0) {
-      return res.status(400).json({ message: 'Invalid park ID' });
-    }
-
-    // Datos básicos
-    const parkResult = await pool.query(`
-      SELECT 
-        p.id, p.name, p.park_type as "parkType", p.description, p.address, 
-        p.postal_code as "postalCode", p.latitude, p.longitude, 
-        p.area, p.foundation_year as "foundationYear",
-        p.administrator, p.status,
-        p.regulation_url as "regulationUrl", p.opening_hours as "openingHours", 
-        p.contact_email as "contactEmail", p.contact_phone as "contactPhone",
-        p.video_url as "videoUrl", p.municipality_text as "municipalityText"
-      FROM parks p
-      WHERE p.id = $1
-    `, [parkId]);
-
-    if (parkResult.rows.length === 0) {
-      return res.status(404).json({ message: 'Park not found' });
-    }
-
-    const park = parkResult.rows[0];
-
-    // Amenidades
-    const amenitiesResult = await pool.query(`
-      SELECT a.id, a.name, a.icon, a.category, 
-             a.icon_type as "iconType", a.custom_icon_url as "customIconUrl",
-             pa.module_name as "moduleName", pa.surface_area as "surfaceArea"
-      FROM amenities a
-      JOIN park_amenities pa ON a.id = pa.amenity_id
-      WHERE pa.park_id = $1 AND pa.status = 'activo'
-      ORDER BY a.category, a.name
-    `, [parkId]);
-
-    // Imágenes
-    const imagesResult = await pool.query(`
-      SELECT id, image_url as "imageUrl", caption, is_primary as "isPrimary"
-      FROM park_images
-      WHERE park_id = $1
-      ORDER BY is_primary DESC, created_at DESC
-    `, [parkId]);
-
-    res.json({
-      ...park,
-      amenities: amenitiesResult.rows,
-      images: imagesResult.rows
-    });
-
-  } catch (error) {
-    console.error('Error getting extended park data:', error);
-    res.status(500).json({ message: 'Error fetching park data' });
-  }
-});
-
-// =============================================================================
-// SECCIÓN 3: RUTAS PÚBLICAS - SUBRECURSOS (lectura)
-// =============================================================================
-
-/**
- * GET /parks/:id/amenities - Obtener amenidades de un parque
- */
-router.get('/:id/amenities', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-
-    const result = await pool.query(`
-      SELECT 
-        pa.id,
-        pa.park_id as "parkId",
-        pa.amenity_id as "amenityId",
-        pa.module_name as "moduleName",
-        pa.location_latitude as "locationLatitude",
-        pa.location_longitude as "locationLongitude",
-        pa.surface_area as "surfaceArea",
-        pa.status,
-        pa.description,
-        a.name as "amenityName",
-        a.icon as "amenityIcon",
-        a.custom_icon_url as "customIconUrl"
-      FROM park_amenities pa
-      INNER JOIN amenities a ON pa.amenity_id = a.id
-      WHERE pa.park_id = $1
-      ORDER BY a.name
-    `, [parkId]);
-
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching park amenities:', error);
-    res.status(500).json({ message: 'Error fetching park amenities' });
-  }
-});
-
-/**
- * GET /parks/:id/images - Obtener imágenes de un parque
- */
-router.get('/:id/images', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-    const images = await storage.getParkImages(parkId);
-
-    const mappedImages = images.map(img => ({
-      id: img.id,
-      parkId: img.parkId,
-      imageUrl: img.imageUrl,
-      caption: img.caption,
-      isPrimary: img.isPrimary,
-      createdAt: img.createdAt
-    }));
-
-    res.json(mappedImages);
-  } catch (error) {
-    console.error('Error fetching park images:', error);
-    res.status(500).json({ message: 'Error fetching park images' });
-  }
-});
-
-/**
- * GET /parks/:id/documents - Obtener documentos de un parque
- */
-router.get('/:id/documents', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-    const documents = await storage.getParkDocuments(parkId);
-    res.json(documents);
-  } catch (error) {
-    console.error('Error fetching park documents:', error);
-    res.status(500).json({ message: 'Error fetching documents' });
-  }
-});
-
-/**
- * GET /parks/:id/videos - Obtener videos de un parque
- */
-router.get('/:id/videos', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-
-    const result = await pool.query(`
-      SELECT id, park_id as "parkId", video_url as "videoUrl", 
-             title, description, thumbnail_url as "thumbnailUrl",
-             is_featured as "isFeatured", created_at as "createdAt"
-      FROM park_videos 
-      WHERE park_id = $1 
-      ORDER BY is_featured DESC, created_at DESC
-    `, [parkId]);
-
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching park videos:', error);
-    res.status(500).json({ message: 'Error fetching videos' });
-  }
-});
-
-/**
- * GET /parks/:id/evaluations - Obtener evaluaciones de un parque
- */
-router.get('/:id/evaluations', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-
-    const result = await pool.query(`
-      SELECT 
-        pe.id, pe.park_id as "parkId", pe.user_id as "userId",
-        pe.overall_rating as "overallRating", pe.cleanliness, pe.safety, 
-        pe.amenities as amenities_rating, pe.accessibility, 
-        pe.comment, pe.visit_date as "visitDate", pe.created_at as "createdAt",
-        pe.status, pe.would_recommend as "wouldRecommend",
-        u.full_name as "userName"
-      FROM park_evaluations pe
-      LEFT JOIN users u ON pe.user_id = u.id
-      WHERE pe.park_id = $1
-      ORDER BY pe.created_at DESC
-    `, [parkId]);
-
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching park evaluations:', error);
-    res.status(500).json({ message: 'Error fetching evaluations' });
-  }
-});
-
-/**
- * GET /parks/:id/evaluation-stats - Estadísticas de evaluaciones
- */
-router.get('/:id/evaluation-stats', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-
-    if (isNaN(parkId)) {
-      return res.status(400).json({ success: false, message: 'ID de parque inválido' });
-    }
-
-    const statsResult = await db.execute(sql`
-      SELECT 
-        COUNT(*)::int as total_evaluations,
-        AVG(overall_rating)::numeric(3,2) as average_rating,
-        (COUNT(*) FILTER (WHERE would_recommend = true)::numeric / NULLIF(COUNT(*)::numeric, 0) * 100)::numeric(5,2) as recommendation_rate,
-        AVG(cleanliness)::numeric(3,2) as avg_cleanliness,
-        AVG(safety)::numeric(3,2) as avg_safety,
-        AVG(maintenance)::numeric(3,2) as avg_maintenance,
-        AVG(accessibility)::numeric(3,2) as avg_accessibility,
-        AVG(amenities)::numeric(3,2) as avg_amenities,
-        AVG(activities)::numeric(3,2) as avg_activities,
-        AVG(staff)::numeric(3,2) as avg_staff,
-        AVG(natural_beauty)::numeric(3,2) as avg_natural_beauty,
-        COUNT(*) FILTER (WHERE overall_rating = 5)::int as five_star_count,
-        COUNT(*) FILTER (WHERE overall_rating = 4)::int as four_star_count,
-        COUNT(*) FILTER (WHERE overall_rating = 3)::int as three_star_count,
-        COUNT(*) FILTER (WHERE overall_rating = 2)::int as two_star_count,
-        COUNT(*) FILTER (WHERE overall_rating = 1)::int as one_star_count
-      FROM park_evaluations
-      WHERE park_id = ${parkId} AND status = 'approved'
-    `);
-
-    const stats = statsResult.rows[0] || {
-      total_evaluations: 0,
-      average_rating: 0,
-      recommendation_rate: 0
-    };
-
-    res.json(stats);
-  } catch (error) {
-    console.error('Error obteniendo estadísticas de evaluaciones:', error);
-    res.status(500).json({ success: false, message: 'Error al obtener estadísticas' });
-  }
-});
-
-/**
- * GET /parks/:id/comments - Obtener comentarios de un parque
- */
-router.get('/:id/comments', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-    const approvedOnly = req.query.approvedOnly === 'true';
-
-    const comments = await storage.getParkComments(parkId, approvedOnly);
-    res.json(comments);
-  } catch (error) {
-    console.error('Error fetching park comments:', error);
-    res.status(500).json({ message: 'Error fetching park comments' });
-  }
-});
-
-// =============================================================================
-// SECCIÓN 4: RUTAS PROTEGIDAS - MÉTRICAS Y SUMMARY (DEBE IR ANTES DE /:id)
+// SECCIÓN 2: RUTAS PROTEGIDAS - MÉTRICAS Y SUMMARY (DEBE IR ANTES DE /:id)
 // =============================================================================
 
 /**
@@ -714,8 +395,9 @@ router.get('/summary', isAuthenticated, requirePermission('management:parks:park
         'event' as type,
         COUNT(*) as count
       FROM events e
-      INNER JOIN parks p ON p.id = ANY($1)
-      WHERE e.location ILIKE '%' || p.name || '%'
+      INNER JOIN parks p ON true  
+      WHERE p.id = ANY($1)
+      AND e.location ILIKE '%' || p.name || '%'
       AND e.start_date >= $2 AND e.start_date <= $3
       GROUP BY p.id
     `;
@@ -1119,6 +801,287 @@ router.get('/:id/dependencies', isAuthenticated, requirePermission('management:p
   } catch (error) {
     console.error('Error fetching park dependencies:', error);
     res.status(500).json({ message: 'Error fetching park dependencies' });
+  }
+});
+
+// =============================================================================
+// SECCIÓN 3: RUTAS PÚBLICAS - CONSULTAS POR ID
+// =============================================================================
+
+/**
+ * GET /parks/:id - Obtener un parque por ID
+ */
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+
+    // Evitar conflicto con rutas como /parks/summary
+    if (isNaN(parkId)) {
+      return res.status(400).json({ message: 'Invalid park ID' });
+    }
+
+    const { getParkByIdDirectly } = await import('../direct-park-queries');
+    const park = await getParkByIdDirectly(parkId);
+
+    if (!park) {
+      return res.status(404).json({ message: 'Park not found' });
+    }
+
+    res.json(park);
+  } catch (error) {
+    console.error('Error al obtener parque:', error);
+    res.status(500).json({ message: 'Error fetching park' });
+  }
+});
+
+/**
+ * GET /parks/:id/extended - Datos extendidos del parque (con amenidades e imágenes)
+ */
+router.get('/:id/extended', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+
+    if (isNaN(parkId) || parkId <= 0) {
+      return res.status(400).json({ message: 'Invalid park ID' });
+    }
+
+    // Datos básicos
+    const parkResult = await pool.query(`
+      SELECT 
+        p.id, p.name, p.park_type as "parkType", p.description, p.address, 
+        p.postal_code as "postalCode", p.latitude, p.longitude, 
+        p.area, p.foundation_year as "foundationYear",
+        p.administrator, p.status,
+        p.regulation_url as "regulationUrl", p.opening_hours as "openingHours", 
+        p.contact_email as "contactEmail", p.contact_phone as "contactPhone",
+        p.video_url as "videoUrl", p.municipality_text as "municipalityText"
+      FROM parks p
+      WHERE p.id = $1
+    `, [parkId]);
+
+    if (parkResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Park not found' });
+    }
+
+    const park = parkResult.rows[0];
+
+    // Amenidades
+    const amenitiesResult = await pool.query(`
+      SELECT a.id, a.name, a.icon, a.category, 
+             a.icon_type as "iconType", a.custom_icon_url as "customIconUrl",
+             pa.module_name as "moduleName", pa.surface_area as "surfaceArea"
+      FROM amenities a
+      JOIN park_amenities pa ON a.id = pa.amenity_id
+      WHERE pa.park_id = $1 AND pa.status = 'activo'
+      ORDER BY a.category, a.name
+    `, [parkId]);
+
+    // Imágenes
+    const imagesResult = await pool.query(`
+      SELECT id, image_url as "imageUrl", caption, is_primary as "isPrimary"
+      FROM park_images
+      WHERE park_id = $1
+      ORDER BY is_primary DESC, created_at DESC
+    `, [parkId]);
+
+    res.json({
+      ...park,
+      amenities: amenitiesResult.rows,
+      images: imagesResult.rows
+    });
+
+  } catch (error) {
+    console.error('Error getting extended park data:', error);
+    res.status(500).json({ message: 'Error fetching park data' });
+  }
+});
+
+// =============================================================================
+// SECCIÓN 4: RUTAS PÚBLICAS - SUBRECURSOS (lectura)
+// =============================================================================
+
+/**
+ * GET /parks/:id/amenities - Obtener amenidades de un parque
+ */
+router.get('/:id/amenities', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+
+    const result = await pool.query(`
+      SELECT 
+        pa.id,
+        pa.park_id as "parkId",
+        pa.amenity_id as "amenityId",
+        pa.module_name as "moduleName",
+        pa.location_latitude as "locationLatitude",
+        pa.location_longitude as "locationLongitude",
+        pa.surface_area as "surfaceArea",
+        pa.status,
+        pa.description,
+        a.name as "amenityName",
+        a.icon as "amenityIcon",
+        a.custom_icon_url as "customIconUrl"
+      FROM park_amenities pa
+      INNER JOIN amenities a ON pa.amenity_id = a.id
+      WHERE pa.park_id = $1
+      ORDER BY a.name
+    `, [parkId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching park amenities:', error);
+    res.status(500).json({ message: 'Error fetching park amenities' });
+  }
+});
+
+/**
+ * GET /parks/:id/images - Obtener imágenes de un parque
+ */
+router.get('/:id/images', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+    const images = await storage.getParkImages(parkId);
+
+    const mappedImages = images.map(img => ({
+      id: img.id,
+      parkId: img.parkId,
+      imageUrl: img.imageUrl,
+      caption: img.caption,
+      isPrimary: img.isPrimary,
+      createdAt: img.createdAt
+    }));
+
+    res.json(mappedImages);
+  } catch (error) {
+    console.error('Error fetching park images:', error);
+    res.status(500).json({ message: 'Error fetching park images' });
+  }
+});
+
+/**
+ * GET /parks/:id/documents - Obtener documentos de un parque
+ */
+router.get('/:id/documents', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+    const documents = await storage.getParkDocuments(parkId);
+    res.json(documents);
+  } catch (error) {
+    console.error('Error fetching park documents:', error);
+    res.status(500).json({ message: 'Error fetching documents' });
+  }
+});
+
+/**
+ * GET /parks/:id/videos - Obtener videos de un parque
+ */
+router.get('/:id/videos', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+
+    const result = await pool.query(`
+      SELECT id, park_id as "parkId", video_url as "videoUrl", 
+             title, description, thumbnail_url as "thumbnailUrl",
+             is_featured as "isFeatured", created_at as "createdAt"
+      FROM park_videos 
+      WHERE park_id = $1 
+      ORDER BY is_featured DESC, created_at DESC
+    `, [parkId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching park videos:', error);
+    res.status(500).json({ message: 'Error fetching videos' });
+  }
+});
+
+/**
+ * GET /parks/:id/evaluations - Obtener evaluaciones de un parque
+ */
+router.get('/:id/evaluations', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+
+    const result = await pool.query(`
+      SELECT 
+        pe.id, pe.park_id as "parkId", pe.user_id as "userId",
+        pe.overall_rating as "overallRating", pe.cleanliness, pe.safety, 
+        pe.amenities as amenities_rating, pe.accessibility, 
+        pe.comment, pe.visit_date as "visitDate", pe.created_at as "createdAt",
+        pe.status, pe.would_recommend as "wouldRecommend",
+        u.full_name as "userName"
+      FROM park_evaluations pe
+      LEFT JOIN users u ON pe.user_id = u.id
+      WHERE pe.park_id = $1
+      ORDER BY pe.created_at DESC
+    `, [parkId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching park evaluations:', error);
+    res.status(500).json({ message: 'Error fetching evaluations' });
+  }
+});
+
+/**
+ * GET /parks/:id/evaluation-stats - Estadísticas de evaluaciones
+ */
+router.get('/:id/evaluation-stats', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+
+    if (isNaN(parkId)) {
+      return res.status(400).json({ success: false, message: 'ID de parque inválido' });
+    }
+
+    const statsResult = await db.execute(sql`
+      SELECT 
+        COUNT(*)::int as total_evaluations,
+        AVG(overall_rating)::numeric(3,2) as average_rating,
+        (COUNT(*) FILTER (WHERE would_recommend = true)::numeric / NULLIF(COUNT(*)::numeric, 0) * 100)::numeric(5,2) as recommendation_rate,
+        AVG(cleanliness)::numeric(3,2) as avg_cleanliness,
+        AVG(safety)::numeric(3,2) as avg_safety,
+        AVG(maintenance)::numeric(3,2) as avg_maintenance,
+        AVG(accessibility)::numeric(3,2) as avg_accessibility,
+        AVG(amenities)::numeric(3,2) as avg_amenities,
+        AVG(activities)::numeric(3,2) as avg_activities,
+        AVG(staff)::numeric(3,2) as avg_staff,
+        AVG(natural_beauty)::numeric(3,2) as avg_natural_beauty,
+        COUNT(*) FILTER (WHERE overall_rating = 5)::int as five_star_count,
+        COUNT(*) FILTER (WHERE overall_rating = 4)::int as four_star_count,
+        COUNT(*) FILTER (WHERE overall_rating = 3)::int as three_star_count,
+        COUNT(*) FILTER (WHERE overall_rating = 2)::int as two_star_count,
+        COUNT(*) FILTER (WHERE overall_rating = 1)::int as one_star_count
+      FROM park_evaluations
+      WHERE park_id = ${parkId} AND status = 'approved'
+    `);
+
+    const stats = statsResult.rows[0] || {
+      total_evaluations: 0,
+      average_rating: 0,
+      recommendation_rate: 0
+    };
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Error obteniendo estadísticas de evaluaciones:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener estadísticas' });
+  }
+});
+
+/**
+ * GET /parks/:id/comments - Obtener comentarios de un parque
+ */
+router.get('/:id/comments', async (req: Request, res: Response) => {
+  try {
+    const parkId = Number(req.params.id);
+    const approvedOnly = req.query.approvedOnly === 'true';
+
+    const comments = await storage.getParkComments(parkId, approvedOnly);
+    res.json(comments);
+  } catch (error) {
+    console.error('Error fetching park comments:', error);
+    res.status(500).json({ message: 'Error fetching park comments' });
   }
 });
 

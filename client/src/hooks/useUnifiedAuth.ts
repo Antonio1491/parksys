@@ -152,20 +152,20 @@ export function useUnifiedAuth(): UnifiedAuthState {
   // Log para debugging (solo en desarrollo)
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 [UNIFIED AUTH] Estado:', {
-        isAuthenticated,
-        isLoading,
-        user: unifiedUser,
-        firebaseStatus: {
-          authenticated: firebaseAuth.isAuthenticated,
-          loading: firebaseAuth.loading,
-          approved: firebaseAuth.userStatus.isApproved
-        },
-        localStatus: {
-          authenticated: localAuth.isAuthenticated,
-          loading: localAuth.isLoading
-        }
-      });
+      // console.log('🔧 [UNIFIED AUTH] Estado:', {
+      //   isAuthenticated,
+      //   isLoading,
+      //   user: unifiedUser,
+      //   firebaseStatus: {
+      //     authenticated: firebaseAuth.isAuthenticated,
+      //     loading: firebaseAuth.loading,
+      //     approved: firebaseAuth.userStatus.isApproved
+      //   },
+      //   localStatus: {
+      //     authenticated: localAuth.isAuthenticated,
+      //     loading: localAuth.isLoading
+      //   }
+      // });
     }
   }, [isAuthenticated, isLoading, unifiedUser, firebaseAuth, localAuth]);
 

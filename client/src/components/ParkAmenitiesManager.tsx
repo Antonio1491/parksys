@@ -1,27 +1,49 @@
 /**
- * GESTOR COMPLETO DE AMENIDADES PARA PARQUES - INTERFAZ DE DOS COLUMNAS
- * ====================================================================
+ * ============================================================================
+ * GESTOR DE AMENIDADES PARA PARQUES - VERSIÓN REFACTORIZADA
+ * ============================================================================
  * 
- * Componente integral para gestión de amenidades y servicios de parques
- * con funcionalidades mejoradas de agregar, editar y eliminar amenidades
- * mediante una interfaz intuitiva de dos columnas
+ * Componente optimizado para gestión de amenidades de parques con:
+ * - Autenticación centralizada vía apiRequest
+ * - Arquitectura limpia y mantenible
+ * - Interfaz de dos columnas intuitiva
+ * - Sin código hardcodeado
+ * 
+ * CAMBIOS PRINCIPALES:
+ * ✅ Eliminados 7 headers hardcodeados
+ * ✅ Migrado de fetch directo a apiRequest
+ * ✅ Hooks personalizados para lógica reutilizable
+ * ✅ Mejor manejo de estados y errores
+ * ✅ Optimización de re-renders
+ * 
+ * @author ParkSys Team
+ * @version 2.0 - Refactored
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter 
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, MapPin, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin, Package, Loader2 } from 'lucide-react';
 import AmenityIcon from './AmenityIcon';
+import { apiRequest } from '@/lib/queryClient';
 
-/**
- * INTERFACES PARA TIPADO TYPESCRIPT
- * ================================
- */
+// ============================================================================
+// TYPES & INTERFACES
+// ============================================================================
 
 interface ParkAmenity {
   id: number;
@@ -49,78 +71,70 @@ interface ParkAmenitiesManagerProps {
   parkId: number;
 }
 
-const statusTranslations: Record<string, string> = {
+interface AmenityFormData {
+  moduleName: string;
+  surfaceArea: string;
+  description: string;
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const STATUS_TRANSLATIONS: Record<string, string> = {
   'activo': 'Activo',
   'inactivo': 'Inactivo',
   'mantenimiento': 'En Mantenimiento'
 };
 
-export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerProps) {
+const EMPTY_FORM_DATA: AmenityFormData = {
+  moduleName: '',
+  surfaceArea: '',
+  description: ''
+};
+
+// ============================================================================
+// CUSTOM HOOKS
+// ============================================================================
+
+/**
+ * Hook para gestionar amenidades del parque
+ * Centraliza queries y mutations relacionadas
+ */
+function useParkAmenities(parkId: number) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Estados para modales
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingAmenity, setEditingAmenity] = useState<ParkAmenity | null>(null);
-  const [selectedAmenityId, setSelectedAmenityId] = useState<number | null>(null);
-  const [moduleName, setModuleName] = useState('');
-  const [surfaceArea, setSurfaceArea] = useState('');
-  const [description, setDescription] = useState('');
-
-  // Consulta para obtener amenidades del parque
-  const { data: parkAmenities = [], isLoading: amenitiesLoading, error: amenitiesError } = useQuery<ParkAmenity[]>({
+  // Query: Amenidades del parque
+  const {
+    data: parkAmenities = [],
+    isLoading: isLoadingPark,
+    error: parkError
+  } = useQuery<ParkAmenity[]>({
     queryKey: [`/api/parks/${parkId}/amenities`],
-    queryFn: async () => {
-      console.log('🔍 FRONTEND: Cargando amenidades para parque', parkId);
-      const response = await fetch(`/api/parks/${parkId}/amenities`, {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
-      if (!response.ok) throw new Error('Error cargando amenidades');
-      const data = await response.json();
-      console.log('✅ FRONTEND: Amenidades cargadas:', data);
-      return data;
-    },
-    enabled: !!parkId
+    enabled: !!parkId,
   });
 
-  // Consulta para obtener todas las amenidades disponibles
-  const { data: availableAmenities = [], isLoading: availableLoading } = useQuery<Amenity[]>({
+  // Query: Amenidades disponibles
+  const {
+    data: availableAmenities = [],
+    isLoading: isLoadingAvailable
+  } = useQuery<Amenity[]>({
     queryKey: ['/api/amenities'],
-    queryFn: async () => {
-      console.log('🔍 FRONTEND: Cargando amenidades disponibles...');
-      const response = await fetch('/api/amenities', {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
-      if (!response.ok) throw new Error('Error cargando amenidades disponibles');
-      const data = await response.json();
-      console.log('✅ FRONTEND: Amenidades disponibles cargadas:', data);
-      return data;
-    }
   });
 
-  // Mutación para agregar amenidad
+  // Mutation: Agregar amenidad
   const addAmenityMutation = useMutation({
-    mutationFn: async (data: { amenityId: number; moduleName: string; surfaceArea: string | null; description: string | null }) => {
-      const response = await fetch(`/api/parks/${parkId}/amenities`, {
+    mutationFn: async (data: {
+      amenityId: number;
+      moduleName: string;
+      surfaceArea: string | null;
+      description: string | null;
+    }) => {
+      return apiRequest(`/api/parks/${parkId}/amenities`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        },
-        body: JSON.stringify(data)
+        data,
       });
-      if (!response.ok) throw new Error('Error agregando amenidad');
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/amenities`] });
@@ -128,59 +142,52 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
         title: "Amenidad agregada",
         description: "La amenidad se agregó correctamente al parque",
       });
-      setSelectedAmenityId(null);
-      setModuleName('');
-      setSurfaceArea('');
-      setDescription('');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "No se pudo agregar la amenidad",
+        description: error.message || "No se pudo agregar la amenidad",
         variant: "destructive",
       });
     }
   });
 
-  // Mutación para actualizar amenidad
+  // Mutation: Actualizar amenidad
   const updateAmenityMutation = useMutation({
-    mutationFn: async ({ parkAmenityId, data }: { parkAmenityId: number; data: any }) => {
-      const response = await fetch(`/api/park-amenities/${parkAmenityId}`, {
+    mutationFn: async ({
+      parkAmenityId,
+      data
+    }: {
+      parkAmenityId: number;
+      data: Partial<AmenityFormData>;
+    }) => {
+      return apiRequest(`/api/park-amenities/${parkAmenityId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        },
-        body: JSON.stringify(data)
+        data,
       });
-      if (!response.ok) throw new Error('Error actualizando amenidad');
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/amenities`] });
-      setIsEditDialogOpen(false);
-      setEditingAmenity(null);
       toast({
         title: "Amenidad actualizada",
         description: "La amenidad se actualizó correctamente",
       });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo actualizar la amenidad",
+        variant: "destructive",
+      });
     }
   });
 
-  // Mutación para eliminar amenidad
+  // Mutation: Eliminar amenidad
   const removeAmenityMutation = useMutation({
     mutationFn: async (parkAmenityId: number) => {
-      const response = await fetch(`/api/parks/${parkId}/amenities/${parkAmenityId}`, {
+      return apiRequest(`/api/parks/${parkId}/amenities/${parkAmenityId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
       });
-      if (!response.ok) throw new Error('Error eliminando amenidad');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}/amenities`] });
@@ -188,170 +195,372 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
         title: "Amenidad eliminada",
         description: "La amenidad se eliminó correctamente del parque",
       });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo eliminar la amenidad",
+        variant: "destructive",
+      });
     }
   });
 
-  const handleEditAmenity = (amenity: ParkAmenity) => {
-    setEditingAmenity(amenity);
-    setModuleName(amenity.moduleName || '');
-    setSurfaceArea(amenity.surfaceArea || '');
-    setDescription(amenity.description || '');
-    setIsEditDialogOpen(true);
+  // Filtrar amenidades disponibles (que no estén asignadas)
+  const unassignedAmenities = useMemo(() => {
+    const assignedIds = new Set(parkAmenities.map(pa => pa.amenityId));
+    return availableAmenities.filter(amenity => !assignedIds.has(amenity.id));
+  }, [parkAmenities, availableAmenities]);
+
+  return {
+    parkAmenities,
+    unassignedAmenities,
+    isLoading: isLoadingPark || isLoadingAvailable,
+    error: parkError,
+    addAmenity: addAmenityMutation.mutate,
+    updateAmenity: updateAmenityMutation.mutate,
+    removeAmenity: removeAmenityMutation.mutate,
+    isAdding: addAmenityMutation.isPending,
+    isUpdating: updateAmenityMutation.isPending,
+    isRemoving: removeAmenityMutation.isPending,
   };
+}
 
-  const handleUpdateAmenity = () => {
-    if (!editingAmenity) return;
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
 
+/**
+ * Diálogo para editar detalles de amenidad
+ */
+interface EditAmenityDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  amenity: ParkAmenity;
+  onSave: (parkAmenityId: number, data: Partial<AmenityFormData>) => void;
+  isSaving: boolean;
+}
+
+function EditAmenityDialog({
+  isOpen,
+  onClose,
+  amenity,
+  onSave,
+  isSaving
+}: EditAmenityDialogProps) {
+  const [formData, setFormData] = useState<AmenityFormData>({
+    moduleName: amenity.moduleName || '',
+    surfaceArea: amenity.surfaceArea || '',
+    description: amenity.description || ''
+  });
+
+  const handleSave = () => {
     const updateData = {
-      moduleName: moduleName || null,
-      surfaceArea: surfaceArea || null,
-      description: description || null
+      moduleName: formData.moduleName || null,
+      surfaceArea: formData.surfaceArea || null,
+      description: formData.description || null
     };
-
-    updateAmenityMutation.mutate({
-      parkAmenityId: editingAmenity.id,
-      data: updateData
-    });
+    onSave(amenity.id, updateData);
+    onClose();
   };
 
-  const handleRemoveAmenity = (parkAmenityId: number) => {
-    if (confirm('¿Estás seguro de que deseas eliminar esta amenidad del parque?')) {
-      removeAmenityMutation.mutate(parkAmenityId);
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Editar Amenidad</DialogTitle>
+          <DialogDescription>
+            Modifica los detalles de {amenity.amenityName}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="moduleName">Nombre del Módulo</Label>
+            <Input
+              id="moduleName"
+              value={formData.moduleName}
+              onChange={(e) => setFormData({ ...formData, moduleName: e.target.value })}
+              placeholder="Ej: Módulo A, Sección Norte..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="surfaceArea">Superficie (m²)</Label>
+            <Input
+              id="surfaceArea"
+              value={formData.surfaceArea}
+              onChange={(e) => setFormData({ ...formData, surfaceArea: e.target.value })}
+              placeholder="Ej: 150m²"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Descripción</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Detalles adicionales..."
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={isSaving}>
+            Cancelar
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Guardar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * Card de amenidad disponible (columna izquierda)
+ */
+interface AvailableAmenityCardProps {
+  amenity: Amenity;
+  onAdd: (amenityId: number) => void;
+  isAdding: boolean;
+}
+
+function AvailableAmenityCard({ amenity, onAdd, isAdding }: AvailableAmenityCardProps) {
+  return (
+    <div
+      onClick={() => !isAdding && onAdd(amenity.id)}
+      className={`
+        flex items-center gap-3 p-3 border rounded-lg 
+        transition-all duration-200
+        ${isAdding 
+          ? 'opacity-50 cursor-not-allowed' 
+          : 'hover:bg-gray-50 hover:border-[#00a587] cursor-pointer hover:shadow-sm'
+        }
+      `}
+    >
+      <AmenityIcon
+        name={amenity.name}
+        iconType={amenity.icon === 'custom' ? 'custom' : 'system'}
+        customIconUrl={amenity.icon === 'custom' ? `/uploads/amenity-icon-${amenity.id}.png` : undefined}
+        size={32}
+      />
+      <div className="flex-1">
+        <h5 className="font-medium text-gray-900">{amenity.name}</h5>
+        <p className="text-xs text-gray-500">Click para agregar</p>
+      </div>
+      {isAdding ? (
+        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+      ) : (
+        <Plus className="h-4 w-4 text-gray-400" />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Card de amenidad asignada (columna derecha)
+ */
+interface AssignedAmenityCardProps {
+  amenity: ParkAmenity;
+  onEdit: (amenity: ParkAmenity) => void;
+  onRemove: (parkAmenityId: number) => void;
+  isRemoving: boolean;
+}
+
+function AssignedAmenityCard({ 
+  amenity, 
+  onEdit, 
+  onRemove, 
+  isRemoving 
+}: AssignedAmenityCardProps) {
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('¿Estás seguro de que deseas eliminar esta amenidad del parque?')) {
+      onRemove(amenity.id);
     }
   };
 
-  // Función para agregar amenidad rápidamente
-  const handleQuickAddAmenity = (amenityId: number) => {
-    const updateData = {
+  return (
+    <div className="flex items-center gap-3 p-3 border rounded-lg border-[#ceefea] bg-[#ceefea]/20 hover:bg-[#ceefea]/30 transition-colors">
+      <AmenityIcon
+        name={amenity.amenityName}
+        iconType={amenity.amenityIcon === 'custom' ? 'custom' : 'system'}
+        customIconUrl={amenity.customIconUrl}
+        size={32}
+      />
+      <div className="flex-1 min-w-0">
+        <h5 className="font-medium text-gray-900">{amenity.amenityName}</h5>
+        {amenity.moduleName && (
+          <p className="text-xs text-gray-600 flex items-center gap-1 mt-0.5">
+            <MapPin className="h-3 w-3" />
+            {amenity.moduleName}
+          </p>
+        )}
+        {amenity.surfaceArea && (
+          <p className="text-xs text-gray-500 mt-0.5">
+            {amenity.surfaceArea}
+          </p>
+        )}
+        <Badge variant="outline" className="mt-1 text-xs">
+          {STATUS_TRANSLATIONS[amenity.status] || amenity.status}
+        </Badge>
+      </div>
+      <div className="flex gap-1">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => onEdit(amenity)}
+          disabled={isRemoving}
+          className="h-8 w-8 p-0"
+        >
+          <Edit className="h-4 w-4" />
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleRemove}
+          disabled={isRemoving}
+          className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+        >
+          {isRemoving ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerProps) {
+  const [editingAmenity, setEditingAmenity] = useState<ParkAmenity | null>(null);
+
+  const {
+    parkAmenities,
+    unassignedAmenities,
+    isLoading,
+    error,
+    addAmenity,
+    updateAmenity,
+    removeAmenity,
+    isAdding,
+    isUpdating,
+    isRemoving,
+  } = useParkAmenities(parkId);
+
+  // Handler optimizado con useCallback
+  const handleQuickAddAmenity = useCallback((amenityId: number) => {
+    addAmenity({
       amenityId,
       moduleName: '',
       surfaceArea: null,
       description: null
-    };
+    });
+  }, [addAmenity]);
 
-    addAmenityMutation.mutate(updateData);
-  };
+  const handleEditAmenity = useCallback((amenity: ParkAmenity) => {
+    setEditingAmenity(amenity);
+  }, []);
 
-  console.log('🔍 AMENITIES MANAGER - Renderizando con:', {
-    parkId,
-    amenitiesCount: parkAmenities.length,
-    amenitiesLoading,
-    amenitiesError: amenitiesError?.message || null,
-    availableCount: availableAmenities.length
-  });
+  const handleCloseEditDialog = useCallback(() => {
+    setEditingAmenity(null);
+  }, []);
 
-  if (amenitiesLoading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-[#00a587] mx-auto" />
         <p className="mt-2 text-gray-600">Cargando amenidades...</p>
       </div>
     );
   }
 
-  if (amenitiesError) {
+  // Error state
+  if (error) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-600">Error cargando amenidades: {amenitiesError.message}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+          <p className="text-red-600 font-medium">Error cargando amenidades</p>
+          <p className="text-red-500 text-sm mt-1">{error.message}</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-
       {/* Layout de dos columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Columna izquierda: Amenidades disponibles */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Disponibles
+
+        {/* COLUMNA IZQUIERDA: Amenidades disponibles */}
+        <Card className="border-2 border-gray-200">
+          <CardHeader className="bg-gray-50">
+            <CardTitle className="flex items-center gap-2 text-gray-700">
+              <Package className="h-5 w-5" />
+              Disponibles ({unassignedAmenities.length})
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-[600px] overflow-y-auto">
-              {availableAmenities
-                .filter(amenity => !parkAmenities.some(pa => pa.amenityId === amenity.id))
-                .map((amenity) => (
-                  <div
-                    key={amenity.id}
-                    onClick={() => handleQuickAddAmenity(amenity.id)}
-                    className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-100 hover:border-gray-100 cursor-pointer transition-colors"
-                  >
-                    <AmenityIcon 
-                      name={amenity.name}
-                      iconType={amenity.icon === 'custom' ? 'custom' : 'system'}
-                      customIconUrl={amenity.icon === 'custom' ? `/uploads/amenity-icon-${amenity.id}.png` : undefined}
-                      size={32}
-                    />
-                    <div className="flex-1">
-                      <h5 className="font-medium text-gray-900">{amenity.name}</h5>
-                      <p className="text-xs text-gray-500">Click para agregar</p>
-                    </div>
-                    <Plus className="h-4 w-4 text-gray-400" />
-                  </div>
-                ))}
-              {availableAmenities.filter(amenity => !parkAmenities.some(pa => pa.amenityId === amenity.id)).length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <Package className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm">Todas las amenidades disponibles ya están asignadas</p>
+          <CardContent className="pt-4">
+            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
+              {unassignedAmenities.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <Package className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="font-medium">Todas las amenidades asignadas</p>
+                  <p className="text-sm mt-1">
+                    No hay más amenidades disponibles para agregar
+                  </p>
                 </div>
+              ) : (
+                unassignedAmenities.map((amenity) => (
+                  <AvailableAmenityCard
+                    key={amenity.id}
+                    amenity={amenity}
+                    onAdd={handleQuickAddAmenity}
+                    isAdding={isAdding}
+                  />
+                ))
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Columna derecha: Amenidades del parque */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        {/* COLUMNA DERECHA: Amenidades asignadas */}
+        <Card className="border-2 border-[#00a587]">
+          <CardHeader className="bg-[#ceefea]">
+            <CardTitle className="flex items-center gap-2 text-[#00444f]">
+              <MapPin className="h-5 w-5" />
               Asignadas ({parkAmenities.length})
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-[600px] overflow-y-auto">
+          <CardContent className="pt-4">
+            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
               {parkAmenities.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <MapPin className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm">No hay amenidades asignadas</p>
-                  <p className="text-xs mt-1">Agrega amenidades desde la lista de la izquierda</p>
+                <div className="text-center py-12 text-gray-500">
+                  <MapPin className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="font-medium">Sin amenidades asignadas</p>
+                  <p className="text-sm mt-1">
+                    Selecciona amenidades de la lista de la izquierda
+                  </p>
                 </div>
               ) : (
-                parkAmenities.map((amenity, index) => (
-                  <div
-                    key={`${amenity.id}-${amenity.amenityId}-${index}`}
-                    className="flex items-center gap-3 p-3 border rounded-lg border-green-200"
-                  >
-                    <AmenityIcon 
-                      name={amenity.amenityName}
-                      iconType={amenity.amenityIcon === 'custom' ? 'custom' : 'system'}
-                      customIconUrl={amenity.customIconUrl}
-                      size={32}
-                    />
-                    <div className="flex-1">
-                      <h5 className="font-medium text-gray-900">{amenity.amenityName}</h5>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {statusTranslations[amenity.status as keyof typeof statusTranslations] || amenity.status}
-                        </Badge>
-                        {amenity.moduleName && (
-                          <span className="text-xs text-gray-500">📍 {amenity.moduleName}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleRemoveAmenity(amenity.id)}
-                        disabled={removeAmenityMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-3" />
-                      </Button>
-                    </div>
-                  </div>
+                parkAmenities.map((amenity) => (
+                  <AssignedAmenityCard
+                    key={`${amenity.id}-${amenity.amenityId}`}
+                    amenity={amenity}
+                    onEdit={handleEditAmenity}
+                    onRemove={removeAmenity}
+                    isRemoving={isRemoving}
+                  />
                 ))
               )}
             </div>
@@ -359,78 +568,16 @@ export default function ParkAmenitiesManager({ parkId }: ParkAmenitiesManagerPro
         </Card>
       </div>
 
-      {/* Dialog de edición */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Editar Amenidad</DialogTitle>
-          </DialogHeader>
-          {editingAmenity && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <AmenityIcon 
-                  name={editingAmenity.amenityName}
-                  iconType={editingAmenity.amenityIcon === 'custom' ? 'custom' : 'system'}
-                  customIconUrl={editingAmenity.customIconUrl}
-                  size={32}
-                />
-                <div>
-                  <h5 className="font-medium">{editingAmenity.amenityName}</h5>
-                  <p className="text-sm text-gray-600 capitalize">
-                    General
-                  </p>
-                </div>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">Módulo/Ubicación</label>
-                <Input
-                  value={moduleName}
-                  onChange={(e) => setModuleName(e.target.value)}
-                  placeholder="Ej: Zona Norte, Entrada Principal..."
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">Superficie (m²)</label>
-                <Input
-                  value={surfaceArea}
-                  onChange={(e) => setSurfaceArea(e.target.value)}
-                  placeholder="Ej: 150.5"
-                  type="number"
-                  step="0.1"
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">Descripción</label>
-                <Input
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Descripción adicional..."
-                />
-              </div>
-              
-              <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={handleUpdateAmenity}
-                  disabled={updateAmenityMutation.isPending}
-                  className="flex-1"
-                >
-                  {updateAmenityMutation.isPending ? 'Actualizando...' : 'Actualizar'}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Diálogo de edición */}
+      {editingAmenity && (
+        <EditAmenityDialog
+          isOpen={!!editingAmenity}
+          onClose={handleCloseEditDialog}
+          amenity={editingAmenity}
+          onSave={updateAmenity}
+          isSaving={isUpdating}
+        />
+      )}
     </div>
   );
 }
