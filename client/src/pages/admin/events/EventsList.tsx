@@ -626,13 +626,13 @@ const EventsList: React.FC = () => {
       <div className="space-y-6">
         <PageHeader 
           title="Listado de eventos"
-          subtitle="Eventos registrados en el sistema"
+          subtitle="Gestión de eventos registrados en el sistema."
           icon={<CalendarDays />}
           actions={[
             <Button
               key="new-event"
+              variant="primary"
               onClick={() => setLocation(ROUTES.admin.events.create)}
-              className="bg-[#a0cc4d] hover:bg-[#00a587] text-white"
               data-testid="button-new-event"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -640,18 +640,16 @@ const EventsList: React.FC = () => {
             </Button>,
             <Button
               key="importar"
-              variant="outline"
+              variant="secondary"
               onClick={() => setShowImportDialog(true)}
-              className="border-[#f4f5f7v] text-[#00444f] hover:bg-[#00a587] hover:text-white"
             >
               <Upload className="h-4 w-4 mr-2" />
               Importar
             </Button>,
             <Button
               key="exportar"
-              variant="outline"
+              variant="tertiary"
               onClick={handleExportCSV}
-              className="bg-[#00444f] text-[#ffffff] hover:bg-[#00a587] hover:text-white"
             >
               <Download className="h-4 w-4 mr-2" />
               Exportar
@@ -660,7 +658,7 @@ const EventsList: React.FC = () => {
         />
 
         {/* Filtros y controles */}
-        <div className="bg-white p-4 rounded-lg">
+        <div className="bg-white p-4 rounded-lg border">
           <div className="flex flex-wrap items-start justify-start gap-3">
             <div className="relative flex-1 min-w-[280px] max-w-lg">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-600" />

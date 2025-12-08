@@ -55,7 +55,9 @@
     "spaceReservations": "Volver a Reservas de Espacios",
     "spaces": "Volver a Espacios",
     "advertisements": "Volver a Anuncios",
-    "home": "Volver al Panel de Control"
+    "home": "Volver al Panel de Control",
+    "programming": "Volver a Programación",
+    "classification": "Volver a Clasificación"
   },
   "navigation": {
     "parks": "Parques", 
@@ -144,7 +146,9 @@
     "roles": "Roles",
     "policies": "Políticas",
     "audit": "Auditoría",
-    "operation": "Operación"
+    "operation": "Operación",
+    "programming": "Programación",
+    "classification": "Clasificación"
   },
   "actions": {
     "refresh": "Actualizar",

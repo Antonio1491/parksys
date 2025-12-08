@@ -575,40 +575,110 @@ const AdminParksContent = () => {
     }
 
     return (
-      <div className="flex items-center justify-between mt-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
+        {/* Info de paginación */}
         <div className="text-sm text-gray-600">
-          Mostrando {startIndex + 1}-{Math.min(endIndex, filteredParks.length)} de {filteredParks.length} parques
+          <span className="hidden sm:inline">
+            Mostrando {startIndex + 1}-{Math.min(endIndex, filteredParks.length)} de {filteredParks.length} parques
+          </span>
+          <span className="sm:hidden">
+            {startIndex + 1}-{Math.min(endIndex, filteredParks.length)} de {filteredParks.length}
+          </span>
         </div>
-        <div className="flex items-center space-x-2">
+
+        {/* Controles de paginación */}
+        <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-center sm:justify-end">
+          {/* Botón Anterior */}
           <Button
             variant="outline"
             size="sm"
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
+            className="h-9 px-2 sm:px-3"
           >
             <ChevronLeft className="h-4 w-4" />
-            Anterior
+            <span className="hidden sm:inline ml-1">Anterior</span>
           </Button>
 
-          {pages.map(page => (
-            <Button
-              key={page}
-              variant={currentPage === page ? "default" : "outline"}
-              size="sm"
-              onClick={() => handlePageClick(page)}
-              className={currentPage === page ? "min-w-9" : "min-w-9"}
-            >
-              {page}
-            </Button>
-          ))}
+          {/* Números de página - limitados en móvil */}
+          <div className="flex items-center gap-1">
+            {pages.length <= 5 ? (
+              // Mostrar todos si son 5 o menos
+              pages.map(page => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePageClick(page)}
+                  className="h-9 min-w-[36px] px-2"
+                >
+                  {page}
+                </Button>
+              ))
+            ) : (
+              // Móvil: Solo mostrar página actual y total
+              <>
+                <span className="sm:hidden text-sm text-gray-600 px-2">
+                  {currentPage} / {totalPages}
+                </span>
 
+                {/* Desktop: Mostrar con elipsis */}
+                <div className="hidden sm:flex items-center gap-1">
+                  {/* Primera página */}
+                  <Button
+                    variant={currentPage === 1 ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageClick(1)}
+                    className="h-9 min-w-[36px] px-2"
+                  >
+                    1
+                  </Button>
+
+                  {/* Elipsis inicial */}
+                  {currentPage > 3 && <span className="px-1">...</span>}
+
+                  {/* Páginas cercanas a la actual */}
+                  {pages
+                    .filter(p => p > 1 && p < totalPages && Math.abs(p - currentPage) <= 1)
+                    .map(page => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageClick(page)}
+                        className="h-9 min-w-[36px] px-2"
+                      >
+                        {page}
+                      </Button>
+                    ))
+                  }
+
+                  {/* Elipsis final */}
+                  {currentPage < totalPages - 2 && <span className="px-1">...</span>}
+
+                  {/* Última página */}
+                  <Button
+                    variant={currentPage === totalPages ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageClick(totalPages)}
+                    className="h-9 min-w-[36px] px-2"
+                  >
+                    {totalPages}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Botón Siguiente */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
+            className="h-9 px-2 sm:px-3"
           >
-            Siguiente
+            <span className="hidden sm:inline mr-1">Siguiente</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -628,100 +698,102 @@ const AdminParksContent = () => {
 
     return (
       <div className="rounded-xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {selectionMode && (
-                <TableHead className="w-[50px]">
-                  <Checkbox
-                    checked={currentParks.length > 0 && currentParks.every(park => selectedParks.has(park.id))}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        handleSelectAllParks();
-                      } else {
-                        handleDeselectAllParks();
-                      }
-                    }}
-                    data-testid="checkbox-select-all-table"
-                  />
-                </TableHead>
-              )}
-              <TableHead className="w-[80px]">ID</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Área</TableHead>
-              <TableHead>Dirección</TableHead>
-              <TableHead>Administrador</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentParks.map((park: Park) => (
-              <TableRow 
-                key={park.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setLocation(ROUTES.admin.parks.view.build(park.id))}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setLocation(ROUTES.admin.parks.view.build(park.id));
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label={`Ver detalles del parque ${park.name}`}
-                data-testid={`row-park-table-${park.id}`}
-              >
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
                 {selectionMode && (
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableHead className="w-[50px]">
                     <Checkbox
-                      checked={selectedParks.has(park.id)}
-                      onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
-                      data-testid={`checkbox-park-table-${park.id}`}
+                      checked={currentParks.length > 0 && currentParks.every(park => selectedParks.has(park.id))}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          handleSelectAllParks();
+                        } else {
+                          handleDeselectAllParks();
+                        }
+                      }}
+                      data-testid="checkbox-select-all-table"
                     />
-                  </TableCell>
+                  </TableHead>
                 )}
-                <TableCell className="font-medium">#{park.id}</TableCell>
-                <TableCell>
-                  <div>
-                    <p className="font-medium">{park.name}</p>
-                  </div>
-                </TableCell>
-                <TableCell>{formatArea(park.area)}</TableCell>
-                <TableCell>
-                  <div className="max-w-xs">
-                    <p className="truncate">{park.address}</p>
-                  </div>
-                </TableCell>
-                <TableCell>{(park as any).administrator || 'Sin asignar'}</TableCell>
-                <TableCell className="text-right">
-                  <div 
-                    className="flex justify-end space-x-2"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
-                      onClick={() => setLocation(ROUTES.admin.parks.edit.build(park.id))}
-                      data-testid={`button-edit-park-table-${park.id}`}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="bg-transparent text-destructive hover:text-destructive hover:bg-destructive/10 h-11 w-11"
-                      onClick={() => handleDeleteClick(park)}
-                      data-testid={`button-delete-park-table-${park.id}`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+                <TableHead className="w-[80px] min-w-[80px]">ID</TableHead>
+                <TableHead className="min-w-[200px]">Nombre</TableHead>
+                <TableHead className="min-w-[100px]">Área</TableHead>
+                <TableHead className="min-w-[200px]">Dirección</TableHead>
+                <TableHead className="min-w-[150px]">Administrador</TableHead>
+                <TableHead className="text-right min-w-[120px]">Acciones</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {currentParks.map((park: Park) => (
+                <TableRow 
+                  key={park.id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => setLocation(ROUTES.admin.parks.view.build(park.id))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setLocation(ROUTES.admin.parks.view.build(park.id));
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Ver detalles del parque ${park.name}`}
+                  data-testid={`row-park-table-${park.id}`}
+                >
+                  {selectionMode && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedParks.has(park.id)}
+                        onCheckedChange={(checked) => handleSelectPark(park.id, checked as boolean)}
+                        data-testid={`checkbox-park-table-${park.id}`}
+                      />
+                    </TableCell>
+                  )}
+                  <TableCell className="font-medium">#{park.id}</TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="font-medium">{park.name}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>{formatArea(park.area)}</TableCell>
+                  <TableCell>
+                    <div className="max-w-xs">
+                      <p className="truncate">{park.address}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>{(park as any).administrator || 'Sin asignar'}</TableCell>
+                  <TableCell className="text-right">
+                    <div 
+                     className="flex justify-end space-x-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-transparent text-foreground/80 hover:text-foreground/80 hover:bg-buttonHover h-11 w-11"
+                        onClick={() => setLocation(ROUTES.admin.parks.edit.build(park.id))}
+                        data-testid={`button-edit-park-table-${park.id}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-transparent text-destructive hover:text-destructive hover:bg-destructive/10 h-11 w-11"
+                        onClick={() => handleDeleteClick(park)}
+                        data-testid={`button-delete-park-table-${park.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   };

@@ -3,7 +3,6 @@ import { useLocation } from 'wouter';
 import ROUTES from '@/routes';
 import { useRouteGuard } from '@/hooks/useRouteGuard';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
-import LoadingPage from '@/components/LoadingPage';
 
 /**
  * Componente que verifica permisos para rutas admin

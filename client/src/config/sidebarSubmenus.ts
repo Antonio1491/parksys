@@ -7,6 +7,7 @@ import {
   Binoculars,
   Users,
   CalendarDays,
+  CalendarRange,
   CalendarClock,
   Star,
   AlertTriangle,
@@ -87,6 +88,17 @@ export const sidebarSubmenus = {
     ROUTES.admin.activities.instructors.create,
     ROUTES.admin.activities.instructors.view.path,
     ROUTES.admin.activities.instructors.edit.path,
+  ],
+  programming: [
+    ROUTES.admin.programming.catalog,
+    ROUTES.admin.programming.create,
+    ROUTES.admin.programming.view.path,
+    ROUTES.admin.programming.edit.path,
+    ROUTES.admin.programming.classification,
+    ROUTES.admin.programming.instructors.list,
+    ROUTES.admin.programming.instructors.create,
+    ROUTES.admin.programming.instructors.view.path,
+    ROUTES.admin.programming.instructors.edit.path,
   ],
   amenities: [
     ROUTES.admin.amenities.list,
@@ -323,6 +335,12 @@ export const sidebarMeta: Record<string, SubmenuMeta> = {
     permissionSlugs: ['activities.view'],
     permissionPrefix: 'management:activities',
   },
+  programming: {
+    label: 'navigation.programming',
+    icon: CalendarRange,
+    permissionSlugs: ['programming.view'],
+    permissionPrefix: 'management:programming',
+  },
   amenities: {
     label: 'navigation.amenities',
     icon: Package,
@@ -527,6 +545,11 @@ export const navigableRoutes: Record<string, Array<{
     { route: ROUTES.admin.activities.categories.list, labelKey: 'navigation.categories', icon: Tag },
     { route: ROUTES.admin.activities.registrations, labelKey: 'navigation.registrations', icon: UserCheck },
     { route: ROUTES.admin.activities.instructors.list, labelKey: 'navigation.instructors', icon: GraduationCap },
+  ],
+  programming: [
+    { route: ROUTES.admin.programming.catalog, labelKey: 'navigation.catalog', icon: List },
+    { route: ROUTES.admin.programming.classification, labelKey: 'navigation.classification', icon: Tag },
+    { route: ROUTES.admin.programming.instructors.list, labelKey: 'navigation.instructors', icon: GraduationCap },
   ],
   trees: [
     { route: ROUTES.admin.trees.list, labelKey: 'navigation.inventory', icon: NotebookPen },

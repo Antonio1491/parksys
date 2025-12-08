@@ -94,7 +94,7 @@ const HRDashboard = lazy(() => import('@/pages/admin/hr/dashboard'));
 // MÓDULOS ADMINISTRATIVOS (Mantenemos importación directa por ahora)
 // ============================================
 import AdminParks from "@/pages/admin/parks";
-import AdminParkEdit from "@/pages/admin/park-edit";
+import AdminParkNew from "@/pages/admin/park-new";
 import AdminParkView from "@/pages/admin/park-view";
 import AdminActivities from "@/pages/admin/activities";
 import AdminAmenities from "@/pages/admin/amenities";
@@ -421,7 +421,7 @@ function Router() {
 
           {/* Rutas del módulo de Parques */}
           <Route path={ROUTES.admin.parks.list} component={AdminParks} />
-          <Route path={ROUTES.admin.parks.create} component={AdminParkEdit} />
+          <Route path={ROUTES.admin.parks.create} component={AdminParkNew} />
           <Route path={ROUTES.admin.parks.view.path} component={AdminParkView} />
           <Route path={ROUTES.admin.parks.edit.path}>
             <Suspense fallback={<LoadingPage messageKey="loading.parkManagement" />}>
@@ -434,6 +434,70 @@ function Router() {
             </Suspense>
           </Route>
 
+          {/* ========== MÓDULO DE PROGRAMACIÓN ========== */}
+          {/* Catálogo (página principal) */}
+          <Route path={ROUTES.admin.programming.catalog}>
+            <Suspense fallback={<LoadingPage messageKey="loading.programming" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/catalog')))}
+            </Suspense>
+          </Route>
+
+          {/* Crear nueva programación */}
+          <Route path={ROUTES.admin.programming.create}>
+            <Suspense fallback={<LoadingPage messageKey="loading.programming" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/catalog')))}
+            </Suspense>
+          </Route>
+
+          {/* Ver detalle de programación */}
+          <Route path={ROUTES.admin.programming.view.path}>
+            <Suspense fallback={<LoadingPage messageKey="loading.programming" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/catalog')))}
+            </Suspense>
+          </Route>
+
+          {/* Editar programación */}
+          <Route path={ROUTES.admin.programming.edit.path}>
+            <Suspense fallback={<LoadingPage messageKey="loading.programming" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/catalog')))}
+            </Suspense>
+          </Route>
+
+          {/* Clasificación */}
+          <Route path={ROUTES.admin.programming.classification}>
+            <Suspense fallback={<LoadingPage messageKey="loading.programming" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/classification')))}
+            </Suspense>
+          </Route>
+
+          {/* Instructores - Lista */}
+          <Route path={ROUTES.admin.programming.instructors.list}>
+            <Suspense fallback={<LoadingPage messageKey="loading.instructors" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/instructors')))}
+            </Suspense>
+          </Route>
+
+          {/* Instructores - Crear */}
+          <Route path={ROUTES.admin.programming.instructors.create}>
+            <Suspense fallback={<LoadingPage messageKey="loading.instructors" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/instructors')))}
+            </Suspense>
+          </Route>
+
+          {/* Instructores - Ver */}
+          <Route path={ROUTES.admin.programming.instructors.view.path}>
+            <Suspense fallback={<LoadingPage messageKey="loading.instructors" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/instructors')))}
+            </Suspense>
+          </Route>
+
+          {/* Instructores - Editar */}
+          <Route path={ROUTES.admin.programming.instructors.edit.path}>
+            <Suspense fallback={<LoadingPage messageKey="loading.instructors" />}>
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/instructors')))}
+            </Suspense>
+          </Route>
+          
           {/* Rutas del módulo de Actividades */}
           <Route path={ROUTES.admin.activities.list} component={AdminActivities} />
           <Route path={ROUTES.admin.activities.create}>

@@ -36,6 +36,21 @@ const contextMap: { prefix: string; to: string; labelKey: string }[] = [
     labelKey: 'return.instructors',
   },
   {
+    prefix: ROUTES.admin.programming.catalog,
+    to: ROUTES.admin.programming.catalog,
+    labelKey: 'return.programming',
+  },
+  {
+    prefix: ROUTES.admin.programming.instructors.list,
+    to: ROUTES.admin.programming.instructors.list,
+    labelKey: 'return.instructors',
+  },
+  {
+    prefix: ROUTES.admin.programming.classification,
+    to: ROUTES.admin.programming.classification,
+    labelKey: 'return.classification',
+  },
+  {
     prefix: ROUTES.admin.amenities.list,
     to: ROUTES.admin.amenities.list,
     labelKey: 'return.amenities',

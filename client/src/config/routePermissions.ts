@@ -39,6 +39,17 @@ export const routePermissions: Record<string, RoutePermissionConfig> = {
   [ROUTES.admin.activities.instructors.view.path]: { permission: 'management:activities:instructors:view' },
   [ROUTES.admin.activities.instructors.edit.path]: { permission: 'management:activities:instructors:edit' },
 
+  // Programación (Unifica Actividades + Eventos)
+  [ROUTES.admin.programming.catalog]: { permission: 'management:programming:catalog:view' },
+  [ROUTES.admin.programming.create]: { permission: 'management:programming:catalog:create' },
+  [ROUTES.admin.programming.edit.path]: { permission: 'management:programming:catalog:edit' },
+  [ROUTES.admin.programming.view.path]: { permission: 'management:programming:catalog:view' },
+  [ROUTES.admin.programming.classification]: { permission: 'management:programming:classification:view' },
+  [ROUTES.admin.programming.instructors.list]: { permission: 'management:programming:instructors:view' },
+  [ROUTES.admin.programming.instructors.create]: { permission: 'management:programming:instructors:create' },
+  [ROUTES.admin.programming.instructors.view.path]: { permission: 'management:programming:instructors:view' },
+  [ROUTES.admin.programming.instructors.edit.path]: { permission: 'management:programming:instructors:edit' },
+
   // Amenidades
   [ROUTES.admin.amenities.list]: { permission: 'management:amenities:amenities:view' },
   [ROUTES.admin.amenities.create]: { permission: 'management:amenities:amenities:create' },
@@ -226,6 +237,7 @@ export const routePermissions: Record<string, RoutePermissionConfig> = {
   // Dashboards específicos heredan permiso de view del módulo principal
   [ROUTES.dashboards.parks]: { permission: 'management:parks:parks:view' },
   [ROUTES.dashboards.activities]: { permission: 'management:activities:catalog:view' },
+  [ROUTES.dashboards.programming]: { permission: 'management:programming:catalog:view' },
   [ROUTES.dashboards.amenities]: { permission: 'management:amenities:amenities:view' },
   [ROUTES.dashboards.trees]: { permission: 'management:trees:species:view' },
   [ROUTES.dashboards.visitors]: { permission: 'management:visitors:count:view' },

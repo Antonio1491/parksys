@@ -14,12 +14,11 @@ export const adminSidebarStructure = [
     icon: FolderOpen,
     submenus: [
       { id: 'parks', type: 'link' },
-      { id: 'activities', type: 'group' },
+      { id: 'programming', type: 'group' },
       { id: 'amenities', type: 'link' },
       { id: 'trees', type: 'group' },
       { id: 'fauna', type: 'link' },
       { id: 'visitors', type: 'group' },
-      { id: 'events', type: 'group' },
       { id: 'spaceReservations', type: 'group' },
       { id: 'evaluations', type: 'group' },
     ],

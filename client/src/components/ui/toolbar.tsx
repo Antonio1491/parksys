@@ -109,6 +109,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     onViewModeChange(mode);
   };
 
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+
   // ========== RENDER HELPERS ==========
 
   /**
@@ -153,61 +155,84 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <Button
           variant={selectionMode ? 'default' : 'outline'}
           size="sm"
-          className={`flex items-center h-11 w-11 ${
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className={`flex items-center h-10 w-10 sm:h-11 sm:w-11 ${
             selectionMode 
               ? 'bg-primary text-white hover:bg-[#00a587]' 
               : 'bg-gray-100 hover:bg-[#00a587]'
           }`}
           data-testid="button-selection-toggle"
         >
-          <CopyCheck className={`h-5 w-5 ${selectionMode ? 'text-white' : 'text-[#4b5b65]'}`} />
+          <CopyCheck className={`h-4 w-4 sm:h-5 sm:w-5 ${
+            selectionMode ? 'text-white' : 'text-[#4b5b65]'
+          }`} />
         </Button>
 
-        {/* Dropdown menu con CSS hover */}
-        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-          <div className="py-1">
-            <button
-              onClick={() => onToggleSelection()}
-              className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
-              data-testid="menu-enable-selection"
-            >
-              <CopyCheck className="h-4 w-4 mr-2" />
-              {selectionMode ? 'Desactivar selección' : 'Selección múltiple'}
-            </button>
+        {/* Dropdown menu con click toggle (mobile-friendly) */}
+        {isDropdownOpen && (
+          <>
+            {/* Overlay para cerrar al hacer click fuera */}
+            <div 
+              className="fixed inset-0 z-40"
+              onClick={() => setIsDropdownOpen(false)}
+            />
 
-            {onSelectAll && (
-              <button
-                onClick={() => {
-                  if (!selectionMode && onToggleSelection) {
-                    onToggleSelection();
-                  }
-                  onSelectAll();
-                }}
-                className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
-                data-testid="menu-select-all"
-              >
-                <CheckSquare className="h-4 w-4 mr-2" />
-                Seleccionar todo
-              </button>
-            )}
+            <div className="absolute right-0 top-full mt-1 w-44 sm:w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+              <div className="py-1">
+                {/* Activar modo selección (solo si no está activo) */}
+                {!selectionMode && (
+                  <button
+                    onClick={() => {
+                      onToggleSelection();
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
+                    data-testid="menu-enable-selection"
+                  >
+                    <CopyCheck className="h-4 w-4 mr-2" />
+                    Activar selección
+                  </button>
+                )}
 
-            {onDeselectAll && (
-              <button
-                onClick={() => {
-                  onDeselectAll();
-                  if (onToggleSelection) {
-                    onToggleSelection();
-                  }
-                }}
-                className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
-                data-testid="menu-deselect-all"
-              >
-                <Square className="h-4 w-4 mr-2" />
-                Deseleccionar
-              </button>
-            )}
-          </div>
-        </div>
+                {/* Seleccionar todo */}
+                {onSelectAll && (
+                  <button
+                    onClick={() => {
+                      if (!selectionMode && onToggleSelection) {
+                        onToggleSelection();
+                      }
+                      onSelectAll();
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
+                    data-testid="menu-select-all"
+                  >
+                    <CheckSquare className="h-4 w-4 mr-2" />
+                    Seleccionar todo
+                  </button>
+                )}
+
+                {/* Deseleccionar todo (desactiva el modo y limpia selección) */}
+                {onDeselectAll && (
+                  <button
+                    onClick={() => {
+                      onDeselectAll();
+                      if (onToggleSelection) {
+                        onToggleSelection();
+                      }
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full text-left block px-4 py-2 text-sm text-foreground hover:bg-buttonHover hover:text-foreground flex items-center"
+                    data-testid="menu-deselect-all"
+                  >
+                    <Square className="h-4 w-4 mr-2" />
+                    Deseleccionar
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     );
   };
@@ -223,15 +248,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         variant="outline"
         size="sm"
         onClick={onBulkDelete}
-        className="flex items-center h-11 min-w-11 bg-[#ededed] text-destructive hover:bg-destructive/10 hover:text-destructive"
+        className="flex items-center h-10 sm:h-11 px-3 bg-[#ededed] text-destructive hover:bg-destructive/10 hover:text-destructive"
         disabled={selectedCount === 0}
         data-testid="button-delete-selected"
         title={`Eliminar ${selectedCount} seleccionado(s)`}
       >
-        <Trash2 className="h-5 w-5" />
+        <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
         {selectedCount > 0 && (
-          <span className="ml-1">
-            {bulkDeleteLabel || `( ${selectedCount} )`}
+          <span className="ml-2">
+            {bulkDeleteLabel || `${selectedCount}`}
           </span>
         )}
       </Button>
@@ -248,13 +273,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <div className={containerClasses} data-testid="toolbar">
-      <div className="flex items-center justify-between w-full px-2 py-2 gap-4">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between w-full px-2 py-2 gap-3 lg:gap-4">
 
         {/* ===== SECCIÓN IZQUIERDA: Búsqueda + Filtros ===== */}
-        <div className="flex items-center gap-2 flex-wrap flex-1">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 flex-1 w-full lg:w-auto">
 
           {/* Input de búsqueda */}
-          <div className="relative flex-1 max-w-64">
+          <div className="relative w-full lg:flex-1 lg:max-w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-5 text-gray-600" />
             <input
               type="text"
@@ -295,14 +320,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           )}
 
           {/* Selector de ordenamiento */}
-          {sortSelector && <div className="flex items-center gap-2">{sortSelector}</div>}
+          {sortSelector && <div className="hidden sm:flex items-center gap-2">{sortSelector}</div>}
 
           {/* Selector de orden */}
-          {orderSelector && <div className="flex items-center gap-2">{orderSelector}</div>}
+          {orderSelector && <div className="hidden sm:flex items-center gap-2">{orderSelector}</div>}
         </div>
 
         {/* ===== SECCIÓN DERECHA: Controles de vista y acciones ===== */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
 
           {/* Toggle de vista (Grid/List) - Solo mostrar si está configurado y hay más de un modo */}
           {viewMode && onViewModeChange && availableViewModes && availableViewModes.length > 1 && (

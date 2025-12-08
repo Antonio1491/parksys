@@ -43,6 +43,7 @@ import { registerTreeInventoryRoutes } from "./tree_inventory_routes";
 import { registerTreeStatsRoutes } from "./tree_stats_routes";
 import { registerTreeDetailsRoutes } from "./tree_details_route";
 import { registerTreeInventoryGeneratorRoutes } from "./tree-inventory-generator-routes";
+import programmingRoutes from './programming-routes';
 import parkAreasRoutes from "./routes/parkAreas";
 import treeMaintenanceRoutes from "./routes/treeMaintenance";
 import treeLinksRoutes from "./routes/treeLinks";
@@ -360,6 +361,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registramos las rutas de categorías de activos
   registerAssetCategoriesRoutes(app, apiRouter);
+  
+
+  // Rutas del módulo de Programación (unifica activities + events)
+  apiRouter.use('/programming', programmingRoutes);
+  console.log('📅 Rutas del módulo de Programación registradas');
+  
   
   // Registramos las rutas del módulo de actividades
   registerActivityRoutes(app, apiRouter, isAuthenticated, hasParkAccess);

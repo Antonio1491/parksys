@@ -158,6 +158,16 @@ export default function TreeMaintenancePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Colores para tipos de mantenimiento
+  const maintenanceTypeColors: Record<string, { bg: string; text: string }> = {
+    "Poda": { bg: "#cff9c5", text: "#2d5a27" },           // Verde lima
+    "Fertilización": { bg: "#f7f6c6", text: "#5c5a1e" },  // Amarillo
+    "Control de plagas": { bg: "#f9cac5", text: "#8b3a34" }, // Coral
+    "Tratamiento de enfermedades": { bg: "#f1e3ff", text: "#5c3d7a" }, // Lila
+    "Transplante": { bg: "#c5efff", text: "#1a5a6e" },    // Azul cielo
+    "Otro": { bg: "#e0a6d2", text: "#5c2d52" },           // Rosa
+  };
+
   // Estados para selección múltiple
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedMaintenances, setSelectedMaintenances] = useState<Set<number>>(new Set());
@@ -683,6 +693,57 @@ export default function TreeMaintenancePage() {
     },
   });
 
+  // Función para actualizar mantenimiento
+  const updateMaintenanceMutation = useMutation({
+    mutationFn: async (data: any) => {
+      // Primero eliminamos el registro existente
+      const deleteResponse = await fetch(`/api/trees/maintenances/${data.id}`, {
+        method: 'DELETE',
+      });
+      if (!deleteResponse.ok) {
+        throw new Error('Error al actualizar el mantenimiento');
+      }
+
+      // Luego creamos uno nuevo con los datos actualizados
+      const createResponse = await fetch('/api/trees/maintenances', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          treeId: data.treeId,
+          maintenanceType: data.maintenanceType,
+          maintenanceDate: data.maintenanceDate,
+          performedBy: data.performedBy,
+          notes: data.notes,
+          nextMaintenanceDate: data.nextMaintenanceDate || '',
+        }),
+      });
+
+      if (!createResponse.ok) {
+        throw new Error('Error al guardar los cambios');
+      }
+      return createResponse.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trees/maintenances'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/trees/maintenances/stats'] });
+      toast({
+        title: "✅ Mantenimiento actualizado",
+        description: "Los cambios se guardaron correctamente.",
+      });
+      setEditModal(false);
+      setSelectedMaintenance(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "❌ Error al actualizar",
+        description: error.message || "No se pudieron guardar los cambios.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Función para exportar CSV
   const exportToCSV = async () => {
     if (!filteredMaintenances || filteredMaintenances.length === 0) {
@@ -1096,7 +1157,13 @@ export default function TreeMaintenancePage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-green-50 text-green-700">
+                        <Badge 
+                          variant="outline" 
+                          style={{
+                            backgroundColor: maintenanceTypeColors[maintenance.maintenanceType]?.bg || "#f0f0f0",
+                            color: maintenanceTypeColors[maintenance.maintenanceType]?.text || "#333",
+                          }}
+                        >
                           {maintenance.maintenanceType}
                         </Badge>
                       </TableCell>
@@ -1451,12 +1518,9 @@ export default function TreeMaintenancePage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Poda">🌿 Poda</SelectItem>
-                          <SelectItem value="Riego">💧 Riego</SelectItem>
                           <SelectItem value="Fertilización">🌱 Fertilización</SelectItem>
                           <SelectItem value="Control de plagas">🐛 Control de plagas</SelectItem>
                           <SelectItem value="Tratamiento de enfermedades">🏥 Tratamiento de enfermedades</SelectItem>
-                          <SelectItem value="Inspección">🔍 Inspección</SelectItem>
-                          <SelectItem value="Limpieza">🧹 Limpieza</SelectItem>
                           <SelectItem value="Transplante">🌳 Transplante</SelectItem>
                           <SelectItem value="Otro">⚙️ Otro</SelectItem>
                         </SelectContent>
@@ -1691,7 +1755,13 @@ export default function TreeMaintenancePage() {
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-muted-foreground">Tipo de Mantenimiento</Label>
-                  <Badge variant="outline" className="bg-green-50 text-green-700">
+                  <Badge 
+                    variant="outline" 
+                    style={{
+                      backgroundColor: maintenanceTypeColors[selectedMaintenance.maintenanceType]?.bg || "#f0f0f0",
+                      color: maintenanceTypeColors[selectedMaintenance.maintenanceType]?.text || "#333",
+                    }}
+                  >
                     {selectedMaintenance.maintenanceType}
                   </Badge>
                 </div>
@@ -1760,10 +1830,10 @@ export default function TreeMaintenancePage() {
                   <SelectContent>
                     <SelectItem value="Poda">🌿 Poda</SelectItem>
                     <SelectItem value="Fertilización">🌱 Fertilización</SelectItem>
-                    <SelectItem value="Riego">💧 Riego</SelectItem>
-                    <SelectItem value="Fumigación">🚿 Fumigación</SelectItem>
-                    <SelectItem value="Inspección">🔍 Inspección</SelectItem>
-                    <SelectItem value="Limpieza">🧹 Limpieza</SelectItem>
+                    <SelectItem value="Control de plagas">🐛 Control de plagas</SelectItem>
+                    <SelectItem value="Tratamiento de enfermedades">🏥 Tratamiento de enfermedades</SelectItem>
+                    <SelectItem value="Transplante">🌳 Transplante</SelectItem>
+                    <SelectItem value="Otro">⚙️ Otro</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1807,16 +1877,23 @@ export default function TreeMaintenancePage() {
             </Button>
             <Button 
               onClick={() => {
-                // TODO: Implementar lógica de actualización
-                setEditModal(false);
-                toast({
-                  title: "✅ Funcionalidad pendiente",
-                  description: "La edición de mantenimientos se implementará en la siguiente fase.",
+                updateMaintenanceMutation.mutate({
+                  id: selectedMaintenance.id,
+                  treeId: selectedMaintenance.treeId,
+                  ...maintenanceData,
                 });
               }}
+              disabled={updateMaintenanceMutation.isPending}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              Guardar Cambios
+              {updateMaintenanceMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                'Guardar Cambios'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

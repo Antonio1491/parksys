@@ -985,9 +985,8 @@ function TreeInventoryPage() {
           </TabsList>
 
           <TabsContent value="registros">
-            <Card>
-              <CardContent>
-                {isLoadingTrees ? (
+            <div>
+              {isLoadingTrees ? (
 
                   // Estado de carga
                   <div className="space-y-4">
@@ -1077,8 +1076,7 @@ function TreeInventoryPage() {
                     <p className="text-gray-500">No se encontraron árboles</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+                </div>
             
             {/* Paginación */}
             {totalPages > 1 && (
@@ -1162,13 +1160,9 @@ function TreeInventoryPage() {
           </TabsContent>
 
           <TabsContent value="ubicacion">
-            <Card>
-              <CardContent className="p-6">
-                <div className="h-[600px] w-full bg-gray-100 rounded-lg flex items-center justify-center">
-                  <p className="text-gray-500">Vista de mapa - En desarrollo</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="h-[600px] w-full bg-gray-100 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500">Vista de mapa - En desarrollo</p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

@@ -134,6 +134,7 @@ export const DASHBOARD_ROUTES = {
   main: "/admin",
   parks: "/admin/dashboard/parks",
   activities: "/admin/dashboard/activities",
+  programming: "/admin/dashboard/programming",
   amenities: "/admin/dashboard/amenities",
   trees: "/admin/dashboard/trees",
   visitors: "/admin/dashboard/visitors",
@@ -298,6 +299,41 @@ export const ADMIN_VISITORS = {
     build: (id: string | number) => `/admin/visitors/count/${id}/edit`,
   },
   feedback: "/admin/visitors/feedback",
+} as const;
+
+// ============================================
+// MÓDULO: PROGRAMACIÓN (Unifica Actividades + Eventos)
+// ============================================
+
+export const ADMIN_PROGRAMMING = {
+  // Catálogo principal (Tab 1: Grid/List, Tab 2: Calendario)
+  catalog: "/admin/programming/catalog",
+  create: "/admin/programming/catalog/new",
+  view: {
+    path: "/admin/programming/catalog/:id/view",
+    build: (id: string | number) => `/admin/programming/catalog/${id}/view`,
+  },
+  edit: {
+    path: "/admin/programming/catalog/:id/edit",
+    build: (id: string | number) => `/admin/programming/catalog/${id}/edit`,
+  },
+
+  // Clasificación (Tab 1: Categorías/Subcategorías, Tab 2: Ejes temáticos)
+  classification: "/admin/programming/classification",
+
+  // Instructores
+  instructors: {
+    list: "/admin/programming/instructors",
+    create: "/admin/programming/instructors/new",
+    view: {
+      path: "/admin/programming/instructors/:id/view",
+      build: (id: string | number) => `/admin/programming/instructors/${id}/view`,
+    },
+    edit: {
+      path: "/admin/programming/instructors/:id/edit",
+      build: (id: string | number) => `/admin/programming/instructors/${id}/edit`,
+    },
+  },
 } as const;
 
 // ============================================
@@ -1076,6 +1112,7 @@ export const ROUTES = {
     // Gestión
     parks: ADMIN_PARKS,
     activities: ADMIN_ACTIVITIES,
+    programming: ADMIN_PROGRAMMING,
     amenities: ADMIN_AMENITIES,
     trees: ADMIN_TREES,
     fauna: ADMIN_FAUNA,

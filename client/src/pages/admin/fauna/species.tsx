@@ -861,7 +861,9 @@ const FaunaSpeciesAdmin: React.FC = () => {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Bird className="h-5 w-5 text-[#00444f]" />
+                <div className="p-2 border-2 border-[#00444f] rounded-full">
+                  <Bird className="h-5 w-5 text-[#00444f]" />
+                </div>
                 Crear Nueva Especie
               </DialogTitle>
             </DialogHeader>
@@ -1045,8 +1047,10 @@ const FaunaSpeciesAdmin: React.FC = () => {
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Bird className="border rounded-full h-5 w-5 text-[#00444f]" />
+                <DialogTitle className="flex items-center gap-2">
+                  <div className="p-2 border-2 border-[#00444f] rounded-full">
+                    <Bird className="h-5 w-5 text-[#00444f]" />
+                  </div>
                 Editar Especie
               </DialogTitle>
               <DialogDescription>

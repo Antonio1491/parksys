@@ -1,761 +1,250 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link, useLocation as useWouterLocation } from "wouter";
+import React from 'react';
+import { useParams, useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import ROUTES from '@/routes';
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Images, MapPin, Users, TreePine, FileText, Save, Trees } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Images, MapPin, Users, TreePine, FileText, Save, Trees } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest, queryClient } from '@/lib/queryClient';
-import AdminLayout from "@/components/AdminLayout";
-import ParkMultimediaManager from "@/components/ParkMultimediaManager";
-import ParkAmenitiesManager from "@/components/ParkAmenitiesManager";
-import ParkTreeSpeciesManager from "@/components/ParkTreeSpeciesManager";
-import ParkVolunteersManager from "@/components/ParkVolunteersManager";
-import { ReturnHeader } from "@/components/ui/return-header";
+import { queryClient } from '@/lib/queryClient';
+import AdminLayout from '@/components/AdminLayout';
+import { ReturnHeader } from '@/components/ui/return-header';
+import { ParkBasicInfoForm } from '@/components/admin/parks/ParkBasicInfoForm';
+import ParkMultimediaManager from '@/components/ParkMultimediaManager';
+import ParkAmenitiesManager from '@/components/ParkAmenitiesManager';
+import ParkTreeSpeciesManager from '@/components/ParkTreeSpeciesManager';
+import ParkVolunteersManager from '@/components/ParkVolunteersManager';
 
-// Schema de validación para el formulario
-const parkSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido'),
-  municipality: z.string().min(1, 'El municipio es requerido'),
-  address: z.string().min(1, 'La dirección es requerida'),
-  description: z.string().optional(),
-  postalCode: z.string().optional(),
-  latitude: z.string().optional(),
-  longitude: z.string().optional(),
-  area: z.string().optional(),
-  foundationYear: z.coerce.number().nullable().optional(),
-  dailySchedule: z.record(z.string(), z.object({
-    enabled: z.boolean(),
-    openingTime: z.string().nullable().optional(),
-    closingTime: z.string().nullable().optional()
-  })).optional(),
-  administrator: z.string().optional(),
-  contactPhone: z.string().optional(),
-  contactEmail: z.string().optional(),
-  certificaciones: z.string().optional(),
-  status: z.enum([
-    "en_funcionamiento",
-    "operando_parcialmente", 
-    "en_mantenimiento",
-    "cerrado_temporalmente",
-    "cerrado_indefinidamente",
-    "reapertura_proxima",
-    "en_proyecto_construccion",
-    "uso_restringido"
-  ]).default("en_funcionamiento").optional(),
-});
+// ============================================================================
+// COMPONENTE PRINCIPAL
+// ============================================================================
 
-type ParkFormValues = z.infer<typeof parkSchema>;
-
-// Componente del formulario de información básica
-interface ParkBasicInfoFormProps {
-  park: any;
-  parkId: number;
-}
-
-const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({ park, parkId }) => {
-  const [, setLocation] = useWouterLocation();
+const AdminParkManage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const parkId = parseInt(id!);
 
-  // Definir el formulario con react-hook-form
-  const form = useForm<ParkFormValues>({
-    resolver: zodResolver(parkSchema),
-    defaultValues: {
-      name: '',
-      municipality: '',
-      address: '',
-      description: '',
-      postalCode: '',
-      latitude: '',
-      longitude: '',
-      area: '',
-      foundationYear: null,
-      dailySchedule: {
-        'Lunes': { enabled: false, openingTime: '', closingTime: '' },
-        'Martes': { enabled: false, openingTime: '', closingTime: '' },
-        'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
-        'Jueves': { enabled: false, openingTime: '', closingTime: '' },
-        'Viernes': { enabled: false, openingTime: '', closingTime: '' },
-        'Sábado': { enabled: false, openingTime: '', closingTime: '' },
-        'Domingo': { enabled: false, openingTime: '', closingTime: '' }
-      },
-      administrator: '',
-      contactPhone: '',
-      contactEmail: '',
-      certificaciones: '',
-      status: 'en_funcionamiento',
-    },
+  // ========== QUERY PARA CARGAR DATOS DEL PARQUE ==========
+  const { data: park, isLoading } = useQuery({
+    queryKey: [`/api/parks/${parkId}`],
+    enabled: !!parkId,
   });
 
-  // Cargar los datos del parque en el formulario cuando estén disponibles
-  useEffect(() => {
-    if (park) {
-      // Procesar horarios desde la base de datos
-      let dailyScheduleFromDB = {
-        'Lunes': { enabled: false, openingTime: '', closingTime: '' },
-        'Martes': { enabled: false, openingTime: '', closingTime: '' },
-        'Miércoles': { enabled: false, openingTime: '', closingTime: '' },
-        'Jueves': { enabled: false, openingTime: '', closingTime: '' },
-        'Viernes': { enabled: false, openingTime: '', closingTime: '' },
-        'Sábado': { enabled: false, openingTime: '', closingTime: '' },
-        'Domingo': { enabled: false, openingTime: '', closingTime: '' }
-      };
+  // ========== HANDLER POST-GUARDADO ==========
+  const handleSuccess = (parkId: number) => {
+    // Recargar datos del parque
+    queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
 
-      try {
-        if (park.openingHours && typeof park.openingHours === 'string') {
-          const parsed = JSON.parse(park.openingHours);
-          dailyScheduleFromDB = { ...dailyScheduleFromDB, ...parsed };
-        }
-      } catch (error) {
-        console.log('⚠️ Error procesando horarios, usando valores por defecto:', error);
-      }
+    // Toast de confirmación
+    toast({
+      title: 'Parque actualizado',
+      description: 'La información del parque se ha actualizado exitosamente.',
+    });
 
-      const formValues = {
-        name: park.name || '',
-        municipality: park.municipalityText || park.municipality?.name || park.municipality || '',
-        address: park.address || '',
-        description: park.description || '',
-        postalCode: park.postalCode || '',
-        latitude: park.latitude || '',
-        longitude: park.longitude || '',
-        area: park.area || '',
-        foundationYear: park.foundationYear || null,
-        dailySchedule: dailyScheduleFromDB,
-        administrator: park.administrator || '',
-        contactPhone: park.contactPhone || '',
-        contactEmail: park.contactEmail || '',
-        certificaciones: park.certificaciones || '',
-        status: park.status || 'en_funcionamiento',
-      };
-
-      form.reset(formValues);
-    }
-  }, [park, form]);
-
-  const onSubmit = (values: ParkFormValues) => {
-    console.log("🔄 [FRONTEND] Datos del formulario antes de limpiar:", values);
-    
-    // Limpiar valores nulos/vacíos para el backend
-    const cleanedValues = {
-      ...values,
-      latitude: values.latitude ? values.latitude.trim().replace(/,$/, '') : undefined,
-      longitude: values.longitude ? values.longitude.trim().replace(/,$/, '') : undefined,
-      area: values.area ? values.area.replace(/,/g, '') : undefined,
-      foundationYear: values.foundationYear || undefined,
-      administrator: values.administrator || undefined,
-      contactPhone: values.contactPhone || undefined,
-      contactEmail: values.contactEmail || undefined,
-      openingHours: values.dailySchedule && Object.values(values.dailySchedule).some(schedule => schedule.enabled)
-        ? JSON.stringify(values.dailySchedule)
-        : undefined,
-      certificaciones: values.certificaciones || undefined
-    };
-
-    console.log("🔄 [FRONTEND] Datos después de limpiar (enviando al backend):", cleanedValues);
-    mutation.mutate(cleanedValues);
+    // NO redirige, se queda en park-manage
   };
 
-  // Mutación para actualizar el parque
-  const mutation = useMutation({
-    mutationFn: async (values: ParkFormValues) => {
-      const endpoint = `/api/parks/${parkId}`;
-      const method = 'PUT';
-      
-      const result = await apiRequest(endpoint, {
-        method: method,
-        data: values,
-      });
-      
-      return result;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/parks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/parks/${parkId}`] });
-      toast({
-        title: 'Parque actualizado',
-        description: 'La información del parque ha sido actualizada correctamente.',
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Error',
-        description: `Ocurrió un error al actualizar el parque: ${error.message}`,
-        variant: 'destructive',
-      });
-    },
-  });
-
-  return (
-    <Form {...form}>
-      <form id="park-basic-info-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Nombre del parque */}
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-red-600">Nombre del parque *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nombre del parque" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* Municipio */}
-          <FormField
-            control={form.control}
-            name="municipality"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-red-600">Municipio *</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Ingrese el municipio"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        {/* Descripción */}
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Descripción</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="Descripción general del parque..." 
-                  className="min-h-32" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Dirección */}
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-red-600">Dirección *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Dirección completa" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* Código postal */}
-          <FormField
-            control={form.control}
-            name="postalCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Código Postal</FormLabel>
-                <FormControl>
-                  <Input placeholder="Código postal" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Latitud */}
-          <FormField
-            control={form.control}
-            name="latitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Latitud</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ej: 19.432608" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* Longitud */}
-          <FormField
-            control={form.control}
-            name="longitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Longitud</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ej: -99.133209" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Área */}
-          <FormField
-            control={form.control}
-            name="area"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Área (m²)</FormLabel>
-                <FormControl>
-                  <Input placeholder="Superficie en metros cuadrados" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* Año de fundación */}
-          <FormField
-            control={form.control}
-            name="foundationYear"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Año de fundación</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Año de fundación"
-                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : null)}
-                    value={field.value === null ? '' : field.value}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        {/* Configuración de horarios individuales por día */}
-        <FormField
-          control={form.control}
-          name="dailySchedule"
-          render={({ field }) => (
-            <FormItem>
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Configuración de Horarios</h3>
-                
-                {/* Encabezados */}
-                <div className="grid grid-cols-4 gap-4 pb-2 border-b">
-                  <div className="font-medium text-sm">Día</div>
-                  <div className="font-medium text-sm text-center">Activo</div>
-                  <div className="font-medium text-sm text-center">Apertura</div>
-                  <div className="font-medium text-sm text-center">Cierre</div>
-                </div>
-
-                {/* Filas por cada día */}
-                <div className="space-y-3">
-                  {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day) => (
-                    <div key={day} className="grid grid-cols-4 gap-4 items-center">
-                      {/* Nombre del día */}
-                      <div className="font-medium text-sm">
-                        {day}
-                      </div>
-
-                      {/* Checkbox de habilitado */}
-                      <div className="flex justify-center">
-                        <Checkbox
-                          id={`${day}-enabled`}
-                          checked={field.value?.[day]?.enabled || false}
-                          onCheckedChange={(checked) => {
-                            const currentSchedule = field.value || {};
-                            const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
-                            field.onChange({
-                              ...currentSchedule,
-                              [day]: {
-                                ...daySchedule,
-                                enabled: checked as boolean
-                              }
-                            });
-                          }}
-                        />
-                      </div>
-
-                      {/* Hora de apertura */}
-                      <div>
-                        <Input
-                          type="time"
-                          value={field.value?.[day]?.openingTime || ''}
-                          onChange={(e) => {
-                            const currentSchedule = field.value || {};
-                            const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
-                            field.onChange({
-                              ...currentSchedule,
-                              [day]: {
-                                ...daySchedule,
-                                openingTime: e.target.value
-                              }
-                            });
-                          }}
-                          disabled={!field.value?.[day]?.enabled}
-                          className="text-center"
-                        />
-                      </div>
-
-                      {/* Hora de cierre */}
-                      <div>
-                        <Input
-                          type="time"
-                          value={field.value?.[day]?.closingTime || ''}
-                          onChange={(e) => {
-                            const currentSchedule = field.value || {};
-                            const daySchedule = currentSchedule[day] || { enabled: false, openingTime: '', closingTime: '' };
-                            field.onChange({
-                              ...currentSchedule,
-                              [day]: {
-                                ...daySchedule,
-                                closingTime: e.target.value
-                              }
-                            });
-                          }}
-                          disabled={!field.value?.[day]?.enabled}
-                          className="text-center"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Administrador */}
-          <FormField
-            control={form.control}
-            name="administrator"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Administrador</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nombre del administrador" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* Teléfono de contacto */}
-          <FormField
-            control={form.control}
-            name="contactPhone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Teléfono de contacto</FormLabel>
-                <FormControl>
-                  <Input placeholder="Teléfono de contacto" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        {/* Correo electrónico */}
-        <FormField
-          control={form.control}
-          name="contactEmail"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Correo electrónico de contacto</FormLabel>
-              <FormControl>
-                <Input placeholder="correo@ejemplo.com" type="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        {/* Estado del parque */}
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Estado del parque</FormLabel>
-              <FormControl>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el estado del parque" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en_funcionamiento">En funcionamiento</SelectItem>
-                    <SelectItem value="operando_parcialmente">Operando parcialmente</SelectItem>
-                    <SelectItem value="en_mantenimiento">En mantenimiento</SelectItem>
-                    <SelectItem value="cerrado_temporalmente">Cerrado temporalmente</SelectItem>
-                    <SelectItem value="cerrado_indefinidamente">Cerrado indefinidamente</SelectItem>
-                    <SelectItem value="reapertura_proxima">Reapertura próxima</SelectItem>
-                    <SelectItem value="en_proyecto_construccion">En proyecto / construcción</SelectItem>
-                    <SelectItem value="uso_restringido">Uso restringido</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        {/* Certificaciones */}
-        <FormField
-          control={form.control}
-          name="certificaciones"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Certificaciones</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="Ingrese las certificaciones del parque..."
-                  className="min-h-24" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        
-      </form>
-    </Form>
-  );
-};
-
-export default function ParkManage() {
-  const { id } = useParams();
-  const [_, setLocation] = useWouterLocation();
-  const { toast } = useToast();
-  
-  // Consulta para obtener datos del parque
-  const { data: park, isLoading, error } = useQuery({
-    queryKey: [`/api/parks/${id}`],
-    queryFn: async () => {
-      const response = await fetch(`/api/parks/${id}`, {
-        headers: {
-          'Authorization': 'Bearer direct-token-1750522117022',
-          'X-User-Id': '1',
-          'X-User-Role': 'super_admin'
-        }
-      });
-      if (!response.ok) throw new Error('Error cargando parque');
-      return response.json();
-    },
-    enabled: !!id
-  });
-
+  // ========== LOADING STATE ==========
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Cargando parque...</p>
-          </div>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </AdminLayout>
     );
   }
 
-  if (error || !park) {
+  // ========== ERROR STATE ==========
+  if (!park) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className="text-red-600">Error cargando el parque</p>
-            <Link href={ROUTES.admin.parks.list}>
-              <Button className="mt-4">Volver a parques</Button>
-            </Link>
-          </div>
+        <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+          <p className="text-xl text-gray-600">Parque no encontrado</p>
+          <Button onClick={() => setLocation(ROUTES.admin.parks.list)}>
+            Volver al listado
+          </Button>
         </div>
       </AdminLayout>
     );
   }
 
+  // ========== RENDER ==========
   return (
     <AdminLayout>
-      {/* Header con botón volver */}
+      {/* Header con navegación de regreso */}
       <ReturnHeader />
-        <div className="container mx-auto p-6 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-2 border-2 border-[#00444f] rounded-full">
-                <Trees className="h-5 w-5 text-[#00444f]" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-[#00444f]">{park.name}</h1>
-              </div>
-            </div>
 
-            {/* Botón guardar - solo visible en pestaña "basica" */}
-            <Button 
-              type="submit"
-              form="park-basic-info-form"
-              className="bg-[#00444f] hover:bg-[#00a884] hover:text-white"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              Guardar
-            </Button>
+      {/* Contenedor principal responsive */}
+      <div className="space-y-4 px-4 sm:px-6">
+
+        {/* Header con título y botón guardar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-xl border shadow-sm">
+          {/* Título con ícono */}
+          <div className="flex items-center gap-3">
+            <div className="p-2 border-2 border-[#00444f] rounded-full">
+              <Trees className="h-5 w-5 text-[#00444f]" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#00444f]">{park.name}</h1>
+              <p className="text-sm text-gray-600">ID: {park.id}</p>
+            </div>
           </div>
 
-          {/* Tabs de gestión */}
-          <Tabs defaultValue="basica" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-5">              
-              <TabsTrigger value="basica" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Información Básica
-              </TabsTrigger>
-              <TabsTrigger value="multimedia" className="flex items-center gap-2">
-                <Images className="h-4 w-4" />
-                Multimedia
-              </TabsTrigger>
-              <TabsTrigger value="amenidades" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Amenidades
-              </TabsTrigger>
-              <TabsTrigger value="arboles" className="flex items-center gap-2">
-                <TreePine className="h-4 w-4" />
-                Árboles
-              </TabsTrigger>
-              <TabsTrigger value="voluntarios" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Voluntarios
-              </TabsTrigger>
-            </TabsList>
-
-            {/* PESTAÑA DE INFORMACIÓN BÁSICA */}
-            <TabsContent value="basica" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
-                    <div className="p-2 border-2 border-gray-800 rounded-full">
-                    <FileText className="h-6 w-6" />
-                    </div>
-                    Información Básica del Parque
-                  </CardTitle>
-                  <CardDescription>
-                    Administra la información general y detalles del parque.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ParkBasicInfoForm park={park} parkId={parseInt(id || '0')} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* PESTAÑA DE MULTIMEDIA - MODO EDICIÓN COMPLETO */}
-            <TabsContent value="multimedia" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
-                        <div className="p-2 border-2 border-gray-800 rounded-full">
-                        <Images className="h-6 w-6" />
-                        </div>
-                        Gestión de Multimedia del Parque
-                      </CardTitle>
-                      <CardDescription>
-                        Administra imágenes y documentos del parque. Puedes subir archivos o usar URLs externas.
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ParkMultimediaManager parkId={parseInt(id || '0')} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* PESTAÑA DE AMENIDADES - MODO EDICIÓN COMPLETO */}
-            <TabsContent value="amenidades" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
-                    <div className="p-2 border-2 border-gray-800 rounded-full">
-                    <MapPin className="h-6 w-6" />
-                    </div>
-                    Gestión de Amenidades del Parque
-                  </CardTitle>
-                  <CardDescription>
-                    Administra las amenidades y servicios disponibles en el parque. Puedes agregar nuevas amenidades o editar las existentes.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ParkAmenitiesManager parkId={parseInt(id!)} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="arboles" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
-                    <div className="p-2 border-2 border-gray-800 rounded-full">
-                    <TreePine className="h-6 w-6" />
-                    </div>
-                    Gestión de Especies Arbóreas del Parque
-                  </CardTitle>
-                  <CardDescription>
-                    Administra las especies arbóreas asignadas al parque. Puedes seleccionar especies del catálogo y configurar detalles de plantación.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ParkTreeSpeciesManager parkId={parseInt(id!)} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="voluntarios" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
-                    <div className="p-2 border-2 border-gray-800 rounded-full">
-                    <Users className="h-6 w-6" />
-                    </div>
-                    Gestión de Voluntarios del Parque
-                  </CardTitle>
-                  <CardDescription>
-                    Administra los voluntarios asignados al parque. Selecciona voluntarios disponibles de la columna izquierda para asignarlos a este parque.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ParkVolunteersManager parkId={parseInt(id!)} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-
-          </Tabs>
+          {/* Botón guardar - solo visible en pestaña "basica" */}
+          <Button 
+            type="submit"
+            form="park-basic-form"
+            className="w-full sm:w-auto bg-[#00444f] hover:bg-[#00a884] hover:text-white"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Guardar Cambios
+          </Button>
         </div>
+
+        {/* Tabs de gestión */}
+        <Tabs defaultValue="basica" className="space-y-4">
+
+          {/* Lista de tabs - responsive */}
+          <TabsList className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto gap-1 bg-gray-100 p-1">
+            <TabsTrigger value="basica" className="flex items-center gap-2 text-xs sm:text-sm py-2">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Información Básica</span>
+              <span className="sm:hidden">Info</span>
+            </TabsTrigger>
+            <TabsTrigger value="multimedia" className="flex items-center gap-2 text-xs sm:text-sm py-2">
+              <Images className="h-4 w-4" />
+              <span className="hidden sm:inline">Multimedia</span>
+              <span className="sm:hidden">Media</span>
+            </TabsTrigger>
+            <TabsTrigger value="amenidades" className="flex items-center gap-2 text-xs sm:text-sm py-2">
+              <MapPin className="h-4 w-4" />
+              <span className="hidden sm:inline">Amenidades</span>
+              <span className="sm:hidden">Amenid.</span>
+            </TabsTrigger>
+            <TabsTrigger value="arboles" className="flex items-center gap-2 text-xs sm:text-sm py-2">
+              <TreePine className="h-4 w-4" />
+              <span className="hidden sm:inline">Árboles</span>
+              <span className="sm:hidden">Árboles</span>
+            </TabsTrigger>
+            <TabsTrigger value="voluntarios" className="flex items-center gap-2 text-xs sm:text-sm py-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Voluntarios</span>
+              <span className="sm:hidden">Volunt.</span>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* ========== TAB 1: INFORMACIÓN BÁSICA ========== */}
+          <TabsContent value="basica" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl text-gray-800 flex items-center gap-2">
+                  <div className="p-2 border-2 border-gray-800 rounded-full">
+                    <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  Información Básica del Parque
+                </CardTitle>
+                <CardDescription>
+                  Administra la información general y detalles del parque.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <ParkBasicInfoForm
+                  parkId={parkId}
+                  onSuccess={handleSuccess}
+                  showCancelButton={false}
+                  formId="park-basic-form"
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ========== TAB 2: MULTIMEDIA ========== */}
+          <TabsContent value="multimedia" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl text-gray-800 flex items-center gap-2">
+                  <div className="p-2 border-2 border-gray-800 rounded-full">
+                    <Images className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  Gestión de Multimedia del Parque
+                </CardTitle>
+                <CardDescription>
+                  Administra imágenes y documentos del parque. Puedes subir archivos o usar URLs externas.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <ParkMultimediaManager parkId={parkId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ========== TAB 3: AMENIDADES ========== */}
+          <TabsContent value="amenidades" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl text-gray-800 flex items-center gap-2">
+                  <div className="p-2 border-2 border-gray-800 rounded-full">
+                    <MapPin className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  Gestión de Amenidades del Parque
+                </CardTitle>
+                <CardDescription>
+                  Administra las amenidades y servicios disponibles en el parque. Puedes agregar nuevas amenidades o editar las existentes.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <ParkAmenitiesManager parkId={parkId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ========== TAB 4: ÁRBOLES ========== */}
+          <TabsContent value="arboles" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl text-gray-800 flex items-center gap-2">
+                  <div className="p-2 border-2 border-gray-800 rounded-full">
+                    <TreePine className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  Gestión de Especies Arbóreas del Parque
+                </CardTitle>
+                <CardDescription>
+                  Administra las especies arbóreas asignadas al parque. Puedes seleccionar especies del catálogo y configurar detalles de plantación.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <ParkTreeSpeciesManager parkId={parkId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ========== TAB 5: VOLUNTARIOS ========== */}
+          <TabsContent value="voluntarios" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl text-gray-800 flex items-center gap-2">
+                  <div className="p-2 border-2 border-gray-800 rounded-full">
+                    <Users className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  Gestión de Voluntarios del Parque
+                </CardTitle>
+                <CardDescription>
+                  Administra los voluntarios asignados al parque. Selecciona voluntarios disponibles de la columna izquierda para asignarlos a este parque.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <ParkVolunteersManager parkId={parkId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+        </Tabs>
+      </div>
     </AdminLayout>
   );
-}
+};
+
+export default AdminParkManage;

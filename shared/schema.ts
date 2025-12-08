@@ -1129,6 +1129,196 @@ export type VolunteerParticipation = typeof volunteerParticipations.$inferSelect
 export type NewVolunteerParticipation = typeof volunteerParticipations.$inferInsert;
 
 // ============================================
+// MÓDULO DE PROGRAMACIÓN (Unifica Activities + Events)
+// ============================================
+
+// Enum para tipo de programación
+export const programmingTypeEnum = pgEnum('programming_type', ['activity', 'event']);
+
+// Enum para estado de programación
+export const programmingStatusEnum = pgEnum('programming_status', [
+  'draft',        // Borrador
+  'published',    // Publicado
+  'cancelled',    // Cancelado
+  'postponed',    // Pospuesto
+  'completed'     // Finalizado
+]);
+
+// Tabla de ejes temáticos
+export const thematicAxes = pgTable("thematic_axes", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  color: varchar("color", { length: 7 }).default("#00a587"),
+  icon: varchar("icon", { length: 50 }).default("palette"),
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabla principal de programación
+export const programming = pgTable("programming", {
+  id: serial("id").primaryKey(),
+
+  // Tipo: actividad o evento
+  type: varchar("type", { length: 20 }).notNull().default('activity'), // 'activity' | 'event'
+
+  // Información básica
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+
+  // Ubicación
+  parkId: integer("park_id").references(() => parks.id),
+  location: varchar("location", { length: 255 }), // Ubicación específica o texto libre
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+
+  // Fechas y horarios
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  startTime: varchar("start_time", { length: 8 }), // "09:00:00"
+  endTime: varchar("end_time", { length: 8 }),     // "17:00:00"
+  duration: integer("duration"), // Duración en minutos
+
+  // Recurrencia
+  isRecurring: boolean("is_recurring").default(false),
+  recurrencePattern: varchar("recurrence_pattern", { length: 100 }), // 'daily', 'weekly', 'monthly'
+
+  // Capacidad
+  capacity: integer("capacity"),
+
+  // Clasificación
+  thematicAxisId: integer("thematic_axis_id").references(() => thematicAxes.id),
+  targetAudience: varchar("target_audience", { length: 100 }), // niños, jóvenes, adultos, familias
+
+  // Precios y descuentos
+  isFree: boolean("is_free").default(true),
+  price: decimal("price", { precision: 10, scale: 2 }).default("0.00"),
+  discountSeniors: decimal("discount_seniors", { precision: 5, scale: 2 }).default("0.00"),
+  discountStudents: decimal("discount_students", { precision: 5, scale: 2 }).default("0.00"),
+  discountFamilies: decimal("discount_families", { precision: 5, scale: 2 }).default("0.00"),
+  discountDisability: decimal("discount_disability", { precision: 5, scale: 2 }).default("0.00"),
+  discountEarlyBird: decimal("discount_early_bird", { precision: 5, scale: 2 }).default("0.00"),
+  discountEarlyBirdDeadline: timestamp("discount_early_bird_deadline"),
+
+  // Instructor (opcional, principalmente para actividades)
+  instructorId: integer("instructor_id").references(() => instructors.id),
+
+  // Organizador (principalmente para eventos)
+  organizerName: varchar("organizer_name", { length: 255 }),
+  organizerEmail: varchar("organizer_email", { length: 255 }),
+  organizerPhone: varchar("organizer_phone", { length: 20 }),
+  organizerOrganization: varchar("organizer_organization", { length: 255 }),
+
+  // Materiales y requisitos
+  materials: text("materials"),
+  requirements: text("requirements"),
+  requiredStaff: integer("required_staff"),
+
+  // Imagen principal
+  featuredImageUrl: varchar("featured_image_url", { length: 500 }),
+
+  // Estado y registro
+  status: varchar("status", { length: 20 }).default("draft").notNull(),
+  registrationType: varchar("registration_type", { length: 50 }).default("none"), // none, required, optional
+  requiresApproval: boolean("requires_approval").default(false),
+
+  // Campos financieros
+  financialStatus: varchar("financial_status", { length: 20 }).default("por_costear"),
+  costRecoveryPercentage: decimal("cost_recovery_percentage", { precision: 5, scale: 2 }).default("30.00"),
+  financialNotes: text("financial_notes"),
+  reviewedBy: integer("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at"),
+
+  // Metadata
+  createdById: integer("created_by_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+
+  // Referencia al registro original (para migración)
+  legacyActivityId: integer("legacy_activity_id"),
+  legacyEventId: integer("legacy_event_id"),
+});
+
+// Tabla de imágenes de programación
+export const programmingImages = pgTable("programming_images", {
+  id: serial("id").primaryKey(),
+  programmingId: integer("programming_id").notNull().references(() => programming.id, { onDelete: "cascade" }),
+  imageUrl: text("image_url").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size"),
+  mimeType: text("mime_type").notNull(),
+  caption: text("caption"),
+  isPrimary: boolean("is_primary").default(false),
+  uploadedById: integer("uploaded_by_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabla de inscripciones a programación
+export const programmingRegistrations = pgTable("programming_registrations", {
+  id: serial("id").primaryKey(),
+  programmingId: integer("programming_id").notNull().references(() => programming.id, { onDelete: "cascade" }),
+
+  // Datos del participante
+  fullName: varchar("full_name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+
+  // Estado
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending, confirmed, cancelled, attended
+
+  // Pago
+  paymentStatus: varchar("payment_status", { length: 20 }).default("pending"), // pending, paid, refunded
+  paymentAmount: decimal("payment_amount", { precision: 10, scale: 2 }),
+  paymentDate: timestamp("payment_date"),
+
+  // Metadata
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Schemas de inserción
+export const insertThematicAxisSchema = createInsertSchema(thematicAxes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProgrammingSchema = createInsertSchema(programming).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProgrammingImageSchema = createInsertSchema(programmingImages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProgrammingRegistrationSchema = createInsertSchema(programmingRegistrations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Tipos
+export type ThematicAxis = typeof thematicAxes.$inferSelect;
+export type InsertThematicAxis = z.infer<typeof insertThematicAxisSchema>;
+
+export type Programming = typeof programming.$inferSelect;
+export type InsertProgramming = z.infer<typeof insertProgrammingSchema>;
+
+export type ProgrammingImage = typeof programmingImages.$inferSelect;
+export type InsertProgrammingImage = z.infer<typeof insertProgrammingImageSchema>;
+
+export type ProgrammingRegistration = typeof programmingRegistrations.$inferSelect;
+export type InsertProgrammingRegistration = z.infer<typeof insertProgrammingRegistrationSchema>;
+
+// ============================================
 // SCHEMAS DE VALIDACIÓN
 // ============================================
 export const insertVolunteerActivitySchema = createInsertSchema(volunteerActivities).omit({ 
