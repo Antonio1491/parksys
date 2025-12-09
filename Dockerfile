@@ -30,8 +30,8 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Remove devDependencies after build to reduce image size
-RUN npm prune --production
+# Note: Not running npm prune --production because server/vite.ts
+# imports vite module which is needed even at runtime for the import resolution
 
 # Expose the port (Railway will set PORT env var)
 EXPOSE 5000
