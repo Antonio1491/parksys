@@ -1,17 +1,34 @@
 /**
  * REPLIT OBJECT STORAGE SERVICE - VERSIÓN OFICIAL
  * ===============================================
- * 
- * Usa @replit/object-storage (librería oficial) 
+ *
+ * Usa @replit/object-storage (librería oficial)
  * con autenticación automática - SIN problemas 401
+ *
+ * NOTA: Solo funciona en entorno Replit. En otros entornos (Railway, etc.)
+ * este servicio estará deshabilitado.
  */
 
-import { Client } from "@replit/object-storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 
-// Cliente oficial de Replit - autenticación automática
-const replitStorageClient = new Client();
+// Detectar si estamos en Replit
+const isReplit = !!(process.env.REPL_ID || process.env.REPLIT_DEPLOYMENT);
+
+// Cliente oficial de Replit - solo inicializar en Replit
+let replitStorageClient: any = null;
+
+if (isReplit) {
+  try {
+    const { Client } = require("@replit/object-storage");
+    replitStorageClient = new Client();
+    console.log('✅ [REPLIT-STORAGE] Cliente inicializado en entorno Replit');
+  } catch (error) {
+    console.warn('⚠️ [REPLIT-STORAGE] No se pudo inicializar el cliente:', error);
+  }
+} else {
+  console.log('ℹ️ [REPLIT-STORAGE] No estamos en Replit - Object Storage deshabilitado');
+}
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -22,37 +39,55 @@ export class ObjectNotFoundError extends Error {
 }
 
 export class ReplitObjectStorageService {
+  private isAvailable: boolean;
+
   constructor() {
-    console.log('✅ [REPLIT-STORAGE] Cliente oficial inicializado con autenticación automática');
+    this.isAvailable = !!replitStorageClient;
+    if (this.isAvailable) {
+      console.log('✅ [REPLIT-STORAGE] Cliente oficial inicializado con autenticación automática');
+    } else {
+      console.log('ℹ️ [REPLIT-STORAGE] Servicio no disponible (no estamos en Replit)');
+    }
+  }
+
+  /**
+   * Verificar si el servicio está disponible
+   */
+  isServiceAvailable(): boolean {
+    return this.isAvailable;
   }
 
   /**
    * 🚀 UPLOAD: Subir archivo usando la librería oficial de Replit
    */
   async uploadFile(file: Buffer, filename: string): Promise<string> {
+    if (!this.isAvailable) {
+      throw new Error('Replit Object Storage no está disponible en este entorno');
+    }
+
     try {
       const uniqueFilename = `uploads/${Date.now()}-${randomUUID()}-${filename}`;
-      
+
       console.log(`📤 [REPLIT-STORAGE] DETALLE: Iniciando upload`);
       console.log(`📤 [REPLIT-STORAGE] - Filename objetivo: ${uniqueFilename}`);
       console.log(`📤 [REPLIT-STORAGE] - Buffer size: ${file.length} bytes`);
       console.log(`📤 [REPLIT-STORAGE] - Client disponible: ${!!replitStorageClient}`);
-      
+
       const { ok, error } = await replitStorageClient.uploadFromBytes(
         uniqueFilename,
         file
       );
-      
+
       console.log(`📤 [REPLIT-STORAGE] RESPUESTA: ok=${ok}, error=${error}`);
-      
+
       if (!ok) {
         console.error('❌ [REPLIT-STORAGE] Upload falló:', error);
         throw new Error(`Error subiendo archivo: ${error}`);
       }
-      
+
       console.log(`✅ [REPLIT-STORAGE] Upload exitoso: ${uniqueFilename}`);
       return uniqueFilename;
-      
+
     } catch (error) {
       console.error('❌ [REPLIT-STORAGE] Excepción en upload:', error);
       console.error('❌ [REPLIT-STORAGE] Error type:', typeof error);
@@ -65,9 +100,14 @@ export class ReplitObjectStorageService {
    * 📥 DOWNLOAD AS BUFFER: Descargar archivo como Buffer
    */
   async downloadFile(filename: string): Promise<Buffer | null> {
+    if (!this.isAvailable) {
+      console.warn('⚠️ [REPLIT-STORAGE] Servicio no disponible - no se puede descargar archivo');
+      return null;
+    }
+
     try {
       console.log(`📥 [REPLIT-STORAGE] Descargando archivo: ${filename}`);
-      
+
       const { ok, value, error } = await replitStorageClient.downloadAsBytes(filename);
       
       if (!ok) {
@@ -138,9 +178,14 @@ export class ReplitObjectStorageService {
    * 🗑️ DELETE: Eliminar archivo
    */
   async deleteFile(filename: string): Promise<boolean> {
+    if (!this.isAvailable) {
+      console.warn('⚠️ [REPLIT-STORAGE] Servicio no disponible - no se puede eliminar archivo');
+      return false;
+    }
+
     try {
       console.log(`🗑️ [REPLIT-STORAGE] Eliminando archivo: ${filename}`);
-      
+
       const { ok, error } = await replitStorageClient.delete(filename);
       
       if (!ok) {
@@ -161,6 +206,11 @@ export class ReplitObjectStorageService {
    * 📂 LIST: Listar archivos (para debugging)
    */
   async listFiles(): Promise<string[]> {
+    if (!this.isAvailable) {
+      console.warn('⚠️ [REPLIT-STORAGE] Servicio no disponible - no se puede listar archivos');
+      return [];
+    }
+
     try {
       const { ok, value, error } = await replitStorageClient.list();
       
@@ -181,6 +231,10 @@ export class ReplitObjectStorageService {
    * 🔍 EXISTS: Verificar si un archivo existe
    */
   async fileExists(filename: string): Promise<boolean> {
+    if (!this.isAvailable) {
+      return false;
+    }
+
     try {
       const { ok } = await replitStorageClient.downloadAsBytes(filename);
       return ok;
