@@ -1,13 +1,16 @@
 # Dockerfile for Railway deployment
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 WORKDIR /app
+
+# Increase Node.js memory limit for build
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 # Copy package files
 COPY package*.json ./
 
-# Install ALL dependencies (including devDependencies for build)
-RUN npm install
+# Install dependencies with reduced memory usage
+RUN npm install --legacy-peer-deps --maxsockets 1
 
 # Copy source code
 COPY . .
@@ -15,20 +18,8 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM node:18-alpine AS production
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm install --only=production
-
-# Copy built files from builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/public ./public
+# Remove devDependencies after build to reduce image size
+RUN npm prune --production
 
 # Expose the port (Railway will set PORT env var)
 EXPOSE 5000
