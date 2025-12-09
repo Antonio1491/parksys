@@ -3,14 +3,26 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Install build dependencies for native modules (canvas, bcrypt, etc.)
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev \
+    pixman-dev
+
 # Increase Node.js memory limit for build
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with reduced memory usage
-RUN npm install --legacy-peer-deps --maxsockets 1
+# Install dependencies
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
