@@ -7,13 +7,13 @@ import { calculateUnifiedDiscounts } from './unified-discounts';
 const router = Router();
 const sql = neon(process.env.DATABASE_URL!);
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-07-30.basil' as any })
+  : null;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-07-30.basil',
-});
+if (!stripe) {
+  console.warn('⚠️ STRIPE_SECRET_KEY not configured - event payment routes will return errors');
+}
 
 // Schema de validación para crear payment intent
 const paymentIntentSchema = z.object({

@@ -1,13 +1,13 @@
 import Stripe from 'stripe';
 import { z } from 'zod';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' as any })
+  : null;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia',
-});
+if (!stripe) {
+  console.warn('⚠️ STRIPE_SECRET_KEY not configured - stripe service will not be available');
+}
 
 // Schema para crear un payment intent
 export const createPaymentIntentSchema = z.object({

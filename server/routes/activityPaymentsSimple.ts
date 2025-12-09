@@ -3,11 +3,13 @@ import Stripe from "stripe";
 import { storage } from "../storage";
 import { emailService } from "../email/emailService";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
+  : null;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+if (!stripe) {
+  console.warn('⚠️ STRIPE_SECRET_KEY not configured - simple payment routes will return errors');
+}
 
 export function registerActivityPaymentRoutes(app: Express) {
   // Crear payment intent para pago de actividad

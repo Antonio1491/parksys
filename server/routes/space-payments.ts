@@ -5,14 +5,14 @@ import { db } from "../db";
 import { spaceReservations, reservableSpaces, parks } from "../../shared/schema";
 import { calculateUnifiedDiscounts } from "./unified-discounts";
 
-// Configurar Stripe
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
+// Configurar Stripe (opcional)
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" as any })
+  : null;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
-});
+if (!stripe) {
+  console.warn('⚠️ STRIPE_SECRET_KEY not configured - space payment routes will return errors');
+}
 
 export function registerSpacePaymentRoutes(app: Express) {
   
