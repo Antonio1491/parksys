@@ -445,7 +445,7 @@ function Router() {
           {/* Crear nueva programación */}
           <Route path={ROUTES.admin.programming.create}>
             <Suspense fallback={<LoadingPage messageKey="loading.programming" />}>
-              {React.createElement(React.lazy(() => import('@/pages/admin/programming/catalog')))}
+              {React.createElement(React.lazy(() => import('@/pages/admin/programming/catalog/new')))}
             </Suspense>
           </Route>
 

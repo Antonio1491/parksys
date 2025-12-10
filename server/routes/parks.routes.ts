@@ -835,7 +835,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /parks/:id/extended - Datos extendidos del parque (con amenidades e imágenes)
+ * GET /parks/:id/extended - Datos extendidos del parque (con todas las relaciones)
  */
 router.get('/:id/extended', async (req: Request, res: Response) => {
   try {
@@ -845,7 +845,7 @@ router.get('/:id/extended', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid park ID' });
     }
 
-    // Datos básicos
+    // Datos básicos del parque
     const parkResult = await pool.query(`
       SELECT 
         p.id, p.name, p.park_type as "parkType", p.description, p.address, 
@@ -865,7 +865,7 @@ router.get('/:id/extended', async (req: Request, res: Response) => {
 
     const park = parkResult.rows[0];
 
-    // Amenidades
+    // ✅ Amenidades (ya existe)
     const amenitiesResult = await pool.query(`
       SELECT a.id, a.name, a.icon, a.category, 
              a.icon_type as "iconType", a.custom_icon_url as "customIconUrl",
@@ -876,7 +876,7 @@ router.get('/:id/extended', async (req: Request, res: Response) => {
       ORDER BY a.category, a.name
     `, [parkId]);
 
-    // Imágenes
+    // ✅ Imágenes (ya existe)
     const imagesResult = await pool.query(`
       SELECT id, image_url as "imageUrl", caption, is_primary as "isPrimary"
       FROM park_images
@@ -884,14 +884,123 @@ router.get('/:id/extended', async (req: Request, res: Response) => {
       ORDER BY is_primary DESC, created_at DESC
     `, [parkId]);
 
+    // ✅ AGREGAR: Actividades del parque
+    const activitiesResult = await pool.query(`
+      SELECT 
+        a.id,
+        a.title,
+        a.description,
+        a.start_date as "startDate",
+        a.end_date as "endDate",
+        a.category,
+        a.location,
+        a.instructor_id as "instructorId",
+        img.image_url as "imageUrl"
+      FROM activities a
+      LEFT JOIN activity_images img ON a.id = img.activity_id AND img.is_primary = true
+      WHERE a.park_id = $1 
+      ORDER BY a.start_date ASC
+      LIMIT 10
+    `, [parkId]);
+
+    // ✅ AGREGAR: Instructores que dan clases en este parque
+    const instructorsResult = await pool.query(`
+      SELECT DISTINCT
+        i.id,
+        i.full_name as "fullName",
+        i.email,
+        i.specialties,
+        i.bio,
+        i.profile_image_url as "profileImageUrl",
+        i.certifications
+      FROM instructors i
+      INNER JOIN activities a ON i.id = a.instructor_id
+      WHERE a.park_id = $1
+      ORDER BY i.full_name
+    `, [parkId]);
+
+    // ✅ AGREGAR: Especies arbóreas del parque
+    const treeSpeciesResult = await pool.query(`
+      SELECT 
+        ts.id,
+        ts.common_name as "commonName",
+        ts.scientific_name as "scientificName",
+        ts.family,
+        ts.origin,
+        ts.image_url as "photoUrl",
+        ts.image_url as "customPhotoUrl",
+        ts.is_endangered as "isEndangered"
+      FROM tree_species ts
+      INNER JOIN park_tree_species pts ON ts.id = pts.species_id
+      WHERE pts.park_id = $1
+        AND pts.status != 'eliminado'
+      ORDER BY ts.common_name
+    `, [parkId]);
+
+    // Voluntarios relacionados con este parque (han participado O lo prefieren)
+    const volunteersResult = await pool.query(`
+      SELECT DISTINCT
+        v.id,
+        v.full_name as "fullName",
+        v.email,
+        v.phone,
+        v.profile_image_url as "profileImageUrl",
+        v.skills,
+        v.status,
+        v.interest_areas as interestAreas
+      FROM volunteers v
+      WHERE v.status = 'activo'
+        AND (
+          -- Voluntarios que prefieren este parque
+          v.preferred_park_id = $1
+          OR
+          -- Voluntarios que han participado en actividades de este parque
+          v.id IN (
+            SELECT DISTINCT vp.volunteer_id
+            FROM volunteer_participations vp
+            INNER JOIN volunteer_activities va ON vp.volunteer_activity_id = va.id
+            WHERE va.park_id = $1
+          )
+        )
+      ORDER BY v.full_name
+    `, [parkId]);
+
+    // Concesiones activas del parque
+    const concessionsResult = await pool.query(`
+      SELECT 
+        ac.id,
+        ac.name as "vendorName",
+        ac.specific_location as location,
+        ac.start_date as "startDate",
+        c.phone as "vendorPhone",
+        ct.name as "concessionType",
+        ct.description as "typeDescription",
+        aci.image_url as "primaryImage"
+      FROM active_concessions ac
+      LEFT JOIN concession_types ct ON ac.concession_type_id = ct.id
+      LEFT JOIN concessionaires cp ON ac.concessionaire_id = c.id
+      LEFT JOIN active_concession_images aci 
+        ON ac.id = aci.concession_id 
+        AND aci.is_primary = true
+      WHERE ac.park_id = $1
+        AND ac.status = 'activa'
+      ORDER BY ac.name
+    `, [parkId]);
+
+    // ✅ Respuesta completa con todas las relaciones
     res.json({
       ...park,
       amenities: amenitiesResult.rows,
-      images: imagesResult.rows
+      images: imagesResult.rows,
+      activities: activitiesResult.rows,
+      instructors: instructorsResult.rows,
+      treeSpecies: treeSpeciesResult.rows,
+      volunteers: volunteersResult.rows,
+      concessions: concessionsResult.rows,
     });
 
   } catch (error) {
-    console.error('Error getting extended park data:', error);
+    console.error('❌ Error getting extended park data:', error);
     res.status(500).json({ message: 'Error fetching park data' });
   }
 });

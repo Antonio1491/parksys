@@ -15,6 +15,7 @@ import { sql, eq, and, desc } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 import { deleteAllVolunteers, deleteVolunteer } from "./delete-all-volunteers";
 import * as schema from "@shared/schema";
+import { initializeEntityRegistry } from '../shared/data-transfer';
 const { 
   parkAmenities, amenities, insertParkSchema, 
   incidents, assets, assetMaintenances, parkEvaluations, 
@@ -101,6 +102,8 @@ import { registerEventCategoriesRoutes } from "./event-categories-routes";
 import { seedEventCategories } from "./seed-event-categories";
 import { registerInstructorEvaluationRoutes } from "./instructor-evaluations-routes";
 import exportRoutes from "./routes/exports";
+
+initializeEntityRegistry(schema);
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server first
@@ -868,7 +871,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           common_name,
           scientific_name,
           family,
-          characteristics,
           image_url
         FROM tree_species
         ORDER BY common_name ASC
@@ -3895,36 +3897,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-  
-  // DISABLED - This endpoint was interfering with the main amenities endpoint
-  /*
-  publicRouter.get("/parks/:id/amenities", async (req: Request, res: Response) => {
-    try {
-      const parkId = Number(req.params.id);
-      const amenities = await storage.getParkAmenities(parkId);
-      
-      // Format for external consumption
-      const formattedAmenities = amenities.map(amenity => ({
-        id: amenity.id,
-        name: amenity.name,
-        category: amenity.category,
-        icon: amenity.icon
-      }));
-      
-      res.json({
-        status: "success",
-        data: formattedAmenities,
-        count: formattedAmenities.length
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ 
-        status: "error", 
-        message: "Error fetching park amenities data" 
-      });
-    }
-  });
-  */
   
   // Get activities for a specific park - for external applications
   publicRouter.get("/parks/:id/activities", async (req: Request, res: Response) => {

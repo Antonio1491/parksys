@@ -91,7 +91,7 @@ export function registerTreeInventoryRoutes(app: any, apiRouter: Router, isAuthe
         ${speciesId ? `AND t.species_id = ${speciesId}` : ''}
         ${healthStatus ? `AND t.health_status = '${healthStatus}'` : ''}
         ${searchTerm ? `AND (t.location_description ILIKE '%${searchTerm}%' OR t.notes ILIKE '%${searchTerm}%' OR ts.common_name ILIKE '%${searchTerm}%' OR ts.scientific_name ILIKE '%${searchTerm}%' OR t.code ILIKE '%${searchTerm}%')` : ''}
-        ORDER BY t.updated_at DESC
+        ORDER BY ts.common_name ASC, t.code ASC
         LIMIT ${limit} OFFSET ${offset}
       `;
       
@@ -461,6 +461,7 @@ export function registerTreeInventoryRoutes(app: any, apiRouter: Router, isAuthe
         isProtected,
         locationDescription,
         imageUrl,
+        last_maintenance_date,
       } = req.body;
       
       console.log('🌳 Campos extraídos:');
@@ -511,6 +512,7 @@ export function registerTreeInventoryRoutes(app: any, apiRouter: Router, isAuthe
         image_url: imageUrl || null,
         notes: observations || null,
         location_description: locationDescription || null,
+        last_maintenance_date: last_maintenance_date || null,
         updated_at: new Date(),
       };
       

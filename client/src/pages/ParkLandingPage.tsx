@@ -935,9 +935,9 @@ function ParkLandingPage() {
                                   <div className="flex flex-wrap gap-1">
                                     {(() => {
                                       let interestsList: string[] = [];
-                                      const interests = volunteer.interests;
+                                      const interests = volunteer.interestAreas;
                                       
-                                      if (interests.startsWith('{') && interests.endsWith('}')) {
+                                      if (interests.startsWith('[') && interests.endsWith(']')) {
                                         const arrayContent = interests.slice(1, -1);
                                         interestsList = arrayContent
                                           .split(',')

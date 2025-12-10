@@ -845,7 +845,7 @@ export const volunteers = pgTable("volunteers", {
   emergencyContactName: text("emergency_contact_name"),
   emergencyContactPhone: text("emergency_contact_phone"),
   emergencyContactRelation: text("emergency_contact_relation"),
-  preferredParkId: integer("preferred_park_id"),
+  preferredParkId: integer("preferred_park_id").references(() => parks.id, { onDelete: "set null" }),
   previousExperience: text("previous_experience"),
   availableDays: text("available_days").array(),
   availableHours: text("available_hours"),
@@ -878,24 +878,16 @@ export const volunteerActivities = pgTable("volunteer_activities", {
 // Tabla de participaciones (relación voluntario-actividad)
 export const volunteerParticipations = pgTable("volunteer_participations", {
   id: serial("id").primaryKey(),
-  volunteerId: integer("volunteer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  volunteerId: integer("volunteer_id").notNull().references(() => volunteers.id, { onDelete: "cascade" }),
   volunteerActivityId: integer("volunteer_activity_id").notNull().references(() => volunteerActivities.id, { onDelete: "cascade" }),
-
-  // Estado de la participación
   registrationDate: timestamp("registration_date").notNull().defaultNow(),
-  attendanceStatus: text("attendance_status").default("registered"), // registered, confirmed, attended, absent, cancelled
-
-  // Registro de horas
+  attendanceStatus: text("attendance_status").default("registered"),
   hoursContributed: decimal("hours_contributed", { precision: 4, scale: 2 }),
   checkInTime: timestamp("check_in_time"),
   checkOutTime: timestamp("check_out_time"),
-
-  // Feedback
   volunteerNotes: text("volunteer_notes"),
   supervisorNotes: text("supervisor_notes"),
   rating: integer("rating"),
-
-  // Metadata
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -4275,59 +4267,32 @@ export type InsertSponsorEventBenefit = z.infer<typeof insertSponsorEventBenefit
 // Tabla principal de concesiones activas (nueva estructura lógica)
 export const activeConcessions = pgTable("active_concessions", {
   id: serial("id").primaryKey(),
-  
-  // Información básica de la concesión
-  name: varchar("name", { length: 255 }).notNull(), // Nombre específico de la concesión
-  description: text("description").notNull(),
-  
-  // Relaciones principales
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
   concessionTypeId: integer("concession_type_id").notNull().references(() => concessionTypes.id),
-  concessionaireId: integer("concessionaire_id").notNull().references(() => users.id), // Usuario con rol concesionario
+  concessionaireId: integer("concessionaire_id").notNull().references(() => concessionaireProfiles.id),
   parkId: integer("park_id").notNull().references(() => parks.id),
-  
-  // Ubicación específica en el parque
-  specificLocation: text("specific_location").notNull(), // "Entrada principal", "Zona deportiva", etc.
-  coordinates: varchar("coordinates", { length: 100 }), // GPS si es necesario
-  area: decimal("area", { precision: 10, scale: 2 }), // Metros cuadrados
-  
-  // Operación y vigencia
+  specificLocation: varchar("specific_location", { length: 255 }),
+  coordinates: varchar("coordinates", { length: 255 }),
+  area: decimal("area", { precision: 10, scale: 2 }),
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
-  operatingHours: varchar("operating_hours", { length: 255 }), // "8:00-18:00" o JSON
-  operatingDays: varchar("operating_days", { length: 100 }), // "Lunes a Domingo" o JSON
-  
-  // Estado y gestión
-  status: varchar("status", { length: 50 }).notNull().default('activa'), // activa, suspendida, vencida, renovacion
-  priority: varchar("priority", { length: 20 }).default("normal"), // alta, normal, baja
-  
-  // Términos específicos de la concesión
-  specificTerms: text("specific_terms"), // Condiciones particulares
-  specialRequirements: text("special_requirements"), // Requisitos específicos
-  
-  // Documentación
+  operatingHours: varchar("operating_hours", { length: 100 }),
+  operatingDays: varchar("operating_days", { length: 100 }),
+  status: varchar("status", { length: 50 }).notNull().default('activa'),
+  priority: varchar("priority", { length: 50 }).default("normal"),
+  termsConditions: text("terms_conditions"),
+  specialRequirements: text("special_requirements"),
   contractNumber: varchar("contract_number", { length: 100 }),
-  contractFile: varchar("contract_file", { length: 500 }), // URL del contrato firmado
-  permitFile: varchar("permit_file", { length: 500 }), // URL del permiso municipal
-  insuranceFile: varchar("insurance_file", { length: 500 }), // URL del seguro
-  
-  // Información financiera básica
-  monthlyPayment: decimal("monthly_payment", { precision: 10, scale: 2 }), // Pago mensual fijo si aplica
-  revenuePercentage: decimal("revenue_percentage", { precision: 5, scale: 2 }), // % de ingresos si aplica
-  deposit: decimal("deposit", { precision: 10, scale: 2 }), // Depósito en garantía
-  
-  // Contacto de emergencia/operación
+  monthlyPayment: decimal("monthly_payment", { precision: 10, scale: 2 }),
+  revenuePercentage: decimal("revenue_percentage", { precision: 5, scale: 2 }),
+  deposit: decimal("deposit", { precision: 10, scale: 2 }),
   emergencyContact: varchar("emergency_contact", { length: 255 }),
-  emergencyPhone: varchar("emergency_phone", { length: 50 }),
-  
-  // Notas y observaciones
+  emergencyPhone: varchar("emergency_phone", { length: 20 }),
   notes: text("notes"),
-  internalNotes: text("internal_notes"), // Solo para administradores
-  
-  // Metadatos
-  createdBy: integer("created_by").references(() => users.id),
-  lastModifiedBy: integer("last_modified_by").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
+  internalNotes: text("internal_notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
 });
 
 // Tabla para imágenes de concesiones activas (mejorando la existente)

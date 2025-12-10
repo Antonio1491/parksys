@@ -66,7 +66,8 @@ import {
   List,
   CopyCheck,
   CheckSquare,
-  Square
+  Square,
+  Edit
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -74,6 +75,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -89,6 +91,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 // Tipos para los árboles del inventario
 interface TreeInventory {
@@ -132,6 +135,15 @@ function TreeInventoryPage() {
   const [selectedArea, setSelectedArea] = useState('all');
   const [selectedHealthStatus, setSelectedHealthStatus] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'map'>('table');
+  const [editTreeModal, setEditTreeModal] = useState(false);
+  const [selectedTree, setSelectedTree] = useState<TreeInventory | null>(null);
+  const [treeData, setTreeData] = useState({
+    areaId: '',
+    healthStatus: '',
+    height: '',
+    diameter: '',
+    lastInspectionDate: ''
+  });
 
   // Consultar los parques para el filtro
   const { data: parksResponse, isLoading: isLoadingParks } = useQuery({
@@ -513,6 +525,32 @@ function TreeInventoryPage() {
     },
   });
 
+  // Mutación para actualizar árbol
+  const updateTreeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest(`/api/trees/${data.id}`, {
+        method: 'PUT',
+        data: data,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Árbol actualizado",
+        description: "Los datos del árbol se han actualizado correctamente.",
+      });
+      setEditTreeModal(false);
+      setSelectedTree(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/trees'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo actualizar el árbol.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Confirmar importación
   const handleConfirmImport = () => {
     importCsvMutation.mutate(csvPreview);
@@ -575,7 +613,9 @@ function TreeInventoryPage() {
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'No disponible';
     try {
-      return format(new Date(dateStr), 'dd/MM/yyyy', { locale: es });
+      // Tomar solo la parte de la fecha (YYYY-MM-DD) y parsear manualmente
+      const [year, month, day] = dateStr.split('T')[0].split('-');
+      return `${day}/${month}/${year}`;
     } catch (e) {
       return 'Fecha inválida';
     }
@@ -1048,11 +1088,19 @@ function TreeInventoryPage() {
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleViewDetails(tree.id);
+                                  setSelectedTree(tree);
+                                  setTreeData({
+                                    areaId: tree.areaId?.toString() || '',
+                                    healthStatus: tree.healthStatus || '',
+                                    height: tree.height?.toString() || '',
+                                    diameter: tree.diameter?.toString() || '',
+                                    lastInspectionDate: tree.lastInspectionDate ? tree.lastInspectionDate.split('T')[0] : ''
+                                  });
+                                  setEditTreeModal(true);
                                 }}
-                                className="bg-transparent text-gray-800"
+                                className="bg-transparent text-gray-800 border border-gray-200 hover:bg-[#ceefea]"
                               >
-                                <Eye className="h-4 w-4" />
+                                <Edit className="h-4 w-4" />
                               </Button>
                               <Button 
                                 variant="outline" 
@@ -1189,8 +1237,131 @@ function TreeInventoryPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
-  );
-}
+
+            {/* Modal para Editar Árbol */}
+            <Dialog open={editTreeModal} onOpenChange={setEditTreeModal}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Edit className="h-5 w-5 text-blue-600" />
+                    Editar Árbol - {selectedTree?.speciesName} ({selectedTree?.code})
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-area">Área</Label>
+                      <Select
+                        value={treeData.areaId}
+                        onValueChange={(value) => setTreeData({...treeData, areaId: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona área" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {areas?.map((area: any) => (
+                            <SelectItem key={area.id} value={area.id.toString()}>
+                              {area.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-health-status">Estado de Salud</Label>
+                      <Select
+                        value={treeData.healthStatus}
+                        onValueChange={(value) => setTreeData({...treeData, healthStatus: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona estado" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Bueno">🟢 Bueno</SelectItem>
+                          <SelectItem value="Regular">🟡 Regular</SelectItem>
+                          <SelectItem value="Malo">🔴 Malo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-height">Altura (m)</Label>
+                      <Input
+                        id="edit-height"
+                        type="number"
+                        step="0.1"
+                        placeholder="Ej: 5.5"
+                        value={treeData.height}
+                        onChange={(e) => setTreeData({...treeData, height: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-diameter">DAP (cm)</Label>
+                      <Input
+                        id="edit-diameter"
+                        type="number"
+                        step="0.1"
+                        placeholder="Ej: 30.5"
+                        value={treeData.diameter}
+                        onChange={(e) => setTreeData({...treeData, diameter: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-inspection-date">Última Inspección</Label>
+                    <Input
+                      id="edit-inspection-date"
+                      type="date"
+                      value={treeData.lastInspectionDate}
+                      onChange={(e) => setTreeData({...treeData, lastInspectionDate: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter className="gap-2">
+                  <Button variant="outline" onClick={() => setEditTreeModal(false)}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      updateTreeMutation.mutate({
+                        id: selectedTree?.id,
+                        speciesId: selectedTree?.speciesId,
+                        parkId: selectedTree?.parkId,
+                        latitude: selectedTree?.latitude,
+                        longitude: selectedTree?.longitude,
+                        code: selectedTree?.code,
+                        areaId: treeData.areaId ? parseInt(treeData.areaId) : null,
+                        healthStatus: treeData.healthStatus,
+                        height: treeData.height ? parseFloat(treeData.height) : null,
+                        diameter: treeData.diameter ? parseFloat(treeData.diameter) : null,
+                        trunk_diameter: treeData.diameter ? parseFloat(treeData.diameter) : null,
+                        last_maintenance_date: treeData.lastInspectionDate || null
+                      });
+                    }}
+                    disabled={updateTreeMutation.isPending}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {updateTreeMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      'Guardar Cambios'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </AdminLayout>
+        );
+      }
 
 export default TreeInventoryPage;
