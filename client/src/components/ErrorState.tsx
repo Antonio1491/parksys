@@ -5,96 +5,19 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface ErrorStateProps {
-  /**
-   * Error object de React Query o custom
-   */
   error?: Error | unknown;
-  
-  /**
-   * Título del error
-   */
   title?: string;
-  
-  /**
-   * Mensaje del error
-   * Si no se proporciona, intenta usar error.message
-   */
   message?: string;
-  
-  /**
-   * Función para reintentar la operación
-   */
   onRetry?: () => void;
-  
-  /**
-   * Texto del botón de retry
-   * @default "Reintentar"
-   */
   retryText?: string;
-  
-  /**
-   * Namespace i18n
-   * @default 'common'
-   */
   namespace?: string;
-  
-  /**
-   * Variante visual
-   * - 'admin': Con logo ParkSys, Alert formal, detalles técnicos
-   * - 'public': Estilo amigable, mensaje esperanzador
-   * @default 'admin'
-   */
   variant?: 'public' | 'admin';
-  
-  /**
-   * Mostrar detalles técnicos del error (solo en admin)
-   * @default false
-   */
   showDetails?: boolean;
-  
-  /**
-   * Tamaño del componente
-   * @default 'default'
-   */
   size?: 'sm' | 'default' | 'lg';
-  
-  /**
-   * Mensaje secundario esperanzador (usado en variante public)
-   */
+  minHeight?: string;
   secondaryText?: string;
 }
 
-/**
- * Componente para mostrar estados de error con opción de reintentar
- * 
- * @example Uso admin (por defecto)
- * ```tsx
- * if (error) {
- *   return (
- *     <ErrorState 
- *       error={error} 
- *       onRetry={refetch}
- *       title="Error al cargar árboles"
- *     />
- *   );
- * }
- * ```
- * 
- * @example Uso público
- * ```tsx
- * if (error) {
- *   return (
- *     <ErrorState 
- *       variant="public"
- *       title="No pudimos cargar los parques"
- *       message="Estamos trabajando para solucionarlo"
- *       secondaryText="Por favor, intenta de nuevo en unos minutos"
- *       onRetry={refetch}
- *     />
- *   );
- * }
- * ```
- */
 export default function ErrorState({
   error,
   title,
@@ -105,19 +28,15 @@ export default function ErrorState({
   variant = 'admin',
   showDetails = false,
   size = 'default',
+  minHeight = '400px',
   secondaryText
 }: ErrorStateProps) {
   const { t } = useTranslation(namespace);
-  
-  // Extraer mensaje del error
   const errorMessage = message || 
     (error instanceof Error ? error.message : undefined) ||
     t('error.generic');
-  
   const errorTitle = title || t('error.title');
   const buttonText = retryText || t('error.retry');
-  
-  // Configuración de tamaños
   const sizeConfig = {
     sm: {
       container: 'py-8 px-4',
@@ -147,25 +66,18 @@ export default function ErrorState({
   
   const config = sizeConfig[size];
 
-  // ===== VARIANTE ADMIN =====
   if (variant === 'admin') {
     return (
-      <div className={`flex items-center justify-center w-full ${config.container}`}>
+      <div className={`flex items-center justify-center w-full ${config.container}`} style={{ minHeight }}>
         <div className="max-w-2xl w-full">
-          {/* Logo ParkSys */}
           <div className="flex justify-center mb-4">
             <div className={`${config.logo}`}>
-              {/* 
-                TODO: Reemplazar con logo de ParkSys
-                <img 
-                  src="/images/parksys-logo.svg" 
+              <div className="w-full h-full bg-gradient-to-br from-[#00a587]/20 to-[#00444f]/20 rounded-xl flex items-center justify-center opacity-60">
+                 <img 
+                  src="/public/parksys-logo.png" 
                   alt="ParkSys" 
                   className="h-full w-auto opacity-50"
                 />
-              */}
-              <div className="w-full h-full bg-gradient-to-br from-[#00a587]/20 to-[#00444f]/20 rounded-xl flex items-center justify-center opacity-60">
-                {/* Placeholder para logo - Reemplazar con imagen real */}
-                <span className="text-[#00444f] font-bold text-xs">LOGO</span>
               </div>
             </div>
           </div>
@@ -207,33 +119,23 @@ export default function ErrorState({
     );
   }
 
-  // ===== VARIANTE PUBLIC =====
   return (
-    <div className={`flex items-center justify-center w-full ${config.container}`}>
+    <div className={`flex items-center justify-center w-full ${config.container}`} style={{ minHeight }}>
       <div className="flex flex-col items-center text-center max-w-md">
-        {/* Icono con estilo amigable */}
         <div className={`${config.iconWrapper} bg-orange-100 rounded-full flex items-center justify-center mb-6`}>
           <AlertTriangle className={`${config.icon} text-orange-500`} />
         </div>
-        
-        {/* Título */}
         <h3 className={`${config.title} font-medium text-gray-700 mb-2`}>
           {errorTitle}
         </h3>
-        
-        {/* Mensaje principal */}
         <p className={`${config.message} text-gray-500 mb-2`}>
           {errorMessage}
         </p>
-        
-        {/* Mensaje secundario esperanzador */}
         {secondaryText && (
           <p className={`${config.message} text-gray-400`}>
             {secondaryText}
           </p>
         )}
-        
-        {/* Botón de retry (más sutil en público) */}
         {onRetry && (
           <Button
             onClick={onRetry}
@@ -250,22 +152,6 @@ export default function ErrorState({
   );
 }
 
-/**
- * Variante inline para usar dentro de secciones
- * Útil cuando el error es de una parte de la página, no toda
- * 
- * @example
- * ```tsx
- * <div className="grid grid-cols-2 gap-4">
- *   <ActivityCard data={activity} />
- *   {eventsError ? (
- *     <ErrorStateInline error={eventsError} onRetry={refetchEvents} />
- *   ) : (
- *     <EventsWidget data={events} />
- *   )}
- * </div>
- * ```
- */
 export function ErrorStateInline({
   error,
   message,
@@ -299,18 +185,6 @@ export function ErrorStateInline({
   );
 }
 
-/**
- * Helper para usar con React Query
- * 
- * @example
- * ```tsx
- * const query = useQuery(['/api/parks']);
- * 
- * if (query.error) {
- *   return <ErrorStateQuery query={query} variant="public" />;
- * }
- * ```
- */
 export function ErrorStateQuery({
   query,
   variant = 'admin',

@@ -145,7 +145,7 @@ export default function ParkEvaluationForm() {
       console.log('🚀 MUTATION: Iniciando envío de evaluación');
       console.log('🚀 MUTATION: Datos recibidos:', JSON.stringify(evaluationData, null, 2));
 
-      const response = await apiRequest('/api/park-evaluations', {
+      const response = await apiRequest('/api/parks/evaluations', {
         method: 'POST',
         data: evaluationData,
       });

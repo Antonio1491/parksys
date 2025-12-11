@@ -39,6 +39,8 @@ import { useToast } from '@/hooks/use-toast';
 import TreeSpeciesIcon from '@/components/ui/tree-species-icon';
 import ParkEvaluationsSectionSimple from '@/components/ParkEvaluationsSectionSimple';
 import PublicLayout from '@/components/PublicLayout';
+import LoadingState from '@/components/LoadingState';
+import ErrorState from '@/components/ErrorState';
 
 const greenFlagLogo = "/images/green-flag-logo.jpg";
 
@@ -89,7 +91,7 @@ function ParkLandingPage() {
   // Extraer ID del slug (formato: nombre-parque-id)
   const parkId = id;
 
-  const { data: park, isLoading, error } = useQuery<ExtendedPark>({
+  const { data: park, isLoading, error, refetch } = useQuery<ExtendedPark>({
     queryKey: [`/api/parks/${parkId}/extended`],
     retry: 1,
     enabled: !!parkId,
@@ -357,26 +359,6 @@ function ParkLandingPage() {
     }
   };
 
-  if (error || !park) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-600 mb-4">
-            <FileText className="h-16 w-16 mx-auto" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Parque no encontrado</h1>
-          <p className="text-gray-600 mb-6">No pudimos encontrar la información de este parque.</p>
-          <Link href={ROUTES.public.parks}>
-            <Button>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver a parques
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   // Get main image - prioritize primary image or first available image
   const primaryImageExists = park?.images?.some(img => img.isPrimary) || false;
   const mainImage = park ? (park.primaryImage || 
@@ -430,7 +412,28 @@ function ParkLandingPage() {
 
   return (
     <PublicLayout>
-      {/* Hero Image Section con Header Navigation Superpuesto */}
+
+      {isLoading && (
+        <LoadingState 
+          variant="public" 
+          message="Cargando información del parque..."
+          size="lg"
+          minHeight="70vh"
+        />
+      )}
+
+      {error && (
+        <ErrorState
+          variant="public"
+          title="No pudimos cargar el parque"
+          message="Ocurrió un error. Por favor, intenta nuevamente."
+          onRetry={refetch}
+          minHeight="60vh"
+        />
+      )}
+      
+      {!isLoading && !error && park && (
+      <>
       <div className="relative h-[600px] overflow-hidden">
         {mainImage ? (
           <img 
@@ -797,9 +800,16 @@ function ParkLandingPage() {
             {/* Instructores - Columna izquierda */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-purple-600" />
-                  Instructores
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-purple-600" />
+                    Instructores
+                  </div>
+                  {park.instructors && park.instructors.length > 0 && (
+                    <Badge variant="secondary">
+                      {park.instructors.length}
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -900,15 +910,22 @@ function ParkLandingPage() {
             {/* Voluntarios - Columna derecha */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-pink-600" />
-                  Voluntarios Activos
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-pink-600" />
+                    Voluntarios Activos
+                  </div>
+                  {park.volunteers && park.volunteers.length > 0 && (
+                    <Badge variant="secondary">
+                      {park.volunteers.length}
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {park.volunteers && park.volunteers.length > 0 ? (
                   <div className="space-y-3">
-                    {park.volunteers.slice(0, 1).map((volunteer) => (
+                    {park.volunteers.slice(0, 3).map((volunteer) => (
                       <div key={volunteer.id} className="flex items-start gap-3 p-4 bg-white rounded-lg border border-pink-200">
                         {volunteer.profileImageUrl ? (
                           <img 
@@ -930,46 +947,18 @@ function ParkLandingPage() {
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
                               <h4 className="font-semibold text-pink-900 text-sm line-clamp-2">{volunteer.fullName}</h4>
-                              {volunteer.interests && (
+                              {volunteer.interestAreas && volunteer.interestAreas.length > 0 && (
                                 <div className="mt-2">
                                   <div className="flex flex-wrap gap-1">
-                                    {(() => {
-                                      let interestsList: string[] = [];
-                                      const interests = volunteer.interestAreas;
-                                      
-                                      if (interests.startsWith('[') && interests.endsWith(']')) {
-                                        const arrayContent = interests.slice(1, -1);
-                                        interestsList = arrayContent
-                                          .split(',')
-                                          .map(s => {
-                                            let cleaned = s.trim();
-                                            cleaned = cleaned.replace(/^"+/, '').replace(/"+$/, '');
-                                            cleaned = cleaned.replace(/^'+/, '').replace(/'+$/, '');
-                                            cleaned = cleaned.replace(/^\[+/, '').replace(/\]+$/, '');
-                                            return cleaned;
-                                          })
-                                          .filter(s => s && s !== 'null' && s !== '');
-                                      } else {
-                                        try {
-                                          const parsed = JSON.parse(interests);
-                                          if (Array.isArray(parsed)) {
-                                            interestsList = parsed.filter(s => s && s !== 'null');
-                                          }
-                                        } catch {
-                                          interestsList = [interests];
-                                        }
-                                      }
-                                      
-                                      return interestsList.slice(0, 2).map((interest, index) => (
-                                        <Badge 
-                                          key={index} 
-                                          variant="outline" 
-                                          className="text-xs bg-pink-50 text-pink-700 border-pink-200"
-                                        >
-                                          {interest}
-                                        </Badge>
-                                      ));
-                                    })()}
+                                    {volunteer.interestAreas.slice(0, 2).map((interest, index) => (
+                                      <Badge 
+                                        key={index} 
+                                        variant="outline" 
+                                        className="text-xs bg-pink-50 text-pink-700 border-pink-200"
+                                      >
+                                        {interest}
+                                      </Badge>
+                                    ))}
                                   </div>
                                 </div>
                               )}
@@ -1848,6 +1837,8 @@ function ParkLandingPage() {
             )}
           </div>
         </div>
+      )}
+      </>
       )}
     </PublicLayout>
   );

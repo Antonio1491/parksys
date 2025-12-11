@@ -24,11 +24,11 @@ export const PUBLIC_ROUTES = {
   },
   parkEvaluate: {
     path: "/parks/:id/evaluate",
-    build: (id: string) => `/parks/${id}/evaluate`, // ✅ Actualizado
+    build: (id: string | number) => `/parks/${id}/evaluate`, // ✅ Actualizado
   },
   parkEvaluations: {
     path: "/parks/:id/evaluations",
-    build: (id: string) => `/parks/${id}/evaluations`, // ✅ Actualizado
+    build: (id: string | number) => `/parks/${id}/evaluations`, // ✅ Actualizado
   },
 
   activities: "/activities",

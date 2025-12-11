@@ -27,10 +27,6 @@ import {
 } from '@/components/ui/select';
 import { Loader } from 'lucide-react';
 
-// ============================================================================
-// SCHEMA DE VALIDACIÓN
-// ============================================================================
-
 const parkSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   municipality: z.string().min(1, 'El municipio es requerido'),
@@ -64,10 +60,6 @@ const parkSchema = z.object({
 
 type ParkFormValues = z.infer<typeof parkSchema>;
 
-// ============================================================================
-// INTERFACES
-// ============================================================================
-
 interface Park {
   id: number;
   name: string;
@@ -80,7 +72,7 @@ interface Park {
   longitude?: string;
   area?: string;
   foundationYear?: number | null;
-  openingHours?: string; // JSON string
+  openingHours?: string;
   administrator?: string;
   contactPhone?: string;
   contactEmail?: string;
@@ -89,31 +81,13 @@ interface Park {
 }
 
 export interface ParkBasicInfoFormProps {
-  /** ID del parque a editar (undefined = modo creación) */
   parkId?: number;
-
-  /** 
-   * Callback ejecutado después de guardado exitoso
-   * @param parkId - ID del parque creado/actualizado
-   */
   onSuccess?: (parkId: number) => void;
-
-  /** Mostrar botón de cancelar */
   showCancelButton?: boolean;
-
-  /** Ruta a la que redirigir al cancelar (usar ROUTES centralizadas) */
   cancelRoute?: string;
-
-  /** Clase CSS adicional para el contenedor */
   className?: string;
-
-  /** ID del formulario (para submit externo desde park-manage) */
   formId?: string;
 }
-
-// ============================================================================
-// COMPONENTE PRINCIPAL
-// ============================================================================
 
 export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
   parkId,
@@ -127,7 +101,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
   const { toast } = useToast();
   const isEdit = !!parkId;
 
-  // ========== FORM SETUP ==========
   const form = useForm<ParkFormValues>({
     resolver: zodResolver(parkSchema),
     defaultValues: {
@@ -157,16 +130,13 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
     },
   });
 
-  // ========== QUERY PARA CARGAR DATOS (SOLO EN EDICIÓN) ==========
   const { data: park, isLoading: isLoadingPark } = useQuery<Park>({
     queryKey: [`/api/parks/${parkId}`],
     enabled: isEdit,
   });
 
-  // ========== CARGAR VALORES AL FORMULARIO ==========
   useEffect(() => {
     if (park && isEdit) {
-      // Parsear horarios desde DB
       let dailyScheduleFromDB = {
         Lunes: { enabled: false, openingTime: null, closingTime: null },
         Martes: { enabled: false, openingTime: null, closingTime: null },
@@ -208,9 +178,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
     }
   }, [park, isEdit, form]);
 
-  // ========== SUBMIT HANDLER ==========
   const onSubmit = (values: ParkFormValues) => {
-    // Limpiar valores nulos/vacíos para el backend
     const cleanedValues = {
       ...values,
       latitude: values.latitude ? values.latitude.trim().replace(/,$/, '') : undefined,
@@ -230,7 +198,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
     mutation.mutate(cleanedValues);
   };
 
-  // ========== MUTATION ==========
   const mutation = useMutation({
     mutationFn: async (values: any) => {
       const endpoint = isEdit ? `/api/parks/${parkId}` : '/api/parks';
@@ -252,7 +219,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
         description: `El parque ha sido ${isEdit ? 'actualizado' : 'creado'} exitosamente.`,
       });
 
-      // Callback onSuccess con el ID del parque
       if (onSuccess) {
         onSuccess(data.id || parkId!);
       }
@@ -266,7 +232,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
     },
   });
 
-  // ========== LOADING STATE ==========
   if (isEdit && isLoadingPark) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -275,7 +240,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
     );
   }
 
-  // ========== RENDER ==========
   return (
     <Form {...form}>
       <form 
@@ -283,9 +247,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
         onSubmit={form.handleSubmit(onSubmit)} 
         className={`space-y-6 ${className}`}
       >
-        {/* ========== SECCIÓN 1: IDENTIFICACIÓN ========== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Nombre del parque */}
           <FormField
             control={form.control}
             name="name"
@@ -299,8 +261,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
               </FormItem>
             )}
           />
-
-          {/* Municipio */}
           <FormField
             control={form.control}
             name="municipality"
@@ -318,8 +278,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             )}
           />
         </div>
-
-        {/* Descripción */}
         <FormField
           control={form.control}
           name="description"
@@ -337,10 +295,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             </FormItem>
           )}
         />
-
-        {/* ========== SECCIÓN 2: UBICACIÓN ========== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Dirección */}
           <FormField
             control={form.control}
             name="address"
@@ -354,8 +309,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
               </FormItem>
             )}
           />
-
-          {/* Código postal */}
           <FormField
             control={form.control}
             name="postalCode"
@@ -370,9 +323,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             )}
           />
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Latitud */}
           <FormField
             control={form.control}
             name="latitude"
@@ -389,8 +340,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
               </FormItem>
             )}
           />
-
-          {/* Longitud */}
           <FormField
             control={form.control}
             name="longitude"
@@ -408,10 +357,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             )}
           />
         </div>
-
-        {/* ========== SECCIÓN 3: CARACTERÍSTICAS ========== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Área */}
           <FormField
             control={form.control}
             name="area"
@@ -428,8 +374,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
               </FormItem>
             )}
           />
-
-          {/* Año de Fundación */}
           <FormField
             control={form.control}
             name="foundationYear"
@@ -453,17 +397,13 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             )}
           />
         </div>
-
-        {/* ========== SECCIÓN 4: HORARIOS ========== */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-800">Horarios de Apertura</h3>
           <p className="text-sm text-gray-600">
             Selecciona los días en que el parque está abierto y define los horarios
           </p>
-
           {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day) => (
             <div key={day} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
-              {/* Checkbox */}
               <FormField
                 control={form.control}
                 name={`dailySchedule.${day}.enabled`}
@@ -478,11 +418,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
                   </FormItem>
                 )}
               />
-
-              {/* Nombre del día */}
               <span className="w-full sm:w-24 font-medium text-gray-700">{day}</span>
-
-              {/* Horario de apertura */}
               <FormField
                 control={form.control}
                 name={`dailySchedule.${day}.openingTime`}
@@ -500,10 +436,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
                   </FormItem>
                 )}
               />
-
               <span className="hidden sm:inline text-gray-500">-</span>
-
-              {/* Horario de cierre */}
               <FormField
                 control={form.control}
                 name={`dailySchedule.${day}.closingTime`}
@@ -524,10 +457,7 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             </div>
           ))}
         </div>
-
-        {/* ========== SECCIÓN 5: ADMINISTRACIÓN ========== */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Administrador */}
           <FormField
             control={form.control}
             name="administrator"
@@ -541,8 +471,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
               </FormItem>
             )}
           />
-
-          {/* Teléfono de Contacto */}
           <FormField
             control={form.control}
             name="contactPhone"
@@ -556,8 +484,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
               </FormItem>
             )}
           />
-
-          {/* Email de Contacto */}
           <FormField
             control={form.control}
             name="contactEmail"
@@ -576,8 +502,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             )}
           />
         </div>
-
-        {/* ========== SECCIÓN 6: CERTIFICACIONES ========== */}
         <FormField
           control={form.control}
           name="certificaciones"
@@ -595,8 +519,6 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             </FormItem>
           )}
         />
-
-        {/* ========== SECCIÓN 7: ESTADO ========== */}
         <FormField
           control={form.control}
           name="status"
@@ -624,10 +546,8 @@ export const ParkBasicInfoForm: React.FC<ParkBasicInfoFormProps> = ({
             </FormItem>
           )}
         />
-
-        {/* ========== BOTONES ========== */}
         {showCancelButton && (
-          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 border-t">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6">
             <Button 
               type="button" 
               variant="outline"

@@ -1370,6 +1370,34 @@ export const insertConcessionaireProfileSchema = createInsertSchema(concessionai
   updatedAt: true
 });
 
+// Tabla de concesionarios (sistema simplificado)
+export const concessionaires = pgTable("concessionaires", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  rfc: varchar("rfc", { length: 20 }).notNull(),
+  taxAddress: text("tax_address").notNull(),
+  legalRepresentative: varchar("legal_representative", { length: 200 }),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 100 }),
+  registrationDate: date("registration_date").notNull().defaultNow(),
+  status: varchar("status", { length: 20 }).notNull().default("activo"),
+  notes: text("notes"),
+  createdById: integer("created_by_id").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
+export type Concessionaire = typeof concessionaires.$inferSelect;
+export type InsertConcessionaire = typeof concessionaires.$inferInsert;
+
+export const insertConcessionaireSchema = createInsertSchema(concessionaires).omit({
+  id: true,
+  createdById: true,
+  createdAt: true,
+  updatedAt: true
+});
+
 // Documentos de concesionarios
 export const concessionaireDocuments = pgTable("concessionaire_documents", {
   id: serial("id").primaryKey(),
@@ -4270,7 +4298,7 @@ export const activeConcessions = pgTable("active_concessions", {
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   concessionTypeId: integer("concession_type_id").notNull().references(() => concessionTypes.id),
-  concessionaireId: integer("concessionaire_id").notNull().references(() => concessionaireProfiles.id),
+  concessionaireId: integer("concessionaire_id").notNull().references(() => concessionaires.id),
   parkId: integer("park_id").notNull().references(() => parks.id),
   specificLocation: varchar("specific_location", { length: 255 }),
   coordinates: varchar("coordinates", { length: 255 }),

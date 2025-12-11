@@ -947,7 +947,7 @@ router.get('/:id/extended', async (req: Request, res: Response) => {
         v.profile_image_url as "profileImageUrl",
         v.skills,
         v.status,
-        v.interest_areas as interestAreas
+        v.interest_areas as "interestAreas"
       FROM volunteers v
       WHERE v.status = 'activo'
         AND (
@@ -972,16 +972,16 @@ router.get('/:id/extended', async (req: Request, res: Response) => {
         ac.name as "vendorName",
         ac.specific_location as location,
         ac.start_date as "startDate",
-        c.phone as "vendorPhone",
         ct.name as "concessionType",
         ct.description as "typeDescription",
-        aci.image_url as "primaryImage"
+        aci.image_url as "primaryImage",
+        con.phone as "vendorPhone"
       FROM active_concessions ac
       LEFT JOIN concession_types ct ON ac.concession_type_id = ct.id
-      LEFT JOIN concessionaires cp ON ac.concessionaire_id = c.id
       LEFT JOIN active_concession_images aci 
         ON ac.id = aci.concession_id 
         AND aci.is_primary = true
+      LEFT JOIN concessionaires con ON ac.concessionaire_id = con.id
       WHERE ac.park_id = $1
         AND ac.status = 'activa'
       ORDER BY ac.name
@@ -1081,54 +1081,90 @@ router.get('/:id/documents', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * GET /parks/:id/videos - Obtener videos de un parque
- */
-router.get('/:id/videos', async (req: Request, res: Response) => {
-  try {
-    const parkId = Number(req.params.id);
-
-    const result = await pool.query(`
-      SELECT id, park_id as "parkId", video_url as "videoUrl", 
-             title, description, thumbnail_url as "thumbnailUrl",
-             is_featured as "isFeatured", created_at as "createdAt"
-      FROM park_videos 
-      WHERE park_id = $1 
-      ORDER BY is_featured DESC, created_at DESC
-    `, [parkId]);
-
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Error fetching park videos:', error);
-    res.status(500).json({ message: 'Error fetching videos' });
-  }
-});
-
-/**
- * GET /parks/:id/evaluations - Obtener evaluaciones de un parque
- */
 router.get('/:id/evaluations', async (req: Request, res: Response) => {
   try {
     const parkId = Number(req.params.id);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    if (isNaN(parkId)) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'ID de parque inválido' 
+      });
+    }
+
+    if (page < 1 || limit < 1 || limit > 100) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Parámetros de paginación inválidos' 
+      });
+    }
 
     const result = await pool.query(`
       SELECT 
-        pe.id, pe.park_id as "parkId", pe.user_id as "userId",
-        pe.overall_rating as "overallRating", pe.cleanliness, pe.safety, 
-        pe.amenities as amenities_rating, pe.accessibility, 
-        pe.comment, pe.visit_date as "visitDate", pe.created_at as "createdAt",
-        pe.status, pe.would_recommend as "wouldRecommend",
-        u.full_name as "userName"
+        pe.id,
+        pe.park_id as "parkId",
+        pe.evaluator_name as "evaluator_name",
+        pe.evaluator_email as "evaluator_email",
+        pe.evaluator_phone as "evaluator_phone",
+        pe.evaluator_city as "evaluator_city",
+        pe.evaluator_age as "evaluator_age",
+        pe.is_frequent_visitor as "is_frequent_visitor",
+        pe.overall_rating as "overall_rating",
+        pe.cleanliness,
+        pe.safety,
+        pe.maintenance,
+        pe.accessibility,
+        pe.amenities,
+        pe.activities,
+        pe.staff,
+        pe.natural_beauty,
+        pe.comments,
+        pe.suggestions,
+        pe.would_recommend as "would_recommend",
+        pe.visit_date as "visit_date",
+        pe.visit_purpose as "visit_purpose",
+        pe.visit_duration as "visit_duration",
+        pe.status,
+        pe.created_at as "created_at",
+        pe.updated_at as "updated_at"
       FROM park_evaluations pe
-      LEFT JOIN users u ON pe.user_id = u.id
       WHERE pe.park_id = $1
+        AND pe.status = 'approved'
       ORDER BY pe.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [parkId, limit, offset]);
+
+    const countResult = await pool.query(`
+      SELECT COUNT(*)::int as total
+      FROM park_evaluations
+      WHERE park_id = $1
+        AND status = 'approved'
     `, [parkId]);
 
-    res.json(result.rows);
+    const total = countResult.rows[0]?.total || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      success: true,
+      evaluations: result.rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('Error fetching park evaluations:', error);
-    res.status(500).json({ message: 'Error fetching evaluations' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Error al obtener evaluaciones del parque' 
+    });
   }
 });
 
@@ -1146,16 +1182,16 @@ router.get('/:id/evaluation-stats', async (req: Request, res: Response) => {
     const statsResult = await db.execute(sql`
       SELECT 
         COUNT(*)::int as total_evaluations,
-        AVG(overall_rating)::numeric(3,2) as average_rating,
-        (COUNT(*) FILTER (WHERE would_recommend = true)::numeric / NULLIF(COUNT(*)::numeric, 0) * 100)::numeric(5,2) as recommendation_rate,
-        AVG(cleanliness)::numeric(3,2) as avg_cleanliness,
-        AVG(safety)::numeric(3,2) as avg_safety,
-        AVG(maintenance)::numeric(3,2) as avg_maintenance,
-        AVG(accessibility)::numeric(3,2) as avg_accessibility,
-        AVG(amenities)::numeric(3,2) as avg_amenities,
-        AVG(activities)::numeric(3,2) as avg_activities,
-        AVG(staff)::numeric(3,2) as avg_staff,
-        AVG(natural_beauty)::numeric(3,2) as avg_natural_beauty,
+        AVG(overall_rating)::float as average_rating,
+        (COUNT(*) FILTER (WHERE would_recommend = true)::float / NULLIF(COUNT(*)::float, 0) * 100)::float as recommendation_rate,
+        AVG(cleanliness)::float as avg_cleanliness,
+        AVG(safety)::float as avg_safety,
+        AVG(maintenance)::float as avg_maintenance,
+        AVG(accessibility)::float as avg_accessibility,
+        AVG(amenities)::float as avg_amenities,
+        AVG(activities)::float as avg_activities,
+        AVG(staff)::float as avg_staff,
+        AVG(natural_beauty)::float as avg_natural_beauty,
         COUNT(*) FILTER (WHERE overall_rating = 5)::int as five_star_count,
         COUNT(*) FILTER (WHERE overall_rating = 4)::int as four_star_count,
         COUNT(*) FILTER (WHERE overall_rating = 3)::int as three_star_count,

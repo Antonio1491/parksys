@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, Calendar, MapPin, Users, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import ROUTES from '@/routes';
 
 interface EvaluationStats {
   total_evaluations: number;
@@ -29,7 +30,7 @@ interface EvaluationStats {
 interface Evaluation {
   id: number;
   evaluator_name: string;
-  evaluator_city: string;
+  evaluator_city: string | null;
   overall_rating: number;
   cleanliness: number;
   safety: number;
@@ -39,11 +40,11 @@ interface Evaluation {
   activities: number;
   staff: number;
   natural_beauty: number;
-  comments: string;
-  suggestions: string;
+  comments: string | null;
+  suggestions: string | null;
   would_recommend: boolean;
-  visit_date: string;
-  visit_purpose: string;
+  visit_date: string | null;
+  visit_purpose: string | null;
   created_at: string;
 }
 
@@ -145,12 +146,12 @@ const EvaluationCard = ({ evaluation }: { evaluation: Evaluation }) => {
 };
 
 export default function ParkEvaluations() {
-  const { parkSlug } = useParams<{ parkSlug: string }>();
+  const { id } = useParams<{ id: string }>();
   const [currentPage, setCurrentPage] = useState(1);
   const evaluationsPerPage = 10;
 
   // Extraer el ID del parque del slug
-  const parkId = parkSlug?.split('-').pop();
+  const parkId = parseInt(id);
 
   // Obtener estadísticas de evaluaciones
   const { data: stats } = useQuery<EvaluationStats>({
@@ -216,7 +217,7 @@ export default function ParkEvaluations() {
             </div>
             <Button
               className="bg-green-600 hover:bg-green-700"
-              onClick={() => window.open(`/parque/${parkSlug}/evaluar`, '_blank')}
+              onClick={() => window.open(ROUTES.public.parkEvaluate.build(parkId), '_blank')}
             >
               <Star className="h-4 w-4 mr-2" />
               Evaluar este parque
@@ -337,7 +338,7 @@ export default function ParkEvaluations() {
                   </p>
                   <Button
                     className="bg-green-600 hover:bg-green-700"
-                    onClick={() => window.open(`/parque/${parkSlug}/evaluar`, '_blank')}
+                    onClick={() => window.open(ROUTES.public.parkEvaluate.build(parkId), '_blank')}
                   >
                     <Star className="h-4 w-4 mr-2" />
                     Evaluar parque
