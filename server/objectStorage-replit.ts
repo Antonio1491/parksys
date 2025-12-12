@@ -205,7 +205,7 @@ export class ReplitObjectStorageService {
   /**
    * 📂 LIST: Listar archivos (para debugging)
    */
-  async listFiles(): Promise<string[]> {
+  async listFiles(prefix?: string): Promise<string[]> {
     if (!this.isAvailable) {
       console.warn('⚠️ [REPLIT-STORAGE] Servicio no disponible - no se puede listar archivos');
       return [];
@@ -213,14 +213,21 @@ export class ReplitObjectStorageService {
 
     try {
       const { ok, value, error } = await replitStorageClient.list();
-      
+
       if (!ok) {
         console.error('❌ [REPLIT-STORAGE] Error listando archivos:', error);
         return [];
       }
-      
-      return value.map(file => file.name);
-      
+
+      let files = value.map((file: any) => file.name);
+
+      // Filtrar por prefijo si se especifica
+      if (prefix) {
+        files = files.filter((name: string) => name.startsWith(prefix));
+      }
+
+      return files;
+
     } catch (error) {
       console.error('❌ [REPLIT-STORAGE] Error listando archivos:', error);
       return [];
